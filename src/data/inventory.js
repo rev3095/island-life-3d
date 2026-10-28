@@ -1,4 +1,5 @@
 // 가방 20칸. 칸마다 { id, count } 또는 null. 도구 칸은 { id, count: 1, uses } (남은 사용 횟수).
+// 색·모양 변형이 있는 물건(가구 색, 주민 사진의 주민)은 { id, count, variant } — 같은 변형끼리만 쌓인다.
 // 쌓이는 수는 카테고리마다 다르다 (items.STACK: 물고기·곤충·도구·가구 1, 과일·조개·꽃 10, 재료 30).
 import * as items from './items.js';
 
@@ -31,20 +32,22 @@ export function createInventory(state, { onChange = () => {} } = {}) {
     }
   }
 
-  /** 지금 몇 개까지 더 들어가나 */
-  function canFit(id, n = 1) {
+  const sameVariant = (slot, variant) => (slot.variant ?? null) === (variant ?? null);
+
+  /** 지금 몇 개까지 더 들어가나 (opts.variant: 그 변형으로) */
+  function canFit(id, n = 1, { variant = null } = {}) {
     const item = items.get(id);
     if (!item) return 0;
     let room = 0;
     for (const s of slots()) {
       if (!s) room += item.stack;
-      else if (s.id === id && item.stack > 1) room += Math.max(0, item.stack - s.count);
+      else if (s.id === id && item.stack > 1 && sameVariant(s, variant)) room += Math.max(0, item.stack - s.count);
     }
     return Math.min(whole(n), room);
   }
 
-  /** 넣기 → 실제로 들어간 수. 같은 아이템 칸을 먼저 채우고 빈칸을 쓴다 */
-  function add(id, n = 1) {
+  /** 넣기 → 실제로 들어간 수. 같은 아이템(같은 변형) 칸을 먼저 채우고 빈칸을 쓴다. opts.variant: 변형 이름 */
+  function add(id, n = 1, { variant = null } = {}) {
     const item = items.get(id);
     let left = whole(n);
     if (!item || left === 0) return 0;
@@ -52,7 +55,7 @@ export function createInventory(state, { onChange = () => {} } = {}) {
     if (item.stack > 1) {
       for (const slot of s) {
         if (left === 0) break;
-        if (slot && slot.id === id && slot.count < item.stack) {
+        if (slot && slot.id === id && slot.count < item.stack && sameVariant(slot, variant)) {
           const put = Math.min(left, item.stack - slot.count);
           slot.count += put;
           left -= put;
@@ -62,7 +65,7 @@ export function createInventory(state, { onChange = () => {} } = {}) {
     for (let i = 0; i < s.length && left > 0; i++) {
       if (s[i]) continue;
       const put = Math.min(left, item.stack);
-      s[i] = item.durability ? { id, count: 1, uses: item.durability } : { id, count: put };
+      s[i] = item.durability ? { id, count: 1, uses: item.durability } : { id, count: put, ...(variant != null ? { variant: String(variant) } : {}) };
       left -= item.durability ? 1 : put;
     }
     const added = whole(n) - left;
@@ -112,7 +115,7 @@ export function createInventory(state, { onChange = () => {} } = {}) {
     if (from === to || !s[from] || to < 0 || to >= s.length) return false;
     const a = s[from], b = s[to];
     const stack = items.stackOf(a.id);
-    if (b && b.id === a.id && stack > 1 && !a.uses) {
+    if (b && b.id === a.id && stack > 1 && !a.uses && sameVariant(a, b.variant)) {
       const put = Math.min(a.count, stack - b.count);
       b.count += put;
       a.count -= put;

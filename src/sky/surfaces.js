@@ -26,14 +26,18 @@ void main() {
   vKind = aKind;
   vA = (aKind > 0.5 ? 0.25 + 0.75 * uOn : uOn) * flick;
 }`;
-const HALO_FS = /* glsl */ `
+// 빛무리·빛웅덩이는 미리 곱한 알파(One, OneMinusSrcAlpha) → 색만 바꾼 뒤 알파를 곱한다 (화면 효과 버퍼에 그려도 같은 색)
+const SKY_OUT = /* glsl */ `
+vec4 skyOut( vec3 c, float a ) { return linearToOutputTexel( vec4( sRGBTransferEOTF( vec4( c, 1.0 ) ).rgb, a ) ); }
+`;
+const HALO_FS = /* glsl */ `${SKY_OUT}
 varying float vA, vKind;
 void main() {
   float d = length(gl_PointCoord - 0.5) * 2.0;
   float a = pow(max(1.0 - d, 0.0), 2.2) * vA * 0.55;
   if (a < 0.004) discard;
   vec3 c = vKind > 0.5 ? vec3(1.0, 0.62, 0.28) : vec3(1.0, 0.85, 0.5);
-  gl_FragColor = vec4(c * a, a);
+  gl_FragColor = vec4(skyOut(c, 1.0).rgb * a, a);
 }`;
 
 // 바닥 빛웅덩이 (곡면 월드에 맞춰 휜다)
@@ -47,7 +51,7 @@ void main() {
   float dz = w.z - uCurveOrigin.z; w.y -= dz * dz * uCurve;
   gl_Position = projectionMatrix * viewMatrix * w;
 }`;
-const POOL_FS = /* glsl */ `
+const POOL_FS = /* glsl */ `${SKY_OUT}
 uniform float uOn;
 varying vec2 vUv;
 void main() {
@@ -55,7 +59,7 @@ void main() {
   float a = smoothstep(1.0, 0.0, d);
   a = a * a * uOn * 0.42;
   if (a < 0.004) discard;
-  gl_FragColor = vec4(vec3(1.0, 0.78, 0.45) * a, a);
+  gl_FragColor = vec4(skyOut(vec3(1.0, 0.78, 0.45), 1.0).rgb * a, a);
 }`;
 
 export function createSurfaces(curve) {

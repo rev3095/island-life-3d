@@ -10,7 +10,12 @@ void main() {
   gl_Position = p.xyww;   // 깊이 = 맨 끝
 }`;
 
-const DOME_FS = /* glsl */ `
+// 색은 sRGB(화면 색)로 섞고 skyOut 으로 내보낸다 → 화면에 바로 그려도, 화면 효과 버퍼(선형)에 그려도 같은 색
+const SKY_OUT = /* glsl */ `
+vec4 skyOut( vec3 c, float a ) { return linearToOutputTexel( vec4( sRGBTransferEOTF( vec4( c, 1.0 ) ).rgb, a ) ); }
+`;
+
+const DOME_FS = /* glsl */ `${SKY_OUT}
 uniform vec3 uZenith, uHorizon, uSunDir, uSunColor, uMoonDir;
 uniform float uSunVis, uMoonVis;
 varying vec3 vDir;
@@ -27,7 +32,7 @@ void main() {
   float m = max(dot(d, uMoonDir), 0.0);
   col += vec3(0.45, 0.52, 0.8) * (pow(m, 12.0) * 0.12 + pow(m, 90.0) * 0.3) * uMoonVis;
   col = mix(col, vec3(1.0, 0.97, 0.84), smoothstep(0.99905, 0.99925, m) * uMoonVis);
-  gl_FragColor = vec4(col, 1.0);
+  gl_FragColor = skyOut(col, 1.0);
 }`;
 
 const STAR_VS = /* glsl */ `
@@ -44,13 +49,13 @@ void main() {
   vAlpha = uAlpha * tw * smoothstep(0.0, 0.12, normalize(position).y);
 }`;
 
-const STAR_FS = /* glsl */ `
+const STAR_FS = /* glsl */ `${SKY_OUT}
 varying float vAlpha;
 void main() {
   float d = length(gl_PointCoord - 0.5);
   float a = smoothstep(0.5, 0.05, d) * vAlpha;
   if (a < 0.01) discard;
-  gl_FragColor = vec4(1.0, 0.97, 0.85, min(1.0, a * 1.4));
+  gl_FragColor = skyOut(vec3(1.0, 0.97, 0.85), min(1.0, a * 1.4));
 }`;
 
 export function createDome() {

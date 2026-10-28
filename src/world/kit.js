@@ -1,6 +1,8 @@
 // 배경 모델 → '판'(템플릿) → InstancedMesh 묶음.
 // 한 모델의 여러 재질을 꼭짓점 색으로 합쳐 [툰 · 평면 · 외곽선] 세 덩어리로 만든다 → 종류마다 그리기 호출 2~3번.
 // 계절·색 변형은 꼭짓점 색만 다시 칠한다. 잎·꽃 흔들림(sway)과 흔들기(shake)는 셰이더에서 한다.
+// 합치면 재질 이름이 사라지므로 이름의 스타일 효과(바람·물결·하이라이트)는 꼭짓점 속성 aStyle 로 남긴다 (materials.styleClass).
+// 외곽선 판도 꼭짓점 색을 가져서 은은한 외곽선이 물체 색을 따라간다.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -36,8 +38,9 @@ export function createKit(ctx) {
     const key = `${type}|${sway}|${type === 'outline' ? width : name}`;
     if (matCache.has(key)) return matCache.get(key);
     let m;
-    if (type === 'outline') m = materials.outlineMaterial(width);
-    else { m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name }); m.vertexColors = true; }
+    if (type === 'outline') m = materials.outlineMaterial(width, { styleAttr: true });
+    else m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name, styleAttr: true });
+    m.vertexColors = true;
     if (sway) {
       const base = m.onBeforeCompile;
       const baseKey = m.customProgramCacheKey();
@@ -86,6 +89,7 @@ export function createKit(ctx) {
       if (o.geometry.index) g.setIndex(o.geometry.index.clone());
       g.applyMatrix4(o.matrixWorld);
       const n = g.attributes.position.count;
+      g.setAttribute('aStyle', new THREE.BufferAttribute(new Float32Array(n).fill(materials.styleClass?.(name) ?? 0), 1));
       if (sway) {
         const sw = new Float32Array(n * 2);
         for (let i = 0; i < n; i++) { sw[i * 2] = swayW; sw[i * 2 + 1] = pivot; }
@@ -94,7 +98,7 @@ export function createKit(ctx) {
       const part = { g, name, srcColor: o.material.color.clone() };
       const type = flatSet.has(name) ? 'flat' : 'toon';
       push(`${type}|${NAMED.has(name) ? name : materialName ?? `kit-${type}`}`, part);
-      if (width > 0 && !skipOutline.has(name)) push('outline|', { g: g.clone(), name });
+      if (width > 0 && !skipOutline.has(name)) push('outline|', { g: g.clone(), name, srcColor: part.srcColor });
     });
 
     const parts = [];
@@ -104,7 +108,7 @@ export function createKit(ctx) {
       let start = 0;
       for (const p of list) { ranges.push({ name: p.name, start, count: p.g.attributes.position.count, src: p.srcColor }); start += p.g.attributes.position.count; }
       const geo = list.length === 1 ? list[0].g : mergeGeometries(list.map(p => p.g), false);
-      if (type !== 'outline') geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(start * 3), 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(start * 3), 3));   // 외곽선 판도 (물체 색을 어둡게 쓴다)
       geo.computeBoundingSphere();
       parts.push({
         type, geometry: geo, ranges,

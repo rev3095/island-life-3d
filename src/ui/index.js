@@ -9,6 +9,7 @@ import { createPhone } from './phone.js';
 import { createMap } from './map.js';
 import { createShop } from './shop.js';
 import { createMuseum } from './museum.js';
+import { createCraft } from './craft.js';
 
 let dialog = null, hud = null;
 
@@ -48,11 +49,20 @@ export default {
     const phone = createPhone(ctx, panels, { openBag: o => bag.open(o), openMap: () => map.open(), toast, setSetting });
     const shop = createShop(ctx, panels, { bag, toast });
     const museum = createMuseum(ctx, panels, { bag, toast });
+    const craft = createCraft(ctx, panels, { toast });
+    // 화면 전환 막 (집·건물 드나들 때): HUD 위, 창·알림 아래
+    const fadeEl = h('div', { class: 'pk-fade', 'aria-hidden': 'true' });
+    const fade = (on = true, sec = 0.3, color) => new Promise(res => {
+      if (color) fadeEl.style.background = color;
+      fadeEl.style.transitionDuration = `${Math.max(0, sec)}s`;
+      fadeEl.classList.toggle('is-on', !!on);
+      setTimeout(res, Math.max(0, sec) * 1000 + 30);
+    });
     dialog = createDialog(ctx, panels);
     hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), setHint: v => setSetting('keyHint', v) });
     hud.showHint(state.settings.keyHint !== false);
 
-    root.append(hud.root, stackEl, toasts.root);
+    root.append(hud.root, fadeEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
 
     // 바쁠 때(창·대화) HUD 일부를 접는다
@@ -94,6 +104,8 @@ export default {
       map: { open: () => map.open() },
       shop: { open: opts => shop.open(opts) },
       museum: { open: opts => museum.open(opts) },
+      craft: { open: opts => craft.open(opts) },   // 작업대 창 → Promise<만든 레시피 id 들>
+      fade,                                        // fade(on, 초, 색?) → Promise (화면 전환 막)
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
     };

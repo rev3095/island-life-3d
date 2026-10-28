@@ -7,7 +7,7 @@
   "kind": "bug-case",
   "version": "0.1",
   "place": "floor",
-  "triangles": 3548,
+  "triangles": 3736,
   "parts": 2,
   "materials": [
     "bug",
@@ -46,7 +46,7 @@
     1,
     1
   ],
-  "glbBytes": 71636,
+  "glbBytes": 75116,
   "blender": "5.2.3 LTS",
   "renders": [
     "bug-case_front.png",

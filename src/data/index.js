@@ -51,8 +51,9 @@ export function createDataService(ctx, opts = {}) {
     onReset: () => { giveStarter(); announceAll(); },
   });
 
-  /** 주운 것·잡은 것을 챙기기 → { added, left, acorns }. 도토리 주머니는 바로 지갑으로, 물고기·곤충은 도감에 기록 */
-  function collect(id, n = 1) {
+  /** 주운 것·잡은 것을 챙기기 → { added, left, acorns }. 도토리 주머니는 바로 지갑으로, 물고기·곤충은 도감에 기록.
+   *  opts.variant: 변형 (가구 색, 주민 사진의 주민 slug) */
+  function collect(id, n = 1, opts = {}) {
     const item = items.get(id);
     if (!item || !(n > 0)) return { added: 0, left: n > 0 ? n : 0, acorns: 0 };
     if (item.acorns) {
@@ -60,7 +61,7 @@ export function createDataService(ctx, opts = {}) {
       return { added: n, left: 0, acorns: item.acorns * n };
     }
     if (museum.record(id)) emit('encyclopedia:changed', { id });
-    const added = inventory.add(id, n);
+    const added = inventory.add(id, n, opts);
     return { added, left: n - added, acorns: 0 };
   }
 

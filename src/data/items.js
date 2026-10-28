@@ -193,8 +193,9 @@ export const ITEMS = [
   ...TOOLS.map(([slug, name, icon, use, from, durability, buy], i) => ({
     id: `tool.${slug}`, category: 'tool', code: code('TL', i), name, icon, price: buy / 4, buy, tool: slug, use, from, durability,
   })),
+  // 가구 아이콘 = 가구 모델 썸네일 그림 (assets/furniture, W3). 글자로 써야 하는 곳(대화 선택지 등)은 emoji
   ...FURN.map(([slug, name, size, from, icon, price, buy, source], i) => ({
-    id: `furn.${slug}`, category: 'furn', code: code('FU', i), name, icon, price, ...(buy ? { buy } : {}),
+    id: `furn.${slug}`, category: 'furn', code: code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji: icon, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,
     ...(slug === 'campfire' ? { outdoor: true } : {}), ...(slug === 'radio' ? { plays: 'bgm' } : {}),
     ...(slug === 'fish-tank' ? { holds: 'fish' } : {}), ...(slug === 'bug-case' ? { holds: 'bug' } : {}),

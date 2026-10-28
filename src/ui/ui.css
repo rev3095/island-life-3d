@@ -41,6 +41,14 @@
 .pk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .pk-icon { line-height: 1; }
 img.pk-icon, img.pk-slot-icon { width: 1.2em; height: 1.2em; object-fit: contain; }
+/* 그림 아이콘(가구 썸네일 등)이 이모지 자리에 맞는 크기로 */
+img.pk-toast-icon { width: 26px; height: 26px; object-fit: contain; }
+img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; height: 34px; object-fit: contain; }
+.pk-confirm-icon img { width: 72px; height: 72px; object-fit: contain; }
+
+/* 화면 전환 막 (ui.fade) */
+.pk-fade { position: absolute; inset: 0; z-index: 1; background: #2E2420; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.pk-fade.is-on { opacity: 1; }
 
 /* ---------- HUD ---------- */
 .pk-hud { position: absolute; inset: 0; pointer-events: none; }
@@ -234,6 +242,28 @@ img.pk-icon, img.pk-slot-icon { width: 1.2em; height: 1.2em; object-fit: contain
 .pk-sell { display: grid; justify-items: center; gap: 14px; padding: 22px 0; text-align: center; }
 .pk-shop .pk-card-foot, .pk-museum .pk-card-foot { justify-content: flex-end; }
 .pk-museum { width: min(500px, 100%); }
+
+/* ---------- 작업대 ---------- */
+.pk-craft { width: min(640px, 100%); }
+.pk-craft .pk-card-body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 12px; padding-top: 14px; }
+.pk-craft-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; align-content: start; }
+.pk-craft-item { width: 100%; min-height: 48px; display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border: 0; border-radius: 14px; background: var(--pk-cream); box-shadow: 0 2px 0 var(--pk-edge); font: 16px var(--pk-display); text-align: left; cursor: pointer; transition: transform .1s; }
+.pk-craft-item:hover { transform: translateX(2px); }
+.pk-craft-item:not(.is-can) { opacity: .7; }
+.pk-craft-item.is-selected { background: #FBEBCB; opacity: 1; }
+.pk-craft-icon { font-size: 24px; text-align: center; }
+img.pk-craft-icon { width: 34px; height: 34px; object-fit: contain; }
+.pk-craft-short { font: 13px var(--pk-body); color: #B5523B; white-space: nowrap; }
+.pk-craft-detail { position: sticky; top: 0; align-self: start; display: grid; justify-items: center; gap: 10px; padding: 14px 12px; background: var(--pk-cream); border-radius: 18px; text-align: center; }
+.pk-craft-head { display: grid; justify-items: center; gap: 4px; font: 20px var(--pk-display); }
+.pk-craft-big { font-size: 48px; line-height: 1.1; }
+img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
+.pk-craft-mats { justify-content: center; font-size: 15px; }
+.pk-craft-mats .is-short { color: #B5523B; }
+@media (max-width: 560px) {
+  .pk-craft .pk-card-body { grid-template-columns: 1fr; }
+  .pk-craft-detail { position: static; order: -1; }
+}
 .pk-museum-sec { margin-bottom: 8px; padding: 8px 12px; background: var(--pk-cream); border-radius: 16px; }
 .pk-museum-row { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; font-size: 22px; }
 
@@ -241,7 +271,7 @@ img.pk-icon, img.pk-slot-icon { width: 1.2em; height: 1.2em; object-fit: contain
 .pk-confirm { width: min(380px, 100%); }
 .pk-confirm .pk-card-body { padding-top: 12px; text-align: center; }
 .pk-confirm-icon { font-size: 42px; line-height: 1.2; }
-.pk-confirm-text { margin-top: 6px; font-size: 17px; line-height: 1.55; word-break: keep-all; }
+.pk-confirm-text { margin-top: 6px; font-size: 17px; line-height: 1.55; word-break: keep-all; white-space: pre-line; }
 .pk-confirm .pk-btn-row { flex-direction: column; align-items: stretch; }
 
 /* ---------- 대화창 ---------- */

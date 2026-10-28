@@ -14,6 +14,7 @@ export function createCameraRig(ctx) {
   const ahead = new THREE.Vector3();
   const tmp = new THREE.Vector3();
   let zoom = 0.15, zoomTarget = 0.15;          // 0 = 가까이, 1 = 멀리
+  let bounds = null, curveScale = 1;           // 집 안처럼 좁은 곳: 카메라 중심을 네모 안으로, 곡면 월드 세기 배율
   const lerp = THREE.MathUtils.lerp;
 
   const el = renderer.domElement;
@@ -44,16 +45,23 @@ export function createCameraRig(ctx) {
   function place() {
     const pitch = THREE.MathUtils.degToRad(lerp(PRESETS.near.pitch, PRESETS.far.pitch, zoom));
     const dist = lerp(PRESETS.near.dist, PRESETS.far.dist, zoom);
-    tmp.set(focus.x, focus.y + 0.55, focus.z);
+    const fx = bounds ? THREE.MathUtils.clamp(focus.x, bounds.x0, bounds.x1) : focus.x;
+    const fz = bounds ? THREE.MathUtils.clamp(focus.z, bounds.z0, bounds.z1) : focus.z;
+    tmp.set(fx, focus.y + 0.55, fz);
     camera.position.set(tmp.x, tmp.y + Math.sin(pitch) * dist, tmp.z + Math.cos(pitch) * dist);
     camera.lookAt(tmp);
-    materials.curve.uCurve.value = lerp(PRESETS.near.curve, PRESETS.far.curve, zoom);
-    ctx.focus.copy(focus);
+    materials.curve.uCurve.value = lerp(PRESETS.near.curve, PRESETS.far.curve, zoom) * curveScale;
+    ctx.focus.set(fx, focus.y, fz);
   }
 
   return {
     get zoom() { return zoomTarget; },
     setZoom(v) { zoomTarget = THREE.MathUtils.clamp(v, 0, 1); },
+    /** 카메라 중심(focus)이 머무는 네모 { x0, x1, z0, z1 } (월드 좌표). null 이면 풀린다. 집 안처럼 좁은 곳에서 벽 너머가 덜 보이게 */
+    setBounds(b) { bounds = b ? { x0: b.x0, x1: b.x1, z0: b.z0, z1: b.z1 } : null; },
+    /** 곡면 월드 세기 배율 (1 = 보통, 집 안은 낮게) */
+    setCurveScale(k = 1) { curveScale = Number.isFinite(k) ? Math.max(0, k) : 1; },
+    get bounds() { return bounds; },
     /** 순간이동할 때 (처음 섰을 때·집에서 나올 때) */
     snap(target) { focus.copy(target); ahead.set(0, 0, 0); zoom = zoomTarget; place(); },
     update(dt, target, vx, vz) {
