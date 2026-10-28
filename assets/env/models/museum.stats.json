@@ -1,0 +1,37 @@
+{
+  "id": "BD-04",
+  "slug": "museum",
+  "name": "박물관",
+  "category": "building",
+  "kind": "museum",
+  "version": "0.1",
+  "triangles": 2860,
+  "parts": 1,
+  "materials": [
+    "column",
+    "door",
+    "roof",
+    "stone",
+    "trim",
+    "wall"
+  ],
+  "animations": {},
+  "size": [
+    5.9,
+    5.1,
+    3.64
+  ],
+  "footprint": [
+    6,
+    6
+  ],
+  "glbBytes": 57472,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "museum_front.png",
+    "museum_hero.jpg",
+    "museum_main.png",
+    "museum_thumb.png",
+    "museum_top.png"
+  ]
+}

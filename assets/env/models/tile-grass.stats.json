@@ -1,0 +1,35 @@
+{
+  "id": "TI-01",
+  "slug": "tile-grass",
+  "name": "풀밭",
+  "category": "tile",
+  "kind": "tile-grass",
+  "version": "0.1",
+  "triangles": 228,
+  "parts": 1,
+  "materials": [
+    "dirt",
+    "grass",
+    "grassDark"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.09
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 7280,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-grass_front.png",
+    "tile-grass_hero.jpg",
+    "tile-grass_main.png",
+    "tile-grass_thumb.png",
+    "tile-grass_top.png",
+    "tile-grass_variants.png"
+  ]
+}

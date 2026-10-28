@@ -1,0 +1,52 @@
+{
+  "id": "TI-07",
+  "slug": "tile-plaza",
+  "name": "광장 바닥",
+  "category": "tile",
+  "kind": "tile-plaza",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "광장에 깔린 돌바닥. 한 칸에 네모 돌 네 장.",
+    "keywords": [
+      "네모 포석 4장",
+      "줄눈"
+    ],
+    "references": [
+      "유럽 광장 포석"
+    ],
+    "avoid": [
+      "번쩍이는 대리석"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "grout": "#CFC6B4",
+    "dirt": "#9A7650",
+    "stone": "#E2DACB",
+    "stoneLight": "#EFE9DD"
+  },
+  "paletteLabels": {
+    "grout": "줄눈",
+    "dirt": "옆면",
+    "stone": "돌",
+    "stoneLight": "밝은 돌"
+  },
+  "heroGround": "none",
+  "animations": []
+}

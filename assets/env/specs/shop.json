@@ -1,0 +1,85 @@
+{
+  "id": "BD-03",
+  "slug": "shop",
+  "name": "도토리상점",
+  "category": "building",
+  "kind": "shop",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤톨이 운영하는 상점. 초록·흰 줄무늬 차양과 지붕 위 커다란 도토리 간판이 눈에 띈다.",
+    "keywords": [
+      "줄무늬 차양",
+      "큰 진열창",
+      "도토리 간판"
+    ],
+    "references": [
+      "동네 잡화점"
+    ],
+    "avoid": [
+      "대형 마트 느낌"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.022
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "가로",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "depth": {
+      "label": "깊이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "wallHeight": {
+      "label": "벽 높이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "foundation": "#B8B2A6",
+    "wall": "#F3E7D3",
+    "roof": "#7F5636",
+    "awningA": "#5E8C61",
+    "awningB": "#F7F1E4",
+    "door": "#9A6B45",
+    "trim": "#6A4A33",
+    "window": "#CDEBF5",
+    "acorn": "#A8642E",
+    "acornCap": "#7F5636"
+  },
+  "paletteLabels": {
+    "foundation": "기초",
+    "wall": "벽",
+    "roof": "지붕",
+    "awningA": "차양 색 1",
+    "awningB": "차양 색 2",
+    "door": "문",
+    "trim": "창틀",
+    "window": "유리",
+    "acorn": "도토리",
+    "acornCap": "도토리 모자"
+  },
+  "animations": []
+}

@@ -1,0 +1,33 @@
+{
+  "id": "PR-02",
+  "slug": "bench",
+  "name": "벤치",
+  "category": "prop",
+  "kind": "bench",
+  "version": "0.1",
+  "triangles": 1188,
+  "parts": 1,
+  "materials": [
+    "metal",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    1.4,
+    0.53,
+    0.84
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 23800,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bench_front.png",
+    "bench_hero.jpg",
+    "bench_main.png",
+    "bench_thumb.png",
+    "bench_top.png"
+  ]
+}

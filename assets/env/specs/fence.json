@@ -1,0 +1,72 @@
+{
+  "id": "PR-06",
+  "slug": "fence",
+  "name": "울타리",
+  "category": "prop",
+  "kind": "fence",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "한 칸짜리 나무 울타리. 이어 붙여서 마당을 꾸민다.",
+    "keywords": [
+      "기둥 둘",
+      "가로대 둘",
+      "뾰족 기둥 머리"
+    ],
+    "references": [
+      "목장 울타리"
+    ],
+    "avoid": [
+      "철망"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodLight": "#D6B07E"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "woodLight": "가로대"
+  },
+  "variants": {
+    "wood": {
+      "label": "나무 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "wood": "#F3EFE6",
+        "woodLight": "#FFFFFF"
+      }
+    },
+    "dark": {
+      "label": "진한 나무",
+      "palette": {
+        "wood": "#7F5636",
+        "woodLight": "#9A6B45"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

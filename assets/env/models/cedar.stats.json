@@ -1,0 +1,43 @@
+{
+  "id": "EN-04",
+  "slug": "cedar",
+  "name": "삼나무",
+  "category": "nature",
+  "kind": "cedar",
+  "version": "0.1",
+  "triangles": 356,
+  "parts": 2,
+  "materials": [
+    "leaf",
+    "trunk"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "shake": {
+      "frames": 18,
+      "seconds": 0.75
+    }
+  },
+  "size": [
+    1.5,
+    1.5,
+    2.38
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 10688,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cedar_front.png",
+    "cedar_hero.jpg",
+    "cedar_main.png",
+    "cedar_thumb.png",
+    "cedar_top.png",
+    "cedar_variants.png"
+  ]
+}

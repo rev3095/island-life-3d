@@ -1,0 +1,33 @@
+{
+  "id": "PR-01",
+  "slug": "lamp",
+  "name": "가로등",
+  "category": "prop",
+  "kind": "lamp",
+  "version": "0.1",
+  "triangles": 864,
+  "parts": 1,
+  "materials": [
+    "glow",
+    "metal"
+  ],
+  "animations": {},
+  "size": [
+    0.48,
+    0.48,
+    1.99
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 18280,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lamp_front.png",
+    "lamp_hero.jpg",
+    "lamp_main.png",
+    "lamp_thumb.png",
+    "lamp_top.png"
+  ]
+}

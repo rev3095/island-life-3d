@@ -1,0 +1,94 @@
+{
+  "models": [
+    {
+      "id": "CH-01",
+      "slug": "player",
+      "name": "플레이어",
+      "species": "human",
+      "role": "주인공",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-02",
+      "slug": "coco",
+      "name": "코코",
+      "species": "cat",
+      "role": "주민 · 고양이",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-03",
+      "slug": "bori",
+      "name": "보리",
+      "species": "dog",
+      "role": "주민 · 강아지",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-04",
+      "slug": "mochi",
+      "name": "모찌",
+      "species": "rabbit",
+      "role": "주민 · 토끼",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-05",
+      "slug": "dubu",
+      "name": "두부",
+      "species": "bear",
+      "role": "주민 · 곰",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-06",
+      "slug": "pong",
+      "name": "퐁",
+      "species": "duck",
+      "role": "주민 · 오리",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-07",
+      "slug": "chorong",
+      "name": "초롱",
+      "species": "frog",
+      "role": "주민 · 개구리",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-08",
+      "slug": "bamtol",
+      "name": "밤톨",
+      "species": "squirrel",
+      "role": "도토리상점 주인 · 다람쥐",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-09",
+      "slug": "neuru",
+      "name": "느루",
+      "species": "tortoise",
+      "role": "박물관장 · 거북",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    }
+  ]
+}

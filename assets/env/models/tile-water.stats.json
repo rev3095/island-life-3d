@@ -1,0 +1,35 @@
+{
+  "id": "TI-04",
+  "slug": "tile-water",
+  "name": "물",
+  "category": "tile",
+  "kind": "tile-water",
+  "version": "0.1",
+  "triangles": 324,
+  "parts": 1,
+  "materials": [
+    "water",
+    "waterDeep",
+    "waterLight"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    -0.14
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 8904,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-water_front.png",
+    "tile-water_hero.jpg",
+    "tile-water_main.png",
+    "tile-water_thumb.png",
+    "tile-water_top.png",
+    "tile-water_variants.png"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "EN-09",
+  "slug": "weed",
+  "name": "잡초",
+  "category": "nature",
+  "kind": "weed",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "매일 아침 섬 여기저기에 돋아나는 잡초. 뽑으면 만들기 재료가 된다.",
+    "keywords": [
+      "가는 잎 7가닥",
+      "바깥으로 휘어짐"
+    ],
+    "references": [
+      "보도블록 틈의 풀"
+    ],
+    "avoid": [
+      "꽃처럼 보이는 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "weed": "#6E9E3E"
+  },
+  "paletteLabels": {
+    "weed": "풀"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway"
+  ]
+}

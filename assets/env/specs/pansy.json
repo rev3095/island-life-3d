@@ -1,0 +1,85 @@
+{
+  "id": "EN-08",
+  "slug": "pansy",
+  "name": "팬지",
+  "category": "nature",
+  "kind": "flower-pansy",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "낮게 깔리는 팬지. 둥근 꽃잎 다섯 장 가운데에 진한 무늬가 있다.",
+    "keywords": [
+      "낮은 잎 무더기",
+      "둥근 꽃잎 5장",
+      "가운데 진한 무늬"
+    ],
+    "references": [
+      "화분 속 팬지"
+    ],
+    "avoid": [
+      "사람 얼굴처럼 보이는 무늬"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "petal": "#9C7BD6",
+    "petalDark": "#5B3F94",
+    "center": "#F6C84C"
+  },
+  "paletteLabels": {
+    "stem": "잎",
+    "petal": "꽃잎",
+    "petalDark": "가운데 무늬",
+    "center": "꽃술"
+  },
+  "variants": {
+    "purple": {
+      "label": "보라 (기본)",
+      "palette": {}
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "petal": "#F6D35C",
+        "petalDark": "#B5852A"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "petal": "#7FA8E6",
+        "petalDark": "#3F5FA8"
+      }
+    },
+    "orange": {
+      "label": "주황",
+      "palette": {
+        "petal": "#F2A65A",
+        "petalDark": "#B4532A"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway"
+  ]
+}

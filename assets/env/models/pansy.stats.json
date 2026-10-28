@@ -1,0 +1,41 @@
+{
+  "id": "EN-08",
+  "slug": "pansy",
+  "name": "팬지",
+  "category": "nature",
+  "kind": "flower-pansy",
+  "version": "0.1",
+  "triangles": 1640,
+  "parts": 1,
+  "materials": [
+    "center",
+    "petal",
+    "petalDark",
+    "stem"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    0.27,
+    0.24,
+    0.19
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 34972,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "pansy_front.png",
+    "pansy_hero.jpg",
+    "pansy_main.png",
+    "pansy_thumb.png",
+    "pansy_top.png",
+    "pansy_variants.png"
+  ]
+}

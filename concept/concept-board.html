@@ -1,0 +1,615 @@
+<title>포근섬 이야기 컨셉 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 섬 안내 책자처럼 — 결정 사항을 맨 위에, 그 아래 카테고리별 리소스 시트가 ID 순서로 이어진다 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 일러스트 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2A3832; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2A3832; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(34px, 6vw, 56px); color: var(--leaf); }
+h2 { font-size: 28px; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 68ch; font-size: 16px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; }
+.sec-head p { max-width: 70ch; }
+
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.grid.small { grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 6px; }
+.stage svg { width: 100%; height: auto; max-width: 220px; display: block; }
+.card .name { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+.quote { font-size: 13.5px; border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); }
+.sw { display: flex; gap: 4px; }
+.sw i { width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(0,0,0,.15); display: block; }
+
+/* 결정 사항 */
+.decisions { display: grid; gap: 10px; }
+.dec { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
+  display: grid; grid-template-columns: 64px 1fr; gap: 6px 14px; }
+.dec .id { padding-top: 3px; }
+.dec .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt { font-size: 13.5px; padding: 3px 10px; border-radius: 8px; border: 1px solid var(--line); }
+.opt.rec { border-color: var(--leaf); color: var(--leaf); font-weight: 700; }
+.opt.rec::before { content: "추천 · "; font-weight: 400; }
+@media (max-width: 520px) { .dec { grid-template-columns: 1fr; } }
+
+/* 표 */
+.tbl { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 400; color: var(--muted); font-size: 12.5px; letter-spacing: .03em; position: sticky; top: 0; background: var(--panel); }
+tr:last-child td { border-bottom: none; }
+td.num { text-align: right; }
+td .id { font-size: 11.5px; }
+.rare { color: var(--acorn); }
+
+/* 팔레트 */
+.palette { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.pal { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); }
+.pal .band { height: 70px; }
+.pal .cap { padding: 8px 12px; font-size: 13px; display: grid; gap: 2px; }
+
+/* 지도 */
+.map-wrap { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 820px) { .map-wrap { grid-template-columns: 1fr; } }
+.map-wrap svg { width: 100%; height: auto; border-radius: 14px; display: block; }
+.legend { display: grid; gap: 6px; font-size: 14px; }
+.legend div { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; }
+.legend b { font-family: var(--mono); font-size: 12px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--acorn); color: var(--panel); font-weight: 500; }
+
+/* UI 목업: 게임 화면 안 색은 제안하는 UI 색 그대로 */
+.mock { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; overflow: hidden;
+  background: linear-gradient(#9AD8F2 0%, #CDEFFB 38%, #8FCB6E 38.2%, #7DBE5E 100%); font-family: var(--display); }
+.mock .clock { position: absolute; left: 3%; top: 5%; background: #FFF8E6; color: #5A4632; border-radius: 16px; padding: 6px 14px; line-height: 1.15; box-shadow: 0 3px 0 #E2D2AE; }
+.mock .clock b { font-size: clamp(16px, 3vw, 28px); font-weight: 400; display: block; }
+.mock .clock span { font-size: clamp(10px, 1.5vw, 14px); }
+.mock .money { position: absolute; right: 3%; top: 5%; background: #FFF8E6; color: #5A4632; border-radius: 999px; padding: 4px 14px; font-size: clamp(12px, 2vw, 18px); box-shadow: 0 3px 0 #E2D2AE; }
+.mock .talk { position: absolute; left: 12%; right: 12%; bottom: 6%; background: #FFFBEF; color: #4E3D2C; border-radius: 26px; padding: 4% 5% 3%; font-family: var(--body); font-size: clamp(11px, 1.8vw, 17px); box-shadow: 0 4px 0 #E6D7B6; }
+.mock .talk .tag { position: absolute; top: -14px; left: 7%; background: #F2B36B; color: #fff; font-family: var(--display); padding: 2px 14px; border-radius: 999px; font-size: clamp(11px, 1.7vw, 16px); transform: rotate(-3deg); }
+.mock .talk .next { position: absolute; right: 5%; bottom: 10%; color: #F2B36B; }
+.mock .tool { position: absolute; right: 3%; bottom: 36%; width: 11%; aspect-ratio: 1; border-radius: 50%; background: #FFF8E6; display: grid; place-items: center; font-size: clamp(16px, 3vw, 30px); box-shadow: 0 3px 0 #E2D2AE; }
+.mock .chars { position: absolute; left: 30%; bottom: 30%; width: 40%; display: flex; justify-content: center; gap: 4%; }
+.mock .chars svg { width: 30%; height: auto; }
+.ui-row { display: grid; gap: 14px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 820px) { .ui-row { grid-template-columns: 1fr; } }
+.phone { background: #F7EFDC; border-radius: 28px; padding: 18px 16px; max-width: 260px; width: 100%; justify-self: center; box-shadow: 0 0 0 6px #E4D5B5; color: #5A4632; }
+.phone .ph-title { font-family: var(--display); text-align: center; font-size: 18px; margin-bottom: 10px; }
+.phone .apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.phone .app { display: grid; justify-items: center; gap: 2px; font-size: 12px; }
+.phone .app i { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-style: normal; font-size: 24px; }
+.inv { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #F7EFDC; padding: 12px; border-radius: 18px; max-width: 360px; }
+.inv span { aspect-ratio: 1; background: #FFF9EC; border-radius: 50%; display: grid; place-items: center; font-size: 20px; position: relative; }
+.inv span small { position: absolute; right: 0; bottom: -2px; font-size: 10px; color: #5A4632; background: #F2D9A6; border-radius: 6px; padding: 0 4px; font-family: var(--mono); }
+
+.compare { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.compare .stage svg { max-width: 320px; }
+ul.tight { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 14px; }
+.feedback { background: var(--panel); border: 2px dashed var(--acorn); border-radius: 14px; padding: 16px 18px; display: grid; gap: 6px; }
+.feedback code { font-family: var(--mono); font-size: 13px; background: var(--chip); padding: 1px 6px; border-radius: 6px; }
+:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="status">
+      <span class="pill wait">검수 대기</span>
+      <span class="pill">컨셉 v0.1 · 2026-10-28</span>
+      <span class="pill">모델링 전 단계</span>
+    </div>
+    <h1>포근섬 이야기</h1>
+    <p class="lede">웹 브라우저에서 바로 하는 3D 섬 생활 게임의 리소스 계획과 컨셉 시안입니다. 모든 리소스에 ID를 붙였어요. 바꾸고 싶은 항목은 ID와 함께 알려주시면 반영한 뒤 모델링을 시작합니다.</p>
+    <p class="small muted">제작 방식: 3D 모델·지형·아이콘·음악·효과음을 모두 코드로 만들어서, 외부 파일 없이 웹페이지 하나로 실행되게 합니다. 오리지널 캐릭터와 이름만 사용해요.</p>
+  </header>
+
+  <nav class="toc" aria-label="섹션">
+    <a href="#decide">결정 사항</a><a href="#style">아트 방향</a><a href="#chars">캐릭터</a><a href="#map">섬 지도</a>
+    <a href="#palette">계절·시간</a><a href="#props">소품·건물</a><a href="#collect">수집물</a><a href="#items">가구·도구</a>
+    <a href="#ui">UI</a><a href="#sound">사운드</a><a href="#summary">총괄·일정</a>
+  </nav>
+
+  <!-- 결정 사항 -->
+  <section id="decide">
+    <div class="sec-head">
+      <h2>먼저 정해주세요</h2>
+      <p class="muted">아래 7가지는 모델링 전에 확정해야 나중에 다시 만들 일이 없어요. 추천안대로 괜찮으면 "추천안으로"라고만 답해주셔도 됩니다.</p>
+    </div>
+    <div class="decisions" id="decisions"></div>
+  </section>
+
+  <!-- 아트 방향 -->
+  <section id="style">
+    <div class="sec-head">
+      <span class="id">ART</span>
+      <h2>아트 방향</h2>
+      <p class="muted">둥근 실루엣, 머리가 큰 2.5등신, 채도를 살짝 낮춘 파스텔 색, 따뜻한 햇빛. 화면 멀리 있는 땅이 둥글게 휘어 내려가는 "통나무 굴리기" 시점으로 아늑한 느낌을 냅니다.</p>
+    </div>
+    <div class="compare">
+      <div class="card">
+        <div class="name"><span class="id">ART-A</span><h3>A. 플랫 로우폴리</h3></div>
+        <div class="stage" id="styleA"></div>
+        <ul class="tight"><li>각진 면이 그대로 보이는 깔끔한 느낌</li><li>가장 가볍고 제작이 빠름</li><li>캐릭터가 다소 딱딱해 보일 수 있음</li></ul>
+      </div>
+      <div class="card">
+        <div class="name"><span class="id">ART-B</span><h3>B. 소프트 툰 + 외곽선</h3></div>
+        <div class="stage" id="styleB"></div>
+        <ul class="tight"><li>부드러운 2~3단 명암 + 갈색 외곽선</li><li>동글동글한 섬 생활 분위기에 잘 맞음</li><li>외곽선 처리로 성능 비용이 조금 늘어남</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 캐릭터 -->
+  <section id="chars">
+    <div class="sec-head">
+      <span class="id">CH</span>
+      <h2>캐릭터 9종</h2>
+      <p class="muted">플레이어 1, 주민 6, 가게·박물관 NPC 2. 모두 구·캡슐·원기둥 같은 기본 도형을 조합해서 만듭니다. 캐릭터당 약 600~900 삼각형, 걷기·달리기·대화·감정표현 3종 애니메이션.</p>
+    </div>
+    <div class="grid" id="charGrid"></div>
+  </section>
+
+  <!-- 지도 -->
+  <section id="map">
+    <div class="sec-head">
+      <span class="id">MAP</span>
+      <h2>섬 지도 시안</h2>
+      <p class="muted">64 × 56 타일. 걸어서 한 바퀴 약 3분. 북쪽은 한 단 높은 언덕(경사로 3곳), 언덕 폭포에서 시작한 강이 남동쪽 바다로 흘러가요.</p>
+    </div>
+    <div class="map-wrap">
+      <div id="mapSvg"></div>
+      <div class="legend" id="mapLegend"></div>
+    </div>
+  </section>
+
+  <!-- 팔레트 -->
+  <section id="palette">
+    <div class="sec-head">
+      <span class="id">PAL</span>
+      <h2>계절과 시간</h2>
+      <p class="muted">실제 날짜를 따라 계절이 바뀝니다. 오늘(10월 28일)은 가을이에요. 하늘과 조명은 시간대에 따라 부드럽게 넘어가고, 밤에는 집 창문과 가로등이 켜집니다.</p>
+    </div>
+    <h3>계절별 땅·나뭇잎</h3>
+    <div class="palette" id="seasonPal"></div>
+    <h3>시간대별 하늘</h3>
+    <div class="palette" id="skyPal"></div>
+    <h3>날씨</h3>
+    <div class="grid small" id="weather"></div>
+  </section>
+
+  <!-- 소품 -->
+  <section id="props">
+    <div class="sec-head">
+      <span class="id">PR · BD</span>
+      <h2>자연 소품과 건물</h2>
+      <p class="muted">같은 모양을 여러 번 쓰는 나무·꽃·돌은 인스턴싱으로 한 번에 그려서 가볍게 만듭니다.</p>
+    </div>
+    <h3>자연·소품</h3>
+    <div class="grid small" id="propGrid"></div>
+    <h3>건물</h3>
+    <div class="grid" id="bldGrid"></div>
+  </section>
+
+  <!-- 수집물 -->
+  <section id="collect">
+    <div class="sec-head">
+      <span class="id">FI · BU · FO</span>
+      <h2>수집물: 물고기 20 · 곤충 20 · 화석 8</h2>
+      <p class="muted">가격 단위는 도토리. 물고기는 물속 그림자 크기(1 아주 작음 ~ 6 대형)로 정체를 짐작합니다. <span class="rare">갈색 이름</span>은 희귀종.</p>
+    </div>
+    <h3>물고기</h3>
+    <div class="tbl"><table id="fishT"></table></div>
+    <h3>곤충</h3>
+    <div class="tbl"><table id="bugT"></table></div>
+    <h3>화석 · 과일 · 재료</h3>
+    <div class="grid wide">
+      <div class="tbl"><table id="fossilT"></table></div>
+      <div class="tbl"><table id="matT"></table></div>
+    </div>
+  </section>
+
+  <!-- 가구·도구 -->
+  <section id="items">
+    <div class="sec-head">
+      <span class="id">TL · FU</span>
+      <h2>도구 5종 · 가구 20종</h2>
+      <p class="muted">도구는 처음에 낚싯대와 잠자리채를 받고, 나머지는 상점에서 사거나 작업대에서 만듭니다. 가구는 집 안 8×8 칸에 자유롭게 놓고 돌릴 수 있어요.</p>
+    </div>
+    <div class="tbl"><table id="toolT"></table></div>
+    <div class="tbl"><table id="furnT"></table></div>
+  </section>
+
+  <!-- UI -->
+  <section id="ui">
+    <div class="sec-head">
+      <span class="id">UI</span>
+      <h2>UI 시안</h2>
+      <p class="muted">크림색 말풍선, 둥근 글꼴, 손으로 만든 듯한 살짝 기울어진 이름표. 주민 대사는 한 글자씩 나오며 종족마다 다른 높이의 "웅얼웅얼" 목소리가 붙습니다.</p>
+    </div>
+    <div class="ui-row">
+      <div class="card">
+        <div class="name"><span class="id">UI-01</span><h3>게임 화면 HUD + 대화창</h3></div>
+        <div class="mock" role="img" aria-label="게임 화면 목업">
+          <div class="clock"><b>오전 10:24</b><span>10월 28일 (수)</span></div>
+          <div class="money">🌰 12,340</div>
+          <div class="chars" id="mockChars"></div>
+          <div class="tool">🎣</div>
+          <div class="talk"><span class="tag">코코</span>오늘 바람 진짜 시원하다냥~ 강가에서 큰 그림자 봤어? 나 아까 엄청 큰 걸 놓쳤다냥!<span class="next">▼</span></div>
+        </div>
+        <p class="small muted">왼쪽 위 시계·날짜, 오른쪽 위 도토리, 오른쪽 아래 지금 든 도구. 휴대폰에서는 왼쪽 아래에 이동 조이스틱, 오른쪽 아래에 행동·줍기 버튼이 추가됩니다.</p>
+      </div>
+      <div class="card">
+        <div class="name"><span class="id">UI-02</span><h3>섬폰 메뉴</h3></div>
+        <div class="phone">
+          <div class="ph-title">섬폰</div>
+          <div class="apps">
+            <div class="app"><i style="background:#9ED3A8">📖</i>도감</div>
+            <div class="app"><i style="background:#9CCBE8">🗺️</i>지도</div>
+            <div class="app"><i style="background:#F3C77E">🔨</i>레시피</div>
+            <div class="app"><i style="background:#F2A99B">🎒</i>가방</div>
+            <div class="app"><i style="background:#C8B6E2">📷</i>사진</div>
+            <div class="app"><i style="background:#D8D0BE">⚙️</i>설정</div>
+          </div>
+        </div>
+        <div class="name"><span class="id">UI-03</span><h3>가방 (20칸)</h3></div>
+        <div class="inv">
+          <span>🐟</span><span>🦋</span><span>🍑<small>3</small></span><span>🪵<small>12</small></span><span>🪨<small>5</small></span>
+          <span>🐚</span><span>🌷</span><span>🦴</span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="small muted">목업의 아이콘은 자리표시용 이모지입니다. 최종 아이콘 방식은 결정 사항 D2를 따릅니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 사운드 -->
+  <section id="sound">
+    <div class="sec-head">
+      <span class="id">BGM · SFX · VO</span>
+      <h2>사운드</h2>
+      <p class="muted">전부 브라우저 안에서 실시간 합성합니다. 실로폰·마림바·부드러운 패드 음색, 5음계 위주로 아늑하게.</p>
+    </div>
+    <div class="grid wide">
+      <div class="tbl"><table id="bgmT"></table></div>
+      <div class="tbl"><table id="sfxT"></table></div>
+    </div>
+  </section>
+
+  <!-- 총괄 -->
+  <section id="summary">
+    <div class="sec-head">
+      <span class="id">SUM</span>
+      <h2>리소스 총괄과 제작 순서</h2>
+      <p class="muted">검수 확정 후 M1부터 순서대로 만들고, 각 단계가 끝날 때마다 실행 가능한 버전을 보여드립니다.</p>
+    </div>
+    <div class="tbl"><table id="sumT"></table></div>
+    <div class="tbl"><table id="msT"></table></div>
+    <div class="feedback">
+      <h3>피드백 주는 방법</h3>
+      <p>채팅으로 ID와 함께 적어주세요. 예시:</p>
+      <p><code>D1 B로</code> <code>CH-02 고양이 말고 여우로, 옷은 노란색</code> <code>MAP 강을 두 갈래로</code> <code>FI 상어 빼기</code></p>
+      <p class="small muted">수정 사항을 반영한 v0.2 보드를 다시 보여드리고, 확정되면 모델링을 시작합니다.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const O = '#4a3b32';
+const ST = `stroke="${O}" stroke-width="3" stroke-linejoin="round"`;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- 결정 사항 ---------- */
+const DECISIONS = [
+  ['D1', '그래픽 스타일', ['A. 플랫 로우폴리', '*B. 소프트 툰 + 외곽선'], '아래 아트 방향의 두 시안을 비교해 주세요.'],
+  ['D2', '아이템 아이콘', ['이모지 사용 (빠름, 기기마다 모양이 다름)', '*직접 그린 아이콘 약 90개 (통일감)'], '도감·가방·상점에 쓰이는 아이콘입니다.'],
+  ['D3', '게임 시간', ['*실제 시계 기준 + 설정에서 빠른 시간 켜기', '항상 빠른 시간 (1분 = 1시간)'], '실제 시계면 밤에 접속하면 밤 섬이 나와요.'],
+  ['D4', '주민 구성', ['*고양이·강아지·토끼·곰·오리·개구리 6명', '다른 종족·인원으로 변경'], '이름·성격·옷 색까지 바꿀 수 있어요.'],
+  ['D5', '플레이어 꾸미기', ['*머리색·옷색만 (v1)', '+ 헤어스타일·얼굴·옷 종류'], '범위가 넓어지면 모델 수가 크게 늘어납니다.'],
+  ['D6', '섬 크기', ['작게 48×40', '*보통 64×56', '크게 80×72'], '크면 탐험할 곳은 많지만 휴대폰에서 느려질 수 있어요.'],
+  ['D7', '게임 이름·화폐', ['*포근섬 이야기 · 도토리', '다른 이름 제안'], ''],
+];
+$('decisions').innerHTML = DECISIONS.map(([id, t, opts, note]) => `
+  <div class="dec"><span class="id">${id}</span>
+    <div style="display:grid;gap:6px"><h3>${t}</h3>
+      <div class="opts">${opts.map(o => o[0] === '*' ? `<span class="opt rec">${esc(o.slice(1))}</span>` : `<span class="opt">${esc(o)}</span>`).join('')}</div>
+      ${note ? `<p class="small muted">${note}</p>` : ''}</div></div>`).join('');
+
+/* ---------- 캐릭터 그리기 ---------- */
+function eye(x, y) { return `<ellipse cx="${x}" cy="${y}" rx="5" ry="7" fill="${O}"/><circle cx="${x + 1.6}" cy="${y - 3}" r="1.9" fill="#fff"/>`; }
+function drawChar(c) {
+  const k = c.kind, f = c.fur, b = c.belly || c.fur;
+  let back = '', ears = '', after = '', face = '';
+  if (k === 'cat') back += `<path d="M104 168 C140 168 146 126 130 110 C125 105 118 110 122 117 C131 132 126 154 100 156Z" fill="${f}" ${ST}/>`;
+  if (k === 'squirrel') back += `<path d="M102 176 C158 178 168 116 142 84 C128 66 102 78 116 98 C132 120 124 148 98 158Z" fill="${c.tail}" ${ST}/>`;
+  if (k === 'tortoise') back += `<ellipse cx="80" cy="150" rx="50" ry="38" fill="${c.shell}" ${ST}/><path d="M48 142 L64 124 L96 124 L112 142 L96 162 L64 162Z" fill="none" stroke="${O}" stroke-width="2" opacity=".45"/>`;
+  if (k === 'cat') ears = `<path d="M44 72 L41 30 L76 48Z" fill="${f}" ${ST}/><path d="M116 72 L119 30 L84 48Z" fill="${f}" ${ST}/><path d="M50 62 L48 40 L67 51Z" fill="${c.inner}"/><path d="M110 62 L112 40 L93 51Z" fill="${c.inner}"/>`;
+  if (k === 'rabbit') ears = `<ellipse cx="62" cy="34" rx="12" ry="32" transform="rotate(-10 62 34)" fill="${f}" ${ST}/><ellipse cx="98" cy="34" rx="12" ry="32" transform="rotate(10 98 34)" fill="${f}" ${ST}/><ellipse cx="62" cy="37" rx="6" ry="21" transform="rotate(-10 62 37)" fill="${c.inner}"/><ellipse cx="98" cy="37" rx="6" ry="21" transform="rotate(10 98 37)" fill="${c.inner}"/>`;
+  if (k === 'bear') ears = `<circle cx="46" cy="52" r="15" fill="${f}" ${ST}/><circle cx="114" cy="52" r="15" fill="${f}" ${ST}/><circle cx="46" cy="52" r="7" fill="${b}"/><circle cx="114" cy="52" r="7" fill="${b}"/>`;
+  if (k === 'squirrel') ears = `<path d="M47 64 L49 28 L74 47Z" fill="${f}" ${ST}/><path d="M113 64 L111 28 L86 47Z" fill="${f}" ${ST}/><path d="M49 28 L45 20 M49 28 L52 19" stroke="${O}" stroke-width="2.5" stroke-linecap="round"/><path d="M111 28 L115 20 M111 28 L108 19" stroke="${O}" stroke-width="2.5" stroke-linecap="round"/>`;
+  const legs = `<rect x="61" y="166" width="15" height="20" rx="7" fill="${c.pants}" ${ST}/><rect x="84" y="166" width="15" height="20" rx="7" fill="${c.pants}" ${ST}/>`;
+  const body = `<rect x="54" y="122" width="52" height="52" rx="22" fill="${c.shirt}" ${ST}/>`;
+  let acc = '';
+  if (c.apron) acc += `<path d="M62 132 L98 132 L101 172 L59 172Z" fill="${c.apron}" ${ST}/><rect x="72" y="150" width="16" height="10" rx="3" fill="none" stroke="${O}" stroke-width="2"/>`;
+  if (c.stripe) acc += `<path d="M56 140 H104 M55 152 H105" stroke="${c.stripe}" stroke-width="5"/>`;
+  const arms = `<ellipse cx="49" cy="146" rx="9" ry="15" fill="${c.arm || f}" ${ST}/><ellipse cx="111" cy="146" rx="9" ry="15" fill="${c.arm || f}" ${ST}/>`;
+  let head;
+  if (k === 'frog') head = `<ellipse cx="80" cy="94" rx="52" ry="38" fill="${f}" ${ST}/><ellipse cx="80" cy="108" rx="34" ry="18" fill="${b}"/>`;
+  else head = `<circle cx="80" cy="86" r="44" fill="${k === 'human' ? c.skin : f}" ${ST}/>`;
+  if (k === 'cat' || k === 'rabbit') head += `<ellipse cx="80" cy="104" rx="20" ry="13" fill="${b}"/>`;
+  if (k === 'human') after += `<path d="M36 90 A44 44 0 0 1 124 90 L119 74 L106 69 L97 80 L86 66 L74 80 L63 68 L50 74 Z" fill="${c.hair}" ${ST}/>`;
+  if (k === 'duck') after += `<path d="M76 44 Q78 28 88 36 Q84 38 84 44" fill="${f}" ${ST}/>`;
+  if (k === 'frog') after += `<circle cx="56" cy="60" r="17" fill="${f}" ${ST}/><circle cx="104" cy="60" r="17" fill="${f}" ${ST}/>`;
+  if (k === 'dog') after += `<ellipse cx="42" cy="84" rx="12" ry="25" transform="rotate(16 42 84)" fill="${c.ear}" ${ST}/><ellipse cx="118" cy="84" rx="12" ry="25" transform="rotate(-16 118 84)" fill="${c.ear}" ${ST}/>`;
+  const ey = k === 'frog' ? 60 : 86;
+  face += eye(k === 'frog' ? 56 : 64, ey) + eye(k === 'frog' ? 104 : 96, ey);
+  face += `<circle cx="53" cy="${k === 'frog' ? 100 : 102}" r="7" fill="#F49A9A" opacity=".55"/><circle cx="107" cy="${k === 'frog' ? 100 : 102}" r="7" fill="#F49A9A" opacity=".55"/>`;
+  const line = `fill="none" stroke="${O}" stroke-width="2.5" stroke-linecap="round"`;
+  if (k === 'dog' || k === 'bear' || k === 'squirrel') face += `<ellipse cx="80" cy="106" rx="17" ry="12" fill="${b}"/><ellipse cx="80" cy="100" rx="5.5" ry="4" fill="${O}"/><path d="M80 104 V109 M74 110 Q80 115 86 110" ${line}/>`;
+  if (k === 'cat') face += `<path d="M76 99 H84 L80 104Z" fill="#E88C8C"/><path d="M72 106 Q76 110 80 105 Q84 110 88 106" ${line}/><path d="M44 100 H60 M45 107 L60 105 M116 100 H100 M115 107 L100 105" stroke="${O}" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>`;
+  if (k === 'rabbit') face += `<ellipse cx="80" cy="100" rx="4" ry="3" fill="#E88C9C"/><path d="M80 103 V107 M75 108 Q80 111 85 108" ${line}/>`;
+  if (k === 'duck') face += `<ellipse cx="80" cy="106" rx="21" ry="9" fill="${c.beak}" ${ST}/><path d="M61 106 H99" stroke="${O}" stroke-width="2"/>`;
+  if (k === 'frog') face += `<path d="M56 98 Q80 116 104 98" ${line}/>`;
+  if (k === 'tortoise' || k === 'human') face += `<path d="M73 106 Q80 112 87 106" ${line}/>`;
+  if (c.glasses) face += `<circle cx="64" cy="86" r="11" fill="none" stroke="${O}" stroke-width="2.5"/><circle cx="96" cy="86" r="11" fill="none" stroke="${O}" stroke-width="2.5"/><path d="M75 86 H85" stroke="${O}" stroke-width="2.5"/>`;
+  if (c.bow) face += `<path d="M80 134 L67 127 L67 141Z M80 134 L93 127 L93 141Z" fill="${c.bow}" ${ST}/>`;
+  return `<svg viewBox="0 0 160 196" role="img" aria-label="${esc(c.name)}"><ellipse cx="80" cy="188" rx="42" ry="6" fill="#000" opacity=".1"/>${back}${ears}${legs}${body}${acc}${arms}${head}${after}${face}</svg>`;
+}
+
+const CHARS = [
+  { id: 'CH-01', name: '플레이어', kind: 'human', role: '주인공', skin: '#F6D3B6', hair: '#6B4A33', shirt: '#5DB7A8', pants: '#3E5577', fur: '#F6D3B6',
+    h: '1.0 타일', persona: '머리색 6 · 옷색 8 선택', line: '(말 대신 선택지로 대답)', voice: '-' },
+  { id: 'CH-02', name: '코코', kind: 'cat', role: '주민 · 고양이', fur: '#F2B36B', belly: '#FFF1DC', inner: '#F4A9A9', shirt: '#E86A5B', stripe: '#F7D9A8', pants: '#8C5A3C',
+    h: '0.95 타일', persona: '활발함 · 운동 좋아함', line: '오늘 바람 진짜 시원하다냥~', voice: '높고 빠름' },
+  { id: 'CH-03', name: '보리', kind: 'dog', role: '주민 · 강아지', fur: '#D8A26E', belly: '#F6E3C8', ear: '#8C5A36', shirt: '#6CA0DC', pants: '#4D5E78',
+    h: '1.0 타일', persona: '느긋함 · 낮잠 전문가', line: '음… 햇볕 좋은 데서 자고 싶다멍.', voice: '중간 · 느림' },
+  { id: 'CH-04', name: '모찌', kind: 'rabbit', role: '주민 · 토끼', fur: '#F7F1EC', belly: '#FFFFFF', inner: '#F4B6C2', shirt: '#B9A6E0', pants: '#7D6AA8',
+    h: '1.0 타일 (귀 제외)', persona: '상냥함 · 꽃 가꾸기', line: '꽃에 물 줬어? 같이 하자깡!', voice: '가장 높음' },
+  { id: 'CH-05', name: '두부', kind: 'bear', role: '주민 · 곰', fur: '#9A8573', belly: '#DCCBB7', shirt: '#7FA36B', pants: '#5B4A3E',
+    h: '1.1 타일', persona: '무뚝뚝하지만 다정함', line: '…낚시라면 좀 하지. 따라와.', voice: '가장 낮음' },
+  { id: 'CH-06', name: '퐁', kind: 'duck', role: '주민 · 오리', fur: '#FFD866', beak: '#F39A3B', shirt: '#5BB5B0', pants: '#3F7F7B',
+    h: '0.9 타일', persona: '먹보 · 요리 좋아함', line: '복숭아 있으면 하나만 줄래꽥?', voice: '높고 통통 튐' },
+  { id: 'CH-07', name: '초롱', kind: 'frog', role: '주민 · 개구리', fur: '#8CCB6E', belly: '#E9F3C8', shirt: '#F2A65A', pants: '#7B6A3A',
+    h: '0.9 타일', persona: '수다쟁이 · 비 오는 날 최고', line: '비 온다! 오늘 운 좋은 날이개굴!', voice: '중간 · 빠름' },
+  { id: 'CH-08', name: '밤톨', kind: 'squirrel', role: '도토리상점 주인 · 다람쥐', fur: '#C7743E', tail: '#DA8E52', belly: '#F6E0C4', shirt: '#F3E7D3', apron: '#5E8C61', pants: '#6A4A33',
+    h: '0.9 타일', persona: '부지런한 장사꾼 · 첫날 섬 안내', line: '어서 와! 오늘의 추천은 이거야.', voice: '높고 또박또박' },
+  { id: 'CH-09', name: '느루', kind: 'tortoise', role: '박물관장 · 거북', fur: '#B7C98A', belly: '#E3EBC6', shell: '#7A9A5A', shirt: '#E9E1CF', bow: '#B5523B', glasses: true, pants: '#6B6B5A',
+    h: '0.95 타일', persona: '느릿느릿 박식함 · 화석 마니아', line: '오오… 이건… 아주… 귀한… 것이로군요…', voice: '낮고 아주 느림' },
+];
+$('charGrid').innerHTML = CHARS.map(c => {
+  const sw = [c.kind === 'human' ? c.skin : c.fur, c.belly, c.hair, c.ear, c.tail, c.shell, c.beak, c.shirt, c.apron, c.pants].filter(Boolean);
+  return `<article class="card">
+    <div class="name"><span class="id">${c.id}</span><h3>${c.name}</h3><span class="small muted">${c.role}</span></div>
+    <div class="stage">${drawChar(c)}</div>
+    <div class="sw">${sw.map(s => `<i style="background:${s}" title="${s}"></i>`).join('')}</div>
+    <dl class="kv"><dt>키</dt><dd>${c.h}</dd><dt>성격</dt><dd>${c.persona}</dd><dt>목소리</dt><dd>${c.voice}</dd></dl>
+    <p class="quote">${esc(c.line)}</p></article>`;
+}).join('');
+$('mockChars').innerHTML = drawChar(CHARS[0]) + drawChar(CHARS[1]);
+
+/* ---------- 아트 스타일 비교 ---------- */
+$('styleA').innerHTML = `<svg viewBox="0 0 320 170" role="img" aria-label="플랫 로우폴리 시안">
+  <rect x="0" y="130" width="320" height="40" fill="#8CC56B"/><polygon points="0,130 320,130 320,138 0,138" fill="#7AB45C"/>
+  <polygon points="58,96 70,96 72,132 56,132" fill="#9A6B45"/><polygon points="64,96 70,96 72,132 64,132" fill="#7F5636"/>
+  <polygon points="64,20 104,52 96,98 32,98 24,52" fill="#5FAE5A"/><polygon points="64,20 104,52 96,98 64,74" fill="#4C9449"/><polygon points="24,52 64,20 64,74 32,98" fill="#72C06A"/>
+  <polygon points="130,132 146,104 176,96 196,112 200,132" fill="#B8B2A6"/><polygon points="176,96 196,112 200,132 168,132" fill="#9C968B"/>
+  <polygon points="240,56 284,56 292,96 232,96" fill="#F2B36B"/><polygon points="262,56 284,56 292,96 262,96" fill="#DB9A55"/>
+  <polygon points="240,56 246,30 262,48" fill="#F2B36B"/><polygon points="284,56 278,30 262,48" fill="#DB9A55"/>
+  <polygon points="246,96 278,96 280,124 244,124" fill="#E86A5B"/><polygon points="262,96 278,96 280,124 262,124" fill="#C95546"/>
+  <rect x="250" y="70" width="5" height="8" fill="${O}"/><rect x="269" y="70" width="5" height="8" fill="${O}"/>
+  <polygon points="248,124 258,124 258,134 248,134" fill="#8C5A3C"/><polygon points="266,124 276,124 276,134 266,134" fill="#8C5A3C"/></svg>`;
+$('styleB').innerHTML = `<svg viewBox="0 0 320 170" role="img" aria-label="소프트 툰 시안">
+  <defs><radialGradient id="gL" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#8ED37D"/><stop offset=".55" stop-color="#63B35B"/><stop offset="1" stop-color="#4E9A4C"/></radialGradient>
+  <radialGradient id="gR" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#D9D4CA"/><stop offset="1" stop-color="#A7A196"/></radialGradient></defs>
+  <rect x="0" y="130" width="320" height="40" fill="#8CC56B"/>
+  <rect x="57" y="92" width="14" height="40" rx="5" fill="#9A6B45" ${ST}/>
+  <circle cx="64" cy="58" r="38" fill="url(#gL)" ${ST}/><circle cx="52" cy="44" r="9" fill="#fff" opacity=".25"/>
+  <path d="M128 132 C126 108 150 94 172 98 C194 102 204 118 200 132Z" fill="url(#gR)" ${ST}/>
+  ${drawChar(CHARS[1]).replace('<svg viewBox="0 0 160 196"', '<svg x="224" y="22" width="88" height="108" viewBox="0 0 160 196"')}</svg>`;
+
+/* ---------- 지도 ---------- */
+const MARKS = [
+  [1, 300, 520, '선착장', '첫 도착 지점 · 바다 낚시'], [2, 238, 300, '광장', '안내판 · 이벤트 · 모닥불'], [3, 465, 300, '도토리상점', '밤톨 · 사고팔기'],
+  [4, 220, 168, '박물관', '느루 · 기증과 전시 (언덕 위)'], [5, 175, 410, '플레이어 집', '실내 꾸미기 · 작업대'], [6, 362, 140, '폭포와 연못', '언덕 위 강의 시작점'],
+  [7, 352, 286, '북쪽 다리', ''], [8, 404, 420, '남쪽 다리', ''], [9, 150, 296, '주민 집 ×2', '코코 · 보리'], [10, 290, 410, '주민 집 ×2', '모찌 · 두부'],
+  [11, 470, 220, '주민 집 ×2', '퐁 · 초롱'], [12, 300, 200, '경사로 ×3', '언덕 오르내리기'], [13, 520, 420, '과수원 언덕', '과일나무 · 벌집 확률↑'], [14, 120, 210, '바위 지대', '돌 · 철광석 · 화석'],
+];
+$('mapSvg').innerHTML = `<svg viewBox="0 0 640 560" role="img" aria-label="섬 지도 시안">
+  <rect width="640" height="560" fill="#6FC0DC"/>
+  <path d="M58 270 C48 140 150 44 320 40 C496 36 600 140 596 280 C592 432 492 528 320 530 C146 532 66 410 58 270Z" fill="#9ED6E8"/>
+  <path d="M74 270 C64 150 158 60 320 56 C488 52 584 146 580 280 C576 420 484 512 320 514 C152 516 82 402 74 270Z" fill="#F1DFAE"/>
+  <path d="M104 270 C98 170 175 94 320 90 C466 88 550 165 546 280 C542 396 466 472 320 476 C174 480 110 380 104 270Z" fill="#8FC96E"/>
+  <path d="M128 230 C130 150 210 106 320 104 C430 102 508 150 512 230 C470 214 420 210 380 216 C330 222 290 214 250 222 C200 232 160 238 128 230Z" fill="#74B45A" stroke="#5E8F4A" stroke-width="5"/>
+  <path d="M352 112 C348 170 384 222 352 284 C322 344 382 404 420 470 L452 520" fill="none" stroke="#6BB8D6" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="362" cy="138" rx="26" ry="16" fill="#6BB8D6"/>
+  <rect x="330" y="278" width="44" height="16" rx="3" fill="#B98957" stroke="#7F5A36" stroke-width="2" transform="rotate(-8 352 286)"/>
+  <rect x="382" y="412" width="44" height="16" rx="3" fill="#B98957" stroke="#7F5A36" stroke-width="2" transform="rotate(-28 404 420)"/>
+  <path d="M230 222 l14 0 l-2 18 l-12 0z M300 214 l14 0 l2 18 l-14 0z M440 214 l14 2 l-4 17 l-12 -2z" fill="#C9B07C"/>
+  <circle cx="238" cy="300" r="34" fill="#E8D5A8"/>
+  <rect x="290" y="512" width="20" height="40" fill="#B98957" stroke="#7F5A36" stroke-width="2"/>
+  <g fill="#5E9F4F">${[[180,260],[200,340],[130,330],[420,180],[480,260],[510,330],[260,450],[340,460],[160,450],[230,130],[410,140],[460,160],[520,410],[540,440],[505,450],[140,190],[300,170],[330,360],[280,250]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7"/>`).join('')}</g>
+  <g fill="#9C968B">${[[112,206],[126,220],[140,204]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="6"/>`).join('')}</g>
+  <g fill="#F7F1E4" stroke="${O}" stroke-width="2">
+    <rect x="452" y="288" width="28" height="22" rx="3"/><rect x="205" y="155" width="30" height="24" rx="3"/><rect x="164" y="398" width="22" height="20" rx="3"/>
+    ${[[140,286],[160,306],[280,400],[300,420],[462,210],[482,230]].map(([x, y]) => `<rect x="${x - 8}" y="${y - 7}" width="16" height="14" rx="2"/>`).join('')}
+  </g>
+  ${MARKS.map(([n, x, y]) => `<g><circle cx="${x}" cy="${y - 20}" r="11" fill="#A8642E"/><text x="${x}" y="${y - 16}" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, monospace" fill="#fff">${n}</text></g>`).join('')}
+  <text x="320" y="24" text-anchor="middle" font-size="14" fill="#235B70" font-family="Jua, sans-serif">북 ▲</text>
+</svg>`;
+$('mapLegend').innerHTML = MARKS.map(([n, , , t, d]) => `<div><b>${n}</b><span><strong>${t}</strong>${d ? ` <span class="muted small">· ${d}</span>` : ''}</span></div>`).join('')
+  + `<p class="small muted" style="margin-top:6px">지도는 위치 감을 보는 시안입니다. 실제 지형은 타일 단위로 다듬고, 바닷가에는 조개, 풀밭에는 꽃·잡초가 매일 새로 생겨요.</p>`;
+
+/* ---------- 팔레트 ---------- */
+const SEASONS = [
+  ['PAL-S1', '봄 3~5월', 'linear-gradient(90deg,#9BD47A 0 50%,#F7B9CC 50% 100%)', '풀 #9BD47A · 벚꽃잎 #F7B9CC'],
+  ['PAL-S2', '여름 6~8월', 'linear-gradient(90deg,#6CC160 0 50%,#3E9E4F 50% 100%)', '풀 #6CC160 · 잎 #3E9E4F'],
+  ['PAL-S3', '가을 9~11월', 'linear-gradient(90deg,#A9C46A 0 34%,#E8913A 34% 67%,#D9583B 67% 100%)', '풀 #A9C46A · 단풍 #E8913A / #D9583B'],
+  ['PAL-S4', '겨울 12~2월', 'linear-gradient(90deg,#EEF3F6 0 50%,#7FA38E 50% 100%)', '눈 #EEF3F6 · 상록잎 #7FA38E'],
+];
+const SKIES = [
+  ['PAL-T1', '새벽 5~8시', 'linear-gradient(#F9C9A5,#A9C9EE)'], ['PAL-T2', '낮 8~17시', 'linear-gradient(#8FD3F4,#D8F1FF)'],
+  ['PAL-T3', '노을 17~19시', 'linear-gradient(#F59E79,#7A6BB3)'], ['PAL-T4', '밤 19~5시', 'linear-gradient(#1E2A5A,#3B4D8A)'],
+];
+$('seasonPal').innerHTML = SEASONS.map(([id, t, g, d]) => `<div class="pal"><div class="band" style="background:${g}"></div><div class="cap"><span class="id">${id}</span><strong>${t}</strong><span class="muted">${d}</span></div></div>`).join('');
+$('skyPal').innerHTML = SKIES.map(([id, t, g]) => `<div class="pal"><div class="band" style="background:${g}"></div><div class="cap"><span class="id">${id}</span><strong>${t}</strong></div></div>`).join('');
+$('weather').innerHTML = [['WX-1', '맑음', '기본 · 햇빛 그림자'], ['WX-2', '흐림', '그림자 옅게'], ['WX-3', '비', '빗방울 입자 · 웅덩이 · 비 전용 물고기/곤충'], ['WX-4', '눈 (겨울)', '눈송이 입자 · 땅에 눈 쌓임'], ['WX-5', '무지개', '비 갠 직후 드물게']]
+  .map(([id, t, d]) => `<div class="card"><span class="id">${id}</span><h3>${t}</h3><p class="small muted">${d}</p></div>`).join('');
+
+/* ---------- 소품 ---------- */
+const blob = (pts, fill, r) => pts.map(([x, y, rr]) => `<circle cx="${x}" cy="${y}" r="${rr || r}" fill="${fill}" stroke="${O}" stroke-width="5"/>`).join('') + pts.map(([x, y, rr]) => `<circle cx="${x}" cy="${y}" r="${rr || r}" fill="${fill}"/>`).join('');
+const trunk = `<rect x="45" y="56" width="10" height="32" rx="3" fill="#9A6B45" ${ST}/>`;
+const gnd = `<ellipse cx="50" cy="90" rx="34" ry="5" fill="#000" opacity=".1"/>`;
+const P = {
+  tree: () => gnd + trunk + blob([[50, 38, 24], [34, 52, 15], [66, 52, 15]], '#E8913A'),
+  fruit: () => gnd + trunk + blob([[50, 38, 24], [34, 52, 15], [66, 52, 15]], '#63B35B') + [[40, 40], [58, 34], [62, 54], [44, 56]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#F07A8A" stroke="${O}" stroke-width="1.5"/>`).join(''),
+  palm: () => gnd + `<path d="M48 88 C46 66 52 46 58 30" fill="none" stroke="#B58A5A" stroke-width="8" stroke-linecap="round"/>` + [[-1, 0], [1, 0], [-1, 1], [1, 1], [0, -1]].map(([dx, dy]) => `<path d="M58 30 Q${58 + dx * 20} ${18 + dy * 10} ${58 + dx * 32} ${36 + dy * 14}" fill="none" stroke="#4E9A4C" stroke-width="7" stroke-linecap="round"/>`).join(''),
+  cedar: () => gnd + `<rect x="46" y="70" width="8" height="18" fill="#7F5636" ${ST}/><path d="M50 12 L74 50 L60 50 L80 76 L20 76 L40 50 L26 50Z" fill="#3E8A5A" ${ST}/>`,
+  rock: () => gnd + `<path d="M24 88 C20 66 36 50 54 52 C72 54 82 70 78 88Z" fill="#B8B2A6" ${ST}/><path d="M38 62 Q46 58 52 60" stroke="#fff" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>`,
+  flowers: () => `<path d="M24 88 V66 M50 88 V60 M76 88 V68" stroke="#4E9A4C" stroke-width="3"/>` +
+    `<path d="M16 66 Q16 52 24 54 Q32 52 32 66Z" fill="#F07A8A" ${ST}/>` + [0, 72, 144, 216, 288].map(a => `<circle cx="${50 + 8 * Math.cos(a * Math.PI / 180)}" cy="${56 + 8 * Math.sin(a * Math.PI / 180)}" r="6" fill="#F7C6E0" stroke="${O}" stroke-width="1.5"/>`).join('') + `<circle cx="50" cy="56" r="4" fill="#F6C84C"/>` +
+    `<circle cx="70" cy="64" r="7" fill="#9C7BD6" ${ST}/><circle cx="82" cy="64" r="7" fill="#9C7BD6" ${ST}/><circle cx="76" cy="70" r="5" fill="#F6C84C"/>`,
+  weed: () => `<path d="M30 88 Q28 70 22 64 M34 88 Q36 68 44 60 M32 88 Q32 74 32 66 M62 88 Q60 74 56 70 M66 88 Q70 72 76 68" stroke="#6E9E3E" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  shell: () => `<path d="M24 76 Q50 22 76 76 Q50 86 24 76Z" fill="#F9D9C4" ${ST}/><path d="M50 78 L50 40 M50 78 L36 48 M50 78 L64 48" stroke="${O}" stroke-width="2" opacity=".5"/><rect x="42" y="76" width="16" height="8" rx="3" fill="#F9D9C4" ${ST}/>`,
+  crack: () => `<ellipse cx="50" cy="70" rx="34" ry="14" fill="#B79870"/><path d="M36 62 L64 78 M64 62 L36 78" stroke="${O}" stroke-width="5" stroke-linecap="round"/>`,
+  lamp: () => gnd + `<rect x="47" y="30" width="6" height="58" fill="#4E5A57" ${ST}/><path d="M36 30 L64 30 L58 14 L42 14Z" fill="#F7E6A8" ${ST}/>`,
+  bench: () => gnd + `<rect x="18" y="52" width="64" height="10" rx="3" fill="#B98957" ${ST}/><rect x="16" y="64" width="68" height="10" rx="3" fill="#B98957" ${ST}/><path d="M24 74 V88 M76 74 V88" stroke="${O}" stroke-width="5"/>`,
+  mailbox: () => gnd + `<rect x="47" y="54" width="6" height="34" fill="#7F5636"/><rect x="30" y="34" width="40" height="24" rx="10" fill="#E86A5B" ${ST}/><rect x="66" y="26" width="4" height="14" fill="#F6C84C"/>`,
+  sign: () => gnd + `<rect x="47" y="50" width="6" height="38" fill="#7F5636"/><rect x="20" y="24" width="60" height="32" rx="6" fill="#E8D5A8" ${ST}/><path d="M30 36 H70 M30 44 H58" stroke="${O}" stroke-width="2.5" opacity=".5"/>`,
+  bridge: () => `<rect x="0" y="60" width="100" height="30" fill="#6BB8D6"/><rect x="8" y="50" width="84" height="22" rx="4" fill="#B98957" ${ST}/><path d="M22 50 V72 M36 50 V72 M50 50 V72 M64 50 V72 M78 50 V72" stroke="${O}" stroke-width="1.5" opacity=".4"/>`,
+  ramp: () => `<path d="M10 88 L10 54 L46 54 L90 88Z" fill="#C9B07C" ${ST}/><path d="M46 54 L90 88" stroke="${O}" stroke-width="3"/><path d="M22 64 H50 M22 74 H62" stroke="${O}" stroke-width="2" opacity=".35"/>`,
+  shadow: () => `<rect x="0" y="40" width="100" height="56" fill="#6BB8D6"/><ellipse cx="50" cy="68" rx="20" ry="8" fill="#1F4E60" opacity=".55"/><circle cx="80" cy="56" r="4" fill="#fff" stroke="${O}" stroke-width="1.5"/>`,
+};
+const PROPS = [
+  ['PR-01', '활엽수', 'tree', '계절별 잎색 4종 · 흔들면 나뭇가지/도토리'], ['PR-02', '과일나무', 'fruit', '사과·배·복숭아·체리·오렌지 5종'],
+  ['PR-03', '야자수', 'palm', '해변 전용 · 야자열매'], ['PR-04', '삼나무', 'cedar', '언덕 · 겨울에 눈 덮임'],
+  ['PR-05', '바위', 'rock', '하루 1회 · 도끼로 쳐서 광물'], ['PR-06', '꽃 3종', 'flowers', '튤립·코스모스·팬지 × 색 4'],
+  ['PR-07', '잡초', 'weed', '매일 생성 · 뽑아서 재료'], ['PR-08', '조개', 'shell', '해변 · 6종'],
+  ['PR-09', '화석 자리', 'crack', '하루 4곳 · 삽으로 파기'], ['PR-10', '가로등', 'lamp', '밤에 켜짐'],
+  ['PR-11', '벤치', 'bench', '앉기 가능'], ['PR-12', '우편함', 'mailbox', '주민 편지 · 선물 도착'],
+  ['PR-13', '안내판', 'sign', '오늘의 소식'], ['PR-14', '나무다리', 'bridge', '강 건너기 ×2'],
+  ['PR-15', '경사로', 'ramp', '언덕 오르내리기 ×3'], ['PR-16', '물고기 그림자', 'shadow', '크기 6단계 · 찌'],
+];
+$('propGrid').innerHTML = PROPS.map(([id, n, k, d]) => `<div class="card"><div class="stage"><svg viewBox="0 0 100 100" role="img" aria-label="${n}">${P[k]()}</svg></div><span class="id">${id}</span><h3>${n}</h3><p class="small muted">${d}</p></div>`).join('');
+
+const house = (roof, wall = '#F7F1E4', extra = '') => `<ellipse cx="60" cy="92" rx="50" ry="5" fill="#000" opacity=".1"/><rect x="22" y="46" width="76" height="44" rx="4" fill="${wall}" ${ST}/><path d="M12 50 L60 14 L108 50Z" fill="${roof}" ${ST}/><rect x="52" y="64" width="16" height="26" rx="3" fill="#9A6B45" ${ST}/><rect x="30" y="58" width="14" height="12" rx="2" fill="#F7E6A8" ${ST}/><rect x="76" y="58" width="14" height="12" rx="2" fill="#F7E6A8" ${ST}/>${extra}`;
+const BLD = [
+  ['BD-01', '플레이어 집', house('#5DB7A8'), '1칸 방 · 실내 8×8 · 문 앞 우편함'],
+  ['BD-02', '주민 집 ×6', house('#E86A5B') , '지붕색 = 주민 테마색 · 밤에 창문 켜짐'],
+  ['BD-03', '도토리상점', `<ellipse cx="60" cy="92" rx="54" ry="5" fill="#000" opacity=".1"/><rect x="12" y="40" width="96" height="50" rx="4" fill="#F3E7D3" ${ST}/>${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${12 + i * 16} 40 h16 v12 q-8 6 -16 0z" fill="${i % 2 ? '#F7F1E4' : '#5E8C61'}" ${ST}/>`).join('')}<rect x="50" y="62" width="20" height="28" rx="3" fill="#9A6B45" ${ST}/><ellipse cx="60" cy="24" rx="12" ry="10" fill="#A8642E" ${ST}/><path d="M48 22 Q60 8 72 22Z" fill="#7F5636" ${ST}/>`, '사고팔기 · 오늘의 가구 2종 · 영업 8~22시'],
+  ['BD-04', '박물관', `<ellipse cx="60" cy="92" rx="54" ry="5" fill="#000" opacity=".1"/><rect x="14" y="84" width="92" height="6" fill="#D9D2C2" ${ST}/><path d="M10 40 L60 12 L110 40Z" fill="#E9E1CF" ${ST}/><rect x="14" y="40" width="92" height="8" fill="#E9E1CF" ${ST}/>${[24, 44, 70, 90].map(x => `<rect x="${x - 4}" y="48" width="8" height="36" fill="#F7F1E4" ${ST}/>`).join('')}<rect x="52" y="58" width="16" height="26" rx="8" fill="#7A9A5A" ${ST}/>`, '물고기·곤충·화석 기증 · 기증 현황 패널'],
+  ['BD-05', '작업대', `<ellipse cx="60" cy="92" rx="44" ry="5" fill="#000" opacity=".1"/><rect x="20" y="50" width="80" height="14" rx="3" fill="#C99B68" ${ST}/><path d="M28 64 V90 M92 64 V90" stroke="${O}" stroke-width="6"/><rect x="34" y="40" width="22" height="10" rx="2" fill="#9C968B" ${ST}/><path d="M70 50 L84 34" stroke="${O}" stroke-width="5" stroke-linecap="round"/>`, '플레이어 집 안 · 레시피 제작'],
+  ['BD-06', '선착장', `<rect x="0" y="50" width="120" height="50" fill="#6BB8D6"/><rect x="40" y="30" width="40" height="60" fill="#B98957" ${ST}/><path d="M40 45 H80 M40 60 H80 M40 75 H80" stroke="${O}" stroke-width="1.5" opacity=".4"/><rect x="36" y="84" width="8" height="12" fill="#7F5636"/><rect x="76" y="84" width="8" height="12" fill="#7F5636"/>`, '게임 시작 지점 · 바다 낚시 명당'],
+];
+$('bldGrid').innerHTML = BLD.map(([id, n, svg, d]) => `<div class="card"><div class="stage"><svg viewBox="0 0 120 100" role="img" aria-label="${n}">${svg}</svg></div><div class="name"><span class="id">${id}</span><h3>${n}</h3></div><p class="small muted">${d}</p></div>`).join('');
+
+/* ---------- 표 ---------- */
+function table(el, head, rows, numCols = []) {
+  $(el).innerHTML = `<thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((v, i) => `<td${numCols.includes(i) ? ' class="num"' : ''}>${v}</td>`).join('')}</tr>`).join('')}</tbody>`;
+}
+const idc = s => `<span class="id">${s}</span>`;
+const nm = (n, rare) => rare ? `<span class="rare">${n}</span>` : n;
+const won = n => n.toLocaleString('ko-KR');
+const FISH = [
+  ['붕어', '강', '종일', '연중', 2, 160], ['피라미', '강', '종일', '연중', 1, 200], ['송사리', '강', '종일', '봄~가을', 1, 300], ['잉어', '강 · 연못', '종일', '연중', 4, 300],
+  ['미꾸라지', '강', '종일', '봄~여름', 2, 400], ['은어', '강', '낮', '여름', 3, 900], ['메기', '연못', '밤', '여름~가을', 4, 800], ['쏘가리', '강', '밤', '연중', 3, 1000],
+  ['연어', '하구', '종일', '가을', 5, 700], ['금붕어', '연못', '종일', '연중', 1, 1300, 1], ['가물치', '연못', '밤', '여름', 5, 5500, 1],
+  ['전갱이', '바다', '종일', '연중', 2, 150], ['고등어', '바다', '종일', '연중', 3, 150], ['광어', '바다', '종일', '연중', 4, 800], ['오징어', '바다', '종일', '겨울~봄', 3, 500],
+  ['문어', '바다', '종일', '연중', 3, 1200], ['해마', '바다', '종일', '봄~가을', 1, 1100], ['도미', '바다', '종일', '연중', 4, 3000], ['참치', '선착장', '종일', '겨울', 6, 7000, 1], ['상어', '바다', '밤', '여름', 6, 15000, 1],
+];
+table('fishT', ['ID', '이름', '장소', '시간', '계절', '그림자', '가격'], FISH.map((f, i) => [idc('FI-' + String(i + 1).padStart(2, '0')), nm(f[0], f[6]), f[1], f[2], f[3], '●'.repeat(f[4]), won(f[5])]), [6]);
+const BUGS = [
+  ['배추흰나비', '꽃 주변', '낮', '봄~가을', 160], ['호랑나비', '꽃 주변', '낮', '봄~여름', 240], ['노랑나비', '꽃 주변', '낮', '봄', 160], ['무당벌레', '꽃 위', '낮', '봄·가을', 200],
+  ['꿀벌', '나무 흔들기', '낮', '연중', 2500], ['고추잠자리', '공중', '낮', '가을', 180], ['밀잠자리', '물가 공중', '낮', '여름', 230], ['매미', '나무 줄기', '낮', '여름', 250],
+  ['반딧불이', '물가 공중', '밤', '초여름', 1600, 1], ['장수풍뎅이', '나무 줄기', '밤', '여름', 1350], ['사슴벌레', '야자수', '밤', '여름', 8000, 1], ['사마귀', '꽃 위', '낮', '봄~가을', 430],
+  ['메뚜기', '풀밭', '낮', '여름~가을', 160], ['귀뚜라미', '풀밭', '밤', '가을', 130], ['방울벌레', '풀밭', '밤', '가을', 430], ['개미', '떨어진 과일', '종일', '연중', 80],
+  ['달팽이', '바위', '비 올 때', '연중', 250], ['쥐며느리', '바위 밑', '종일', '연중', 250], ['소금쟁이', '강 위', '낮', '여름', 130], ['나방', '가로등·창문', '밤', '연중', 130],
+];
+table('bugT', ['ID', '이름', '장소', '시간', '계절', '가격'], BUGS.map((b, i) => [idc('BU-' + String(i + 1).padStart(2, '0')), nm(b[0], b[5]), b[1], b[2], b[3], won(b[4])]), [5]);
+const FOSSILS = [['암모나이트', 1100], ['삼엽충', 1300], ['호박', 1200], ['고사리 화석', 1000], ['상어 이빨', 1000], ['공룡 발자국', 1500], ['매머드 엄니', 2500], ['공룡 두개골', 6000, 1]];
+table('fossilT', ['ID', '화석', '가격'], FOSSILS.map((f, i) => [idc('FO-0' + (i + 1)), nm(f[0], f[2]), won(f[1])]), [2]);
+const MATS = [['MA-01', '사과 · 배 · 복숭아 · 체리 · 오렌지', '과일 (섬 특산 1종은 100, 나머지 500)'], ['MA-02', '야자열매', '해변 야자수'], ['MA-03', '나무 · 단단한 나무', '나무를 도끼로'],
+  ['MA-04', '나뭇가지', '나무 흔들기'], ['MA-05', '돌 · 철광석 · 점토', '바위를 도끼로'], ['MA-06', '잡초', '뽑기'], ['MA-07', '조개 6종', '해변'], ['MA-08', '도토리 주머니', '나무·바위에서 가끔']];
+table('matT', ['ID', '재료', '얻는 곳'], MATS.map(([id, a, b]) => [idc(id), a, b]));
+const TOOLS = [['TL-01', '낚싯대', '물가에서 찌 던지기', '시작 지급'], ['TL-02', '잠자리채', '곤충 잡기', '시작 지급'], ['TL-03', '삽', '화석 파기 · 나무 심기', '상점 800 / 제작: 나무 5'],
+  ['TL-04', '도끼', '나무 베기 · 바위 치기', '상점 800 / 제작: 나뭇가지 5 + 돌 1'], ['TL-05', '물뿌리개', '꽃에 물 주기 → 새 꽃 번식', '상점 800 / 제작: 나무 5']];
+table('toolT', ['ID', '도구', '용도', '얻는 법'], TOOLS.map(([id, ...r]) => [idc(id), ...r]));
+const FURN = [
+  ['통나무 의자', '1×1', '제작'], ['통나무 테이블', '2×2', '제작'], ['나무 침대', '2×3', '제작'], ['모닥불', '1×1', '제작 (야외 가능)'], ['장작더미', '1×1', '제작'],
+  ['스탠드 조명', '1×1', '상점'], ['화분', '1×1', '상점'], ['동그란 러그', '3×3', '상점'], ['책장', '2×1', '상점'], ['라디오', '1×1', '상점 · BGM 재생'],
+  ['소파', '2×1', '상점'], ['옷장', '2×1', '상점'], ['벽시계', '벽', '상점'], ['어항', '1×1', '물고기를 넣어 장식'], ['곤충 상자', '1×1', '곤충을 넣어 장식'],
+  ['액자', '벽', '주민 선물'], ['주민 사진', '1×1', '친밀도 최대'], ['조개 커튼', '창문', '제작: 조개 6'], ['과일 의자', '1×1', '제작: 과일 10'], ['공룡 모형', '2×2', '박물관 완성 보상'],
+];
+table('furnT', ['ID', '가구', '크기', '얻는 법'], FURN.map((f, i) => [idc('FU-' + String(i + 1).padStart(2, '0')), ...f]));
+
+const BGM = [['BGM-01', '새벽', '조용한 피아노 · 72bpm'], ['BGM-02', '오전', '밝은 마림바 · 96bpm'], ['BGM-03', '오후', '느긋한 우쿨렐레풍 · 88bpm'], ['BGM-04', '저녁', '따뜻한 패드 · 76bpm'],
+  ['BGM-05', '밤', '오르골 · 64bpm'], ['BGM-06', '비 오는 날', '낮은 패드 + 빗소리'], ['BGM-07', '실내', '작은 라디오 음질'], ['BGM-08', '도토리상점', '경쾌한 리듬'], ['BGM-09', '박물관', '잔향 큰 느린 멜로디']];
+table('bgmT', ['ID', '배경음', '분위기'], BGM.map(([id, a, b]) => [idc(id), a, b]));
+const SFX = ['발소리 (풀·모래·나무·실내)', '찌 던지기 · 톡톡 · 첨벙', '낚시 성공 팡파르', '잠자리채 휘두르기', '곤충 잡기 성공', '나무 흔들기 바스락', '과일 떨어짐 · 도토리 짤랑',
+  '삽 파기 · 화석 발견', '도끼 나무 · 도끼 바위', '물 주기', '줍기 뽁', '가방 열기 · 메뉴 클릭', '판매 짤랑', '문 열기', '벌 윙윙', '주민 웅얼웅얼 목소리 ×9 (VO)'];
+table('sfxT', ['ID', '효과음'], SFX.map((s, i) => [idc((i === SFX.length - 1 ? 'VO' : 'SFX') + '-' + String(i + 1).padStart(2, '0')), s]));
+
+table('sumT', ['분류', '수량', '만드는 방법', '단계'], [
+  ['캐릭터 모델', '9', '기본 도형 조합 + 걷기/감정 애니메이션', 'M1 · M3'], ['지형 타일', '9종', '타일맵 → 하나의 지형 메시 + 곡면 셰이더', 'M1'],
+  ['자연 소품', '16', '인스턴싱 메시', 'M1 · M2'], ['건물', '6종 (10채)', '기본 도형 조합', 'M3'], ['가구', '20', '기본 도형 조합', 'M4'],
+  ['도구', '5', '손에 드는 모델 + 사용 동작', 'M2'], ['수집물', '물고기 20 · 곤충 20 · 화석 8', '그림자/곤충 모델 + 도감 데이터', 'M2'],
+  ['아이콘', '약 90', 'D2 결정에 따름', 'M2 ~ M4'], ['배경음', '9', 'WebAudio 실시간 합성', 'M5'], ['효과음·목소리', '16 + 9', 'WebAudio 합성', 'M2 ~ M5'],
+], [1]);
+table('msT', ['단계', '내용', '확인 방법'], [
+  [idc('M1'), '섬 지형 · 곡면 시점 · 플레이어 이동 · 카메라', '섬을 걸어 다닐 수 있음'], [idc('M2'), '도구 5종 · 낚시 · 곤충 · 화석 · 나무 흔들기 · 가방', '채집해서 가방에 담기'],
+  [idc('M3'), '주민 6명 · 대화 · 상점 · 박물관 · 부탁 퀘스트', '팔고 사고 기증하기'], [idc('M4'), '집 실내 · 가구 배치 · 작업대 제작 · 저장/불러오기', '집 꾸미고 다시 접속'],
+  [idc('M5'), '시간 · 계절 · 날씨 · 배경음 · 효과음', '밤/비/가을 분위기 확인'], [idc('M6'), '휴대폰 조작 · 최적화 · 다듬기 · 웹 배포', '링크로 바로 플레이'],
+]);
+</script>

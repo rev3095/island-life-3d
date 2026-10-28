@@ -1,0 +1,859 @@
+<title>캐릭터 편집기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 장난감 진열장 — 맨 위에 모델 버튼 줄, 고른 모델의 3D 뷰어(왼쪽)와 프롬프트·레퍼런스 편집(오른쪽), 그 아래 요청 기록과 Blender 렌더 시트 */
+:root {
+  --bg: #EDF3EE;
+  --panel: #FFFFFF;
+  --ink: #3B2F28;        /* 캐릭터 외곽선과 같은 갈색 */
+  --muted: #6D6259;
+  --line: #D9E1D8;
+  --accent: #C9701F;
+  --accent-ink: #FFFFFF;
+  --chip: #E4ECE2;
+  --live: #3E8A55;
+  --warn: #B4532A;
+  --sky-top: #BFE6F7;
+  --sky-bot: #EEF8FC;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161B18; --panel: #1F2620; --ink: #EEE6DC; --muted: #A99F95; --line: #323B33;
+    --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #29312A; --live: #7CCB93; --warn: #F08A60;
+    --sky-top: #5E88A8; --sky-bot: #A9C9DA; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161B18; --panel: #1F2620; --ink: #EEE6DC; --muted: #A99F95; --line: #323B33;
+  --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #29312A; --live: #7CCB93; --warn: #F08A60;
+  --sky-top: #5E88A8; --sky-bot: #A9C9DA; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 24px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: clamp(30px, 5vw, 44px); }
+h2 { font-size: 24px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .05em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+header { display: grid; gap: 8px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 12.5px; padding: 2px 10px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill.wait, .pill.st-new { background: var(--accent); color: var(--accent-ink); }
+.pill.st-working { background: var(--ink); color: var(--panel); }
+.pill.st-done, .pill.ok { background: var(--live); color: var(--panel); }
+
+/* 모델 버튼 줄 */
+.picker { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
+.pick { flex: none; scroll-snap-align: start; width: 108px; display: grid; gap: 2px; justify-items: center; text-align: center;
+  font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px 6px 8px; cursor: pointer; position: relative; }
+.pick img { width: 72px; height: 72px; object-fit: cover; object-position: 50% 30%; border-radius: 10px; background: var(--chip); }
+.pick .nm { font-family: var(--display); font-size: 16px; line-height: 1.1; }
+.pick .rl { font-size: 11px; color: var(--muted); line-height: 1.25; }
+.pick .id { font-size: 10.5px; }
+.pick[aria-pressed="true"] { border: 2px solid var(--accent); padding: 7px 5px 7px; }
+.pick .dot { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.pick .dot.ok { background: var(--live); }
+.pick.add { border-style: dashed; align-content: center; min-height: 128px; }
+.pick.add .plus { font-family: var(--display); font-size: 34px; line-height: 1; color: var(--accent); }
+
+.sel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.main { display: grid; gap: 18px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.sticky { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .sticky { position: static; } }
+
+/* 3D 뷰어 */
+.viewer { position: relative; aspect-ratio: 1 / 1; max-width: 100%; border-radius: 12px; overflow: hidden;
+  background: linear-gradient(var(--sky-top), var(--sky-bot) 70%); touch-action: none; }
+.viewer canvas { display: block; width: 100%; height: 100%; }
+.viewer .hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: #2F4A57; background: rgba(255,255,255,.7); padding: 2px 8px; border-radius: 8px; }
+.viewer .msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: #2F4A57; font-size: 14px; }
+.newcard { aspect-ratio: 1 / 1; max-width: 100%; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-content: center; gap: 8px; text-align: center; padding: 24px; }
+.newcard .plus { font-family: var(--display); font-size: 56px; color: var(--accent); line-height: 1; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; background: var(--chip); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button, .btn { font: inherit; font-size: 14px; border: 0; background: transparent; color: var(--ink); padding: 5px 12px; border-radius: 8px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.btn { border: 1px solid var(--line); background: var(--panel); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-family: var(--display); font-size: 16px; padding: 8px 16px; }
+.btn.link { border: 0; padding: 0; background: none; color: var(--muted); font-size: 12.5px; text-decoration: underline; }
+.btn.link.armed { color: var(--warn); }
+.toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.spec-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.stat { background: var(--chip); border-radius: 10px; padding: 8px 10px; display: grid; }
+.stat b { font-family: var(--mono); font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+
+/* 프롬프트 편집 */
+.editor { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field label, .group-title { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+textarea, input[type="text"], select, input[type="number"] { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; width: 100%; box-sizing: border-box; }
+textarea { resize: vertical; min-height: 64px; }
+textarea#req { min-height: 84px; border-color: var(--accent); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 6px 10px; }
+.swatch { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+.swatch input[type="color"] { width: 34px; height: 28px; border: 1px solid var(--line); border-radius: 8px; padding: 0; background: none; cursor: pointer; }
+.swatch code { font-family: var(--mono); font-size: 11.5px; color: var(--muted); display: block; }
+.sliders { display: grid; gap: 6px; }
+.slider { display: grid; grid-template-columns: 92px 1fr 44px 48px; gap: 8px; align-items: center; font-size: 13.5px; }
+.slider input { width: 100%; accent-color: var(--accent); }
+.slider output { font-family: var(--mono); font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; }
+.tag { font-size: 11px; text-align: center; border-radius: 6px; padding: 1px 0; border: 1px solid var(--line); color: var(--muted); }
+.tag.live { color: var(--live); border-color: var(--live); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+@media (max-width: 480px) { .slider { grid-template-columns: 80px 1fr 40px; } .slider .tag { display: none; } .row2, .two { grid-template-columns: 1fr; } }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.out { display: grid; gap: 6px; }
+.out textarea { min-height: 160px; font-family: var(--mono); font-size: 12.5px; }
+.status { font-size: 13px; color: var(--live); min-height: 1.2em; }
+.status.err { color: var(--warn); }
+
+/* 레퍼런스 */
+.drop { border: 2px dashed var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; justify-items: start; background: var(--bg); }
+.drop.over { border-color: var(--accent); }
+.drop[aria-disabled="true"] { opacity: .7; }
+.refs { display: grid; gap: 8px; }
+.ref { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.ref-media { width: 96px; height: 96px; border-radius: 8px; overflow: hidden; background: var(--chip); display: grid; place-items: center; font-size: 12px; color: var(--muted); text-align: center; }
+.ref-media img, .ref-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ref-body { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.ref-name { font-size: 13px; display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+.ref-name span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips button { font: inherit; font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+.chips button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.ref-note { font-size: 13px !important; padding: 5px 8px !important; }
+.frames { display: flex; gap: 4px; overflow-x: auto; }
+.frames img { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; flex: none; }
+
+/* 요청 기록 */
+.reqs { display: grid; gap: 10px; }
+.req { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+.req-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.req pre { margin: 6px 0 0; white-space: pre-wrap; font-family: var(--mono); font-size: 12.5px; background: var(--bg); padding: 10px; border-radius: 10px; overflow-x: auto; }
+.req summary { cursor: pointer; font-size: 13.5px; }
+.reply { font-size: 14px; border-left: 3px solid var(--live); padding-left: 10px; }
+.req-refs { display: flex; gap: 4px; flex-wrap: wrap; }
+.req-refs img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+
+/* 렌더 시트 */
+.sheet { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+figure { margin: 0; display: grid; gap: 6px; }
+figure .ph { background: repeating-conic-gradient(var(--chip) 0 25%, var(--panel) 0 50%) 0 0 / 20px 20px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
+.hero img { border-radius: 14px; border: 1px solid var(--line); }
+.steps { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.step code { font-family: var(--mono); font-size: 12px; background: var(--chip); padding: 1px 6px; border-radius: 6px; word-break: break-all; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px"><h1>캐릭터 편집기</h1><a class="small" style="color:var(--accent)" href="https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh" target="_blank" rel="noopener">배경 편집기 열기 ↗</a></div>
+    <div class="pills" id="pills"></div>
+    <p class="muted" style="max-width:72ch">포근섬 이야기에 들어갈 3D 모델을 하나씩 골라 고치는 곳입니다. 아래 버튼으로 모델을 고르고, 그림·영상 레퍼런스와 프롬프트를 넣어 "요청 보내기"를 누르세요. 새 모델이 필요하면 "새 모델"로 추가 요청을 보낼 수 있어요.</p>
+  </header>
+
+  <nav class="picker" id="picker" aria-label="모델 고르기"></nav>
+
+  <section style="display:grid;gap:14px" aria-live="polite">
+    <div class="sel-head"><span class="id" id="selId"></span><h2 id="selName">불러오는 중…</h2><span class="small muted" id="selRole"></span><span id="selStatus"></span></div>
+    <div class="main">
+      <section class="card sticky" aria-label="3D 모델">
+        <div id="viewArea">
+          <div class="viewer" id="viewer"><div class="msg" id="viewerMsg">3D 모델 불러오는 중…</div><span class="hint">드래그: 회전 · 휠/핀치: 확대</span></div>
+        </div>
+        <div class="newcard" id="newCard" hidden>
+          <div class="plus">+</div>
+          <h3>새 모델 추가 요청</h3>
+          <p class="small muted">이름·종류·컨셉과 레퍼런스를 적어 보내주시면, Claude가 Blender로 새 모델을 만들어 이 편집기에 버튼으로 추가해요.</p>
+        </div>
+        <div class="controls" id="viewControls">
+          <div class="seg" id="animSeg" role="group" aria-label="동작"></div>
+          <label class="toggle"><input type="checkbox" id="autoRot" checked> 자동 회전</label>
+          <label class="toggle"><input type="checkbox" id="outlineOn" checked> 외곽선</label>
+        </div>
+        <div class="spec-row" id="stats"></div>
+      </section>
+
+      <section class="card editor" aria-label="프롬프트 편집">
+        <div style="display:grid;gap:2px"><h2>프롬프트 · 레퍼런스</h2><p class="small muted"><span id="baseVer"></span> · <span id="storeState">저장소 연결 중…</span></p></div>
+        <div class="two" id="newFields" hidden>
+          <div class="field"><label for="newName">새 모델 이름</label><input type="text" id="newName" placeholder="예: 부엉이 주민 '호두'"></div>
+          <div class="field"><label for="newCat">종류</label>
+            <select id="newCat"><option value="캐릭터">캐릭터</option><option value="자연·소품">자연·소품</option><option value="건물">건물</option><option value="가구">가구</option><option value="도구">도구</option></select></div>
+        </div>
+        <div class="field"><label for="req">자유 요청 (가장 우선)</label>
+          <textarea id="req" placeholder="예: 첨부한 그림처럼 귀를 둥글게, 볼은 더 통통하게. 반바지는 멜빵바지로 바꿔줘"></textarea></div>
+
+        <div class="field">
+          <span class="group-title">레퍼런스 이미지 · 영상</span>
+          <div class="drop" id="drop" aria-disabled="true">
+            <input type="file" id="refFile" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm" multiple hidden>
+            <button type="button" class="btn" id="pickFile" disabled>파일 선택</button>
+            <span class="small muted" id="dropHint">그림·사진·영상을 여기로 끌어다 놓거나 붙여넣기(Ctrl+V) 해도 돼요. PNG·JPG·WEBP·GIF·MP4·WEBM, 파일당 20MB까지.</span>
+          </div>
+          <p class="small muted">레퍼런스는 지금 고른 모델에만 붙어요. Claude가 그림을 직접 보고 형태·비율·색을 옮기고, 영상은 장면 6장을 뽑아 동작과 각도를 참고해요.</p>
+          <div class="refs" id="refList"></div>
+        </div>
+
+        <div class="field"><label for="references">글 레퍼런스 (한 줄에 하나)</label><textarea id="references"></textarea></div>
+        <div class="field"><label for="concept">컨셉</label><textarea id="concept"></textarea></div>
+        <div class="field"><label for="keywords">키워드 (쉼표로 구분)</label><input type="text" id="keywords"></div>
+        <div class="field"><label for="avoid">피할 것 (한 줄에 하나)</label><textarea id="avoid"></textarea></div>
+        <div id="modelOnly" style="display:grid;gap:16px">
+          <div class="field"><span class="group-title">색 · 바로 미리보기</span><div class="palette" id="palette"></div></div>
+          <div class="field"><span class="group-title">비율 · <span style="color:var(--live)">실시간</span> 항목은 바로 보이고, 나머지는 다시 만들 때 반영</span><div class="sliders" id="sliders"></div></div>
+          <div class="field"><span class="group-title">의상 · 무늬 (다시 만들 때 반영)</span>
+            <div class="row2">
+              <select id="top" aria-label="상의"><option value="striped-tee">줄무늬 티셔츠</option><option value="plain-tee">민무늬 티셔츠</option></select>
+              <input type="number" id="stripes" min="0" max="5" aria-label="줄무늬 수">
+              <select id="markings" aria-label="이마 무늬"><option value="none">무늬 없음</option><option value="tabby">이마 줄무늬</option></select>
+            </div></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="sendReq">요청 보내기</button>
+          <button class="btn" id="makeReq">글로 복사하기</button>
+          <button class="btn" id="resetDraft">처음 값으로</button>
+        </div>
+        <p class="status" id="sendStatus" role="status"></p>
+        <div class="out" id="outWrap" hidden>
+          <textarea id="out" readonly aria-label="수정 요청 글"></textarea>
+          <div class="actions"><button class="btn" id="copyOut">복사하기</button><span class="status" id="copyStatus" role="status"></span></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <div><span class="id">REQUESTS</span><h2>요청 기록</h2><p class="small muted">고른 모델에 보낸 요청과 Claude의 반영 결과가 여기에 쌓여요.</p></div>
+    <div class="reqs" id="reqList"><p class="small muted">아직 보낸 요청이 없어요.</p></div>
+  </section>
+
+  <section style="display:grid;gap:12px" id="renderSec">
+    <div><span class="id">RENDER</span><h2>Blender 렌더</h2><p class="small muted">정사영 카메라, 툰 셰이딩 + 외곽선. 게임 안에서는 같은 모델이 실시간으로 그려져요.</p></div>
+    <div class="sheet" id="turn"></div>
+    <h3>동작 포즈</h3>
+    <div class="sheet" id="poses"></div>
+    <figure class="hero" id="hero"></figure>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <div><span class="id">PIPELINE</span><h2>수정이 반영되는 과정</h2></div>
+    <div class="steps">
+      <div class="step"><h3>1. 모델 고르고 요청 보내기</h3><p class="small">버튼으로 모델을 고르고 레퍼런스·프롬프트를 넣어 "요청 보내기". 요청과 파일은 이 페이지의 저장소에 모델별로 남아요.</p></div>
+      <div class="step"><h3>2. 채팅에서 확인 부탁</h3><p class="small">채팅에 "요청 확인"이라고 보내주세요. Claude가 새 요청을 모두 읽고 레퍼런스를 내려받아 직접 봅니다.</p></div>
+      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/specs/&lt;모델&gt;.json</code>에, 모양 변화는 모델링 스크립트에 반영하고 <code>node tools/build-character.mjs &lt;모델&gt;</code>로 다시 만들어요.</p></div>
+      <div class="step"><h3>4. 같은 링크 갱신</h3><p class="small">새 모델·렌더로 편집기가 업데이트되고, 요청 기록에 "반영 완료"와 무엇을 바꿨는지가 적혀요. 새 모델은 버튼이 하나 늘어나요.</p></div>
+    </div>
+  </section>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const NEW = '_new';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const PAL_LABEL = { fur: '털', marking: '무늬', muzzle: '주둥이·배', innerEar: '귀 안쪽', ear: '귀', eye: '눈·입', nose: '코', blush: '볼터치',
+  shirt: '셔츠', stripe: '셔츠 줄무늬', pants: '반바지', outline: '외곽선', hair: '머리카락', tail: '꼬리', beak: '부리', feet: '발',
+  shell: '등껍질', apron: '앞치마', bowtie: '나비넥타이', glasses: '안경' };
+const palLabel = (k, species) => (k === 'fur' && species === 'human') ? '피부' : (PAL_LABEL[k] ?? k);
+const PROP = [
+  ['height', '키', 0.8, 1.2, true], ['headScale', '머리 크기', 0.8, 1.3, true], ['limbLength', '팔다리 길이', 0.7, 1.5, true],
+  ['earSize', '귀 크기', 0.6, 1.5, true], ['tailLength', '꼬리 길이', 0.5, 1.6, true], ['bodyWidth', '몸 너비', 0.8, 1.3, false],
+  ['earPointiness', '귀 뾰족함', 0.6, 2.0, false], ['eyeSize', '눈 크기', 0.7, 1.5, false], ['eyeSpacing', '눈 간격', 0.8, 1.2, false],
+];
+const FOCUS = ['전체 느낌', '얼굴', '비율·실루엣', '색', '의상', '동작'];
+const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기' };
+const RENDER_LABEL = { front: '정면', three_quarter: '3/4', side: '옆', back: '뒤', walk: '걷기', run: '달리기', happy: '기뻐하기' };
+const STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'] };
+const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
+const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
+const MAX_BYTES = 20 * 1024 * 1024;
+
+function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); }); }
+
+let models = [];
+try { models = (await loadJSON('assets/models/index.json')).models; }
+catch (e) { $('selName').textContent = '모델 목록을 불러오지 못했어요.'; $('viewerMsg').textContent = '로컬에서는 node dev-server.mjs 로 연 주소에서 확인해 주세요.'; throw e; }
+
+/* ---------- 헤더 · 모델 버튼 ---------- */
+const reviewing = models.filter(m => m.status !== 'approved').length;
+$('pills').innerHTML = [`모델 ${models.length}개`, `검수 대기 ${reviewing}`, `확정 ${models.length - reviewing}`].map(t => `<span class="pill">${t}</span>`).join('');
+$('picker').innerHTML = models.map(m => `<button type="button" class="pick" data-slug="${esc(m.slug)}" aria-pressed="false">
+    <span class="dot ${m.status === 'approved' ? 'ok' : ''}" title="${MODEL_STATUS[m.status]?.[1] ?? ''}"></span>
+    <img src="assets/renders/${esc(m.slug)}_thumb.png" alt="" loading="lazy">
+    <span class="id">${esc(m.id)}</span><span class="nm">${esc(m.name)}</span><span class="rl">${esc(m.role)}</span></button>`).join('')
+  + `<button type="button" class="pick add" data-slug="${NEW}" aria-pressed="false"><span class="plus">+</span><span class="nm">새 모델</span><span class="rl">추가 요청</span></button>`;
+$('picker').addEventListener('click', e => { const b = e.target.closest('[data-slug]'); if (b) select(b.dataset.slug); });
+
+/* ---------- 고른 모델 상태 ---------- */
+let slug = null, spec = null, stats = null, draft = null;
+const cache = {};
+const draftKey = () => slug === NEW ? 'island-draft-_new' : `island-draft-${slug}-v${spec.version}`;
+const pick = s => JSON.parse(JSON.stringify({ request: '', prompt: s.prompt, palette: s.palette, proportions: s.proportions, outfit: s.outfit, markings: s.markings ?? 'none' }));
+const blankNew = () => ({ request: '', name: '', category: '캐릭터', prompt: { concept: '', keywords: [], references: [], avoid: [] } });
+const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify(draft)); } catch {} };
+const restore = base => { try { const s = localStorage.getItem(draftKey()); if (s) return { ...base, ...JSON.parse(s) }; } catch {} return base; };
+
+async function select(next) {
+  if (next === slug) return;
+  const model = models.find(m => m.slug === next);
+  if (next !== NEW && !model) next = models[0]?.slug;
+  slug = next;
+  try { history.replaceState(null, '', '#' + slug.replace(/^_/, '')); } catch {}
+  document.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.slug === slug)));
+  document.querySelector(`.pick[data-slug="${slug}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  $('outWrap').hidden = true; setStatus('');
+  document.querySelectorAll('#refList .pending').forEach(n => n.remove());
+  const isNew = slug === NEW;
+  $('newFields').hidden = !isNew; $('newCard').hidden = !isNew;
+  $('viewArea').hidden = isNew; $('viewControls').hidden = isNew; $('renderSec').hidden = isNew;
+  $('modelOnly').style.display = isNew ? 'none' : 'grid';
+  clearModel();
+  if (isNew) {
+    spec = null; stats = null;
+    $('selId').textContent = 'NEW'; $('selName').textContent = '새 모델 추가'; $('selRole').textContent = '';
+    $('selStatus').innerHTML = ''; $('stats').innerHTML = ''; $('baseVer').textContent = '새 모델 요청';
+    draft = restore(blankNew());
+    fillForm(); renderRefs(); renderRequests();
+    return;
+  }
+  $('selId').textContent = model.id; $('selName').textContent = model.name; $('selRole').textContent = model.role;
+  const [cls, label] = MODEL_STATUS[model.status] ?? MODEL_STATUS.review;
+  $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
+  $('viewerMsg').hidden = false; $('viewerMsg').textContent = '3D 모델 불러오는 중…';
+  const want = slug;
+  try {
+    cache[want] ??= await Promise.all([loadJSON(`assets/specs/${want}.json`), loadJSON(`assets/models/${want}.stats.json`)]);
+  } catch { if (slug === want) $('viewerMsg').textContent = '모델 정보를 불러오지 못했어요.'; return; }
+  if (slug !== want) return;
+  [spec, stats] = cache[want];
+  $('baseVer').textContent = `기준: 스펙 v${spec.version}`;
+  const kb = n => `${Math.round(n / 1024)}KB`;
+  $('stats').innerHTML = [
+    [stats.triangles.toLocaleString('ko-KR'), '삼각형'], [stats.bones, '뼈대(본)'], [Object.keys(stats.animations).length, '동작'],
+    [stats.materials.length, '재질'], [kb(stats.glbBytes), '.glb 용량'], [`${stats.height.toFixed(2)}`, '키 (타일)'],
+  ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  const img = name => `<figure><div class="ph"><img src="assets/renders/${want}_${name}.png" alt="${esc(spec.name)} ${RENDER_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${RENDER_LABEL[name] ?? ''}</figcaption></figure>`;
+  $('turn').innerHTML = ['front', 'three_quarter', 'side', 'back'].map(img).join('');
+  $('poses').innerHTML = ['walk', 'run', 'happy'].filter(n => stats.renders.includes(`${want}_${n}.png`)).map(img).join('');
+  $('hero').innerHTML = `<img src="assets/renders/${want}_hero.png" alt="섬 위에 서 있는 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>섬 위에 세워 본 모습</figcaption>`;
+  draft = restore(pick(spec));
+  fillForm(); renderRefs(); renderRequests();
+  loadModel(want);
+}
+
+/* ---------- 프롬프트 폼 ---------- */
+function fillForm() {
+  $('req').value = draft.request ?? '';
+  $('concept').value = draft.prompt.concept ?? '';
+  $('keywords').value = (draft.prompt.keywords ?? []).join(', ');
+  $('references').value = (draft.prompt.references ?? []).join('\n');
+  $('avoid').value = (draft.prompt.avoid ?? []).join('\n');
+  if (slug === NEW) { $('newName').value = draft.name ?? ''; $('newCat').value = draft.category ?? '캐릭터'; return; }
+  $('palette').innerHTML = Object.entries(draft.palette).map(([k, v]) =>
+    `<label class="swatch"><input type="color" data-pal="${k}" value="${v.toLowerCase()}"><span>${palLabel(k, spec.species)}<code data-hex="${k}">${v.toUpperCase()}</code></span></label>`).join('');
+  $('sliders').innerHTML = PROP.map(([k, label, min, max, live]) =>
+    `<label class="slider"><span>${label}</span><input type="range" min="${min}" max="${max}" step="0.01" value="${draft.proportions[k]}" data-prop="${k}"><output data-out="${k}">${(+draft.proportions[k]).toFixed(2)}</output><span class="tag ${live ? 'live' : ''}">${live ? '실시간' : '재생성'}</span></label>`).join('');
+  $('top').value = draft.outfit.top;
+  $('stripes').value = draft.outfit.stripes;
+  $('markings').value = draft.markings;
+}
+
+const lines = v => v.split('\n').map(s => s.trim()).filter(Boolean);
+const editor = document.querySelector('.editor');
+editor.addEventListener('input', e => {
+  const t = e.target;
+  if (!draft || t.closest('#refList')) return;
+  if (t.id === 'req') draft.request = t.value;
+  else if (t.id === 'newName') draft.name = t.value;
+  else if (t.id === 'newCat') draft.category = t.value;
+  else if (t.id === 'concept') draft.prompt.concept = t.value;
+  else if (t.id === 'keywords') draft.prompt.keywords = t.value.split(',').map(s => s.trim()).filter(Boolean);
+  else if (t.id === 'references') draft.prompt.references = lines(t.value);
+  else if (t.id === 'avoid') draft.prompt.avoid = lines(t.value);
+  else if (t.dataset.pal) { draft.palette[t.dataset.pal] = t.value.toUpperCase(); document.querySelector(`[data-hex="${t.dataset.pal}"]`).textContent = t.value.toUpperCase(); recolor(); }
+  else if (t.dataset.prop) { draft.proportions[t.dataset.prop] = +t.value; document.querySelector(`[data-out="${t.dataset.prop}"]`).textContent = (+t.value).toFixed(2); }
+  else if (t.id === 'top') draft.outfit.top = t.value;
+  else if (t.id === 'stripes') draft.outfit.stripes = Math.max(0, Math.min(5, +t.value || 0));
+  else if (t.id === 'markings') draft.markings = t.value;
+  else return;
+  save();
+});
+editor.addEventListener('change', e => { if (e.target.tagName === 'SELECT') e.target.dispatchEvent(new Event('input', { bubbles: true })); });
+$('resetDraft').addEventListener('click', () => { draft = slug === NEW ? blankNew() : pick(spec); save(); fillForm(); recolor(); $('outWrap').hidden = true; });
+
+/* ---------- 저장소: 웹 링크(아티팩트 db·assets) 또는 로컬 dev-server ---------- */
+function artifactStore(db, assets, user) {
+  return {
+    label: '이 페이지의 저장소(웹)에 저장돼요', canUpload: !!assets,
+    watch(col, cb) { return db.collection(col).onSnapshot(s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), e => cb(null, e)); },
+    add: (col, data) => db.collection(col).add(data).then(ref => ref.id),
+    update: (col, id, data) => db.doc(`${col}/${id}`).update(data),
+    upload: async (blob, type) => { const r = await assets.upload(blob, { type }); return { id: r.id, url: r.url }; },
+    url: id => '/_blob/' + id,
+    who: async () => (await user?.id?.()) ?? null,
+  };
+}
+function localStore() {
+  const listeners = {};
+  const refresh = async col => {
+    try { const rows = await fetch(`api/db/${col}`).then(r => r.json()); (listeners[col] ?? []).forEach(cb => cb(rows)); } catch {}
+  };
+  setInterval(() => Object.keys(listeners).forEach(refresh), 5000);
+  const send = (url, method, payload) => fetch(url, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }).then(r => r.json());
+  return {
+    label: '로컬 프로젝트 폴더(assets/review, assets/references)에 저장돼요', canUpload: true,
+    watch(col, cb) { (listeners[col] ??= []).push(cb); refresh(col); return () => {}; },
+    async add(col, data) { const r = await send(`api/db/${col}`, 'POST', data); refresh(col); return r.id; },
+    async update(col, id, data) { await send(`api/db/${col}/${id}`, 'PATCH', data); refresh(col); },
+    async upload(blob, type, name) {
+      const r = await fetch(`api/assets?name=${encodeURIComponent(name ?? 'file')}`, { method: 'POST', headers: { 'content-type': type }, body: blob });
+      if (!r.ok) throw Object.assign(new Error('upload'), { code: (await r.json()).code });
+      return r.json();
+    },
+    url: id => `assets/references/${id}`,
+    who: async () => 'local',
+  };
+}
+async function connectStore() {
+  if (window.claude?.use) {
+    const [db, assets, user] = await Promise.all(['db', 'assets', 'user'].map(n => window.claude.use(n).catch(() => null)));
+    if (db) return artifactStore(db, assets, user);
+  }
+  try { if ((await fetch('api/ping')).ok) return localStore(); } catch {}
+  return null;
+}
+
+let store = null, allRefs = [], allReqs = [];
+connectStore().then(s => {
+  store = s;
+  if (!s) {
+    $('storeState').textContent = '저장소를 쓸 수 없는 화면이라 "글로 복사하기"로 채팅에 붙여 주세요.';
+    $('dropHint').textContent = '이 화면에서는 파일을 올릴 수 없어요. claude.ai 링크에서 열거나, 그림은 채팅에 직접 첨부해 주세요.';
+    $('sendReq').disabled = true;
+    return;
+  }
+  $('storeState').textContent = s.label;
+  if (s.canUpload) { $('drop').setAttribute('aria-disabled', 'false'); $('pickFile').disabled = false; }
+  else $('dropHint').textContent = '파일은 이 페이지를 편집할 수 있는 사람만 올릴 수 있어요.';
+  s.watch('refs', rows => { if (rows) { allRefs = rows; renderRefs(); } });
+  s.watch('requests', rows => { if (rows) { allReqs = rows; renderRequests(); renderPickerBadges(); } });
+});
+const refRows = () => allRefs.filter(r => r.slug === slug);
+function renderPickerBadges() {
+  const open = new Set(allReqs.filter(r => r.status !== 'done').map(r => r.slug));
+  document.querySelectorAll('.pick').forEach(b => { b.title = open.has(b.dataset.slug) ? '처리 중인 요청이 있어요' : ''; });
+}
+
+/* ---------- 레퍼런스 업로드 ---------- */
+const mediaURL = asset => store ? store.url(asset) : '';
+function mediaTag(r) {
+  return r.kind === 'video'
+    ? `<video src="${esc(mediaURL(r.asset))}" muted playsinline preload="metadata" controls></video>`
+    : `<img src="${esc(mediaURL(r.asset))}" alt="${esc(r.name)}" loading="lazy">`;
+}
+function renderRefs() {
+  const list = $('refList'), rows = refRows();
+  const parents = rows.filter(r => r.kind !== 'frame' && r.status !== 'removed').sort((a, b) => a.createdAt - b.createdAt);
+  const keep = new Set(parents.map(r => r.id));
+  for (const card of [...list.querySelectorAll('[data-ref]')]) if (!keep.has(card.dataset.ref)) card.remove();
+  for (const r of parents) {
+    let card = list.querySelector(`[data-ref="${r.id}"]`);
+    if (!card) {
+      card = document.createElement('article');
+      card.className = 'ref';
+      card.dataset.ref = r.id;
+      card.innerHTML = `<div class="ref-media">${mediaTag(r)}</div>
+        <div class="ref-body">
+          <div class="ref-name"><span>${esc(r.name)}</span><span class="muted small">${r.kind === 'video' ? '영상' : '이미지'}</span></div>
+          <div class="chips">${FOCUS.map(f => `<button type="button" data-focus="${f}" aria-pressed="false">${f}</button>`).join('')}</div>
+          <input type="text" class="ref-note" placeholder="이 레퍼런스에서 볼 점 (예: 귀 모양, 꼬리 끝 색)" aria-label="볼 점">
+          <div class="frames"></div>
+          <div><button type="button" class="btn link" data-remove>목록에서 빼기</button></div>
+        </div>`;
+      list.append(card);
+    }
+    card.querySelectorAll('[data-focus]').forEach(b => b.setAttribute('aria-pressed', String((r.focus ?? []).includes(b.dataset.focus))));
+    const note = card.querySelector('.ref-note');
+    if (document.activeElement !== note) note.value = r.note ?? '';
+    const frames = rows.filter(f => f.kind === 'frame' && f.parent === r.id).sort((a, b) => a.t - b.t);
+    const fr = card.querySelector('.frames');
+    const sig = frames.map(f => f.asset).join(',');
+    if (fr.dataset.sig !== sig) { fr.dataset.sig = sig; fr.innerHTML = frames.map(f => `<img src="${esc(mediaURL(f.asset))}" alt="${esc(r.name)} ${f.t.toFixed(1)}초 장면" title="${f.t.toFixed(1)}초">`).join(''); }
+  }
+}
+const refById = id => allRefs.find(r => r.id === id);
+$('refList').addEventListener('click', async e => {
+  const card = e.target.closest('[data-ref]');
+  if (!card || !store) return;
+  const r = refById(card.dataset.ref);
+  const chip = e.target.closest('[data-focus]');
+  if (chip && r) {
+    const focus = new Set(r.focus ?? []);
+    focus.has(chip.dataset.focus) ? focus.delete(chip.dataset.focus) : focus.add(chip.dataset.focus);
+    chip.setAttribute('aria-pressed', String(focus.has(chip.dataset.focus)));
+    await store.update('refs', r.id, { focus: [...focus] }).catch(() => {});
+  }
+  const rm = e.target.closest('[data-remove]');
+  if (rm && r) {
+    if (!rm.classList.contains('armed')) { rm.classList.add('armed'); rm.textContent = '한 번 더 누르면 빠져요'; setTimeout(() => { rm.classList.remove('armed'); rm.textContent = '목록에서 빼기'; }, 4000); return; }
+    await store.update('refs', r.id, { status: 'removed' }).catch(() => {});
+  }
+});
+$('refList').addEventListener('change', e => {
+  if (!e.target.classList.contains('ref-note') || !store) return;
+  store.update('refs', e.target.closest('[data-ref]').dataset.ref, { note: e.target.value.trim() }).catch(() => {});
+});
+
+const seek = (v, t) => new Promise((ok, no) => { const tm = setTimeout(() => no(new Error('seek')), 8000); v.onseeked = () => { clearTimeout(tm); ok(); }; v.currentTime = t; });
+async function extractFrames(src, n = 6) {
+  const v = document.createElement('video');
+  v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = src;
+  await new Promise((ok, no) => { const tm = setTimeout(() => no(new Error('timeout')), 15000); v.onloadeddata = () => { clearTimeout(tm); ok(); }; v.onerror = () => no(new Error('video')); });
+  if (!isFinite(v.duration) || v.duration <= 0 || !v.videoWidth) throw new Error('duration');
+  const W = Math.min(768, v.videoWidth), H = Math.round(v.videoHeight * W / v.videoWidth);
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const g = c.getContext('2d'), out = [];
+  for (let i = 0; i < n; i++) {
+    const t = v.duration * (i + 0.5) / n;
+    await seek(v, t);
+    g.drawImage(v, 0, 0, W, H);
+    out.push({ t, blob: await new Promise(r => c.toBlob(r, 'image/jpeg', 0.86)) });
+  }
+  return out;
+}
+
+const UPLOAD_ERR = { too_large: '20MB보다 커서 올릴 수 없어요.', unsupported_type: '지원하지 않는 형식이에요.', quota_or_state: '저장 공간이 가득 찼어요.', rate_limited: '잠시 후 다시 올려 주세요.', not_granted: '이 화면에서는 올릴 권한이 없어요.' };
+async function addFiles(files) {
+  if (!store?.canUpload || !slug) return;
+  const target = slug;
+  for (const file of files) {
+    const type = file.type;
+    const pending = document.createElement('article');
+    pending.className = 'ref pending';
+    pending.innerHTML = `<div class="ref-media">올리는 중…</div><div class="ref-body"><div class="ref-name"><span>${esc(file.name)}</span></div><span class="small muted" data-msg>업로드 중</span></div>`;
+    $('refList').append(pending);
+    const msg = t => { const m = pending.querySelector('[data-msg]'); if (m) m.textContent = t; };
+    if (!UPLOAD_TYPES.includes(type)) { msg('PNG·JPG·WEBP·GIF·MP4·WEBM 파일만 올릴 수 있어요.'); setTimeout(() => pending.remove(), 6000); continue; }
+    if (file.size > MAX_BYTES) { msg(UPLOAD_ERR.too_large); setTimeout(() => pending.remove(), 6000); continue; }
+    try {
+      const kind = type.startsWith('video/') ? 'video' : 'image';
+      const a = await store.upload(file, type, file.name);
+      const refId = await store.add('refs', { slug: target, kind, asset: a.id, mime: type, name: file.name, note: '', focus: [], status: 'active', createdAt: Date.now() });
+      if (kind === 'video') {
+        msg('장면 뽑는 중…');
+        let frames;
+        const local = URL.createObjectURL(file);
+        try { frames = await extractFrames(local); } catch { frames = await extractFrames(store.url(a.id)).catch(() => []); }
+        URL.revokeObjectURL(local);
+        for (const [i, f] of frames.entries()) {
+          msg(`장면 저장 중 ${i + 1}/${frames.length}`);
+          const fa = await store.upload(f.blob, 'image/jpeg', `${file.name}-${i + 1}.jpg`);
+          await store.add('refs', { slug: target, kind: 'frame', parent: refId, asset: fa.id, mime: 'image/jpeg', name: `${file.name} #${i + 1}`, t: f.t, status: 'active', createdAt: Date.now() });
+        }
+        if (!frames.length) await store.update('refs', refId, { note: '(장면을 뽑지 못했어요. 영상 자체는 저장됨)' });
+      }
+      pending.remove();
+    } catch (err) {
+      msg(UPLOAD_ERR[err?.code] ?? '올리지 못했어요. 다시 시도해 주세요.');
+      setTimeout(() => pending.remove(), 8000);
+    }
+  }
+}
+$('pickFile').addEventListener('click', () => $('refFile').click());
+$('refFile').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { if (!store?.canUpload) return; e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('over')));
+drop.addEventListener('drop', e => { if (!store?.canUpload) return; e.preventDefault(); addFiles([...e.dataTransfer.files]); });
+document.addEventListener('paste', e => {
+  const files = [...(e.clipboardData?.files ?? [])].filter(f => UPLOAD_TYPES.includes(f.type));
+  if (files.length && store?.canUpload) { e.preventDefault(); addFiles(files); }
+});
+
+/* ---------- 요청 만들기 · 보내기 ---------- */
+const activeRefs = () => {
+  const live = refRows().filter(r => r.status !== 'removed');
+  return live.filter(r => r.kind !== 'frame').map(r => ({
+    id: r.id, asset: r.asset, kind: r.kind, name: r.name, note: r.note ?? '', focus: r.focus ?? [],
+    frames: live.filter(f => f.kind === 'frame' && f.parent === r.id).sort((a, b) => a.t - b.t).map(f => f.asset),
+  }));
+};
+function refLines(refs) {
+  return refs.length ? ['', `■ 이미지·영상 레퍼런스 ${refs.length}개`, ...refs.map(r =>
+    `- ${r.name} (${r.kind === 'video' ? `영상, 장면 ${r.frames.length}장` : '이미지'})${r.focus.length ? ` · 볼 부분: ${r.focus.join(', ')}` : ''}${r.note ? ` · ${r.note}` : ''}`)] : [];
+}
+function buildRequest(refs = activeRefs()) {
+  if (slug === NEW) {
+    const p = draft.prompt, out = [`[새 모델 추가 요청] ${draft.name || '(이름 미정)'} · ${draft.category}`];
+    if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
+    out.push(...refLines(refs));
+    if (p.concept) out.push('', '■ 컨셉', p.concept);
+    if (p.keywords.length) out.push('', '■ 키워드', p.keywords.join(', '));
+    if (p.references.length) out.push('', '■ 글 레퍼런스', ...p.references.map(s => `- ${s}`));
+    if (p.avoid.length) out.push('', '■ 피할 것', ...p.avoid.map(s => `- ${s}`));
+    return out.join('\n');
+  }
+  const base = pick(spec), out = [`[${spec.id} ${spec.name} 수정 요청 · 기준 스펙 v${spec.version}]`];
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
+  out.push(...refLines(refs));
+  if (draft.prompt.concept !== base.prompt.concept) out.push('', '■ 컨셉', draft.prompt.concept);
+  if (!same(draft.prompt.keywords, base.prompt.keywords)) out.push('', '■ 키워드', draft.prompt.keywords.join(', '));
+  if (!same(draft.prompt.references, base.prompt.references)) out.push('', '■ 글 레퍼런스', ...draft.prompt.references.map(s => `- ${s}`));
+  if (!same(draft.prompt.avoid, base.prompt.avoid)) out.push('', '■ 피할 것', ...draft.prompt.avoid.map(s => `- ${s}`));
+  const pal = Object.keys(draft.palette).filter(k => draft.palette[k].toUpperCase() !== base.palette[k]?.toUpperCase());
+  if (pal.length) out.push('', '■ 색 변경', ...pal.map(k => `- ${k}(${palLabel(k, spec.species)}): ${base.palette[k]} → ${draft.palette[k]}`));
+  const pr = PROP.filter(([k]) => Math.abs(draft.proportions[k] - base.proportions[k]) > 0.004);
+  if (pr.length) out.push('', '■ 비율 변경', ...pr.map(([k, l]) => `- ${k}(${l}): ${(+base.proportions[k]).toFixed(2)} → ${draft.proportions[k].toFixed(2)}`));
+  const of = [];
+  if (draft.outfit.top !== base.outfit.top) of.push(`- 상의: ${base.outfit.top} → ${draft.outfit.top}`);
+  if (+draft.outfit.stripes !== +base.outfit.stripes) of.push(`- 줄무늬 수: ${base.outfit.stripes} → ${draft.outfit.stripes}`);
+  if (draft.markings !== base.markings) of.push(`- 이마 무늬: ${base.markings} → ${draft.markings}`);
+  if (of.length) out.push('', '■ 의상 · 무늬', ...of);
+  if (out.length === 1) out.push('', `(바뀐 내용이 없어요. 이대로 확정이면 "${spec.name} 확정"이라고 보내주세요.)`);
+  return out.join('\n');
+}
+function setStatus(text, err = false) { const s = $('sendStatus'); s.textContent = text; s.classList.toggle('err', err); }
+$('sendReq').addEventListener('click', async () => {
+  if (!store || !draft) return;
+  if (slug === NEW && !draft.name.trim() && !draft.request.trim() && !draft.prompt.concept.trim()) { setStatus('새 모델 이름이나 요청 내용을 적어 주세요.', true); return; }
+  const btn = $('sendReq');
+  btn.disabled = true;
+  setStatus('보내는 중…');
+  try {
+    const refs = activeRefs();
+    await store.add('requests', { slug, kind: slug === NEW ? 'add' : 'edit', base: spec?.version ?? null, status: 'new', createdAt: Date.now(),
+      by: await store.who(), text: buildRequest(refs), fields: draft, refs });
+    setStatus('요청을 저장했어요. 채팅에 "요청 확인"이라고 보내주시면 바로 작업할게요.');
+    draft.request = ''; $('req').value = ''; save();
+  } catch (err) {
+    setStatus(err?.code === 'quota_exceeded' ? '저장 공간이 가득 차서 보내지 못했어요.' : '보내지 못했어요. "글로 복사하기"로 채팅에 붙여 주세요.', true);
+  } finally { btn.disabled = !store; }
+});
+$('makeReq').addEventListener('click', () => { if (!draft) return; $('out').value = buildRequest(); $('outWrap').hidden = false; $('copyStatus').textContent = ''; $('out').focus(); });
+$('copyOut').addEventListener('click', () => {
+  const ta = $('out');
+  const fallback = () => { ta.select(); $('copyStatus').textContent = '선택해 두었어요. Ctrl+C로 복사해 주세요.'; };
+  try { navigator.clipboard.writeText(ta.value).then(() => { $('copyStatus').textContent = '복사했어요. 채팅에 붙여넣어 주세요.'; }, fallback); }
+  catch { fallback(); }
+});
+
+const when = ts => new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+function renderRequests() {
+  const rows = allReqs.filter(r => r.slug === slug).sort((a, b) => b.createdAt - a.createdAt);
+  if (!rows.length) { $('reqList').innerHTML = '<p class="small muted">아직 보낸 요청이 없어요.</p>'; return; }
+  $('reqList').innerHTML = rows.map(r => {
+    const [cls, label] = STATUS[r.status] ?? STATUS.new;
+    const thumbs = (r.refs ?? []).map(x => x.kind === 'video' ? (x.frames?.[0] ?? null) : x.asset).filter(Boolean);
+    return `<article class="req">
+      <div class="req-head"><span class="pill ${cls}">${label}</span><span class="small muted">${when(r.createdAt)}${r.base ? ` · 기준 v${esc(r.base)}` : ''}${r.doneVersion ? ` → v${esc(r.doneVersion)}` : ''} · 레퍼런스 ${(r.refs ?? []).length}개</span></div>
+      ${thumbs.length ? `<div class="req-refs">${thumbs.map(a => `<img src="${esc(mediaURL(a))}" alt="" loading="lazy">`).join('')}</div>` : ''}
+      ${r.reply ? `<p class="reply">${esc(r.reply)}</p>` : ''}
+      <details><summary>요청 내용</summary><pre>${esc(r.text)}</pre></details>
+    </article>`;
+  }).join('');
+}
+
+/* ---------- 3D 뷰어 ---------- */
+const host = $('viewer');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+host.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(28, 1, 0.05, 50);
+camera.position.set(-1.1, 1.05, 3.0);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.46, 0);
+controls.enableDamping = true;
+controls.minDistance = 1.1;
+controls.maxDistance = 6;
+controls.maxPolarAngle = Math.PI * 0.56;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.1;
+controls.addEventListener('start', () => { controls.autoRotate = false; $('autoRot').checked = false; });
+$('autoRot').addEventListener('change', e => { controls.autoRotate = e.target.checked; });
+
+scene.add(new THREE.HemisphereLight(0xeef8ff, 0xc9d79f, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+sun.position.set(-1.4, 3.2, 2.6);
+scene.add(sun);
+
+const grad = new THREE.DataTexture(new Uint8Array([168, 168, 168, 255, 255, 255, 255, 255]), 2, 1, THREE.RGBAFormat);
+grad.minFilter = grad.magFilter = THREE.NearestFilter;
+grad.needsUpdate = true;
+
+const ground = new THREE.Mesh(new THREE.CircleGeometry(1.5, 64), new THREE.MeshToonMaterial({ color: 0xa9c46a, gradientMap: grad }));
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+const shadowTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+  r.addColorStop(0, 'rgba(40,60,30,.38)'); r.addColorStop(1, 'rgba(40,60,30,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+})();
+const blob = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.62), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
+blob.rotation.x = -Math.PI / 2;
+blob.position.y = 0.003;
+scene.add(blob);
+
+const outlineW = { value: 0.006 };
+const outlineMat = new THREE.MeshBasicMaterial({ color: '#4A3B32', side: THREE.BackSide });
+outlineMat.onBeforeCompile = sh => {
+  sh.uniforms.uW = outlineW;
+  sh.vertexShader = 'uniform float uW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize( normal ) * uW;');
+};
+const NO_OUTLINE = new Set(['eye', 'eyeHighlight', 'blush', 'marking', 'innerEar', 'glasses']);
+const FLAT = new Set(['eye', 'eyeHighlight', 'blush']);
+let model = null, mixer = null, actions = {}, current = null, bones = {}, rootRest = 0, mats = {}, outlines = [], loadSeq = 0;
+
+function clearModel() {
+  loadSeq++;
+  if (model) {
+    scene.remove(model);
+    model.traverse(o => { if (o.isMesh) { o.geometry.dispose(); if (o.material !== outlineMat) o.material.dispose(); } });
+  }
+  model = null; mixer = null; actions = {}; current = null; bones = {}; mats = {}; outlines = [];
+  $('animSeg').innerHTML = '';
+}
+
+function recolor() {
+  if (!draft?.palette) return;
+  for (const [name, list] of Object.entries(mats)) if (draft.palette[name]) list.forEach(m => m.color.set(draft.palette[name]));
+  outlineMat.color.set(draft.palette.outline ?? '#4A3B32');
+}
+
+function applyProportions() {
+  if (!model || !draft?.proportions) return;
+  const p = draft.proportions, o = spec.proportions;
+  const k = key => p[key] / (o[key] || 1);
+  model.scale.setScalar(k('height'));
+  bones.head?.scale.setScalar(k('headScale'));
+  bones.earL?.scale.setScalar(k('earSize'));
+  bones.earR?.scale.setScalar(k('earSize'));
+  bones.tail1?.scale.setScalar(k('tailLength'));
+  const lk = k('limbLength');
+  for (const b of [bones.legL, bones.legR, bones.armL, bones.armR]) b?.scale.set(1, lk, 1);
+  if (bones.root) bones.root.position.y = rootRest + 0.13 * (o.limbLength ?? 1) * (o.height ?? 1) * (lk - 1);
+}
+
+function play(name) {
+  const next = actions[name];
+  if (!next || next === current) return;
+  next.reset().play();
+  if (current) current.crossFadeTo(next, 0.25, false);
+  current = next;
+  document.querySelectorAll('#animSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.anim === name)));
+}
+$('animSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) play(b.dataset.anim); });
+
+function onModel(gltf) {
+  model = gltf.scene;
+  const meshes = [];
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    const src = o.material, name = src.name;
+    const m = FLAT.has(name) ? new THREE.MeshBasicMaterial({ color: src.color.clone() }) : new THREE.MeshToonMaterial({ color: src.color.clone(), gradientMap: grad });
+    m.name = name;
+    o.material = m;
+    o.frustumCulled = false;
+    (mats[name] ||= []).push(m);
+    meshes.push(o);
+  });
+  for (const o of meshes) {
+    if (NO_OUTLINE.has(o.material.name) || !o.isSkinnedMesh) continue;
+    const ol = new THREE.SkinnedMesh(o.geometry, outlineMat);
+    ol.bind(o.skeleton, o.bindMatrix);
+    ol.position.copy(o.position); ol.quaternion.copy(o.quaternion); ol.scale.copy(o.scale);
+    ol.frustumCulled = false;
+    ol.visible = $('outlineOn').checked;
+    o.parent.add(ol);
+    outlines.push(ol);
+  }
+  const find = n => model.getObjectByName(n) ?? model.getObjectByName(n.replace('.', ''));
+  bones = { root: find('root'), head: find('head'), earL: find('ear.L'), earR: find('ear.R'), tail1: find('tail.1'),
+    legL: find('leg.L'), legR: find('leg.R'), armL: find('arm.L'), armR: find('arm.R') };
+  rootRest = bones.root?.position.y ?? 0;
+  scene.add(model);
+  mixer = new THREE.AnimationMixer(model);
+  for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
+  const order = ['idle', 'walk', 'run', 'happy'].filter(n => actions[n]);
+  $('animSeg').innerHTML = order.map(n => `<button type="button" data-anim="${n}" aria-pressed="false">${ANIM_LABEL[n] ?? n}</button>`).join('');
+  outlineW.value = spec.style?.outlineWidth ?? 0.006;
+  const h = stats.height ?? 1;
+  controls.target.set(0, 0.46 * h, 0);
+  recolor();
+  play('idle');
+  $('viewerMsg').hidden = true;
+}
+// 웹 링크는 .glb 파일과 data: 주소 fetch 를 막아서, base64로 감싼 JSON을 받아 직접 풀어 읽는다 (tools/glb-to-json.mjs)
+function loadModel(want) {
+  const seq = loadSeq;
+  loadJSON(`assets/models/${want}.glb.json`)
+    .then(j => {
+      const bin = Uint8Array.from(atob(j.data), c => c.charCodeAt(0));
+      return new Promise((ok, no) => new GLTFLoader().parse(bin.buffer, '', ok, no));
+    })
+    .then(gltf => { if (seq === loadSeq && slug === want) onModel(gltf); })
+    .catch(() => { if (seq === loadSeq) $('viewerMsg').textContent = '3D 모델을 불러오지 못했어요. 새로고침해 보시고, 계속되면 채팅으로 알려주세요.'; });
+}
+
+$('outlineOn').addEventListener('change', e => outlines.forEach(o => { o.visible = e.target.checked; }));
+
+const clock = new THREE.Clock();
+function resize() {
+  const w = host.clientWidth, h = host.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(host);
+resize();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mixer) { mixer.update(dt); applyProportions(); }
+  controls.update();
+  renderer.render(scene, camera);
+});
+
+const slugFromHash = () => {
+  const h = location.hash.slice(1);
+  return h === 'new' ? NEW : (models.some(m => m.slug === h) ? h : null);
+};
+addEventListener('hashchange', () => { const s = slugFromHash(); if (s) select(s); });
+select(slugFromHash() ?? (models.find(m => m.slug === 'coco') ?? models[0]).slug);
+</script>

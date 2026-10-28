@@ -1,0 +1,35 @@
+{
+  "id": "TI-07",
+  "slug": "tile-plaza",
+  "name": "광장 바닥",
+  "category": "tile",
+  "kind": "tile-plaza",
+  "version": "0.1",
+  "triangles": 540,
+  "parts": 1,
+  "materials": [
+    "dirt",
+    "grout",
+    "stone",
+    "stoneLight"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.06
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 12148,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-plaza_front.png",
+    "tile-plaza_hero.jpg",
+    "tile-plaza_main.png",
+    "tile-plaza_thumb.png",
+    "tile-plaza_top.png"
+  ]
+}

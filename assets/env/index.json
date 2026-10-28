@@ -1,0 +1,298 @@
+{
+  "categories": [
+    "nature",
+    "prop",
+    "building",
+    "tile"
+  ],
+  "models": [
+    {
+      "id": "EN-01",
+      "slug": "tree",
+      "name": "활엽수",
+      "category": "nature",
+      "kind": "tree",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-02",
+      "slug": "fruit-tree",
+      "name": "과일나무",
+      "category": "nature",
+      "kind": "fruit-tree",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-03",
+      "slug": "palm",
+      "name": "야자수",
+      "category": "nature",
+      "kind": "palm",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-04",
+      "slug": "cedar",
+      "name": "삼나무",
+      "category": "nature",
+      "kind": "cedar",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-05",
+      "slug": "rock",
+      "name": "바위",
+      "category": "nature",
+      "kind": "rock",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-06",
+      "slug": "tulip",
+      "name": "튤립",
+      "category": "nature",
+      "kind": "flower-tulip",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-07",
+      "slug": "cosmos",
+      "name": "코스모스",
+      "category": "nature",
+      "kind": "flower-cosmos",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-08",
+      "slug": "pansy",
+      "name": "팬지",
+      "category": "nature",
+      "kind": "flower-pansy",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-09",
+      "slug": "weed",
+      "name": "잡초",
+      "category": "nature",
+      "kind": "weed",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-10",
+      "slug": "shell",
+      "name": "조개",
+      "category": "nature",
+      "kind": "shell",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "EN-11",
+      "slug": "bush",
+      "name": "꽃덤불",
+      "category": "nature",
+      "kind": "bush",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-01",
+      "slug": "lamp",
+      "name": "가로등",
+      "category": "prop",
+      "kind": "lamp",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-02",
+      "slug": "bench",
+      "name": "벤치",
+      "category": "prop",
+      "kind": "bench",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-03",
+      "slug": "mailbox",
+      "name": "우편함",
+      "category": "prop",
+      "kind": "mailbox",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-04",
+      "slug": "signboard",
+      "name": "안내판",
+      "category": "prop",
+      "kind": "signboard",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-05",
+      "slug": "bridge",
+      "name": "나무다리",
+      "category": "prop",
+      "kind": "bridge",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-06",
+      "slug": "fence",
+      "name": "울타리",
+      "category": "prop",
+      "kind": "fence",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-07",
+      "slug": "fossil-spot",
+      "name": "화석 자리",
+      "category": "prop",
+      "kind": "fossil-spot",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-08",
+      "slug": "workbench",
+      "name": "작업대",
+      "category": "prop",
+      "kind": "workbench",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-09",
+      "slug": "campfire",
+      "name": "모닥불",
+      "category": "prop",
+      "kind": "campfire",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-01",
+      "slug": "house-player",
+      "name": "플레이어 집",
+      "category": "building",
+      "kind": "house",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-02",
+      "slug": "house-villager",
+      "name": "주민 집",
+      "category": "building",
+      "kind": "house",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-03",
+      "slug": "shop",
+      "name": "도토리상점",
+      "category": "building",
+      "kind": "shop",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-04",
+      "slug": "museum",
+      "name": "박물관",
+      "category": "building",
+      "kind": "museum",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-05",
+      "slug": "dock",
+      "name": "선착장",
+      "category": "building",
+      "kind": "dock",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-01",
+      "slug": "tile-grass",
+      "name": "풀밭",
+      "category": "tile",
+      "kind": "tile-grass",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-02",
+      "slug": "tile-sand",
+      "name": "모래사장",
+      "category": "tile",
+      "kind": "tile-sand",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-03",
+      "slug": "tile-path",
+      "name": "흙길",
+      "category": "tile",
+      "kind": "tile-path",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-04",
+      "slug": "tile-water",
+      "name": "물",
+      "category": "tile",
+      "kind": "tile-water",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-05",
+      "slug": "tile-cliff",
+      "name": "절벽",
+      "category": "tile",
+      "kind": "tile-cliff",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-06",
+      "slug": "tile-ramp",
+      "name": "경사로",
+      "category": "tile",
+      "kind": "tile-ramp",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-07",
+      "slug": "tile-plaza",
+      "name": "광장 바닥",
+      "category": "tile",
+      "kind": "tile-plaza",
+      "version": "0.1",
+      "status": "review"
+    }
+  ]
+}

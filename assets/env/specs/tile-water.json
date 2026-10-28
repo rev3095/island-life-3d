@@ -1,0 +1,63 @@
+{
+  "id": "TI-04",
+  "slug": "tile-water",
+  "name": "물",
+  "category": "tile",
+  "kind": "tile-water",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "강과 바다 칸. 땅보다 조금 낮고 물결 반짝임이 있다. 게임에서는 물결이 움직인다.",
+    "keywords": [
+      "땅보다 낮은 수면",
+      "물결 반짝임"
+    ],
+    "references": [
+      "얕은 개울"
+    ],
+    "avoid": [
+      "너무 진한 남색"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "water": "#6BB8D6",
+    "waterDeep": "#4C97B8",
+    "waterLight": "#CDEFFB"
+  },
+  "paletteLabels": {
+    "water": "수면",
+    "waterDeep": "깊은 물",
+    "waterLight": "반짝임"
+  },
+  "variants": {
+    "river": {
+      "label": "강 (기본)",
+      "palette": {}
+    },
+    "sea": {
+      "label": "바다",
+      "palette": {
+        "water": "#5BAFD0",
+        "waterDeep": "#3C86A8"
+      }
+    }
+  },
+  "heroGround": "none",
+  "animations": []
+}

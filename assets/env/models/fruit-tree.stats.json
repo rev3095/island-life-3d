@@ -1,0 +1,44 @@
+{
+  "id": "EN-02",
+  "slug": "fruit-tree",
+  "name": "과일나무",
+  "category": "nature",
+  "kind": "fruit-tree",
+  "version": "0.1",
+  "triangles": 5668,
+  "parts": 2,
+  "materials": [
+    "fruit",
+    "leaf",
+    "trunk"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "shake": {
+      "frames": 18,
+      "seconds": 0.75
+    }
+  },
+  "size": [
+    1.6,
+    1.66,
+    2.29
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 108432,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-tree_front.png",
+    "fruit-tree_hero.jpg",
+    "fruit-tree_main.png",
+    "fruit-tree_thumb.png",
+    "fruit-tree_top.png",
+    "fruit-tree_variants.png"
+  ]
+}

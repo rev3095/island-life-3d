@@ -1,0 +1,68 @@
+{
+  "id": "EN-03",
+  "slug": "palm",
+  "name": "야자수",
+  "category": "nature",
+  "kind": "palm",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "해변에만 자라는 야자수. 마디진 줄기가 바다 쪽으로 살짝 휘어 있고 야자열매가 열린다.",
+    "keywords": [
+      "휘어진 줄기",
+      "마디 줄무늬",
+      "넓은 잎 7장",
+      "야자열매"
+    ],
+    "references": [
+      "남쪽 섬 엽서 속 야자수"
+    ],
+    "avoid": [
+      "너무 길쭉한 줄기"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "trunkHeight": {
+      "label": "줄기 높이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "trunk": "#B58A5A",
+    "trunkRing": "#9A7448",
+    "leaf": "#4E9A4C",
+    "coconut": "#7A5232"
+  },
+  "paletteLabels": {
+    "trunk": "줄기",
+    "trunkRing": "줄기 마디",
+    "leaf": "잎",
+    "coconut": "야자열매"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "heroGround": "sand",
+  "animations": [
+    "sway",
+    "shake"
+  ]
+}

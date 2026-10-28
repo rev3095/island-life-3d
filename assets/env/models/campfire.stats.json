@@ -1,0 +1,40 @@
+{
+  "id": "PR-09",
+  "slug": "campfire",
+  "name": "모닥불",
+  "category": "prop",
+  "kind": "campfire",
+  "version": "0.1",
+  "triangles": 916,
+  "parts": 2,
+  "materials": [
+    "flame",
+    "flameCore",
+    "stone",
+    "wood"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    0.83,
+    0.81,
+    0.55
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 44076,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "campfire_front.png",
+    "campfire_hero.jpg",
+    "campfire_main.png",
+    "campfire_thumb.png",
+    "campfire_top.png"
+  ]
+}

@@ -1,0 +1,14 @@
+# Blender 작업 파일은 스크립트로 다시 만들 수 있어서 저장소에 넣지 않는다 (node tools/build-*.mjs)
+*.blend
+*.blend1
+
+# 로컬 편집기 테스트 데이터 (요청·레퍼런스 업로드)
+assets/review/
+assets/references/
+
+# 세션별 실행 설정·임시 파일
+.claude/
+_contact.html
+node_modules/
+.DS_Store
+Thumbs.db

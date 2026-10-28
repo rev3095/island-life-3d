@@ -1,0 +1,34 @@
+{
+  "id": "PR-08",
+  "slug": "workbench",
+  "name": "작업대",
+  "category": "prop",
+  "kind": "workbench",
+  "version": "0.1",
+  "triangles": 1052,
+  "parts": 1,
+  "materials": [
+    "metal",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    1.3,
+    0.72,
+    0.9
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 22044,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "workbench_front.png",
+    "workbench_hero.jpg",
+    "workbench_main.png",
+    "workbench_thumb.png",
+    "workbench_top.png"
+  ]
+}

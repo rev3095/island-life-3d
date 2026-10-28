@@ -1,0 +1,80 @@
+{
+  "id": "PR-03",
+  "slug": "mailbox",
+  "name": "우편함",
+  "category": "prop",
+  "kind": "mailbox",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "집 앞 우편함. 편지가 오면 깃발이 올라간다. 주민마다 색이 다르다.",
+    "keywords": [
+      "둥근 상자",
+      "옆 깃발",
+      "나무 기둥"
+    ],
+    "references": [
+      "시골 길가 우편함"
+    ],
+    "avoid": [
+      "네모 반듯한 철제함"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#7F5636",
+    "box": "#E86A5B",
+    "trim": "#4A3B32",
+    "flag": "#F6C84C"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "box": "우편함",
+    "trim": "뚜껑 테두리",
+    "flag": "깃발"
+  },
+  "variants": {
+    "red": {
+      "label": "빨강 (기본)",
+      "palette": {}
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "box": "#6CA0DC"
+      }
+    },
+    "green": {
+      "label": "초록",
+      "palette": {
+        "box": "#7FA36B"
+      }
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "box": "#F6C84C"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

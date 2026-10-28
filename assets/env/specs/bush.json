@@ -1,0 +1,77 @@
+{
+  "id": "EN-11",
+  "slug": "bush",
+  "name": "꽃덤불",
+  "category": "nature",
+  "kind": "bush",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "길가를 꾸미는 둥근 덤불. 계절이 되면 작은 꽃송이가 핀다.",
+    "keywords": [
+      "둥근 잎 뭉치 5개",
+      "작은 꽃송이"
+    ],
+    "references": [
+      "수국 덤불"
+    ],
+    "avoid": [
+      "나무처럼 높은 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "leaf": "#5FA05A",
+    "flower": "#F4B6C8"
+  },
+  "paletteLabels": {
+    "leaf": "잎",
+    "flower": "꽃송이"
+  },
+  "variants": {
+    "pink": {
+      "label": "분홍 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "flower": "#FBF7F2"
+      }
+    },
+    "blue": {
+      "label": "하늘",
+      "palette": {
+        "flower": "#9CC3EA"
+      }
+    },
+    "red": {
+      "label": "빨강",
+      "palette": {
+        "flower": "#E8504F"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway"
+  ]
+}

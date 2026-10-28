@@ -1,0 +1,33 @@
+{
+  "id": "PR-07",
+  "slug": "fossil-spot",
+  "name": "화석 자리",
+  "category": "prop",
+  "kind": "fossil-spot",
+  "version": "0.1",
+  "triangles": 552,
+  "parts": 1,
+  "materials": [
+    "crack",
+    "dirt"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.84,
+    0.06
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11972,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-spot_front.png",
+    "fossil-spot_hero.jpg",
+    "fossil-spot_main.png",
+    "fossil-spot_thumb.png",
+    "fossil-spot_top.png"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "PR-05",
+  "slug": "bridge",
+  "name": "나무다리",
+  "category": "prop",
+  "kind": "bridge",
+  "version": "0.1",
+  "triangles": 3564,
+  "parts": 1,
+  "materials": [
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    3.03,
+    1.44,
+    0.88
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 67440,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bridge_front.png",
+    "bridge_hero.jpg",
+    "bridge_main.png",
+    "bridge_thumb.png",
+    "bridge_top.png"
+  ]
+}

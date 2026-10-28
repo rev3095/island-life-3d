@@ -1,0 +1,44 @@
+{
+  "id": "EN-03",
+  "slug": "palm",
+  "name": "야자수",
+  "category": "nature",
+  "kind": "palm",
+  "version": "0.1",
+  "triangles": 2568,
+  "parts": 2,
+  "materials": [
+    "coconut",
+    "leaf",
+    "trunk",
+    "trunkRing"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "shake": {
+      "frames": 18,
+      "seconds": 0.75
+    }
+  },
+  "size": [
+    2.06,
+    2.04,
+    2.17
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 52848,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "palm_front.png",
+    "palm_hero.jpg",
+    "palm_main.png",
+    "palm_thumb.png",
+    "palm_top.png"
+  ]
+}

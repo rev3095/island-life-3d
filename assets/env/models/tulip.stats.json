@@ -1,0 +1,39 @@
+{
+  "id": "EN-06",
+  "slug": "tulip",
+  "name": "튤립",
+  "category": "nature",
+  "kind": "flower-tulip",
+  "version": "0.1",
+  "triangles": 1208,
+  "parts": 1,
+  "materials": [
+    "petal",
+    "stem"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    0.19,
+    0.16,
+    0.42
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 25356,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tulip_front.png",
+    "tulip_hero.jpg",
+    "tulip_main.png",
+    "tulip_thumb.png",
+    "tulip_top.png",
+    "tulip_variants.png"
+  ]
+}

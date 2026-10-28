@@ -1,0 +1,43 @@
+{
+  "id": "EN-01",
+  "slug": "tree",
+  "name": "활엽수",
+  "category": "nature",
+  "kind": "tree",
+  "version": "0.1",
+  "triangles": 4128,
+  "parts": 2,
+  "materials": [
+    "leaf",
+    "trunk"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "shake": {
+      "frames": 18,
+      "seconds": 0.75
+    }
+  },
+  "size": [
+    1.6,
+    1.58,
+    2.29
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 78852,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tree_front.png",
+    "tree_hero.jpg",
+    "tree_main.png",
+    "tree_thumb.png",
+    "tree_top.png",
+    "tree_variants.png"
+  ]
+}

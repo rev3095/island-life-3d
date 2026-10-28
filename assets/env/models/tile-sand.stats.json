@@ -1,0 +1,33 @@
+{
+  "id": "TI-02",
+  "slug": "tile-sand",
+  "name": "모래사장",
+  "category": "tile",
+  "kind": "tile-sand",
+  "version": "0.1",
+  "triangles": 408,
+  "parts": 1,
+  "materials": [
+    "sand",
+    "sandDark"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.02
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 9608,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-sand_front.png",
+    "tile-sand_hero.jpg",
+    "tile-sand_main.png",
+    "tile-sand_thumb.png",
+    "tile-sand_top.png"
+  ]
+}

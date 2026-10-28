@@ -1,0 +1,65 @@
+{
+  "id": "CH-06",
+  "slug": "pong",
+  "name": "퐁",
+  "species": "duck",
+  "role": "주민 · 오리",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "먹보 오리 주민. 요리를 좋아하고 맛있는 과일만 보면 신이 난다. 통통 튀는 말투.",
+    "keywords": [
+      "노란 깃털",
+      "넓적한 주황 부리",
+      "정수리 깃털",
+      "통통함"
+    ],
+    "references": [
+      "고무 오리 장난감",
+      "아기 오리"
+    ],
+    "avoid": [
+      "사실적인 깃털"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.9,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#FFD866",
+    "beak": "#F39A3B",
+    "feet": "#F39A3B",
+    "tail": "#FFD866",
+    "shirt": "#5BB5B0",
+    "pants": "#3F7F7B",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

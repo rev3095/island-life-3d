@@ -1,0 +1,78 @@
+{
+  "id": "TI-01",
+  "slug": "tile-grass",
+  "name": "풀밭",
+  "category": "tile",
+  "kind": "tile-grass",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 대부분을 덮는 기본 땅. 계절마다 풀색이 바뀌고 겨울엔 눈으로 덮인다.",
+    "keywords": [
+      "부드러운 모서리",
+      "작은 풀 싹",
+      "흙 옆면"
+    ],
+    "references": [
+      "보드게임 지형 타일"
+    ],
+    "avoid": [
+      "풀 한 포기씩 사실적인 표현"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "grass": "#A9C46A",
+    "grassDark": "#8FB052",
+    "dirt": "#9A7650"
+  },
+  "paletteLabels": {
+    "grass": "풀",
+    "grassDark": "풀 싹",
+    "dirt": "흙 옆면"
+  },
+  "variants": {
+    "spring": {
+      "label": "봄",
+      "palette": {
+        "grass": "#9BD47A",
+        "grassDark": "#7FBF5E"
+      }
+    },
+    "summer": {
+      "label": "여름",
+      "palette": {
+        "grass": "#6CC160",
+        "grassDark": "#55A84C"
+      }
+    },
+    "autumn": {
+      "label": "가을 (기본)",
+      "palette": {}
+    },
+    "winter": {
+      "label": "겨울",
+      "palette": {
+        "grass": "#EEF3F6",
+        "grassDark": "#D5E0E6"
+      }
+    }
+  },
+  "heroGround": "none",
+  "animations": []
+}

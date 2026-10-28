@@ -1,0 +1,39 @@
+{
+  "id": "EN-11",
+  "slug": "bush",
+  "name": "꽃덤불",
+  "category": "nature",
+  "kind": "bush",
+  "version": "0.1",
+  "triangles": 3520,
+  "parts": 1,
+  "materials": [
+    "flower",
+    "leaf"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    1.19,
+    1.07,
+    0.73
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 67400,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bush_front.png",
+    "bush_hero.jpg",
+    "bush_main.png",
+    "bush_thumb.png",
+    "bush_top.png",
+    "bush_variants.png"
+  ]
+}

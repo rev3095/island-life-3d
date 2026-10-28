@@ -1,0 +1,62 @@
+{
+  "id": "PR-09",
+  "slug": "campfire",
+  "name": "모닥불",
+  "category": "prop",
+  "kind": "campfire",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "돌로 둘러싼 모닥불. 불꽃이 일렁이고 밤에 주변을 밝힌다.",
+    "keywords": [
+      "돌 아홉 개",
+      "장작 셋",
+      "두 겹 불꽃"
+    ],
+    "references": [
+      "캠핑장 모닥불"
+    ],
+    "avoid": [
+      "무섭게 큰 불"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "flame",
+      "flameCore"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#A49E92",
+    "wood": "#8C6440",
+    "flame": "#F39A3B",
+    "flameCore": "#F7E6A8"
+  },
+  "paletteLabels": {
+    "stone": "돌",
+    "wood": "장작",
+    "flame": "불꽃",
+    "flameCore": "불꽃 속"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "flicker"
+  ]
+}

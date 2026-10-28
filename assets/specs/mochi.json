@@ -1,0 +1,69 @@
+{
+  "id": "CH-04",
+  "slug": "mochi",
+  "name": "모찌",
+  "species": "rabbit",
+  "role": "주민 · 토끼",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "상냥한 토끼 주민. 꽃 가꾸기를 좋아하고 말투가 늘 부드럽다. 하얀 털에 연보라 옷.",
+    "keywords": [
+      "긴 귀",
+      "하얀 털",
+      "분홍 귀 안쪽",
+      "동그란 꼬리",
+      "연보라"
+    ],
+    "references": [
+      "찹쌀떡처럼 말랑한 느낌",
+      "귀가 살짝 벌어진 토끼 인형"
+    ],
+    "avoid": [
+      "너무 마른 몸",
+      "빨간 눈"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 1,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#F7F1EC",
+    "muzzle": "#FFFFFF",
+    "innerEar": "#F4B6C2",
+    "nose": "#E88C9C",
+    "tail": "#FFFFFF",
+    "shirt": "#B9A6E0",
+    "stripe": "#F4EEFB",
+    "pants": "#7D6AA8",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 1,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

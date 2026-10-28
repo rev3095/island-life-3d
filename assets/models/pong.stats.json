@@ -1,0 +1,53 @@
+{
+  "id": "CH-06",
+  "slug": "pong",
+  "name": "퐁",
+  "species": "duck",
+  "version": "0.1",
+  "triangles": 8936,
+  "vertices": 4510,
+  "bones": 9,
+  "materials": [
+    "pants",
+    "shirt",
+    "feet",
+    "fur",
+    "beak",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 0.9,
+  "glbBytes": 302856,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "pong_back.png",
+    "pong_front.png",
+    "pong_happy.png",
+    "pong_hero.png",
+    "pong_run.png",
+    "pong_side.png",
+    "pong_three_quarter.png",
+    "pong_thumb.png",
+    "pong_walk.png"
+  ]
+}

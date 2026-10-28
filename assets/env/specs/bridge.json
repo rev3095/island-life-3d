@@ -1,0 +1,62 @@
+{
+  "id": "PR-05",
+  "slug": "bridge",
+  "name": "나무다리",
+  "category": "prop",
+  "kind": "bridge",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "강을 건너는 나무다리. 가운데가 살짝 둥글게 솟아 있다.",
+    "keywords": [
+      "아치형",
+      "판자 갈마들이 색",
+      "난간"
+    ],
+    "references": [
+      "시골 개울 다리"
+    ],
+    "avoid": [
+      "철제 다리"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이 (3칸 기준)",
+      "value": 1,
+      "min": 0.67,
+      "max": 1.67,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodDark": "#8C6440"
+  },
+  "paletteLabels": {
+    "wood": "판자·난간",
+    "woodDark": "어두운 판자"
+  },
+  "animations": []
+}

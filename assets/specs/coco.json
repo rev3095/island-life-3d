@@ -1,0 +1,74 @@
+{
+  "id": "CH-02",
+  "slug": "coco",
+  "name": "코코",
+  "species": "cat",
+  "role": "주민 · 고양이",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬에서 제일 활발한 고양이 주민. 아침마다 해변을 달리고, 늘 신이 나 있어서 꼬리가 쉬지 않는다.",
+    "keywords": [
+      "동글동글",
+      "소프트비닐 피규어",
+      "2.5등신",
+      "큰 머리",
+      "짧은 팔다리",
+      "파스텔 주황",
+      "줄무늬 티셔츠",
+      "반바지"
+    ],
+    "references": [
+      "매끈한 소프트비닐 토이 피규어의 표면감",
+      "아침 햇살 아래의 주황 치즈 고양이",
+      "이마의 짧은 고등어 줄무늬 세 줄"
+    ],
+    "avoid": [
+      "사실적인 털 표현",
+      "날카롭거나 화난 인상",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 1,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#F2B36B",
+    "marking": "#DE8B45",
+    "muzzle": "#FFF1DC",
+    "innerEar": "#F4A9A9",
+    "eye": "#3A2A22",
+    "nose": "#E88C8C",
+    "blush": "#F6A8A0",
+    "shirt": "#E86A5B",
+    "stripe": "#F7D9A8",
+    "pants": "#8C5A3C",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 2,
+    "bottom": "shorts"
+  },
+  "markings": "tabby",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "id": "CH-04",
+  "slug": "mochi",
+  "name": "모찌",
+  "species": "rabbit",
+  "version": "0.1",
+  "triangles": 11124,
+  "vertices": 5610,
+  "bones": 11,
+  "materials": [
+    "shirt",
+    "pants",
+    "stripe",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 1,
+  "glbBytes": 378060,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mochi_back.png",
+    "mochi_front.png",
+    "mochi_happy.png",
+    "mochi_hero.png",
+    "mochi_run.png",
+    "mochi_side.png",
+    "mochi_three_quarter.png",
+    "mochi_thumb.png",
+    "mochi_walk.png"
+  ]
+}

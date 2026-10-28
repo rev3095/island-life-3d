@@ -1,0 +1,47 @@
+{
+  "id": "PR-02",
+  "slug": "bench",
+  "name": "벤치",
+  "category": "prop",
+  "kind": "bench",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "광장과 바닷가에 놓는 나무 벤치. 앉아서 쉴 수 있다.",
+    "keywords": [
+      "나무 널판 5장",
+      "검은 철 다리"
+    ],
+    "references": [
+      "공원 벤치"
+    ],
+    "avoid": [
+      "딱딱한 돌 벤치"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "metal": "#4E5A57"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "metal": "다리"
+  },
+  "animations": []
+}

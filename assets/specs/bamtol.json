@@ -1,0 +1,71 @@
+{
+  "id": "CH-08",
+  "slug": "bamtol",
+  "name": "밤톨",
+  "species": "squirrel",
+  "role": "도토리상점 주인 · 다람쥐",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "부지런한 다람쥐 상점 주인. 첫날 섬을 안내해 주고, 늘 초록 앞치마를 두르고 있다.",
+    "keywords": [
+      "큰 솜털 꼬리",
+      "귀 끝 털",
+      "초록 앞치마",
+      "부지런함"
+    ],
+    "references": [
+      "청설모보다 다람쥐에 가까운 둥근 얼굴",
+      "가게 앞치마"
+    ],
+    "avoid": [
+      "쥐처럼 보이는 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.9,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 0.85,
+    "earPointiness": 0.6,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#C7743E",
+    "tail": "#DA8E52",
+    "muzzle": "#F6E0C4",
+    "innerEar": "#F6E0C4",
+    "marking": "#8A4E2A",
+    "nose": "#3A2A22",
+    "shirt": "#F3E7D3",
+    "apron": "#5E8C61",
+    "pants": "#6A4A33",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "accessories": [
+    "apron"
+  ],
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

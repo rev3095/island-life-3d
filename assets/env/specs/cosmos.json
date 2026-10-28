@@ -1,0 +1,80 @@
+{
+  "id": "EN-07",
+  "slug": "cosmos",
+  "name": "코스모스",
+  "category": "nature",
+  "kind": "flower-cosmos",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "가을 들판의 코스모스. 꽃잎 여덟 장이 앞쪽으로 살짝 기울어 있다.",
+    "keywords": [
+      "꽃잎 8장",
+      "가는 줄기",
+      "노란 꽃술"
+    ],
+    "references": [
+      "가을 길가 코스모스"
+    ],
+    "avoid": [
+      "줄기가 너무 길어 쓰러져 보이는 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "petal": "#F7C6E0",
+    "center": "#F6C84C"
+  },
+  "paletteLabels": {
+    "stem": "줄기·잎",
+    "petal": "꽃잎",
+    "center": "꽃술"
+  },
+  "variants": {
+    "pink": {
+      "label": "분홍 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "petal": "#FBF7F2"
+      }
+    },
+    "orange": {
+      "label": "주황",
+      "palette": {
+        "petal": "#F2A65A"
+      }
+    },
+    "red": {
+      "label": "빨강",
+      "palette": {
+        "petal": "#D9583B"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway"
+  ]
+}

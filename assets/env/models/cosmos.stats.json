@@ -1,0 +1,40 @@
+{
+  "id": "EN-07",
+  "slug": "cosmos",
+  "name": "코스모스",
+  "category": "nature",
+  "kind": "flower-cosmos",
+  "version": "0.1",
+  "triangles": 1436,
+  "parts": 1,
+  "materials": [
+    "center",
+    "petal",
+    "stem"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    0.22,
+    0.19,
+    0.43
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 30472,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cosmos_front.png",
+    "cosmos_hero.jpg",
+    "cosmos_main.png",
+    "cosmos_thumb.png",
+    "cosmos_top.png",
+    "cosmos_variants.png"
+  ]
+}

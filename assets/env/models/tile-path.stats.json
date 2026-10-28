@@ -1,0 +1,34 @@
+{
+  "id": "TI-03",
+  "slug": "tile-path",
+  "name": "흙길",
+  "category": "tile",
+  "kind": "tile-path",
+  "version": "0.1",
+  "triangles": 708,
+  "parts": 1,
+  "materials": [
+    "dirt",
+    "path",
+    "pebble"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.02
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 15924,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-path_front.png",
+    "tile-path_hero.jpg",
+    "tile-path_main.png",
+    "tile-path_thumb.png",
+    "tile-path_top.png"
+  ]
+}

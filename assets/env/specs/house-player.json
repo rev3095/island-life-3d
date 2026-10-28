@@ -1,0 +1,85 @@
+{
+  "id": "BD-01",
+  "slug": "house-player",
+  "name": "플레이어 집",
+  "category": "building",
+  "kind": "house",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "주인공의 첫 집. 굴뚝 달린 작은 박공지붕 집으로, 문으로 들어가면 실내를 꾸밀 수 있다.",
+    "keywords": [
+      "박공지붕",
+      "굴뚝",
+      "창문 둘",
+      "문 앞 계단"
+    ],
+    "references": [
+      "그림책 속 작은 집"
+    ],
+    "avoid": [
+      "너무 큰 저택"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.02
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "가로",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "depth": {
+      "label": "깊이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "wallHeight": {
+      "label": "벽 높이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "roofHeight": {
+      "label": "지붕 높이",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "foundation": "#B8B2A6",
+    "wall": "#F7F1E4",
+    "roof": "#5DB7A8",
+    "door": "#9A6B45",
+    "trim": "#8C6440",
+    "window": "#CDEBF5"
+  },
+  "paletteLabels": {
+    "foundation": "기초·굴뚝",
+    "wall": "벽",
+    "roof": "지붕",
+    "door": "문",
+    "trim": "창틀·손잡이",
+    "window": "유리"
+  },
+  "animations": []
+}

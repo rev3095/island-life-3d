@@ -1,0 +1,66 @@
+{
+  "id": "CH-05",
+  "slug": "dubu",
+  "name": "두부",
+  "species": "bear",
+  "role": "주민 · 곰",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "무뚝뚝하지만 다정한 곰 주민. 낚시가 취미이고 말수가 적다. 섬 주민 중 제일 크다.",
+    "keywords": [
+      "둥근 귀",
+      "큰 덩치",
+      "무뚝뚝",
+      "초록 셔츠"
+    ],
+    "references": [
+      "갈색 테디베어",
+      "어깨가 넓은 곰 인형"
+    ],
+    "avoid": [
+      "무섭거나 사나운 표정"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 1.1,
+    "headScale": 1,
+    "bodyWidth": 1.12,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#9A8573",
+    "muzzle": "#DCCBB7",
+    "innerEar": "#DCCBB7",
+    "nose": "#3A2A22",
+    "tail": "#9A8573",
+    "shirt": "#7FA36B",
+    "pants": "#5B4A3E",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

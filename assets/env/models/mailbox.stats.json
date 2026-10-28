@@ -1,0 +1,36 @@
+{
+  "id": "PR-03",
+  "slug": "mailbox",
+  "name": "우편함",
+  "category": "prop",
+  "kind": "mailbox",
+  "version": "0.1",
+  "triangles": 532,
+  "parts": 1,
+  "materials": [
+    "box",
+    "flag",
+    "trim",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    0.37,
+    0.52,
+    1.08
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11624,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mailbox_front.png",
+    "mailbox_hero.jpg",
+    "mailbox_main.png",
+    "mailbox_thumb.png",
+    "mailbox_top.png",
+    "mailbox_variants.png"
+  ]
+}

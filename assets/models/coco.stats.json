@@ -1,0 +1,55 @@
+{
+  "id": "CH-02",
+  "slug": "coco",
+  "name": "코코",
+  "species": "cat",
+  "version": "0.1",
+  "triangles": 10512,
+  "vertices": 5312,
+  "bones": 12,
+  "materials": [
+    "stripe",
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "marking",
+    "innerEar"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 1,
+  "glbBytes": 369616,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "coco_back.png",
+    "coco_front.png",
+    "coco_happy.png",
+    "coco_hero.png",
+    "coco_run.png",
+    "coco_side.png",
+    "coco_three_quarter.png",
+    "coco_thumb.png",
+    "coco_walk.png"
+  ]
+}

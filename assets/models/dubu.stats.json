@@ -1,0 +1,54 @@
+{
+  "id": "CH-05",
+  "slug": "dubu",
+  "name": "두부",
+  "species": "bear",
+  "version": "0.1",
+  "triangles": 10880,
+  "vertices": 5490,
+  "bones": 11,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 1.1,
+  "glbBytes": 366880,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "dubu_back.png",
+    "dubu_front.png",
+    "dubu_happy.png",
+    "dubu_hero.png",
+    "dubu_run.png",
+    "dubu_side.png",
+    "dubu_three_quarter.png",
+    "dubu_thumb.png",
+    "dubu_walk.png"
+  ]
+}

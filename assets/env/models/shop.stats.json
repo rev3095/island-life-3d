@@ -1,0 +1,41 @@
+{
+  "id": "BD-03",
+  "slug": "shop",
+  "name": "도토리상점",
+  "category": "building",
+  "kind": "shop",
+  "version": "0.1",
+  "triangles": 4284,
+  "parts": 1,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "awningA",
+    "awningB",
+    "door",
+    "foundation",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    4.24,
+    3.33,
+    3.29
+  ],
+  "footprint": [
+    5,
+    4
+  ],
+  "glbBytes": 83488,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shop_front.png",
+    "shop_hero.jpg",
+    "shop_main.png",
+    "shop_thumb.png",
+    "shop_top.png"
+  ]
+}

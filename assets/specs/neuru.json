@@ -1,0 +1,71 @@
+{
+  "id": "CH-09",
+  "slug": "neuru",
+  "name": "느루",
+  "species": "tortoise",
+  "role": "박물관장 · 거북",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "느릿느릿하지만 박식한 거북 박물관장. 화석 이야기만 나오면 눈이 반짝인다. 동그란 안경과 나비넥타이.",
+    "keywords": [
+      "등껍질",
+      "동그란 안경",
+      "나비넥타이",
+      "느긋함",
+      "학자"
+    ],
+    "references": [
+      "나이 지긋한 거북 인형",
+      "박물관 큐레이터"
+    ],
+    "avoid": [
+      "늙고 지쳐 보이는 표정"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.95,
+    "headScale": 0.94,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#B7C98A",
+    "shell": "#7A9A5A",
+    "marking": "#5F7F45",
+    "shirt": "#E9E1CF",
+    "bowtie": "#B5523B",
+    "glasses": "#4A3B32",
+    "pants": "#6B6B5A",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "accessories": [
+    "glasses",
+    "bowtie"
+  ],
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

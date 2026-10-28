@@ -1,0 +1,58 @@
+{
+  "id": "TI-05",
+  "slug": "tile-cliff",
+  "name": "절벽",
+  "category": "tile",
+  "kind": "tile-cliff",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "한 단 높은 언덕의 가장자리. 옆면에 흙 지층 줄무늬가 있고 위는 풀밭.",
+    "keywords": [
+      "한 단 높이",
+      "지층 줄무늬",
+      "풀 덮인 윗면"
+    ],
+    "references": [
+      "계단식 논두렁"
+    ],
+    "avoid": [
+      "낭떠러지처럼 위험해 보이는 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이 (1단 기준)",
+      "value": 1,
+      "min": 0.6,
+      "max": 2,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "grass": "#A9C46A",
+    "cliff": "#B79870",
+    "cliffDark": "#9A7A58"
+  },
+  "paletteLabels": {
+    "grass": "윗면 풀",
+    "cliff": "지층 밝은 색",
+    "cliffDark": "지층 어두운 색"
+  },
+  "heroGround": "none",
+  "animations": []
+}

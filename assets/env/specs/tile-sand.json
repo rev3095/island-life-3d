@@ -1,0 +1,48 @@
+{
+  "id": "TI-02",
+  "slug": "tile-sand",
+  "name": "모래사장",
+  "category": "tile",
+  "kind": "tile-sand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 둘레의 모래사장. 조개가 밀려오고 야자수가 자란다.",
+    "keywords": [
+      "밝은 모래색",
+      "작은 알갱이"
+    ],
+    "references": [
+      "열대 해변"
+    ],
+    "avoid": [
+      "회색 자갈"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "sand": "#F1DFAE",
+    "sandDark": "#DDC690"
+  },
+  "paletteLabels": {
+    "sand": "모래",
+    "sandDark": "옆면·알갱이"
+  },
+  "heroGround": "none",
+  "animations": []
+}

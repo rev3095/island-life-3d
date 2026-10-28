@@ -1,0 +1,34 @@
+{
+  "id": "EN-10",
+  "slug": "shell",
+  "name": "조개",
+  "category": "nature",
+  "kind": "shell",
+  "version": "0.1",
+  "triangles": 1812,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellRib"
+  ],
+  "animations": {},
+  "size": [
+    0.28,
+    0.25,
+    0.08
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 34972,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell_front.png",
+    "shell_hero.jpg",
+    "shell_main.png",
+    "shell_thumb.png",
+    "shell_top.png",
+    "shell_variants.png"
+  ]
+}

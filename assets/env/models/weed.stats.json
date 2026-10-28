@@ -1,0 +1,37 @@
+{
+  "id": "EN-09",
+  "slug": "weed",
+  "name": "잡초",
+  "category": "nature",
+  "kind": "weed",
+  "version": "0.1",
+  "triangles": 196,
+  "parts": 1,
+  "materials": [
+    "weed"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    0.25,
+    0.26,
+    0.26
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 6352,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "weed_front.png",
+    "weed_hero.jpg",
+    "weed_main.png",
+    "weed_thumb.png",
+    "weed_top.png"
+  ]
+}

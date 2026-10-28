@@ -1,0 +1,38 @@
+{
+  "id": "BD-02",
+  "slug": "house-villager",
+  "name": "주민 집",
+  "category": "building",
+  "kind": "house",
+  "version": "0.1",
+  "triangles": 1412,
+  "parts": 1,
+  "materials": [
+    "door",
+    "foundation",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.76,
+    2.87,
+    2.72
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 31036,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "house-villager_front.png",
+    "house-villager_hero.jpg",
+    "house-villager_main.png",
+    "house-villager_thumb.png",
+    "house-villager_top.png",
+    "house-villager_variants.png"
+  ]
+}

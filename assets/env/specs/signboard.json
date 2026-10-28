@@ -1,0 +1,52 @@
+{
+  "id": "PR-04",
+  "slug": "signboard",
+  "name": "안내판",
+  "category": "prop",
+  "kind": "signboard",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "광장의 안내판. 오늘의 소식과 행사가 붙어 있다.",
+    "keywords": [
+      "작은 박공지붕",
+      "종이 두 장",
+      "나무 기둥 둘"
+    ],
+    "references": [
+      "마을 게시판"
+    ],
+    "avoid": [
+      "전광판"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#7F5636",
+    "board": "#E8D5A8",
+    "paper": "#FFFFFF",
+    "roof": "#A8642E"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "board": "판",
+    "paper": "종이",
+    "roof": "지붕"
+  },
+  "animations": []
+}

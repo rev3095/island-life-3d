@@ -1,0 +1,54 @@
+{
+  "id": "CH-09",
+  "slug": "neuru",
+  "name": "느루",
+  "species": "tortoise",
+  "version": "0.1",
+  "triangles": 11816,
+  "vertices": 5968,
+  "bones": 9,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "shell",
+    "marking",
+    "glasses",
+    "bowtie"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 0.95,
+  "glbBytes": 385068,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "neuru_back.png",
+    "neuru_front.png",
+    "neuru_happy.png",
+    "neuru_hero.png",
+    "neuru_run.png",
+    "neuru_side.png",
+    "neuru_three_quarter.png",
+    "neuru_thumb.png",
+    "neuru_walk.png"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "TI-05",
+  "slug": "tile-cliff",
+  "name": "절벽",
+  "category": "tile",
+  "kind": "tile-cliff",
+  "version": "0.1",
+  "triangles": 756,
+  "parts": 1,
+  "materials": [
+    "cliff",
+    "cliffDark",
+    "grass"
+  ],
+  "animations": {},
+  "size": [
+    1.04,
+    1.04,
+    1.01
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 14516,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tile-cliff_front.png",
+    "tile-cliff_hero.jpg",
+    "tile-cliff_main.png",
+    "tile-cliff_thumb.png",
+    "tile-cliff_top.png"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "PR-07",
+  "slug": "fossil-spot",
+  "name": "화석 자리",
+  "category": "prop",
+  "kind": "fossil-spot",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "땅에 X자로 금이 간 자리. 삽으로 파면 화석이 나온다. 하루에 네 군데.",
+    "keywords": [
+      "흙 둔덕",
+      "X자 금"
+    ],
+    "references": [
+      "보물지도의 X 표시"
+    ],
+    "avoid": [
+      "구덩이처럼 깊어 보이는 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "dirt": "#B79870",
+    "crack": "#5A4632"
+  },
+  "paletteLabels": {
+    "dirt": "흙",
+    "crack": "금"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

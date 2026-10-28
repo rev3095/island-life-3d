@@ -1,0 +1,78 @@
+{
+  "id": "EN-06",
+  "slug": "tulip",
+  "name": "튤립",
+  "category": "nature",
+  "kind": "flower-tulip",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "봄에 피는 튤립. 물을 주면 옆 칸에 새 꽃이 피고, 색끼리 섞어 피울 수 있다.",
+    "keywords": [
+      "컵 모양 꽃",
+      "곧은 줄기",
+      "잎 두 장"
+    ],
+    "references": [
+      "화단의 튤립"
+    ],
+    "avoid": [
+      "꽃잎이 활짝 벌어진 모양"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "petal": "#E8504F"
+  },
+  "paletteLabels": {
+    "stem": "줄기·잎",
+    "petal": "꽃잎"
+  },
+  "variants": {
+    "red": {
+      "label": "빨강 (기본)",
+      "palette": {}
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "petal": "#F6C84C"
+      }
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "petal": "#F7F3EE"
+      }
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "petal": "#F4A6C0"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway"
+  ]
+}

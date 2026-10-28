@@ -1,0 +1,54 @@
+{
+  "id": "CH-03",
+  "slug": "bori",
+  "name": "보리",
+  "species": "dog",
+  "version": "0.1",
+  "triangles": 10676,
+  "vertices": 5386,
+  "bones": 12,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "ear",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 1,
+  "glbBytes": 367140,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bori_back.png",
+    "bori_front.png",
+    "bori_happy.png",
+    "bori_hero.png",
+    "bori_run.png",
+    "bori_side.png",
+    "bori_three_quarter.png",
+    "bori_thumb.png",
+    "bori_walk.png"
+  ]
+}

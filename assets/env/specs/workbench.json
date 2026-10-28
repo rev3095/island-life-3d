@@ -1,0 +1,50 @@
+{
+  "id": "PR-08",
+  "slug": "workbench",
+  "name": "작업대",
+  "category": "prop",
+  "kind": "workbench",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "도구와 가구를 만드는 작업대. 망치·톱·바이스가 올려져 있다.",
+    "keywords": [
+      "두꺼운 상판",
+      "아래 선반",
+      "공구"
+    ],
+    "references": [
+      "목공소 작업대"
+    ],
+    "avoid": [
+      "복잡한 기계"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "woodDark": "#8C6440",
+    "metal": "#8E9A9C"
+  },
+  "paletteLabels": {
+    "wood": "상판",
+    "woodDark": "다리·선반",
+    "metal": "공구"
+  },
+  "animations": []
+}

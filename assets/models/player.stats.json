@@ -1,0 +1,51 @@
+{
+  "id": "CH-01",
+  "slug": "player",
+  "name": "플레이어",
+  "species": "human",
+  "version": "0.1",
+  "triangles": 10604,
+  "vertices": 5375,
+  "bones": 8,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "hair"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 1,
+  "glbBytes": 344500,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "player_back.png",
+    "player_front.png",
+    "player_happy.png",
+    "player_hero.png",
+    "player_run.png",
+    "player_side.png",
+    "player_three_quarter.png",
+    "player_thumb.png",
+    "player_walk.png"
+  ]
+}

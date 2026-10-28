@@ -1,0 +1,37 @@
+{
+  "id": "BD-01",
+  "slug": "house-player",
+  "name": "플레이어 집",
+  "category": "building",
+  "kind": "house",
+  "version": "0.1",
+  "triangles": 1304,
+  "parts": 1,
+  "materials": [
+    "door",
+    "foundation",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.76,
+    2.87,
+    2.72
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 29032,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "house-player_front.png",
+    "house-player_hero.jpg",
+    "house-player_main.png",
+    "house-player_thumb.png",
+    "house-player_top.png"
+  ]
+}
