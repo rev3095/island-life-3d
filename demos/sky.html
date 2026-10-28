@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- 모델·스펙 경로(assets/...)가 저장소 맨 위 기준이라 base 를 한 칸 위로 -->
+<base href="../">
+<title>하늘 데모 — 포근섬 이야기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  :root { --ink: #4A3B32; --cream: #FFF8E6; --display: "Jua", "Malgun Gothic", sans-serif; --body: "Gowun Dodum", "Malgun Gothic", sans-serif; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #BFE6F7; color: var(--ink); font-family: var(--body); }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--body); }
+  #ui > * { pointer-events: auto; }
+  .demo-bar { position: absolute; left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(10px + env(safe-area-inset-top, 0px));
+    max-width: calc(100vw - 20px); box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    background: rgba(255, 248, 230, .94); padding: 7px 10px; border-radius: 14px; box-shadow: 0 3px 0 #E2D2AE; font-size: 13px; }
+  .demo-bar strong { font: 16px var(--display); margin-right: 4px; }
+  .demo-bar button { border: 0; border-radius: 999px; padding: 3px 10px; background: #F1E4C6; color: var(--ink); font: inherit; cursor: pointer; }
+  .demo-bar button.on { background: #5DB7A8; color: #fff; }
+  .demo-bar .muted { color: #7A6656; font-size: 12px; }
+  .loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--cream); padding: 8px 16px; border-radius: 999px; box-shadow: 0 3px 0 #E2D2AE; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="game" aria-label="하늘 데모 화면"></canvas>
+<div id="ui">
+  <div class="demo-bar">
+    <strong>하늘 데모</strong>
+    <span class="muted">카메라</span>
+    <button type="button" data-cam="game">게임 시점</button>
+    <button type="button" data-cam="view">풍경</button>
+    <button type="button" data-cam="up">하늘 올려보기</button>
+    <span class="muted">· 끌어서 돌려보기</span>
+  </div>
+  <div class="loading">불러오는 중…</div>
+</div>
+<script type="module">
+// 공용 기반(core) + sky 모듈만으로 도는 작은 장면. 시각·날씨·계절은 오른쪽 아래 '하늘 조절' 판으로 바꾼다.
+// 주소 뒤에 붙여 시작 상태 고정: ?hour=18.5&weather=rain&season=winter&cam=view&pause&mode=fast
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createEvents } from './src/core/events.js';
+import { createState } from './src/core/state.js';
+import * as assets from './src/core/assets.js';
+import * as materials from './src/core/materials.js';
+import * as constants from './src/core/constants.js';
+import sky from './src/sky/index.js';
+
+const params = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#BFE6F7');
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 300);
+
+// src/main.js 와 같은 기본 조명
+const hemi = new THREE.HemisphereLight(0xeef8ff, 0xc9d79f, 1.5);
+const sun = new THREE.DirectionalLight(0xffffff, 2.3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
+sun.shadow.bias = -0.0008;
+scene.add(hemi, sun, sun.target);
+
+const events = createEvents();
+const ctx = {
+  THREE, renderer, scene, camera, events, state: createState(), assets, materials, constants,
+  input: { move: { x: 0, z: 0 }, run: false, enabled: true, touch: false, update() {} },
+  lights: { hemi, sun, sunOffset: new THREE.Vector3(-8, 16, 10) },
+  uiRoot: document.getElementById('ui'), services: {}, focus: new THREE.Vector3(), debug: true,
+};
+window.__island = ctx;
+
+await sky.init(ctx);
+const time = ctx.services.time;
+
+// ── 작은 땅과 배경 요소 ──
+const objects = [];   // { slug, toon }
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(220, 220, 88, 88), materials.toonMaterial('#A9C46A', { name: 'grass' }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+const path = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 9, 2, 18), materials.toonMaterial('#D8B98A', { name: 'path' }));
+path.rotation.x = -Math.PI / 2;
+path.position.set(0, 0.01, 0.6);
+path.receiveShadow = true;
+scene.add(path);
+
+async function put(slug, x, z, rot = 0, scale = 1) {
+  const [gltf, spec] = await Promise.all([assets.loadEnv(slug), assets.loadEnvSpec(slug)]);
+  const { scene: obj } = assets.instantiate(gltf);
+  const toon = materials.applyToonStyle(obj, { spec });
+  obj.position.set(x, 0, z);
+  obj.rotation.y = rot;
+  obj.scale.setScalar(scale);
+  scene.add(obj);
+  objects.push({ slug, toon, spec });
+}
+const jobs = [
+  put('house-player', 0, -5.2),
+  put('tree', -5.2, -3), put('tree', 5.6, -2.4, 1.2), put('tree', -7.4, 3.2, 2.1), put('tree', 7.8, 3.8, 0.4, 1.1), put('tree', -12, -8, 0.8, 1.2), put('tree', 13, -9, 2.4, 1.2),
+  put('cedar', -3.6, -9.5), put('cedar', 4.2, -10, 0.5, 1.1), put('cedar', -9.6, -2.2, 0, 1.2), put('cedar', 10.2, -5.6, 0, 1.15), put('cedar', -16, -14, 0, 1.3), put('cedar', 18, -15, 0, 1.3),
+  put('lamp', -2.0, 0.4), put('lamp', 2.3, 2.2, Math.PI),
+  put('campfire', 3.2, 5.2),
+  put('bush', -3.4, -1.6), put('tulip', -1.5, 3.4), put('cosmos', -2.1, 3.8), put('rock', 5.2, 1.0),
+];
+const [pgltf] = await Promise.all([assets.loadCharacter('player'), ...jobs]);
+const { scene: player, animations } = assets.instantiate(pgltf);
+materials.applyToonStyle(player, { outlineWidth: 0.006 });
+player.position.set(-0.6, 0, 2.6);
+player.rotation.y = 0.3;
+scene.add(player);
+const mixer = new THREE.AnimationMixer(player);
+mixer.clipAction(animations.find(a => a.name === 'idle')).play();
+document.querySelector('.loading').remove();
+
+// 데모용 world 서비스: 계절 팔레트로 잎·풀 색 바꾸기 (진짜 섬은 T1 world 가 한다)
+ctx.services.world = {
+  setSeason(season) {
+    const pal = time.seasonPalette(season);
+    ground.material.color.set(pal.bySlug['tile-grass']?.grass ?? pal.grass);
+    for (const o of objects) {
+      const colors = pal.bySlug[o.slug] ?? o.spec.palette;
+      if (!pal.bySlug[o.slug] && !o.spec.variants) continue;
+      for (const [name, hex] of Object.entries(colors)) o.toon.setColor(name, hex);
+    }
+  },
+};
+events.emit('world:ready', { island: null });
+
+// ── 카메라 ──
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.52;
+controls.minDistance = 6;
+controls.maxDistance = 60;
+const CAMS = {
+  game: { pos: [0, 14, 16], target: [0, 0, 0] },        // 게임 기본 카메라와 같은 각도
+  view: { pos: [0, 4.2, 19], target: [0, 2.4, -4] },
+  up: { pos: [0, 1.6, 12], target: [0, 7, -6] },
+};
+function setCam(name) {
+  const c = CAMS[name] ?? CAMS.game;
+  camera.position.fromArray(c.pos);
+  controls.target.fromArray(c.target);
+  controls.update();
+  document.querySelectorAll('[data-cam]').forEach(b => b.classList.toggle('on', b.dataset.cam === name));
+}
+document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => setCam(b.dataset.cam)));
+setCam(params.get('cam') ?? 'view');
+
+// 주소로 시작 상태
+if (params.get('mode') === 'fast') time.setMode('fast');
+if (params.has('hour')) time.setHour(Number(params.get('hour')));
+if (params.has('pause')) time.setPaused(true);
+if (params.has('weather')) time.setWeather(params.get('weather'), { instant: true });
+if (params.has('season')) time.setSeasonOverride(params.get('season'));
+
+events.emit('game:ready', { modules: ['sky'] });
+
+const resize = () => {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+};
+addEventListener('resize', resize);
+resize();
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  sky.update(dt, ctx);
+  mixer.update(dt);
+  controls.update();
+  materials.curve.uCurveOrigin.value.copy(ctx.focus);
+  sun.target.position.copy(ctx.focus);
+  sun.position.copy(ctx.focus).add(ctx.lights.sunOffset);
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
