@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포근섬 데이터 확인</title>
+<style>
+  /* 데이터 트랙(T2) 확인 페이지: 아이템 사전, 출현표 굴려 보기, 상점·하루 리셋, 가방 */
+  :root { --ink: #4A3B32; --cream: #FFF8E6; --line: #E2D2AE; --leaf: #5E8C61; --acorn: #A8642E; --soft: #F3E7D3; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font: 14px/1.5 "Gowun Dodum", "Malgun Gothic", sans-serif; }
+  header { padding: 16px; border-bottom: 2px solid var(--line); background: #fff; }
+  h1 { margin: 0; font-size: 20px; } h2 { font-size: 16px; margin: 0 0 8px; }
+  main { display: grid; gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+  section { background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+  label { display: inline-flex; gap: 4px; align-items: center; }
+  select, input, button { font: inherit; color: inherit; border: 2px solid var(--line); border-radius: 8px; padding: 4px 8px; background: var(--cream); }
+  button { cursor: pointer; background: var(--leaf); color: #fff; border-color: var(--leaf); }
+  button.ghost { background: var(--cream); color: var(--ink); border-color: var(--line); }
+  .scroll { overflow: auto; max-height: 420px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--soft); vertical-align: top; }
+  th { position: sticky; top: 0; background: #fff; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { opacity: .7; } .rare { color: var(--acorn); font-weight: bold; }
+  .bar { height: 8px; background: var(--leaf); border-radius: 4px; }
+  .bag { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+  .cell { aspect-ratio: 1; border: 2px solid var(--line); border-radius: 8px; display: grid; place-items: center; position: relative; font-size: 22px; background: var(--cream); }
+  .cell small { position: absolute; right: 3px; bottom: 0; font-size: 11px; }
+  .log { font-size: 13px; max-height: 160px; overflow: auto; background: var(--cream); border-radius: 8px; padding: 6px; }
+  @media (min-width: 900px) { main { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
+  @media (max-width: 560px) { .bag { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<header><h1>포근섬 데이터 확인 <span class="muted" id="summary"></span></h1></header>
+<main>
+  <section class="wide">
+    <h2>아이템 사전</h2>
+    <div class="row"><label>카테고리 <select id="cat"></select></label></div>
+    <div class="scroll"><table id="items"></table></div>
+  </section>
+
+  <section>
+    <h2>출현표 굴려 보기</h2>
+    <div class="row">
+      <label>종류 <select id="kind">
+        <option value="fish">물고기</option><option value="bug">곤충</option><option value="fossil">화석</option>
+        <option value="rock">바위</option><option value="shake">나무 흔들기</option>
+      </select></label>
+      <label id="whereBox">장소 <select id="where"></select></label>
+    </div>
+    <div class="row">
+      <label>시 <input id="hour" type="number" min="0" max="23" value="12" style="width:64px"></label>
+      <label>월 <input id="month" type="number" min="1" max="12" value="10" style="width:64px"></label>
+      <label>날씨 <select id="weather"><option>clear</option><option>cloudy</option><option>rain</option><option>snow</option><option>rainbow</option></select></label>
+      <label>시드 <input id="seed" value="1" style="width:80px"></label>
+      <button id="roll">1000번 굴리기</button>
+    </div>
+    <div class="scroll"><table id="rolls"></table></div>
+  </section>
+
+  <section>
+    <h2>상점 · 하루 리셋</h2>
+    <div class="row"><label>날짜 <input id="date" type="date"></label></div>
+    <div id="shop"></div>
+    <div id="daily" class="muted"></div>
+  </section>
+
+  <section class="wide">
+    <h2>가방 (데모용 메모리 저장소 — 게임 저장은 건드리지 않음)</h2>
+    <div class="row">
+      <button data-act="fish">강에서 낚시</button><button data-act="bug">꽃밭 곤충</button><button data-act="rock">바위 치기</button>
+      <button data-act="shake">나무 흔들기</button><button data-act="dig">화석 파기</button>
+      <button data-act="craft" class="ghost">도끼 만들기</button><button data-act="sell" class="ghost">마지막 칸 팔기</button>
+      <button data-act="save" class="ghost">저장</button><button data-act="load" class="ghost">불러오기</button><button data-act="reset" class="ghost">새 게임</button>
+    </div>
+    <div class="row">도토리 <b id="acorns">0</b> · 박물관 <span id="museum"></span></div>
+    <div class="bag" id="bag"></div>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+<script type="module">
+import * as items from '../src/data/items.js';
+import * as spawns from '../src/data/spawns.js';
+import { rngFor } from '../src/data/rng.js';
+import { shopStock, nativeFruit } from '../src/data/economy.js';
+import { runDailyReset } from '../src/data/day.js';
+import { createDataService } from '../src/data/index.js';
+import { createEvents } from '../src/core/events.js';
+import { createState } from '../src/core/state.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const won = n => Number(n).toLocaleString('ko-KR');
+const nameOf = id => { const it = items.get(id); return it ? `${it.icon} ${esc(it.name)}` : esc(id); };
+
+// ---------- 아이템 사전 ----------
+$('summary').textContent = `· 아이템 ${items.ITEMS.length}개`;
+$('cat').innerHTML = items.CATEGORIES.map(c => `<option value="${c}">${items.CATEGORY_NAMES[c]} (${items.list(c).length})</option>`).join('');
+function detail(it) {
+  if (it.category === 'fish') return `${it.place} · ${it.time} · ${it.season} · 그림자 ${'●'.repeat(it.shadow)}`;
+  if (it.category === 'bug') return `${it.place} · ${it.time} · ${it.season}${it.flying ? ' · 날벌레' : ''}`;
+  if (it.category === 'tool') return `${it.use} · 내구도 ${it.durability} · ${it.from}`;
+  if (it.category === 'furn') return `${it.sizeText} · ${it.from}${it.buy ? ` · 상점 ${won(it.buy)}` : ''}`;
+  if (it.category === 'fruit') return it.variant ? `특산이면 ${it.nativePrice}` : '야자수';
+  if (it.category === 'seed') return `상점 ${won(it.buy)}`;
+  return it.from ?? it.variant ?? '';
+}
+function showItems() {
+  const list = items.list($('cat').value);
+  $('items').innerHTML = `<thead><tr><th>코드</th><th></th><th>id</th><th>이름</th><th>값</th><th>쌓임</th><th>정보</th></tr></thead><tbody>${list.map(it => `
+    <tr><td class="muted">${it.code ?? ''}</td><td>${it.icon}</td><td class="muted">${it.id}</td>
+    <td class="${it.rare ? 'rare' : ''}">${esc(it.name)}</td><td class="num">${won(it.price)}</td><td class="num">${it.stack}</td>
+    <td>${esc(detail(it))}${it.desc ? `<div class="muted">${esc(it.desc)}</div>` : ''}</td></tr>`).join('')}</tbody>`;
+}
+$('cat').onchange = showItems;
+showItems();
+
+// ---------- 출현표 ----------
+const WHERE = {
+  fish: Object.keys(spawns.HABITAT_POOLS),
+  bug: spawns.BUG_PLACES,
+  shake: ['tree', 'fruit-tree', 'palm', 'cedar'],
+};
+function syncWhere() {
+  const opts = WHERE[$('kind').value];
+  $('whereBox').style.display = opts ? '' : 'none';
+  if (opts) $('where').innerHTML = opts.map(o => `<option>${o}</option>`).join('');
+}
+$('kind').onchange = syncWhere;
+syncWhere();
+$('roll').onclick = () => {
+  const kind = $('kind').value, where = $('where').value;
+  const hour = +$('hour').value, month = +$('month').value, weather = $('weather').value;
+  const rng = rngFor($('seed').value, kind);
+  const tally = new Map();
+  const N = 1000;
+  for (let i = 0; i < N; i++) {
+    let id;
+    if (kind === 'fish') id = spawns.fish({ habitat: where, hour, month, weather, rng });
+    else if (kind === 'bug') id = spawns.bug({ place: where, hour, month, weather, rng });
+    else if (kind === 'fossil') id = spawns.fossil(rng);
+    else if (kind === 'rock') id = spawns.rock(rng, i % spawns.ROCK_MAX_HITS)?.id;
+    else { const r = spawns.treeShake(where, rng, { hour, fruit: 'fruit.apple', fruitReady: i % 4 === 0 }); id = r ? r.id + (r.event ? ` (${r.event})` : '') : null; }
+    tally.set(id ?? '없음', (tally.get(id ?? '없음') ?? 0) + 1);
+  }
+  const rows = [...tally].sort((a, b) => b[1] - a[1]);
+  $('rolls').innerHTML = `<thead><tr><th>결과</th><th>횟수</th><th style="width:40%"></th></tr></thead><tbody>${rows.map(([id, n]) => `
+    <tr><td>${id.includes(' (') ? esc(id) : nameOf(id)}</td><td class="num">${n}</td><td><div class="bar" style="width:${(n / rows[0][1]) * 100}%"></div></td></tr>`).join('')}</tbody>`;
+};
+$('roll').click();
+
+// ---------- 상점 · 하루 리셋 ----------
+const SEED = createState().island.seed;
+const pad = n => String(n).padStart(2, '0');
+const today = new Date();
+$('date').value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+function showDay() {
+  const key = $('date').value;
+  if (!key) return;
+  const s = shopStock(key, SEED);
+  $('shop').innerHTML = `<p><b>오늘의 가구</b> ${s.furniture.map(nameOf).join(', ')}<br><b>도구</b> ${s.tools.map(nameOf).join(', ')}<br>
+    <b>씨앗·묘목</b> ${[...s.seeds, ...s.saplings].map(nameOf).join(', ')}<br><b>섬 특산 과일</b> ${nameOf(nativeFruit(SEED))}</p>`;
+  const island = createState().island;
+  const r = runDailyReset(island, key);
+  $('daily').textContent = `이날 첫 리셋: 화석 자리 ${r.fossils}곳 · 조개 ${r.shells}개 · 잡초 ${r.weeds}개`;
+}
+$('date').onchange = showDay;
+showDay();
+
+// ---------- 가방 (진짜 서비스, 메모리 저장소) ----------
+const mem = new Map();
+const storage = { getItem: k => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, String(v)), removeItem: k => mem.delete(k) };
+const events = createEvents();
+const ctx = { events, state: createState(), services: {} };
+const inst = createDataService(ctx, { storage });
+const data = inst.service;
+inst.start();
+data.day.check();
+const log = msg => { $('log').insertAdjacentHTML('afterbegin', `<div>${msg}</div>`); };
+function render() {
+  $('bag').innerHTML = data.inventory.slots.map(s => `<div class="cell" title="${s ? esc(items.get(s.id).name) : ''}">${s ? items.get(s.id).icon : ''}${s && (s.count > 1 || s.uses) ? `<small>${s.uses ? `${s.uses}회` : s.count}</small>` : ''}</div>`).join('');
+  $('acorns').textContent = won(data.wallet.get());
+  const p = data.museum.progress();
+  $('museum').textContent = `물고기 ${p.fish.join('/')} · 곤충 ${p.bug.join('/')} · 화석 ${p.fossil.join('/')}`;
+}
+for (const n of ['inventory:changed', 'wallet:changed', 'museum:changed']) events.on(n, render);
+events.on('save:done', ({ ok }) => log(ok ? '저장했어요' : '저장 못 했어요'));
+const now = () => { const d = new Date(); return { hour: d.getHours(), month: d.getMonth() + 1, weather: 'clear' }; };
+const got = (r, what) => {
+  if (!r) return log(`${what}: 아무것도 없어요`);
+  const c = data.collect(r.id ?? r, r.count ?? 1);
+  log(`${what}: ${nameOf(r.id ?? r)} ×${r.count ?? 1}${c.acorns ? ` → 도토리 ${c.acorns}` : c.left ? ' (가방이 꽉 찼어요)' : ''}${r.event ? ' — 벌떼다!' : ''}`);
+};
+let rockNo = 0;
+const acts = {
+  fish: () => { if (data.inventory.useTool('rod').ok) got(data.spawns.fish({ habitat: 'river', ...now() }), '낚시'); else log('낚싯대가 없어요'); },
+  bug: () => { if (data.inventory.useTool('net').ok) got(data.spawns.bug({ place: 'flower', ...now() }), '곤충'); else log('잠자리채가 없어요'); },
+  rock: () => got(data.harvest.hitRock(`rock-${rockNo % 3}`), `바위 ${rockNo++ % 3}`),
+  shake: () => got(data.harvest.shakeTree('tree-1', 'fruit-tree', { fruit: data.economy.nativeFruit(), hour: now().hour }), '과일나무'),
+  dig: () => got(data.harvest.digFossil(`spot-${data.harvest.fossilsLeft()}`), '화석 자리'),
+  craft: () => log(data.recipes.craft('tool.axe') ? '도끼를 만들었어요' : `재료 부족: ${data.recipes.missing('tool.axe').map(m => `${items.get(m.id).name} ${m.have}/${m.n}`).join(', ')}`),
+  sell: () => { const i = data.inventory.slots.findLastIndex(Boolean); log(i < 0 ? '팔 게 없어요' : `${nameOf(data.inventory.slots[i].id)} → ${data.economy.sell(i)} 도토리`); },
+  save: () => data.save.save(),
+  load: () => { log(data.save.load() ? '불러왔어요' : '저장이 없어요'); render(); },
+  reset: () => { data.save.reset(); log('새 게임'); },
+};
+document.querySelectorAll('[data-act]').forEach(b => { b.onclick = () => acts[b.dataset.act](); });
+render();
+</script>
+</body>
+</html>
