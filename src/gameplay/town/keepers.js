@@ -1,5 +1,7 @@
 // 가게 주인: 밤톨(도토리상점 문 옆)·느루(박물관 문 옆). 첫날엔 밤톨이 선착장에서 맞이하고 조작을 알려 준다.
 // 상점·박물관 문 앞에서 행동 키(우선순위 90) → 인사 → ui.shop / ui.museum. 첫날 안내는 우선순위 100.
+// 첫날 할 일(ctx.services.intro, 3차 X3): 이름을 정하는 동안 첫 안내를 미루고, 다 마치면 밤톨이 축하하며 선물을 준다
+// (집 안에서 마쳤으면 집 앞에서 기다리다가, 아니면 상점 문·밤톨 앞에서 우선순위 95).
 import { createActor } from './actor.js';
 import { KEEPERS } from './people.js';
 import { context, speaker, giveItem } from './talk.js';
@@ -44,7 +46,12 @@ export async function createKeepers(ctx, town, lines) {
 
   // ---- 밤톨: 영업시간엔 문 옆, 아니면 가게 안 (첫날엔 선착장) ----
   // 첫 입력(키·터치) 뒤에 말을 건다 — 소리 잠금이 풀려야 밤톨 목소리가 난다. 아무 입력이 없어도 12초 뒤엔 시작
-  const intro = { pending: !ctx.state.flags?.intro, running: false, wait: 1.6, idle: 0, heard: ctx.services.audio?.unlocked === true };
+  // 이름 정하기 창이 떠 있는 동안(intro.holding)은 기다렸다가, 닫히고 잠깐 뒤에 말을 건다
+  const intro = { pending: !ctx.state.flags?.intro, running: false, wait: 1.6, idle: 0, heard: ctx.services.audio?.unlocked === true, held: false };
+  const firstday = () => ctx.services.intro;
+  const holding = () => !!firstday()?.holding;
+  /** 대사의 {player}·{island} (intro 모듈이 없으면 기본값) */
+  const names = () => firstday()?.names?.() ?? { player: '친구', island: '포근섬' };
   if (intro.pending && !intro.heard) {
     const heard = () => { intro.heard = true; intro.wait = Math.min(intro.wait, 0.7); };
     addEventListener('keydown', heard, { once: true, capture: true });
@@ -87,11 +94,18 @@ export async function createKeepers(ctx, town, lines) {
       if (B.mode === 'stand' && !open) { B.mode = 'inside'; B.actor.fade(0, 0.8); town.sfxAt('door', shopDoor, 0.5); }
       else if (B.mode === 'inside' && open) { B.mode = 'stand'; B.actor.place(B.spot.x, B.spot.z, Math.PI); B.actor.fade(1, 0.8); town.sfxAt('door', shopDoor, 0.5); }
     }
-    // 첫날: 선착장 가까이 오면 밤톨이 먼저 말을 건다
-    if (intro.pending && !intro.running && pl && !ctx.services.ui?.isBlocking?.()) {
+    // 첫날: 선착장 가까이 오면 밤톨이 먼저 말을 건다 (이름을 다 정한 뒤)
+    if (intro.pending && holding()) intro.held = true;
+    else if (intro.held) { intro.held = false; intro.idle = 0; intro.wait = Math.max(intro.wait, 0.9); }
+    if (intro.pending && !intro.running && !intro.held && pl && !ctx.services.ui?.isBlocking?.()) {
       intro.idle += dt;
       if (intro.heard) intro.wait -= dt;
       if ((intro.wait <= 0 || intro.idle > 12) && Math.hypot(pl.x - B.actor.position.x, pl.z - B.actor.position.z) < 5) town.conversation(B, introFlow);
+    }
+    // 첫날 할 일 축하: 집에서 나오면 집 앞에서 기다리던 밤톨이 먼저 말을 건다
+    if (visit.wait >= 0 && (visit.wait -= dt) < 0 && visit.on) {
+      if (ctx.services.ui?.isBlocking?.() || ctx.services.house?.inside) visit.wait = 0.3;
+      else town.conversation(B, celebrateFlow);
     }
   }
 
@@ -100,14 +114,15 @@ export async function createKeepers(ctx, town, lines) {
     if (intro.running || !intro.pending) return;
     intro.running = true;
     try {
-      const say = speaker(ctx, B.person);
+      const say = speaker(ctx, B.person, names());
       B.happy();
       await say(LB.intro.hello);
       for (;;) {
         const a = await say(ctx.input?.touch ? LB.intro.touch : LB.intro.keys, ['알겠어요!', '한 번 더 들을래요']);
         if (a !== 1) break;
       }
-      await say(LB.intro.after);
+      // 첫날 할 일 목록이 있으면 그 얘기도 (목록은 town:intro 뒤에 뜬다)
+      await say([...LB.intro.after, ...(firstday() ? LB.intro.list : []), ...LB.intro.bye]);
       ctx.state.flags ??= {};
       ctx.state.flags.intro = true;
       intro.pending = false;
@@ -118,6 +133,69 @@ export async function createKeepers(ctx, town, lines) {
       if (pts) { B.actor.setPath(pts); B.mode = 'walk'; B.prev = 'walk'; }
       else { B.actor.place(B.spot.x, B.spot.z, Math.PI); B.mode = 'stand'; B.prev = 'stand'; }
     } finally { intro.running = false; }
+  }
+
+  // ---- 첫날 할 일을 다 마쳤을 때: 밤톨 축하·선물 ----
+  // 집 안에서 마쳤으면 밤톨이 집 앞으로 와서 기다리다가 나오면 말을 건다. 그 밖엔 상점 문·밤톨 앞에서 (우선순위 95)
+  const visit = { on: false, wait: -1, full: false };   // full = 지난번에 가방이 꽉 차서 못 줬다
+  /** 선물이 남아 있고 플레이어가 집 안이면 밤톨을 집 앞에 세워 둔다 (안에선 밖이 안 보이므로 옮겨도 된다) */
+  function arrangeVisit() {
+    const door = places.playerHouse?.door;
+    if (visit.on || intro.pending || !door || !firstday()?.rewardPending?.() || !ctx.services.house?.inside) return;
+    let s = null;
+    for (const [dx, dz] of [[-1.35, 1.05], [1.35, 1.6], [0, 2.1]]) {
+      if (world.island.isWalkable(door.x + dx, door.z + dz)) { s = { x: door.x + dx, z: door.z + dz }; break; }
+    }
+    if (!s) return;
+    visit.on = true;
+    B.mode = 'visit';
+    B.actor.path = [];
+    B.actor.place(s.x, s.z, 0);
+    B.actor.setOpacity(1);
+    B.actor.fadeTo = 1;
+  }
+  ctx.events.on('intro:done', () => arrangeVisit());
+  ctx.events.on('house:enter', () => arrangeVisit());
+  ctx.events.once('game:ready', () => arrangeVisit());   // 집 안에서 이어하기
+  ctx.events.on('house:leave', () => { if (visit.on) visit.wait = 0.9; });
+
+  async function celebrateFlow() {
+    const fd = firstday();
+    if (!fd?.rewardPending?.()) return;
+    const d = ctx.services.data, ui = ctx.services.ui;
+    const rw = fd.reward;
+    const vars = { ...names(), item: d?.items?.get?.(rw.item)?.name ?? '선물' };
+    const say = speaker(ctx, B.person, vars);
+    // 문 닫은 시간이면 잠깐 나온다 (끝나면 update 가 다시 가게 안으로 들인다)
+    if (B.prev === 'inside') {
+      ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
+      B.actor.place(B.spot.x, B.spot.z, Math.PI);
+      B.actor.fade(1, 0.4);
+      B.prev = 'stand';
+    }
+    const atHome = visit.on;
+    visit.on = false;
+    B.happy();
+    await say([...(atHome ? LB.firstday.visit : []), ...(visit.full ? LB.firstday.again : LB.firstday.done)]);
+    const left = giveItem(ctx, rw.item);
+    visit.full = left > 0;
+    if (left > 0) await say(LB.firstday.full);          // 가방이 꽉 참 → 다음에 다시
+    else {
+      if (rw.acorns > 0 && d?.wallet?.add) {
+        d.wallet.add(rw.acorns);
+        ui?.toast?.(`도토리 ${rw.acorns.toLocaleString('ko-KR')}개를 받았어요`, '🌰');
+        ctx.events.emit('sfx', { name: 'acorn' });
+      }
+      ctx.services.player?.play?.('happy');
+      fd.claimReward();
+      await say(LB.firstday.after);
+    }
+    // 집 앞에 왔던 거면 가게로 돌아간다
+    if (atHome) {
+      const pts = town.route(B.actor.position, B.spot);
+      if (pts) { B.actor.setPath(pts); B.mode = 'walk'; B.prev = 'walk'; }
+      else { B.actor.place(B.spot.x, B.spot.z, Math.PI); B.mode = 'stand'; B.prev = 'stand'; }
+    }
   }
 
   // ---- 도토리상점 ----
@@ -131,7 +209,8 @@ export async function createKeepers(ctx, town, lines) {
       return;
     }
     const greet = [...pickLines(LB.greet[c.slot] ?? LB.greet.morning, r, B.recent)];
-    if (furn.length && r() < 0.45) greet.push(...pickLines(LB.today, r, B.recent));
+    if (firstday()?.current?.() === 'sell') greet.push(...pickLines(LB.firstday.sell, r));   // 첫날 할 일: 팔기 차례
+    else if (furn.length && r() < 0.45) greet.push(...pickLines(LB.today, r, B.recent));
     else if (r() < 0.3) greet.push(...pickLines(LB.chat, r, B.recent));
     const a = await say(greet, ['살래요', '팔래요', '그냥 구경할게요']);
     if (a === 0 || a === 1) {
@@ -208,8 +287,19 @@ export async function createKeepers(ctx, town, lines) {
     const offs = [];
     offs.push(gp.add({
       name: 'town:intro', intent: 'action', priority: 100,
-      test: () => (intro.pending && !intro.running && near(B.actor.position, 2.2) ? B : null),
+      test: () => (intro.pending && !intro.running && !holding() && near(B.actor.position, 2.2) ? B : null),
       run: () => town.conversation(B, introFlow),
+    }));
+    offs.push(gp.add({
+      name: 'town:firstday', intent: 'action', priority: 95,
+      test: () => {
+        if (intro.pending || !firstday()?.rewardPending?.()) return null;
+        if (visit.on) return near(B.actor.position, 2.2) ? B : null;
+        if (places.shop && near(shopDoor, DOOR_DIST) && facingTo(shopDoor)) return B;
+        if (B.talkable && B.mode !== 'walk' && near(B.actor.position, KEEPER_DIST) && facingTo(B.actor.position)) return B;
+        return null;
+      },
+      run: () => town.conversation(B, celebrateFlow, { face: B.mode !== 'inside' }),
     }));
     offs.push(gp.add({
       name: 'town:shop', intent: 'action', priority: 90,
@@ -234,5 +324,5 @@ export async function createKeepers(ctx, town, lines) {
     return () => offs.forEach(f => f());
   }
 
-  return { all, bamtol: B, neuru: N, intro, update, register, flows: { introFlow, shopFlow, museumFlow } };
+  return { all, bamtol: B, neuru: N, intro, update, register, flows: { introFlow, shopFlow, museumFlow, celebrateFlow } };
 }
