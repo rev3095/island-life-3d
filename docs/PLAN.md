@@ -40,14 +40,18 @@
 
 행동 키(Space·F)는 `ctx.services.gameplay.interactions` 우선순위로 나눠 받는다 (`docs/CONTRACTS.md` 2차 준비).
 
-### 3차 (2차 후속을 합친 뒤 — P6 마무리와 배포)
+### 3차 (2차 후속을 합친 뒤 — P6 마무리와 배포, 2026-10-29 시작)
 
-| 트랙 | 브랜치 | 고치는 곳 (여기만) | 결과물 |
+`main` 215a315 에서 갈라진다. 포트는 작업 트리마다 다르게 (`node dev-server.mjs --port=…`).
+
+| 트랙 | 브랜치 · 포트 | 고치는 곳 (여기만) | 결과물 |
 |---|---|---|---|
-| X1 휴대폰·조작 | `p6-mobile` | `src/core/input.js`, `src/ui/` 의 터치 버튼·창 배치, `index.html` 의 viewport | 터치 조이스틱·A/B 버튼, 세로/가로 화면, 가방·섬폰·대화 터치, 휴대폰 크기에서 채집·대화·가구 놓기 끝까지 |
-| X2 성능·카메라 | `p6-perf` | `src/player/camera.js`, `src/render/`, `src/gameplay/gather/` 의 그리기 묶음 | 그리기 호출 줄이기, 저사양 자동 판단, 카메라 각도(하늘 조금 더), 가리는 나무 반투명 |
-| X3 첫날 흐름 | `p6-firstday` | `src/gameplay/intro/` (새 폴더), `src/gameplay/town/keepers.js` 의 안내 대사 | 섬·플레이어 이름 → 밤톨 안내 → 도구 → 첫 채집 → 첫 판매·기증 → 집까지 이어지는 첫날 |
-| X4 웹 배포 | `p6-deploy` | `tools/build-web.mjs` (새), `dist/` | 게임을 claude.ai 링크로: 파일 목록·용량 맞추기, `.glb.json` 만, 로딩 화면, 브라우저 저장 |
+| X1 휴대폰·조작 | `p6-mobile` · 4195 | `src/core/input.js`, `src/ui/` (모든 창·HUD·`ui.css`), `index.html` 의 `<head>`·viewport | 터치 조이스틱·A/B 버튼 크기·위치·눌림 표시, 세로/가로 화면과 안전 영역, 가방·섬폰·대화·상점·제작 창 터치, 가방에서 가구 변형 색 이름 보이기, 휴대폰 크기에서 채집·대화·가구 놓기 끝까지 |
+| X2 성능·카메라·섬 경관 | `p6-perf` · 4196 | `src/player/camera.js`, `src/render/`, `src/world/` | 카메라 각도(하늘이 조금 더), 카메라와 플레이어 사이 나무 반투명, 해안선 다듬기·바다 물결, 그리기 호출·프레임 시간 줄이기, 저사양 자동 판단 |
+| X3 첫날 흐름 | `p6-firstday` · 4197 | `src/gameplay/intro/` (새 폴더), `src/gameplay/index.js` 의 하위 모듈 목록 한 줄, `src/gameplay/town/keepers.js` · `lines/bamtol.js` 의 첫날 안내 | 플레이어·섬 이름 정하기 → 밤톨 안내 → 도구 들기 → 첫 채집 → 첫 판매·기증 → 집 들어가기까지 이어지는 첫날 할 일(체크리스트)과 보상 |
+| X4 웹 배포 | `p6-deploy` · 4198 | `tools/build-web.mjs` (새), `dist/` (새), `src/core/assets.js` | 게임을 claude.ai 아티팩트 한 페이지 + 파일들로 묶는 빌드, 파일 수·용량 표, 로딩 화면, 저장은 브라우저 저장소. **게시는 조정 세션이 합친 뒤에** |
+
+겹치면 안 되는 곳: X1 만 `src/ui/` 를 고친다 (X3 의 이름 정하기 창은 `src/gameplay/intro/` 안에 자기 DOM 으로). X2 만 `src/world/`·`src/render/` 를 고친다. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안으로 적는다.
 
 ## 합치기
 
