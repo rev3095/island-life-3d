@@ -94,9 +94,41 @@ async function writeOne(res, req, [, col, id], data) {
   return json(res, 404, { code: "not_found" });
 }
 
+// 웹 빌드 확인 (node tools/build-web.mjs 뒤): /artifact/ 가 dist/web 을 아티팩트처럼 연다.
+// 페이지에 아티팩트 뼈대를 씌우고, 하위 경로에서, dist/web/files.json 에 있는 파일만 내준다 (없는 파일은 여기 로그).
+//   /artifact/?nostorage → localStorage 가 막힌 창 흉내,  /artifact-frame → claude.ai 처럼 iframe 안에서 열기
+const SKELETON = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
+  + '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>';
+const NO_STORAGE = "<script>Object.defineProperty(window,'localStorage',{configurable:true,get(){throw new DOMException('막힌 저장소 (dev-server ?nostorage)','SecurityError')}})</script>";
+async function artifact(req, res, path) {
+  const send = (type, data) => res.writeHead(200, { "content-type": type, "cache-control": "no-store", "content-security-policy": CSP }).end(data);
+  const search = new URL(req.url, "http://x").search;
+  if (path === "/artifact-frame") {
+    return send(MIME[".html"], `<!doctype html><meta charset="utf-8"><title>아티팩트 틀</title><style>html,body{margin:0;height:100%;background:#2b2b2b}iframe{border:0;width:100%;height:100%;display:block}</style>`
+      + `<iframe src="/artifact/${search}" allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"></iframe>`);
+  }
+  const rel = path.slice("/artifact/".length) || "index.html";
+  const dir = join(root, "dist/web");
+  if (rel === "index.html") {
+    const page = await readFile(join(dir, "index.html"), "utf8").catch(() => null);
+    if (page == null) return res.writeHead(404, { "content-type": MIME[".html"] }).end("dist/web 이 없어요 — 먼저 node tools/build-web.mjs");
+    const extra = new URLSearchParams(search).has("nostorage") ? NO_STORAGE : "";
+    return send(MIME[".html"], `${SKELETON}${extra}</head><body>${page}</body></html>`);
+  }
+  const files = JSON.parse(await readFile(join(dir, "files.json"), "utf8").catch(() => "{}"));
+  if (!files[rel]) {
+    console.warn(`[artifact] 게시 목록에 없는 파일: ${rel}`);
+    return res.writeHead(404).end("not published");
+  }
+  const target = normalize(join(root, files[rel]));
+  if (!target.startsWith(root)) return res.writeHead(403).end("forbidden");
+  return send(MIME[extname(target).toLowerCase()] ?? "application/octet-stream", await readFile(target));
+}
+
 createServer(async (req, res) => {
   const path = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
   if (path.startsWith("/api/")) return api(req, res, path).catch(e => json(res, 500, { code: "server_error", message: String(e) }));
+  if (path.startsWith("/artifact/") || path === "/artifact-frame") return artifact(req, res, path).catch(e => res.writeHead(500).end(String(e)));
   const target = normalize(join(root, path === "/" ? "/editor.html" : path));
   if (!target.startsWith(root)) return res.writeHead(403).end("forbidden");
   try {
