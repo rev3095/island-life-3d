@@ -16,6 +16,11 @@ export function createCollision(island) {
   function add(c) { for (const k of cellsOf(c)) { if (!cells.has(k)) cells.set(k, new Set()); cells.get(k).add(c); } return c; }
   function remove(c) { for (const k of cellsOf(c)) cells.get(k)?.delete(c); }
 
+  // 움직이는 원 (주민·플레이어): 칸 해시에 넣지 않고 move 때마다 본다. m = { x, z, r, y?, active? } (값은 getter 여도 된다)
+  // 자기 자신은 막지 않는다 — 출발점이 그 원의 중심이면 건너뛴다.
+  const movers = new Set();
+  function addMover(m) { movers.add(m); return () => movers.delete(m); }
+
   function near(tx, tz, out) {
     for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
       const x = tx + dx, z = tz + dz;
@@ -66,6 +71,12 @@ export function createCollision(island) {
     const steps = Math.max(1, Math.ceil(dist / 0.12));
     const sx = (nx - fx) / steps, sz = (nz - fz) / steps;
     const set = new Set();
+    const others = [];
+    for (const m of movers) {
+      if (m.active === false || (Math.abs(m.x - fx) < 1e-6 && Math.abs(m.z - fz) < 1e-6)) continue;
+      if (y != null && m.y != null && Math.abs(m.y - y) > 0.6) continue;
+      if (Math.hypot(m.x - fx, m.z - fz) < dist + r + m.r + 0.5) others.push({ x: m.x, z: m.z, r: m.r });
+    }
     for (let s = 0; s < steps; s++) {
       const prev = { x: p.x, z: p.z };
       const pt = island.toTile(prev.x, prev.z);
@@ -85,6 +96,7 @@ export function createCollision(island) {
           if (y != null && Math.abs(c.y - y) > 0.6) continue;
           hit = (c.type === 'circle' ? pushCircle(p, r, c.x, c.z, c.r) : pushBox(p, r, c.x0, c.z0, c.x1, c.z1)) || hit;
         }
+        for (const c of others) hit = pushCircle(p, r, c.x, c.z, c.r) || hit;
         if (!hit) break;
       }
       // 밀어낸 뒤에도 못 가는 칸에 들어갔으면 이 걸음은 취소
@@ -94,5 +106,5 @@ export function createCollision(island) {
     return p;
   }
 
-  return { add, remove, move, blockedAt, cells };
+  return { add, remove, move, blockedAt, cells, addMover, movers };
 }
