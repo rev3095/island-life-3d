@@ -11,7 +11,8 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
-const port = Number(process.env.PORT ?? 4180);
+// 포트: --port=4181 인자 > PORT 환경변수 > 4180 (작업 트리마다 다른 포트로 띄울 때)
+const port = Number(process.argv.find(a => a.startsWith("--port="))?.slice(7) ?? process.env.PORT ?? 4180);
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
