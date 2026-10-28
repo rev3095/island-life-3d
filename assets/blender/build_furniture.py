@@ -431,7 +431,10 @@ def b_bug_case(M):
     c.add(ellipsoid(b + V((0.075, 0, 0.045)), (0.038, 0.036, 0.03), rot=rot_xyz(y=-0.45), seg=14, rings=8), 'bug')
     horn = bezier(b + V((0.09, 0, 0.06)), b + V((0.125, 0, 0.08)), b + V((0.15, 0, 0.12)), b + V((0.135, 0, 0.16)), 6)
     c.add(rail(horn, [0.015 - 0.009 * i / 6 for i in range(7)], seg=8), 'bug')
-    c.add(ellipsoid(b + V((-0.02, -0.035, 0.035)), (0.035, 0.012, 0.016), rot=rot_xyz(y=-0.45), seg=12, rings=6), 'bugShine')
+    tilt = rot_xyz(y=-0.45)
+    c.add(box(b + tilt @ V((-0.012, 0, 0.049)), (0.13, 0.006, 0.006), bevel=0.002, rot=tilt), 'bugShine')   # 겉날개 가운데 줄
+    for sy in (1, -1):   # 등 반짝임 두 점
+        c.add(ellipsoid(b + tilt @ V((-0.03, sy * 0.022, 0.044)), (0.022, 0.01, 0.006), rot=tilt, seg=10, rings=6), 'bugShine')
     for sy in (1, -1):
         for x in (-0.03, 0.035):
             c.add(capsule(b + V((x, sy * 0.045, -0.02)), b + V((x - 0.015, sy * 0.075, -0.06)), 0.009, seg=6, rings=4), 'bug')

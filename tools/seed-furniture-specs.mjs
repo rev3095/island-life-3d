@@ -105,7 +105,7 @@ const F = [
   { slug: "bug-case", name: "곤충 상자", footprint: [1, 1],
     concept: "나무 받침 위 유리 상자. 나뭇가지와 잎 위에 장수풍뎅이 한 마리.",
     keywords: ["나무 테 유리 상자", "나뭇가지", "풍뎅이"], references: ["곤충 채집 상자"], avoid: ["징그러운 벌레 표현"],
-    palette: { wood: "#C99B68", woodDark: "#8C6440", caseBack: "#E6F3DC", soil: "#7A5A3E", twig: "#D9B382", leaf: "#7FBF5E", bug: "#4A3428", bugShine: "#B88C66", glint: "#FFFFFF" },
+    palette: { wood: "#C99B68", woodDark: "#8C6440", caseBack: "#E6F3DC", soil: "#7A5A3E", twig: "#D9B382", leaf: "#7FBF5E", bug: "#5B3F2E", bugShine: "#D9B08A", glint: "#FFFFFF" },
     labels: { wood: "테·받침", woodDark: "받침 문", caseBack: "뒤판", soil: "흙", twig: "나뭇가지", leaf: "잎", bug: "풍뎅이", bugShine: "풍뎅이 빛", glint: "유리 반짝임" },
     params: { scale }, noOutline: ["glint", "bugShine"], flat: ["glint"], outline: 0.008 },
   { slug: "picture-frame", name: "액자", footprint: [1, 1], place: "wall",
