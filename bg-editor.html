@@ -184,7 +184,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
   <header>
     <div class="title-row"><h1>배경 편집기</h1><a class="small" href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2" target="_blank" rel="noopener">캐릭터 편집기 열기 ↗</a></div>
     <div class="pills" id="pills"></div>
-    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일을 요소 하나하나로 나눠 Blender로 만든 3D 모델입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요.</p>
+    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일과 집 안 가구를 요소 하나하나로 나눠 Blender로 만든 3D 모델입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요.</p>
   </header>
 
   <nav style="display:grid;gap:12px" aria-label="요소 고르기">
@@ -222,7 +222,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
         <div class="two" id="newFields" hidden>
           <div class="field"><label for="newName">새 요소 이름</label><input type="text" id="newName" placeholder="예: 대나무, 분수대, 빨간 우체통"></div>
           <div class="field"><label for="newCat">분류</label>
-            <select id="newCat"><option value="nature">자연</option><option value="prop">소품</option><option value="building">건물</option><option value="tile">타일</option></select></div>
+            <select id="newCat"><option value="nature">자연</option><option value="prop">소품</option><option value="building">건물</option><option value="tile">타일</option><option value="furniture">가구</option></select></div>
         </div>
         <div class="field"><label for="req">자유 요청 (가장 우선)</label>
           <textarea id="req" placeholder="예: 첨부한 그림처럼 지붕을 더 뾰족하게, 창문은 둥글게. 굴뚝은 빼줘"></textarea></div>
@@ -278,7 +278,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
     <div class="steps">
       <div class="step"><h3>1. 요소 고르고 요청 보내기</h3><p class="small">격자에서 요소를 고르고 레퍼런스·프롬프트를 넣어 "요청 보내기". 요청과 파일은 이 페이지의 저장소에 요소별로 남아요.</p></div>
       <div class="step"><h3>2. 채팅에서 확인 부탁</h3><p class="small">채팅에 "배경 요청 확인"이라고 보내주세요. Claude가 새 요청을 모두 읽고 레퍼런스를 내려받아 직접 봅니다.</p></div>
-      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>에, 모양 변화는 <code>build_env.py</code>에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>로 다시 만들어요.</p></div>
+      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>(가구는 <code>assets/furniture/specs/</code>)에, 모양 변화는 <code>build_env.py</code>(가구는 <code>build_furniture.py</code>)에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>(가구는 <code>build-furniture.mjs</code>)로 다시 만들어요.</p></div>
       <div class="step"><h3>4. 같은 링크 갱신</h3><p class="small">새 모델·렌더로 편집기가 업데이트되고, 요청 기록에 "반영 완료"와 바뀐 내용이 적혀요. 확정한 요소는 초록 점으로 바뀌어요.</p></div>
     </div>
   </section>
@@ -296,12 +296,12 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const NEW = '_new';
-const BASE = 'assets/env/';
+const BASE = 'assets/env/', FURN = 'assets/furniture/';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일' };
-const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각' };
+const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구' };
+const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각', furniture: '집 안에 놓는 가구 (작업대에서 만들거나 선물로 받음)' };
 const FOCUS = ['전체 느낌', '모양·실루엣', '비율·크기', '색', '재질', '디테일'];
 const ANIM_LABEL = { sway: '바람에 흔들림', shake: '나무 흔들기', flicker: '불꽃 일렁임' };
 const VIEW_LABEL = { main: '3/4 보기', front: '정면', top: '위에서' };
@@ -315,6 +315,13 @@ function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if
 let models = [], categories = ['nature', 'prop', 'building', 'tile'];
 try { ({ models, categories = categories } = await loadJSON(BASE + 'index.json')); }
 catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어요.'; $('viewerMsg').textContent = '로컬에서는 node dev-server.mjs 로 연 주소에서 확인해 주세요.'; throw e; }
+// 배경 요소와 가구는 폴더가 달라서 요소마다 폴더(base)를 기억한다. 모닥불처럼 slug 가 겹치는 가구는 key 앞에 furn- 을 붙여 나눈다.
+models.forEach(m => Object.assign(m, { key: m.slug, base: BASE }));
+try {
+  const furn = (await loadJSON(FURN + 'index.json')).models ?? [];
+  models.push(...furn.map(m => ({ ...m, category: 'furniture', key: 'furn-' + m.slug, base: FURN })));
+  if (furn.length) categories = [...categories, 'furniture'];
+} catch {}
 
 /* ---------- 헤더 · 분류 탭 · 요소 격자 ---------- */
 const reviewing = models.filter(m => m.status !== 'approved').length;
@@ -328,9 +335,9 @@ function renderTabs() {
 function renderGroups() {
   const cats = tab === 'all' ? categories : [tab];
   $('groups').innerHTML = cats.map(c => `<div class="group"><h3>${CAT_LABEL[c]} <span class="small muted">${CAT_NOTE[c]}</span></h3><div class="grid">
-    ${models.filter(m => m.category === c).map(m => `<button type="button" class="pick" data-slug="${esc(m.slug)}" aria-pressed="${m.slug === slug}">
+    ${models.filter(m => m.category === c).map(m => `<button type="button" class="pick" data-slug="${esc(m.key)}" aria-pressed="${m.key === slug}">
       <span class="dot ${m.status === 'approved' ? 'ok' : ''}" title="${MODEL_STATUS[m.status]?.[1] ?? ''}"></span>
-      <img src="${BASE}renders/${esc(m.slug)}_thumb.png" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.name)}</span></button>`).join('')}
+      <img src="${m.base}renders/${esc(m.slug)}_thumb.png" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.name)}</span></button>`).join('')}
     <button type="button" class="pick add" data-slug="${NEW}" data-cat="${c}" aria-pressed="${slug === NEW && newCat === c}"><span class="plus">+</span><span class="nm">새 요소</span></button>
   </div></div>`).join('');
 }
@@ -354,8 +361,8 @@ const restore = base => { try { const s = localStorage.getItem(draftKey()); if (
 
 async function select(next) {
   if (next === slug) return;
-  const model = models.find(m => m.slug === next);
-  if (next !== NEW && !model) next = models[0]?.slug;
+  let model = models.find(m => m.key === next);
+  if (next !== NEW && !model) { model = models[0]; next = model?.key; }
   slug = next;
   try { history.replaceState(null, '', '#' + (slug === NEW ? 'new' : slug)); } catch {}
   renderGroups();
@@ -378,8 +385,8 @@ async function select(next) {
   const [cls, label] = MODEL_STATUS[model.status] ?? MODEL_STATUS.review;
   $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
   $('viewerMsg').hidden = false; $('viewerMsg').textContent = '3D 모델 불러오는 중…';
-  const want = slug;
-  try { cache[want] ??= await Promise.all([loadJSON(`${BASE}specs/${want}.json`), loadJSON(`${BASE}models/${want}.stats.json`)]); }
+  const want = slug, B = model.base, file = model.slug;
+  try { cache[want] ??= await Promise.all([loadJSON(`${B}specs/${file}.json`), loadJSON(`${B}models/${file}.stats.json`)]); }
   catch { if (slug === want) $('viewerMsg').textContent = '요소 정보를 불러오지 못했어요.'; return; }
   if (slug !== want) return;
   [spec, stats] = cache[want];
@@ -391,17 +398,19 @@ async function select(next) {
     [stats.triangles.toLocaleString('ko-KR'), '삼각형'], [`${stats.footprint[0]}×${stats.footprint[1]}`, '차지하는 칸'],
     [`${sx}×${sy}×${sz}`, '크기 (가로×깊이×높이)'], [stats.materials.length, '재질'], [stats.parts, '부품'], [kb(stats.glbBytes), '.glb 용량'],
   ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
-  const img = (name, ext = 'png') => `<figure><div class="ph"><img src="${BASE}renders/${want}_${name}.${ext}" alt="${esc(spec.name)} ${VIEW_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${VIEW_LABEL[name] ?? ''}</figcaption></figure>`;
+  const img = (name, ext = 'png') => `<figure><div class="ph"><img src="${B}renders/${file}_${name}.${ext}" alt="${esc(spec.name)} ${VIEW_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${VIEW_LABEL[name] ?? ''}</figcaption></figure>`;
   $('views').innerHTML = ['main', 'front', 'top'].map(n => img(n)).join('');
-  const hasVariants = stats.renders.includes(`${want}_variants.png`);
-  $('variantsImg').innerHTML = hasVariants ? `<img src="${BASE}renders/${want}_variants.png" alt="${esc(spec.name)} 변형 모음" loading="lazy"><figcaption><span class="id">VARIANTS</span>${Object.values(spec.variants ?? {}).map(v => esc(v.label)).join(' · ')}</figcaption>` : '';
+  const hasVariants = stats.renders.includes(`${file}_variants.png`);
+  $('variantsImg').innerHTML = hasVariants ? `<img src="${B}renders/${file}_variants.png" alt="${esc(spec.name)} 변형 모음" loading="lazy"><figcaption><span class="id">VARIANTS</span>${Object.values(spec.variants ?? {}).map(v => esc(v.label)).join(' · ')}</figcaption>` : '';
   $('variantsImg').hidden = !hasVariants;
-  $('hero').innerHTML = `<img src="${BASE}renders/${want}_hero.jpg" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
+  const hasHero = stats.renders.includes(`${file}_hero.jpg`) || B === BASE;
+  $('hero').hidden = !hasHero;
+  $('hero').innerHTML = !hasHero ? '' : `<img src="${B}renders/${file}_hero.jpg" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
   $('tileToggle').hidden = spec.category !== 'tile';
   $('tile3').checked = spec.category === 'tile';
   draft = restore(pick(spec));
   fillForm(); renderVariants(); renderRefs(); renderRequests();
-  loadModel(want);
+  loadModel(want, `${B}models/${file}.glb.json`);
 }
 
 /* ---------- 프롬프트 폼 ---------- */
@@ -755,7 +764,7 @@ const ground = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshToo
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.002;
 scene.add(ground);
-const GROUND = { grass: 0xa9c46a, sand: 0xf1dfae, water: 0x6bb8d6 };
+const GROUND = { grass: 0xa9c46a, sand: 0xf1dfae, water: 0x6bb8d6, floor: 0xd9b48a };
 // 캐릭터 키(1.0칸) 비교용 막대
 const refBar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1, 12), new THREE.MeshToonMaterial({ color: 0xf2b36b, gradientMap: grad }));
 refBar.position.y = 0.5;
@@ -837,7 +846,7 @@ function frame() {
   camera.near = dist / 100; camera.far = dist * 10; camera.updateProjectionMatrix();
   const isTile = spec.category === 'tile';
   ground.visible = !isTile && spec.heroGround !== 'none';
-  ground.material.color.setHex(GROUND[spec.heroGround] ?? GROUND.grass);
+  ground.material.color.setHex(GROUND[spec.heroGround] ?? (spec.category === 'furniture' ? GROUND.floor : GROUND.grass));
   ground.scale.setScalar(Math.max(1.4, Math.hypot(size.x, size.z) * 0.9));
   refBar.position.x = box.max.x + 0.35;
 }
@@ -857,7 +866,7 @@ function onModel(gltf) {
     meshes.push(o);
   });
   for (const o of meshes) {
-    if (NO_OUTLINE.has(o.material.name)) continue;
+    if (NO_OUTLINE.has(o.material.name) || spec.style?.noOutline?.includes(o.material.name)) continue;
     const ol = new THREE.Mesh(o.geometry, outlineMat);
     ol.visible = $('outlineOn').checked;
     ol.userData.outline = true;
@@ -879,9 +888,9 @@ function onModel(gltf) {
   $('viewerMsg').hidden = true;
 }
 // 웹 링크는 .glb 파일과 data: 주소 fetch 를 막아서, base64로 감싼 JSON을 받아 직접 풀어 읽는다 (tools/glb-to-json.mjs)
-function loadModel(want) {
+function loadModel(want, url) {
   const seq = loadSeq;
-  loadJSON(`${BASE}models/${want}.glb.json`)
+  loadJSON(url)
     .then(j => {
       const bin = Uint8Array.from(atob(j.data), c => c.charCodeAt(0));
       return new Promise((ok, no) => new GLTFLoader().parse(bin.buffer, '', ok, no));
@@ -912,9 +921,9 @@ renderer.setAnimationLoop(() => {
 
 const slugFromHash = () => {
   const h = location.hash.slice(1);
-  return h === 'new' ? NEW : (models.some(m => m.slug === h) ? h : null);
+  return h === 'new' ? NEW : (models.some(m => m.key === h) ? h : null);
 };
 addEventListener('hashchange', () => { const s = slugFromHash(); if (s) select(s); });
 renderTabs();
-select(slugFromHash() ?? models[0]?.slug);
+select(slugFromHash() ?? models[0]?.key);
 </script>
