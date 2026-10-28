@@ -29,6 +29,8 @@ export const look = {
   uWind: { value: 0 }, uWindSpeed: { value: 1 },
   // 물결 반짝임 (sea·water·waterLight·waterfall): 세기 · 무늬 크기
   uWater: { value: 0 }, uWaterScale: { value: 1 },
+  // 스스로 빛나기 (불꽃·반딧불·반짝이): 0 = 예전 색 그대로, 클수록 밝아져 빛 번짐이 걸린다
+  uGlow: { value: 0 },
   // 외곽선: 굵기 배율 · 바탕색 섞기(0 = 갈색 잉크, 1 = 물체 색을 어둡게) · 어둡게 하는 정도
   uOutlineScale: { value: 1 }, uOutlineTint: { value: 0 }, uOutlineDark: { value: 0.55 },
   uOutlineFallback: { value: new THREE.Color('#7A6656') },   // 바탕색을 모르는 외곽선(합친 배경 묶음)에 쓰는 색
@@ -41,7 +43,19 @@ export const STYLE_NAMES = {
   spec: new Set(['beak', 'shell', 'metal', 'nose', 'glasses', 'fruit', 'coconut', 'window', 'acorn', 'bowtie']),
   noAO: new Set(['sea', 'water', 'waterLight', 'waterDeep', 'cloud', 'foam', 'glow', 'flame', 'flameCore', 'window']),
   worldPaint: new Set(['sea', 'ground']),       // 월드 좌표 무늬 (안 움직이는 큰 판). 나머지는 모델 좌표라 걸어도 무늬가 안 미끄러진다
+  glow: new Set(['flame', 'flameCore', 'firefly', 'sparkle']),
 };
+
+/**
+ * 재질 이름 → 꼭짓점 스타일 번호 (여러 재질을 한 메시로 합친 곳에서 aStyle 속성으로 쓴다: world 의 배경 묶음)
+ * 0 없음 · 1 바람 · 2 물결 · 3 장난감 하이라이트
+ */
+export function styleClass(name) {
+  if (STYLE_NAMES.wind.has(name)) return 1;
+  if (STYLE_NAMES.water.has(name)) return 2;
+  if (STYLE_NAMES.spec.has(name)) return 3;
+  return 0;
+}
 
 const PROJECT_CURVED = /* glsl */ `
 vec4 mvPosition = vec4( transformed, 1.0 );
@@ -86,8 +100,16 @@ const STYLE_ORIGIN = /* glsl */ `
 
 // 바람: 물체 원점 기준 위로 갈수록 크게, 원점마다 위상을 달리한다 (인스턴스도 안전). 모델 좌표 xz 로 민다 (회전·크기는 무시해도 티 안 남)
 const WIND_GLSL = /* glsl */ `
-#ifdef STYLE_WIND
-  {
+#ifdef STYLE_ATTR
+  vStyleKind = aStyle;
+#endif
+#if defined( STYLE_WIND ) || defined( STYLE_ATTR )
+  #ifdef STYLE_WIND
+    float windK = 1.0;
+  #else
+    float windK = step( 0.5, aStyle ) * step( aStyle, 1.5 );     // aStyle 1 = 바람
+  #endif
+  if ( windK > 0.0 ) {
     ${STYLE_ORIGIN}
     vec4 wv = vec4( transformed, 1.0 );
     #ifdef USE_INSTANCING
@@ -98,13 +120,17 @@ const WIND_GLSL = /* glsl */ `
     float wt = uStyleTime * 1.9 * uWindSpeed;
     float wph = wt + styleOrigin.x * 0.71 + styleOrigin.z * 0.53 + wv.y * 1.7;
     float gust = 0.55 + 0.45 * sin( wt * 0.27 + styleOrigin.x * 0.06 + styleOrigin.z * 0.09 );
-    transformed.xz += vec2( sin( wph ), cos( wph * 0.83 + 1.3 ) ) * uWind * 0.03 * wh * gust;
+    transformed.xz += vec2( sin( wph ), cos( wph * 0.83 + 1.3 ) ) * uWind * 0.03 * wh * gust * windK;
   }
 #endif
 `;
 
 const STYLE_VERT_PARS = /* glsl */ `
 uniform float uStyleTime, uWind, uWindSpeed, uPaintScale;
+#ifdef STYLE_ATTR
+  attribute float aStyle;
+  varying float vStyleKind;
+#endif
 #ifdef STYLE_VARYINGS
   varying vec3 vStyleWorld;
   varying float vStylePaint;
@@ -166,11 +192,15 @@ float styleWater( vec2 p, float t ) {
 const STYLE_FRAG_PARS = /* glsl */ `
 uniform float uStyleTime, uBands, uBandSoft, uShadeFloor, uWrap, uCastDark, uShadeSat;
 uniform vec3 uShadeTint, uLitTint;
-uniform float uRim, uRimChar, uRimPower, uSpec, uSpecSize, uPaint, uPaintScale, uAO, uAOHeight, uWater, uWaterScale;
+uniform float uRim, uRimChar, uRimPower, uSpec, uSpecSize, uPaint, uPaintScale, uAO, uAOHeight, uWater, uWaterScale, uGlow;
 uniform float uMatRim, uMatSpec, uMatAO, uMatPaint;     // 재질마다 (캐릭터는 림 세게, 물은 접촉 그늘 없음 …)
 varying vec3 vStyleWorld;
 varying float vStylePaint;
 varying float vStyleBase;
+#ifdef STYLE_ATTR
+  varying float vStyleKind;      // aStyle (1 바람 · 2 물결 · 3 하이라이트)
+#endif
+float styleSpecK = 0.0;    // 이 조각의 하이라이트 세기 (재질 값 또는 aStyle 3)
 float styleShadow = 1.0;   // 지금 방향광의 그림자 (0 = 그림자 속). 점·스포트 빛은 예전처럼 색에 곱한다
 float styleSun = 0.0;      // 빛을 받은 정도 0~1 (띠 × 그림자 × 빛 세기) — 그늘 색·채도를 어디에 줄지 정한다
 ${NOISE_GLSL}
@@ -199,12 +229,12 @@ void RE_Direct_Style( const in IncidentLight directLight, const in vec3 geometry
   reflectedLight.directDiffuse += directLight.color * k * BRDF_Lambert( material.diffuseColor );
   // 해가 꺼진(세기 0) 실내에서도 맞게: 빛 세기로 무게를 준다 (낮 해 ≈ 1, 달 ≈ 0.9, 꺼짐 = 0)
   styleSun = max( styleSun, lit * clamp( dot( directLight.color, vec3( 0.2126, 0.7152, 0.0722 ) ) * 1.5, 0.0, 1.0 ) );
-  if ( uMatSpec > 0.0 && uSpec > 0.0 ) {
+  if ( styleSpecK > 0.0 && uSpec > 0.0 ) {
     vec3 hv = normalize( directLight.direction + geometryViewDir );
     float ndh = max( dot( geometryNormal, hv ), 0.0 );
     float edge = mix( 0.985, 0.90, uSpecSize );
     float sp = smoothstep( edge, edge + ( 1.0 - edge ) * 0.45, ndh );
-    reflectedLight.directSpecular += directLight.color * sp * lit * uSpec * uMatSpec * 0.35;
+    reflectedLight.directSpecular += directLight.color * sp * lit * uSpec * styleSpecK * 0.35;
   }
 }
 void RE_IndirectDiffuse_Style( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
@@ -217,6 +247,10 @@ void RE_IndirectDiffuse_Style( const in vec3 irradiance, const in vec3 geometryP
 
 // color_fragment 뒤: 붓질 색 흔들림 (밝기 + 살짝 따뜻/차가움)
 const STYLE_PAINT = /* glsl */ `
+styleSpecK = uMatSpec;
+#ifdef STYLE_ATTR
+  styleSpecK = max( styleSpecK, step( 2.5, vStyleKind ) );
+#endif
 if ( uPaint > 0.0 && uMatPaint > 0.0 ) {
   float pn = vStylePaint;
   float pk = uPaint * uMatPaint;
@@ -251,9 +285,19 @@ const STYLE_COMPOSE = /* glsl */ `
     float rim = smoothstep( 0.25, 1.0, pow( fres, uRimPower ) * 1.6 );
     totalEmissiveRadiance += rim * rimK * skyLight * mix( vec3( 1.0 ), diffuseColor.rgb, 0.55 ) * ( 0.35 + 0.65 * styleSun ) * 0.22;
   }
-  #ifdef STYLE_WATER
-    float wpat = styleWater( vStyleWorld.xz * uWaterScale, uStyleTime );
-    totalEmissiveRadiance += wpat * uWater * ( skyLight * 0.22 + reflectedLight.directDiffuse * 0.42 );
+  #if defined( STYLE_WATER ) || defined( STYLE_ATTR )
+    #ifdef STYLE_WATER
+      float waterK = 1.0;
+    #else
+      float waterK = step( 1.5, vStyleKind ) * step( vStyleKind, 2.5 );   // aStyle 2 = 물결
+    #endif
+    if ( waterK > 0.0 && uWater > 0.0 ) {
+      float wpat = styleWater( vStyleWorld.xz * uWaterScale, uStyleTime );
+      totalEmissiveRadiance += wpat * uWater * waterK * ( skyLight * 0.22 + reflectedLight.directDiffuse * 0.42 );
+    }
+  #endif
+  #ifdef STYLE_GLOW
+    totalEmissiveRadiance += diffuseColor.rgb * uGlow;
   #endif
   totalEmissiveRadiance += reflectedLight.directSpecular;
 }
@@ -288,7 +332,7 @@ const OUTLINE_FRAG = /* glsl */ `
   #endif
   vec3 olDark = olBase * uOutlineDark;
   olDark = max( mix( vec3( dot( olDark, vec3( 0.2126, 0.7152, 0.0722 ) ) ), olDark, 1.3 ), 0.0 );
-  diffuseColor.rgb = mix( diffuseColor.rgb, olDark, uOutlineTint );
+  diffuseColor.rgb = mix( diffuse, olDark, uOutlineTint );   // diffuse = 잉크 색 (꼭짓점 색이 곱해지기 전)
 }
 `;
 
@@ -296,7 +340,7 @@ const OUTLINE_FRAG = /* glsl */ `
  * 셰이더 고치기. opts: { bend, outline(uniform), lit(툰 조명), wind, water, paintWorld, mat(재질별 uniform), base(외곽선 바탕색 uniform) }
  */
 function patch(shader, opts) {
-  const { bend = true, outline = null, lit = false, wind = false, water = false, paintWorld = false, mat = null, base = null } = opts;
+  const { bend = true, outline = null, lit = false, wind = false, water = false, paintWorld = false, attr = false, glow = false, mat = null, base = null } = opts;
   Object.assign(shader.uniforms, { uCurve: curve.uCurve, uCurveOrigin: curve.uCurveOrigin });
   for (const k of STYLE_UNIFORM_KEYS) shader.uniforms[k] = look[k];
   if (mat) Object.assign(shader.uniforms, mat);
@@ -306,6 +350,8 @@ function patch(shader, opts) {
   if (wind) defs += '#define STYLE_WIND\n';
   if (water) defs += '#define STYLE_WATER\n';
   if (paintWorld) defs += '#define STYLE_PAINT_WORLD\n';
+  if (attr) defs += '#define STYLE_ATTR\n';
+  if (glow) defs += '#define STYLE_GLOW\n';
 
   let vs = `${defs}uniform float uCurve;\nuniform vec3 uCurveOrigin;\n${STYLE_VERT_PARS.replace('NOISE_CORE', NOISE_CORE)}` + shader.vertexShader;
   let begin = '#include <begin_vertex>\n' + WIND_GLSL;
@@ -326,10 +372,13 @@ function patch(shader, opts) {
       .replace('#include <lights_fragment_begin>', styledLightsBegin())
       .replace('#include <color_fragment>', `#include <color_fragment>\n${STYLE_PAINT}`)
       .replace('#include <aomap_fragment>', `#include <aomap_fragment>\n${STYLE_COMPOSE}`);
-  } else if (water) {
+  } else if (water || glow) {
     // 평면(빛 안 받는) 물: 폭포 판 등. 하늘빛 대신 고정 밝기로 반짝임
-    fs = `uniform float uStyleTime, uWater, uWaterScale;\nvarying vec3 vStyleWorld;\n${NOISE_GLSL}` + fs.replace('#include <map_fragment>',
-      '#include <map_fragment>\n  diffuseColor.rgb += styleWater( vec2( ( vStyleWorld.x + vStyleWorld.z ) * 1.6, ( vStyleWorld.y + uStyleTime * 1.1 ) * 0.6 ) * uWaterScale, uStyleTime * 0.8 ) * uWater * 0.22;');
+    // 평면 재질: 물(폭포) 반짝임 · 스스로 빛나기(반딧불·반짝이)
+    let add = '';
+    if (water) add += '\n  diffuseColor.rgb += styleWater( vec2( ( vStyleWorld.x + vStyleWorld.z ) * 1.6, ( vStyleWorld.y + uStyleTime * 1.1 ) * 0.6 ) * uWaterScale, uStyleTime * 0.8 ) * uWater * 0.22;';
+    if (glow) add += '\n  diffuseColor.rgb *= 1.0 + uGlow;';
+    fs = `uniform float uStyleTime, uWater, uWaterScale, uGlow;\n${water ? 'varying vec3 vStyleWorld;\n' + NOISE_GLSL : ''}` + fs.replace('#include <map_fragment>', '#include <map_fragment>' + add);
   }
   if (outline) {
     shader.uniforms.uOutlineBase = base ?? look.uOutlineFallback;
@@ -339,7 +388,7 @@ function patch(shader, opts) {
 }
 
 /** 프로그램 캐시 열쇠: 셰이더 글자가 달라지는 선택지만 담는다 (값은 uniform 이라 안 들어감) */
-const keyOf = (kind, o) => [kind, o.bend === false ? 'flat' : 'curved', o.wind && 'wind', o.water && 'water', o.paintWorld && 'pw'].filter(Boolean).join('-');
+const keyOf = (kind, o) => [kind, o.bend === false ? 'flat' : 'curved', o.wind && 'wind', o.water && 'water', o.paintWorld && 'pw', o.attr && 'attr', o.glow && 'glow'].filter(Boolean).join('-');
 
 /** 기존 재질에 곡면 월드 패치를 건다 (같은 종류 재질끼리 셰이더 프로그램을 공유한다). */
 export function curved(material) {
@@ -360,14 +409,17 @@ export const OUTLINE_COLOR = '#4A3B32';
 
 /**
  * 툰 재질. name 으로 효과가 정해진다 (STYLE_NAMES). 추가 선택지:
- *   character: 캐릭터(림 세게, 접촉 그늘·무늬는 약하게), wind / water / spec: 이름과 상관없이 켜기
+ *   character: 캐릭터(림 세게, 접촉 그늘·무늬는 약하게), wind / water / spec / glow: 이름과 상관없이 켜기
+ *   styleAttr: 여러 재질을 합친 메시 — 꼭짓점 속성 aStyle(styleClass)로 바람·물결·하이라이트를 고른다 (world 배경 묶음)
  */
-export function toonMaterial(color, { flat = false, bend = true, name = '', character = false, wind, water, spec } = {}) {
+export function toonMaterial(color, { flat = false, bend = true, name = '', character = false, wind, water, spec, glow, styleAttr = false } = {}) {
   const o = {
     bend,
     wind: wind ?? STYLE_NAMES.wind.has(name),
     water: water ?? STYLE_NAMES.water.has(name),
     paintWorld: STYLE_NAMES.worldPaint.has(name),
+    glow: glow ?? STYLE_NAMES.glow.has(name),
+    attr: !flat && styleAttr,
   };
   let m;
   if (flat) {
@@ -388,7 +440,8 @@ export function toonMaterial(color, { flat = false, bend = true, name = '', char
     m.customProgramCacheKey = () => keyOf('toon', o);
   }
   m.name = name;
-  if (!bend && !o.water && flat) {           // 곡면도 효과도 없는 평면 재질은 그대로
+  if (o.attr) m.defaultAttributeValues = { aStyle: [0] };   // aStyle 이 없는 메시에 써도 0(효과 없음)으로
+  if (!bend && !o.water && !o.glow && flat) {   // 곡면도 효과도 없는 평면 재질은 그대로
     m.onBeforeCompile = () => {};
     m.customProgramCacheKey = () => 'plain';
   }
@@ -406,18 +459,20 @@ export function setOutlinesVisible(v) {
 
 /**
  * 뒤집은 껍데기 외곽선 재질. width 는 모델 단위(타일 1칸 = 1).
- * base: 바탕색 (외곽선 'subtle' 모드에서 이 색을 어둡게 해서 쓴다. 없으면 look.uOutlineFallback), wind: 바람 따라 흔들리기
+ * base: 바탕색 (외곽선 'subtle' 모드에서 이 색을 어둡게 해서 쓴다. 없으면 꼭짓점 색(vertexColors), 그것도 없으면 look.uOutlineFallback)
+ * wind: 바람 따라 흔들리기, styleAttr: 합친 메시의 aStyle 로 바람 (툰 재질과 같은 모양으로 흔들리게)
  */
-export function outlineMaterial(width = 0.01, { color = OUTLINE_COLOR, bend = true, base = null, wind = false } = {}) {
+export function outlineMaterial(width = 0.01, { color = OUTLINE_COLOR, bend = true, base = null, wind = false, styleAttr = false } = {}) {
   const m = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide });
   const uOutline = { value: width };
   const uBase = base ? { value: new THREE.Color(base) } : null;
   m.userData.uOutline = uOutline;
   if (uBase) m.userData.uOutlineBase = uBase;
-  const o = { bend, wind };
+  const o = { bend, wind, attr: styleAttr };
   m.onBeforeCompile = sh => patch(sh, { ...o, outline: uOutline, base: uBase });
   m.customProgramCacheKey = () => keyOf('outline', o);
   m.visible = outlineState.visible;
+  if (styleAttr) m.defaultAttributeValues = { aStyle: [0] };
   outlineMaterials.add(m);
   return m;
 }
