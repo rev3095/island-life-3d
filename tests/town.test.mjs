@@ -1,12 +1,14 @@
-// 주민 규칙·대사 데이터 확인: node --test src/gameplay/town/
-// (tests/ 는 T2 폴더라 여기에 둔다. 합칠 때 tests/ 로 옮겨도 된다 — docs/notes/town.md)
+// 주민 규칙·대사 데이터·길찾기 확인 (src/gameplay/town/). node --test tests/town.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as R from './rules.js';
-import { createNav } from './path.js';
-import { PEOPLE } from './people.js';
-import LINES from './lines/index.js';
-import * as items from '../../data/items.js';
+import * as R from '../src/gameplay/town/rules.js';
+import { createNav } from '../src/gameplay/town/path.js';
+import { PEOPLE } from '../src/gameplay/town/people.js';
+import LINES from '../src/gameplay/town/lines/index.js';
+import * as items from '../src/data/items.js';
+import { createCollision } from '../src/world/collision.js';
+import { itemInfo } from '../src/ui/dom.js';
+import { createEconomy } from '../src/data/economy.js';
 
 const DAY = '2026-10-29';
 const nowAt = (hourF, dayKey = DAY) => ({ hour: Math.floor(hourF % 24), minute: 0, hourF: hourF % 24, dayKey, month: 10 });
@@ -113,15 +115,18 @@ test('대사 데이터: 주민마다 필요한 묶음이 다 있고 자리 이�
     'tier.new', 'tier.known', 'tier.friend', 'tier.close', 'tier.best', 'chat', 'menu', 'goingHome',
     'request.ask', 'request.accept', 'request.decline', 'request.remind', 'request.notYet', 'request.thanks', 'request.reward', 'request.done',
     'gift.love', 'gift.like', 'gift.normal', 'gift.dislike', 'gift.many', 'gift.back', 'gift.surprise', 'gift.pending', 'gift.full', 'gift.cancel',
-    'bye', 'tierUp.known', 'tierUp.friend', 'tierUp.close', 'tierUp.best', 'photo', 'home.day', 'home.rain', 'home.sleep'];
+    'bye', 'tierUp.known', 'tierUp.friend', 'tierUp.close', 'tierUp.best', 'photo', 'home.day', 'home.rain', 'home.sleep',
+    'chatting', 'banter', 'letters.friend', 'letters.close', 'letters.thanks', 'letters.gift'];
   const get = (o, path) => path.split('.').reduce((a, k) => a?.[k], o);
   const strings = v => (typeof v === 'string' ? [v] : Array.isArray(v) ? v.flatMap(strings) : v && typeof v === 'object' ? Object.values(v).flatMap(strings) : []);
-  const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat']);
+  const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat', 'other']);
   for (const slug of ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong']) {
     const L = LINES[slug];
     for (const p of need) assert.ok(get(L, p)?.length, `${slug}.${p}`);
     const all = strings(L);
     assert.ok(all.length >= 100, `${slug} 대사 ${all.length}줄`);
+    for (const s of L.banter) assert.ok(s.length <= 16, `${slug}: 말풍선이 길다 — ${s}`);
+    for (const letter of [...L.letters.friend, ...L.letters.close, ...L.letters.thanks]) assert.ok(Array.isArray(letter) && letter.length >= 2, `${slug}: 편지는 여러 줄 배열`);
     for (const s of all) {
       for (const [, k] of s.matchAll(/\{(\w+)/g)) assert.ok(KEYS.has(k), `${slug}: 모르는 자리 {${k}} — ${s}`);
       assert.ok(s.length <= 60, `${slug}: 한 줄이 너무 길다 (${s.length}) — ${s}`);
@@ -169,4 +174,70 @@ test('길찾기: 막힌 칸을 돌아가고 못 가는 곳은 null', () => {
   const pts = nav.smooth(p.slice(1), 0.5, 1.5);
   assert.ok(pts.length <= p.length - 1);
   assert.deepEqual(pts.at(-1), { x: 6.5, z: 1.5 });
+});
+
+test('편지: 부탁 들어준 다음 날 고맙다는 편지, 친구 이상은 가끔, 하루 3통까지', () => {
+  const state = { villagers: {} };
+  const v = R.villagerState(state, 'coco');
+  v.met = true; v.doneDay = '2026-10-28';
+  const plan = R.planLetters(state, PEOPLE, DAY);
+  assert.deepEqual(plan.map(p => [p.from, p.kind]), [['coco', 'thanks']]);
+  assert.equal(plan[0].mark, '2026-10-28');
+  v.thankedDay = plan[0].mark;
+  assert.equal(R.planLetters(state, PEOPLE, DAY).length, 0, '한 번만');
+  // 모두 절친이면 날마다 몇 통, 3통을 넘지 않는다
+  for (const slug of Object.keys(PEOPLE)) Object.assign(R.villagerState(state, slug), { met: true, friendship: 95 });
+  let total = 0;
+  for (let d = 1; d <= 28; d++) {
+    const key = `2026-11-${String(d).padStart(2, '0')}`;
+    const p = R.planLetters(state, PEOPLE, key);
+    assert.ok(p.length <= R.LETTERS_PER_DAY);
+    assert.deepEqual(p, R.planLetters(state, PEOPLE, key), '같은 날엔 같다');
+    for (const x of p) { assert.equal(x.kind, 'close'); if (x.gift) assert.ok(items.get(x.gift)); }
+    total += p.length;
+  }
+  assert.ok(total > 20 && total < 84, `4주 동안 ${total}통`);
+  // 못 만난 주민은 안 보낸다
+  assert.equal(R.planLetters({ villagers: { bori: { friendship: 99 } } }, PEOPLE, DAY).length, 0);
+});
+
+test('움직이는 충돌체: 다른 원은 밀어내고 자기 자신은 막지 않는다', () => {
+  const w = 10, h = 10;
+  const island = {
+    w, h,
+    toTile: (x, z) => ({ tx: Math.floor(x), tz: Math.floor(z) }),
+    toWorld: (tx, tz) => ({ x: tx + 0.5, z: tz + 0.5 }),
+    isWalkableTile: (tx, tz) => tx >= 0 && tz >= 0 && tx < w && tz < h,
+    passable: (ax, az, bx, bz) => bx >= 0 && bz >= 0 && bx < w && bz < h,
+  };
+  const col = createCollision(island);
+  const npc = { x: 5, z: 5, r: 0.24 };
+  const off = col.addMover(npc);
+  // 플레이어가 주민 쪽으로 걸어가면 0.5 거리에서 멈춘다
+  const p = col.move(3, 5, 5, 5, 0.26);
+  assert.ok(Math.hypot(p.x - npc.x, p.z - npc.z) >= 0.5 - 1e-6, `겹치지 않는다 (${p.x})`);
+  // 주민 자신은 자기 원에 막히지 않는다
+  const q = col.move(5, 5, 6, 5, 0.24);
+  assert.ok(Math.abs(q.x - 6) < 1e-6);
+  // 꺼진(active false) 충돌체는 무시
+  npc.active = false;
+  assert.ok(Math.abs(col.move(3, 5, 5, 5, 0.26).x - 5) < 1e-6);
+  off();
+  npc.active = true;
+  assert.ok(Math.abs(col.move(3, 5, 5, 5, 0.26).x - 5) < 1e-6, '해제하면 사라진다');
+});
+
+test('상점 값: ui 는 data.economy 값을 쓴다 (사는 값, 섬 특산 과일)', () => {
+  const eco = createEconomy({ inventory: null, wallet: null, getSeed: () => 20261028 });
+  const native = eco.nativeFruit();
+  const ctx = { services: { data: { items, economy: eco } } };
+  assert.equal(items.get('tool.rod').buyPrice, 400);
+  assert.equal(itemInfo(ctx, 'tool.rod').buy, 400);
+  assert.equal(itemInfo(ctx, 'tool.rod').sell, 100);
+  assert.equal(itemInfo(ctx, 'furn.sofa').buy, 3000);
+  assert.equal(itemInfo(ctx, native).sell, 100, '특산 과일은 싸게');
+  const other = items.list('fruit').find(f => f.id !== native && f.variant);
+  assert.equal(itemInfo(ctx, other.id).sell, 500);
+  // data 가 없어도 아이템 칸으로
+  assert.equal(itemInfo({ services: {} }, 'tool.rod').name, 'tool.rod');
 });
