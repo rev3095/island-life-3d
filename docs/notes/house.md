@@ -28,7 +28,7 @@ wave 2 다른 트랙(W1 `src/player/index.js`·`motions.js`·`tools.js`, W2 `src
 | `src/data/inventory.js` · `index.js` · `save.js` | 가방 칸 `variant`, `collect(id, n, { variant })` |
 | `src/data/items.js` | 가구 `icon` = 썸네일 그림, `emoji` = 원래 이모지 |
 | `tests/house-grid.test.mjs` (옮김) · `tests/variant.test.mjs` (새) | 칸 계산 7개, 변형 4개 |
-| `docs/CONTRACTS.md` | 맨 끝 'W3 집·가구·제작 뒤 추가된 약속' 절, '2차에서 정할 것'의 실내 항목 정리 |
+| `docs/CONTRACTS.md` | '2차 W3 집·가구·제작에서 추가된 약속' 절 ('2차 준비' 앞), '2차에서 정할 것'의 실내 항목 정리 |
 
 ## 가구 20종
 
@@ -100,7 +100,7 @@ time.indoor            // 지금 상태
 
 ## 제안 — 반영한 것과 남은 것
 
-반영함 (위 표·`docs/CONTRACTS.md` 맨 끝 절): 1 실내 모드 계약 · 2 `ui.craft`·`ui.fade`·확인 창 `disabled`·줄바꿈 · 3 카메라 범위 · 4 레시피 재료 모양(ui 가 `needs` 를 읽음) · 5 가구 썸네일 아이콘 · 6 가방 칸 변형 · 7 테스트를 `tests/` 로 · 8 라디오는 전용 곡 대신 시간대 곡 채널로 (실내 기본곡 `indoor` 가 이미 '작은 라디오' 분위기라 T4 를 고치지 않았다).
+반영함 (위 표·`docs/CONTRACTS.md` 의 '2차 W3' 절): 1 실내 모드 계약 · 2 `ui.craft`·`ui.fade`·확인 창 `disabled`·줄바꿈 · 3 카메라 범위 · 4 레시피 재료 모양(ui 가 `needs` 를 읽음) · 5 가구 썸네일 아이콘 · 6 가방 칸 변형 · 7 테스트를 `tests/` 로 · 8 라디오는 전용 곡 대신 시간대 곡 채널로 (실내 기본곡 `indoor` 가 이미 '작은 라디오' 분위기라 T4 를 고치지 않았다).
 
 다른 트랙에 남은 부탁:
 - **W2 town**: 주민 사진을 줄 때 `data.collect('furn.villager-photo', 1, { variant: 주민slug })` 로 주면 사진에 그 주민 얼굴 색이 나온다 (스펙 변형 `coco bori mochi dubu pong chorong`). 보상 가구도 색을 정해 주고 싶으면 같은 `variant`.

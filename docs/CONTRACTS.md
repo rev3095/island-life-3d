@@ -198,30 +198,16 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - 개발용: `forecast(dayKey?)`, `setHour(hh)`, `setPaused(bool)`, `setWeather(w, {instant})` (강제 날씨는 다음 날 5시에 풀림), `setSeasonOverride(season|null)`.
 
 ### 2차에서 정할 것
-- ~~실내 장면(P4)~~ → `time.setIndoor(bool)` + 이벤트 `scene:indoor {on}` (아래 'W3 집' 절).
+- ~~실내 장면(P4)~~ → `time.setIndoor(bool)` + 이벤트 `scene:indoor {on}` (아래 '2차 W3 집·가구·제작' 절).
 - ~~외곽선 설정~~ → `main.js` 가 `settings:changed {key:'outline'}` 를 듣고 `userData.outline` 메시를 모두 켜고 끈다. 외곽선 메시를 새로 만들 땐 `userData.outline = true` 를 꼭 붙인다.
 - `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다.
 - **카메라와 하늘**: 기본 카메라에서 하늘이 잘 안 보여 구름·별·무지개가 묻힌다 — 화면 위쪽에 하늘 띠를 조금 남기는 쪽으로 조정.
 
 ---
 
-## 2차 준비 (main 에 먼저 넣은 것)
+## 2차 W3 집·가구·제작에서 추가된 약속 (2026-10-29)
 
-### `src/gameplay/index.js` — 2차 트랙 묶음
-- 하위 폴더 `gather/`(P2) · `town/`(P3) · `house/`(P4) 의 `index.js` 를 순서대로 불러온다 (없으면 건너뜀). **각 트랙은 자기 하위 폴더만 만든다. `src/gameplay/index.js` 는 고치지 않는다.**
-- **행동 키 나눠 주기**: `ctx.services.gameplay.interactions.add({ name, intent, priority, test(ctx), run(target, ctx) }) → 해제 함수`.
-  `input:press` 의 `action`/`pickup` 을 받으면 (UI 창이 열려 있으면 무시) 우선순위가 높은 처리기부터 `test` 해서 처음 대상이 나온 하나만 `run` 한다.
-  권장 우선순위: 주민 말 걸기 **100**, 문·건물 들어가기 **90**, 실내 가구 **80**, 줍기 **50**, 도구 쓰기 **10**. 같은 키를 직접 `input:press` 로 따로 처리하지 않는다.
-
-### `world.addZone(zone) → 해제 함수` — 섬 밖 공간(집 실내 등)
-- `zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }`
-- 플레이어가 구역 안에 있으면 `world.collide`·`island.heightAt`·`island.groundAt`·`island.isWalkable` 이 구역의 것을 쓴다. 실내는 섬에서 멀리 떨어진 좌표(예: x = 500)에 만들고 플레이어를 옮긴다.
-
----
-
-## W3 집·가구·제작 뒤 추가된 약속 (2026-10-29)
-
-배경: `docs/notes/house.md`. 위 내용과 다르면 이 절이 우선한다.
+배경: `docs/notes/house.md`. 위 내용과 다르면 이 절이 우선한다. (다른 2차 트랙 절과 합칠 때 부딪히지 않게 '2차 준비' 절 앞에 두었다)
 
 ### time (sky)
 - `time.setIndoor(bool)`, `time.indoor` — 집 안: 하늘 돔·별·구름·비·눈·무지개를 숨기고 실내 조명(낮 하얀 빛·밤 따뜻한 빛), 안개를 멀리 민다(객체는 그대로), 배경 = 방 밖 어둠. 시계·날씨는 계속 흐른다. 바뀔 때 이벤트 `scene:indoor {on}`.
@@ -245,3 +231,17 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - `ctx.services.house = { inside, furniture, enter(), leave(), place(item, spot?, { variant }), remove(id), workbench(), models(), room }` — 선물 연출처럼 가방을 거치지 않고 방에 놓을 때 `place`.
 - 이벤트: `house:enter {}`, `house:leave {}`, `house:craft {id, result}`.
 - 상태 `state.house = { furniture: [rec], inside, seeded, radio, nextId }` — 바닥 rec `{ id, item, gx, gz, rot, variant?, holds? }` (칸 = 돌린 발자국의 북서쪽, rot 0 남·1 동·2 북·3 서), 벽 rec `{ id, item, wall: 'n'|'w'|'e', slot, variant? }`. `holds` = 어항·곤충 상자에 넣어 둔 물고기·곤충 id, `radio` = 켜 둔 채널(시간대 곡 이름) 또는 null.
+
+---
+
+## 2차 준비 (main 에 먼저 넣은 것)
+
+### `src/gameplay/index.js` — 2차 트랙 묶음
+- 하위 폴더 `gather/`(P2) · `town/`(P3) · `house/`(P4) 의 `index.js` 를 순서대로 불러온다 (없으면 건너뜀). **각 트랙은 자기 하위 폴더만 만든다. `src/gameplay/index.js` 는 고치지 않는다.**
+- **행동 키 나눠 주기**: `ctx.services.gameplay.interactions.add({ name, intent, priority, test(ctx), run(target, ctx) }) → 해제 함수`.
+  `input:press` 의 `action`/`pickup` 을 받으면 (UI 창이 열려 있으면 무시) 우선순위가 높은 처리기부터 `test` 해서 처음 대상이 나온 하나만 `run` 한다.
+  권장 우선순위: 주민 말 걸기 **100**, 문·건물 들어가기 **90**, 실내 가구 **80**, 줍기 **50**, 도구 쓰기 **10**. 같은 키를 직접 `input:press` 로 따로 처리하지 않는다.
+
+### `world.addZone(zone) → 해제 함수` — 섬 밖 공간(집 실내 등)
+- `zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }`
+- 플레이어가 구역 안에 있으면 `world.collide`·`island.heightAt`·`island.groundAt`·`island.isWalkable` 이 구역의 것을 쓴다. 실내는 섬에서 멀리 떨어진 좌표(예: x = 500)에 만들고 플레이어를 옮긴다.
