@@ -99,6 +99,13 @@ export default {
       addZone(zone) { zones.push(zone); return () => { const i = zones.indexOf(zone); if (i >= 0) zones.splice(i, 1); }; },
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
       nativeFruit: gen.nativeFruit,
+      /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */
+      palette(kind, variant = null) {
+        const spec = models[kind]?.spec;
+        if (!spec) return {};
+        const v = variant ?? (kind === 'tree' ? season : kind === 'cedar' ? (season === 'winter' ? 'snow' : 'green') : null);
+        return { ...spec.palette, ...(spec.variants?.[v]?.palette ?? {}) };
+      },
       /** 날마다 새로 놓는 것(조개·잡초·화석 자리·꽃)의 후보 칸. data.day.pickSpots(후보, n, 'fossil') 에 바로 넣으면 된다 */
       spawnTiles,
       debug: { gen, kit, terrain, objects, collision, models },

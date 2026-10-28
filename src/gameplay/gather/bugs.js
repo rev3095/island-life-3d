@@ -55,8 +55,8 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
     const place = choosePlace(now.night);
     let anchor = null, obj = null;
     if (place === 'flower') obj = objectAnchor(o => FLOWERS.has(o.kind));
-    else if (place === 'tree') obj = objectAnchor(o => TREES.has(o.kind));
-    else if (place === 'palm') obj = objectAnchor(o => o.kind === 'palm');
+    else if (place === 'tree') obj = objectAnchor(o => TREES.has(o.kind) && !o.data?.grow);
+    else if (place === 'palm') obj = objectAnchor(o => o.kind === 'palm' && !o.data?.grow);
     else if (place === 'rock') obj = objectAnchor(o => o.kind === 'rock');
     else if (place === 'lamp') obj = objectAnchor(o => o.kind === 'lamp');
     else if (place === 'fruit') {
@@ -182,7 +182,10 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
       case 'float': {
         wander(b, dt, { radius: 1.2, speed: 0.35, yBase: gy + 0.6, yAmp: 0.25 });
         const g = b.model.glow;
-        if (g) { const on = 0.35 + 0.65 * Math.max(0, Math.sin(b.t * 2.4)); g.material.color.setRGB(0.55 + 0.4 * on, 0.6 + 0.37 * on, 0.25 + 0.2 * on); }
+        const on = 0.35 + 0.65 * Math.max(0, Math.sin(b.t * 2.4));
+        if (g) g.material.color.setRGB(0.55 + 0.4 * on, 0.6 + 0.37 * on, 0.25 + 0.2 * on);
+        const h = b.model.halo;
+        if (h) { h.material.opacity = 0.08 + 0.32 * on; h.scale.setScalar(0.8 + 0.5 * on); }
         break;
       }
       case 'hop': {

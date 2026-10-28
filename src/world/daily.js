@@ -1,9 +1,17 @@
-// 날마다 새로 놓는 것: 해변 조개 · 풀밭 잡초 · 화석 자리, 그리고 과일나무·야자수 열매 다시 열기.
+// 날마다 새로 놓는 것: 해변 조개 · 풀밭 잡초 · 화석 자리, 과일나무·야자수 열매 다시 열기, 심은 것 자라기.
 // data 의 하루 규칙(harvest.today = 오늘 남은 수)에 맞춰 spawnTiles 후보에서 data.day.pickSpots 로 자리를 고른다.
 // 오늘 놓은 자리는 state.island.spots 에 적고 (주운 것은 뺀다), 다시 불러오면 같은 자리에 다시 놓는다.
 //   spots = { dayKey, shell: ['tx,tz'], weed: [...], 'fossil-spot': [...], holes: ['tx,tz'] (오늘 판 구덩이) }
 // 이 물체들은 objects.add(..., { persist: false }) 로 놓아서 state.island.added 에는 남지 않는다.
+// 심은 것은 data.grow = { stage, max } 가 붙은 물체로, 새 날마다 한 단계씩 커지고 다 자라면 grow 가 빠진다.
 export const DAILY_KINDS = ['shell', 'weed', 'fossil-spot'];
+const TREE_STEPS = [0.32, 0.48, 0.64, 0.8];                // 묘목 → 다 자란 나무(1.0)까지 4일
+export const GROW = {
+  tree: { steps: TREE_STEPS, full: 1 }, cedar: { steps: TREE_STEPS, full: 1 }, 'fruit-tree': { steps: TREE_STEPS, full: 1 }, palm: { steps: TREE_STEPS, full: 1 },
+  tulip: { steps: [0.55], full: 1.3 }, cosmos: { steps: [0.55], full: 1.3 }, pansy: { steps: [0.55], full: 1.3 },   // 씨앗 → 다음 날 핀다
+};
+/** 심은 지 stage 단계의 크기 */
+export const growScale = (kind, stage) => { const g = GROW[kind]; return !g ? 1 : stage >= g.steps.length ? g.full : g.steps[Math.max(0, stage)]; };
 
 const keyOf = (tx, tz) => `${tx},${tz}`;
 const parse = key => key.split(',').map(Number);
@@ -56,6 +64,7 @@ export function createDaily(ctx, { objects, spawnTiles, nativeFruit }) {
         sp = null;
       }
       if (!sp || sp.dayKey !== today.dayKey) {
+        if (sp?.dayKey) growPlants(Math.max(1, d.day.daysSince?.(sp.dayKey) ?? 1));
         // 조개는 쓸려 가고 화석 자리는 새로, 안 뽑은 잡초는 그대로 쌓인다
         for (const [id, p] of [...placed]) if (p.kind !== 'weed') drop(id);
         const fossils = d.day.pickSpots(spawnTiles('fossil-spot'), today.fossils, 'fossil').map(t => keyOf(t.tx, t.tz));
@@ -79,12 +88,23 @@ export function createDaily(ctx, { objects, spawnTiles, nativeFruit }) {
     }
   }
 
-  /** 딴 지 사흘 지난 나무는 열매를 다시 단다 (아직이면 'picked' 모습) */
+  /** 심은 것 자라기: days 단계만큼 */
+  function growPlants(days) {
+    for (const o of objects.list()) {
+      const g = o.data?.grow;
+      if (!g || !GROW[o.kind]) continue;
+      const stage = (g.stage ?? 0) + days;
+      const done = stage >= (g.max ?? GROW[o.kind].steps.length);
+      objects.update(o.id, { scale: growScale(o.kind, done ? Infinity : stage), data: { grow: done ? undefined : { ...g, stage } } });
+    }
+  }
+
+  /** 딴 지 사흘 지난 나무는 열매를 다시 단다 (아직이면 'picked' 모습). 덜 자란 나무는 열매가 없다 */
   function regrowFruit() {
     const h = data()?.harvest;
     if (!h?.fruitReady) return;
     for (const o of [...objects.list('fruit-tree'), ...objects.list('palm')]) {
-      const ready = h.fruitReady(o.id);
+      const ready = h.fruitReady(o.id) && !o.data?.grow;
       const want = !ready ? 'picked' : o.kind === 'fruit-tree' ? (o.data?.fruit ?? nativeFruit ?? null) : null;
       if (o.variant !== want) objects.setVariant(o.id, want);
     }
@@ -95,7 +115,7 @@ export function createDaily(ctx, { objects, spawnTiles, nativeFruit }) {
 
   const spots = () => state.island.spots ?? null;
   return {
-    layout, regrowFruit,
+    layout, regrowFruit, growPlants,
     /** 오늘 놓은 물체면 { kind, key } ('tx,tz' = harvest 의 spotKey) */
     spotOf: id => placed.get(id) ?? null,
     /** 주웠거나 판 물체를 치우고 오늘 목록에서 뺀다 → { kind, key } | null */

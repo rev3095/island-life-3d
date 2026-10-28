@@ -1,5 +1,5 @@
 // 곤충 20종 + 꿀벌 모델 (도형을 합친 작은 툰 메시). 날개는 따로 두어 팔랑인다.
-// build(id) → { root: Group, wings: [{ mesh, side: ±1, axis: 'z'|'x' }], glow: Mesh|null, size }
+// build(id) → { root: Group, wings: [{ mesh, side: ±1, axis: 'z'|'x' }], glow: Mesh|null, halo: Mesh|null, size }
 // 머리가 +Z 쪽. 실제보다 크게 만든다 (캐릭터 키 1.0 기준 손가락 한두 마디).
 
 // 종류별 모양과 색
@@ -54,7 +54,7 @@ export function createBugModels(ctx, mk) {
     const root = new T.Group();
     root.name = `bug-${slug}`;
     const wings = [];
-    let glow = null;
+    let glow = null, halo = null;
     const addWing = (geo, side, x, y, z, axis = 'z') => {
       const w = new T.Mesh(geo, wingMaterial());
       const pivot = new T.Group();
@@ -93,6 +93,12 @@ export function createBugModels(ctx, mk) {
         gm.position.set(0, 0, -s * 0.28);
         root.add(gm);
         glow = gm;
+        // 빛무리: 반투명 공 (깜빡임은 bugs.js 가 투명도로)
+        const hm = Object.assign(ctx.materials.toonMaterial(L.glow, { flat: true, name: 'fireflyGlow' }), { transparent: true, opacity: 0.3, depthWrite: false });
+        halo = new T.Mesh(G.sphere(s * 0.75, 10, 8), hm);
+        halo.position.copy(gm.position);
+        halo.renderOrder = 3;
+        root.add(halo);
         const g = wing('ffw', () => [part(disc(s * 0.25, s * 0.12), '#F4FAFC')]);
         addWing(g, 1, 0, s * 0.12, 0, 'x'); addWing(g, -1, 0, s * 0.12, 0, 'x');
         break;
@@ -148,7 +154,7 @@ export function createBugModels(ctx, mk) {
         break;
       }
     }
-    return { root, wings, glow, size: s, type: L.type };
+    return { root, wings, glow, halo, size: s, type: L.type };
   }
 
   /** 날개 팔랑 (t = 초, speed = 1 이면 보통) */
