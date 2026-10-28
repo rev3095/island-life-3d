@@ -15,10 +15,11 @@
   --pk-body: "Gowun Dodum", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
   --pk-shadow: 0 3px 0 var(--pk-edge), 0 8px 18px rgba(74, 59, 50, .14);
   --pk-shadow-sm: 0 3px 0 var(--pk-edge), 0 4px 10px rgba(74, 59, 50, .1);
-  --sat: env(safe-area-inset-top, 0px);
-  --sar: env(safe-area-inset-right, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sal: env(safe-area-inset-left, 0px);
+  /* 안전 영역(노치·홈 막대): index.html 의 --safe-* (확인할 때 덮어쓰기용), 없으면 env() */
+  --sat: var(--safe-top, env(safe-area-inset-top, 0px));
+  --sar: var(--safe-right, env(safe-area-inset-right, 0px));
+  --sab: var(--safe-bottom, env(safe-area-inset-bottom, 0px));
+  --sal: var(--safe-left, env(safe-area-inset-left, 0px));
   position: absolute; inset: 0; z-index: 0;
   pointer-events: none;
   color: var(--pk-ink);
@@ -64,13 +65,12 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-acorns.is-bump { animation: pk-bump .45s ease; }
 .pk-quick { display: flex; gap: 8px; }
 .pk-quick-btn { position: relative; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); font-size: 22px; display: grid; place-items: center; padding: 0; transition: transform .12s; }
-.pk-quick-btn:hover { transform: translateY(-2px); }
-.pk-quick-btn:active { transform: translateY(1px); }
+.pk-quick-btn:active { transform: translateY(1px) scale(.95); }
 .pk-quick-key { position: absolute; right: -4px; bottom: -4px; font: 11px/1 var(--pk-display); background: var(--pk-ink); color: var(--pk-cream); border-radius: 6px; padding: 3px 5px; }
 
 .pk-tool { position: absolute; right: calc(16px + var(--sar)); bottom: calc(16px + var(--sab)); display: grid; justify-items: center; border: 0; background: none; padding: 0; transition: opacity .2s, visibility .2s; }
 .pk-tool-ring { width: 72px; height: 72px; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow); display: grid; place-items: center; transition: transform .12s; }
-.pk-tool:hover .pk-tool-ring { transform: translateY(-2px); }
+.pk-tool:active .pk-tool-ring { transform: scale(.93); }
 .pk-tool-ring svg { width: 46px; height: 46px; display: block; }
 .pk-tool.is-swap .pk-tool-ring { animation: pk-pop .32s ease; }
 .pk-tag { font-family: var(--pk-display); background: var(--pk-accent); color: var(--pk-ink); border-radius: 999px; padding: 2px 12px; transform: rotate(-3deg); box-shadow: 0 2px 0 rgba(74, 59, 50, .18); white-space: nowrap; }
@@ -81,7 +81,6 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-hint-item { white-space: nowrap; }
 .pk-hint kbd { font: 12px var(--pk-display); background: var(--pk-ink); color: var(--pk-cream); border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
 .pk-hint-x { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: none; font-size: 12px; }
-.pk-hint-x:hover { background: var(--pk-edge); }
 .is-busy .pk-hint, .is-busy .pk-tool { opacity: 0; visibility: hidden; }
 
 /* ---------- 알림 ---------- */
@@ -108,14 +107,12 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-card-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 0 12px 0 20px; }
 .pk-card-title { margin-top: -14px; padding: 4px 18px; font: 400 21px/1.3 var(--pk-display); background: var(--pk-accent); color: var(--pk-ink); border-radius: 999px; transform: rotate(-2.5deg); box-shadow: 0 3px 0 rgba(74, 59, 50, .16); }
 .pk-x { flex: none; width: 44px; height: 44px; margin-top: 10px; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); font-size: 16px; cursor: pointer; }
-.pk-x:hover { background: #fff; }
-.pk-card-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 8px 18px 12px; overscroll-behavior: contain; }
+.pk-card-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 8px 18px 12px; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 .pk-card-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 18px 16px; }
 .pk-card-foot:empty { display: none; }
 
 .pk-btn { min-height: 44px; padding: 8px 20px; border: 0; border-radius: 999px; background: var(--pk-cream); box-shadow: 0 3px 0 var(--pk-edge); font: 17px var(--pk-display); cursor: pointer; transition: transform .1s, box-shadow .1s; }
 .pk-btn.is-primary { background: var(--pk-accent); box-shadow: 0 3px 0 var(--pk-accent-deep); }
-.pk-btn:hover:not(:disabled) { transform: translateY(-1px); }
 .pk-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--pk-edge); }
 .pk-btn:disabled { opacity: .5; cursor: default; }
 .pk-btn-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; width: 100%; }
@@ -142,7 +139,8 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-bag-grid { display: grid; gap: 10px; padding: 12px; background: #EFE2C4; border-radius: 20px; }
 .pk-bag-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .pk-slot { position: relative; aspect-ratio: 1; min-width: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--pk-slot); box-shadow: inset 0 -3px 0 rgba(74, 59, 50, .08); display: grid; place-items: center; cursor: pointer; transition: transform .12s; }
-.pk-slot:hover, .pk-slot:focus-visible { transform: scale(1.08); }
+.pk-slot:focus-visible { transform: scale(1.08); }
+.pk-slot:active:not(.is-empty) { transform: scale(.94); }
 .pk-slot:hover, .pk-slot:focus { z-index: 3; }
 .pk-slot.is-empty { background: rgba(255, 249, 236, .5); cursor: default; }
 .pk-slot.is-off { opacity: .38; filter: grayscale(.7); cursor: not-allowed; }
@@ -172,14 +170,14 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-phone-title { font: 400 22px var(--pk-display); }
 .pk-phone-greet { font-size: 14px; color: var(--pk-ink-soft); }
 .pk-back { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); font: 28px/1 var(--pk-display); cursor: pointer; }
-.pk-phone-view { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 2px 4px 8px; overscroll-behavior: contain; }
+.pk-phone-view { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 2px 4px 8px; overscroll-behavior: contain; touch-action: pan-y; }
 .pk-apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 6px; }
 .pk-app { display: grid; justify-items: center; gap: 6px; padding: 6px 0; border: 0; border-radius: 16px; background: none; font-size: 14px; cursor: pointer; }
 .pk-app i { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 19px; font-style: normal; font-size: 30px; box-shadow: 0 3px 0 rgba(74, 59, 50, .16); transition: transform .14s; }
-.pk-app:hover i, .pk-app:focus-visible i { transform: translateY(-3px) scale(1.05); }
+.pk-app:focus-visible i { transform: translateY(-3px) scale(1.05); }
+.pk-app:active i { transform: scale(.94); }
 .pk-phone .pk-card-foot { justify-content: center; padding: 4px 0 14px; }
 .pk-phone-home { width: 48px; height: 48px; border: 3px solid #E4D5B5; border-radius: 50%; background: var(--pk-cream); cursor: pointer; }
-.pk-phone-home:hover { background: #fff; }
 
 .pk-dex { outline-offset: 2px; border-radius: 12px; }
 .pk-dex-grid { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
@@ -227,7 +225,6 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-map-north { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); padding: 1px 10px; background: rgba(255, 255, 255, .65); border-radius: 999px; font: 14px var(--pk-display); color: #235B70; }
 .pk-map-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .pk-legend-btn { width: 100%; min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 4px 10px; border: 0; border-radius: 12px; background: var(--pk-cream); font-size: 14px; text-align: left; cursor: pointer; }
-.pk-legend-btn:hover { background: #fff; }
 .pk-legend-btn i { font-style: normal; font-size: 18px; }
 .pk-legend-btn.is-me { background: #FBE1D4; }
 
@@ -235,7 +232,7 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-shop { width: min(460px, 100%); }
 .pk-stock { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .pk-stock-item { width: 100%; min-height: 56px; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 10px; padding: 6px 14px 6px 8px; border: 0; border-radius: 16px; background: var(--pk-cream); box-shadow: 0 2px 0 var(--pk-edge); font-size: 16px; text-align: left; cursor: pointer; transition: transform .1s; }
-.pk-stock-item:hover { transform: translateX(2px); }
+.pk-stock-item:active { transform: scale(.98); }
 .pk-stock-icon { font-size: 28px; text-align: center; }
 .pk-stock-item.is-short { opacity: .62; }
 .pk-stock-item.is-short .pk-price { color: #B5523B; }
@@ -248,7 +245,7 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-craft .pk-card-body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 12px; padding-top: 14px; }
 .pk-craft-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; align-content: start; }
 .pk-craft-item { width: 100%; min-height: 48px; display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border: 0; border-radius: 14px; background: var(--pk-cream); box-shadow: 0 2px 0 var(--pk-edge); font: 16px var(--pk-display); text-align: left; cursor: pointer; transition: transform .1s; }
-.pk-craft-item:hover { transform: translateX(2px); }
+.pk-craft-item:active { transform: scale(.98); }
 .pk-craft-item:not(.is-can) { opacity: .7; }
 .pk-craft-item.is-selected { background: #FBEBCB; opacity: 1; }
 .pk-craft-icon { font-size: 24px; text-align: center; }
@@ -291,19 +288,39 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
 .pk-dlg-box.is-ready .pk-next { opacity: 1; animation: pk-bob .8s ease-in-out infinite; }
 .pk-choices { min-width: 190px; margin-right: 20px; padding: 10px; display: flex; flex-direction: column; gap: 4px; background: #FFFBEF; border-radius: 22px; box-shadow: 0 4px 0 #E6D7B6, 0 10px 24px rgba(74, 59, 50, .2); pointer-events: auto; animation: pk-pop-in .2s ease; }
 .pk-choice { position: relative; min-height: 44px; padding: 6px 18px 6px 30px; border: 0; border-radius: 14px; background: none; font: 18px var(--pk-display); text-align: left; cursor: pointer; }
-.pk-choice:hover, .pk-choice:focus { background: #FBEBCB; }
+.pk-choice:focus, .pk-choice:active { background: #FBEBCB; }
 .pk-choice:focus::before { content: "▶"; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--pk-accent-deep); }
 
-/* ---------- 휴대폰 터치: 조이스틱(왼쪽 아래)·A/B(오른쪽 아래)를 가리지 않는다 ---------- */
-.pk-touch .pk-quick-key { display: none; }
-.pk-touch .pk-hint { display: none; }
-.pk-touch .pk-tool { right: calc(24px + var(--sar)); bottom: calc(136px + var(--sab)); }
-.pk-touch .pk-scrim { padding-bottom: calc(156px + var(--sab)); }
-.pk-touch .pk-dlg-wrap { bottom: calc(156px + var(--sab)); }
-@media (orientation: landscape) and (max-height: 560px) {
-  .pk-touch .pk-scrim { padding: calc(8px + var(--sat)) calc(184px + var(--sar)) calc(8px + var(--sab)) calc(156px + var(--sal)); }
-  .pk-touch .pk-dlg-wrap { bottom: calc(10px + var(--sab)); left: calc(156px + var(--sal)); right: calc(184px + var(--sar)); width: auto; }
-  .pk-touch .pk-tool { bottom: calc(132px + var(--sab)); }
+/* ---------- 도구 고르기 (HUD 도구 단추) ---------- */
+.pk-scrim.pk-toolring-scrim { background: rgba(74, 59, 50, .2); }
+.pk-toolring { --r: 108px; position: relative; width: calc(var(--r) * 2 + 76px); height: calc(var(--r) * 2 + 76px); border-radius: 50%; background: radial-gradient(circle, rgba(255, 248, 230, .92) 0 38%, rgba(255, 248, 230, .55) 39% 100%); box-shadow: 0 0 0 4px rgba(255, 248, 230, .6), 0 12px 30px rgba(74, 59, 50, .25); animation: pk-pop-in .2s cubic-bezier(.2, 1.3, .4, 1); }
+.pk-toolring-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 2px; width: 120px; text-align: center; pointer-events: none; }
+.pk-toolring-mid b { font: 400 19px var(--pk-display); }
+.pk-toolring-mid span { font-size: 12px; color: var(--pk-ink-soft); }
+.pk-toolring-btn { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; padding: 0; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); display: grid; place-items: center; cursor: pointer; transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(calc(var(--a) * -1)); transition: box-shadow .12s, background .12s; }
+.pk-toolring-btn svg { width: 44px; height: 44px; display: block; }
+.pk-toolring-btn.is-on { background: #FBEBCB; box-shadow: 0 0 0 4px var(--pk-accent), var(--pk-shadow-sm); }
+.pk-toolring-btn:active { background: #F4E6C6; }
+.pk-toolring-uses { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); padding: 0 6px; background: #F2D9A6; border-radius: 8px; font: 11px/1.5 var(--pk-display); white-space: nowrap; }
+
+/* ---------- 가구 변형 색 (가방) ---------- */
+.pk-slot-dot { position: absolute; left: 1px; top: 1px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--pk-cream); box-shadow: 0 1px 2px rgba(74, 59, 50, .3); }
+.pk-variant { display: inline-flex; align-items: center; gap: 4px; padding: 1px 9px 1px 5px; background: #F2E4C4; border-radius: 999px; font-size: 13px; white-space: nowrap; }
+.pk-variant i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(74, 59, 50, .25); }
+.pk-tip .pk-variant { background: rgba(255, 248, 230, .18); color: var(--pk-cream); }
+
+/* ---------- 마우스가 있을 때만 떠오르기 (손가락은 :active 로 눌림만 보인다) ---------- */
+@media (hover: hover) {
+  .pk-quick-btn:hover:not(:active) { transform: translateY(-2px); }
+  .pk-tool:hover:not(:active) .pk-tool-ring { transform: translateY(-2px); }
+  .pk-hint-x:hover { background: var(--pk-edge); }
+  .pk-x:hover, .pk-phone-home:hover, .pk-legend-btn:hover { background: #fff; }
+  .pk-btn:hover:not(:disabled):not(:active) { transform: translateY(-1px); }
+  .pk-slot:hover:not(:active) { transform: scale(1.08); }
+  .pk-app:hover:not(:active) i { transform: translateY(-3px) scale(1.05); }
+  .pk-stock-item:hover:not(:active), .pk-craft-item:hover:not(:active) { transform: translateX(2px); }
+  .pk-choice:hover { background: #FBEBCB; }
+  .pk-toolring-btn:hover { background: #fff; }
 }
 
 /* ---------- 좁은 화면 ---------- */
@@ -325,6 +342,90 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
   .pk-dlg-box { padding: 24px 22px 22px; border-radius: 24px; min-height: 96px; }
   .pk-name { left: 20px; }
   .pk-choices { margin-right: 8px; }
+  /* 작업대: 고른 레시피를 위에 붙여 두고 목록만 스크롤 */
+  .pk-craft-detail { position: sticky; top: -8px; z-index: 1; justify-items: stretch; gap: 6px; padding: 10px 12px; text-align: left; box-shadow: 0 6px 10px -6px rgba(74, 59, 50, .25); }
+  .pk-craft-head { grid-auto-flow: column; justify-content: start; align-items: center; gap: 10px; }
+  img.pk-craft-big { width: 56px; height: 56px; }
+  .pk-craft-big { font-size: 36px; }
+  .pk-craft-mats { justify-content: flex-start; font-size: 14px; }
+}
+
+/* ---------- 낮은 가로 화면 (휴대폰 가로): 창 머리를 얇게, 가방·섬폰·지도는 옆으로 펼친다 ---------- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .pk-scrim { padding-top: calc(18px + var(--sat)); padding-bottom: calc(8px + var(--sab)); }
+  .pk-card { border-radius: 22px; }
+  .pk-card-head { padding: 0 50px 0 16px; }
+  .pk-card-title { margin-top: -13px; padding: 3px 16px; font-size: 18px; }
+  .pk-x { position: absolute; z-index: 2; top: -10px; right: -10px; margin: 0; }
+  .pk-card-body { padding: 6px 14px 8px; }
+  .pk-card-foot { padding: 0 14px 10px; }
+  .pk-keeper { margin: 2px 0 8px; font-size: 14px; }
+  .pk-tabs { margin-bottom: 8px; }
+  .pk-notice { padding: 12px; }
+
+  .pk-bag { --slot: clamp(44px, calc((100vh - 140px - var(--sat) - var(--sab)) / 4), 64px); width: min(640px, 100%); }
+  .pk-bag .pk-card-body { display: grid; grid-template-columns: auto minmax(140px, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "g h" "g i"; gap: 8px 12px; }
+  .pk-bag-grid { grid-area: g; gap: 6px; padding: 8px; border-radius: 18px; }
+  .pk-bag-row { grid-template-columns: repeat(5, var(--slot)); gap: 6px; }
+  .pk-slot-icon { font-size: calc(var(--slot) * .5); }
+  .pk-bag-hint { grid-area: h; margin: 0; font-size: 15px; }
+  .pk-bag-info { grid-area: i; align-self: stretch; margin: 0; flex-direction: column; flex-wrap: nowrap; justify-content: center; text-align: center; }
+
+  .pk-phone { width: min(620px, 100%); height: 100%; border-radius: 28px; }
+  .pk-phone .pk-card-body { padding: 8px 14px 2px; }
+  .pk-phone-top { min-height: 44px; padding-bottom: 4px; margin-bottom: 6px; }
+  .pk-phone-top:has(.pk-phone-greet) { padding: 0 0 8px; }
+  .pk-phone-title { font-size: 19px; }
+  .pk-apps { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px 4px; }
+  .pk-app i { width: 54px; height: 54px; border-radius: 16px; font-size: 26px; }
+  .pk-phone .pk-card-foot { padding: 2px 0 8px; }
+  .pk-phone-home { width: 44px; height: 44px; }
+
+  .pk-map { --map-h: calc(100vh - 74px - var(--sat) - var(--sab)); width: min(660px, 100%); }
+  .pk-map-note { display: none; }
+  .pk-map-wrap { grid-template-columns: auto minmax(150px, 1fr); gap: 10px; }
+  .pk-map-frame { height: var(--map-h); }
+  .pk-map-canvas { width: auto; height: 100%; }
+  .pk-map-legend { max-height: var(--map-h); overflow: auto; grid-template-columns: 1fr; padding-right: 2px; }
+
+  .pk-shop { width: min(620px, 100%); }
+  .pk-stock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pk-sell { padding: 10px 0; }
+  .pk-craft .pk-card-body { padding-top: 10px; }
+  img.pk-craft-big { width: 72px; height: 72px; }
+  .pk-craft-detail { padding: 10px; gap: 6px; }
+
+  .pk-confirm { width: min(480px, 100%); }
+  .pk-confirm .pk-card-body { padding-top: 6px; }
+  .pk-confirm-icon { font-size: 32px; }
+  .pk-confirm-icon img { width: 48px; height: 48px; }
+  .pk-confirm .pk-btn-row { flex-direction: row; justify-content: center; }
+  .pk-confirm .pk-btn-row .pk-btn { flex: 1 1 auto; }
+
+  .pk-dlg-box { min-height: 90px; padding: 22px 28px 16px; }
+  .pk-dlg-text { min-height: 2.6em; }
+  .pk-toolring { --r: 96px; }
+}
+
+/* ---------- 휴대폰 터치: 패드(왼쪽 아래)·A/B(오른쪽 아래, core/input.js)를 가리지 않는다 ----------
+   A = 오른쪽 20·아래 62, 78px / B = 오른쪽 108·아래 20, 64px / 패드는 창이 열리면 숨는다 */
+.pk-touch .pk-quick-key { display: none; }
+.pk-touch .pk-hint { display: none; }
+.pk-touch .pk-quick-btn { width: 50px; height: 50px; font-size: 22px; }
+.pk-touch .pk-tool { right: calc(27px + var(--sar)); bottom: calc(150px + var(--sab)); }
+.pk-touch .pk-tool-ring { width: 64px; height: 64px; }
+.pk-touch .pk-tool-ring svg { width: 42px; height: 42px; }
+.pk-touch .pk-tab, .pk-touch .pk-seg-btn, .pk-touch .pk-legend-btn { min-height: 44px; }
+.pk-touch .pk-range { height: 44px; }
+.pk-touch .pk-switch::after { content: ""; position: absolute; inset: -6px -4px; }
+.pk-touch .pk-scrim { padding-bottom: calc(150px + var(--sab)); }
+.pk-touch .pk-dlg-wrap { bottom: calc(152px + var(--sab)); }
+@media (orientation: portrait) { .pk-touch .pk-toolring-scrim { align-items: flex-end; } }   /* 엄지 가까이 */
+@media (orientation: landscape) and (max-height: 560px) {
+  .pk-touch .pk-scrim { padding: calc(18px + var(--sat)) calc(182px + var(--sar)) calc(8px + var(--sab)) calc(12px + var(--sal)); }
+  .pk-touch .pk-dlg-wrap { bottom: calc(10px + var(--sab)); left: calc(12px + var(--sal)); right: calc(182px + var(--sar)); width: auto; }
+  .pk-touch .pk-tool { bottom: calc(148px + var(--sab)); }
+  .pk-touch .pk-toasts { max-width: calc(100% - 380px - var(--sal) - var(--sar)); }
 }
 
 /* ---------- 움직임 ---------- */
