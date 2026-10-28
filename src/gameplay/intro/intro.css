@@ -1,0 +1,124 @@
+/* 첫날 흐름 (src/gameplay/intro): 이름 정하기 창 · 첫날 할 일 목록. ui 의 색·글꼴과 맞춘다 (ui.css 는 고치지 않는다). */
+.fd-root {
+  --fd-ink: #4A3B32;
+  --fd-ink-soft: #7A6656;
+  --fd-cream: #FFF8E6;
+  --fd-paper: #F7EFDC;
+  --fd-edge: #E2D2AE;
+  --fd-ring: #E4D5B5;
+  --fd-accent: #F2B36B;
+  --fd-accent-deep: #C9772E;
+  --fd-green: #7DB06A;
+  --fd-focus: #E0663A;
+  --fd-display: "Jua", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --fd-body: "Gowun Dodum", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --fd-shadow: 0 3px 0 var(--fd-edge), 0 8px 18px rgba(74, 59, 50, .14);
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  position: absolute; inset: 0; color: var(--fd-ink); font-family: var(--fd-body);
+}
+#ui > .fd-root { pointer-events: none; }
+.fd-root *, .fd-root *::before, .fd-root *::after { box-sizing: border-box; }
+.fd-root [hidden] { display: none !important; }
+.fd-root button, .fd-root input { font-family: inherit; color: inherit; touch-action: manipulation; }
+.fd-root h2, .fd-root p { margin: 0; }
+.fd-root :focus { outline: none; }
+.fd-root :focus-visible { outline: 3px solid var(--fd-focus); outline-offset: 3px; }
+.fd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- 이름 정하기 ---------- */
+.fd-name {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(16px + var(--sab)) calc(16px + var(--sal));
+  background: radial-gradient(ellipse at 50% 40%, rgba(255, 248, 230, .35), rgba(74, 59, 50, .42));
+  pointer-events: auto; animation: fd-fade .3s ease;
+}
+.fd-card {
+  position: relative; width: min(440px, 100%); margin: auto; padding: 30px 24px 22px;
+  background: var(--fd-paper); border-radius: 28px;
+  box-shadow: 0 0 0 5px var(--fd-ring), 0 16px 38px rgba(74, 59, 50, .3);
+  animation: fd-pop .32s cubic-bezier(.2, 1.3, .4, 1);
+}
+.fd-card-tag {
+  position: absolute; top: -18px; left: 22px; padding: 4px 18px; border-radius: 999px;
+  background: var(--fd-accent); font: 400 21px/1.3 var(--fd-display); transform: rotate(-2.5deg);
+  box-shadow: 0 3px 0 rgba(74, 59, 50, .16);
+}
+.fd-lead { margin-bottom: 16px; font-size: 16px; line-height: 1.55; word-break: keep-all; color: var(--fd-ink-soft); }
+.fd-lead b { color: var(--fd-ink); font-weight: 400; font-family: var(--fd-display); }
+.fd-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 14px; }   /* 글자 칸 기본 너비 때문에 좁은 화면에서 넘치지 않게 */
+.fd-label { display: flex; align-items: baseline; justify-content: space-between; font: 18px var(--fd-display); }
+.fd-count { font: 14px var(--fd-body); color: var(--fd-ink-soft); font-variant-numeric: tabular-nums; }
+.fd-count.is-over { color: #B5523B; }
+.fd-row { display: flex; align-items: center; gap: 8px; }
+.fd-input-wrap { flex: 1; min-width: 0; display: flex; align-items: center; height: 52px; padding: 0 16px; background: #FFFDF6; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--fd-edge); }
+.fd-input-wrap:focus-within { box-shadow: inset 0 0 0 3px var(--fd-accent); }
+.fd-input { flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; background: none; font: 22px var(--fd-display); letter-spacing: .02em; }
+.fd-input::placeholder { color: #C4B39A; }
+.fd-input:focus-visible { outline: none; }
+.fd-suffix { flex: none; font: 22px var(--fd-display); color: var(--fd-accent-deep); }
+.fd-dice { flex: none; width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--fd-cream); box-shadow: 0 3px 0 var(--fd-edge); font-size: 24px; cursor: pointer; transition: transform .12s; }
+.fd-dice:hover { transform: rotate(-12deg); }
+.fd-dice:active { transform: translateY(2px) rotate(-12deg); box-shadow: 0 1px 0 var(--fd-edge); }
+.fd-err { min-height: 1.3em; font-size: 14px; color: #B5523B; }
+.fd-foot { display: flex; justify-content: flex-end; margin-top: 4px; }
+.fd-go { min-height: 50px; padding: 8px 26px; border: 0; border-radius: 999px; background: var(--fd-accent); box-shadow: 0 3px 0 var(--fd-accent-deep); font: 19px var(--fd-display); cursor: pointer; transition: transform .1s, box-shadow .1s; }
+.fd-go:hover { transform: translateY(-1px); }
+.fd-go:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--fd-accent-deep); }
+.fd-card.is-shake { animation: fd-shake .3s ease; }
+
+/* ---------- 첫날 할 일 목록 (왼쪽 위 시계 아래) ---------- */
+.fd-list {
+  position: absolute; left: calc(14px + var(--sal)); top: calc(96px + var(--sat)); width: 248px; max-width: calc(100% - 28px - var(--sal) - var(--sar));
+  background: rgba(255, 248, 230, .94); border-radius: 18px; box-shadow: var(--fd-shadow);
+  pointer-events: auto; transition: opacity .25s, transform .25s, visibility .25s; animation: fd-slide .4s cubic-bezier(.2, 1.3, .4, 1);
+}
+.fd-list.is-away { opacity: 0; visibility: hidden; transform: translateX(-12px); }
+.fd-head { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 42px; padding: 8px 12px 6px 14px; border: 0; background: none; font: 17px var(--fd-display); text-align: left; cursor: pointer; }
+.fd-head-n { margin-left: auto; padding: 1px 9px; border-radius: 999px; background: var(--fd-accent); font-size: 14px; font-variant-numeric: tabular-nums; }
+.fd-caret { font-size: 12px; transition: transform .2s; }
+.fd-list.is-collapsed .fd-caret { transform: rotate(-90deg); }
+.fd-steps { list-style: none; margin: 0; padding: 0 10px 10px; display: grid; gap: 2px; }
+.fd-step { display: grid; grid-template-columns: 22px 1fr; gap: 0 6px; align-items: start; padding: 4px 6px; border-radius: 12px; font-size: 15px; line-height: 1.4; }
+.fd-mark { width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 2px var(--fd-edge); font-size: 12px; color: #fff; }
+.fd-step.is-done { color: var(--fd-ink-soft); }
+.fd-step.is-done .fd-label-t { text-decoration: line-through; text-decoration-color: rgba(122, 102, 86, .45); }
+.fd-step.is-done .fd-mark { background: var(--fd-green); box-shadow: none; }
+.fd-step.is-current { background: #FBEBCB; }
+.fd-step.is-current .fd-mark { box-shadow: inset 0 0 0 2px var(--fd-accent-deep); background: #fff; }
+.fd-step.is-current .fd-mark::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--fd-accent-deep); }
+.fd-step.is-pop .fd-mark { animation: fd-pop-mark .5s ease; }
+.fd-label-t { font-family: var(--fd-display); font-size: 15px; }
+.fd-hint { grid-column: 2; margin-top: 2px; font-size: 13px; line-height: 1.45; color: var(--fd-ink-soft); word-break: keep-all; }
+.fd-dir { grid-column: 2; display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; font: 13px var(--fd-display); color: var(--fd-accent-deep); }
+.fd-arrow { display: inline-block; transition: transform .2s linear; }
+.fd-list.is-collapsed .fd-step:not(.is-current) { display: none; }
+.fd-list.is-done .fd-head-n { background: var(--fd-green); color: #fff; }
+.fd-list.is-done { animation: fd-cheer .6s ease; }
+
+.fd-touch .fd-list { width: 216px; }
+/* 휴대폰 세로: 오른쪽 위 메뉴 단추(가방·섬폰·지도)에 닿지 않게 좁게 */
+@media (max-width: 640px) {
+  .fd-list, .fd-touch .fd-list { top: calc(84px + var(--sat)); width: 184px; }
+  .fd-head { min-height: 38px; padding: 6px 10px 4px 12px; font-size: 16px; }
+  .fd-step { font-size: 14px; }
+  .fd-hint { font-size: 12.5px; }
+}
+@media (max-width: 360px) {
+  .fd-list, .fd-touch .fd-list { top: calc(112px + var(--sat)); }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .fd-list { top: calc(80px + var(--sat)); width: 220px; }
+}
+
+@keyframes fd-fade { from { opacity: 0; } }
+@keyframes fd-pop { from { opacity: 0; transform: scale(.92) translateY(10px); } }
+@keyframes fd-slide { from { opacity: 0; transform: translateX(-16px); } }
+@keyframes fd-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes fd-pop-mark { 40% { transform: scale(1.35); } }
+@keyframes fd-cheer { 30% { transform: rotate(-2deg) scale(1.03); } 60% { transform: rotate(1.5deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .fd-root *, .fd-root *::before, .fd-root *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+}
