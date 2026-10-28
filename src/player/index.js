@@ -1,7 +1,8 @@
-// 트랙 T1: 플레이어 — 걷기·달리기·충돌·높이 따라가기·발소리, 도구 들기, 카메라. ctx.services.player 를 올린다.
-import { LoopOnce, LoopRepeat } from 'three';
+// 트랙 T1: 플레이어 — 걷기·달리기·충돌·높이 따라가기·발소리, 도구 들기·도구 동작, 카메라. ctx.services.player 를 올린다.
+import { LoopOnce, LoopRepeat, Vector3 } from 'three';
 import { createCameraRig } from './camera.js';
 import { buildTool } from './tools.js';
+import { createMotions } from './motions.js';
 
 const WALK = 2.6, RUN = 5.0;          // 칸/초
 const RADIUS = 0.26;                  // 충돌 원 반지름
@@ -42,7 +43,9 @@ export default {
       position: root.position, facing: 0, vx: 0, vz: 0, speed: 0,
       frozen: false, anim: null, oneShot: null, tool: null, toolKeys: true,
       tile: { tx: -1, tz: -1 }, stepPhase: 0, rig: createCameraRig(ctx),
+      motions: createMotions(model, toolMount),
     };
+    const headBone = model.getObjectByName('head');
 
     // 처음 설 곳: 저장된 자리가 걸을 수 있으면 거기, 아니면 선착장 앞
     const sp = world?.places?.spawn ?? { x: 0, z: 0, facing: 0 };
@@ -67,6 +70,30 @@ export default {
       pointInFront(dist = 0.75) { return { x: P.position.x - Math.sin(P.facing) * dist, z: P.position.z - Math.cos(P.facing) * dist }; },
       setTool,
       play(name) { playOnce(name); },
+      /**
+       * 도구 동작 (절차적): 'swing' 'cast' 'reel' 'dig' 'chop' 'water' 'shake' 'pickup' 'ouch'.
+       * opts: { onHit() 효과 나는 순간, speed, lock=true 동작 중 못 움직임 } → Promise<bool> (끝까지 하면 true)
+       */
+      act(name, opts) { P.oneShot = null; return P.motions.play(name, opts); },
+      /** 잡고 있을 자세 ('fish' = 낚싯대 내밀기, null = 놓기). 'cast' 는 끝나면 저절로 'fish' */
+      hold(name) { P.motions.hold(name); },
+      get acting() { return P.motions.active; },
+      /** 지금 든 도구 모델 (Group, userData.tip·bobber) 또는 null */
+      toolModel() { return (P.tool && P.toolModels[P.tool]) || null; },
+      /** 도구 끝(낚싯대 끝·잠자리채 그물·물뿌리개 주둥이)의 월드 좌표 */
+      toolTip(out = new Vector3()) {
+        const m = api.toolModel();
+        if (!m) return null;
+        P.root.updateMatrixWorld(true);
+        return (m.userData.tip ?? m).getWorldPosition(out);
+      },
+      /** 머리 위 (잡은 것을 들어 보일 때) */
+      headTop(out = new Vector3()) {
+        P.root.updateMatrixWorld(true);
+        if (headBone) headBone.getWorldPosition(out); else out.copy(P.position).setY(P.position.y + 0.8);
+        out.y += 0.55;
+        return out;
+      },
       freeze(v = true) { P.frozen = !!v; if (P.frozen) { P.vx = P.vz = 0; } },
       /** 순간이동 (집 안팎 등). facing 생략하면 그대로 */
       teleport(x, z, facing = P.facing) {
@@ -82,9 +109,9 @@ export default {
       set toolKeys(v) { P.toolKeys = v; }, get toolKeys() { return P.toolKeys; },
     };
     ctx.services.player = api;
-    if (saved.tool) setTool(saved.tool, { silent: true });
-
     const TOOLS = ctx.constants.TOOLS;
+    if (saved.tool) setTool(saved.tool, { silent: true });     // TOOLS 다음에 (저장된 도구가 있으면 바로 쓴다)
+
     events.on('input:press', ({ intent }) => {
       if (!P.toolKeys || P.frozen || !ctx.input.enabled || ctx.services.ui?.isBlocking?.()) return;
       const n = /^tool([1-5])$/.exec(intent);
@@ -117,9 +144,10 @@ export default {
     const world = ctx.services.world;
 
     // 이동 의도 → 목표 속도
-    let mx = P.frozen ? 0 : input.move.x, mz = P.frozen ? 0 : input.move.z;
+    const still = P.frozen || P.motions.locked;
+    let mx = still ? 0 : input.move.x, mz = still ? 0 : input.move.z;
     const mag = Math.min(1, Math.hypot(mx, mz));
-    const top = input.run && !P.frozen ? RUN : WALK;
+    const top = input.run && !still ? RUN : WALK;
     const tx = mag > 0.05 ? (mx / (mag || 1)) * top * mag : 0, tz = mag > 0.05 ? (mz / (mag || 1)) * top * mag : 0;
     const k = 1 - Math.exp(-dt * ACCEL);
     P.vx += (tx - P.vx) * k;
@@ -162,6 +190,7 @@ export default {
       if (want === 'run') P.actions.run.timeScale = Math.max(0.7, P.speed / RUN) * 1.2;
     }
     P.mixer.update(dt);
+    P.motions.update(dt);
 
     // 발소리: 걷기·달리기 한 주기에 두 번
     const a = P.anim === 'walk' || P.anim === 'run' ? P.actions[P.anim] : null;

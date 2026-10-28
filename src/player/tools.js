@@ -1,5 +1,8 @@
 // 손에 드는 도구 5종: 낚싯대·잠자리채·삽·도끼·물뿌리개. 간단한 도형으로 만든 임시 모델 (툰 재질 + 외곽선).
-// 손잡이 아래쪽이 원점, +Y 가 손잡이 끝 방향이다.
+// 손잡이 아래쪽이 원점, +Y 가 손잡이 끝 방향이다. userData.tip = 도구 끝(낚싯줄·그물·주둥이), userData.bobber = 낚싯대에 달린 찌.
+
+// 쥐는 각도 (손잡이 받침 기준 Euler x·y·z): 삽은 날이 아래로, 물뿌리개는 똑바로 세우고 주둥이가 앞으로
+export const GRIP = { shovel: [0.8, 0, 0], can: [0.63, Math.PI, 0] };
 
 export function buildTool(ctx, id) {
   const { THREE, materials } = ctx;
@@ -14,11 +17,13 @@ export function buildTool(ctx, id) {
     return m;
   };
   const stick = (len, r = 0.018, color = '#B98957') => add(new THREE.CylinderGeometry(r, r, len, 8), color, 0, len / 2, 0);
+  const tip = (x, y, z) => { const t = new THREE.Object3D(); t.name = 'tip'; t.position.set(x, y, z); g.add(t); g.userData.tip = t; };
   switch (id) {
     case 'rod': {
       stick(0.62, 0.014, '#9A6B45');
       add(new THREE.CylinderGeometry(0.03, 0.03, 0.05, 10), '#4E5A57', 0, 0.12, 0.025, Math.PI / 2);          // 릴
-      add(new THREE.SphereGeometry(0.03, 8, 6), '#E8504F', 0, 0.6, 0.08);                                     // 찌
+      g.userData.bobber = add(new THREE.SphereGeometry(0.03, 8, 6), '#E8504F', 0, 0.6, 0.08);                 // 찌
+      tip(0, 0.62, 0);
       break;
     }
     case 'net': {
@@ -26,30 +31,35 @@ export function buildTool(ctx, id) {
       const ring = add(new THREE.TorusGeometry(0.11, 0.012, 6, 18), '#4E5A57', 0, 0.6, 0, Math.PI / 2);
       ring.rotation.set(0, 0, 0);
       add(new THREE.ConeGeometry(0.1, 0.16, 12, 1, true), '#F7F1E4', 0, 0.6, -0.08, -Math.PI / 2);
+      tip(0, 0.6, 0);
       break;
     }
     case 'shovel': {
       stick(0.45);
       add(new THREE.BoxGeometry(0.12, 0.03, 0.02), '#7F5636', 0, 0.45, 0);
       add(new THREE.BoxGeometry(0.13, 0.16, 0.025), '#9AA6A8', 0, -0.07, 0);
+      tip(0, -0.15, 0);
       break;
     }
     case 'axe': {
       stick(0.42, 0.02, '#9A6B45');
       add(new THREE.BoxGeometry(0.05, 0.1, 0.13), '#9AA6A8', 0, 0.36, 0.06);
       add(new THREE.BoxGeometry(0.052, 0.12, 0.03), '#4E5A57', 0, 0.36, 0.13);
+      tip(0, 0.36, 0.14);
       break;
     }
     case 'can': {
       add(new THREE.CylinderGeometry(0.075, 0.085, 0.13, 14), '#7FA36B', 0, 0.06, 0);
       add(new THREE.CylinderGeometry(0.012, 0.02, 0.16, 8), '#7FA36B', 0, 0.12, 0.1, Math.PI / 3.2);
       add(new THREE.TorusGeometry(0.05, 0.012, 6, 12, Math.PI), '#5E8A4F', 0, 0.13, -0.02, 0, Math.PI / 2);
+      tip(0, 0.165, 0.166);
       break;
     }
     default: return null;
   }
+  if (GRIP[id]) g.rotation.set(...GRIP[id]);
   // 외곽선
   const ol = materials.outlineMaterial(0.006);
-  for (const m of [...g.children]) { const hull = new THREE.Mesh(m.geometry, ol); hull.userData.outline = true; m.add(hull); }
+  for (const m of g.children.filter(c => c.isMesh)) { const hull = new THREE.Mesh(m.geometry, ol); hull.userData.outline = true; m.add(hull); }
   return g;
 }
