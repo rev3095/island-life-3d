@@ -103,7 +103,7 @@ export default {
 /** ?debug 일 때 왼쪽 위에 fps·그리기 호출·삼각형 수 */
 function createStats(ctx) {
   const el = document.createElement('div');
-  el.style.cssText = 'position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:8px;background:rgba(74,59,50,.75);color:#FFF8E6;font:12px/1.4 monospace;pointer-events:none;white-space:pre';
+  el.style.cssText = 'position:absolute;left:8px;bottom:8px;padding:4px 8px;border-radius:8px;background:rgba(74,59,50,.75);color:#FFF8E6;font:12px/1.4 monospace;pointer-events:none;white-space:pre';
   ctx.uiRoot.append(el);
   let last = performance.now(), frames = 0;
   return {
