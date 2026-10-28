@@ -33,12 +33,14 @@ export const DEX_CATEGORIES = ['fish', 'bug', 'fossil'];
 export function itemInfo(ctx, id) {
   const it = id ? ctx.services.data?.items?.get?.(id) : null;
   const category = it?.category ?? String(id ?? '').split('.')[0];
+  // 값은 data.economy 가 정한다 (섬 특산 과일은 싸게 사 준다). 없으면 아이템 칸에서
+  const eco = it ? ctx.services.data?.economy : null;
   return {
     id, category, known: !!it,
     name: it?.name ?? id ?? '',
     icon: it?.icon ?? CATEGORY_ICON[category] ?? '❔',
-    sell: it?.sellPrice ?? it?.price ?? 0,   // 상점이 사 주는 값
-    buy: it?.buyPrice ?? it?.price ?? 0,     // 상점에서 살 때 값
+    sell: eco?.sellPrice?.(id) ?? it?.sellPrice ?? it?.price ?? 0,                  // 상점이 사 주는 값
+    buy: eco?.buyPrice?.(id) || (it?.buyPrice ?? it?.buy ?? it?.price ?? 0),       // 상점에서 살 때 값
   };
 }
 

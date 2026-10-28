@@ -211,6 +211,7 @@ const deepFreeze = v => {
 };
 for (const it of ITEMS) {
   if (it.stack == null) it.stack = STACK[it.category] ?? 1;
+  if (it.buy) it.buyPrice = it.buy;   // 계약 이름 (docs/CONTRACTS.md: buyPrice = 상점에서 살 때 값)
   deepFreeze(it);   // months·hours 같은 배열은 여러 아이템이 같이 쓴다
 }
 
