@@ -171,9 +171,8 @@ uniform float uMatRim, uMatSpec, uMatAO, uMatPaint;     // 재질마다 (캐릭�
 varying vec3 vStyleWorld;
 varying float vStylePaint;
 varying float vStyleBase;
-float styleShadow = 1.0;   // 지금 빛의 그림자 (0 = 그림자 속)
-float styleDir = 0.0;      // 지금 빛이 해·달(방향광)이면 1
-float styleSun = 0.0;      // 해를 받은 정도 0~1 (띠 × 그림자)
+float styleShadow = 1.0;   // 지금 방향광의 그림자 (0 = 그림자 속). 점·스포트 빛은 예전처럼 색에 곱한다
+float styleSun = 0.0;      // 빛을 받은 정도 0~1 (띠 × 그림자 × 빛 세기) — 그늘 색·채도를 어디에 줄지 정한다
 ${NOISE_GLSL}
 // 명암 띠: 감싸는 빛 → 띠 나누기 → 경계 부드럽게
 float styleBand( float ndl ) {
@@ -198,7 +197,8 @@ void RE_Direct_Style( const in IncidentLight directLight, const in vec3 geometry
   float lit = q * s;
   vec3 k = mix( uShadeFloor * mix( 1.0, s, uCastDark ) * uShadeTint, uLitTint, lit );
   reflectedLight.directDiffuse += directLight.color * k * BRDF_Lambert( material.diffuseColor );
-  styleSun = max( styleSun, lit * styleDir );
+  // 해가 꺼진(세기 0) 실내에서도 맞게: 빛 세기로 무게를 준다 (낮 해 ≈ 1, 달 ≈ 0.9, 꺼짐 = 0)
+  styleSun = max( styleSun, lit * clamp( dot( directLight.color, vec3( 0.2126, 0.7152, 0.0722 ) ) * 1.5, 0.0, 1.0 ) );
   if ( uMatSpec > 0.0 && uSpec > 0.0 ) {
     vec3 hv = normalize( directLight.direction + geometryViewDir );
     float ndh = max( dot( geometryNormal, hv ), 0.0 );
@@ -208,7 +208,7 @@ void RE_Direct_Style( const in IncidentLight directLight, const in vec3 geometry
   }
 }
 void RE_IndirectDiffuse_Style( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
-  // 하늘빛(간접광)은 해를 못 받은 곳에서만 그늘 색으로 (방향광이 먼저 돌아 styleSun 이 정해져 있다)
+  // 하늘빛(간접광)은 빛을 못 받은 곳에서만 그늘 색으로 (직접광이 먼저 돌아 styleSun 이 정해져 있다)
   reflectedLight.indirectDiffuse += irradiance * mix( uShadeTint, vec3( 1.0 ), styleSun ) * BRDF_Lambert( material.diffuseColor );
 }
 #define RE_Direct RE_Direct_Style
@@ -269,9 +269,9 @@ function styledLightsBegin() {
   if (lightsBegin != null) return lightsBegin;
   const src = THREE.ShaderChunk.lights_fragment_begin;
   if (src.includes(DIR_SHADOW_FROM) && src.includes(DIR_INFO_FROM)) {
-    // 점·스포트 빛은 방향광보다 먼저 돌아서 styleDir = 0 그대로, 그림자는 예전처럼 색에 곱한다
+    // 방향광마다 그림자 값을 새로 받는다. 점·스포트 빛은 방향광보다 먼저 돌고 styleShadow = 1 그대로
     lightsBegin = src
-      .replace(DIR_INFO_FROM, `${DIR_INFO_FROM}\n\t\tstyleShadow = 1.0; styleDir = 1.0;`)
+      .replace(DIR_INFO_FROM, `${DIR_INFO_FROM}\n\t\tstyleShadow = 1.0;`)
       .replace(DIR_SHADOW_FROM, 'styleShadow = ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ]');
   } else {
     console.warn('[materials] three 셰이더 조각이 예상과 달라 그림자 진하기 조절을 끕니다');
