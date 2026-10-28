@@ -215,3 +215,42 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 ### `world.addZone(zone) → 해제 함수` — 섬 밖 공간(집 실내 등)
 - `zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }`
 - 플레이어가 구역 안에 있으면 `world.collide`·`island.heightAt`·`island.groundAt`·`island.isWalkable` 이 구역의 것을 쓴다. 실내는 섬에서 멀리 떨어진 좌표(예: x = 500)에 만들고 플레이어를 옮긴다.
+
+---
+
+## 2차 W2 (town) 에서 정한 것
+
+`src/gameplay/town/` 의 약속 (자세한 배경: `docs/notes/town.md`).
+
+### 행동 키
+| 이름 | 우선순위 | 언제 |
+|---|---|---|
+| `town:talk` | 100 | 주민이 1.3칸 안·앞쪽(0.8칸 안이면 옆도)·같은 높이 |
+| `town:intro` | 100 | 첫날 안내 전, 밤톨 2.2칸 안 |
+| `town:mail` | 91 | 플레이어 집 우편함 1.15칸 안, 그쪽을 볼 때 |
+| `town:knock` · `town:shop` · `town:museum` | 90 | 주민이 집에 있을 때 그 집 문 / 상점 문·밤톨 / 박물관 문·느루 |
+
+### 이벤트
+- `town:intro {done: true}` — 첫날 밤톨 안내가 끝났을 때 (`state.flags.intro = true` 와 같이).
+- `mail:new {from, kind}` — 우편함에 편지가 들어왔을 때.
+
+### 상태 (2차 gameplay 칸)
+```js
+state.villagers[slug] = { friendship /* 0~100 */, met, lastTalk, talkDays, giftDay, giftsToday, backDay,
+                          request: { cat, id, label, day } | null, doneDay, thankedDay, pending: [itemId], photo }
+state.flags = { intro, museumVisit, museumReward, … }
+state.mail = { list: [{ id, from, kind, day, lines, gift, read, stub? }], day, nextId }   // 새 칸 (town)
+```
+
+### world 추가
+- **`world.addMover(m) → 해제 함수`** — 움직이는 충돌체. `m = { x, z, r, y?, active? }` (값은 getter 여도 된다). 섬 위 `world.collide` 가 원으로 밀어낸다. 출발점이 그 원의 중심이면(= 자기 자신) 건너뛴다. `isWalkable` 에는 들어가지 않는다 (길찾기는 그대로). town 이 주민·가게 주인·플레이어를 올린다.
+
+### data · ui
+- 아이템 `buyPrice` 칸이 생겼다 (`buy` 와 같은 값, 상점에서 살 때 값).
+- ui 의 아이템 값(`itemInfo`)은 `data.economy.sellPrice / buyPrice` 를 먼저 쓴다 → 섬 특산 과일은 싸게 사 주고, 사는 값은 판매가가 아니라 `buy`.
+
+### 재질
+- 집을 드나드는 주민은 재질의 `opacity`·`transparent` 를 바꾸고 `needsUpdate` 한다. 툰·외곽선 재질을 바꿀 때 이 둘이 그대로 먹게 둔다.
+
+### 개발용 (계약 밖)
+- `ctx.services.town = { villagers, keepers, state(slug), talkTo(slug), mail: { unread(), post(from, kind, gift), deliver(dayKey), spot }, debug }`.
