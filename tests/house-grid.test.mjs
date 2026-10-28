@@ -1,8 +1,7 @@
-// 집 안 칸 계산 확인: node --test src/gameplay/house/grid.test.mjs
-// (tests/ 는 T2 폴더라 여기에 둔다 — 합칠 때 tests/house-grid.test.mjs 로 옮기면 node --test tests/ 에 들어간다)
+// W3 집 안 칸 계산 (src/gameplay/house/grid.js): 놓을 자리·돌리기·러그 겹침·벽 자리·방 안 충돌
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dims, cellsOf, facingDir, fits, spotInFront, rotateInPlace, wallInFront, wallFree, moveCircle } from './grid.js';
+import { dims, cellsOf, facingDir, fits, spotInFront, rotateInPlace, wallInFront, wallFree, moveCircle } from '../src/gameplay/house/grid.js';
 
 const INFO = { sofa: { footprint: [2, 1] }, bed: { footprint: [2, 3] }, rug: { footprint: [3, 3], layer: 'rug' }, chair: { footprint: [1, 1] } };
 const info = id => INFO[id] ?? null;
