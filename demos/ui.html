@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UI 데모 · 포근섬</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  /* index.html 과 같은 기본 틀 */
+  :root { --ink: #4A3B32; --cream: #FFF8E6; --display: "Jua", "Malgun Gothic", sans-serif; --body: "Gowun Dodum", "Malgun Gothic", sans-serif; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #BFE6F7; color: var(--ink); font-family: var(--body); }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--body); z-index: 2; }
+  #ui > * { pointer-events: auto; }
+  #touch-controls { position: absolute; inset: 0; pointer-events: none; }
+  #touch-controls > * { pointer-events: auto; position: absolute; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .tc-stick { left: calc(24px + env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 248, 230, .45); border: 2px solid rgba(74, 59, 50, .25); }
+  .tc-knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: var(--cream); box-shadow: 0 3px 0 #E2D2AE; }
+  .tc-btn { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--cream); color: var(--ink); font: 22px var(--display); box-shadow: 0 3px 0 #E2D2AE; }
+  .tc-a { right: calc(28px + env(safe-area-inset-right, 0px)); bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .tc-b { right: calc(104px + env(safe-area-inset-right, 0px)); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+
+  /* 데모 전용: 3D 장면 대신 하늘·풀밭 그림, 왼쪽 조작판 */
+  #game { background: linear-gradient(#9AD8F2 0%, #CDEFFB 40%, #8FCB6E 40.3%, #7DBE5E 100%); }
+  .demo-me { position: fixed; left: 50%; top: 58%; font-size: 44px; transform: translate(-50%, -50%); transition: transform .08s linear; filter: drop-shadow(0 6px 4px rgba(0,0,0,.15)); }
+  .demo { position: fixed; z-index: 1; left: calc(14px + env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); width: 250px;
+    background: rgba(255, 248, 230, .94); border-radius: 18px; box-shadow: 0 3px 0 #E2D2AE, 0 8px 18px rgba(74,59,50,.14); font-size: 14px; }
+  .demo summary { padding: 10px 14px; font: 17px var(--display); cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+  .demo summary::after { content: "▾"; }
+  .demo:not([open]) summary::after { content: "▸"; }
+  .demo summary:focus-visible, .demo button:focus-visible { outline: 3px solid #E0663A; outline-offset: 2px; }
+  .demo-body { overflow: auto; max-height: calc(100vh - 250px); padding: 0 12px 12px; display: grid; gap: 10px; }
+  .demo h3 { margin: 4px 0 0; font: 400 13px var(--display); color: #7A6656; }
+  .demo .row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .demo button { min-height: 34px; padding: 4px 10px; border: 0; border-radius: 999px; background: #F2E4C4; color: var(--ink); font: 14px var(--body); cursor: pointer; }
+  .demo button:hover { background: #F2D9A6; }
+  .demo-state { font-size: 12.5px; color: #7A6656; line-height: 1.5; }
+  .demo-log { margin: 0; padding: 8px 10px; max-height: 150px; overflow: auto; list-style: none; background: #4A3B32; color: #FFF8E6; border-radius: 12px; font: 12px/1.5 ui-monospace, Consolas, monospace; }
+  .demo-log li { white-space: pre-wrap; word-break: break-all; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="game" aria-hidden="true"></div>
+<div class="demo-me" aria-hidden="true">🧑‍🌾</div>
+<div id="ui"></div>
+<details class="demo" open>
+  <summary>UI 데모 조작</summary>
+  <div class="demo-body">
+    <p class="demo-state" id="state"></p>
+    <h3>대화</h3>
+    <div class="row">
+      <button data-do="talk-coco">코코 (선택지)</button>
+      <button data-do="talk-bori">보리</button>
+      <button data-do="talk-bamtol">밤톨 → 상점</button>
+      <button data-do="talk-neuru">느루 → 박물관</button>
+    </div>
+    <h3>창</h3>
+    <div class="row">
+      <button data-do="bag-view">가방</button>
+      <button data-do="bag-sell">가방·팔기</button>
+      <button data-do="bag-donate">가방·기증</button>
+      <button data-do="bag-pick">가방·고르기</button>
+      <button data-do="phone">섬폰</button>
+      <button data-do="map">지도</button>
+      <button data-do="shop">상점</button>
+      <button data-do="museum">박물관</button>
+      <button data-do="confirm">확인 창</button>
+    </div>
+    <h3>HUD · 알림</h3>
+    <div class="row">
+      <button data-do="acorn+">도토리 +500</button>
+      <button data-do="acorn-">도토리 −300</button>
+      <button data-do="hour">시간 +1시간</button>
+      <button data-do="weather">날씨 바꾸기</button>
+      <button data-do="tool">다음 도구</button>
+      <button data-do="pickup">물건 줍기</button>
+      <button data-do="toast">알림</button>
+      <button data-do="toast5">알림 5개</button>
+      <button data-do="hud">HUD 숨기기/보이기</button>
+    </div>
+    <h3>이벤트 기록</h3>
+    <ul class="demo-log" id="log" aria-live="off"></ul>
+  </div>
+</details>
+<script type="module">
+// UI 트랙 단독 데모: core 의 events·state·input 에 가짜 data·time·world·player 서비스를 붙여 모든 창을 열어 본다.
+// 여기 있는 아이템·섬·시계는 전부 데모용 가짜 데이터다 (진짜는 T1·T2·T5 모듈이 준다).
+import { createEvents } from '../src/core/events.js';
+import { createState } from '../src/core/state.js';
+import { createInput } from '../src/core/input.js';
+import * as constants from '../src/core/constants.js';
+import ui from '../src/ui/index.js';
+
+// ---------- 가짜 아이템 ----------
+const ITEMS = [
+  ['fish.crucian', '붕어', '🐟', 160], ['fish.carp', '잉어', '🐟', 300], ['fish.catfish', '메기', '🐡', 800], ['fish.sweetfish', '은어', '🐟', 900],
+  ['fish.goldfish', '금붕어', '🐠', 1300], ['fish.sea-bass', '농어', '🐟', 400], ['fish.squid', '오징어', '🦑', 500], ['fish.octopus', '문어', '🐙', 1000],
+  ['fish.puffer', '복어', '🐡', 5000], ['fish.shark', '상어', '🦈', 15000], ['fish.tuna', '다랑어', '🐟', 7000], ['fish.clownfish', '흰동가리', '🐠', 650],
+  ['bug.cabbage-white', '배추흰나비', '🦋', 160], ['bug.ladybug', '무당벌레', '🐞', 200], ['bug.bee', '꿀벌', '🐝', 2500], ['bug.cricket', '귀뚜라미', '🦗', 130],
+  ['bug.beetle', '장수풍뎅이', '🪲', 1350], ['bug.ant', '개미', '🐜', 80], ['bug.firefly', '반딧불이', '✨', 300], ['bug.snail', '달팽이', '🐌', 250],
+  ['bug.spider', '거미', '🕷️', 480], ['bug.fly', '파리', '🪰', 60],
+  ['fossil.ammonite', '암모나이트', '🐚', 1100], ['fossil.trilobite', '삼엽충', '🦴', 1300], ['fossil.amber', '호박', '🟠', 1200],
+  ['fossil.dino-skull', '공룡 머리뼈', '🦖', 6000], ['fossil.fern', '고사리 화석', '🌿', 800], ['fossil.shark-tooth', '상어 이빨', '🦷', 1000],
+  ['fruit.apple', '사과', '🍎', 100], ['fruit.peach', '복숭아', '🍑', 100], ['fruit.pear', '배', '🍐', 100], ['fruit.orange', '귤', '🍊', 100], ['fruit.coconut', '코코넛', '🥥', 250],
+  ['mat.wood', '나무', '🪵', 60], ['mat.stone', '돌', '🪨', 75], ['mat.iron', '철광석', '🔩', 375], ['mat.clay', '점토', '🟤', 100], ['mat.branch', '나뭇가지', '🥢', 5],
+  ['tool.rod', '낚싯대', '🎣', 100, 400], ['tool.net', '잠자리채', '🥅', 100, 400], ['tool.shovel', '삽', '⛏️', 150, 600], ['tool.axe', '도끼', '🪓', 150, 600], ['tool.can', '물뿌리개', '🪣', 120, 500],
+  ['furn.log-chair', '통나무 의자', '🪑', 300, 1200], ['furn.lamp', '램프', '🪔', 400, 1600], ['seed.tulip', '튤립 씨앗', '🌱', 60, 240],
+].map(([id, name, icon, price, buyPrice]) => ({ id, category: id.split('.')[0], name, icon, price, ...(buyPrice ? { buyPrice } : {}) }));
+const RECIPES = [
+  { id: 'furn.log-chair', name: '통나무 의자', materials: [{ id: 'mat.wood', count: 4 }] },
+  { id: 'furn.lamp', name: '램프', materials: [{ id: 'mat.iron', count: 2 }, { id: 'mat.wood', count: 3 }] },
+  { id: 'tool.axe', name: '도끼', materials: [{ id: 'mat.branch', count: 5 }, { id: 'mat.stone', count: 1 }] },
+];
+const STACK = { fruit: 10, mat: 30, seed: 10 };   // 겹쳐 담기는 분류와 한 칸 최대 수
+
+function mockData(ctx) {
+  const { events, state } = ctx;
+  const byId = new Map(ITEMS.map(it => [it.id, it]));
+  const slots = state.inventory;
+  const changed = () => events.emit('inventory:changed', { slots });
+  const inventory = {
+    slots,
+    add(id, n = 1) {
+      const cat = id.split('.')[0], max = STACK[cat] ?? 1;
+      let left = n;
+      for (const s of slots) if (left && s?.id === id && s.count < max) { const k = Math.min(max - s.count, left); s.count += k; left -= k; }
+      for (let i = 0; left && i < slots.length; i++) if (!slots[i]) { const k = Math.min(max, left); slots[i] = { id, count: k }; left -= k; }
+      if (['fish', 'bug'].includes(cat) && left < n && !state.encyclopedia[cat].includes(id)) state.encyclopedia[cat].push(id);
+      if (left < n) changed();
+      return n - left;
+    },
+    remove(i, n = 1) { const s = slots[i]; if (!s) return 0; const k = Math.min(n, s.count); s.count -= k; if (!s.count) slots[i] = null; changed(); return k; },
+    count: id => slots.reduce((a, s) => a + (s?.id === id ? s.count : 0), 0),
+    isFull: () => slots.every(Boolean),
+  };
+  const wallet = {
+    get: () => state.wallet.acorns,
+    add(n) { state.wallet.acorns = Math.max(0, state.wallet.acorns + n); events.emit('wallet:changed', { acorns: state.wallet.acorns }); },
+    spend(n) { if (state.wallet.acorns < n) return false; wallet.add(-n); return true; },
+  };
+  const museum = {
+    has: id => (state.museum[id.split('.')[0]] ?? []).includes(id),
+    donate(id) { const c = id.split('.')[0]; if (!state.museum[c] || museum.has(id)) return false; state.museum[c].push(id); events.emit('museum:changed', { id }); return true; },
+    progress: () => Object.fromEntries(['fish', 'bug', 'fossil'].map(c => [c, [state.museum[c].length, ITEMS.filter(it => it.category === c).length]])),
+  };
+  const recipes = {
+    list: () => RECIPES,
+    canCraft: rid => RECIPES.find(r => r.id === rid)?.materials.every(m => inventory.count(m.id) >= m.count) ?? false,
+    craft: () => false,
+  };
+  const save = {
+    save() { let ok = true; try { localStorage.setItem('island-life-ui-demo', JSON.stringify(state)); } catch { ok = false; } events.emit('save:done', { ok }); return ok; },
+    load: () => false, reset() {},
+  };
+  return { items: { get: id => byId.get(id) ?? null, list: c => ITEMS.filter(it => it.category === c) }, spawns: {}, inventory, wallet, museum, recipes, save, day: { key: () => '', check: () => false } };
+}
+
+// ---------- 가짜 시계 (sky 대신) ----------
+function mockTime(ctx) {
+  const PARTS = constants.DAY_PARTS;
+  let mode = 'real', offset = 0, gameMs = Date.now(), weather = 'clear', lastMin = -1, lastPart = null;
+  const partOf = hr => (PARTS.find(p => (hr >= p.from && hr < p.to) || (hr + 24 >= p.from && hr + 24 < p.to)) ?? PARTS[3]).id;
+  const api = {
+    get mode() { return mode; },
+    get weather() { return weather; },
+    nightFactor: 0,
+    now() {
+      const d = new Date(gameMs), hour = d.getHours(), part = partOf(hour);
+      return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate(), hour, minute: d.getMinutes(), weekday: d.getDay(),
+        season: constants.seasonOf(d.getMonth() + 1), part, isNight: part === 'night', dayKey: d.toISOString().slice(0, 10) };
+    },
+    setMode(m) { if (m === 'real') offset = gameMs - Date.now(); mode = m; ctx.state.time.mode = m; },
+    setWeather(w) { weather = w; ctx.events.emit('weather:change', { weather: w }); },
+    skip(ms) { if (mode === 'real') offset += ms; else gameMs += ms; },
+    update(dt) {
+      gameMs = mode === 'fast' ? gameMs + dt * 60000 : Date.now() + offset;
+      const now = api.now();
+      if (now.minute !== lastMin) { lastMin = now.minute; ctx.events.emit('time:tick', { now }); }
+      if (now.part !== lastPart) { if (lastPart) ctx.events.emit('time:part', { part: now.part }); lastPart = now.part; }
+    },
+    seasonPalette: () => ({}),
+  };
+  return api;
+}
+
+// ---------- 가짜 섬 (world 대신): 북쪽 언덕, 강, 광장, 길, 선착장 ----------
+function mockWorld() {
+  const W = constants.ISLAND.w, H = constants.ISLAND.h;
+  const T = new Array(W * H).fill('sea'), L = new Uint8Array(W * H);
+  const idx = (x, z) => z * W + x, inside = (x, z) => x >= 0 && z >= 0 && x < W && z < H;
+  const set = (x, z, t) => { if (inside(x, z)) T[idx(x, z)] = t; };
+  for (let z = 0; z < H; z++) for (let x = 0; x < W; x++) {
+    const dx = (x + 0.5 - W / 2) / (W * 0.45), dz = (z + 0.5 - H / 2) / (H * 0.45);
+    const r = Math.hypot(dx, dz) + 0.045 * (Math.sin(x * 0.45 + z * 0.2) + Math.sin(z * 0.37 - x * 0.15));
+    T[idx(x, z)] = r > 1 ? 'sea' : r > 0.89 ? 'sand' : 'grass';
+    if (T[idx(x, z)] === 'grass' && z < H * 0.36 + 2 * Math.sin(x * 0.28)) L[idx(x, z)] = 1;
+  }
+  // 언덕 가장자리 = 절벽, 세 곳은 경사로
+  const ramps = [[21, 0], [33, 0], [45, 0]];
+  for (let z = 1; z < H - 1; z++) for (let x = 1; x < W - 1; x++) {
+    if (!L[idx(x, z)]) continue;
+    const edge = [[0, 1], [1, 0], [-1, 0]].some(([a, b]) => !L[idx(x + a, z + b)] && T[idx(x + a, z + b)] === 'grass');
+    if (edge) T[idx(x, z)] = 'cliff';
+  }
+  for (const r of ramps) { for (let z = H - 1; z > 0; z--) if (T[idx(r[0], z)] === 'cliff') { T[idx(r[0], z)] = 'ramp'; T[idx(r[0], z + 1)] = 'ramp'; break; } }
+  const line = (pts, t, wide = 0) => {
+    for (let i = 1; i < pts.length; i++) {
+      const [ax, az] = pts[i - 1], [bx, bz] = pts[i], n = Math.max(Math.abs(bx - ax), Math.abs(bz - az)) * 2;
+      for (let k = 0; k <= n; k++) {
+        const x = Math.round(ax + ((bx - ax) * k) / n), z = Math.round(az + ((bz - az) * k) / n);
+        for (let a = -wide; a <= wide; a++) for (let b = -wide; b <= wide; b++) if (inside(x + a, z + b) && T[idx(x + a, z + b)] !== 'sea') set(x + a, z + b, t);
+      }
+    }
+  };
+  // 연못·강
+  for (let z = 6; z < 13; z++) for (let x = 32; x < 41; x++) if (((x - 36) / 4) ** 2 + ((z - 9) / 2.6) ** 2 < 1) set(x, z, 'water');
+  line([[36, 11], [35, 18], [37, 25], [36, 30], [40, 37], [45, 44], [48, 52]], 'water', 1);
+  // 광장과 길 (강 건너는 곳은 다리)
+  for (let z = 26; z < 35; z++) for (let x = 19; x < 30; x++) if (((x - 24) / 4.2) ** 2 + ((z - 30) / 3.6) ** 2 < 1) set(x, z, 'plaza');
+  line([[28, 30], [46, 30]], 'path'); line([[25, 34], [29, 46], [30, 50]], 'path'); line([[22, 27], [21, 22], [21, 17]], 'path'); line([[20, 32], [17, 39]], 'path');
+  for (let z = 49; z < 55; z++) set(30, z, 'path');   // 선착장 다리
+  const at = (x, z) => (inside(x, z) ? T[idx(x, z)] : 'sea');
+  const island = {
+    w: W, h: H,
+    tileAt: at,
+    levelAt: (x, z) => (inside(x, z) ? L[idx(x, z)] : 0),
+    toTile: (x, z) => ({ tx: Math.floor(x + W / 2), tz: Math.floor(z + H / 2) }),
+    toWorld: (tx, tz) => ({ x: tx - W / 2 + 0.5, z: tz - H / 2 + 0.5 }),
+    heightAt: () => 0,
+    isWater: (x, z) => { const t = island.toTile(x, z); return ['sea', 'water'].includes(at(t.tx, t.tz)); },
+    isWalkable: (x, z) => !island.isWater(x, z),
+  };
+  const P = (tx, tz) => island.toWorld(tx, tz);
+  const places = {
+    spawn: P(30, 50), plaza: P(24, 30), shop: P(46, 29), museum: P(21, 14), dock: P(30, 53), playerHouse: P(16, 41),
+    villagerHouses: [['coco', 13, 28], ['bori', 15, 33], ['mochi', 27, 40], ['dubu', 33, 42], ['pong', 47, 22], ['chorong', 51, 26]].map(([slug, x, z]) => ({ slug, ...P(x, z) })),
+  };
+  return { island, places, objects: { query: () => [] }, setSeason() {} };
+}
+
+// ---------- 가짜 플레이어 ----------
+function mockPlayer(ctx, world) {
+  const p = {
+    position: { ...world.places.plaza }, facing: 0, tool: null,
+    setTool(id) { p.tool = id ?? null; ctx.state.player.tool = p.tool; ctx.events.emit('player:tool', { tool: p.tool }); },
+    play() {}, freeze() {},
+  };
+  return p;
+}
+
+// ---------- ctx ----------
+const events = createEvents();
+const state = createState();
+const uiRoot = document.getElementById('ui');
+const ctx = { events, state, input: createInput(events, { touchRoot: uiRoot }), constants, uiRoot, services: {}, debug: true };
+window.__island = ctx;
+state.wallet.acorns = 12340;
+state.museum = { fish: ['fish.carp', 'fish.goldfish'], bug: ['bug.ant'], fossil: ['fossil.trilobite'] };
+state.encyclopedia = { fish: ['fish.crucian', 'fish.carp', 'fish.goldfish', 'fish.squid', 'fish.sea-bass'], bug: ['bug.cabbage-white', 'bug.ladybug', 'bug.ant', 'bug.cricket'] };
+ctx.services.data = mockData(ctx);
+const time = ctx.services.time = mockTime(ctx);
+const world = ctx.services.world = mockWorld();
+const player = ctx.services.player = mockPlayer(ctx, world);
+for (const [id, n] of [['fish.crucian', 1], ['bug.cabbage-white', 1], ['fruit.peach', 3], ['mat.wood', 12], ['mat.stone', 5], ['fossil.ammonite', 1],
+  ['fish.carp', 1], ['bug.ladybug', 1], ['fruit.apple', 6], ['tool.rod', 1], ['fish.squid', 1], ['mat.branch', 8]]) ctx.services.data.inventory.add(id, n);
+time.update(0);
+
+await ui.init(ctx);
+const UI = ctx.services.ui;
+
+// ---------- 기록 ----------
+const logEl = document.getElementById('log');
+const log = (name, payload) => {
+  const li = document.createElement('li');
+  li.textContent = `${name} ${payload === undefined ? '' : JSON.stringify(payload)}`.slice(0, 160);
+  logEl.prepend(li);
+  while (logEl.children.length > 40) logEl.lastChild.remove();
+};
+for (const n of ['ui:open', 'ui:close', 'dialog:line', 'settings:changed', 'sfx', 'save:done', 'museum:changed', 'player:tool', 'weather:change'])
+  events.on(n, p => log(n, n === 'settings:changed' ? { key: p.key, value: p.value } : p));
+events.on('input:press', p => log('input:press', p));
+
+// ---------- 대화 ----------
+const TALK = {
+  coco: { speaker: '코코', voice: 'coco', color: '#F2B36B', lines: ['오늘 바람 진짜 시원하다냥~', '강가에서 큰 그림자 봤어? 나 아까 엄청 큰 걸 놓쳤다냥!', '다음엔 꼭 잡을 거다냥. 같이 가 줄래?'], choices: ['좋아, 같이 가자!', '나중에 갈게', '무슨 그림자였어?'] },
+  bori: { speaker: '보리', voice: 'bori', color: '#6CA0DC', lines: ['멍! 안녕! 오늘 날씨 좋지?', '광장 쪽에 꽃이 잔뜩 피었더라. 이따 같이 보러 가자!'] },
+  bamtol: { speaker: '밤톨', voice: 'bamtol', color: '#C7743E', lines: ['어서 와요, 도토리상점이에요!', '오늘은 뭘 도와줄까요?'], choices: ['물건 살래요', '물건 팔래요', '그냥 구경만'] },
+  neuru: { speaker: '느루', voice: 'neuru', color: '#7A9A5A', lines: ['어서 오게나. 섬의 박물관이라네.', '기증할 것이 있다면 천천히 보여 주게.'] },
+};
+const STOCK = ['tool.rod', 'tool.net', 'tool.shovel', 'tool.axe', 'tool.can', 'furn.log-chair', 'furn.lamp', 'seed.tulip'];
+async function talk(who) {
+  const r = await UI.dialog.open(TALK[who]);
+  log(`→ dialog 결과`, r);
+  if (who === 'bamtol' && r != null && r < 2) UI.shop.open({ stock: STOCK, tab: r === 1 ? 'sell' : 'buy' });
+  if (who === 'neuru') UI.museum.open();
+  if (who === 'coco' && r === 2) UI.dialog.open({ ...TALK.coco, lines: ['몰라! 엄청 길쭉하고 반짝였다냥… 상어였을까?'], choices: undefined });
+}
+// 행동 키(Space/Enter, 휴대폰 A): 창이 없을 때 주민과 차례로 이야기
+const order = ['coco', 'bori', 'bamtol', 'neuru'];
+let talkI = 0;
+events.on('input:press', ({ intent }) => {
+  if (UI.isBlocking() || !ctx.input.enabled) return;
+  const tools = [null, ...constants.TOOLS];
+  if (intent === 'action') talk(order[talkI++ % order.length]);
+  else if (intent === 'toolNext' || intent === 'toolPrev') player.setTool(tools[(tools.indexOf(player.tool) + (intent === 'toolNext' ? 1 : tools.length - 1)) % tools.length]);
+  else if (/^tool[1-5]$/.test(intent)) player.setTool(constants.TOOLS[Number(intent.slice(4)) - 1]);
+  else if (intent === 'toolNone') player.setTool(null);
+  else if (intent === 'pickup') pickup();
+});
+function pickup() {
+  const pool = ITEMS.filter(it => !['tool', 'furn', 'seed'].includes(it.category));
+  const it = pool[Math.floor(Math.random() * pool.length)];
+  if (ctx.services.data.inventory.add(it.id, 1)) { UI.toast(`${it.name} 주웠어요!`, it.icon); events.emit('sfx', { name: 'pickup' }); }
+  else UI.toast('가방이 꽉 찼어요', '🎒');
+}
+
+// ---------- 조작판 ----------
+const WX = ['clear', 'cloudy', 'rain', 'snow', 'rainbow'];
+const ACT = {
+  'talk-coco': () => talk('coco'), 'talk-bori': () => talk('bori'), 'talk-bamtol': () => talk('bamtol'), 'talk-neuru': () => talk('neuru'),
+  'bag-view': async () => log('→ bag(view)', await UI.bag.open({ mode: 'view' })),
+  'bag-sell': async () => log('→ bag(sell)', await UI.bag.open({ mode: 'sell' })),
+  'bag-donate': async () => log('→ bag(donate)', await UI.bag.open({ mode: 'donate' })),
+  'bag-pick': async () => log('→ bag(pick)', await UI.bag.open({ mode: 'pick' })),
+  phone: () => UI.phone.open(), map: () => UI.map.open(), shop: () => UI.shop.open({ stock: STOCK }), museum: () => UI.museum.open(),
+  confirm: async () => log('→ confirm', await UI.confirm({ title: '확인', icon: '🌙', text: '오늘은 이만 잘까요?', buttons: [{ label: '잘래요', value: 'sleep', primary: true }, { label: '조금 더 놀래요', value: 'play' }] })),
+  'acorn+': () => ctx.services.data.wallet.add(500), 'acorn-': () => ctx.services.data.wallet.spend(300) || UI.toast('도토리가 모자라요', '🌰'),
+  hour: () => { time.skip(3600000); time.update(0); },
+  weather: () => time.setWeather(WX[(WX.indexOf(time.weather) + 1) % WX.length]),
+  tool: () => ctx.input.press('toolNext'), pickup,
+  toast: () => UI.toast('오늘의 날씨는 맑음이에요', '☀️'),
+  toast5: () => ['잉어를 잡았어요!', '나뭇가지 주웠어요', '사과가 떨어졌어요', '새 레시피를 배웠어요', '편지가 왔어요'].forEach((t, i) => events.emit('toast', { text: t, icon: ['🐟', '🥢', '🍎', '🔨', '✉️'][i] })),
+  hud: (() => { let on = true; return () => UI.hud.show((on = !on)); })(),
+};
+document.querySelector('.demo').addEventListener('click', e => { const b = e.target.closest('[data-do]'); if (b) ACT[b.dataset.do]?.(); });
+if (innerWidth < 700) document.querySelector('.demo').open = false;
+
+// ---------- 매 프레임 ----------
+const me = document.querySelector('.demo-me'), stateEl = document.getElementById('state');
+let last = performance.now(), lastTile = '';
+function frame(t) {
+  const dt = Math.min((t - last) / 1000, 0.05); last = t;
+  ctx.input.update();
+  time.update(dt);
+  const { x, z } = ctx.input.move;
+  if (x || z) {
+    const sp = ctx.input.run ? 7 : 4, pos = player.position;
+    const nx = pos.x + x * sp * dt, nz = pos.z + z * sp * dt;
+    if (world.island.isWalkable(nx, nz)) { pos.x = nx; pos.z = nz; }
+    player.facing = Math.atan2(-x, -z);
+    const tl = world.island.toTile(pos.x, pos.z), key = `${tl.tx},${tl.tz}`;
+    if (key !== lastTile) { lastTile = key; events.emit('player:moved', { x: pos.x, z: pos.z, ...tl }); }
+  }
+  me.style.transform = `translate(-50%, -50%) translate(${(x * 6).toFixed(1)}px, ${(z * 6).toFixed(1)}px)`;
+  ui.update(dt, ctx);
+  const tl = world.island.toTile(player.position.x, player.position.z);
+  stateEl.textContent = `input.enabled: ${ctx.input.enabled} · isBlocking: ${UI.isBlocking()} · 칸 ${tl.tx},${tl.tz} · 터치: ${ctx.input.touch}`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
