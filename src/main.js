@@ -25,9 +25,11 @@ const params = new URLSearchParams(location.search);
 async function boot() {
   const canvas = document.getElementById('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  // 품질: 휴대폰(터치 기기)이나 ?quality=low 면 해상도·그림자를 낮춘다 (그림자가 프레임 시간의 절반쯤 든다)
+  const quality = params.get('quality') ?? (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
+  renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.5 : 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = quality === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#BFE6F7');
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 300);
@@ -39,7 +41,7 @@ async function boot() {
   const sun = new THREE.DirectionalLight(0xffffff, 2.3);
   sun.position.set(-8, 16, 10);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.setScalar(quality === 'low' ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
   sun.shadow.bias = -0.0008;
   scene.add(hemi, sun, sun.target);
@@ -55,8 +57,16 @@ async function boot() {
     services: {},                       // 모듈이 서로에게 주는 기능: data, time, world, player, ui, audio ...
     focus: new THREE.Vector3(),         // 카메라가 따라가는 지점 (보통 플레이어). 곡면 월드 중심이기도 하다.
     debug: params.has('debug'),
+    quality,                            // 'high' | 'low'
   };
   window.__island = ctx;                // 개발용: 콘솔에서 상태 확인
+
+  // 섬폰 설정의 외곽선 켜기/끄기: 외곽선 메시는 모두 userData.outline 표시가 있다 (core·world·player 공통)
+  events.on('settings:changed', ({ key }) => {
+    if (key !== 'outline') return;
+    const on = ctx.state.settings.outline !== false;
+    scene.traverse(o => { if (o.userData.outline) o.visible = on; });
+  });
 
   const loaded = [];
   for (const [name, path] of MODULES) {

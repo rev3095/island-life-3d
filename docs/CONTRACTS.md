@@ -119,7 +119,9 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 
 | 이벤트 | 보내는 쪽 | 내용 |
 |---|---|---|
-| `input:press` | core | `{intent}` action, pickup, toolPrev, toolNext, tool1~5, toolNone, bag, phone, map |
+| `input:press` | core | `{intent}` action, pickup, toolPrev, toolNext, tool1~5, toolNone, bag, phone, map. **처리 전에 `ctx.services.ui?.isBlocking()` 확인 — 창이 열려 있으면 무시** |
+| `settings:changed` | ui | `{key, value, settings}` 소리 크기·외곽선·키 안내를 바꿨을 때 |
+| `data:newday` / `data:loaded` / `encyclopedia:changed` | data | 하루 리셋 **뒤** `{dayKey, prev, days, regrown, fossils, shells, weeds}` / 저장 불러온 뒤 / 처음 잡은 물고기·곤충 `{id}` |
 | `game:ready` | core | `{modules}` |
 | `time:tick` / `time:newday` / `time:part` / `weather:change` | sky | 위 참고 |
 | `world:ready` | world | `{island}` |
@@ -145,3 +147,57 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - 캐릭터: `assets/models/index.json`, 스펙 `assets/specs/<slug>.json`, 동작 `idle/walk/run/happy`. 정면 = -Y(블렌더) = +Z(three). 키 ≈ 1.0.
 - 배경: `assets/env/index.json`, 스펙 `assets/env/specs/<slug>.json` (`footprint`, `variants`, `animations: sway|shake|flicker`, `style.flat`).
 - 타일 모델(`tile-grass` 등)은 1×1, 윗면 높이 0 (절벽은 윗면 1.0, 경사로는 1×2).
+
+---
+
+## 1차 합친 뒤 추가된 약속 (2026-10-28)
+
+1차 다섯 트랙이 만들면서 정한 것들이다 (자세한 배경: `docs/notes/*.md`). 위 내용과 다르면 **이 절이 우선**한다.
+
+### 공통
+- **방향**: `player.facing` 은 three 의 `rotation.y` 와 같은 뜻. 0 = 북쪽(-Z), +π/2 = 서쪽(-X), -π/2 = 동쪽. 모델(정면 +Z)은 `rotation.y = facing + π`.
+- **요일**: `now().weekday` 는 JS `Date.getDay()` 처럼 0 = 일요일.
+- **하루 경계**: 새벽 05:00 에 `dayKey` 가 바뀐다 (time 이 정하고 data 도 같은 규칙을 쓴다).
+- **창이 열린 동안의 입력**: ui 가 키 입력을 먼저 받아 막는다. 휴대폰 A/B 는 `input:press` 로 오므로 **gameplay·player 는 처리 전에 `ui.isBlocking()` 을 꼭 확인**한다. `isBlocking()` 은 마지막 창을 닫은 그 입력이 끝날 때까지 true 다 (A 한 번에 대화가 닫히고 다음 대화가 열리는 일 방지).
+- **재질 이름** (world·sky 가 같이 쓴다): 밤에 켜지는 것 `glow`(등불)·`window`(창유리), 빛무리 `glow`·`flame`, 비에 젖는 땅 `ground grass grassDark path dirt sand sandDark stone stoneLight grout pebble cliff cliffDark`. world 가 합친 땅 타일 재질 이름은 `ground`. 새 재질을 만들 때 이 이름을 지킨다.
+- **시작 알림**: `game:ready` 때 sky 가 `time:tick`, `time:part {initial: true}`, `weather:change {initial: true}` 를 한 번 보낸다 (ui 시계·audio 배경음의 첫 상태). `time:newday` 는 시작 때 보내지 않는다.
+
+### data 추가
+- `collect(id, n) → {added, left, acorns}`: 주운 것을 챙길 때 **`inventory.add` 대신 이것**을 쓴다 (도토리 주머니는 지갑으로, 물고기·곤충은 도감 기록).
+- `harvest`: `shakeTree(treeId, kind, opts)`, `chopTree`, `hitRock(rockId)`, `digFossil(spotKey)`, `pickShell(spotKey)`, `shellAt`, `pullWeed()`, `fruitReady(treeId)`, `today()`. id 는 `world.objects.query` 의 id 를 그대로 쓴다.
+- `economy`: `sellPrice(id)`, `buyPrice(id)`, `stock()` (→ `ui.shop.open({stock})`), `sell(slot, n)`, `buy(id, n) → 'ok'|'money'|'full'|'none'`, `isOpen(hour)`, `nativeFruit()` (섬 특산 과일, world 가 과일나무 색에 쓴다).
+- `inventory`: `useTool(id) → {ok, uses, broken}`, `hasTool`, `findTool`, `canFit`, `move`, `removeId`, `countCategory`, `batch`. 도구 칸은 `{ id, count: 1, uses }`.
+- `museum`: `record(id)`, `caught(id)`, `canDonate(id)`, `list(cat)`, `progress()` 에 `total`, `complete`. `recipes.missing(id)`, `recipes.get(id)` (레시피 id = 만들어지는 아이템 id).
+- `day.pickSpots(candidates, n, salt)`, `day.daily()`, `day.rng(...salt)`.
+- 아이템: 카테고리 `seed` 추가 (`seed.tulip`, `seed.sapling` …). 가격은 `price` = 상점이 사 주는 값(판매가), `buyPrice` = 상점에서 살 때 값. 레시피 모양 `{ id, materials: [{ id, count }] }`.
+- spawns: `fish` habitat 에 `mouth`(하구), `bug` place 에 `shake`(나무 흔들기 벌), place 는 배열도 받는다. `rock(rng, hits)` 는 오늘 친 횟수가 6 이상이면 `null`. `treeShake` 결과의 `event: 'bees'` = 벌떼. `weather: 'rainbow'` 는 맑음처럼 다룬다.
+- 더 새 버전의 저장이 있으면 불러오지도 덮어쓰지도 않는다 (`save.blocked`) — 안내는 ui 가 띄운다.
+
+### world · player 추가
+- **도구 숫자키**(tool1~5, toolPrev/Next/None)는 지금 player 가 처리한다. gameplay 가 가방에 있는 도구만 들게 하려면 `player.toolKeys = false` 로 끄고 직접 `setTool` 을 부른다.
+- 상태: `state.island.variants` (`{물체id: 변형}`), `added` 행 `{ id, kind, tx, tz, data:{rot, scale, variant, …} }`, `removed` 는 id 목록.
+- `objects.setVariant(id, 'picked')` = 열매를 딴 과일나무 모습, `setVariant(id, null)` 로 되돌린다.
+- **하루 리셋 연결(2차)**: world 는 `time:newday` 가 아니라 **`data:newday`** 를 듣고 `spawnTiles('shell'|'weed'|'fossil-spot')` 후보를 `data.day.pickSpots` 로 골라 `objects.add/remove` 한다.
+- `world.setSeason(season)` 은 여러 번 불려도 괜찮다 (같은 계절이면 무시). `time.seasonPalette(season).variants` (`{tree:'autumn', 'tile-grass':'autumn', ...}`) 를 그대로 써도 된다.
+
+### ui 추가
+- `ui.confirm({ title, text, icon, buttons:[{label, value, primary}], cancelValue }) → Promise<value>` (브라우저 `confirm()` 금지).
+- 선택 인자: `bag.open({ mode, title?, hint?, filter?(slot, info) → bool })`, `shop.open({ stock, tab?, title?, keeper?, color? })`, `museum.open({ title?, keeper?, color? })`.
+- 아이템 `icon` 은 이모지 또는 그림 경로(`.svg/.png/.webp/.jpg`).
+- 상태: `state.settings.keyHint` (키 안내 보이기, H 키·설정). 설정을 바꾸면 `settings:changed` 를 보내고 소리는 `audio.setVolume` 도 직접 부른다.
+
+### audio 추가
+- `bgm(name)` = 그 곡으로 고정, **`bgm('auto')`** = 자동 선곡(시각·비)으로, **`bgm(null)`** = 끄기. 우선순위: 열린 상점·박물관 창 > 고른 곡 > 자동. 집에 들어갈 때 `bgm('indoor')`, 나올 때 `bgm('auto')`.
+- `sfx` 이벤트 내용: `{ name, volume?, pitch?, pan?, delay? }`.
+- `speak(text, voice) → Promise<boolean>` (끝까지 말하면 true, 끊기면 false). 소리가 잠겨 있어도 같은 시간 뒤에 끝난다. `dialog:line` 에 `voice` 가 없으면 조용히 넘어간다.
+- `setVolume(kind, v)` 는 `state.settings[kind]` 에도 적는다.
+
+### time 추가
+- `now()` 에 `hourF`(소수 시각), `ms`, `weekdayName`('일'~'토'). 돌려주는 객체는 얼려 있다 — 복사해서 쓴다.
+- 개발용: `forecast(dayKey?)`, `setHour(hh)`, `setPaused(bool)`, `setWeather(w, {instant})` (강제 날씨는 다음 날 5시에 풀림), `setSeasonOverride(season|null)`.
+
+### 2차에서 정할 것
+- **실내 장면(P4)**: 집 안에선 비·눈·구름을 끄고 조명을 실내용으로 — `time.setIndoor(bool)` 또는 `scene:indoor {on}` 이벤트 중 하나로 정한다.
+- ~~외곽선 설정~~ → `main.js` 가 `settings:changed {key:'outline'}` 를 듣고 `userData.outline` 메시를 모두 켜고 끈다. 외곽선 메시를 새로 만들 땐 `userData.outline = true` 를 꼭 붙인다.
+- `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다.
+- **카메라와 하늘**: 기본 카메라에서 하늘이 잘 안 보여 구름·별·무지개가 묻힌다 — 화면 위쪽에 하늘 띠를 조금 남기는 쪽으로 조정.
