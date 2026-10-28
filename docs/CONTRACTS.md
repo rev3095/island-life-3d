@@ -218,9 +218,57 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 
 ---
 
-## 2차 W2 (town) 에서 정한 것
+## 2차 W1 채집에서 추가된 약속 (2026-10-29)
 
-`src/gameplay/town/` 의 약속 (자세한 배경: `docs/notes/town.md`).
+자세한 배경: `docs/notes/gather.md`. 위 내용과 다르면 이 절이 우선한다.
+
+### 행동 키
+- 채집이 쓰는 우선순위: **진행 중 막기 200** (`gather-busy`: 도구 동작·잡은 것 들어 보이기·낚시 중에는 Space/F 를 여기서 먹는다 — 낚시 중 Space = 찌 당기기), 나무 흔들기 60, 줍기 50, 심기 45, 도구 쓰기 10.
+- 숫자키 1~5·Q/E·0 은 gather 가 받는다 (`player.toolKeys = false`). 가방에 없는 도구는 들 수 없다.
+
+### player 추가
+```js
+act(name, { onHit, speed = 1, lock = true }) → Promise<bool>   // 'swing'|'cast'|'reel'|'dig'|'chop'|'water'|'shake'|'pickup'|'ouch'
+hold('fish' | null),  acting → 동작 이름 | null                  // 'cast' 는 끝나면 저절로 'fish' 자세
+toolModel() → Group | null (userData.tip, userData.bobber),  toolTip(out) → Vector3,  headTop(out) → Vector3
+```
+- `act` 중에는 플레이어가 움직이지 않는다. 다른 트랙(주민·집)도 같은 동작을 써도 된다.
+
+### world 추가
+```js
+world.daily: { layout(), spotOf(id) → { kind, key }, take(id), holes(), addHole(tx, tz), removeHole(tx, tz) }
+world.palette(kind, variant?) → { 재질이름: 색 }   // 배경 스펙 팔레트 + 변형 + 계절
+objects.update(id, { scale, data }) → bool          // 크기(충돌체도 같이)·data 바꾸기. data 값이 undefined 면 그 칸을 뺀다
+objects.query(...) 결과에 scale 추가
+```
+- 이벤트 `world:daily {dayKey, shells, weeds, fossils}` — 오늘 조개·잡초·화석 자리를 놓은 뒤 (game:ready·data:newday 때).
+- 심은 것: `objects.add(kind, tx, tz, { grow: { stage, max } })` 인 물체는 새 날마다 한 단계 자란다 (다 자라면 `grow` 가 빠진다). 덜 자란 나무는 흔들기·도끼·열매가 없다.
+
+### 상태
+| 칸 | 주인 | 내용 |
+|---|---|---|
+| `island.spots` | world | `{ dayKey, shell:['tx,tz'], weed, 'fossil-spot', holes }` 오늘 놓은 자리·판 구덩이 |
+| `island.drops` | gather | `[{ item, count, x, z, rot }]` 땅에 떨어진 물건 |
+| `island.watered` | gather | `{ dayKey, ids:[물체id] }` 오늘 물 준 꽃 |
+| `flags.gatherStarterTools` | gather | 첫 시작 도구를 줬음 |
+
+### 이벤트
+| 이벤트 | 보내는 쪽 | 내용 |
+|---|---|---|
+| `world:daily` | world | 위 참고 |
+| `gather:watered` | gather | `{ids}` 물 준 꽃 |
+| `gather:bloom` | gather | `{ids}` 새 날 물 준 꽃 옆에 새로 핀 꽃 |
+| `gather:planted` | gather | `{id, item}` 구덩이에 심음 |
+
+### 재질 (W4 셰이더와 맞출 것)
+- gather 메시: `toonMaterial('#ffffff', { name: 'gather' | 'gather-flat' })` 에 `vertexColors = true` 를 켠 공용 재질 + `outlineMaterial(0.0035~0.005)`. 떨어진 물건은 `InstancedMesh`.
+- 투명: `fishShadow`(opacity 0.42, depthWrite false), `fx-ring`, `fireflyGlow`. 곤충 날개는 `side = DoubleSide`. 낚싯줄은 `THREE.Line` + `toonMaterial(flat)`.
+
+---
+
+## 2차 W2 주민에서 추가된 약속 (2026-10-29)
+
+자세한 배경: `docs/notes/town.md`. 위 내용과 다르면 이 절이 우선한다.
 
 ### 행동 키
 | 이름 | 우선순위 | 언제 |

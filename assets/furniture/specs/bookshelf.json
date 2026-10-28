@@ -1,0 +1,71 @@
+{
+  "id": "FU-09",
+  "slug": "bookshelf",
+  "item": "furn.bookshelf",
+  "name": "책장",
+  "category": "furniture",
+  "kind": "bookshelf",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "세 칸짜리 나무 책장. 알록달록한 책이 꽂혀 있고 몇 권은 기울어져 있다.",
+    "keywords": [
+      "세 칸",
+      "알록달록 책",
+      "기울어진 책"
+    ],
+    "references": [
+      "동네 도서관 책장"
+    ],
+    "avoid": [
+      "텅 빈 선반"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "seed": {
+      "label": "책 꽂힘 번호",
+      "value": 4,
+      "min": 1,
+      "max": 9,
+      "step": 1
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "woodDark": "#8C6440",
+    "bookRed": "#E8726A",
+    "bookBlue": "#6CA0DC",
+    "bookGreen": "#7FBF5E",
+    "bookYellow": "#F6C84C",
+    "bookPink": "#F4A6C0"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "뒤판·받침",
+    "bookRed": "책 빨강",
+    "bookBlue": "책 파랑",
+    "bookGreen": "책 초록",
+    "bookYellow": "책 노랑",
+    "bookPink": "책 분홍"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -52,12 +52,13 @@ export function createObjects(ctx, island, kit, models, collision) {
     templates.set(key, tpl);
     return tpl;
   }
-  // 열매를 딴 과일나무('picked')처럼 일부 재질을 빼는 변형
+  // 열매를 딴 과일나무·야자수('picked')처럼 일부 재질을 빼는 변형
+  const PICKED = { 'fruit-tree': 'fruit', palm: 'coconut' };
   function prune(gltf, kind, variant) {
-    if (!(kind === 'fruit-tree' && variant === 'picked')) return gltf;
+    if (!(PICKED[kind] && variant === 'picked')) return gltf;
     const scene = gltf.scene.clone(true);
     const drop = [];
-    scene.traverse(o => { if (o.isMesh && o.material.name === 'fruit') drop.push(o); });
+    scene.traverse(o => { if (o.isMesh && o.material.name === PICKED[kind]) drop.push(o); });
     for (const o of drop) o.parent.remove(o);
     return { scene, animations: gltf.animations };
   }
@@ -142,7 +143,7 @@ export function createObjects(ctx, island, kit, models, collision) {
     byId.delete(o.id);
   }
 
-  const publicOf = o => ({ id: o.id, kind: o.kind, x: o.x, z: o.z, y: o.y, tile: { tx: o.tx, tz: o.tz }, variant: o.variant, data: o.data });
+  const publicOf = o => ({ id: o.id, kind: o.kind, x: o.x, z: o.z, y: o.y, tile: { tx: o.tx, tz: o.tz }, variant: o.variant, scale: o.scale, data: o.data });
 
   const api = {
     /** (x, z) 에서 radius 안의 물체. 여러 칸 물체는 가장 가까운 테두리까지 거리로 잰다. */
@@ -207,6 +208,23 @@ export function createObjects(ctx, island, kit, models, collision) {
       const a = state.island.added.find(x => x.id === id);
       if (a) a.data.variant = variant;
       else if (o.generated) (state.island.variants ??= {})[id] = variant;
+      return true;
+    },
+    /** 크기·data 바꾸기 (심은 나무가 자랄 때). data 의 값을 undefined 로 주면 그 칸을 뺀다 */
+    update(id, { scale, data } = {}) {
+      const o = byId.get(id);
+      if (!o) return false;
+      if (scale != null && scale !== o.scale) {
+        undraw(o);
+        for (const c of o.colliders) collision.remove(c);
+        o.scale = scale;
+        o.colliders = collidersOf(o).map(collision.add);
+        draw(o);
+      }
+      const merge = (dst, src) => { for (const [k, v] of Object.entries(src)) { if (v === undefined) delete dst[k]; else dst[k] = v; } };
+      if (data) merge(o.data, data);
+      const a = state.island.added.find(x => x.id === id);
+      if (a) { if (scale != null) a.data.scale = scale; if (data) merge(a.data, data); }
       return true;
     },
     /** 흔들기 연출 (나무·덤불). P2 채집에서 쓴다 */

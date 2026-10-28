@@ -1,0 +1,54 @@
+{
+  "id": "FU-16",
+  "slug": "picture-frame",
+  "item": "furn.picture-frame",
+  "name": "액자",
+  "category": "furniture",
+  "kind": "picture-frame",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2004,
+  "parts": 1,
+  "materials": [
+    "canvasCloud",
+    "canvasHill",
+    "canvasHill2",
+    "canvasSky",
+    "canvasSun",
+    "frame",
+    "string"
+  ],
+  "objects": [
+    "frame"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.06,
+    1.99
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -0.07,
+      1.18
+    ],
+    [
+      0.42,
+      -0.006,
+      1.994
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 42460,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "picture-frame_front.png",
+    "picture-frame_main.png",
+    "picture-frame_thumb.png",
+    "picture-frame_top.png"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "FU-07",
+  "slug": "plant-pot",
+  "item": "furn.plant-pot",
+  "name": "화분",
+  "category": "furniture",
+  "kind": "plant-pot",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2200,
+  "parts": 2,
+  "materials": [
+    "leaf",
+    "leafLight",
+    "pot",
+    "potDark",
+    "soil"
+  ],
+  "objects": [
+    "plant",
+    "pot"
+  ],
+  "animations": {},
+  "size": [
+    0.58,
+    0.89,
+    0.99
+  ],
+  "bounds": [
+    [
+      -0.302,
+      -0.432,
+      0.0
+    ],
+    [
+      0.275,
+      0.458,
+      0.985
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 43648,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "plant-pot_front.png",
+    "plant-pot_main.png",
+    "plant-pot_thumb.png",
+    "plant-pot_top.png",
+    "plant-pot_variants.png"
+  ]
+}

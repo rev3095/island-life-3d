@@ -1,0 +1,53 @@
+{
+  "id": "FU-19",
+  "slug": "fruit-chair",
+  "item": "furn.fruit-chair",
+  "name": "과일 의자",
+  "category": "furniture",
+  "kind": "fruit-chair",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2388,
+  "parts": 1,
+  "materials": [
+    "flesh",
+    "fruit",
+    "leaf",
+    "seed",
+    "stem"
+  ],
+  "objects": [
+    "chair"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.84,
+    1.02
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -0.42,
+      0.0
+    ],
+    [
+      0.42,
+      0.42,
+      1.024
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 48276,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-chair_front.png",
+    "fruit-chair_main.png",
+    "fruit-chair_thumb.png",
+    "fruit-chair_top.png",
+    "fruit-chair_variants.png"
+  ]
+}

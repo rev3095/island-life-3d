@@ -1,0 +1,50 @@
+{
+  "id": "FU-05",
+  "slug": "woodpile",
+  "item": "furn.woodpile",
+  "name": "장작더미",
+  "category": "furniture",
+  "kind": "woodpile",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4152,
+  "parts": 1,
+  "materials": [
+    "bark",
+    "ring",
+    "wood"
+  ],
+  "objects": [
+    "pile"
+  ],
+  "animations": {},
+  "size": [
+    0.91,
+    0.76,
+    0.74
+  ],
+  "bounds": [
+    [
+      -0.453,
+      -0.382,
+      0.0
+    ],
+    [
+      0.453,
+      0.383,
+      0.736
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 83040,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "woodpile_front.png",
+    "woodpile_main.png",
+    "woodpile_thumb.png",
+    "woodpile_top.png"
+  ]
+}

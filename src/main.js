@@ -8,6 +8,7 @@ import { createInput } from './core/input.js';
 import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
+import { createView } from './render/index.js';
 
 // 불러오는 순서 = 초기화 순서. 앞 모듈이 ctx.services 에 올린 것을 뒤 모듈이 쓸 수 있다.
 const MODULES = [
@@ -61,6 +62,9 @@ async function boot() {
   };
   window.__island = ctx;                // 개발용: 콘솔에서 상태 확인
 
+  // 그리기: 스타일 셰이더 값 + 화면 효과 (src/render). ?style=toon 이면 예전 툰 모습으로 비교
+  const view = createView(ctx, { preset: params.get('style') });
+
   // 섬폰 설정의 외곽선 켜기/끄기: 외곽선 메시는 모두 userData.outline 표시가 있다 (core·world·player 공통)
   events.on('settings:changed', ({ key }) => {
     if (key !== 'outline') return;
@@ -81,7 +85,7 @@ async function boot() {
 
   const resize = () => {
     const w = innerWidth, h = innerHeight;
-    renderer.setSize(w, h, false);
+    view.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
@@ -89,8 +93,8 @@ async function boot() {
   resize();
 
   const clock = new THREE.Clock();
-  renderer.setAnimationLoop(() => {
-    const dt = Math.min(clock.getDelta(), 0.05);
+  /** 한 프레임: 모듈 update → 해·곡면 중심 맞추기 → 그리기. 개발용으로 ctx.step(dt) 로도 부를 수 있다 (창이 숨겨져 rAF 가 멈출 때) */
+  const step = dt => {
     ctx.input.update();
     for (const [name, mod] of loaded) {
       try { mod.update?.(dt, ctx); } catch (e) { console.error(`[loop] ${name}`, e); }
@@ -98,8 +102,10 @@ async function boot() {
     materials.curve.uCurveOrigin.value.copy(ctx.focus);
     sun.target.position.copy(ctx.focus);
     sun.position.copy(ctx.focus).add(ctx.lights.sunOffset);
-    renderer.render(scene, camera);
-  });
+    view.render(dt);
+  };
+  ctx.step = step;
+  renderer.setAnimationLoop(() => step(Math.min(clock.getDelta(), 0.05)));
 }
 
 /** world 모듈이 없을 때: 공용 도구(모델 불러오기·툰 재질·곡면 월드)가 제대로 도는지 보여주는 확인 장면 */

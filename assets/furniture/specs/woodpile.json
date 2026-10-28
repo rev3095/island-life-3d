@@ -1,0 +1,59 @@
+{
+  "id": "FU-05",
+  "slug": "woodpile",
+  "item": "furn.woodpile",
+  "name": "장작더미",
+  "category": "furniture",
+  "kind": "woodpile",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "통나무 여섯 개를 세모로 쌓은 장작더미. 자른 면이 앞을 본다.",
+    "keywords": [
+      "3-2-1 쌓기",
+      "나이테 앞면",
+      "받침 말뚝"
+    ],
+    "references": [
+      "시골집 처마 밑 장작"
+    ],
+    "avoid": [
+      "어지럽게 흩어진 나무"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "ring"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "bark": "#8C6440",
+    "wood": "#E2C08D",
+    "ring": "#C29A66"
+  },
+  "paletteLabels": {
+    "bark": "나무껍질",
+    "wood": "자른 면",
+    "ring": "나이테"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,67 @@
+{
+  "id": "FU-18",
+  "slug": "shell-curtain",
+  "item": "furn.shell-curtain",
+  "name": "조개 커튼",
+  "category": "furniture",
+  "kind": "shell-curtain",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "조개 여섯 개로 만든 창문 커튼. 막대에 실을 늘어뜨려 조개와 구슬을 꿰었다.",
+    "keywords": [
+      "막대",
+      "실 일곱 줄",
+      "파스텔 조개",
+      "구슬"
+    ],
+    "references": [
+      "바닷가 집 조개 발"
+    ],
+    "avoid": [
+      "무거운 천 커튼"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "noOutline": [
+      "string",
+      "bead"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "rod": "#B98957",
+    "string": "#E2D2AE",
+    "shellA": "#F9D9C4",
+    "shellB": "#F7C6D6",
+    "shellC": "#F7F3EE",
+    "bead": "#7FC8B8"
+  },
+  "paletteLabels": {
+    "rod": "막대",
+    "string": "실",
+    "shellA": "조개 살구",
+    "shellB": "조개 분홍",
+    "shellC": "조개 하양",
+    "bead": "구슬"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "window",
+  "animations": []
+}

@@ -1,0 +1,448 @@
+{
+  "models": [
+    {
+      "id": "FU-01",
+      "slug": "log-chair",
+      "item": "furn.log-chair",
+      "name": "통나무 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.61,
+        0.62,
+        0.84
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-02",
+      "slug": "log-table",
+      "item": "furn.log-table",
+      "name": "통나무 테이블",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.64,
+        1.64,
+        0.72
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-03",
+      "slug": "wood-bed",
+      "item": "furn.wood-bed",
+      "name": "나무 침대",
+      "place": "floor",
+      "footprint": [
+        2,
+        3
+      ],
+      "size": [
+        1.82,
+        2.81,
+        1.31
+      ],
+      "variants": [
+        "mint",
+        "pink",
+        "yellow",
+        "blue"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-04",
+      "slug": "campfire",
+      "item": "furn.campfire",
+      "name": "모닥불",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.83,
+        0.81,
+        0.55
+      ],
+      "variants": [],
+      "animations": [
+        "flicker"
+      ],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-05",
+      "slug": "woodpile",
+      "item": "furn.woodpile",
+      "name": "장작더미",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.91,
+        0.76,
+        0.74
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-06",
+      "slug": "floor-lamp",
+      "item": "furn.floor-lamp",
+      "name": "스탠드 조명",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.63,
+        0.63,
+        1.52
+      ],
+      "variants": [
+        "cream",
+        "mint",
+        "pink",
+        "blue"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-07",
+      "slug": "plant-pot",
+      "item": "furn.plant-pot",
+      "name": "화분",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.58,
+        0.89,
+        0.99
+      ],
+      "variants": [
+        "terracotta",
+        "white",
+        "blue"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-08",
+      "slug": "round-rug",
+      "item": "furn.round-rug",
+      "name": "동그란 러그",
+      "place": "floor",
+      "layer": "rug",
+      "footprint": [
+        3,
+        3
+      ],
+      "size": [
+        2.8,
+        2.78,
+        0.03
+      ],
+      "variants": [
+        "orange",
+        "mint",
+        "pink",
+        "blue"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-09",
+      "slug": "bookshelf",
+      "item": "furn.bookshelf",
+      "name": "책장",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.76,
+        0.45,
+        1.56
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-10",
+      "slug": "radio",
+      "item": "furn.radio",
+      "name": "라디오",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.63,
+        0.5,
+        1.21
+      ],
+      "variants": [
+        "mint",
+        "red",
+        "yellow"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-11",
+      "slug": "sofa",
+      "item": "furn.sofa",
+      "name": "소파",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.81,
+        0.94,
+        0.93
+      ],
+      "variants": [
+        "orange",
+        "green",
+        "blue",
+        "pink"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-12",
+      "slug": "wardrobe",
+      "item": "furn.wardrobe",
+      "name": "옷장",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.7,
+        0.7,
+        2.02
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-13",
+      "slug": "wall-clock",
+      "item": "furn.wall-clock",
+      "name": "벽시계",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.6,
+        0.12,
+        1.92
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-14",
+      "slug": "fish-tank",
+      "item": "furn.fish-tank",
+      "name": "어항",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.72,
+        0.49,
+        1
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-15",
+      "slug": "bug-case",
+      "item": "furn.bug-case",
+      "name": "곤충 상자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.66,
+        0.47,
+        0.92
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-16",
+      "slug": "picture-frame",
+      "item": "furn.picture-frame",
+      "name": "액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.84,
+        0.06,
+        1.99
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-17",
+      "slug": "villager-photo",
+      "item": "furn.villager-photo",
+      "name": "주민 사진",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.5,
+        0.42,
+        0.96
+      ],
+      "variants": [
+        "coco",
+        "bori",
+        "mochi",
+        "dubu",
+        "pong",
+        "chorong"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-18",
+      "slug": "shell-curtain",
+      "item": "furn.shell-curtain",
+      "name": "조개 커튼",
+      "place": "window",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        1.24,
+        0.11,
+        1.9
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-19",
+      "slug": "fruit-chair",
+      "item": "furn.fruit-chair",
+      "name": "과일 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.84,
+        0.84,
+        1.02
+      ],
+      "variants": [
+        "apple",
+        "orange",
+        "pear",
+        "peach",
+        "cherry"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-20",
+      "slug": "dino-model",
+      "item": "furn.dino-model",
+      "name": "공룡 모형",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.74,
+        0.91,
+        1.57
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    }
+  ]
+}

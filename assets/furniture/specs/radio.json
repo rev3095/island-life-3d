@@ -1,0 +1,89 @@
+{
+  "id": "FU-10",
+  "slug": "radio",
+  "item": "furn.radio",
+  "name": "라디오",
+  "category": "furniture",
+  "kind": "radio",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "작은 협탁 위의 레트로 라디오. 손잡이와 안테나가 있고 켜면 음악이 나온다.",
+    "keywords": [
+      "둥근 모서리 상자",
+      "스피커 망",
+      "다이얼",
+      "안테나"
+    ],
+    "references": [
+      "1960년대 휴대용 라디오"
+    ],
+    "avoid": [
+      "최신 스피커"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "dial",
+      "grilleLine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "radio": "#7FC8B8",
+    "grille": "#F7F1E4",
+    "grilleLine": "#C9BFA9",
+    "dial": "#FFF3C9",
+    "knob": "#8C6440",
+    "metal": "#B8B2A6",
+    "wood": "#C99B68",
+    "woodDark": "#8C6440"
+  },
+  "paletteLabels": {
+    "radio": "몸통",
+    "grille": "스피커 망",
+    "grilleLine": "망 줄·바늘",
+    "dial": "다이얼 창",
+    "knob": "손잡이·단추",
+    "metal": "안테나",
+    "wood": "협탁 상판",
+    "woodDark": "협탁 다리"
+  },
+  "variants": {
+    "mint": {
+      "label": "민트 (기본)",
+      "palette": {}
+    },
+    "red": {
+      "label": "빨강",
+      "palette": {
+        "radio": "#E8726A"
+      }
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "radio": "#F6C84C"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}
