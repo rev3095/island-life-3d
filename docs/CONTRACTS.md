@@ -201,3 +201,17 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - ~~외곽선 설정~~ → `main.js` 가 `settings:changed {key:'outline'}` 를 듣고 `userData.outline` 메시를 모두 켜고 끈다. 외곽선 메시를 새로 만들 땐 `userData.outline = true` 를 꼭 붙인다.
 - `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다.
 - **카메라와 하늘**: 기본 카메라에서 하늘이 잘 안 보여 구름·별·무지개가 묻힌다 — 화면 위쪽에 하늘 띠를 조금 남기는 쪽으로 조정.
+
+---
+
+## 2차 준비 (main 에 먼저 넣은 것)
+
+### `src/gameplay/index.js` — 2차 트랙 묶음
+- 하위 폴더 `gather/`(P2) · `town/`(P3) · `house/`(P4) 의 `index.js` 를 순서대로 불러온다 (없으면 건너뜀). **각 트랙은 자기 하위 폴더만 만든다. `src/gameplay/index.js` 는 고치지 않는다.**
+- **행동 키 나눠 주기**: `ctx.services.gameplay.interactions.add({ name, intent, priority, test(ctx), run(target, ctx) }) → 해제 함수`.
+  `input:press` 의 `action`/`pickup` 을 받으면 (UI 창이 열려 있으면 무시) 우선순위가 높은 처리기부터 `test` 해서 처음 대상이 나온 하나만 `run` 한다.
+  권장 우선순위: 주민 말 걸기 **100**, 문·건물 들어가기 **90**, 실내 가구 **80**, 줍기 **50**, 도구 쓰기 **10**. 같은 키를 직접 `input:press` 로 따로 처리하지 않는다.
+
+### `world.addZone(zone) → 해제 함수` — 섬 밖 공간(집 실내 등)
+- `zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }`
+- 플레이어가 구역 안에 있으면 `world.collide`·`island.heightAt`·`island.groundAt`·`island.isWalkable` 이 구역의 것을 쓴다. 실내는 섬에서 멀리 떨어진 좌표(예: x = 500)에 만들고 플레이어를 옮긴다.

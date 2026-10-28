@@ -31,16 +31,24 @@ export default {
     objects = createObjects(ctx, base, kit, models, collision);
     objects.populate(gen.objects);
 
+    // 구역(zone): 섬 밖에 따로 놓은 공간(집 실내 등)이 자기 바닥·벽을 쓰게 하는 갈고리.
+    // zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }
+    const zones = [];
+    const zoneAt = (x, z) => zones.find(zn => zn.contains(x, z));
     const island = {
       w: base.w, h: base.h,
-      tileAt: base.tileAt, levelAt: base.levelAt, heightAt: base.heightAt, isWater: base.isWater,
+      tileAt: base.tileAt, levelAt: base.levelAt, isWater: base.isWater,
+      heightAt: (x, z) => zoneAt(x, z)?.heightAt?.(x, z) ?? base.heightAt(x, z),
       toTile: base.toTile, toWorld: base.toWorld,
       /** 땅이 걸을 수 있고 물체 충돌체 안이 아니면 true */
       isWalkable(x, z) {
+        const zn = zoneAt(x, z);
+        if (zn) return zn.isWalkable ? zn.isWalkable(x, z) : true;
         const { tx, tz } = base.toTile(x, z);
         return base.isWalkableTile(tx, tz) && !collision.blockedAt(x, z, base.heightAt(x, z));
       },
-      passable: base.passable, rampAt: base.rampAt, groundAt: base.groundAt, flagsAt: base.flagsAt,
+      passable: base.passable, rampAt: base.rampAt, flagsAt: base.flagsAt,
+      groundAt: (x, z) => zoneAt(x, z)?.groundAt?.(x, z) ?? base.groundAt(x, z),
     };
 
     let season = null;
@@ -65,7 +73,12 @@ export default {
       island, places: gen.places, objects: objects.api, setSeason,
       get season() { return season; },
       /** 원(반지름 r)을 (fx,fz) → (nx,nz) 로 옮긴다. 막히면 미끄러진 자리 {x, z} */
-      collide: (fx, fz, nx, nz, r, y) => collision.move(fx, fz, nx, nz, r, y),
+      collide: (fx, fz, nx, nz, r, y) => {
+        const zn = zoneAt(fx, fz);
+        return zn ? zn.collide(fx, fz, nx, nz, r, y) : collision.move(fx, fz, nx, nz, r, y);
+      },
+      /** 구역 등록 (집 실내 등). 돌려받은 함수를 부르면 해제된다 */
+      addZone(zone) { zones.push(zone); return () => { const i = zones.indexOf(zone); if (i >= 0) zones.splice(i, 1); }; },
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
       nativeFruit: gen.nativeFruit,
       /** 날마다 새로 놓는 것(조개·잡초·화석 자리·꽃)의 후보 칸. data.day.pickSpots(후보, n, 'fossil') 에 바로 넣으면 된다 */
