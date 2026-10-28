@@ -115,8 +115,8 @@ export function createMeshKit(ctx) {
   }
   const CAT_COLOR = { shell: '#F9D9C4', flower: '#E8504F', mat: '#B98957', seed: '#8FBF5A', furn: '#F2C14E', tool: '#9AA6A8', fish: '#8FA7B5', bug: '#6E5A3E', fossil: '#D9C7A3' };
 
-  /** 아이템 id → 떨어진 모습 메시 */
-  function item(id) {
+  /** 아이템 id → { key, geo } 떨어진 모습 도형 (같은 key 끼리 인스턴스로 묶어 그린다) */
+  function itemGeometry(id) {
     const it = ctx.services.data?.items?.get?.(id);
     const cat = it?.category ?? String(id).split('.')[0];
     let key = id, build = ITEM_PARTS[id];
@@ -125,8 +125,10 @@ export function createMeshKit(ctx) {
     else if (cat === 'fossil') { key = 'fossil'; build = ITEM_PARTS.fossil; }
     else if (cat === 'fish') { key = `fish:${id}`; build = () => fishParts(id); }
     if (!build) { key = `cat:${cat}`; build = () => [part(G.box(0.16, 0.16, 0.16), CAT_COLOR[cat] ?? '#CCCCCC', { p: [0, 0.08, 0] })]; }
-    return mesh(geometry(key, build));
+    return { key, geo: geometry(key, build) };
   }
+  /** 아이템 id → 떨어진 모습 메시 (들어 보일 때) */
+  const item = id => mesh(itemGeometry(id).geo);
 
   // ---------- 물고기 (잡았을 때 들어 보이기) ----------
   function fishParts(id) {
@@ -181,5 +183,5 @@ export function createMeshKit(ctx) {
     part(G.sphere(0.07, 6, 4), '#B79870', { p: [0.3, 0.04, 0.1], sc: [1, 0.5, 1] }),
   ]), { outline: 0.004 });
 
-  return { part, merge, geometry, mesh, G, toon, flat, outlineMat, item, fishShadow, bobber, hole, fishParts };
+  return { part, merge, geometry, mesh, G, toon, flat, outlineMat, item, itemGeometry, fishShadow, bobber, hole, fishParts };
 }

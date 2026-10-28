@@ -16,7 +16,8 @@ export function createTrees(ctx, kit, { drops, fx, mk, bugModels, results, act, 
     const p = kit.player, world = kit.world;
     if (!p || !world || p.tool) return null;
     const f = p.pointInFront(0.55);
-    const hits = world.objects.query(f.x, f.z, 0.62).filter(o => TREE_KINDS.has(o.kind) && Math.abs(o.y - p.position.y) < 0.5);
+    // 덜 자란 나무는 흔들지 않는다
+    const hits = world.objects.query(f.x, f.z, 0.62).filter(o => TREE_KINDS.has(o.kind) && !o.data?.grow && Math.abs(o.y - p.position.y) < 0.5);
     return hits[0] ?? null;
   }
 
@@ -136,7 +137,9 @@ export function createTrees(ctx, kit, { drops, fx, mk, bugModels, results, act, 
         onHit() {
           kit.world.objects.shake(o.id);
           kit.sfx('shake');
-          fx.leaves({ x: o.x, y: o.y + (CANOPY[o.kind] ?? 1) - 0.1, z: o.z }, o.kind === 'cedar' ? '#4E8A4C' : o.kind === 'palm' ? '#4E9A4C' : '#6FAE4A', 4);
+          // 잎 색은 그 나무의 지금 팔레트 (가을 활엽수는 주황, 겨울 삼나무는 눈 색)
+          const leaf = kit.world.palette?.(o.kind, o.kind === 'fruit-tree' ? o.variant : null)?.leaf ?? '#6FAE4A';
+          fx.leaves({ x: o.x, y: o.y + (CANOPY[o.kind] ?? 1) - 0.1, z: o.z }, leaf, 4);
           result(o);
         },
       });
