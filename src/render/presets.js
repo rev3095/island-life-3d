@@ -84,9 +84,10 @@ const COZY = {
 
 export const PRESETS = { cozy: COZY, toon: TOON };
 
-// 집 안(scene:indoor)에서 프리셋 위에 얹는 값: 따뜻한 실내 빛이라 그늘을 덜 파랗게, 방이 작으니 흐림은 약하게
+// 집 안(scene:indoor)에서 프리셋 위에 얹는 값: 실내 빛이 이미 따뜻해서 햇빛 색·따뜻함·채도를 덜고(크림 벽이 주황이 되지 않게),
+// 그늘은 덜 파랗게, 방이 작으니 흐림은 약하게
 export const INDOOR = {
-  cozy: { shadeTint: '#EADDE8', shadeSat: 0.2, tiltTop: 0.6, tiltBottom: 0.25, tiltFocus: 0.45, vignette: 0.32, warmth: 0.18, ao: 0.42 },
+  cozy: { shadeTint: '#EDE4EE', litTint: '#FFFAF3', shadeSat: 0.15, saturation: 1.03, warmth: 0, tiltTop: 0.6, tiltBottom: 0.25, vignette: 0.3, ao: 0.42 },
 };
 export const DEFAULT_PRESET = 'cozy';
 export const PRESET_LABELS = { cozy: '포근 (동숲풍)', toon: '툰 (예전)' };

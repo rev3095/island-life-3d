@@ -373,11 +373,10 @@ function patch(shader, opts) {
       .replace('#include <color_fragment>', `#include <color_fragment>\n${STYLE_PAINT}`)
       .replace('#include <aomap_fragment>', `#include <aomap_fragment>\n${STYLE_COMPOSE}`);
   } else if (water || glow) {
-    // 평면(빛 안 받는) 물: 폭포 판 등. 하늘빛 대신 고정 밝기로 반짝임
-    // 평면 재질: 물(폭포) 반짝임 · 스스로 빛나기(반딧불·반짝이)
+    // 평면(빛 안 받는) 재질: 물(폭포 판)은 고정 밝기로 반짝임, 스스로 빛나기(반딧불·반짝이)는 작아서 세게 밝혀야 빛 번짐이 보인다
     let add = '';
     if (water) add += '\n  diffuseColor.rgb += styleWater( vec2( ( vStyleWorld.x + vStyleWorld.z ) * 1.6, ( vStyleWorld.y + uStyleTime * 1.1 ) * 0.6 ) * uWaterScale, uStyleTime * 0.8 ) * uWater * 0.22;';
-    if (glow) add += '\n  diffuseColor.rgb *= 1.0 + uGlow;';
+    if (glow) add += '\n  diffuseColor.rgb *= 1.0 + uGlow * 3.0;';
     fs = `uniform float uStyleTime, uWater, uWaterScale, uGlow;\n${water ? 'varying vec3 vStyleWorld;\n' + NOISE_GLSL : ''}` + fs.replace('#include <map_fragment>', '#include <map_fragment>' + add);
   }
   if (outline) {
