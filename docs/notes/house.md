@@ -17,7 +17,7 @@
 
 ### 제안을 반영하며 다른 폴더에 더한 것 (사용자 요청, 2026-10-29)
 
-wave 2 다른 트랙(W1 `src/player/index.js`·`motions.js`·`tools.js`, W2 `src/gameplay/town/`, W4 `src/core/materials.js`·`src/main.js`·`src/render/`)이 고친 파일은 건드리지 않았다. `git merge-tree` 로 세 브랜치 모두와 충돌 없음을 확인했다.
+wave 2 다른 트랙(W1 `src/player/index.js`·`motions.js`·`tools.js`·`src/world/`, W2 `src/gameplay/town/`, W4 `src/core/materials.js`·`src/main.js`·`src/render/`·`src/sky/` 셰이더 파일)이 고친 파일은 건드리지 않았다. `src/ui/phone.js` 는 W4 도 고쳤지만(화면 모습 고르기) 다른 줄이라 저절로 합쳐진다. `git merge-tree` 로 `main`·`p2-gather`·`p3-town`·`stylized-shader` 와 각각 충돌 없음을 확인했다 (`CONTRACTS.md` 의 W3 절은 다른 트랙들이 맨 끝에 덧붙인 절과 부딪히지 않게 '2차 준비' 앞에 둠).
 
 | 파일 | 더한 것 |
 |---|---|
@@ -118,6 +118,7 @@ time.indoor            // 지금 상태
 - `node --test tests/` 97개 통과 (기존 86 + 칸 계산 7 + 가방 변형 4).
 - 제안 반영 뒤(2026-10-29): 가방 '가구 놓기' 칸에 썸네일 그림, 파란 소파를 놓고 F 로 넣으면 가방 칸 `variant: 'blue'` → 다시 놓으면 파랑, 어항에 붕어 넣기·말 걸기('붕어가 헤엄치고 있어요')·새로고침 뒤에도 들어 있음, 라디오 켜기(새벽 2시 → 밤)·다른 곡(새벽)·끄기(indoor), 작업대 창에서 통나무 테이블 만들기(나무 20 → 12, 창은 열린 채 만들기 버튼에 포커스), 섬폰 레시피 앱에 '조개 아무거나 0/6' 같은 재료가 나옴, `ui.fade` 로 드나듦, 방 북서쪽 구석에 서도 방 전체가 보임.
 - 미리보기 창이 숨겨져 rAF 가 멈춰 있어서, 걷기 확인은 `player.update`·`gameplay.update` 를 JS 로 직접 돌렸다.
+- **2차 네 트랙 합쳐 보기** (임시 작업 트리, 커밋·브랜치 변경 없음): `p4-house` + `p2-gather` + `p3-town` + `stylized-shader` → 콘솔 오류 0 (gameplay 하위 폴더가 다 있어 404 도 없음), `node --test tests/` 114개 통과. 행동 키 순서 200 gather-busy · 120 가구 옮기기 · 100 주민 · 91 우편함 · 90 문(집·상점·박물관·주민 집 두드리기) · 80 가구 · 60 나무 흔들기 · 50 줍기 · 45 심기 · 20 가구 놓기 · 10 도구. 집 문 앞에서 북쪽을 보고 Space → 우편함(91, 문 오른쪽 칸)보다 집 문이 먼저 걸리는 것 확인. W4 cozy 셰이더로 실내가 잘 보이고(`scene:indoor` 를 W4 가 받아 실내 값), 나오면 카메라 범위가 풀림.
 - 스크린샷: 공유 노트 폴더 `w3-house-shots/` (가구 20종 모음, 첫 입장, 꾸민 방 밤·낮, 벽 가구, 작업대, 비 오는 밤 문 앞).
 
 ## 알려진 빈틈
