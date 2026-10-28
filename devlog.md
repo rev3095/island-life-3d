@@ -9,40 +9,33 @@
 ## 현재 상태 (2026-10-29 기준)
 
 ### 한 줄 요약
-2차 4트랙(W1 채집 · W2 주민·상점·박물관 · W3 집·가구·제작 · W4 동숲풍 셰이더)을 **`main` 에 합쳤다** (c683531). 섬에서 채집·주민 대화·상점·박물관·집 꾸미기·제작이 모두 플레이되고, 기본 화면은 새 `cozy` 셰이더다. 배경 편집기에 가구 20종을 넣어 다시 게시했다. 지금 네 트랙이 **서로 부탁한 후속 작업**(아래 「진행 중」)을 자기 브랜치에서 하는 중이고, 끝나면 이어서 합친 뒤 **3차(P6)** 를 시작한다.
+2차 4트랙(W1 채집 · W2 주민·상점·박물관 · W3 집·가구·제작 · W4 동숲풍 셰이더)과 **그 후속 작업까지 모두 `main` 에 합쳤다** (마지막 합치기 215a315, 테스트 114/114). 섬에서 채집·꽃 심기·교배·주민 대화·편지·상점·박물관·집 꾸미기·제작이 모두 키보드로 플레이되고, 기본 화면은 `cozy` 셰이더(섬 나무·꽃·강에도 바람·물결)다. 배경 편집기에 가구 20종 탭을 넣어 게시했다. **3차(P6) 네 트랙의 작업 폴더를 만들어 두었고, 사용자가 시작을 말하면 세션을 연다.**
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
 | 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 9종 모두 검수 대기. db `refs` / `requests` — 2026-10-29 확인 때 요청 0건 |
-| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | **버전 3: 가구 20종 탭 추가** (요소 52개, 모두 검수 대기). db `env-refs` / `env-requests` — 요청 0건. 파일 약 420개 (한 번에 255개 제한 → 나눠서 publish, 바뀐 파일만 올려도 나머지는 남음) |
+| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | **버전 4**: 가구 20종 탭(버전 3) + W3 가 다시 만든 곤충 상자(버전 4). 요소 52개 모두 검수 대기. db `env-refs` / `env-requests` — 요청 0건. 파일 약 420개(한 번 publish 255개 제한 → 바뀐 파일만 올려도 나머지는 남음) |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
-| 게임 | (아직 웹 게시 안 함) | `index.html` + `src/` | 로컬 `node dev-server.mjs` → http://localhost:4180/index.html (`?debug`, `?style=toon` 비교) |
+| 게임 | (아직 웹 게시 안 함 — X4 가 빌드, 조정 세션이 합친 뒤 게시) | `index.html` + `src/` | 로컬 `node dev-server.mjs` → http://localhost:4180/index.html (`?debug`, `?style=toon` 비교) |
 
-### 진행 중 (2차 후속 — 각 트랙이 다른 트랙 부탁을 처리)
-조정 세션이 "자기 브랜치에 커밋만 하고 멈춰 달라"고 보냈다 (그 턴이 끝나면 전달됨). 기록 시점에 커밋 전 변경만 있다.
+### 진행 중
+없음. 2차 세션(W1~W4)은 모두 멈춤(idle), 각 브랜치는 main 에 다 들어갔다.
 
-| 세션 | 세션 id | 브랜치 | 하고 있는 것 (바뀐 파일로 짐작) |
+**3차 준비 완료 (세션 시작 대기)** — `docs/PLAN.md` 3차 표대로 main 1b200c4 에서 작업 폴더를 만들었다:
+| 트랙 | 브랜치 · 작업 폴더 | 포트 | 고치는 곳 |
 |---|---|---|---|
-| W1 채집 | `local_67ef3508-3c29-46c1-8f91-1ca2b277b83b` | `p2-gather` | 꽃 교배(`gather/breeding.js` + 테스트), 매일 다시 놓기·kit 정리, `docs/CONTRACTS.md` |
-| W2 주민 | `local_9ed02860-f2e3-4ec1-a98b-96ce0a1e772f` | `p3-town` | 상점 사는 값(`data/items.js`), 움직이는 충돌체(`world/collision.js`), 대사 다듬기 |
-| W3 집 | `local_6232f2a5-9cef-4d2c-bde3-ee67083c4896` | `p4-house` | 가구 변형을 가방에(`data/inventory.js`·`save.js`), 그림 아이콘(`ui/*` `iconEl`), 제작 창, 카메라 범위(`player/camera.js`) |
-| W4 셰이더 | `local_b29f8fe0-6a9d-4061-9d51-20528d621e73` | `stylized-shader` | kit 묶음에 바람·물결(`world/kit.js` + `materials.js`), 하늘 셰이더 색공간·노을(`sky/*`) |
+| X1 휴대폰·조작 | `p6-mobile` · `../island-worktrees/p6-mobile` | 4195 | `src/core/input.js`, `src/ui/`, `index.html` `<head>` |
+| X2 성능·카메라·섬 경관 | `p6-perf` · `../island-worktrees/p6-perf` | 4196 | `src/player/camera.js`, `src/render/`, `src/world/` |
+| X3 첫날 흐름 | `p6-firstday` · `../island-worktrees/p6-firstday` | 4197 | `src/gameplay/intro/`(새), `gameplay/index.js` 한 줄, `town/keepers.js`·`lines/bamtol.js` 첫날 안내 |
+| X4 웹 배포 | `p6-deploy` · `../island-worktrees/p6-deploy` | 4198 | `tools/build-web.mjs`(새), `dist/`, `src/core/assets.js` (게시는 조정 세션이) |
+주의: 세션 시작은 사용자가 채팅에서 직접 말한 턴에만 된다 (다른 세션 보고로 시작된 턴에서는 앱이 막음).
 
-**겹치는 파일** (합칠 때 직접 맞춤): `src/data/items.js` (W2·W3), `src/world/*` (W1·W2·W4), `src/ui/dom.js` (W3, 앞서 W2도 만짐).
-**끝나면 할 일**: 1차·2차와 같은 순서 — `git log main..<브랜치>` · `git merge-tree --write-tree main <브랜치>` · `node --test tests/` + 트랙 테스트 → `--no-ff` 로 하나씩 합치기(충돌은 양쪽 의도를 살려 손으로) → 합친 게임 브라우저 확인 → 트랙 테스트를 `tests/` 로 옮기기 → 노트의 계약 제안을 `docs/CONTRACTS.md` 에 반영.
-
-### 다음에 할 일 — 3차 (P6 마무리와 배포) 제안
-2차 후속을 합친 `main` 에서 갈라 병렬로 한다 (`docs/PLAN.md` 3차 표).
-| 트랙 | 브랜치 | 결과물 |
-|---|---|---|
-| X1 휴대폰·조작 | `p6-mobile` | 터치 조이스틱·A/B 버튼 크기·위치, 세로/가로 화면, 섬폰·가방 터치, 실제 휴대폰 크기에서 채집·대화·가구 놓기 끝까지 |
-| X2 성능·카메라 | `p6-perf` | 그리기 호출 줄이기(떨어진 물건·곤충 묶기), 저사양 자동 판단, 카메라가 하늘을 조금 더 보게, 나무가 플레이어를 가리면 반투명 |
-| X3 첫날 흐름·튜토리얼 | `p6-firstday` | 밤톨 안내(`town:intro`) → 도구 안내 → 첫 채집 → 첫 판매·기증 → 집 들어가기까지 이어지는 첫날, 섬 이름·플레이어 이름 정하기 |
-| X4 웹 배포 | `p6-deploy` | 게임을 claude.ai 아티팩트 링크로 (파일 수·용량 맞추기, `.glb.json` 만, 오디오는 합성이라 파일 없음), 저장은 브라우저 저장소, 로딩 화면 |
-
-남은 빈틈(2차 보고): 계단 모양 해안선·바다 물결, 도구·가구 아이콘 이모지 임시(가구는 W3 가 썸네일로 바꾸는 중), 주민 집 안·편지·이사 없음, 낚시 줄 당김 미니게임 없음, 꽃 교배·화석 감정(W1 진행 중), 실제 휴대폰 확인 안 함.
-1차 브랜치·작업 폴더(`p1-world`, `p2-data`, `ui-system`, `audio`, `sky-time`)는 아직 남아 있다 → 정리 여부를 물어본 뒤 `git worktree remove`.
+### 다음에 할 일
+1. 3차 네 세션 시작 → 끝나면 브랜치 검증·사용자 승인·합치기 (2차와 같은 순서) → X4 빌드로 게임을 웹 링크로 게시.
+2. 편집기 요청이 오면 "요청 확인" / "배경 요청 확인" 흐름.
+3. 남은 빈틈(3차에 안 넣은 것): 화석 감정(아이템 `fossil.unknown` 필요), 낚시 줄 당김 미니게임, 주민 집 안·이사·생일, 곤충 들추기 연출, 그림자에 바람 없음, 도구 아이콘 이모지 임시(D2).
+4. 1차 브랜치·작업 폴더(`p1-world`, `p2-data`, `ui-system`, `audio`, `sky-time`)와 2차(`p2-gather`, `p3-town`, `p4-house`, `stylized-shader`)는 모두 합쳐짐 → 사용자에게 정리 여부를 물은 뒤 `git worktree remove` + `git branch -d`.
 
 ### 사용자 원칙·선호 (계속 지킬 것)
 - 한국어로 소통. 결과는 확인한 것과 못 한 것을 나눠서 보고.
@@ -151,14 +144,26 @@
 
 합친 커밋: eac413c · 13b2e59 · 1bb6369 · c683531, 그 뒤 d6215a4 (배경 편집기 가구 탭).
 
+**2차 후속 (각 트랙이 서로의 계약 제안을 처리 — 사용자 "제안 내용 실행")**
+| 트랙 | 합친 커밋 | 내용 |
+|---|---|---|
+| W1 | 3bc5d5e (← a642de8) | 심기(묘목·씨앗·과일)·하루씩 자라기, 꽃 꺾기·교배(`gather/breeding.js` + 테스트 5), 반딧불이 빛무리, 떨어진 물건 InstancedMesh(호출 +80 → +8), 계절 색 찾기 |
+| W3 | 9b931ed (← 7781531) | `ui.craft` 격자 제작 창·`ui.fade`·확인 창 disabled, `camera.setBounds/setCurveScale`, 가방 칸 `variant`·가구 썸네일 아이콘, 라디오 채널, 어항·곤충 상자에 잡은 것, 곤충 상자 모델 다시 만듦, 테스트 `tests/` 로 |
+| W4 | f4bab90 (← ddd9a57) | `world/kit.js` 꼭짓점 `aStyle` 로 섬 나무·꽃·풀 바람·강물 물결·외곽선 물체 색(호출 그대로), 하늘 셰이더 `skyOut()` 색공간, 노을 분홍, 섬폰 '화면 모습: 포근/툰' 저장, 실내 값·빛나기 |
+| W2 | 215a315 (← 49afc6e) | 상점 사는 값(`economy.buyPrice`, 낚싯대 400), `world.addMover` 움직이는 충돌체, 우편함 편지, 주민끼리 수다, 안내는 첫 입력 뒤 시작, 주민 사진 `variant`, 테스트 `tests/` 로 |
+
+CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 합칠 때 충돌 0 (CONTRACTS·phone.js 는 저절로 합쳐짐).
+
 #### 3. 검증한 것 / 확인 못 한 것
 - 검증: 네 브랜치끼리·main 과 `merge-tree` 충돌 없음, 바뀐 파일 겹침 없음. 합친 `main` 에서 `node --test tests/` 86/86, `town.test.mjs` 9 + `grid.test.mjs` 7 통과. 브라우저(`/index.html?debug`): 모듈 11개(style·data·time·world·player·ui·audio·gameplay·gather·town·house) 로드, 콘솔 오류 없음, 행동 키 16개 우선순위대로 등록(gather-busy 200 … gather-tool 10), 주민 6명, 첫날 밤톨 안내 뜸, 집 들어가기 → 실내 모드 켜짐·가구 3개 → 나오기 → 꺼짐.
 - 배경 편집기: 로컬에서 가구 탭 20개 썸네일, 모닥불 두 개(배경 PR-09 · 가구 FU-04) 따로 열림, 3D 모델·렌더 3장 200, 가구는 HERO 숨김. 웹 링크 게시(버전 3).
-- 확인 못 함: 합친 게임에서 손으로 끝까지 플레이(채집→판매→기증→가구 제작), 주민이 문을 드나들 때 새 셰이더에서 투명하게 사라지는지(W2 제안 5), 웹 링크의 배경 편집기를 직접 열어 보기, 실제 휴대폰.
+- 후속까지 합친 main: 테스트 114/114, 모듈 11개·콘솔 오류 없음, 행동 키 18개, 낚싯대 사는 값 400(전엔 100), `world.addMover`·`ui.craft`·`ui.fade`·`camera.setBounds` 연결, 집 들어가기·나오기, 낮 11시 맑음 cozy 화면 스크린샷. 주민이 cozy 에서 반투명하게 사라지는 것은 W2 가 확인(스크린샷 town-shots/07).
+- 확인 못 함: 합친 게임에서 손으로 끝까지 플레이(채집→판매→기증→가구 제작), 웹 링크의 배경 편집기를 직접 열어 보기, 실제 휴대폰.
 
 #### 4. 문제와 해결
 | 문제 | 원인 | 해결 |
 |---|---|---|
 | 2차 세션이 하룻밤 동안 아무것도 안 함 | 세션 1 끝에 "작업 중단, 이후 언급시 재개" 를 보냄 | 재개 지시 확인 |
 | 합치려는데 네 세션이 다른 트랙 파일을 고치기 시작 | 완료 보고의 '다른 트랙 부탁'을 각자 처리하는 중 (조정 세션의 멈춤 메시지는 그 턴이 끝나야 전달) | 이미 커밋된 것만 먼저 합치고, 후속은 끝나면 따로 합치기로 |
+| 3차 세션을 바로 열지 못함 | 세션 보고로 시작된 턴에서는 앱이 새 세션 시작을 막음 | 작업 폴더만 만들고 사용자에게 시작 여부를 물음 |
 | 배경 편집기에 가구를 넣으면 `campfire` slug 가 겹침 | 배경 PR-09 와 가구 FU-04 가 같은 이름 | 요소마다 `key`(가구는 `furn-` 앞붙임)·`base` 폴더를 두고, 요청의 `slug` 도 key 로 저장 |
