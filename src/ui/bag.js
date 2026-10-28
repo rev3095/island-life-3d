@@ -43,7 +43,7 @@ export function createBag(ctx, panels) {
       const b = h('button', { type: 'button', class: 'pk-slot', role: 'gridcell', dataset: { i } });
       b.addEventListener('click', () => choose(i));
       b.addEventListener('focus', () => detail(i));
-      b.addEventListener('pointerenter', () => detail(i));
+      b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') detail(i); });   // 손가락은 누르면 포커스로 보인다
       return b;
     });
     // 5칸씩 줄로 묶어 표 구조를 맞춘다
