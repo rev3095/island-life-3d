@@ -29,13 +29,16 @@
 | T4 사운드 | `audio` | `src/audio/`, `demos/audio.html` | P5 소리 | 합성 배경음 9곡, 효과음 16종, 주민 목소리 9종 |
 | T5 시간·날씨·하늘 | `sky-time` | `src/sky/`, `demos/sky.html` | P5 분위기 | 시계, 계절, 하늘·조명, 비·눈 |
 
-### 2차 (1차 합친 뒤)
+### 2차 (1차 합친 뒤, 지금 동시 진행)
 
-| 트랙 | 내용 |
-|---|---|
-| P2 채집 연결 | T1 섬 + T2 규칙 + T3 화면을 이어 도구·낚시·곤충·화석·나무 흔들기를 실제로 플레이 |
-| P3 주민·가게 | 주민 배회 AI, 대화, 상점·박물관 동작 |
-| P4 집·제작 | 실내 장면, 가구 배치, 작업대 |
+| 트랙 | 브랜치 | 고치는 곳 (여기만) | 결과물 |
+|---|---|---|---|
+| W1 P2 채집 연결 | `p2-gather` | `src/gameplay/gather/`, 그리고 `src/player/`·`src/world/` (도구 동작, 매일 다시 놓기) | 도구 5종·낚시·곤충·화석·나무 흔들기·바위·줍기를 실제로 플레이 |
+| W2 P3 주민·상점·박물관 | `p3-town` | `src/gameplay/town/` | 주민 6명 배회·대화·목소리·친밀도·부탁, 밤톨 상점, 느루 박물관 |
+| W3 P4 집·가구·제작 | `p4-house` | `src/gameplay/house/`, `assets/furniture/`, `assets/blender/build_furniture.py`, `tools/*furniture*`, `src/sky/` (실내 모드만) | 집 실내, 가구 20종 모델, 배치·회전, 작업대 제작, 저장 이어하기 |
+| W4 스타일 셰이더 | `stylized-shader` | `src/core/materials.js`, `src/render/`, `src/main.js` (그리기 부분), `demos/style.html`, `docs/SHADERS.md` | 모델은 그대로 두고 동숲풍 3D 스타일 셰이더·후처리, 비교·조절 페이지 |
+
+행동 키(Space·F)는 `ctx.services.gameplay.interactions` 우선순위로 나눠 받는다 (`docs/CONTRACTS.md` 2차 준비).
 
 ### 3차
 
