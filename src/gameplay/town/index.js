@@ -1,17 +1,21 @@
-// 2차 W2 (P3): 주민 6명 배회·일과·대화·친밀도·부탁·선물, 밤톨 도토리상점, 느루 박물관, 첫날 안내, 이름표.
-// 행동 키는 gameplay.interactions 로 받는다: 주민 말 걸기 100, 첫날 안내 100, 상점·박물관·주민 집 문 90.
+// 2차 W2 (P3): 주민 6명 배회·일과·대화·친밀도·부탁·선물·주민끼리 수다·편지, 밤톨 도토리상점, 느루 박물관, 첫날 안내, 이름표.
+// 행동 키는 gameplay.interactions 로 받는다: 주민 말 걸기 100, 첫날 안내 100, 우편함 91, 상점·박물관·주민 집 문 90.
 import { createNav } from './path.js';
 import { PEOPLE } from './people.js';
 import { createVillager } from './villager.js';
+import { RADIUS } from './actor.js';
 import { createKeepers } from './keepers.js';
 import { createLabels } from './labels.js';
 import { createTalk, context } from './talk.js';
+import { createChatter } from './chatter.js';
+import { createMail } from './mail.js';
 import { villagerState, pickWeighted } from './rules.js';
 import LINES from './lines/index.js';
 
 const TALK_DIST = 1.3;
 const ANIM_DIST = 30;        // 이보다 멀면 동작을 멈춘다 (화면 밖)
-const BODY = 0.5;            // 플레이어와 주민이 겹치지 않는 거리
+const PLAYER_RADIUS = 0.26; // player 모듈의 충돌 원
+const BODY = RADIUS + PLAYER_RADIUS;
 
 let T = null;
 
@@ -99,7 +103,7 @@ export default {
         pl.freeze(true);
         if (face) pl.face(who.actor.position.x, who.actor.position.z);
         who.beginTalk?.();
-        who.actor.lookAt(pl.position.x, pl.position.z);
+        who.actor.lookAt?.(pl.position.x, pl.position.z);
         try { await fn(); } catch (e) { console.error('[town] 대화', e); }
         finally { who.endTalk?.(); pl.freeze(false); busy = false; }
       },
@@ -108,8 +112,23 @@ export default {
     villagers = await Promise.all(ctx.constants.VILLAGERS.filter(s => PEOPLE[s] && LINES[s]).map(s => createVillager(ctx, PEOPLE[s], town)));
     const keepers = await createKeepers(ctx, town, LINES);
     actors = [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)];
+    // 몸은 단단하다: 주민·가게 주인·플레이어를 world 의 움직이는 충돌체로 (없으면 매 프레임 플레이어를 밀어낸다)
+    const solid = !!world.addMover;
+    if (solid) {
+      const body = (pos, r, on = () => true) => ({ get x() { return pos.x; }, get z() { return pos.z; }, get y() { return pos.y; }, r, get active() { return on(); } });
+      for (const a of actors) world.addMover(body(a.position, RADIUS, () => a.visible && a.opacity > 0.5));
+      world.addMover(body(player.position, PLAYER_RADIUS));
+    }
     const labels = createLabels(ctx);
     const talk = createTalk(ctx, { lines: LINES });
+    const chatter = createChatter(villagers, LINES);
+    const mail = createMail(ctx, { lines: LINES });
+    town.mail = mail;
+    // 아침 편지: 시작할 때 한 번, 하루가 바뀌면 (data 의 하루 리셋 뒤)
+    mail.deliver();
+    ctx.events.on('data:newday', ({ dayKey } = {}) => mail.deliver(dayKey));
+    ctx.events.on('time:newday', ({ dayKey } = {}) => mail.deliver(dayKey));
+    const mailbox = mail.spot && { position: { x: mail.spot.x, y: world.island.heightAt(mail.spot.x, mail.spot.z), z: mail.spot.z }, height: 0.95, visible: true, opacity: 1 };
 
     const c = context(ctx);
     for (const V of villagers) V.spawn(c.now, c.weather);
@@ -141,25 +160,34 @@ export default {
       }
       return null;
     }
+    /** 플레이어 집 우편함 앞 (그쪽을 볼 때) */
+    function mailboxInFront() {
+      if (!mailbox) return null;
+      const p = pl.position, q = mailbox.position, dx = q.x - p.x, dz = q.z - p.z, d = Math.hypot(dx, dz);
+      if (d > 1.15 || Math.abs(q.y - p.y) > 0.6) return null;
+      return d < 0.55 || (-Math.sin(pl.facing) * dx - Math.cos(pl.facing) * dz) / d > 0.45 ? mailbox : null;
+    }
     const gp = ctx.services.gameplay.interactions;
     gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, () => talk.converse(V)) });
     gp.add({ name: 'town:knock', intent: 'action', priority: 90, test: homeDoorInFront, run: V => town.conversation(V, () => talk.knock(V), { face: true }) });
+    gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** 개발용: 주민 상태 보기·고치기 */
       state: slug => villagerState(ctx.state, slug),
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
-      debug: { nav, spots, town, keepers },
+      mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot },
+      debug: { nav, spots, town, keepers, chatter },
     };
     console.info(`[town] 주민 ${villagers.length}명 준비 ${Math.round(performance.now() - t0)}ms`);
   },
 
   update(dt) {
     if (!T) return;
-    const { ctx, villagers, keepers, labels } = T;
+    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox } = T;
     const time = ctx.services.time;
     const now = time?.now?.() ?? null;
     const weather = time?.weather ?? 'clear';
@@ -169,15 +197,18 @@ export default {
       V.update(dt, now, weather, Math.hypot(p.x - f.x, p.z - f.z) < ANIM_DIST);
     }
     keepers.update(dt, now);
-    pushPlayer(ctx, [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)]);
+    chatter.update(dt);
+    if (!solid) pushPlayer(ctx, [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)]);
+    const letters = mailbox ? mail.unread().length : 0;
     labels.update([
-      ...villagers.map(V => ({ actor: V.actor, name: V.person.name, color: V.person.color, show: V.talkable })),
+      ...villagers.map(V => ({ actor: V.actor, name: V.person.name, color: V.person.color, show: V.talkable, bubble: V.bubble })),
       ...keepers.all.map(K => ({ actor: K.actor, name: K.person.name, color: K.person.color })),
+      ...(mailbox ? [{ actor: mailbox, bubble: letters ? `✉️ ${letters}` : null }] : []),
     ]);
   },
 };
 
-/** 주민 몸은 단단하다: 플레이어가 겹치면 (벽 충돌을 지키며) 살짝 밀어낸다 */
+/** world.addMover 가 없을 때: 플레이어가 주민과 겹치면 (벽 충돌을 지키며) 살짝 밀어낸다 */
 function pushPlayer(ctx, actors) {
   const pl = ctx.services.player, world = ctx.services.world;
   if (!pl || !world) return;

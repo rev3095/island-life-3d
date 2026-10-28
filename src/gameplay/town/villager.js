@@ -18,6 +18,7 @@ export async function createVillager(ctx, person, town) {
     slug: person.slug, person, actor, house, door,
     mode: 'home', timer: 0, think: Math.random() * THINK, run: false, tries: 0,
     talkFrom: null, noticedAt: -99, clock: 0, emergeDelay: 0,
+    partner: null, bubble: null, chatAt: -99,   // 주민끼리 수다: 상대, 지금 말풍선 글자
 
     get out() { return V.mode !== 'home'; },
     /** 말 걸 수 있는 상태인가 (문을 드나드는 중엔 안 됨) */
@@ -36,6 +37,9 @@ export async function createVillager(ctx, person, town) {
     beginTalk() {
       if (V.mode === 'talk') return;
       V.talkFrom = V.mode;
+      V.chatWith = V.mode === 'chat' ? V.partner : null;   // 수다 떨던 상대 (인사에 쓴다)
+      V.partner = null;
+      V.bubble = null;
       V.mode = 'talk';
       actor.speed = 0;
       actor.play('idle');
@@ -48,6 +52,21 @@ export async function createVillager(ctx, person, town) {
       V.think = 0;
     },
     happy() { actor.playOnce('happy'); },
+    /** 다른 주민과 수다 시작 (index.js 가 짝을 지어 준다) */
+    startChat(other, seconds) {
+      V.mode = 'chat';
+      V.partner = other;
+      V.timer = seconds;
+      V.chatAt = V.clock;
+      actor.path = [];
+      actor.lookAt(other.actor.position.x, other.actor.position.z);
+    },
+    stopChat() {
+      if (V.mode !== 'chat') return;
+      V.partner = null;
+      V.bubble = null;
+      idle(1 + r() * 2.5);
+    },
 
     update(dt, now, weather, animate) {
       V.clock += dt;
@@ -62,6 +81,14 @@ export async function createVillager(ctx, person, town) {
         case 'talk':
           if (pl) actor.lookAt(pl.x, pl.z);
           break;
+        case 'chat': {
+          const o = V.partner;
+          if (!o || o.mode !== 'chat' || o.partner !== V) { V.stopChat(); break; }
+          actor.lookAt(o.actor.position.x, o.actor.position.z);
+          actor.animateMove(0);
+          if ((V.timer -= dt) <= 0) { if (r() < 0.5) V.happy(); V.stopChat(); }
+          break;
+        }
         case 'idle':
           if (pl && pd < LOOK_DIST && actor.visible) {
             actor.lookAt(pl.x, pl.z);
@@ -167,7 +194,9 @@ export async function createVillager(ctx, person, town) {
     const want = shouldBeOut(person, now, weather);
     if (want && V.mode === 'home') {
       if ((V.emergeDelay -= THINK) <= 0) emerge();
-    } else if (!want && (V.mode === 'idle' || V.mode === 'walk')) goHome();
+    } else if (want && V.mode === 'toDoor') {
+      idle(1 + r() * 2);   // 집에 가던 길인데 다시 밖에 있을 시각 (시계를 돌렸을 때)
+    } else if (!want && (V.mode === 'idle' || V.mode === 'walk' || V.mode === 'chat')) { V.partner = null; V.bubble = null; goHome(); }
   }
 
   return V;

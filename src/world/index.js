@@ -97,6 +97,8 @@ export default {
       },
       /** 구역 등록 (집 실내 등). 돌려받은 함수를 부르면 해제된다 */
       addZone(zone) { zones.push(zone); return () => { const i = zones.indexOf(zone); if (i >= 0) zones.splice(i, 1); }; },
+      /** 움직이는 충돌체 (주민·플레이어): m = { x, z, r, y?, active? } (getter 가능) → 해제 함수. 섬 위 collide 가 원으로 밀어낸다 (자기 자신은 빼고) */
+      addMover: m => collision.addMover(m),
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
       nativeFruit: gen.nativeFruit,
       /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */

@@ -43,7 +43,13 @@ export async function createKeepers(ctx, town, lines) {
   }
 
   // ---- 밤톨: 영업시간엔 문 옆, 아니면 가게 안 (첫날엔 선착장) ----
-  const intro = { pending: !ctx.state.flags?.intro, running: false, wait: 1.6 };
+  // 첫 입력(키·터치) 뒤에 말을 건다 — 소리 잠금이 풀려야 밤톨 목소리가 난다. 아무 입력이 없어도 12초 뒤엔 시작
+  const intro = { pending: !ctx.state.flags?.intro, running: false, wait: 1.6, idle: 0, heard: ctx.services.audio?.unlocked === true };
+  if (intro.pending && !intro.heard) {
+    const heard = () => { intro.heard = true; intro.wait = Math.min(intro.wait, 0.7); };
+    addEventListener('keydown', heard, { once: true, capture: true });
+    addEventListener('pointerdown', heard, { once: true, capture: true });
+  }
   const isOpen = hour => ctx.services.data?.economy?.isOpen?.(hour) ?? (hour >= 8 && hour < 22);
   if (intro.pending) {
     // 보통은 선착장(처음 서는 곳) 옆. 저장된 자리에서 시작하면 플레이어 곁에서 기다린다
@@ -83,8 +89,9 @@ export async function createKeepers(ctx, town, lines) {
     }
     // 첫날: 선착장 가까이 오면 밤톨이 먼저 말을 건다
     if (intro.pending && !intro.running && pl && !ctx.services.ui?.isBlocking?.()) {
-      intro.wait -= dt;
-      if (intro.wait <= 0 && Math.hypot(pl.x - B.actor.position.x, pl.z - B.actor.position.z) < 5) town.conversation(B, introFlow);
+      intro.idle += dt;
+      if (intro.heard) intro.wait -= dt;
+      if ((intro.wait <= 0 || intro.idle > 12) && Math.hypot(pl.x - B.actor.position.x, pl.z - B.actor.position.z) < 5) town.conversation(B, introFlow);
     }
   }
 
@@ -105,6 +112,7 @@ export async function createKeepers(ctx, town, lines) {
       ctx.state.flags.intro = true;
       intro.pending = false;
       ctx.events.emit('town:intro', { done: true });
+      town.mail?.post('bamtol', 'welcome');
       // 가게로 걸어간다 (길이 없으면 그냥 옮긴다)
       const pts = town.route(B.actor.position, B.spot);
       if (pts) { B.actor.setPath(pts); B.mode = 'walk'; B.prev = 'walk'; }
