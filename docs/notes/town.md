@@ -73,12 +73,12 @@ state.mail = { list: [{ id, from, kind, day, lines, gift, read, stub? }], day, n
 2. **`town:intro {done}` 이벤트·town 서비스·상태 모양**: `docs/CONTRACTS.md` 맨 끝 "2차 W2 (town) 에서 정한 것" 절에 적었다.
 3. **움직이는 충돌체 (T1/W1 world)**: `src/world/collision.js` 에 `addMover`, `src/world/index.js` 서비스에 `addMover` 한 줄. W1(`p2-gather`) 이 고친 줄과 겹치지 않는다 (`git merge-tree` 로 확인).
 4. **재질 투명도 (W4)**: W4 의 새 `materials.js` 도 `MeshToonMaterial`·`MeshBasicMaterial` 에 패치를 거는 방식이라 `opacity`·`transparent` 가 그대로 먹는다 → 고칠 것 없음. 계약 절에 "이 둘을 살려 둘 것"만 적었다.
-5. **테스트 위치**: `tests/town.test.mjs` 로 옮겼다 → `node --test tests/` 98개.
+5. **테스트 위치**: `tests/town.test.mjs` 로 옮겼다 → `node --test tests/` 에 들어간다 (main 과 합친 지금 114개).
+6. **주민 사진 변형 (W3 제안 6)**: W3 가 가방 칸 `variant` 와 `collect(id, n, { variant })` 를 넣어서, 친밀도 100 사진을 `{ id: 'furn.villager-photo', variant: 주민 slug }` 로 준다 → 집에 놓으면 그 주민 사진. 못 준 선물 목록(`pending`)도 `{ id, variant }` 를 받는다.
 
 ## 남은 제안
 
-- **주민 사진 변형 (W3 제안 6 과 같음)**: 가방 칸이 `{ id, count, uses }` 로만 정리돼서 `furn.villager-photo` 가 누구 사진인지 넘길 수 없다. data 가 칸에 `variant` 를 허용하면 town 은 `collect` 뒤 그 칸에 주민 slug 를 적겠다.
-- `ui.fade(on, sec)` (W3 제안 2) 가 생기면 상점·박물관 문에도 같은 화면 전환을 쓰겠다.
+- 상점·박물관은 섬 위에서 창만 여는 방식이라 `ui.fade` 는 쓰지 않았다. 나중에 건물 안 장면을 만들면 W3 집처럼 쓰면 된다.
 - 아이템 `desc` 를 느루가 읽어 준다 — 설명 문장을 바꿀 때 한 줄 60자 안쪽이면 대화창에 잘 들어간다.
 
 ## 확인한 것 (`node dev-server.mjs --port=4192` → `/index.html?debug`)
@@ -90,7 +90,12 @@ state.mail = { list: [{ id, from, kind, day, lines, gift, read, stub? }], day, n
 - 대화: 처음 만남 자기소개, 잡담, 부탁(보리 '꽃' → 가방 고르기에 꽃만 고를 수 있음 → 도토리 300), 선물(퐁 복숭아 = 아주 좋아함, 코코 잡초 = 싫어함), 먼저 주는 선물 + 가방 꽉 참 → 다음에 받음, 단계 오름 알림(모찌 '아는 사이', 코코 '절친'), 친밀도 100 사진.
 - 문 두드리기(비 오는 날 보리), 상점 열림(인사 → 팔기 탭 → 붕어 팔기 → 사기 → 인사) · 닫힘(문 너머 대사), 박물관 첫 방문·첫 기증(암모나이트)·화석 반응·5점·이야기(잉어 설명)·화석 완성·전부 완성 공룡 모형.
 - 몸 밀기: 주민 자리에 겹쳐 놓으면 한 프레임에 0.50 떨어진다. 이름표는 3.4칸 안에서만, 대화 중엔 숨김.
-- 스크린샷: 공유 노트 폴더 `town-shots/` (01 첫날 밤톨 안내 · 02 모찌 대화 선택지 · 03 비 오는 날 이름표 · 04 보리 이름표 · 05 우편함 편지 알림 · 06 주민끼리 수다 말풍선).
+- **main(W1 채집·W3 집·W4 셰이더 후속까지)과 합친 뒤** (`/index.html?debug`): 모듈 11개(style·data·time·world·player·ui·audio·gameplay·gather·town·house), 행동 키 18개가 우선순위대로 (gather-busy 200 … gather-tool 10), 콘솔 오류 없음.
+  - 새 cozy 셰이더에서 주민이 문을 드나들 때 `MeshToonMaterial`·외곽선 `MeshBasicMaterial` 이 `transparent`·`opacity 0.56` 으로 바뀌고 화면에서도 반투명 (스크린샷 07).
+  - 우편함 앞 행동 키 = 편지(복숭아 받으며 W1 `player.act('pickup')` 동작), 집 문 앞 = W3 집 들어가기 (x 500, 이름표 숨김) → 나오기. 잠자리채를 든 채 주민 앞 = 말 걸기 (도구 10 보다 앞).
+  - 친밀도 100 → 가방에 `{ id: 'furn.villager-photo', variant: 'chorong' }`.
+  - 시계를 22:54 → 13시로 돌리면 집에 가던 코코·모찌·두부가 돌아선다.
+- 스크린샷: 공유 노트 폴더 `town-shots/` (01 첫날 밤톨 안내 · 02 모찌 대화 선택지 · 03 비 오는 날 이름표 · 04 보리 이름표 · 05 우편함 편지 알림 · 06 주민끼리 수다 말풍선 · 07 cozy 셰이더에서 반투명하게 사라지는 코코).
 
 ## 알려진 빈틈
 
