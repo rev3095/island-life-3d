@@ -40,9 +40,14 @@
 
 행동 키(Space·F)는 `ctx.services.gameplay.interactions` 우선순위로 나눠 받는다 (`docs/CONTRACTS.md` 2차 준비).
 
-### 3차
+### 3차 (2차 후속을 합친 뒤 — P6 마무리와 배포)
 
-P6 휴대폰·성능·첫날 안내·배포.
+| 트랙 | 브랜치 | 고치는 곳 (여기만) | 결과물 |
+|---|---|---|---|
+| X1 휴대폰·조작 | `p6-mobile` | `src/core/input.js`, `src/ui/` 의 터치 버튼·창 배치, `index.html` 의 viewport | 터치 조이스틱·A/B 버튼, 세로/가로 화면, 가방·섬폰·대화 터치, 휴대폰 크기에서 채집·대화·가구 놓기 끝까지 |
+| X2 성능·카메라 | `p6-perf` | `src/player/camera.js`, `src/render/`, `src/gameplay/gather/` 의 그리기 묶음 | 그리기 호출 줄이기, 저사양 자동 판단, 카메라 각도(하늘 조금 더), 가리는 나무 반투명 |
+| X3 첫날 흐름 | `p6-firstday` | `src/gameplay/intro/` (새 폴더), `src/gameplay/town/keepers.js` 의 안내 대사 | 섬·플레이어 이름 → 밤톨 안내 → 도구 → 첫 채집 → 첫 판매·기증 → 집까지 이어지는 첫날 |
+| X4 웹 배포 | `p6-deploy` | `tools/build-web.mjs` (새), `dist/` | 게임을 claude.ai 링크로: 파일 목록·용량 맞추기, `.glb.json` 만, 로딩 화면, 브라우저 저장 |
 
 ## 합치기
 
