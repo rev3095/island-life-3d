@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>포근섬 이야기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  /* 게임 화면 기본 틀. HUD·창 모양은 ui 모듈(src/ui/ui.css)이 맡는다. */
+  :root { --ink: #4A3B32; --cream: #FFF8E6; --display: "Jua", "Malgun Gothic", sans-serif; --body: "Gowun Dodum", "Malgun Gothic", sans-serif; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #BFE6F7; color: var(--ink); font-family: var(--body); }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--body); }
+  #ui > * { pointer-events: auto; }
+  .core-check { position: absolute; left: 50%; top: calc(16px + env(safe-area-inset-top, 0px)); transform: translateX(-50%);
+    background: var(--cream); padding: 6px 14px; border-radius: 999px; font-size: 14px; box-shadow: 0 3px 0 #E2D2AE; }
+  /* 휴대폰 조이스틱 기본 모양 (core/input.js) */
+  #touch-controls { position: absolute; inset: 0; pointer-events: none; }
+  #touch-controls > * { pointer-events: auto; position: absolute; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .tc-stick { left: calc(24px + env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 120px; border-radius: 50%; background: rgba(255, 248, 230, .45); border: 2px solid rgba(74, 59, 50, .25); }
+  .tc-knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: var(--cream); box-shadow: 0 3px 0 #E2D2AE; }
+  .tc-btn { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--cream); color: var(--ink); font: 22px var(--display); box-shadow: 0 3px 0 #E2D2AE; }
+  .tc-a { right: calc(28px + env(safe-area-inset-right, 0px)); bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .tc-b { right: calc(104px + env(safe-area-inset-right, 0px)); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="game" aria-label="포근섬 게임 화면"></canvas>
+<div id="ui"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
