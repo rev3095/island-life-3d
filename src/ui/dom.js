@@ -42,6 +42,24 @@ export function itemInfo(ctx, id) {
   };
 }
 
+/**
+ * 레시피 재료 줄 → [{ id, category, name, icon, n, have }].
+ * data 의 needs:[{ id | category, n }] 와 계약의 materials:[{ id, count } | [id, count]] 둘 다 읽는다 (category = '조개 아무거나' 같은 재료).
+ */
+export function recipeNeeds(ctx, r) {
+  const inv = ctx.services.data?.inventory;
+  const raw = r.needs ?? (r.materials ?? r.ingredients ?? []).map(m => (Array.isArray(m) ? { id: m[0], n: m[1] } : { id: m.id, category: m.category, n: m.n ?? m.count }));
+  return raw.map(nd => {
+    const it = nd.id ? itemInfo(ctx, nd.id) : null;
+    return {
+      id: nd.id ?? null, category: nd.category ?? null, n: nd.n,
+      name: it ? it.name : `${CATEGORY_NAME[nd.category] ?? nd.category} 아무거나`,
+      icon: it ? it.icon : CATEGORY_ICON[nd.category] ?? '❔',
+      have: nd.id ? (inv?.count?.(nd.id) ?? 0) : (inv?.countCategory?.(nd.category) ?? 0),
+    };
+  });
+}
+
 /** 아이콘 값(이모지 글자 또는 그림 경로) → 요소 */
 export function iconEl(icon, cls = 'pk-icon') {
   if (typeof icon === 'string' && /\.(svg|png|webp|jpe?g)$/i.test(icon)) return h('img', { class: cls, src: icon, alt: '' });

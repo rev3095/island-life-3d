@@ -1,5 +1,5 @@
 // 섬폰: 도감·지도·레시피·가방·설정·저장 앱. 앱 화면에서 Esc(B) 는 첫 화면으로, 첫 화면에서는 닫기.
-import { h, fmt, itemInfo, iconEl, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
+import { h, fmt, itemInfo, iconEl, recipeNeeds, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
 import { panelShell, gridMove, button } from './panels.js';
 
 const APPS = [
@@ -137,16 +137,12 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     view.append(h('p', { class: 'pk-muted pk-small' }, '만들기는 집의 작업대에서 해요.'),
       h('ul', { class: 'pk-recipes', tabindex: '0', 'aria-label': '레시피 목록' }, list.map(r => {
         const out = itemInfo(ctx, r.result ?? r.id);
-        const mats = (r.materials ?? r.ingredients ?? []).map(m => (Array.isArray(m) ? { id: m[0], count: m[1] } : m));
+        const mats = recipeNeeds(ctx, r);
         const can = data.recipes.canCraft?.(r.id);
         return h('li', { class: `pk-recipe${can ? ' is-can' : ''}` },
           iconEl(r.icon ?? out.icon, 'pk-recipe-icon'),
           h('div', null, h('b', null, r.name ?? out.name), can && h('span', { class: 'pk-badge' }, '만들 수 있어요'),
-            h('ul', { class: 'pk-mats' }, mats.map(m => {
-              const have = data.inventory?.count?.(m.id) ?? 0;
-              const mi = itemInfo(ctx, m.id);
-              return h('li', { class: have >= m.count ? 'is-ok' : '' }, iconEl(mi.icon), `${mi.name} ${Math.min(have, m.count)}/${m.count}`);
-            }))));
+            h('ul', { class: 'pk-mats' }, mats.map(m => h('li', { class: m.have >= m.n ? 'is-ok' : '' }, iconEl(m.icon), `${m.name} ${Math.min(m.have, m.n)}/${m.n}`)))));
       })));
   }
 
