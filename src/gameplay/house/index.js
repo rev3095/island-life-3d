@@ -1,9 +1,10 @@
 // 트랙 W3 (P4): 집 실내 · 가구 배치 · 작업대 제작. src/gameplay/index.js 가 불러온다.
 //  - 플레이어 집 문(world.places.playerHouse) 앞에서 행동 키(우선순위 90) 또는 문 쪽으로 밀기 → 잠깐 어두워졌다가 방 안으로.
 //  - 방은 x = 500 에 지은 8×8 칸 (room.js), world.addZone 으로 바닥·벽 충돌을 바꿔 끼운다.
-//  - 가구: 가방에서 골라 앞 칸에 놓기, 가구 앞 행동 키(80) → 돌리기·옮기기·색 바꾸기·가방에 넣기, F → 바로 가방에. state.house.furniture 에 저장.
-//  - 작업대(방 서쪽 벽): 레시피 목록 → 만들기 (craft.js).
-// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio } — rec 모양은 grid.js 맨 위.
+//  - 가구: 가방에서 골라 앞 칸에 놓기, 가구 앞 행동 키(80) → 돌리기·옮기기·색 바꾸기·라디오·어항/곤충 상자에 넣기·가방에 넣기, F → 바로 가방에.
+//  - 작업대(방 서쪽 벽): ui.craft 창 (없으면 대화 선택지로, craft.js).
+// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio, nextId } — rec 모양은 grid.js 맨 위 (+ variant 색, holds 넣어 둔 물고기·곤충 id).
+// 화면 전환은 ui.fade, 카메라 범위는 player.camera.setBounds — 없으면 직접 한다.
 import { ROOM_W, ROOM_D, boxOf, fits, spotInFront, rotateInPlace, wallInFront, wallFree, moveCircle, inBox } from './grid.js';
 import { ROOM, buildRoom, wallMount, x0, z0, WINDOWS, DOOR } from './room.js';
 import { createFurnitureKit } from './furniture.js';
@@ -23,7 +24,11 @@ const WINDOW_SET = new Set(WINDOWS);
 const FADE_OUT = 0.28, FADE_IN = 0.42;                // 초
 const PUSH_TIME = 0.2;                                // 문 쪽으로 이만큼 밀면 드나든다
 const REACH = 0.62;                                   // 플레이어 앞 몇 칸까지 가구를 건드리나
-const RADIO_SONG = 'morning';
+const CAMERA_BOX = { x0: ROOM.x - 0.6, x1: ROOM.x + 0.6, z0: ROOM.z, z1: ROOM.z + 1.4 };   // 집 안 카메라 중심이 머무는 곳 (어디 서도 방 전체가 보이게 좁게)
+const CAMERA_CURVE = 0.3;                             // 집 안 곡면 월드 세기 배율
+// 라디오 채널 = 시간대 배경음 (실내 기본곡 'indoor' 는 '작은 라디오' 분위기라 켜지 않았을 때 쓴다)
+const RADIO = { dawn: '새벽 · 조용한 피아노', morning: '오전 · 밝은 마림바', afternoon: '오후 · 느긋한 우쿨렐레', evening: '저녁 · 따뜻한 패드', night: '밤 · 오르골' };
+const RADIO_ORDER = Object.keys(RADIO);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 let H = null;   // 이 모듈의 상태
@@ -42,6 +47,8 @@ export default {
     if (!Array.isArray(S.furniture)) S.furniture = [];
     S.furniture = S.furniture.filter(r => r && typeof r.item === 'string' && kit.info(r.item));   // 모르는 가구는 버린다
     if (S.furniture.length) S.seeded = true;
+    if (S.radio === true) S.radio = 'morning';                         // 예전 저장 (켜짐/꺼짐만 있던 때)
+    for (const r of S.furniture) if (r.holds && !ctx.services.data?.items.get(r.holds)) delete r.holds;
 
     const room = buildRoom(ctx);
     room.group.visible = false;
@@ -97,12 +104,22 @@ export default {
       H.bench = wb;
     } catch (e) { console.warn('[house] 작업대 모델을 못 읽었어요', e); }
 
-    // 어두워졌다 밝아지는 막 (ui 창보다 아래)
-    const fade = document.createElement('div');
-    fade.className = 'house-fade';
-    fade.style.cssText = 'position:fixed;inset:0;background:#2E2420;opacity:0;pointer-events:none;transition:opacity .3s ease;';
-    ctx.uiRoot.prepend(fade);
-    H.fadeEl = fade;
+    // 어두워졌다 밝아지는 막: ui.fade 가 있으면 그것, 없으면 #ui 맨 앞(ui 창보다 아래)에 직접
+    let ownFade = null;
+    function fadeTo(on, sec) {
+      if (ctx.services.ui?.fade) return ctx.services.ui.fade(on, sec);
+      if (!ownFade) {
+        ownFade = document.createElement('div');
+        ownFade.className = 'house-fade';
+        ownFade.style.cssText = 'position:fixed;inset:0;background:#2E2420;opacity:0;pointer-events:none;transition:opacity .3s ease;';
+        ctx.uiRoot.prepend(ownFade);
+      }
+      return new Promise(res => {
+        ownFade.style.transitionDuration = `${sec}s`;
+        ownFade.style.opacity = on ? '1' : '0';
+        setTimeout(res, sec * 1000 + 30);
+      });
+    }
 
     // 저장된 가구 다시 놓기
     await Promise.all(S.furniture.map(r => spawn(r)));
@@ -143,7 +160,7 @@ export default {
       get furniture() { return S.furniture; },
       enter: () => enter(), leave: () => leave(),
       /** 개발·다른 모듈용: 가구를 바로 놓기 (가방과 상관없이). spot 을 안 주면 플레이어 앞 → 놓은 rec 또는 null */
-      place: (item, spot) => placeRec(item, spot ?? findSpot(item)),
+      place: (item, spot, { variant } = {}) => placeRec(item, spot ?? findSpot(item), { variant }),
       remove: id => { const r = S.furniture.find(o => o.id === id); if (r) removeRec(r); return !!r; },
       workbench: () => workbench(),
       models: () => kit.list.map(m => ({ ...m })),
@@ -167,23 +184,15 @@ export default {
       return Math.abs(p.x - (x0 + ROOM_W / 2)) < 0.75 && p.z - z0 > ROOM_D - 0.85;
     }
 
-    function fadeTo(v, sec) {
-      return new Promise(res => {
-        fade.style.transitionDuration = `${sec}s`;
-        fade.style.opacity = String(v);
-        setTimeout(res, sec * 1000 + 30);
-      });
-    }
-
     async function enter() {
       if (H.busy || H.inside) return;
       H.busy = true;
       player.freeze(true);
       events.emit('sfx', { name: 'door' });
       try {
-        await fadeTo(1, FADE_OUT);
+        await fadeTo(true, FADE_OUT);
         goInside({ ...ENTRY, facing: 0 });
-        await fadeTo(0, FADE_IN);
+        await fadeTo(false, FADE_IN);
       } finally { player.freeze(false); H.busy = false; }
     }
 
@@ -193,9 +202,9 @@ export default {
       player.freeze(true);
       events.emit('sfx', { name: 'door' });
       try {
-        await fadeTo(1, FADE_OUT);
+        await fadeTo(true, FADE_OUT);
         goOutside();
-        await fadeTo(0, FADE_IN);
+        await fadeTo(false, FADE_IN);
       } finally { player.freeze(false); H.busy = false; }
     }
 
@@ -208,9 +217,11 @@ export default {
         S.seeded = true;
         for (const s of STARTER) if (fits(S.furniture, { id: '__s', ...s }, info, { reserved: RESERVED })) placeRec(s.item, s, { silent: true });
       }
+      player.camera?.setBounds?.(CAMERA_BOX);
+      player.camera?.setCurveScale?.(CAMERA_CURVE);
       player.teleport(x0 + lx, z0 + lz, facing);
       ctx.services.time?.setIndoor?.(true);
-      ctx.services.audio?.bgm?.(S.radio ? RADIO_SONG : 'indoor');
+      ctx.services.audio?.bgm?.(radioSong());
       events.emit('house:enter', {});
       saveSoon(0.5);
     }
@@ -220,6 +231,8 @@ export default {
       H.inside = false;
       S.inside = false;
       const d = doorPoint() ?? world.places?.spawn ?? { x: 0, z: 0 };
+      player.camera?.setBounds?.(null);
+      player.camera?.setCurveScale?.(1);
       player.teleport(d.x, d.z + 0.15, Math.PI);
       room.group.visible = false;
       ctx.services.time?.setIndoor?.(false);
@@ -257,9 +270,10 @@ export default {
       return spotInFront(others, item, lx, lz, player.facing, info, { reserved: RESERVED, ignore });
     }
 
-    function placeRec(item, spot, { silent = false } = {}) {
+    function placeRec(item, spot, { silent = false, variant = null } = {}) {
       if (!spot || !info(item)) return null;
       const rec = spot.wall ? { id: newId(), item, wall: spot.wall, slot: spot.slot } : { id: newId(), item, gx: spot.gx, gz: spot.gz, rot: spot.rot ?? 0 };
+      if (variant) rec.variant = variant;
       S.furniture.push(rec);
       spawn(rec);
       if (!silent) { events.emit('sfx', { name: 'step-wood', volume: 1 }); saveSoon(); }
@@ -282,6 +296,7 @@ export default {
         const obj = await kit.make(rec.item, { variant: rec.variant });
         if (H.views.get(rec.id) !== v) { obj.dispose(); return; }   // 만드는 사이에 치웠다
         v.obj = obj;
+        if (rec.holds) obj.setHolds(rec.holds);
         room.group.add(obj.root);
         pose(rec);
       } catch (e) { console.error('[house] 가구를 못 만들었어요', rec.item, e); }
@@ -311,8 +326,9 @@ export default {
       try {
         const slot = await ui.bag.open({ mode: 'pick', title: '가구 놓기', hint: '방에 놓을 가구를 골라 주세요', filter: s => isFurn(s) });
         if (slot == null) return;
-        const item = data.inventory.slots[slot]?.id;
-        if (!isFurn(data.inventory.slots[slot])) return;
+        const picked = data.inventory.slots[slot];
+        if (!isFurn(picked)) return;
+        const item = picked.id, variant = picked.variant ?? null;
         const fi = info(item), name = data.items.get(item)?.name ?? item;
         const spot = findSpot(item);
         if (!spot) {
@@ -320,7 +336,7 @@ export default {
           return;
         }
         if (data.inventory.remove(slot, 1) !== 1) return;
-        placeRec(item, spot);
+        placeRec(item, spot, { variant });
         toast(`${josa(name, '을/를')} 놓았어요`, data.items.get(item)?.icon);
       } finally { H.busy = false; }
     }
@@ -366,11 +382,18 @@ export default {
       if (!rec.wall && info(rec.item).layer !== 'rug') opts.push(['rotate', '돌리기']);
       opts.push(['move', '옮기기']);
       if (variants.length > 1) opts.push(['color', '색 바꾸기']);
-      if (it?.plays === 'bgm') opts.push(['radio', S.radio ? '라디오 끄기' : '라디오 켜기']);
+      if (it?.plays === 'bgm') {
+        if (S.radio) opts.push(['radio-next', '다른 곡 틀기'], ['radio-off', '라디오 끄기']);
+        else opts.push(['radio-on', '라디오 켜기']);
+      }
+      if (it?.holds) opts.push(rec.holds ? ['take', `${nameOf(rec.holds)} 꺼내기`] : ['put', it.holds === 'fish' ? '물고기 넣기' : '곤충 넣기']);
       opts.push(['store', '가방에 넣기'], ['cancel', '그만두기']);
+      let line = `${josa(name, '을/를')} 어떻게 할까요?`;
+      if (rec.holds) line = `${josa(nameOf(rec.holds), '이/가')} ${it.holds === 'fish' ? '헤엄치고' : '쉬고'} 있어요. 어떻게 할까요?`;
+      else if (it?.plays === 'bgm' && S.radio) line = `라디오에서 ${RADIO[S.radio]} 곡이 나오고 있어요.`;
       H.busy = true;
       let pick = null;
-      try { pick = await ui.dialog.open({ speaker: name, color: '#C99B68', lines: [`${josa(name, '을/를')} 어떻게 할까요?`], choices: opts.map(o => o[1]) }); }
+      try { pick = await ui.dialog.open({ speaker: name, color: '#C99B68', lines: [line], choices: opts.map(o => o[1]) }); }
       finally { H.busy = false; }
       const what = pick == null ? 'cancel' : opts[pick][0];
       if (what === 'rotate') {
@@ -388,12 +411,55 @@ export default {
         toast(`${spec.variants[rec.variant].label.replace(/ \(기본\)$/, '')}`, it?.icon);
         events.emit('sfx', { name: 'menu' });
         saveSoon();
-      } else if (what === 'radio') {
-        S.radio = !S.radio;
-        ctx.services.audio?.bgm?.(S.radio ? RADIO_SONG : 'indoor');
-        toast(S.radio ? '라디오를 켰어요' : '라디오를 껐어요', '📻');
+      } else if (what === 'radio-on' || what === 'radio-next') {
+        S.radio = what === 'radio-on' ? radioForNow() : RADIO_ORDER[(RADIO_ORDER.indexOf(S.radio) + 1) % RADIO_ORDER.length];
+        ctx.services.audio?.bgm?.(radioSong());
+        toast(`라디오: ${RADIO[S.radio]}`, '📻');
         saveSoon();
-      } else if (what === 'store') store(rec);
+      } else if (what === 'radio-off') {
+        S.radio = null;
+        ctx.services.audio?.bgm?.('indoor');
+        toast('라디오를 껐어요', '📻');
+        saveSoon();
+      } else if (what === 'put') await putIn(rec, it);
+      else if (what === 'take') takeOut(rec);
+      else if (what === 'store') store(rec);
+    }
+
+    function nameOf(id) { return ctx.services.data?.items.get(id)?.name ?? id; }
+    function radioSong() { return S.radio ? (RADIO[S.radio] ? S.radio : 'morning') : 'indoor'; }
+    function radioForNow() {
+      const h = ctx.services.time?.now?.().hour ?? new Date().getHours();
+      return h < 5 ? 'night' : h < 8 ? 'dawn' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 19 ? 'evening' : 'night';
+    }
+
+    // 어항·곤충 상자: 가방의 물고기·곤충 하나를 넣어 두고 꺼낸다 (넣은 것에 따라 안의 물고기·풍뎅이 색이 바뀐다)
+    async function putIn(rec, it) {
+      const data = ctx.services.data, ui = ctx.services.ui;
+      const cat = it.holds;
+      const ok = s => !!s && data.items.get(s.id)?.category === cat;
+      if (!data.inventory.slots.some(ok)) { toast(cat === 'fish' ? '가방에 물고기가 없어요' : '가방에 곤충이 없어요', it.icon); return; }
+      H.busy = true;
+      try {
+        const slot = await ui.bag.open({ mode: 'pick', title: cat === 'fish' ? '어항에 넣기' : '곤충 상자에 넣기', hint: cat === 'fish' ? '넣을 물고기를 골라 주세요' : '넣을 곤충을 골라 주세요', filter: s => ok(s) });
+        const picked = slot == null ? null : data.inventory.slots[slot];
+        if (!ok(picked) || data.inventory.remove(slot, 1) !== 1) return;
+        rec.holds = picked.id;
+        H.views.get(rec.id)?.obj?.setHolds(rec.holds);
+        events.emit('sfx', { name: cat === 'fish' ? 'splash' : 'bug-catch', volume: 0.6 });
+        toast(`${josa(nameOf(picked.id), '을/를')} ${it.name}에 넣었어요`, data.items.get(picked.id)?.icon);
+        saveSoon();
+      } finally { H.busy = false; }
+    }
+    function takeOut(rec) {
+      const data = ctx.services.data;
+      const id = rec.holds;
+      if (!id || !data.collect(id, 1).added) { toast('가방이 가득 찼어요', '🎒'); return false; }
+      rec.holds = null;
+      H.views.get(rec.id)?.obj?.setHolds(null);
+      toast(`${josa(nameOf(id), '을/를')} 꺼냈어요`, data.items.get(id)?.icon);
+      saveSoon();
+      return true;
     }
 
     function playerCell() { const { lx, lz } = playerLocal(); return `${Math.floor(lx)},${Math.floor(lz)}`; }
@@ -401,7 +467,11 @@ export default {
     function store(rec) {
       const data = ctx.services.data;
       const it = data?.items.get(rec.item), name = it?.name ?? rec.item;
-      const got = data?.collect ? data.collect(rec.item, 1) : { added: data?.inventory?.add?.(rec.item, 1) ?? 0 };
+      if (!data) return;
+      if (data.inventory.freeSlots() < (rec.holds ? 2 : 1)) { toast('가방이 가득 찼어요', '🎒'); return; }
+      if (rec.holds && !takeOut(rec)) return;
+      const opts = rec.variant ? { variant: rec.variant } : {};
+      const got = data.collect ? data.collect(rec.item, 1, opts) : { added: data.inventory.add(rec.item, 1, opts) };
       if (!got.added) { toast('가방이 가득 찼어요', '🎒'); return; }
       if (it?.plays === 'bgm' && S.radio && !S.furniture.some(r => r !== rec && data.items.get(r.item)?.plays === 'bgm')) {
         S.radio = false;
@@ -446,7 +516,11 @@ export default {
 
     async function workbench() {
       H.busy = true;
-      try { await openWorkbench(ctx); } finally { H.busy = false; }
+      try {
+        const onCraft = id => { player.play?.('happy'); events.emit('house:craft', { id, result: ctx.services.data?.recipes?.get?.(id)?.result ?? id }); };
+        if (ctx.services.ui?.craft) await ctx.services.ui.craft.open({ title: '작업대', onCraft });
+        else await openWorkbench(ctx);
+      } finally { H.busy = false; }
     }
 
     // ────────────────────────────── 기타 ──────────────────────────────
@@ -485,13 +559,15 @@ export default {
       const now = ctx.services.time?.now?.();
       for (const v of H.views.values()) v.obj?.tick(dt, now);
       H.room.setNight(ctx.services.time?.nightFactor ?? 0);
-      // 카메라: 방 가운데 둘레에서만 따라다니게 (벽 너머 어둠이 덜 보이게), 곡면 월드도 약하게
-      const f = ctx.focus, cam = ctx.camera;
-      const cx = clamp(f.x, ROOM.x - 1.2, ROOM.x + 1.2), cz = clamp(f.z, ROOM.z - 0.6, ROOM.z + 1.4);
-      cam.position.x += cx - f.x;
-      cam.position.z += cz - f.z;
-      f.x = cx; f.z = cz;
-      ctx.materials.curve.uCurve.value *= 0.3;
+      // 카메라: player.camera.setBounds 가 없는 예전 player 면 여기서 방 가운데 둘레로 당긴다
+      if (!player.camera?.setBounds) {
+        const f = ctx.focus, cam = ctx.camera;
+        const cx = clamp(f.x, CAMERA_BOX.x0, CAMERA_BOX.x1), cz = clamp(f.z, CAMERA_BOX.z0, CAMERA_BOX.z1);
+        cam.position.x += cx - f.x;
+        cam.position.z += cz - f.z;
+        f.x = cx; f.z = cz;
+        ctx.materials.curve.uCurve.value *= CAMERA_CURVE;
+      }
     }
 
     if (H.saveT > 0 && (H.saveT -= dt) <= 0) {

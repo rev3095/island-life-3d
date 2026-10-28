@@ -1,7 +1,7 @@
 // 창(패널) 쌓기, 키보드 길잡이, 포커스 관리.
 // 창이 하나라도 열려 있으면 ctx.input.enabled = false 로 게임 입력을 막고,
 // 키 입력은 core/input.js 로 넘기지 않고 맨 위 창이 받는다 (방향키·Enter·Esc·Tab).
-import { h, nextId, inkOn } from './dom.js';
+import { h, nextId, inkOn, iconEl } from './dom.js';
 
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 /** 보이는 포커스 가능 요소들 (문서 순서) */
@@ -149,16 +149,19 @@ export function button(label, { cls = '', onclick, primary, disabled, ...rest } 
 
 /**
  * 확인 창 (브라우저 confirm() 대신).
- * buttons: [{ label, value, primary }] — 기본은 예/아니요. Esc·바깥 누르기 = cancelValue.
+ * buttons: [{ label, value, primary, disabled }] — 기본은 예/아니요. Esc·바깥 누르기 = cancelValue.
+ * text 의 줄바꿈(
+)은 그대로 줄이 바뀐다. icon 은 이모지 또는 그림 경로.
  */
 export function confirmBox(panels, { title = '확인', text = '', icon, buttons, cancelValue = null } = {}) {
   buttons ??= [{ label: '예', value: true, primary: true }, { label: '아니요', value: false }];
   let p;
   const shell = panelShell({ cls: 'pk-confirm', title, onOutside: () => p.close(cancelValue) });
-  if (icon) shell.body.append(h('div', { class: 'pk-confirm-icon', 'aria-hidden': 'true', text: icon }));
+  if (icon) shell.body.append(h('div', { class: 'pk-confirm-icon', 'aria-hidden': 'true' }, iconEl(icon, 'pk-confirm-img')));
   shell.body.append(h('p', { class: 'pk-confirm-text', text }));
+  const first = Math.max(0, buttons.findIndex(b => !b.disabled));
   const row = h('div', { class: 'pk-btn-row' }, buttons.map((b, i) => button(b.label, {
-    primary: b.primary, onclick: () => p.close(b.value), ...(i === 0 ? { 'data-autofocus': '' } : {}),
+    primary: b.primary, disabled: !!b.disabled, onclick: () => p.close(b.value), ...(i === first ? { 'data-autofocus': '' } : {}),
   })));
   shell.foot.append(row);
   p = panels.open('confirm', shell.root, { onCancel: () => p.close(cancelValue) });

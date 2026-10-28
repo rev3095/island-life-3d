@@ -1,5 +1,5 @@
 // HUD: 왼쪽 위 시계·날짜·날씨, 오른쪽 위 도토리와 메뉴 단추, 오른쪽 아래 지금 든 도구, 왼쪽 아래 키 안내.
-import { h, fmt, clockText, nowFromDate, toolSvg, TOOL_NAME, WEATHER_ICON, WEATHER_NAME } from './dom.js';
+import { h, fmt, clockText, nowFromDate, toolSvg, TOOL_NAME, WEATHER_ICON, WEATHER_NAME, iconEl } from './dom.js';
 
 const HINT_KEYS = [['WASD', '이동'], ['Shift', '달리기'], ['Space', '행동'], ['F', '줍기'], ['Q/E', '도구'], ['I', '가방'], ['P', '섬폰'], ['M', '지도'], ['H', '안내 숨기기']];
 
@@ -88,7 +88,7 @@ export function createToasts() {
     while (showing < MAX && queue.length) {
       const { text, icon } = queue.shift();
       showing++;
-      const el = h('div', { class: 'pk-toast' }, icon && h('span', { class: 'pk-toast-icon', 'aria-hidden': 'true' }, icon), h('span', null, text));
+      const el = h('div', { class: 'pk-toast' }, icon && iconEl(icon, 'pk-toast-icon'), h('span', null, text));
       root.append(el);
       setTimeout(() => {
         el.classList.add('is-out');

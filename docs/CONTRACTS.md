@@ -146,6 +146,7 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 
 - 캐릭터: `assets/models/index.json`, 스펙 `assets/specs/<slug>.json`, 동작 `idle/walk/run/happy`. 정면 = -Y(블렌더) = +Z(three). 키 ≈ 1.0.
 - 배경: `assets/env/index.json`, 스펙 `assets/env/specs/<slug>.json` (`footprint`, `variants`, `animations: sway|shake|flicker`, `style.flat`).
+- 가구: `assets/furniture/index.json` (`item` → `slug`, `footprint`, `place`, `layer`), 스펙 `assets/furniture/specs/<slug>.json`, 모델 `ctx.assets.loadModel('assets/furniture/models/<slug>')`. 바닥 가구 원점 = 발자국 가운데 바닥, 벽·창문 가구 원점 = 벽면 바닥.
 - 타일 모델(`tile-grass` 등)은 1×1, 윗면 높이 0 (절벽은 윗면 1.0, 경사로는 1×2).
 
 ---
@@ -197,10 +198,39 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - 개발용: `forecast(dayKey?)`, `setHour(hh)`, `setPaused(bool)`, `setWeather(w, {instant})` (강제 날씨는 다음 날 5시에 풀림), `setSeasonOverride(season|null)`.
 
 ### 2차에서 정할 것
-- **실내 장면(P4)**: 집 안에선 비·눈·구름을 끄고 조명을 실내용으로 — `time.setIndoor(bool)` 또는 `scene:indoor {on}` 이벤트 중 하나로 정한다.
+- ~~실내 장면(P4)~~ → `time.setIndoor(bool)` + 이벤트 `scene:indoor {on}` (아래 '2차 W3 집·가구·제작' 절).
 - ~~외곽선 설정~~ → `main.js` 가 `settings:changed {key:'outline'}` 를 듣고 `userData.outline` 메시를 모두 켜고 끈다. 외곽선 메시를 새로 만들 땐 `userData.outline = true` 를 꼭 붙인다.
 - `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다.
 - **카메라와 하늘**: 기본 카메라에서 하늘이 잘 안 보여 구름·별·무지개가 묻힌다 — 화면 위쪽에 하늘 띠를 조금 남기는 쪽으로 조정.
+
+---
+
+## 2차 W3 집·가구·제작에서 추가된 약속 (2026-10-29)
+
+배경: `docs/notes/house.md`. 위 내용과 다르면 이 절이 우선한다. (다른 2차 트랙 절과 합칠 때 부딪히지 않게 '2차 준비' 절 앞에 두었다)
+
+### time (sky)
+- `time.setIndoor(bool)`, `time.indoor` — 집 안: 하늘 돔·별·구름·비·눈·무지개를 숨기고 실내 조명(낮 하얀 빛·밤 따뜻한 빛), 안개를 멀리 민다(객체는 그대로), 배경 = 방 밖 어둠. 시계·날씨는 계속 흐른다. 바뀔 때 이벤트 `scene:indoor {on}`.
+
+### ui
+- `ui.fade(on, sec = 0.3, color?) → Promise` — 화면 전환 막 (HUD 위, 창·알림 아래). 집·건물을 드나들 때 같이 쓴다.
+- `ui.craft.open({ title, color, onCraft(recipeId) }) → Promise<string[]>` — 작업대 창. 레시피 목록(✔·모자람) + 재료 가진 수/필요한 수 + 만들기(`data.recipes.craft`). 닫을 때까지 여러 번 만들 수 있고, 닫으면 만든 레시피 id 들.
+- `ui.confirm` 버튼에 `disabled`, 본문 `text` 의 줄바꿈(`
+`)은 그대로 줄이 바뀐다. 알림·확인 창 `icon` 도 그림 경로를 받는다.
+- 레시피 재료는 data 의 `needs: [{ id | category, n }]` 를 그대로 읽는다 (`category` = '조개 아무거나'). 계약의 `materials` 모양도 읽는다.
+
+### player
+- `player.camera.setBounds({ x0, x1, z0, z1 } | null)` — 카메라 중심이 머무는 네모(월드 좌표). `player.camera.setCurveScale(k)` — 곡면 월드 세기 배율(1 = 보통). 집 안에서 house 가 쓴다.
+
+### data
+- 가방 칸 `variant` (선택): `{ id, count, variant }` — 가구 색·주민 사진의 주민 slug. 같은 변형끼리만 쌓인다. `inventory.add(id, n, { variant })`, `inventory.canFit(id, n, { variant })`, `collect(id, n, { variant })`. 저장·불러오기에서 남는다. 변형 없는 칸은 예전 모양 그대로.
+- 가구 아이템 `icon` = `assets/furniture/renders/<slug>_thumb.png` (가구 모델 썸네일), `emoji` = 이모지. 대화 선택지처럼 글자 안에 넣을 때는 `emoji`.
+
+### gameplay · house
+- 행동 키 우선순위 추가: **가구 옮기는 중 120** (action = 내려놓기, pickup = 그만두기), 집 문 90, 실내 가구·작업대 80 (pickup = 바로 가방에), **실내 빈 바닥 = 가구 놓기 20** (집 안에선 도구 쓰기 10 까지 가지 않는다).
+- `ctx.services.house = { inside, furniture, enter(), leave(), place(item, spot?, { variant }), remove(id), workbench(), models(), room }` — 선물 연출처럼 가방을 거치지 않고 방에 놓을 때 `place`.
+- 이벤트: `house:enter {}`, `house:leave {}`, `house:craft {id, result}`.
+- 상태 `state.house = { furniture: [rec], inside, seeded, radio, nextId }` — 바닥 rec `{ id, item, gx, gz, rot, variant?, holds? }` (칸 = 돌린 발자국의 북서쪽, rot 0 남·1 동·2 북·3 서), 벽 rec `{ id, item, wall: 'n'|'w'|'e', slot, variant? }`. `holds` = 어항·곤충 상자에 넣어 둔 물고기·곤충 id, `radio` = 켜 둔 채널(시간대 곡 이름) 또는 null.
 
 ---
 

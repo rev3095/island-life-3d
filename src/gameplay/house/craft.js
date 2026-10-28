@@ -22,10 +22,13 @@ export function needsOf(data, r) {
   }));
 }
 
+/** 글자 안에 넣을 아이콘: 그림 경로면 이모지(item.emoji)로 */
+const textIcon = it => it?.emoji ?? (/\.(svg|png|webp|jpe?g)$/i.test(it?.icon ?? '') ? '🔨' : it?.icon ?? '🔨');
+
 function choiceLabel(data, r) {
   const it = data.items.get(r.result ?? r.id);
   const short = needsOf(data, r).filter(x => x.have < x.n).map(x => `${x.name} ${x.n - x.have}`);
-  return short.length ? `${it?.icon ?? '🔨'} ${it?.name ?? r.id} · ${short.join(', ')} 모자람` : `${it?.icon ?? '🔨'} ${it?.name ?? r.id}  ✔`;
+  return short.length ? `${textIcon(it)} ${it?.name ?? r.id} · ${short.join(', ')} 모자람` : `${textIcon(it)} ${it?.name ?? r.id}  ✔`;
 }
 
 /** 작업대를 연다. 무언가 만들었으면 true */

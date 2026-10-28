@@ -78,6 +78,7 @@ function cleanSlot(s) {
   const count = Math.floor(Number(s.count));
   if (!item || !(count > 0)) return null;
   const slot = { id: s.id, count: Math.min(count, item.stack) };
+  if (typeof s.variant === 'string' && s.variant && s.variant.length <= 40 && !item.durability) slot.variant = s.variant;
   if (item.durability) slot.uses = Number.isFinite(s.uses) ? Math.max(1, Math.min(item.durability, Math.floor(s.uses))) : item.durability;
   return slot;
 }
