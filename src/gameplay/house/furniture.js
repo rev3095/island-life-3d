@@ -1,8 +1,18 @@
 // 가구 모델 불러오기·만들기. assets/furniture/index.json 이 아이템 id → 모델 slug·발자국·놓는 곳을 알려 준다.
 // 모델은 .glb.json (assets.loadModel), 재질은 materials.applyToonStyle(스펙 style 그대로).
 // 움직이는 부분: 벽시계 바늘(hourHand·minuteHand) = 게임 시각, 모닥불 불꽃(flicker) = 반복 동작, 어항 물 = 반투명.
+// 어항·곤충 상자에 넣은 물고기·곤충은 그 아이템 id 로 정한 색으로 안의 물고기(fish)·풍뎅이(bug) 재질을 칠한다.
 
 const BASE = 'assets/furniture';
+const HOLD_MAT = { 'fish-tank': 'fish', 'bug-case': 'bug' };
+
+/** 넣은 생물 id → 색 (같은 id 는 늘 같은 색). 물고기는 밝게, 곤충은 진하게 */
+function holdColor(THREE, id, kind) {
+  let h = 2166136261;
+  for (const ch of String(id)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const hue = ((h >>> 0) % 360) / 360;
+  return `#${new THREE.Color().setHSL(hue, kind === 'fish' ? 0.7 : 0.45, kind === 'fish' ? 0.58 : 0.34).getHexString()}`;
+}
 
 export function createFurnitureKit(ctx) {
   const { THREE, assets, materials } = ctx;
@@ -55,14 +65,24 @@ export function createFurnitureKit(ctx) {
       for (const clip of animations) mixer.clipAction(clip).play();
     }
     const base = { ...sp.palette };
+    const holdKey = HOLD_MAT[m.slug] ?? null;
+    let held = null;
     function setVariant(v) {
+      variant = v;
       const pal = { ...base, ...(sp.variants?.[v]?.palette ?? {}) };
       for (const [name, hex] of Object.entries(pal)) toon.setColor(name, hex);
+      if (held) setHolds(held);
+    }
+    /** 어항·곤충 상자 안의 생물 (아이템 id, null = 원래 색) */
+    function setHolds(id) {
+      if (!holdKey) return;
+      held = id;
+      toon.setColor(holdKey, id ? holdColor(THREE, id, holdKey) : (sp.variants?.[variant]?.palette?.[holdKey] ?? base[holdKey]));
     }
     if (variant) setVariant(variant);
     return {
       root, info: m, spec: sp,
-      setVariant,
+      setVariant, setHolds,
       tick(dt, now) {
         mixer?.update(dt);
         if (hour && now) {
