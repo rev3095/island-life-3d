@@ -9,7 +9,7 @@
 ## 현재 상태 (2026-10-29 기준)
 
 ### 한 줄 요약
-2차 4트랙(W1 채집 · W2 주민·상점·박물관 · W3 집·가구·제작 · W4 동숲풍 셰이더)과 **그 후속 작업까지 모두 `main` 에 합쳤다** (마지막 합치기 215a315, 테스트 114/114). 섬에서 채집·꽃 심기·교배·주민 대화·편지·상점·박물관·집 꾸미기·제작이 모두 키보드로 플레이되고, 기본 화면은 `cozy` 셰이더(섬 나무·꽃·강에도 바람·물결)다. 배경 편집기에 가구 20종 탭을 넣어 게시했다. **3차(P6) 네 트랙의 작업 폴더를 만들어 두었고, 사용자가 시작을 말하면 세션을 연다.**
+2차 4트랙(W1 채집 · W2 주민·상점·박물관 · W3 집·가구·제작 · W4 동숲풍 셰이더)과 **그 후속 작업까지 모두 `main` 에 합쳤다** (마지막 합치기 215a315, 테스트 114/114). 섬에서 채집·꽃 심기·교배·주민 대화·편지·상점·박물관·집 꾸미기·제작이 모두 키보드로 플레이되고, 기본 화면은 `cozy` 셰이더(섬 나무·꽃·강에도 바람·물결)다. 배경 편집기에 가구 20종 탭을 넣어 게시했다. **3차(P6) 네 트랙 세션이 진행 중이다.**
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
@@ -20,19 +20,19 @@
 | 게임 | (아직 웹 게시 안 함 — X4 가 빌드, 조정 세션이 합친 뒤 게시) | `index.html` + `src/` | 로컬 `node dev-server.mjs` → http://localhost:4180/index.html (`?debug`, `?style=toon` 비교) |
 
 ### 진행 중
-없음. 2차 세션(W1~W4)은 모두 멈춤(idle), 각 브랜치는 main 에 다 들어갔다.
+없음. 2차 세션(W1~W4)은 모두 멈춤(idle), 각 브랜치는 main 에 다 들어갔다. 3차 네 세션이 작업 중 (아래 표).
 
-**3차 준비 완료 (세션 시작 대기)** — `docs/PLAN.md` 3차 표대로 main 1b200c4 에서 작업 폴더를 만들었다:
-| 트랙 | 브랜치 · 작업 폴더 | 포트 | 고치는 곳 |
-|---|---|---|---|
-| X1 휴대폰·조작 | `p6-mobile` · `../island-worktrees/p6-mobile` | 4195 | `src/core/input.js`, `src/ui/`, `index.html` `<head>` |
-| X2 성능·카메라·섬 경관 | `p6-perf` · `../island-worktrees/p6-perf` | 4196 | `src/player/camera.js`, `src/render/`, `src/world/` |
-| X3 첫날 흐름 | `p6-firstday` · `../island-worktrees/p6-firstday` | 4197 | `src/gameplay/intro/`(새), `gameplay/index.js` 한 줄, `town/keepers.js`·`lines/bamtol.js` 첫날 안내 |
-| X4 웹 배포 | `p6-deploy` · `../island-worktrees/p6-deploy` | 4198 | `tools/build-web.mjs`(새), `dist/`, `src/core/assets.js` (게시는 조정 세션이) |
+**3차 진행 중 (2026-10-29 시작)** — main 326b8bc 에서 갈라짐. 각 세션은 끝나면 이 세션에 보고한다.
+| 트랙 | 세션 id | 브랜치 · 작업 폴더 | 포트 | 고치는 곳 |
+|---|---|---|---|---|
+| X1 휴대폰·조작 | `local_4a015cb9-b2c5-43b4-b84d-26bb51c8458e` | `p6-mobile` · `../island-worktrees/p6-mobile` | 4195 | `src/core/input.js`, `src/ui/`, `index.html` `<head>` |
+| X2 성능·카메라·섬 경관 | `local_243f0bed-200b-4f74-ba6c-c92b2e293e4a` | `p6-perf` · `../island-worktrees/p6-perf` | 4196 | `src/player/camera.js`, `src/render/`, `src/world/` |
+| X3 첫날 흐름 | `local_7128a1e6-1b2e-4687-b848-59bcbcc801ed` | `p6-firstday` · `../island-worktrees/p6-firstday` | 4197 | `src/gameplay/intro/`(새), `gameplay/index.js` 한 줄, `town/keepers.js`·`lines/bamtol.js` 첫날 안내, `tests/intro.test.mjs` |
+| X4 웹 배포 | `local_56417e90-3480-4391-b745-8ca6dfd8615f` | `p6-deploy` · `../island-worktrees/p6-deploy` | 4198 | `tools/build-web.mjs`(새), `dist/`, `src/core/assets.js`, `tests/build-web.test.mjs` (게시는 조정 세션이) |
 주의: 세션 시작은 사용자가 채팅에서 직접 말한 턴에만 된다 (다른 세션 보고로 시작된 턴에서는 앱이 막음).
 
 ### 다음에 할 일
-1. 3차 네 세션 시작 → 끝나면 브랜치 검증·사용자 승인·합치기 (2차와 같은 순서) → X4 빌드로 게임을 웹 링크로 게시.
+1. 3차 네 세션이 끝나면 브랜치 검증·사용자 승인·합치기 (2차와 같은 순서) → X4 빌드로 게임을 웹 링크로 게시.
 2. 편집기 요청이 오면 "요청 확인" / "배경 요청 확인" 흐름.
 3. 남은 빈틈(3차에 안 넣은 것): 화석 감정(아이템 `fossil.unknown` 필요), 낚시 줄 당김 미니게임, 주민 집 안·이사·생일, 곤충 들추기 연출, 그림자에 바람 없음, 도구 아이콘 이모지 임시(D2).
 4. 1차 브랜치·작업 폴더(`p1-world`, `p2-data`, `ui-system`, `audio`, `sky-time`)와 2차(`p2-gather`, `p3-town`, `p4-house`, `stylized-shader`)는 모두 합쳐짐 → 사용자에게 정리 여부를 물은 뒤 `git worktree remove` + `git branch -d`.
@@ -133,6 +133,8 @@
 | 1 | devlog 로 맥락 불러와 다음 할 일 알려줘 | 두 프로젝트 devlog 읽기, 2차 브랜치·세션 상태 확인 → 4트랙 모두 시작 6분 뒤 "작업 중단" 지시로 멈췄고 커밋 0 | 다음 할 일 정리 |
 | 2 | 포근섬 2차 다시 시작 | 4세션에 "작업 개시, 이어서 진행"이 들어가 다시 돌기 시작한 것 확인 | 네 트랙 완료 보고 |
 | 3 | 합치기 승인 · 배경/캐릭터 편집기 · devlog 계속 갱신 · 이어서 개발 제안·실행·정리 | 브랜치 직접 검증(커밋·파일 겹침 없음·`merge-tree` 충돌 없음), `main` 에 `--no-ff` 4번, 테스트, 합친 게임 브라우저 확인, 두 편집기 db 확인(요청 0건), 배경 편집기에 가구 탭 추가·게시, 3차 계획 | 아래 |
+| 4 | (세션 보고들) | 2차 후속 네 브랜치를 차례로 합침(3bc5d5e · 9b931ed · f4bab90 · 215a315), 브라우저 재확인, 배경 편집기 버전 4(곤충 상자), 3차 작업 폴더 4개 | 3차 세션 시작은 앱이 막음 → 사용자에게 물음 |
+| 5 | 네, 시작 | 작업 폴더를 main 326b8bc 로 올리고 X1~X4 세션 시작 | 진행 중 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
