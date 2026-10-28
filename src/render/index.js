@@ -3,10 +3,14 @@
 // main.js 는 createView(ctx) 한 번, 창 크기가 바뀌면 view.setSize(w, h), 매 프레임 view.render(dt) 만 부른다.
 // 처음 프리셋: 주소 ?style= > 섬폰 설정(state.settings.style, 저장됨) > cozy. 섬폰에서 바꾸면 settings:changed {key:'style'} 로 따라간다.
 // 집 안(scene:indoor {on})에선 프리셋 위에 INDOOR 값을 잠깐 얹는다 (get() 은 얹기 전 값).
+// 품질(ctx.quality = 'high' | 'low'): main.js 가 처음 값을 정하고, 주소에 ?quality= 가 없으면 처음 몇 초 GPU 시간을 재 보고 느리면 low 로 낮춘다 (quality.js).
+// 매 프레임 그리기 전에 cull.js 가 화면 밖 캐릭터를 빼고 그림자 범위를 보이는 땅에 맞춘다.
 import * as THREE from 'three';
 import * as materials from '../core/materials.js';
 import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
+import { createCuller } from './cull.js';
+import { createAutoQuality, QUALITY } from './quality.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
 
@@ -48,8 +52,9 @@ function linearize(m) {
 
 export function createView(ctx, { preset: startPreset } = {}) {
   const { renderer, scene, camera, events } = ctx;
-  const quality = ctx.quality ?? 'high';
+  let quality = ctx.quality ?? 'high';
   const look = materials.look;
+  const culler = ctx.lights ? createCuller(ctx) : null;
   let post = null;                         // 화면 효과는 처음 쓸 때 만든다 ('toon' 만 쓰면 비용 0)
   const fromUrl = !!PRESETS[startPreset];
   const saved = ctx.state?.settings?.style;
@@ -106,6 +111,28 @@ export function createView(ctx, { preset: startPreset } = {}) {
     labels: { ...PRESET_LABELS },
     params: PARAMS,
     get quality() { return quality; },
+    /** 품질 바꾸기 ('high' | 'low'): 화소 배율 · 그림자 지도 크기 · 화면 효과 해상도. ctx.quality 도 바꾸고 quality:changed 를 보낸다 */
+    setQuality(q, { auto = false } = {}) {
+      if (!QUALITY[q] || q === quality) return quality;
+      quality = q;
+      ctx.quality = q;
+      const cfg = QUALITY[q];
+      renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.maxRatio));
+      const sun = ctx.lights?.sun;
+      if (sun && sun.shadow.mapSize.x !== cfg.shadowSize) {
+        sun.shadow.mapSize.setScalar(cfg.shadowSize);
+        sun.shadow.map?.dispose();
+        sun.shadow.map = null;                     // 다음 그림자 그리기 때 새 크기로 만든다
+      }
+      if (post) { post.dispose(); post = null; }   // 화면 효과는 새 품질로 다시 만든다 (빛 번짐·흐림 해상도)
+      view.setSize(size.w, size.h);
+      apply(live());
+      events?.emit('quality:changed', { quality: q, auto });
+      console.info(`[render] 품질 ${q}${auto ? ' (자동)' : ''}`);
+      return quality;
+    },
+    /** 자동 품질 판단 결과 (확인용): { state, gpu, frame, samples } */
+    get autoQuality() { return autoQ?.result ?? null; },
     /** set('toon') = 프리셋으로, set({ bloom: 0.5 }) = 지금 값에 덮어쓰기, set({ preset: 'cozy', ...값 }) = 프리셋 위에 덮어쓰기 */
     set(v) {
       if (typeof v === 'string') return service.use(v);
@@ -132,6 +159,8 @@ export function createView(ctx, { preset: startPreset } = {}) {
     stats() { return { ...last }; },
     /** 개발용: 화면 효과 묶음 (패스를 더하거나 재 볼 때) */
     get post() { return post; },
+    /** 개발용: 그리기 줄이기 (캐릭터 화면 밖 빼기 · 그림자 범위) — fitShadow 로 켜고 끈다 */
+    get culler() { return culler; },
   };
   ctx.services.style = service;
   apply(live());
@@ -139,8 +168,12 @@ export function createView(ctx, { preset: startPreset } = {}) {
   events?.on('data:loaded', () => { const s = ctx.state?.settings?.style; if (!fromUrl && PRESETS[s] && s !== presetName) service.use(s); });
   events?.on('settings:changed', ({ key, value }) => { if (key === 'style' && PRESETS[value]) service.use(value); });
   events?.on('scene:indoor', ({ on }) => { indoor = !!on; apply(live()); });
+  // 처음 몇 초 GPU 시간이 길면 low 로 (주소로 품질을 고른 경우·이미 low 면 하지 않는다)
+  const fixed = typeof location !== 'undefined' && new URLSearchParams(location.search).has('quality');
+  const autoQ = fixed || quality === 'low' ? null
+    : createAutoQuality(ctx, { onSlow: () => service.setQuality('low', { auto: true }) });
 
-  return {
+  const view = {
     service,
     setSize(w, h) {
       size.w = w; size.h = h;
@@ -150,6 +183,12 @@ export function createView(ctx, { preset: startPreset } = {}) {
     render(dt) {
       const t0 = performance.now();
       look.uStyleTime.value = (look.uStyleTime.value + dt) % 3600;
+      // renderer.info 가 화면 효과 패스마다 지워지지 않게 프레임 단위로 센다 (?debug 표시·성능 재기)
+      renderer.info.autoReset = false;
+      renderer.info.reset();
+      culler?.update(dt);
+      ctx.services.world?.prepareFrame?.();     // 배경 묶음: 보이는 칸만 (그림자 범위를 맞춘 뒤)
+      autoQ?.begin();
       // 새로 생긴 sky 셰이더 재질 찾기 (가벼움: 1초에 한 번)
       if ((scanIn -= dt) <= 0) {
         scanIn = 1;
@@ -173,8 +212,11 @@ export function createView(ctx, { preset: startPreset } = {}) {
         renderer.setScissorTest(false);
         renderer.shadowMap.autoUpdate = auto;
       }
+      autoQ?.end(dt);
       last.ms = performance.now() - t0;
       last.passes = params.post && post ? post.composer.passes.filter(p => p.enabled).map(p => p.constructor.name === 'ShaderPass' ? p.material.name : p.constructor.name) : ['direct'];
     },
+    culler,
   };
+  return view;
 }
