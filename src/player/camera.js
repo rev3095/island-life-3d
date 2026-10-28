@@ -1,0 +1,72 @@
+// 동물의 숲처럼 남쪽 위에서 비스듬히 내려다보는 고정 각도 카메라.
+// 플레이어를 부드럽게 따라가고(감쇠), 걷는 방향으로 살짝 앞을 비춘다. 휠·두 손가락으로 가까이/멀리.
+
+const PRESETS = {
+  near: { dist: 11, pitch: 27, curve: 0.0036 },      // 가까이: 낮게 보고 곡면을 세게 → 화면 위쪽에 휘어진 지평선
+  far: { dist: 21, pitch: 45, curve: 0.0018 },       // 멀리: 섬을 넓게
+};
+const LOOK_AHEAD = 0.34;      // 속도(칸/초) × 초
+const FOLLOW = 4.5;           // 따라가기 빠르기 (클수록 딱 붙는다)
+
+export function createCameraRig(ctx) {
+  const { THREE, camera, renderer, materials } = ctx;
+  const focus = new THREE.Vector3();
+  const ahead = new THREE.Vector3();
+  const tmp = new THREE.Vector3();
+  let zoom = 0.15, zoomTarget = 0.15;          // 0 = 가까이, 1 = 멀리
+  const lerp = THREE.MathUtils.lerp;
+
+  const el = renderer.domElement;
+  const onWheel = e => {
+    e.preventDefault();
+    zoomTarget = THREE.MathUtils.clamp(zoomTarget + Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 120) * 0.0035, 0, 1);
+  };
+  el.addEventListener('wheel', onWheel, { passive: false });
+  // 두 손가락 벌리기/모으기
+  const pts = new Map();
+  let pinch0 = 0, zoom0 = 0;
+  const spread = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+  el.addEventListener('pointerdown', e => { pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2) { pinch0 = spread(); zoom0 = zoomTarget; } });
+  el.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 2 && pinch0 > 0) zoomTarget = THREE.MathUtils.clamp(zoom0 - (spread() - pinch0) / 300, 0, 1);
+  });
+  const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = 0; };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  addEventListener('keydown', e => {
+    if (e.target.closest?.('input, textarea, select')) return;
+    if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomTarget = Math.min(1, zoomTarget + 0.25);
+    if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomTarget = Math.max(0, zoomTarget - 0.25);
+  });
+
+  function place() {
+    const pitch = THREE.MathUtils.degToRad(lerp(PRESETS.near.pitch, PRESETS.far.pitch, zoom));
+    const dist = lerp(PRESETS.near.dist, PRESETS.far.dist, zoom);
+    tmp.set(focus.x, focus.y + 0.55, focus.z);
+    camera.position.set(tmp.x, tmp.y + Math.sin(pitch) * dist, tmp.z + Math.cos(pitch) * dist);
+    camera.lookAt(tmp);
+    materials.curve.uCurve.value = lerp(PRESETS.near.curve, PRESETS.far.curve, zoom);
+    ctx.focus.copy(focus);
+  }
+
+  return {
+    get zoom() { return zoomTarget; },
+    setZoom(v) { zoomTarget = THREE.MathUtils.clamp(v, 0, 1); },
+    /** 순간이동할 때 (처음 섰을 때·집에서 나올 때) */
+    snap(target) { focus.copy(target); ahead.set(0, 0, 0); zoom = zoomTarget; place(); },
+    update(dt, target, vx, vz) {
+      const k = 1 - Math.exp(-dt * 3);
+      ahead.x += (vx * LOOK_AHEAD - ahead.x) * k;
+      ahead.z += (vz * LOOK_AHEAD * 0.7 - ahead.z) * k;
+      const f = 1 - Math.exp(-dt * FOLLOW);
+      focus.x += (target.x + ahead.x - focus.x) * f;
+      focus.z += (target.z + ahead.z - focus.z) * f;
+      focus.y += (target.y - focus.y) * (1 - Math.exp(-dt * 6));
+      zoom += (zoomTarget - zoom) * (1 - Math.exp(-dt * 6));
+      place();
+    },
+    dispose() { el.removeEventListener('wheel', onWheel); },
+  };
+}
