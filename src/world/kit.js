@@ -8,6 +8,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 const NO_OUTLINE = new Set(['eye', 'eyeHighlight', 'blush', 'marking', 'innerEar', 'glasses', 'glow', 'flame', 'flameCore', 'crack', 'paper',
   'waterLight', 'center', 'petalDark', 'rockDark', 'shellRib', 'flower', 'grassDark', 'pebble', 'window']);
 const FLAT = new Set(['eye', 'eyeHighlight', 'blush']);
+// 이름을 지켜야 하는 재질: sky(T5)가 재질 이름으로 밤 조명(glow·window)·빛무리(glow·flame)를 붙인다 → 따로 떼어 같은 이름의 재질로 그린다
+const NAMED = new Set(['glow', 'window', 'flame']);
 
 // 흔들림 셰이더: aSway = (세기, 중심 높이). 인스턴스 위치로 위상을 달리한다. aShake = 흔들기 시작 시각.
 const SWAY_GLSL = /* glsl */ `
@@ -29,13 +31,13 @@ export function createKit(ctx) {
   const uTime = { value: 0 };
   const matCache = new Map();
 
-  /** 꼭짓점 색 재질 (공유). kind: toon | flat | outline */
-  function material(type, { sway = false, width = 0.01 } = {}) {
-    const key = `${type}|${sway}|${type === 'outline' ? width : ''}`;
+  /** 꼭짓점 색 재질 (공유). type: toon | flat | outline, name: 재질 이름 (sky 가 이름으로 찾는다) */
+  function material(type, { sway = false, width = 0.01, name = `kit-${type}` } = {}) {
+    const key = `${type}|${sway}|${type === 'outline' ? width : name}`;
     if (matCache.has(key)) return matCache.get(key);
     let m;
     if (type === 'outline') m = materials.outlineMaterial(width);
-    else { m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name: `kit-${type}` }); m.vertexColors = true; }
+    else { m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name }); m.vertexColors = true; }
     if (sway) {
       const base = m.onBeforeCompile;
       const baseKey = m.customProgramCacheKey();
@@ -54,8 +56,9 @@ export function createKit(ctx) {
   /**
    * 판 만들기. gltf 장면의 메시를 원점 기준으로 굳혀 합친다.
    * opts.palette: 재질 이름 → 색 (스펙 palette + 변형), opts.sway: 흔들림을 쓸지, opts.outline: 외곽선 굵기 (0 이면 없음)
+   * opts.materialName: 합친 재질 이름 (땅 타일은 'ground' → 비 올 때 sky 가 젖은 색으로)
    */
-  function buildTemplate(gltf, spec, { palette = {}, sway = false, outline, castShadow = true, noOutline = [] } = {}) {
+  function buildTemplate(gltf, spec, { palette = {}, sway = false, outline, castShadow = true, noOutline = [], materialName = null } = {}) {
     const root = gltf.scene;
     root.updateMatrixWorld(true);
     // 흔들리는 노드: 애니메이션 트랙이 가리키는 노드 (나무는 canopy, 덤불은 전체)
@@ -69,7 +72,8 @@ export function createKit(ctx) {
     const width = outline ?? spec?.style?.outlineWidth ?? 0.01;
     const skipOutline = new Set([...NO_OUTLINE, ...(spec?.style?.noOutline ?? []), ...noOutline]);
     const flatSet = new Set([...FLAT, ...(spec?.style?.flat ?? [])]);
-    const groups = { toon: [], flat: [], outline: [] };
+    const groups = new Map();            // '종류|재질 이름' → 부품 목록
+    const push = (key, part) => { if (!groups.has(key)) groups.set(key, []); groups.get(key).push(part); };
     root.traverse(o => {
       if (!o.isMesh) return;
       const name = o.material.name;
@@ -88,14 +92,14 @@ export function createKit(ctx) {
         g.setAttribute('aSway', new THREE.BufferAttribute(sw, 2));
       }
       const part = { g, name, srcColor: o.material.color.clone() };
-      groups[flatSet.has(name) ? 'flat' : 'toon'].push(part);
-      if (width > 0 && !skipOutline.has(name)) groups.outline.push({ g: g.clone(), name });
+      const type = flatSet.has(name) ? 'flat' : 'toon';
+      push(`${type}|${NAMED.has(name) ? name : materialName ?? `kit-${type}`}`, part);
+      if (width > 0 && !skipOutline.has(name)) push('outline|', { g: g.clone(), name });
     });
 
     const parts = [];
-    for (const type of ['toon', 'flat', 'outline']) {
-      const list = groups[type];
-      if (!list.length) continue;
+    for (const [key, list] of groups) {
+      const [type, matName] = key.split('|');
       const ranges = [];
       let start = 0;
       for (const p of list) { ranges.push({ name: p.name, start, count: p.g.attributes.position.count, src: p.srcColor }); start += p.g.attributes.position.count; }
@@ -104,7 +108,7 @@ export function createKit(ctx) {
       geo.computeBoundingSphere();
       parts.push({
         type, geometry: geo, ranges,
-        material: material(type, { sway, width }),
+        material: material(type, { sway, width, name: matName || undefined }),
         castShadow: type !== 'outline' && castShadow, receiveShadow: type !== 'outline',
       });
     }

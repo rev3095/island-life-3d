@@ -9,6 +9,9 @@ const ACCEL = 14;                     // 속도 따라가기 (1/초)
 const TURN = 13;                      // 최대 회전 (라디안/초)
 const FADE = 0.18;                    // 동작 바꿀 때 섞는 시간
 const STEP_SFX = { sand: 'step-sand', wood: 'step-wood', ramp: 'step-wood' };
+// facing = three 의 rotation.y 와 같은 뜻: 0 = 북쪽(-Z), +π/2 = 서쪽(-X), π = 남쪽, -π/2 = 동쪽.
+// 모델 정면은 +Z 라서 모델 rotation.y = facing + π.
+const facingOf = (dx, dz) => Math.atan2(-dx, -dz);
 
 let P = null;                         // 이 모듈의 상태
 
@@ -31,7 +34,7 @@ export default {
     const hand = model.getObjectByName('armR') ?? model.getObjectByName('arm.R');
     const toolMount = new THREE.Group();
     toolMount.position.set(0, 0.11, 0.02);
-    toolMount.rotation.set(Math.PI * 0.5, 0, 0);
+    toolMount.rotation.set(Math.PI * 0.7, 0, 0);       // 손잡이가 앞 위쪽으로 비스듬히
     hand?.add(toolMount);
 
     P = {
@@ -48,7 +51,7 @@ export default {
     P.position.set(useSaved ? saved.x : sp.x, 0, useSaved ? saved.z : sp.z);
     P.facing = useSaved ? saved.facing ?? 0 : sp.facing ?? 0;
     P.position.y = world ? world.island.heightAt(P.position.x, P.position.z) : 0;
-    root.rotation.y = Math.PI - P.facing;
+    root.rotation.y = P.facing + Math.PI;
     P.rig.snap(P.position);
     play('idle');
 
@@ -61,7 +64,7 @@ export default {
       get frozen() { return P.frozen; },
       get speed() { return P.speed; },
       tileInFront() { const p = api.pointInFront(0.75); return world ? world.island.toTile(p.x, p.z) : { tx: 0, tz: 0 }; },
-      pointInFront(dist = 0.75) { return { x: P.position.x + Math.sin(P.facing) * dist, z: P.position.z - Math.cos(P.facing) * dist }; },
+      pointInFront(dist = 0.75) { return { x: P.position.x - Math.sin(P.facing) * dist, z: P.position.z - Math.cos(P.facing) * dist }; },
       setTool,
       play(name) { playOnce(name); },
       freeze(v = true) { P.frozen = !!v; if (P.frozen) { P.vx = P.vz = 0; } },
@@ -69,11 +72,11 @@ export default {
       teleport(x, z, facing = P.facing) {
         P.position.set(x, world ? world.island.heightAt(x, z) : 0, z);
         P.facing = facing; P.vx = P.vz = 0;
-        root.rotation.y = Math.PI - facing;
+        root.rotation.y = facing + Math.PI;
         P.rig.snap(P.position);
       },
       /** 바라보는 방향으로 돌기 (대화 상대 쪽 등) */
-      face(x, z) { P.facing = Math.atan2(x - P.position.x, -(z - P.position.z)); root.rotation.y = Math.PI - P.facing; },
+      face(x, z) { P.facing = facingOf(x - P.position.x, z - P.position.z); root.rotation.y = P.facing + Math.PI; },
       camera: P.rig,
       /** 숫자키 도구 바꾸기를 이 모듈이 맡을지 (gameplay 가 가방 확인 후 바꾸려면 false) */
       set toolKeys(v) { P.toolKeys = v; }, get toolKeys() { return P.toolKeys; },
@@ -83,7 +86,7 @@ export default {
 
     const TOOLS = ctx.constants.TOOLS;
     events.on('input:press', ({ intent }) => {
-      if (!P.toolKeys || P.frozen) return;
+      if (!P.toolKeys || P.frozen || !ctx.input.enabled || ctx.services.ui?.isBlocking?.()) return;
       const n = /^tool([1-5])$/.exec(intent);
       if (n) setTool(P.tool === TOOLS[n[1] - 1] ? null : TOOLS[n[1] - 1]);
       else if (intent === 'toolNone') setTool(null);
@@ -123,9 +126,9 @@ export default {
     P.vz += (tz - P.vz) * k;
     if (Math.hypot(P.vx, P.vz) < 0.02 && mag < 0.05) P.vx = P.vz = 0;
 
-    // 바라보는 방향: 입력 방향으로 부드럽게 (0 = 북쪽 -Z, 시계 방향)
+    // 바라보는 방향: 입력 방향으로 부드럽게
     if (mag > 0.05) {
-      const want = Math.atan2(mx, -mz);
+      const want = facingOf(mx, mz);
       let d = want - P.facing;
       d = Math.atan2(Math.sin(d), Math.cos(d));
       P.facing += Math.sign(d) * Math.min(Math.abs(d), TURN * dt);
@@ -148,7 +151,7 @@ export default {
       const dy = gy - pos.y;
       pos.y = Math.abs(dy) > 0.6 ? gy : pos.y + dy * (1 - Math.exp(-dt * 22));
     }
-    P.root.rotation.y = Math.PI - P.facing;
+    P.root.rotation.y = P.facing + Math.PI;
 
     // 동작
     const moving = P.speed > 0.25 && mag > 0.05;

@@ -27,7 +27,7 @@ export const BUILDINGS = {
  * 섬 만들기. 돌려주는 값은 순수 데이터 (배열·목록) 이고, createIslandApi 가 조회 함수를 붙인다.
  * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads }}
  */
-export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'] } = {}) {
+export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], nativeFruit: fruitWanted = null } = {}) {
   const rng = mulberry32(seed);
   const N = w * h;
   const K = new Uint8Array(N);           // 타일 종류 (처음엔 모두 바다)
@@ -240,7 +240,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     const [fw, fd] = BUILDINGS[kind].fp;
     const ox = Math.round(fx - fw / 2), oz = Math.round(fz - fd / 2);
     let spot = null;
-    for (let r = 0; r <= 7 && !spot; r++) {
+    for (let r = 0; r <= 20 && !spot; r++) {             // 목표 자리 가까운 곳부터 넓혀 가며 찾는다
       const ring = [];
       for (let dz = -r; dz <= r; dz++) for (let dx = -r; dx <= r; dx++) if (Math.max(Math.abs(dx), Math.abs(dz)) === r) ring.push([dx, dz]);
       ring.sort((p, q) => Math.hypot(...p) - Math.hypot(...q));
@@ -261,7 +261,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     return b;
   };
 
-  const museum = placeBuilding('museum', w * 0.345, h * 0.3, 1, {});
+  const museum = placeBuilding('museum', w * 0.345, h * 0.3, 1, {}) ?? placeBuilding('museum', w * 0.345, h * 0.42, 0, {});   // 언덕에 자리가 없으면 아래에
   const shop = placeBuilding('shop', w * 0.728, h * 0.535, 0, {});
   const playerHouse = placeBuilding('house-player', w * 0.273, h * 0.73, 0, { owner: 'player' });
   const VILLAGER_SPOTS = { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47] };
@@ -338,6 +338,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   reserve(spawnT.tx, spawnT.tz, 2);
   for (const b of bridges) { reserve(b.tx - 1, b.tz, 1); reserve(b.tx + 2, b.tz, 1); }
   for (const r of ramps) { reserve(r.tx, r.tzTop - 1, 1); reserve(r.tx, r.tzTop + 2, 1); }
+  for (const b of buildings) if (b.kind === 'museum' || b.kind === 'shop') reserve(b.door.tx, b.door.tz + 1, 2);   // 큰 건물 앞마당
 
   // 광장: 모닥불·안내판·벤치·가로등
   if (inside(plazaC.tx, plazaC.tz)) {
@@ -392,7 +393,8 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
 
   // 과수원 언덕 (지도 13번): 고장 과일나무
   const FRUITS = ['apple', 'pear', 'peach', 'cherry', 'orange'];
-  const nativeFruit = pick(FRUITS, rng);
+  const fruitRolled = pick(FRUITS, rng);                            // 난수 순서를 지키려고 늘 뽑는다
+  const nativeFruit = FRUITS.includes(fruitWanted) ? fruitWanted : fruitRolled;   // data 모듈이 정한 특산 과일이 있으면 그걸로
   const orchard = { tx: Math.round(w * 0.81), tz: Math.round(h * 0.76) };
   {
     const spots = [];

@@ -13,7 +13,11 @@ export default {
   async init(ctx) {
     const { THREE, constants, state, assets, events, scene } = ctx;
     const t0 = performance.now();
-    const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS });
+    // 특산 과일은 data 모듈(T2)이 시드로 정한다 → 과일나무 열매 색을 거기에 맞춘다 (item.variant = fruit-tree 변형 이름)
+    const data = ctx.services.data;
+    const fruitId = data?.economy?.nativeFruit?.();
+    const nativeFruit = fruitId ? (data.items?.get?.(fruitId)?.variant ?? String(fruitId).split('.')[1]) : null;
+    const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit });
     const base = createIslandApi(gen);
 
     // 배경 모델 32종을 한꺼번에 불러온다 (같은 모델은 assets 가 캐시)
@@ -63,6 +67,22 @@ export default {
       /** 원(반지름 r)을 (fx,fz) → (nx,nz) 로 옮긴다. 막히면 미끄러진 자리 {x, z} */
       collide: (fx, fz, nx, nz, r, y) => collision.move(fx, fz, nx, nz, r, y),
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
+      nativeFruit: gen.nativeFruit,
+      /** 날마다 새로 놓는 것(조개·잡초·화석 자리·꽃)의 후보 칸. data.day.pickSpots(후보, n, 'fossil') 에 바로 넣으면 된다 */
+      spawnTiles(kind) {
+        const out = [];
+        const wantSand = kind === 'shell';
+        for (let tz = 0; tz < gen.h; tz++) for (let tx = 0; tx < gen.w; tx++) {
+          const k = island.tileAt(tx, tz);
+          if (wantSand ? k !== 'sand' : k !== 'grass') continue;
+          if (base.flagsAt(tx, tz) || objects.api.at(tx, tz)) continue;
+          if (wantSand && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => island.tileAt(tx + a, tz + b) === 'sea')) continue;   // 조개는 물가 모래
+          const { x, z } = island.toWorld(tx, tz);
+          if (collision.blockedAt(x, z)) continue;
+          out.push({ tx, tz, x, z, level: island.levelAt(tx, tz) });
+        }
+        return out;
+      },
       debug: { gen, kit, terrain, objects, collision, models },
     };
     if (ctx.debug) stats = createStats(ctx);

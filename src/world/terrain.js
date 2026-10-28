@@ -27,7 +27,9 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     const flatGround = +k !== KIND.CLIFF && +k !== KIND.RAMP;
     const palette = { ...spec.palette, ...(+k === KIND.WATER ? spec.variants?.river?.palette : null) };
     // 평평한 바닥(풀·모래·길·광장·물)은 외곽선을 빼서 칸 무늬가 바둑판처럼 보이지 않게 한다
-    templates[k] = kit.buildTemplate(gltf, spec, { palette, castShadow: !flatGround, outline: flatGround ? 0 : undefined });
+    // 땅 재질 이름 'ground' → 비가 오면 sky 가 젖은 색으로 바꾼다 (물은 빼고)
+    templates[k] = kit.buildTemplate(gltf, spec, { palette, castShadow: !flatGround, outline: flatGround ? 0 : undefined,
+      materialName: +k === KIND.WATER ? null : 'ground' });
   }
 
   const batches = new Map();
