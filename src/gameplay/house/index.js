@@ -106,6 +106,17 @@ export default {
 
     // 저장된 가구 다시 놓기
     await Promise.all(S.furniture.map(r => spawn(r)));
+    H.list = S.furniture;
+    // 게임 중에 저장을 다시 불러오거나 처음부터 하면(save.load/reset) data 가 가구 목록을 새 배열로 바꾼다 → 모델을 맞춘다
+    H.resync = () => {
+      if (!Array.isArray(S.furniture)) S.furniture = [];
+      H.moving = null;
+      const keep = new Set(S.furniture);
+      for (const [id, v] of H.views) if (!keep.has(v.rec)) { v.obj?.dispose(); H.views.delete(id); }
+      for (const r of S.furniture) if (!H.views.has(r.id) && kit.info(r.item)) spawn(r);
+      H.list = S.furniture;
+      S.inside = H.inside;   // 서 있는 곳은 player 가 정한다 — 지금 있는 곳을 그대로 적는다
+    };
 
     // ── 행동 키 ──
     const I = ctx.services.gameplay.interactions;
@@ -449,6 +460,7 @@ export default {
 
   update(dt, ctx) {
     if (!H) return;
+    if (H.S.furniture !== H.list) H.resync();
     const player = ctx.services.player, input = ctx.input;
     const blocked = ctx.services.ui?.isBlocking?.() || input.enabled === false;
 
