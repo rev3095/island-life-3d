@@ -23,6 +23,7 @@ export const PARAMS = [
   { key: 'rimPower', label: '가장자리 빛 폭', group: '빛', type: 'range', min: 1, max: 6, step: 0.1 },
   { key: 'spec', label: '장난감 하이라이트', group: '빛', type: 'range', min: 0, max: 2, step: 0.01 },
   { key: 'specSize', label: '하이라이트 크기', group: '빛', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'glow', label: '불꽃·반딧불 빛나기', group: '빛', type: 'range', min: 0, max: 3, step: 0.01 },
   // ── 움직임 ──
   { key: 'wind', label: '바람 (잎·꽃)', group: '움직임', type: 'range', min: 0, max: 2, step: 0.01 },
   { key: 'windSpeed', label: '바람 빠르기', group: '움직임', type: 'range', min: 0.2, max: 3, step: 0.01 },
@@ -61,7 +62,7 @@ export const PARAMS = [
 const TOON = {
   bands: 2, bandSoft: 0, shadeFloor: 0.659, wrap: 1, castDark: 1, ao: 0, aoHeight: 0.45,
   shadeTint: '#FFFFFF', litTint: '#FFFFFF', shadeSat: 0, paint: 0, paintScale: 0.35,
-  rim: 0, rimChar: 0, rimPower: 3, spec: 0, specSize: 0.5,
+  rim: 0, rimChar: 0, rimPower: 3, spec: 0, specSize: 0.5, glow: 0,
   wind: 0, windSpeed: 1, water: 0, waterScale: 1,
   outline: 'ink', outlineScale: 1, outlineTint: 0, outlineDark: 0.55,
   post: false, exposure: 1, shoulder: 1, bloom: 0, bloomRadius: 0.4, bloomThreshold: 1.1,
@@ -73,7 +74,7 @@ const TOON = {
 const COZY = {
   bands: 3, bandSoft: 0.55, shadeFloor: 0.5, wrap: 0.45, castDark: 0.7, ao: 0.35, aoHeight: 0.45,
   shadeTint: '#D8CEF2', litTint: '#FFF6E8', shadeSat: 0.3, paint: 0.07, paintScale: 0.35,
-  rim: 0.25, rimChar: 0.9, rimPower: 2.6, spec: 0.8, specSize: 0.5,
+  rim: 0.25, rimChar: 0.9, rimPower: 2.6, spec: 0.8, specSize: 0.5, glow: 1.2,
   wind: 1, windSpeed: 1, water: 1, waterScale: 1,
   outline: 'subtle', outlineScale: 0.6, outlineTint: 0.8, outlineDark: 0.5,
   post: true, exposure: 1.06, shoulder: 0.72, bloom: 0.35, bloomRadius: 0.5, bloomThreshold: 1.05,
@@ -82,5 +83,10 @@ const COZY = {
 };
 
 export const PRESETS = { cozy: COZY, toon: TOON };
+
+// 집 안(scene:indoor)에서 프리셋 위에 얹는 값: 따뜻한 실내 빛이라 그늘을 덜 파랗게, 방이 작으니 흐림은 약하게
+export const INDOOR = {
+  cozy: { shadeTint: '#EADDE8', shadeSat: 0.2, tiltTop: 0.6, tiltBottom: 0.25, tiltFocus: 0.45, vignette: 0.32, warmth: 0.18, ao: 0.42 },
+};
 export const DEFAULT_PRESET = 'cozy';
 export const PRESET_LABELS = { cozy: '포근 (동숲풍)', toon: '툰 (예전)' };
