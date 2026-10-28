@@ -194,6 +194,8 @@ export async function createVillager(ctx, person, town) {
     const want = shouldBeOut(person, now, weather);
     if (want && V.mode === 'home') {
       if ((V.emergeDelay -= THINK) <= 0) emerge();
+    } else if (want && V.mode === 'toDoor') {
+      idle(1 + r() * 2);   // 집에 가던 길인데 다시 밖에 있을 시각 (시계를 돌렸을 때)
     } else if (!want && (V.mode === 'idle' || V.mode === 'walk' || V.mode === 'chat')) { V.partner = null; V.bubble = null; goHome(); }
   }
 
