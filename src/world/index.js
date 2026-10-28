@@ -5,8 +5,9 @@ import { buildTerrain } from './terrain.js';
 import { createObjects } from './objects.js';
 import { createCollision } from './collision.js';
 import { createDaily } from './daily.js';
+import { createOcclusion } from './occlusion.js';
 
-let kit, terrain, objects, stats = null, elapsed = 0;
+let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
 
 export default {
   name: 'world',
@@ -31,6 +32,7 @@ export default {
     terrain = buildTerrain(ctx, gen, base, kit, models);
     objects = createObjects(ctx, base, kit, models, collision);
     objects.populate(gen.objects);
+    occlusion = createOcclusion(ctx, objects);
 
     // 구역(zone): 섬 밖에 따로 놓은 공간(집 실내 등)이 자기 바닥·벽을 쓰게 하는 갈고리.
     // zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }
@@ -100,6 +102,10 @@ export default {
       /** 움직이는 충돌체 (주민·플레이어): m = { x, z, r, y?, active? } (getter 가능) → 해제 함수. 섬 위 collide 가 원으로 밀어낸다 (자기 자신은 빼고) */
       addMover: m => collision.addMover(m),
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
+      /** 그리기 직전에 render 가 부른다: 배경 묶음마다 본 카메라·그림자 카메라에 걸리는 칸만 GPU 에 담기 (곡면 월드 반영) */
+      prepareFrame: () => kit.prepareFrame(),
+      /** 가림 투명: 카메라와 플레이어(·대화 상대) 사이 나무·건물을 비치게. watch(getPoint) → 해제 함수 로 보이게 할 점을 더한다 */
+      occlusion: { watch: fn => occlusion.watch(fn), get enabled() { return occlusion.enabled; }, set enabled(v) { occlusion.enabled = v; }, list: () => occlusion.list() },
       nativeFruit: gen.nativeFruit,
       /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */
       palette(kind, variant = null) {
@@ -122,6 +128,7 @@ export default {
     kit.uTime.value = elapsed;
     terrain.update(dt, elapsed);
     objects.update(dt);
+    occlusion.update(dt);
     kit.updateCulling();
     stats?.update(dt);
   },

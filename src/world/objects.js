@@ -233,6 +233,8 @@ export function createObjects(ctx, island, kit, models, collision) {
 
   return {
     api, group, templates, batches,
+    /** 안쪽 기록 (묶음·칸 번호까지). 가림 투명(occlusion.js)이 쓴다 */
+    raw: id => byId.get(id),
     /** 생성기가 만든 물체 + 저장된 변경(없앤 것·놓은 것·변형) 적용 */
     populate(list) {
       const isl = state.island;
@@ -259,7 +261,6 @@ export function createObjects(ctx, island, kit, models, collision) {
       }
     },
     update(dt) {
-      for (const b of batches.values()) b.flush();
       for (const o of singles) o.single.mixer.update(dt);
     },
     setOutlineVisible(v) { for (const b of batches.values()) b.setOutlineVisible(v); },

@@ -1,11 +1,13 @@
-// 지형 그리기: 타일 모델을 종류·구역(16×16칸)별 InstancedMesh 로, 섬 밖 바다는 큰 판 하나로, 폭포는 따로.
+// 지형 그리기: 타일 모델을 종류별 InstancedMesh 로 (칸마다 화면 밖 판정은 kit), 섬 밖 바다는 큰 판 하나로, 폭포는 따로.
 // 바닷가는 coast.js: 부드러운 모래 앞치마 + 바다 셰이더의 얕은 물빛·물가 거품·밀려오는 물결.
 import * as THREE from 'three';
 import { KIND, LEVEL_HEIGHT, WATER_TOP } from './island.js';
 import { mulberry32 } from './rng.js';
 import { buildCoast, patchSea } from './coast.js';
 
-export const CHUNK = 16;                       // 구역 크기 (화면 밖 구역은 그리지 않는다)
+// 구역 크기. 화면 밖 판정은 kit 묶음이 칸마다 하므로 구역을 섬 전체로 크게 둔다 → 종류마다 묶음 하나 (그리기 호출 적게).
+// (예전 16×16 구역: 섬 하나에 묶음 180여 개, 보이는 묶음 통째로 그림)
+export const CHUNK = 64;
 const SEA_Y = WATER_TOP - 0.02;                // 바다 판 높이 (강 물 타일보다 살짝 아래 → 겹침 깜빡임 없음)
 
 // 타일 종류 → 모델 slug, 변형
@@ -32,6 +34,8 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     // 땅 재질 이름 'ground' → 비가 오면 sky 가 젖은 색으로 바꾼다 (물은 빼고)
     templates[k] = kit.buildTemplate(gltf, spec, { palette, castShadow: !flatGround, outline: flatGround ? 0 : undefined,
       materialName: +k === KIND.WATER ? null : 'ground' });
+    // 땅은 물체(나무·집·캐릭터) 다음에 그린다 → 물체에 가린 땅 조각은 깊이 시험에서 먼저 버려진다 (땅 셰이더가 화면 대부분을 칠해서 크다)
+    templates[k].renderOrder = 1;
   }
 
   const batches = new Map();
@@ -60,7 +64,6 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     m4.compose(p.set(x, y, zz), q, LIFT[k] != null ? wide : one);
     batchFor(k, tx, tz).add(i, m4);
   }
-  for (const b of batches.values()) b.flush();
 
   const coast = buildCoast(ctx, gen, models['tile-sand'].spec.palette, SEA_Y);
   coast.apron.renderOrder = 1;
