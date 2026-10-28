@@ -283,10 +283,10 @@ async function runBgm(full) {
     const seconds = full ? Math.ceil(SONGS[n].loopSec * 2 + 2) : 20;
     const t0 = performance.now();
     rows.push({ ...(await levels.measureTrack(n, { seconds })), ms: performance.now() - t0 });
-    table(rows, [['곡', r => `${r.title} (${r.name})`], ['초', r => r.seconds], ['peak dBFS', warnPeak], ['RMS dBFS', warnRms], ['0.4초 최대 RMS', r => fmt(r.shortDb)], ['clip', r => r.clipped], ['렌더 ms', r => r.ms.toFixed(0)]]);
+    table(rows, [['곡', r => `${r.title} (${r.name})`], ['초', r => r.seconds], ['LUFS', r => fmt(r.lufs)], ['peak dBFS', warnPeak], ['RMS dBFS', warnRms], ['0.4초 최대 RMS', r => fmt(r.shortDb)], ['clip', r => r.clipped], ['렌더 ms', r => r.ms.toFixed(0)]]);
   }
   window.__lastLevels = rows;
-  log(`배경음 측정 끝: RMS ${Math.min(...rows.map(r => r.rmsDb)).toFixed(1)} ~ ${Math.max(...rows.map(r => r.rmsDb)).toFixed(1)} dBFS, 최고 peak ${Math.max(...rows.map(r => r.peakDb)).toFixed(1)}`);
+  log(`배경음 측정 끝: ${Math.min(...rows.map(r => r.lufs)).toFixed(1)} ~ ${Math.max(...rows.map(r => r.lufs)).toFixed(1)} LUFS, 최고 peak ${Math.max(...rows.map(r => r.peakDb)).toFixed(1)} dBFS`);
 }
 $('measureBgm').onclick = () => runBgm(false);
 $('measureFull').onclick = () => runBgm(true);
@@ -296,7 +296,7 @@ $('measureOther').onclick = async () => {
   const voices = await levels.measureVoices();
   const rows = [...sfx.map(r => ({ ...r, kind: '효과음' })), ...voices.map(r => ({ ...r, kind: `목소리 ${r.seconds.toFixed(2)}초` }))];
   window.__lastLevels = rows;
-  table(rows, [['이름', r => r.name], ['종류', r => r.kind], ['peak dBFS', warnPeak], ['0.4초 최대 RMS', r => fmt(r.shortDb)], ['clip', r => r.clipped]]);
+  table(rows, [['이름', r => r.name], ['종류', r => r.kind], ['peak dBFS', warnPeak], ['LUFS', r => fmt(r.lufs)], ['0.4초 최대 RMS', r => fmt(r.shortDb)], ['clip', r => r.clipped]]);
 };
 
 log('준비됨 — 아무 곳이나 눌러서 소리를 켜세요.');

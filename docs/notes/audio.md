@@ -22,6 +22,22 @@
 2. **`bgm('auto')` / `bgm(null)` 의미**를 위 표처럼 계약에 적기. 집 안에 들어갈 때 gameplay 가 `bgm('indoor')`, 나올 때 `bgm('auto')`.
 3. 개발용 추가 멤버(계약 밖): `stopVoice()`, `unlocked`, `current`(지금 곡), `wanted`(골라야 할 곡), `position`(마디·바퀴), `stats()`(살아 있는 노드 수), `context`, `engine`. 게임 코드는 계약의 5개만 쓰면 된다.
 
+## 소리 고치는 법 (데모 페이지는 계속 유지)
+
+`demos/audio.html` 은 소리를 다듬는 작업대로 계속 둔다. `node dev-server.mjs --port=4185` → http://localhost:4185/demos/audio.html, 고친 뒤 새로고침하면 바로 들린다.
+
+| 고칠 것 | 파일 · 위치 |
+|---|---|
+| 곡의 멜로디·화음 | `src/audio/songs.js` 곡마다 `mel`(음이름:박자, `\|` 마디선) · `prog`(화음 기호). 길이가 안 맞으면 불러올 때 오류로 알려 준다 |
+| 곡의 반주·변주 | 같은 파일 `bar(s, i, pass)` — `pass % 2 === 1` 이 두 번째 바퀴 |
+| 곡 전체 크기 | 곡 정의의 `gain`, 악기별 크기는 `setup` 의 `s.channel(이름, { gain, pan, verb })` |
+| 악기 음색 | `src/audio/instruments.js` 의 `TONED`(배음·감쇠) · `UNTONED`(타악기·자연 소리) |
+| 효과음 소리·크기 | `src/audio/sfx.js` 의 `RECIPES`(소리) · `TRIM_DB`(크기, dB) |
+| 주민 목소리 | `src/audio/voice.js` 의 `VOICES` — `f0` 높이, `syl` 빠르기, `formant` 입 크기, `gain` 크기 |
+| 시각별 자동 곡 | `src/audio/index.js` 의 `trackForHour` |
+
+고친 뒤에는 데모의 **레벨 측정** 버튼으로 크기를 다시 본다: 배경음은 곡끼리 LUFS 가 ±2dB 안, peak 는 −1 dBFS 아래(빨간 표시 없음)면 된다.
+
 ## 다른 트랙이 보내 주면 좋은 효과음
 
 - player: 걸음마다 `sfx {name:'step-grass'|'step-sand'|'step-wood'}` (칸 종류에 따라), 도구 사용 때 `cast` · `net-swing` · `dig` · `axe-wood` · `axe-rock` · `water`
