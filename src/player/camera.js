@@ -1,9 +1,16 @@
 // 동물의 숲처럼 남쪽 위에서 비스듬히 내려다보는 고정 각도 카메라.
 // 플레이어를 부드럽게 따라가고(감쇠), 걷는 방향으로 살짝 앞을 비춘다. 휠·두 손가락으로 가까이/멀리.
 
-const PRESETS = {
-  near: { dist: 11, pitch: 27, curve: 0.0036 },      // 가까이: 낮게 보고 곡면을 세게 → 화면 위쪽에 휘어진 지평선
-  far: { dist: 21, pitch: 45, curve: 0.0018 },       // 멀리: 섬을 넓게
+// 섬 밖(바깥): 조금 낮게 보고 곡면을 세게 → 휘어 넘어가는 지평선 위로 하늘 띠가 남는다 (기본 확대 0.15 에서 화면 위 5~8%, 가까이 10%).
+// 곡면이 셀수록 지평선이 가까워지고, 각도가 낮을수록 화면 위 끝이 수평에 가까워진다. 둘을 같이 맞춘 값.
+export const PRESETS = {
+  near: { dist: 11, pitch: 22, curve: 0.0064 },      // 가까이: 낮게 보고 곡면을 세게 → 화면 위쪽에 휘어진 지평선과 하늘
+  far: { dist: 21, pitch: 40, curve: 0.0030 },       // 멀리: 섬을 넓게 (하늘은 거의 안 보인다)
+};
+// 집 안(setBounds 가 걸렸을 때)은 예전 각도 그대로 — W3 가 이 각도로 방이 다 보이는 카메라 범위를 맞췄다
+const INDOOR = {
+  near: { dist: 11, pitch: 27, curve: 0.0036 },
+  far: { dist: 21, pitch: 45, curve: 0.0018 },
 };
 const LOOK_AHEAD = 0.34;      // 속도(칸/초) × 초
 const FOLLOW = 4.5;           // 따라가기 빠르기 (클수록 딱 붙는다)
@@ -43,14 +50,15 @@ export function createCameraRig(ctx) {
   });
 
   function place() {
-    const pitch = THREE.MathUtils.degToRad(lerp(PRESETS.near.pitch, PRESETS.far.pitch, zoom));
-    const dist = lerp(PRESETS.near.dist, PRESETS.far.dist, zoom);
+    const P = bounds ? INDOOR : PRESETS;
+    const pitch = THREE.MathUtils.degToRad(lerp(P.near.pitch, P.far.pitch, zoom));
+    const dist = lerp(P.near.dist, P.far.dist, zoom);
     const fx = bounds ? THREE.MathUtils.clamp(focus.x, bounds.x0, bounds.x1) : focus.x;
     const fz = bounds ? THREE.MathUtils.clamp(focus.z, bounds.z0, bounds.z1) : focus.z;
     tmp.set(fx, focus.y + 0.55, fz);
     camera.position.set(tmp.x, tmp.y + Math.sin(pitch) * dist, tmp.z + Math.cos(pitch) * dist);
     camera.lookAt(tmp);
-    materials.curve.uCurve.value = lerp(PRESETS.near.curve, PRESETS.far.curve, zoom) * curveScale;
+    materials.curve.uCurve.value = lerp(P.near.curve, P.far.curve, zoom) * curveScale;
     ctx.focus.set(fx, focus.y, fz);
   }
 
