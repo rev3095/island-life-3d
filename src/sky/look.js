@@ -11,7 +11,8 @@ export const hex = h => {
 export const SKY = {
   dawn: { zenith: '#A9C9EE', horizon: '#F9C9A5', hemiSky: '#FFE4D2', hemiGround: '#B3AE98', hemiI: 1.3, sun: '#FFC9A0', sunI: 1.8 },
   day: { zenith: '#8FD3F4', horizon: '#D8F1FF', hemiSky: '#EEF8FF', hemiGround: '#C9D79F', hemiI: 1.5, sun: '#FFF8EC', sunI: 2.3 },
-  dusk: { zenith: '#7A6BB3', horizon: '#F59E79', hemiSky: '#FFCDB3', hemiGround: '#9A88A8', hemiI: 1.2, sun: '#FF9C68', sunI: 1.9 },
+  // 노을 빛은 주황보다 분홍 쪽으로 (진한 주황 햇빛이면 풀이 올리브색이 된다)
+  dusk: { zenith: '#7A6BB3', horizon: '#F59E79', hemiSky: '#FCD8D2', hemiGround: '#A898BE', hemiI: 1.25, sun: '#FFBC9C', sunI: 1.9 },
   night: { zenith: '#1E2A5A', horizon: '#3B4D8A', hemiSky: '#98ACEC', hemiGround: '#55609A', hemiI: 1.15, sun: '#BCC8FF', sunI: 0.8 },
 };
 const PAL = Object.fromEntries(Object.entries(SKY).map(([k, p]) => [k, {
