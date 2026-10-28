@@ -50,7 +50,7 @@ export function villagerState(state, slug) {
   v.backDay ??= null;      // 답례 선물을 준 날 (하루 한 번)
   v.request ??= null;      // { cat, id, label, day }
   v.doneDay ??= null;      // 부탁을 끝낸 날
-  v.pending ??= [];        // 가방이 꽉 차서 못 준 물건 id
+  v.pending ??= [];        // 가방이 꽉 차서 못 준 물건: id 또는 { id, variant }
   v.photo ??= false;       // 친밀도 최고 사진을 줬나
   v.thankedDay ??= null;   // 고맙다는 편지를 보낸 부탁의 날
   return v;

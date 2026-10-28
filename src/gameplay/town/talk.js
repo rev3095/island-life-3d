@@ -31,12 +31,12 @@ export function speaker(ctx, who, vars = {}) {
   };
 }
 
-/** 물건 받기 (data.collect: 도토리 주머니는 지갑으로). 다 못 받았으면 남은 수 */
-export function giveItem(ctx, id, n = 1) {
+/** 물건 받기 (data.collect: 도토리 주머니는 지갑으로). opts.variant = 가방 칸 변형 (주민 사진의 주민 slug). 다 못 받았으면 남은 수 */
+export function giveItem(ctx, id, n = 1, opts = {}) {
   const data = ctx.services.data, ui = ctx.services.ui;
   const it = data?.items?.get?.(id);
   if (!data || !it) return n;
-  const res = data.collect(id, n);
+  const res = data.collect(id, n, opts.variant ? { variant: opts.variant } : undefined);
   if (res.acorns > 0) {
     ui.toast(`도토리 ${res.acorns.toLocaleString('ko-KR')}개를 받았어요`, '🌰');
     ctx.events.emit('sfx', { name: 'acorn' });
@@ -87,13 +87,14 @@ export function createTalk(ctx, { lines }) {
     V.chatWith = null;
     if (daily.up) greet.push(...tierUp(daily.up));   // 말 걸기 보너스로 단계가 올랐으면 인사에 붙인다
 
-    // 지난번에 가방이 꽉 차서 못 준 물건
+    // 지난번에 가방이 꽉 차서 못 준 물건 (항목은 id 또는 { id, variant })
     if (v.pending.length) {
-      vars.item = itemName(v.pending[0]);
+      const entry = p => (typeof p === 'string' ? { id: p } : p);
+      vars.item = itemName(entry(v.pending[0]).id);
       await say([...greet, ...pickLines(L.gift.pending, r)]);
       greet = [];
       const left = [];
-      for (const id of v.pending) if (giveItem(ctx, id) > 0) left.push(id);
+      for (const p of v.pending) { const e = entry(p); if (giveItem(ctx, e.id, 1, e) > 0) left.push(p); }
       v.pending = left;
     }
     // 친해지면 가끔 먼저 선물
@@ -127,8 +128,9 @@ export function createTalk(ctx, { lines }) {
       vars.item = itemName('furn.villager-photo');
       V.happy();
       await say([...before, ...L.photo]);
-      const left = giveItem(ctx, 'furn.villager-photo');
-      if (left > 0) { giveLater(v, 'furn.villager-photo', left); await say(pickLines(L.gift.full, r)); }
+      // 사진 변형 = 주민 slug (집에 놓으면 그 주민 사진이 걸린다)
+      const left = giveItem(ctx, 'furn.villager-photo', 1, { variant: V.slug });
+      if (left > 0) { v.pending.push({ id: 'furn.villager-photo', variant: V.slug }); await say(pickLines(L.gift.full, r)); }
     }
 
     // ---- 부탁 ----
