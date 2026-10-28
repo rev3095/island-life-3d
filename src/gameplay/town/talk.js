@@ -41,6 +41,7 @@ export function giveItem(ctx, id, n = 1) {
     ui.toast(`도토리 ${res.acorns.toLocaleString('ko-KR')}개를 받았어요`, '🌰');
     ctx.events.emit('sfx', { name: 'acorn' });
   } else if (res.added > 0) {
+    try { ctx.services.player?.act?.('pickup', { lock: false })?.catch?.(() => {}); } catch { /* 동작이 없어도 괜찮다 */ }
     ui.toast(`${josa(res.added > 1 ? `${it.name} ${res.added}개` : it.name, '을')} 받았어요`, it.icon);
     ctx.events.emit('sfx', { name: 'pickup' });
   }
@@ -81,7 +82,9 @@ export function createTalk(ctx, { lines }) {
     let greet;
     if (first) greet = L.intro.slice();
     else if (V.talkFrom === 'toDoor') greet = [...pickLines(L.greet[c.slot] ?? L.greet.evening, r, recent), ...pickLines(L.goingHome, r, recent)];
+    else if (V.chatWith && L.chatting) { vars.other = V.chatWith.person.name; greet = pickLines(L.chatting, r, recent); }
     else greet = greetingLines(L, cc);
+    V.chatWith = null;
     if (daily.up) greet.push(...tierUp(daily.up));   // 말 걸기 보너스로 단계가 올랐으면 인사에 붙인다
 
     // 지난번에 가방이 꽉 차서 못 준 물건

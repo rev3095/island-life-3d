@@ -52,6 +52,7 @@ export function villagerState(state, slug) {
   v.doneDay ??= null;      // 부탁을 끝낸 날
   v.pending ??= [];        // 가방이 꽉 차서 못 준 물건 id
   v.photo ??= false;       // 친밀도 최고 사진을 줬나
+  v.thankedDay ??= null;   // 고맙다는 편지를 보낸 부탁의 날
   return v;
 }
 
@@ -236,4 +237,32 @@ export function surpriseGift(v, person, dayKey, r) {
   if (r() >= 0.12 + (v.friendship - 30) / 700) return null;
   v.backDay = dayKey;
   return pickWeighted(person.gifts, r).id;
+}
+
+// ---------- 편지 ----------
+
+const LETTER_CHANCE = { friend: 0.18, close: 0.3, best: 0.4 };
+export const LETTERS_PER_DAY = 3;
+
+/**
+ * 그날 아침 우편함에 올 편지 계획 (같은 날엔 같다) → [{ from, kind: 'thanks'|'friend'|'close', gift, mark? }]
+ * thanks = 1~3일 안에 부탁을 들어준 주민 (mark 를 v.thankedDay 에 적으면 다시 안 보낸다). 친구 이상은 가끔.
+ */
+export function planLetters(state, people, dayKey) {
+  const out = [];
+  for (const P of Object.values(people)) {
+    const v = state.villagers?.[P.slug];
+    if (!v?.met) continue;
+    const r = rngOf(dayKey, P.slug, 'mail');
+    const gift = chance => (P.gifts?.length && r() < chance ? pickWeighted(P.gifts, r).id : null);
+    const since = daysBetween(v.doneDay, dayKey);
+    if (v.doneDay && v.thankedDay !== v.doneDay && since >= 1 && since <= 3) {
+      out.push({ from: P.slug, kind: 'thanks', gift: gift(0.6), mark: v.doneDay });
+      continue;
+    }
+    const tier = tierOf(v.friendship);
+    if (LETTER_CHANCE[tier] && r() < LETTER_CHANCE[tier]) out.push({ from: P.slug, kind: tier === 'friend' ? 'friend' : 'close', gift: gift(0.5) });
+  }
+  const rank = p => (p.kind === 'thanks' ? 0 : 1);
+  return out.sort((a, b) => rank(a) - rank(b)).slice(0, LETTERS_PER_DAY);
 }
