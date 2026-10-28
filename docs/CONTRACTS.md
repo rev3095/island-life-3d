@@ -293,3 +293,29 @@ objects.query(...) 결과에 scale 추가
 ### 재질 (W4 셰이더와 맞출 것)
 - gather 메시: `toonMaterial('#ffffff', { name: 'gather' | 'gather-flat' })` 에 `vertexColors = true` 를 켠 공용 재질 + `outlineMaterial(0.0035~0.005)`. 떨어진 물건은 `InstancedMesh`.
 - 투명: `fishShadow`(opacity 0.42, depthWrite false), `fx-ring`, `fireflyGlow`. 곤충 날개는 `side = DoubleSide`. 낚싯줄은 `THREE.Line` + `toonMaterial(flat)`.
+
+---
+
+## 2차 W4 스타일 셰이더 (stylized-shader)
+
+자세한 설명: `docs/SHADERS.md`. 비교·조절: `demos/style.html`.
+
+### `style` — W4 (src/render/)
+```js
+preset → 'cozy' | 'toon'          // cozy = 동숲풍 기본, toon = 2차 이전 모습(2단 명암·갈색 잉크 외곽선·화면 효과 없음)
+presets, labels, params           // 프리셋 복사본, 화면 이름, 조절 값 목록(이름·묶음·범위)
+use(name),  set({...값} | name),  get()       // set 은 지금 값에 덮어쓰기, set({ preset, ...값 }) 은 프리셋 위에
+compare({ on, x, preset | params })            // 나눠 보기 (편집기용)
+stats() → { ms, passes }
+```
+- 이벤트 `style:changed {preset, params}`. 주소 `?style=toon|cozy` 가 저장값보다 먼저.
+- **처음 프리셋**: `?style=` > `state.settings.style`(섬폰 설정, 저장됨) > `cozy`. ui 는 바꿀 때 `settings:changed {key:'style', value}` 를 보내면 render 가 따라간다.
+- **집 안**: `scene:indoor {on}` 을 받으면 프리셋 위에 실내 값(`presets.js` 의 `INDOOR`)을 잠깐 얹는다.
+
+### materials 추가
+- `ctx.materials.look` (모든 스타일 재질이 함께 쓰는 uniform), `STYLE_NAMES`, `styleClass(name)`, `setOutlinesVisible(bool)`.
+- `toonMaterial(color, { flat, bend, name, character, wind, water, spec, glow, styleAttr })` — 이름으로 효과가 정해진다: 바람 `leaf weed petal petalDark flower stem grassDark`, 물결 `sea water waterLight waterDeep waterfall`, 하이라이트 `beak shell metal nose glasses fruit coconut window acorn bowtie`, 빛나기 `flame flameCore firefly sparkle`.
+- **여러 재질을 한 메시로 합칠 때**(world 배경 묶음처럼): 꼭짓점 속성 `aStyle = styleClass(재질 이름)` (0 없음 · 1 바람 · 2 물결 · 3 하이라이트) 을 넣고 재질을 `styleAttr: true` 로 만든다. 외곽선 판에 `color` 속성 + `vertexColors = true` 를 주면 은은한 외곽선이 그 색을 따른다.
+- `outlineMaterial(width, { color, bend, base, wind, styleAttr })` — 외곽선 메시엔 계속 `userData.outline = true`. 섬폰 외곽선 끄기는 메시 `visible`, 스타일 `outline: 'off'` 는 재질 `visible` 을 끈다.
+- 셰이더를 덧씌울 때: `#include <begin_vertex>` 표시를 지우지 않는다. uniform 이름 `uTime` 은 world 가 쓰므로 스타일은 `uStyleTime`.
+- 새 `ShaderMaterial` 은 화면 색(sRGB)을 그대로 내보내도 render 가 화면 효과 때 선형으로 바꿔 준다. 직접 맞추려면 sky 처럼 `linearToOutputTexel( vec4( sRGBTransferEOTF( vec4(c, 1.0) ).rgb, a ) )`.

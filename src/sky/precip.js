@@ -24,10 +24,14 @@ void main() {
   vA = uAlpha * smoothstep(0.0, 1.2, y) * (1.0 - smoothstep(uBox.y - 3.0, uBox.y, y)) * (0.55 + 0.45 * aEnd);
   gl_Position = projectionMatrix * viewMatrix * vec4(bend(p), 1.0);
 }`;
-const RAIN_FS = /* glsl */ `
+// 색은 화면 색(sRGB)으로 계산하고 skyOut 으로 내보낸다 (화면 효과 버퍼에 그려도 같은 색)
+const SKY_OUT = /* glsl */ `
+vec4 skyOut( vec3 c, float a ) { return linearToOutputTexel( vec4( sRGBTransferEOTF( vec4( c, 1.0 ) ).rgb, a ) ); }
+`;
+const RAIN_FS = /* glsl */ `${SKY_OUT}
 uniform vec3 uColor;
 varying float vA;
-void main() { gl_FragColor = vec4(uColor, vA); }`;
+void main() { gl_FragColor = skyOut(uColor, vA); }`;
 
 // 빗방울이 땅에 닿아 퍼지는 동그라미
 const SPLASH_VS = /* glsl */ `
@@ -45,7 +49,7 @@ void main() {
   gl_PointSize = (0.1 + 0.5 * vT) * uScale / -mv.z;
   vA = uAlpha * (1.0 - vT);
 }`;
-const SPLASH_FS = /* glsl */ `
+const SPLASH_FS = /* glsl */ `${SKY_OUT}
 uniform vec3 uColor;
 varying float vT, vA;
 void main() {
@@ -53,7 +57,7 @@ void main() {
   float d = length(q);
   float ring = smoothstep(0.5, 0.42, d) * smoothstep(0.26, 0.4, d);
   if (ring * vA < 0.01) discard;
-  gl_FragColor = vec4(uColor, ring * vA);
+  gl_FragColor = skyOut(uColor, ring * vA);
 }`;
 
 const SNOW_VS = /* glsl */ `
@@ -70,13 +74,13 @@ void main() {
   gl_PointSize = min((0.09 + aSeed * 0.08) * uScale / -mv.z, 9.0 * uPixel);   // 카메라 코앞 송이가 너무 크지 않게
   vA = uAlpha * smoothstep(0.0, 0.8, y) * (1.0 - smoothstep(uBox.y - 3.0, uBox.y, y));
 }`;
-const SNOW_FS = /* glsl */ `
+const SNOW_FS = /* glsl */ `${SKY_OUT}
 varying float vA;
 void main() {
   float d = length(gl_PointCoord - 0.5);
   float a = smoothstep(0.5, 0.2, d) * vA;
   if (a < 0.01) discard;
-  gl_FragColor = vec4(1.0, 1.0, 1.0, a);
+  gl_FragColor = skyOut(vec3(1.0), a);
 }`;
 
 // 무지개: 반원 띠. 하늘 돔처럼 카메라를 따라다니며 맨 뒤에 그린다.
@@ -87,7 +91,7 @@ void main() {
   vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   gl_Position = p.xyww;
 }`;
-const BOW_FS = /* glsl */ `
+const BOW_FS = /* glsl */ `${SKY_OUT}
 uniform float uAlpha, uInner, uOuter, uDrop;
 varying vec2 vP;
 vec3 band(float t) {
@@ -109,7 +113,7 @@ void main() {
   float foot = smoothstep(uDrop - 8.0, uDrop + 20.0, vP.y);       // 지평선 쪽 발치는 흐리게
   float a = edge * foot * uAlpha;
   if (a < 0.005) discard;
-  gl_FragColor = vec4(band(t), a);
+  gl_FragColor = skyOut(band(t), a);
 }`;
 
 export function createPrecip(curve) {

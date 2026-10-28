@@ -173,11 +173,22 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       }, t)));
     };
     drawTime();
+    // 화면 모습 (스타일 셰이더 프리셋): 고른 값은 state.settings.style 로 저장되고 render 가 settings:changed 로 따라간다
+    const style = ctx.services.style;
+    const styleRow = h('div', { class: 'pk-seg', role: 'group', 'aria-label': '화면 모습' });
+    const drawStyle = () => {
+      const cur = style?.preset ?? s.style ?? 'cozy';
+      styleRow.replaceChildren(...[['cozy', '포근'], ['toon', '툰 (예전)']].map(([m, t]) => h('button', {
+        type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(cur === m), disabled: !style,
+        onclick: () => { setSetting('style', m); drawStyle(); styleRow.querySelector('[aria-pressed="true"]')?.focus(); },
+      }, t)));
+    };
+    drawStyle();
     view.append(...[
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
       h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
-      h('h3', { class: 'pk-set-head' }, '화면'), toggle('outline', '외곽선'), toggle('keyHint', '키 안내 보기'),
+      h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, toggle('outline', '외곽선'), toggle('keyHint', '키 안내 보기'),
     ].filter(Boolean));
   }
 

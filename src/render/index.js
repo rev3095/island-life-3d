@@ -1,9 +1,11 @@
 // 그리기 담당: 스타일 값(프리셋)을 재질 uniform·외곽선·화면 효과에 나눠 넣고, 매 프레임 장면을 그린다.
 // ctx.services.style = { preset, presets, params, set(값|프리셋이름), get(), use(이름), compare({on, x, preset|params}), stats() }
 // main.js 는 createView(ctx) 한 번, 창 크기가 바뀌면 view.setSize(w, h), 매 프레임 view.render(dt) 만 부른다.
+// 처음 프리셋: 주소 ?style= > 섬폰 설정(state.settings.style, 저장됨) > cozy. 섬폰에서 바꾸면 settings:changed {key:'style'} 로 따라간다.
+// 집 안(scene:indoor {on})에선 프리셋 위에 INDOOR 값을 잠깐 얹는다 (get() 은 얹기 전 값).
 import * as THREE from 'three';
 import * as materials from '../core/materials.js';
-import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET } from './presets.js';
+import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -49,8 +51,13 @@ export function createView(ctx, { preset: startPreset } = {}) {
   const quality = ctx.quality ?? 'high';
   const look = materials.look;
   let post = null;                         // 화면 효과는 처음 쓸 때 만든다 ('toon' 만 쓰면 비용 0)
-  let presetName = PRESETS[startPreset] ? startPreset : DEFAULT_PRESET;
+  const fromUrl = !!PRESETS[startPreset];
+  const saved = ctx.state?.settings?.style;
+  let presetName = fromUrl ? startPreset : PRESETS[saved] ? saved : DEFAULT_PRESET;
   let params = clone(PRESETS[presetName]);
+  let indoor = false;
+  /** 지금 그릴 값: 집 안이면 INDOOR 를 얹는다 */
+  const live = () => (indoor && INDOOR[presetName] ? sanitize(INDOOR[presetName], params) : params);
   let compare = null;                      // { x: 0~1, params } — 왼쪽은 compare.params, 오른쪽은 지금 값
   let scanIn = 0;
   const last = { ms: 0, passes: [] };
@@ -72,6 +79,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
     look.uAO.value = p.ao; look.uAOHeight.value = p.aoHeight;
     look.uWind.value = p.wind; look.uWindSpeed.value = p.windSpeed;
     look.uWater.value = p.water; look.uWaterScale.value = p.waterScale;
+    look.uGlow.value = p.glow;
     // 외곽선: ink = 예전 갈색 잉크 그대로, subtle = 가늘고 물체 색을 어둡게, off = 재질째 숨김 (섬폰 외곽선 끄기와는 따로)
     const ink = p.outline === 'ink';
     look.uOutlineScale.value = ink ? 1 : p.outlineScale;
@@ -103,7 +111,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
       if (typeof v === 'string') return service.use(v);
       const base = v?.preset && PRESETS[v.preset] ? (presetName = v.preset, PRESETS[v.preset]) : params;
       params = sanitize(v, base);
-      apply(params);
+      apply(live());
       events?.emit('style:changed', { preset: presetName, params: clone(params) });
       return clone(params);
     },
@@ -111,7 +119,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
       if (!PRESETS[name]) return clone(params);
       presetName = name;
       params = clone(PRESETS[name]);
-      apply(params);
+      apply(live());
       events?.emit('style:changed', { preset: presetName, params: clone(params) });
       return clone(params);
     },
@@ -119,21 +127,25 @@ export function createView(ctx, { preset: startPreset } = {}) {
     /** 나눠 보기 (편집기): on, x(0~1, 왼쪽 몫), preset 또는 params (왼쪽에 그릴 값) */
     compare({ on = true, x = 0.5, preset = 'toon', params: left } = {}) {
       compare = on ? { x, params: sanitize(left ?? PRESETS[preset] ?? PRESETS.toon, PRESETS.toon) } : null;
-      if (!compare) apply(params);
+      if (!compare) apply(live());
     },
     stats() { return { ...last }; },
     /** 개발용: 화면 효과 묶음 (패스를 더하거나 재 볼 때) */
     get post() { return post; },
   };
   ctx.services.style = service;
-  apply(params);
+  apply(live());
+  // 저장을 불러온 뒤 / 섬폰 설정을 바꿨을 때 (주소로 고른 프리셋이 있으면 그게 먼저)
+  events?.on('data:loaded', () => { const s = ctx.state?.settings?.style; if (!fromUrl && PRESETS[s] && s !== presetName) service.use(s); });
+  events?.on('settings:changed', ({ key, value }) => { if (key === 'style' && PRESETS[value]) service.use(value); });
+  events?.on('scene:indoor', ({ on }) => { indoor = !!on; apply(live()); });
 
   return {
     service,
     setSize(w, h) {
       size.w = w; size.h = h;
       renderer.setSize(w, h, false);
-      if (post) { post.setSize(w, h); if (params.post) post.apply(params); }
+      if (post) { post.setSize(w, h); const p = live(); if (p.post) post.apply(p); }
     },
     render(dt) {
       const t0 = performance.now();
@@ -144,19 +156,20 @@ export function createView(ctx, { preset: startPreset } = {}) {
         scene.traverse(o => { const m = o.material; if (Array.isArray(m)) m.forEach(linearize); else if (m) linearize(m); });
       }
       if (!compare) {
-        frame(params, dt);
+        frame(live(), dt);
       } else {
         // 왼쪽 = 비교 값, 오른쪽 = 지금 값. 그림자 지도는 첫 번째 그릴 때 한 번만 만든다
         const w = size.w, h = size.h, sx = Math.round(w * compare.x);
         apply(compare.params);
         renderer.setScissorTest(false);
         frame(compare.params, dt);
-        apply(params);
+        const right = live();
+        apply(right);
         const auto = renderer.shadowMap.autoUpdate;
         renderer.shadowMap.autoUpdate = false;
         renderer.setScissor(sx, 0, w - sx, h);
         renderer.setScissorTest(true);
-        frame(params, dt);
+        frame(right, dt);
         renderer.setScissorTest(false);
         renderer.shadowMap.autoUpdate = auto;
       }
