@@ -1,0 +1,78 @@
+{
+  "id": "FU-14",
+  "slug": "fish-tank",
+  "item": "furn.fish-tank",
+  "name": "어항",
+  "category": "furniture",
+  "kind": "fish-tank",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "나무 받침 위 네모 어항. 물풀과 물고기 한 마리, 보글보글 공기 방울.",
+    "keywords": [
+      "유리 테두리",
+      "물풀",
+      "물고기",
+      "공기 방울"
+    ],
+    "references": [
+      "교실 뒤 어항"
+    ],
+    "avoid": [
+      "거대한 수족관"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "flat": [
+      "glint"
+    ],
+    "noOutline": [
+      "bubble",
+      "glint",
+      "gravel",
+      "tankWater"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "woodDark": "#8C6440",
+    "frame": "#6B7F86",
+    "tankWater": "#9ED6E8",
+    "gravel": "#E2D2AE",
+    "seaweed": "#5FAE5A",
+    "fish": "#F39A3B",
+    "bubble": "#F2FBFF",
+    "glint": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "wood": "받침",
+    "woodDark": "받침 문",
+    "frame": "어항 테",
+    "tankWater": "물",
+    "gravel": "모래",
+    "seaweed": "물풀",
+    "fish": "물고기",
+    "bubble": "공기 방울",
+    "glint": "유리 반짝임"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

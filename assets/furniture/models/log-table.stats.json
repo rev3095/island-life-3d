@@ -1,0 +1,50 @@
+{
+  "id": "FU-02",
+  "slug": "log-table",
+  "item": "furn.log-table",
+  "name": "통나무 테이블",
+  "category": "furniture",
+  "kind": "log-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1584,
+  "parts": 1,
+  "materials": [
+    "bark",
+    "ring",
+    "wood"
+  ],
+  "objects": [
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    1.64,
+    1.64,
+    0.72
+  ],
+  "bounds": [
+    [
+      -0.82,
+      -0.82,
+      0.0
+    ],
+    [
+      0.82,
+      0.82,
+      0.723
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 33348,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "log-table_front.png",
+    "log-table_main.png",
+    "log-table_thumb.png",
+    "log-table_top.png"
+  ]
+}

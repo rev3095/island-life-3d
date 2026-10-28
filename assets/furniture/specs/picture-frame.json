@@ -1,0 +1,72 @@
+{
+  "id": "FU-16",
+  "slug": "picture-frame",
+  "item": "furn.picture-frame",
+  "name": "액자",
+  "category": "furniture",
+  "kind": "picture-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "주민이 선물한 그림 액자. 언덕과 해가 있는 섬 풍경 그림.",
+    "keywords": [
+      "나무 액자",
+      "언덕 그림",
+      "걸이 끈"
+    ],
+    "references": [
+      "거실 풍경화"
+    ],
+    "avoid": [
+      "어두운 유화"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "canvasSky",
+      "canvasHill",
+      "canvasHill2",
+      "canvasSun",
+      "canvasCloud",
+      "string"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#B98957",
+    "canvasSky": "#BFE6F7",
+    "canvasHill": "#8CCB6E",
+    "canvasHill2": "#5FAE5A",
+    "canvasSun": "#F6C84C",
+    "canvasCloud": "#FFFFFF",
+    "string": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "액자 테",
+    "canvasSky": "하늘",
+    "canvasHill": "언덕",
+    "canvasHill2": "뒷언덕",
+    "canvasSun": "해",
+    "canvasCloud": "구름",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

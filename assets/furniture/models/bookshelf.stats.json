@@ -1,0 +1,54 @@
+{
+  "id": "FU-09",
+  "slug": "bookshelf",
+  "item": "furn.bookshelf",
+  "name": "책장",
+  "category": "furniture",
+  "kind": "bookshelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5184,
+  "parts": 1,
+  "materials": [
+    "bookBlue",
+    "bookGreen",
+    "bookPink",
+    "bookRed",
+    "bookYellow",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "shelf"
+  ],
+  "animations": {},
+  "size": [
+    1.76,
+    0.45,
+    1.56
+  ],
+  "bounds": [
+    [
+      -0.88,
+      -0.225,
+      0.0
+    ],
+    [
+      0.88,
+      0.225,
+      1.56
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 85424,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bookshelf_front.png",
+    "bookshelf_main.png",
+    "bookshelf_thumb.png",
+    "bookshelf_top.png"
+  ]
+}
