@@ -1,0 +1,52 @@
+{
+  "id": "FU-06",
+  "slug": "floor-lamp",
+  "item": "furn.floor-lamp",
+  "name": "스탠드 조명",
+  "category": "furniture",
+  "kind": "floor-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1020,
+  "parts": 1,
+  "materials": [
+    "base",
+    "glow",
+    "shade",
+    "trim"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.63,
+    0.63,
+    1.52
+  ],
+  "bounds": [
+    [
+      -0.315,
+      -0.315,
+      0.0
+    ],
+    [
+      0.315,
+      0.315,
+      1.52
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 22756,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "floor-lamp_front.png",
+    "floor-lamp_main.png",
+    "floor-lamp_thumb.png",
+    "floor-lamp_top.png",
+    "floor-lamp_variants.png"
+  ]
+}

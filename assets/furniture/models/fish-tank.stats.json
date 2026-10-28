@@ -1,0 +1,57 @@
+{
+  "id": "FU-14",
+  "slug": "fish-tank",
+  "item": "furn.fish-tank",
+  "name": "어항",
+  "category": "furniture",
+  "kind": "fish-tank",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3540,
+  "parts": 2,
+  "materials": [
+    "bubble",
+    "fish",
+    "frame",
+    "glint",
+    "gravel",
+    "seaweed",
+    "tankWater",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "stand",
+    "tank"
+  ],
+  "animations": {},
+  "size": [
+    0.72,
+    0.49,
+    1.0
+  ],
+  "bounds": [
+    [
+      -0.36,
+      -0.26,
+      0.0
+    ],
+    [
+      0.36,
+      0.23,
+      1.005
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 70308,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-tank_front.png",
+    "fish-tank_main.png",
+    "fish-tank_thumb.png",
+    "fish-tank_top.png"
+  ]
+}

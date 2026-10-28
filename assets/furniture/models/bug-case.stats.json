@@ -1,0 +1,57 @@
+{
+  "id": "FU-15",
+  "slug": "bug-case",
+  "item": "furn.bug-case",
+  "name": "곤충 상자",
+  "category": "furniture",
+  "kind": "bug-case",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3548,
+  "parts": 2,
+  "materials": [
+    "bug",
+    "bugShine",
+    "caseBack",
+    "glint",
+    "leaf",
+    "soil",
+    "twig",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "case",
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.66,
+    0.47,
+    0.92
+  ],
+  "bounds": [
+    [
+      -0.33,
+      -0.25,
+      0.0
+    ],
+    [
+      0.33,
+      0.22,
+      0.92
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 71636,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-case_front.png",
+    "bug-case_main.png",
+    "bug-case_thumb.png",
+    "bug-case_top.png"
+  ]
+}

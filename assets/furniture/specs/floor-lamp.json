@@ -1,0 +1,92 @@
+{
+  "id": "FU-06",
+  "slug": "floor-lamp",
+  "item": "furn.floor-lamp",
+  "name": "스탠드 조명",
+  "category": "furniture",
+  "kind": "floor-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "갓이 달린 키 큰 스탠드. 밤이 되면 갓 아래 전구가 따뜻하게 빛난다.",
+    "keywords": [
+      "원뿔 갓",
+      "가는 기둥",
+      "둥근 받침"
+    ],
+    "references": [
+      "북유럽 거실 스탠드"
+    ],
+    "avoid": [
+      "차가운 형광등"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이",
+      "value": 1,
+      "min": 0.85,
+      "max": 1.15,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "base": "#8C6440",
+    "shade": "#F7E3B5",
+    "trim": "#C99B68",
+    "glow": "#FFE7A8"
+  },
+  "paletteLabels": {
+    "base": "받침·기둥",
+    "shade": "갓",
+    "trim": "갓 테두리",
+    "glow": "전구"
+  },
+  "variants": {
+    "cream": {
+      "label": "크림 (기본)",
+      "palette": {}
+    },
+    "mint": {
+      "label": "민트",
+      "palette": {
+        "shade": "#BFE3D6"
+      }
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "shade": "#F7C6D6"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "shade": "#C6D9F2"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

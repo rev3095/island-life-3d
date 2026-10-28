@@ -1,0 +1,51 @@
+{
+  "id": "FU-08",
+  "slug": "round-rug",
+  "item": "furn.round-rug",
+  "name": "동그란 러그",
+  "category": "furniture",
+  "kind": "round-rug",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4520,
+  "parts": 1,
+  "materials": [
+    "rug",
+    "rugAccent",
+    "rugDot"
+  ],
+  "objects": [
+    "rug"
+  ],
+  "animations": {},
+  "size": [
+    2.8,
+    2.78,
+    0.03
+  ],
+  "bounds": [
+    [
+      -1.4,
+      -1.391,
+      -0.001
+    ],
+    [
+      1.4,
+      1.391,
+      0.033
+    ]
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 85728,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "round-rug_front.png",
+    "round-rug_main.png",
+    "round-rug_thumb.png",
+    "round-rug_top.png",
+    "round-rug_variants.png"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "FU-04",
+  "slug": "campfire",
+  "item": "furn.campfire",
+  "name": "모닥불",
+  "category": "furniture",
+  "kind": "campfire",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 916,
+  "parts": 2,
+  "materials": [
+    "bark",
+    "flame",
+    "flameCore",
+    "rock"
+  ],
+  "objects": [
+    "fire",
+    "flame"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    0.83,
+    0.81,
+    0.55
+  ],
+  "bounds": [
+    [
+      -0.406,
+      -0.406,
+      -0.004
+    ],
+    [
+      0.423,
+      0.403,
+      0.55
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 44072,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "campfire_front.png",
+    "campfire_main.png",
+    "campfire_thumb.png",
+    "campfire_top.png"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "FU-03",
+  "slug": "wood-bed",
+  "item": "furn.wood-bed",
+  "name": "나무 침대",
+  "category": "furniture",
+  "kind": "wood-bed",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2984,
+  "parts": 1,
+  "materials": [
+    "blanket",
+    "frame",
+    "frameDark",
+    "pillow",
+    "sheet",
+    "stripe"
+  ],
+  "objects": [
+    "bed"
+  ],
+  "animations": {},
+  "size": [
+    1.82,
+    2.81,
+    1.31
+  ],
+  "bounds": [
+    [
+      -0.908,
+      -1.385,
+      0.0
+    ],
+    [
+      0.908,
+      1.42,
+      1.31
+    ]
+  ],
+  "footprint": [
+    2,
+    3
+  ],
+  "glbBytes": 55508,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wood-bed_front.png",
+    "wood-bed_main.png",
+    "wood-bed_thumb.png",
+    "wood-bed_top.png",
+    "wood-bed_variants.png"
+  ]
+}

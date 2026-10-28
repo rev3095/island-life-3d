@@ -1,0 +1,90 @@
+{
+  "id": "FU-03",
+  "slug": "wood-bed",
+  "item": "furn.wood-bed",
+  "name": "나무 침대",
+  "category": "furniture",
+  "kind": "wood-bed",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "나무 머리판이 달린 포근한 침대. 줄무늬 이불을 덮고 베개가 하나 있다.",
+    "keywords": [
+      "나무 머리판",
+      "줄무늬 이불",
+      "폭신한 베개"
+    ],
+    "references": [
+      "그림책 속 아이 침대"
+    ],
+    "avoid": [
+      "호텔 침대",
+      "철제 침대"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "stripe"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#C99B68",
+    "frameDark": "#8C6440",
+    "sheet": "#F7F1E4",
+    "pillow": "#FFFDF6",
+    "blanket": "#7FC8B8",
+    "stripe": "#F7F1E4"
+  },
+  "paletteLabels": {
+    "frame": "나무 틀",
+    "frameDark": "기둥·다리",
+    "sheet": "매트리스",
+    "pillow": "베개",
+    "blanket": "이불",
+    "stripe": "이불 줄무늬"
+  },
+  "variants": {
+    "mint": {
+      "label": "민트 (기본)",
+      "palette": {}
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "blanket": "#F4A6C0"
+      }
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "blanket": "#F6D35C"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "blanket": "#7FA8E6"
+      }
+    }
+  },
+  "footprint": [
+    2,
+    3
+  ],
+  "place": "floor",
+  "animations": []
+}

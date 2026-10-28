@@ -1,0 +1,66 @@
+{
+  "id": "FU-20",
+  "slug": "dino-model",
+  "item": "furn.dino-model",
+  "name": "공룡 모형",
+  "category": "furniture",
+  "kind": "dino-model",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "박물관을 다 채운 선물. 받침대 위 목 긴 공룡 뼈 모형과 이름표.",
+    "keywords": [
+      "목 긴 공룡",
+      "갈비뼈",
+      "받침대",
+      "이름표"
+    ],
+    "references": [
+      "자연사 박물관 공룡 뼈"
+    ],
+    "avoid": [
+      "무서운 육식 공룡"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "boneDark"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "bone": "#EFE3C8",
+    "boneDark": "#C9B48F",
+    "pedestal": "#8C6440",
+    "pedestalTop": "#C99B68",
+    "metal": "#8E9A9C",
+    "plaque": "#F6C84C"
+  },
+  "paletteLabels": {
+    "bone": "뼈",
+    "boneDark": "뼈 그늘",
+    "pedestal": "받침대",
+    "pedestalTop": "받침 윗면",
+    "metal": "지지대",
+    "plaque": "이름표"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,68 @@
+{
+  "id": "FU-01",
+  "slug": "log-chair",
+  "item": "furn.log-chair",
+  "name": "통나무 의자",
+  "category": "furniture",
+  "kind": "log-chair",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "통나무를 잘라 만든 작은 의자. 등받이도 통나무 한 토막이고, 옆에 새싹이 하나 돋아 있다.",
+    "keywords": [
+      "통나무 토막",
+      "나이테 윗면",
+      "새싹"
+    ],
+    "references": [
+      "캠핑장 통나무 의자"
+    ],
+    "avoid": [
+      "매끈하게 깎은 공장 가구"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "ring"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "seatHeight": {
+      "label": "앉는 높이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.2,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "bark": "#8C6440",
+    "wood": "#E2C08D",
+    "ring": "#C29A66",
+    "leaf": "#7FBF5E"
+  },
+  "paletteLabels": {
+    "bark": "나무껍질",
+    "wood": "자른 면",
+    "ring": "나이테",
+    "leaf": "새싹"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}
