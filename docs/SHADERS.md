@@ -25,12 +25,13 @@
 | 드리운 그림자 진하기 | 그림자를 햇빛 0 이 아니라 그늘 쪽 밝기까지만 | `styledLightsBegin()` 이 three `lights_fragment_begin` 의 방향광 그림자를 따로 꺼낸다 | `castDark` |
 | 색조 그늘 | 빛 못 받은 곳(그늘·그림자)은 보랏빛, 햇빛은 따뜻하게, 그늘 채도 올리기 | `RE_Direct_Style` · `RE_IndirectDiffuse_Style` · `STYLE_COMPOSE` | `shadeTint` `litTint` `shadeSat` |
 | 가장자리 빛 (림) | 하늘빛 색 프레넬. 뼈대 있는 메시(캐릭터)는 더 세게 | `STYLE_COMPOSE` | `rim` `rimChar` `rimPower` |
-| 장난감 하이라이트 | 부리·껍데기·쇠·유리·과일 등 이름이 정해진 재질에 둥근 반짝임 | `RE_Direct_Style` (`uMatSpec`), 이름 표 `STYLE_NAMES.spec` | `spec` `specSize` |
+| 장난감 하이라이트 | 부리·껍데기·쇠·유리·과일 등 이름이 정해진 재질에 둥근 반짝임 (합친 메시는 `aStyle` 3) | `RE_Direct_Style` (`styleSpecK`), 이름 표 `STYLE_NAMES.spec` | `spec` `specSize` |
 | 붓질 색 흔들림 | 저주파 잡음으로 평평한 색에 얼룩. **꼭짓점에서** 세어 싸다. 움직이는 것(캐릭터·구름)은 모델 좌표라 무늬가 안 미끄러진다 | `STYLE_VERT_MAIN` · `STYLE_PAINT` | `paint` `paintScale` |
 | 접촉 그늘 (가짜 AO) | 물체 원점(바닥) 가까운 옆면을 어둡게. 위를 보는 면(땅)은 빼고 | `STYLE_COMPOSE` | `ao` `aoHeight` |
-| 바람 | 잎·풀·꽃잎이 원점마다 다른 위상으로 살랑 (인스턴스 안전) | `WIND_GLSL` (이름 표 `STYLE_NAMES.wind`) | `wind` `windSpeed` |
-| 물결 | 짧은 물결 조각 + 반짝 점, 멀면 줄어든다 | `styleWater` (이름 표 `STYLE_NAMES.water`: `sea` `water` `waterLight` `waterfall` …) | `water` `waterScale` |
-| 외곽선 | `off` / `subtle`(가늘게, 물체 색을 어둡게) / `ink`(예전 갈색) | `outlineMaterial` · `OUTLINE_FRAG`, 숨기기 `setOutlinesVisible` | `outline` `outlineScale` `outlineTint` `outlineDark` |
+| 바람 | 잎·풀·꽃잎이 원점마다 다른 위상으로 살랑 (인스턴스 안전). 섬의 나무·꽃·풀 타일은 합친 메시라 꼭짓점 속성 `aStyle` 1 로 고른다 | `WIND_GLSL` (이름 표 `STYLE_NAMES.wind`) | `wind` `windSpeed` |
+| 물결 | 짧은 물결 조각 + 반짝 점, 멀면 줄어든다. 바다 판·폭포는 재질 이름, 강물 타일은 `aStyle` 2 | `styleWater` (이름 표 `STYLE_NAMES.water`: `sea` `water` `waterLight` `waterfall` …) | `water` `waterScale` |
+| 스스로 빛나기 | 불꽃·반딧불·반짝이를 밝게 → 빛 번짐이 걸린다 | `STYLE_GLOW` (이름 표 `STYLE_NAMES.glow`) | `glow` |
+| 외곽선 | `off` / `subtle`(가늘게, 물체 색을 어둡게 — 바탕색 `base` 또는 꼭짓점 색) / `ink`(예전 갈색) | `outlineMaterial` · `OUTLINE_FRAG`, 숨기기 `setOutlinesVisible` | `outline` `outlineScale` `outlineTint` `outlineDark` |
 | 빛 번짐 (bloom) | 문턱보다 밝은 곳(등불·모닥불·해)만 번진다. 1/4 해상도 | `post.js` `UnrealBloomPass` | `bloom` `bloomRadius` `bloomThreshold` |
 | 위쪽 흐림 (틸트시프트) | 곡면 월드가 넘어가는 화면 위쪽을 더 흐리게, 아래는 살짝. three 의 `Horizontal/VerticalTiltShiftShader` 를 절반 해상도로 돌리고 색 보정에서 섞는다 | `post.js` `TiltBlurPass` + `GradeShader` | `tiltTop` `tiltBottom` `tiltFocus` `tiltRange` |
 | 색 보정 | 노출 → 밝은 곳 눌러주기(파스텔 색 유지) → sRGB → lift/gamma/gain · 대비 · 채도 · 따뜻함 · 비네트 | `post.js` `GradeShader` (OutputPass 역할도 한다) | `exposure` `shoulder` `lift` `liftTint` `gamma` `gain` `contrast` `saturation` `warmth` `vignette` `vignetteSoft` |
@@ -41,7 +42,8 @@
 - world 의 흔들림(sway)·물거품 패치는 `#include <begin_vertex>` 뒤에 끼운다. 스타일 패치도 그 표시를 지우지 않는다 → 새 패치를 만들 때도 지키기.
 - 재질마다 다른 값(`uMatRim`·`uMatSpec`·`uMatAO`·`uMatPaint`)은 `material.userData.style` 에 있다. 셰이더 글자가 달라지는 선택지(바람·물·평면)는 `customProgramCacheKey` 에 들어간다.
 - 깊이·법선을 다시 그리는 SSAO 류는 override 재질에 곡면 패치가 없어 어긋난다 → 쓰지 않고 접촉 그늘을 재질에서 흉내 낸다.
-- sky 의 `ShaderMaterial`(하늘 돔·별·비·빛무리)은 화면 색(sRGB)을 그대로 내보낸다. 화면 효과를 쓸 때는 장면이 선형 버퍼라서 `src/render/index.js` 의 `linearize()` 가 그 재질 끝에 선형 변환을 붙인다 (`uStyleLinear` 가 1 일 때만). 새 `ShaderMaterial` 도 자동으로 잡힌다 (1초마다 훑음). 스스로 `#include <colorspace_fragment>` 를 쓰는 재질은 건드리지 않는다.
+- **합친 메시(world 배경 묶음)**: 여러 재질이 한 메시라 이름이 없다 → `kit.js` 가 꼭짓점마다 `aStyle = styleClass(재질 이름)` 을 넣고 재질은 `styleAttr: true`. 외곽선 판도 `aStyle`(바람을 같이 따라가게)과 꼭짓점 색(은은한 외곽선 색)을 가진다.
+- 화면 효과를 쓰면 장면은 **선형** 버퍼에 그린다. sky 의 `ShaderMaterial` 들은 `skyOut()`(sRGB → 선형 → `linearToOutputTexel`)으로 내보내 어느 쪽에 그려도 같은 색이다. 그렇게 하지 않은 새 `ShaderMaterial` 은 `src/render/index.js` 의 `linearize()` 가 끝에 변환을 붙여 준다 (1초마다 훑음, `uStyleLinear` 가 1 일 때만).
 - 외곽선 메시에는 계속 `userData.outline = true`. 섬폰 설정(`settings:changed {key:'outline'}`)은 메시 `visible` 을, 스타일 `outline: 'off'` 는 재질 `visible` 을 끈다 → 둘이 부딪치지 않는다.
 
 ## 쓰는 법 (`ctx.services.style`)
@@ -57,8 +59,11 @@ style.set({ preset: 'cozy', water: 0 }) // 프리셋 위에 덮어쓰기
 style.get()               // 지금 값 복사본
 style.compare({ on: true, x: 0.5, preset: 'toon' })  // 나눠 보기: 왼쪽 = toon, 오른쪽 = 지금 값
 style.stats()             // { ms: CPU 그리기 시간, passes: [...] }
+style.labels              // { cozy: '포근 (동숲풍)', toon: '툰 (예전)' }
 ```
 이벤트: `style:changed {preset, params}`. 주소: `?style=toon` · `?quality=low`.
+- **처음 프리셋**: `?style=` > 섬폰 설정 **화면 모습**(포근 / 툰, `state.settings.style` 로 저장) > `cozy`.
+- **집 안**: `scene:indoor {on}` 동안 프리셋 위에 `presets.js` 의 `INDOOR` 값(덜 푸른 그늘, 약한 흐림)을 얹는다. `get()` 은 얹기 전 값.
 
 ## 스타일 편집기 (`demos/style.html`)
 1. `node dev-server.mjs` 후 `/demos/style.html` 을 연다 (진짜 섬 — 모든 모듈이 돈다, WASD 로 걸을 수 있다).
