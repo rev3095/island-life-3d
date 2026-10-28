@@ -52,12 +52,13 @@ export function createObjects(ctx, island, kit, models, collision) {
     templates.set(key, tpl);
     return tpl;
   }
-  // 열매를 딴 과일나무('picked')처럼 일부 재질을 빼는 변형
+  // 열매를 딴 과일나무·야자수('picked')처럼 일부 재질을 빼는 변형
+  const PICKED = { 'fruit-tree': 'fruit', palm: 'coconut' };
   function prune(gltf, kind, variant) {
-    if (!(kind === 'fruit-tree' && variant === 'picked')) return gltf;
+    if (!(PICKED[kind] && variant === 'picked')) return gltf;
     const scene = gltf.scene.clone(true);
     const drop = [];
-    scene.traverse(o => { if (o.isMesh && o.material.name === 'fruit') drop.push(o); });
+    scene.traverse(o => { if (o.isMesh && o.material.name === PICKED[kind]) drop.push(o); });
     for (const o of drop) o.parent.remove(o);
     return { scene, animations: gltf.animations };
   }
