@@ -1,0 +1,83 @@
+// 주민·가게 주인 설정: 이름표 색(assets/specs 팔레트), 걸음 빠르기, 일과, 자주 가는 곳, 좋아하는 선물, 부탁, 보상.
+// 시각은 5~29 (24 넘으면 다음 날 새벽). haunts 이름은 index.js 의 장소 후보(spots)와 같다. range = 집에서 멀리 가는 한계(칸).
+
+export const PEOPLE = {
+  coco: {
+    slug: 'coco', name: '코코', color: '#F2B36B',
+    pace: { walk: 1.55, run: 3.3, runChance: 0.35, idle: [1.2, 3.5], happy: 0.25 },
+    wake: 6, sleep: 22.5, rainStay: false, snowStay: false, range: 32,
+    haunts: { beach: 4, dock: 2, plaza: 2, home: 1, bridge: 2 },
+    loves: ['fruit.orange', 'fish.sweetfish', 'rare'],
+    likes: ['fish', 'bug', 'fruit'],
+    dislikes: ['mat.weed', 'mat.branch'],
+    wants: [{ cat: 'fish', w: 3 }, { cat: 'bug', w: 2 }, { cat: 'shell', w: 1 }, { id: 'native', w: 1 }],
+    rewards: ['furn.radio', 'furn.floor-lamp', 'furn.round-rug'],
+    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'fruit.orange', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.radio', w: 1 }],
+  },
+  bori: {
+    slug: 'bori', name: '보리', color: '#6CA0DC',
+    pace: { walk: 0.95, run: 2.4, runChance: 0, idle: [4, 9], happy: 0.12 },
+    wake: 8.5, sleep: 21, rainStay: true, snowStay: true, range: 12,
+    haunts: { plaza: 4, home: 4, bridge: 1 },
+    loves: ['furn.wood-bed', 'furn.sofa', 'fruit.peach'],
+    likes: ['fruit', 'flower', 'furn'],
+    dislikes: ['bug'],
+    wants: [{ cat: 'fruit', w: 3 }, { cat: 'flower', w: 2 }, { id: 'mat.wood', w: 1 }],
+    rewards: ['furn.sofa', 'furn.wall-clock', 'furn.plant-pot'],
+    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'fruit.peach', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.wall-clock', w: 1 }],
+  },
+  mochi: {
+    slug: 'mochi', name: '모찌', color: '#B9A6E0',
+    pace: { walk: 1.15, run: 2.6, runChance: 0.05, idle: [2.5, 5.5], happy: 0.2 },
+    wake: 7, sleep: 21.5, rainStay: true, snowStay: false, range: 16,
+    haunts: { flowers: 5, home: 2, plaza: 1, dock: 1 },
+    loves: ['hybrid', 'shell.coral'],
+    likes: ['flower', 'seed', 'shell', 'fruit'],
+    dislikes: ['bug.ant', 'mat.iron'],
+    wants: [{ cat: 'flower', w: 4 }, { cat: 'shell', w: 2 }, { cat: 'fruit', w: 1 }],
+    rewards: ['furn.plant-pot', 'furn.round-rug', 'furn.bookshelf'],
+    gifts: [{ id: 'seed.tulip', w: 2 }, { id: 'seed.cosmos', w: 2 }, { id: 'seed.pansy', w: 2 }, { id: 'mat.acorn-bag', w: 2 }, { id: 'furn.picture-frame', w: 1 }],
+  },
+  dubu: {
+    slug: 'dubu', name: '두부', color: '#7FA36B',
+    pace: { walk: 1.0, run: 2.5, runChance: 0, idle: [5, 11], happy: 0.06 },
+    wake: 5.5, sleep: 20.5, rainStay: false, snowStay: false, range: 22,
+    haunts: { river: 5, home: 2, dock: 2, bridge: 1 },
+    loves: ['fish.mandarin-fish', 'fish.catfish', 'fish.snakehead', 'fish.sea-bream', 'rare'],
+    likes: ['fish', 'mat.wood', 'mat.hardwood', 'fruit.pear'],
+    dislikes: ['flower.tulip-pink', 'mat.weed'],
+    wants: [{ cat: 'fish', w: 4 }, { id: 'mat.wood', w: 2 }, { id: 'mat.branch', w: 1 }],
+    rewards: ['furn.bookshelf', 'furn.wardrobe', 'furn.floor-lamp'],
+    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'mat.hardwood', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.wardrobe', w: 1 }],
+  },
+  pong: {
+    slug: 'pong', name: '퐁', color: '#FFD866',
+    pace: { walk: 1.3, run: 2.9, runChance: 0.15, idle: [2, 5], happy: 0.3 },
+    wake: 8, sleep: 23.5, rainStay: true, snowStay: false, range: 24,
+    haunts: { orchard: 4, shop: 2, home: 2, plaza: 1, beach: 1 },
+    loves: ['fruit.peach', 'fruit.cherry', 'fish.tuna'],
+    likes: ['fruit', 'fish', 'shell.clam', 'shell.scallop'],
+    dislikes: ['fossil', 'mat.stone', 'mat.iron'],
+    wants: [{ cat: 'fruit', w: 3 }, { id: 'native', w: 2 }, { cat: 'fish', w: 2 }, { id: 'fruit.coconut', w: 1 }],
+    rewards: ['furn.radio', 'furn.sofa', 'furn.plant-pot'],
+    gifts: [{ id: 'fruit.cherry', w: 2 }, { id: 'fruit.peach', w: 2 }, { id: 'mat.acorn-bag', w: 3 }, { id: 'furn.picture-frame', w: 1 }],
+  },
+  chorong: {
+    slug: 'chorong', name: '초롱', color: '#8CCB6E',
+    pace: { walk: 1.35, run: 3.0, runChance: 0.2, idle: [1.5, 4], happy: 0.25 },
+    wake: 7, sleep: 22, rainStay: false, snowStay: true, range: 30,
+    haunts: { pond: 3, river: 2, plaza: 2, home: 1, shop: 1, museum: 1 },
+    loves: ['bug.snail', 'bug.firefly', 'shell.coral'],
+    likes: ['bug', 'fish', 'shell', 'flower'],
+    dislikes: ['mat.iron'],
+    wants: [{ cat: 'bug', w: 3 }, { cat: 'shell', w: 2 }, { cat: 'fish', w: 1 }],
+    rewards: ['furn.wall-clock', 'furn.round-rug', 'furn.bookshelf'],
+    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'shell.scallop', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.plant-pot', w: 1 }],
+  },
+};
+
+/** 가게 주인 (돌아다니지 않는다) */
+export const KEEPERS = {
+  bamtol: { slug: 'bamtol', name: '밤톨', color: '#C7743E', pace: { walk: 1.6, run: 3.2, idle: [3, 7], happy: 0.1 } },
+  neuru: { slug: 'neuru', name: '느루', color: '#7A9A5A', pace: { walk: 0.6, run: 1.2, idle: [5, 10], happy: 0.05 } },
+};

@@ -1,0 +1,65 @@
+{
+  "id": "FU-13",
+  "slug": "wall-clock",
+  "item": "furn.wall-clock",
+  "name": "벽시계",
+  "category": "furniture",
+  "kind": "wall-clock",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "벽에 거는 둥근 나무 시계. 바늘은 게임 시각을 그대로 가리킨다.",
+    "keywords": [
+      "둥근 나무 테",
+      "눈금 12개",
+      "잎사귀 장식"
+    ],
+    "references": [
+      "교실 벽시계"
+    ],
+    "avoid": [
+      "전자시계 숫자"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "face",
+      "tick",
+      "hand"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "face": "#FFF8E6",
+    "tick": "#8C6440",
+    "hand": "#4A3B32",
+    "leaf": "#7FBF5E"
+  },
+  "paletteLabels": {
+    "wood": "테",
+    "face": "시계판",
+    "tick": "눈금",
+    "hand": "바늘",
+    "leaf": "잎 장식"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

@@ -1,0 +1,97 @@
+{
+  "id": "FU-19",
+  "slug": "fruit-chair",
+  "item": "furn.fruit-chair",
+  "name": "과일 의자",
+  "category": "furniture",
+  "kind": "fruit-chair",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "과일 열 개로 만든 커다란 과일 모양 의자. 속살 방석과 꼭지·잎이 달려 있다.",
+    "keywords": [
+      "반쯤 잘린 과일",
+      "속살 방석",
+      "꼭지와 잎"
+    ],
+    "references": [
+      "동화 속 사과 의자"
+    ],
+    "avoid": [
+      "진짜 과일처럼 사실적인 것"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "seed"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "fruit": "#E8504F",
+    "flesh": "#FFF1D6",
+    "seed": "#6B4A33",
+    "stem": "#8C6440",
+    "leaf": "#5FAE5A"
+  },
+  "paletteLabels": {
+    "fruit": "껍질",
+    "flesh": "속살",
+    "seed": "씨",
+    "stem": "꼭지",
+    "leaf": "잎"
+  },
+  "variants": {
+    "apple": {
+      "label": "사과 (기본)",
+      "palette": {}
+    },
+    "orange": {
+      "label": "오렌지",
+      "palette": {
+        "fruit": "#F39A3B",
+        "flesh": "#FFD08A"
+      }
+    },
+    "pear": {
+      "label": "배",
+      "palette": {
+        "fruit": "#D9D36A",
+        "flesh": "#FBF4D6"
+      }
+    },
+    "peach": {
+      "label": "복숭아",
+      "palette": {
+        "fruit": "#F7A6A0",
+        "flesh": "#FFE3D2"
+      }
+    },
+    "cherry": {
+      "label": "체리",
+      "palette": {
+        "fruit": "#B5232F",
+        "flesh": "#F5C5C9"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

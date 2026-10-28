@@ -1,0 +1,54 @@
+{
+  "id": "FU-20",
+  "slug": "dino-model",
+  "item": "furn.dino-model",
+  "name": "공룡 모형",
+  "category": "furniture",
+  "kind": "dino-model",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5540,
+  "parts": 2,
+  "materials": [
+    "bone",
+    "boneDark",
+    "metal",
+    "pedestal",
+    "pedestalTop",
+    "plaque"
+  ],
+  "objects": [
+    "bones",
+    "pedestal"
+  ],
+  "animations": {},
+  "size": [
+    1.74,
+    0.91,
+    1.57
+  ],
+  "bounds": [
+    [
+      -0.87,
+      -0.458,
+      0.0
+    ],
+    [
+      0.87,
+      0.45,
+      1.568
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 105492,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "dino-model_front.png",
+    "dino-model_main.png",
+    "dino-model_thumb.png",
+    "dino-model_top.png"
+  ]
+}

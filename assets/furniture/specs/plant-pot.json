@@ -1,0 +1,78 @@
+{
+  "id": "FU-07",
+  "slug": "plant-pot",
+  "item": "furn.plant-pot",
+  "name": "화분",
+  "category": "furniture",
+  "kind": "plant-pot",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "토분에 심은 잎 큰 관엽식물. 잎 일곱 장이 위로 퍼진다.",
+    "keywords": [
+      "토분",
+      "흙",
+      "넓은 잎 7장"
+    ],
+    "references": [
+      "창가의 관엽식물"
+    ],
+    "avoid": [
+      "가시 많은 선인장"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "pot": "#D9875C",
+    "potDark": "#B86A44",
+    "soil": "#6B4A33",
+    "leaf": "#5FAE5A",
+    "leafLight": "#8CCB6E"
+  },
+  "paletteLabels": {
+    "pot": "화분",
+    "potDark": "화분 테",
+    "soil": "흙",
+    "leaf": "잎",
+    "leafLight": "밝은 잎"
+  },
+  "variants": {
+    "terracotta": {
+      "label": "토분 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "pot": "#F2EEE6"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "pot": "#7FA8E6"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

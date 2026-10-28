@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { computeNow, dayHour, msAtDayHour, nightFactorAt, FAST_SCALE } from './clock.js';
 import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
+import { indoorLook } from './indoor.js';
 import { createDome } from './dome.js';
 import { createClouds } from './clouds.js';
 import { createPrecip } from './precip.js';
@@ -30,6 +31,7 @@ const setSRGB = (color, a) => color.setRGB(a[0], a[1], a[2], THREE.SRGBColorSpac
 export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
   let realShift = 0, pausedMs = null, weatherOverride = null, seasonOverride = null;
+  let indoor = false;               // 집 안: 하늘·구름·비·눈을 숨기고 실내 조명 (setIndoor)
   let palettes = fallbackPalettes();
   let fc = { key: null, segs: null };
   let memo = { ms: NaN, now: null };
@@ -112,6 +114,18 @@ export function createSky(ctx) {
     get weatherOverride() { return weatherOverride; },
     get seasonOverride() { return seasonOverride; },
     setSeasonOverride(s) { seasonOverride = constants.SEASONS.includes(s) ? s : null; memo.ms = NaN; },
+
+    // ── 실내 모드 (2차 P4: 집 안) ──
+    get indoor() { return indoor; },
+    /** 집 안이면 true: 하늘 돔·구름·비·눈을 숨기고 따뜻한 실내 조명, 안개 끔. false 면 그대로 되돌린다. 시계·날씨는 계속 흐른다 */
+    setIndoor(on) {
+      on = !!on;
+      if (on === indoor) return;
+      indoor = on;
+      for (const g of [dome.group, clouds.group, precip.group]) g.visible = !on;
+      step(0);
+      events.emit('scene:indoor', { on });
+    },
   };
 
   // 장면 물체
@@ -154,18 +168,21 @@ export function createSky(ctx) {
     const nf = nightFactorAt(n.hourF);
     const look = skyLook(n.hourF, wx, nf);
     const { hemi, sun, sunOffset } = ctx.lights;
-    setSRGB(hemi.color, look.hemiSky);
-    setSRGB(hemi.groundColor, look.hemiGround);
-    hemi.intensity = look.hemiI;
-    setSRGB(sun.color, look.sunColor);
-    sun.intensity = look.sunI;
-    sunOffset.fromArray(look.lightDir).multiplyScalar(SUN_DIST);
+    const lit = indoor ? indoorLook(nf) : look;
+    setSRGB(hemi.color, lit.hemiSky);
+    setSRGB(hemi.groundColor, lit.hemiGround);
+    hemi.intensity = lit.hemiI;
+    setSRGB(sun.color, lit.sunColor);
+    sun.intensity = lit.sunI;
+    sunOffset.fromArray(lit.lightDir).multiplyScalar(SUN_DIST);
     if (!scene.fog) scene.fog = new THREE.Fog(0xffffff, 30, 100);
     setSRGB(scene.fog.color, look.horizon);
-    scene.fog.near = look.fogNear;
-    scene.fog.far = look.fogFar;
-    if (scene.background?.isColor) scene.background.copy(scene.fog.color);
-    else scene.background = scene.fog.color.clone();
+    // 실내: 안개 객체는 두고(셰이더를 다시 만들지 않게) 아주 멀리 민다
+    scene.fog.near = indoor ? 1e4 : look.fogNear;
+    scene.fog.far = indoor ? 2e4 : look.fogFar;
+    if (!scene.background?.isColor) scene.background = new THREE.Color();
+    if (indoor) setSRGB(scene.background, lit.background);
+    else scene.background.copy(scene.fog.color);
 
     elapsed = (elapsed + dt) % 2000;
     const viewH = ctx.renderer?.domElement.height || innerHeight;
@@ -175,7 +192,7 @@ export function createSky(ctx) {
     precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf) }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
 
     if ((scanIn -= dt) <= 0) { scanIn = SCAN_EVERY; surfaces.scan(scene); }
-    surfaces.update(elapsed, Math.max(nf, 0.4 * wx.rain), wx.wet, viewScale);
+    surfaces.update(elapsed, indoor ? nf : Math.max(nf, 0.4 * wx.rain), wx.wet, viewScale);   // 집 안 불빛은 비와 상관없이 밤에만
     debug?.update();
   }
 

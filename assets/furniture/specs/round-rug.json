@@ -1,0 +1,87 @@
+{
+  "id": "FU-08",
+  "slug": "round-rug",
+  "item": "furn.round-rug",
+  "name": "동그란 러그",
+  "category": "furniture",
+  "kind": "round-rug",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "바닥에 까는 동그란 러그. 가운데와 테두리에 다른 색 동그라미 무늬가 있다. 위에 다른 가구를 올릴 수 있다.",
+    "keywords": [
+      "납작한 원",
+      "동심원 무늬",
+      "물결 테두리"
+    ],
+    "references": [
+      "손으로 짠 둥근 러그"
+    ],
+    "avoid": [
+      "복잡한 페르시아 무늬"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "noOutline": [
+      "rugAccent"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "rug": "#F2B36B",
+    "rugAccent": "#F7F1E4",
+    "rugDot": "#E8726A"
+  },
+  "paletteLabels": {
+    "rug": "바탕",
+    "rugAccent": "무늬",
+    "rugDot": "물결 테두리"
+  },
+  "variants": {
+    "orange": {
+      "label": "주황 (기본)",
+      "palette": {}
+    },
+    "mint": {
+      "label": "민트",
+      "palette": {
+        "rug": "#7FC8B8",
+        "rugDot": "#4E9A8C"
+      }
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "rug": "#F4A6C0",
+        "rugDot": "#D9728F"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "rug": "#7FA8E6",
+        "rugDot": "#4E6FB0"
+      }
+    }
+  },
+  "footprint": [
+    3,
+    3
+  ],
+  "place": "floor",
+  "layer": "rug",
+  "animations": []
+}

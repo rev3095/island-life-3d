@@ -1,0 +1,57 @@
+{
+  "id": "FU-10",
+  "slug": "radio",
+  "item": "furn.radio",
+  "name": "라디오",
+  "category": "furniture",
+  "kind": "radio",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1940,
+  "parts": 2,
+  "materials": [
+    "dial",
+    "grille",
+    "grilleLine",
+    "knob",
+    "metal",
+    "radio",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "radio",
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.63,
+    0.5,
+    1.21
+  ],
+  "bounds": [
+    [
+      -0.3,
+      -0.25,
+      0.0
+    ],
+    [
+      0.327,
+      0.25,
+      1.213
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 36580,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "radio_front.png",
+    "radio_main.png",
+    "radio_thumb.png",
+    "radio_top.png",
+    "radio_variants.png"
+  ]
+}

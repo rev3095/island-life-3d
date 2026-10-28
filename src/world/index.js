@@ -4,6 +4,7 @@ import { createKit } from './kit.js';
 import { buildTerrain } from './terrain.js';
 import { createObjects } from './objects.js';
 import { createCollision } from './collision.js';
+import { createDaily } from './daily.js';
 
 let kit, terrain, objects, stats = null, elapsed = 0;
 
@@ -69,8 +70,25 @@ export default {
     // sky 모듈이 없을 때만 기본 안개 (먼 바다가 하늘색에 녹아들게)
     if (!scene.fog && !ctx.services.time) scene.fog = new THREE.Fog(scene.background?.getHex?.() ?? 0xbfe6f7, 48, 130);
 
+    const spawnTiles = kind => {
+      const out = [];
+      const wantSand = kind === 'shell';
+      for (let tz = 0; tz < gen.h; tz++) for (let tx = 0; tx < gen.w; tx++) {
+        const k = island.tileAt(tx, tz);
+        if (wantSand ? k !== 'sand' : k !== 'grass') continue;
+        if (base.flagsAt(tx, tz) || objects.api.at(tx, tz)) continue;
+        if (wantSand && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => island.tileAt(tx + a, tz + b) === 'sea')) continue;   // 조개는 물가 모래
+        const { x, z } = island.toWorld(tx, tz);
+        if (collision.blockedAt(x, z)) continue;
+        out.push({ tx, tz, x, z, level: island.levelAt(tx, tz) });
+      }
+      return out;
+    };
+    // 날마다 조개·잡초·화석 자리 다시 놓기, 열매 다시 열기 (data:newday · game:ready 때)
+    const daily = createDaily(ctx, { objects: objects.api, spawnTiles, nativeFruit: gen.nativeFruit });
+
     ctx.services.world = {
-      island, places: gen.places, objects: objects.api, setSeason,
+      island, places: gen.places, objects: objects.api, setSeason, daily,
       get season() { return season; },
       /** 원(반지름 r)을 (fx,fz) → (nx,nz) 로 옮긴다. 막히면 미끄러진 자리 {x, z} */
       collide: (fx, fz, nx, nz, r, y) => {
@@ -81,21 +99,15 @@ export default {
       addZone(zone) { zones.push(zone); return () => { const i = zones.indexOf(zone); if (i >= 0) zones.splice(i, 1); }; },
       setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
       nativeFruit: gen.nativeFruit,
-      /** 날마다 새로 놓는 것(조개·잡초·화석 자리·꽃)의 후보 칸. data.day.pickSpots(후보, n, 'fossil') 에 바로 넣으면 된다 */
-      spawnTiles(kind) {
-        const out = [];
-        const wantSand = kind === 'shell';
-        for (let tz = 0; tz < gen.h; tz++) for (let tx = 0; tx < gen.w; tx++) {
-          const k = island.tileAt(tx, tz);
-          if (wantSand ? k !== 'sand' : k !== 'grass') continue;
-          if (base.flagsAt(tx, tz) || objects.api.at(tx, tz)) continue;
-          if (wantSand && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => island.tileAt(tx + a, tz + b) === 'sea')) continue;   // 조개는 물가 모래
-          const { x, z } = island.toWorld(tx, tz);
-          if (collision.blockedAt(x, z)) continue;
-          out.push({ tx, tz, x, z, level: island.levelAt(tx, tz) });
-        }
-        return out;
+      /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */
+      palette(kind, variant = null) {
+        const spec = models[kind]?.spec;
+        if (!spec) return {};
+        const v = variant ?? (kind === 'tree' ? season : kind === 'cedar' ? (season === 'winter' ? 'snow' : 'green') : null);
+        return { ...spec.palette, ...(spec.variants?.[v]?.palette ?? {}) };
       },
+      /** 날마다 새로 놓는 것(조개·잡초·화석 자리·꽃)의 후보 칸. data.day.pickSpots(후보, n, 'fossil') 에 바로 넣으면 된다 */
+      spawnTiles,
       debug: { gen, kit, terrain, objects, collision, models },
     };
     if (ctx.debug) stats = createStats(ctx);

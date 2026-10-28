@@ -1,0 +1,66 @@
+{
+  "id": "FU-02",
+  "slug": "log-table",
+  "item": "furn.log-table",
+  "name": "통나무 테이블",
+  "category": "furniture",
+  "kind": "log-table",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "굵은 나무를 둥글게 자른 상판에 뿌리가 뻗은 다리. 위에서 보면 나이테가 크게 보인다.",
+    "keywords": [
+      "둥근 상판",
+      "나이테 세 줄",
+      "뿌리 다리"
+    ],
+    "references": [
+      "숲속 오두막 탁자"
+    ],
+    "avoid": [
+      "네모난 식탁"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "ring"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "topSize": {
+      "label": "상판 크기",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.15,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "bark": "#8C6440",
+    "wood": "#E2C08D",
+    "ring": "#C29A66"
+  },
+  "paletteLabels": {
+    "bark": "나무껍질",
+    "wood": "자른 면",
+    "ring": "나이테"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

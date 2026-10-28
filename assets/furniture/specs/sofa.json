@@ -1,0 +1,83 @@
+{
+  "id": "FU-11",
+  "slug": "sofa",
+  "item": "furn.sofa",
+  "name": "소파",
+  "category": "furniture",
+  "kind": "sofa",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "두 사람이 앉는 폭신한 소파. 둥근 팔걸이와 방석 두 개.",
+    "keywords": [
+      "둥근 팔걸이",
+      "방석 둘",
+      "짧은 다리"
+    ],
+    "references": [
+      "할머니 댁 거실 소파"
+    ],
+    "avoid": [
+      "딱딱한 가죽 소파"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "fabric": "#E8913A",
+    "cushion": "#F2B36B",
+    "leg": "#8C6440"
+  },
+  "paletteLabels": {
+    "fabric": "천",
+    "cushion": "방석",
+    "leg": "다리"
+  },
+  "variants": {
+    "orange": {
+      "label": "주황 (기본)",
+      "palette": {}
+    },
+    "green": {
+      "label": "초록",
+      "palette": {
+        "fabric": "#6E9E5A",
+        "cushion": "#8CCB6E"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "fabric": "#5A7FBF",
+        "cushion": "#7FA8E6"
+      }
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "fabric": "#D9728F",
+        "cushion": "#F4A6C0"
+      }
+    }
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,55 @@
+{
+  "id": "FU-17",
+  "slug": "villager-photo",
+  "item": "furn.villager-photo",
+  "name": "주민 사진",
+  "category": "furniture",
+  "kind": "villager-photo",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1952,
+  "parts": 2,
+  "materials": [
+    "frame",
+    "ink",
+    "photoBg",
+    "photoFace",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "photo",
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.5,
+    0.42,
+    0.96
+  ],
+  "bounds": [
+    [
+      -0.25,
+      -0.21,
+      0.0
+    ],
+    [
+      0.25,
+      0.21,
+      0.957
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 40120,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "villager-photo_front.png",
+    "villager-photo_main.png",
+    "villager-photo_thumb.png",
+    "villager-photo_top.png",
+    "villager-photo_variants.png"
+  ]
+}

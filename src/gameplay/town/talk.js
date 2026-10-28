@@ -1,0 +1,229 @@
+// 주민과 대화: 인사 → 잡담 / 부탁 있어? / 선물 주기 / 잘 가. 친밀도·부탁·선물·답례는 rules.js, 대사는 lines/.
+import {
+  villagerState, tierOf, dailyTalk, addFriendship, greetingLines, chatLines, pickLines, fill, slotOf,
+  makeRequest, matchesRequest, currentRequest, requestReward, receiveGift, giftBack, surpriseGift,
+  REQUEST_POINTS, FRIEND_MAX, josa,
+} from './rules.js';
+
+export const MENU = ['잡담', '부탁 있어?', '선물 주기', '잘 가'];
+const TIER_NAME = { known: '아는 사이', friend: '친구', close: '단짝', best: '절친' };
+
+/** 지금 시각·날씨·계절 (time 서비스가 없으면 브라우저 시계) */
+export function context(ctx) {
+  const time = ctx.services.time;
+  const d = new Date();
+  const now = time?.now?.() ?? { hour: d.getHours(), minute: d.getMinutes(), month: d.getMonth() + 1, dayKey: d.toISOString().slice(0, 10) };
+  return {
+    now,
+    weather: time?.weather ?? 'clear',
+    season: now.season ?? ctx.constants.seasonOf(now.month),
+    dayKey: now.dayKey ?? ctx.services.data?.day?.key?.(),
+    slot: slotOf(now),
+  };
+}
+
+/** 말하는 사람 하나에 묶인 대화창 열기 */
+export function speaker(ctx, who, vars = {}) {
+  return (lines, choices) => {
+    const list = [lines].flat().filter(l => l != null && l !== '').map(l => fill(l, vars));
+    if (!list.length && !choices) return Promise.resolve(null);
+    return ctx.services.ui.dialog.open({ speaker: who.name, color: who.color, lines: list, voice: who.voice ?? who.slug, choices });
+  };
+}
+
+/** 물건 받기 (data.collect: 도토리 주머니는 지갑으로). 다 못 받았으면 남은 수 */
+export function giveItem(ctx, id, n = 1) {
+  const data = ctx.services.data, ui = ctx.services.ui;
+  const it = data?.items?.get?.(id);
+  if (!data || !it) return n;
+  const res = data.collect(id, n);
+  if (res.acorns > 0) {
+    ui.toast(`도토리 ${res.acorns.toLocaleString('ko-KR')}개를 받았어요`, '🌰');
+    ctx.events.emit('sfx', { name: 'acorn' });
+  } else if (res.added > 0) {
+    ui.toast(`${josa(res.added > 1 ? `${it.name} ${res.added}개` : it.name, '을')} 받았어요`, it.icon);
+    ctx.events.emit('sfx', { name: 'pickup' });
+  }
+  return res.left;
+}
+
+export function createTalk(ctx, { lines }) {
+  const data = () => ctx.services.data;
+  const ui = () => ctx.services.ui;
+  const itemName = id => data()?.items?.get?.(id)?.name ?? id;
+
+  /** 가방에서 부탁에 맞는 첫 칸 (없으면 -1) */
+  const findMatch = req => (data()?.inventory?.slots ?? []).findIndex(s => s && matchesRequest(req, data().items.get(s.id)));
+
+  async function converse(V) {
+    const P = V.person, L = lines[V.slug];
+    const c = context(ctx);
+    const v = villagerState(ctx.state, V.slug);
+    const r = Math.random;
+    const recent = (V.recent ??= []);
+    const vars = {};
+    const say = speaker(ctx, P, vars);
+    const ups = [];
+    const note = up => { if (up) ups.push(up); };
+    /** 친밀도 단계가 올랐을 때 한마디 + 알림 */
+    const tierUp = up => {
+      V.happy();
+      if (TIER_NAME[up]) ui().toast(`${josa(P.name, '와')} ${josa(TIER_NAME[up], '이')} 되었어요`, '💛');
+      return pickLines(L.tierUp?.[up], r);
+    };
+
+    const first = !v.met;
+    v.met = true;
+    const daily = dailyTalk(v, c.dayKey);
+    const cc = { ...c, tier: tierOf(v.friendship), r, recent };
+
+    // 인사 (처음 만나면 자기소개, 집에 가던 길이면 그 얘기)
+    let greet;
+    if (first) greet = L.intro.slice();
+    else if (V.talkFrom === 'toDoor') greet = [...pickLines(L.greet[c.slot] ?? L.greet.evening, r, recent), ...pickLines(L.goingHome, r, recent)];
+    else greet = greetingLines(L, cc);
+    if (daily.up) greet.push(...tierUp(daily.up));   // 말 걸기 보너스로 단계가 올랐으면 인사에 붙인다
+
+    // 지난번에 가방이 꽉 차서 못 준 물건
+    if (v.pending.length) {
+      vars.item = itemName(v.pending[0]);
+      await say([...greet, ...pickLines(L.gift.pending, r)]);
+      greet = [];
+      const left = [];
+      for (const id of v.pending) if (giveItem(ctx, id) > 0) left.push(id);
+      v.pending = left;
+    }
+    // 친해지면 가끔 먼저 선물
+    if (daily.first && !first) {
+      const id = surpriseGift(v, P, c.dayKey, r);
+      if (id) {
+        vars.item = itemName(id);
+        await say([...greet, ...pickLines(L.gift.surprise, r, recent)]);
+        greet = [];
+        V.happy();
+        const left = giveItem(ctx, id);
+        if (left > 0) { giveLater(v, id, left); await say(pickLines(L.gift.full, r)); }
+      }
+    }
+
+    // 말 걸기만으로 친밀도가 꽉 찼으면 사진은 인사 때 준다
+    if (v.friendship >= FRIEND_MAX && !v.photo) { await givePhoto(greet); greet = []; }
+
+    const choice = await say(greet.length ? greet : pickLines(L.menu, r, recent), MENU);
+    if (choice === 0) await say(chatLines(L, { ...cc, tier: tierOf(v.friendship) }));
+    else if (choice === 1) await requestFlow();
+    else if (choice === 2) await giftFlow();
+    else await say(pickLines(L.bye, r, recent));
+
+    // 부탁·선물로 단계가 올랐으면 한마디, 친밀도 최고면 사진 한 번
+    if (ups.length) await say(tierUp(ups.at(-1)));
+    if (v.friendship >= FRIEND_MAX && !v.photo) await givePhoto([]);
+
+    async function givePhoto(before) {
+      v.photo = true;
+      vars.item = itemName('furn.villager-photo');
+      V.happy();
+      await say([...before, ...L.photo]);
+      const left = giveItem(ctx, 'furn.villager-photo');
+      if (left > 0) { giveLater(v, 'furn.villager-photo', left); await say(pickLines(L.gift.full, r)); }
+    }
+
+    // ---- 부탁 ----
+    async function requestFlow() {
+      const req = currentRequest(v, c.dayKey);
+      if (req) {
+        vars.want = req.label;
+        if (findMatch(req) >= 0) {
+          const a = await say(pickLines(L.request.remind, r, recent), ['여기 있어!', '아직이야']);
+          const slot = a === 0 ? await pickForRequest(req) : null;
+          if (slot != null) await completeRequest(slot, req);
+          else await say(pickLines(L.request.notYet, r, recent));
+        } else await say([...pickLines(L.request.remind, r, recent), ...pickLines(L.request.notYet, r, recent)]);
+        return;
+      }
+      if (v.doneDay === c.dayKey) { await say(pickLines(L.request.done, r, recent)); return; }
+      const d = data();
+      const nreq = makeRequest(P, { dayKey: c.dayKey, items: d?.items, nativeFruit: d?.economy?.nativeFruit?.() });
+      vars.want = nreq.label;
+      const a = await say(pickLines(L.request.ask, r, recent), ['좋아, 구해 올게!', '이번엔 어려워']);
+      if (a === 0) {
+        v.request = nreq;
+        await say(pickLines(L.request.accept, r, recent));
+        ui().toast(`${P.name}의 부탁: ${nreq.label}`, '📝');
+      } else await say(pickLines(L.request.decline, r, recent));
+    }
+
+    function pickForRequest(req) {
+      return ui().bag.open({
+        mode: 'pick', title: `${P.name}의 부탁`, hint: `${req.label}${req.id ? '' : ' 아무거나'} 골라 주세요`,
+        filter: s => matchesRequest(req, data().items.get(s.id)),
+      });
+    }
+
+    async function completeRequest(slot, req) {
+      const d = data();
+      const s = d.inventory.slots[slot];
+      const item = s && d.items.get(s.id);
+      if (!item || !matchesRequest(req, item)) return;
+      d.inventory.remove(slot, 1);
+      v.request = null;
+      v.doneDay = c.dayKey;
+      note(addFriendship(v, REQUEST_POINTS).up);
+      vars.item = item.name;
+      V.happy();
+      ctx.events.emit('sfx', { name: 'pickup' });
+      await say(pickLines(L.request.thanks, r, recent));
+      const rw = requestReward(P, item, r);
+      vars.reward = rw.id === 'mat.acorn-bag' ? `도토리 ${(rw.n * 100).toLocaleString('ko-KR')}개` : itemName(rw.id);
+      await say(pickLines(L.request.reward, r, recent));
+      const left = giveItem(ctx, rw.id, rw.n);
+      if (left > 0 && rw.id !== 'mat.acorn-bag') { giveLater(v, rw.id, left); vars.item = itemName(rw.id); await say(pickLines(L.gift.full, r)); }
+    }
+
+    // ---- 선물 ----
+    async function giftFlow() {
+      const d = data();
+      const slot = await ui().bag.open({
+        mode: 'pick', title: `${P.name}에게 선물`, hint: '줄 물건을 골라 주세요 (도구는 못 줘요)',
+        filter: s => d.items.get(s.id)?.category !== 'tool',
+      });
+      if (slot == null) { await say(pickLines(L.gift.cancel, r, recent)); return; }
+      const s = d.inventory.slots[slot];
+      const item = s && d.items.get(s.id);
+      if (!item) return;
+      const req = currentRequest(v, c.dayKey);
+      if (req && matchesRequest(req, item)) { vars.want = req.label; await completeRequest(slot, req); return; }
+      d.inventory.remove(slot, 1);
+      ctx.events.emit('sfx', { name: 'pickup' });
+      const res = receiveGift(v, P, item, c.dayKey);
+      note(res.up);
+      vars.item = item.name;
+      if (res.reaction === 'love' || res.reaction === 'like') V.happy();
+      await say(pickLines(v.giftsToday > 3 ? L.gift.many : L.gift[res.reaction], r, recent));
+      const back = giftBack(v, P, res.reaction, c.dayKey, r);
+      if (back) {
+        vars.item = itemName(back);
+        await say(pickLines(L.gift.back, r, recent));
+        const left = giveItem(ctx, back);
+        if (left > 0) { giveLater(v, back, left); await say(pickLines(L.gift.full, r)); }
+      }
+    }
+  }
+
+  /** 집에 있는 주민 문 두드리기 */
+  async function knock(V) {
+    const L = lines[V.slug];
+    const c = context(ctx);
+    const late = c.slot === 'night' || c.slot === 'dawn';
+    const pool = late ? L.home.sleep : c.weather === 'snow' ? L.home.snow ?? L.home.rain : c.weather === 'rain' ? L.home.rain : L.home.day;
+    ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
+    await speaker(ctx, V.person)(pickLines(pool, Math.random));
+  }
+
+  return { converse, knock };
+}
+
+function giveLater(v, id, left) {
+  for (let i = 0; i < left; i++) v.pending.push(id);
+}
+
