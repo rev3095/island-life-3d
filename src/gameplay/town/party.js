@@ -45,8 +45,8 @@ export function createParty(ctx, { mail, residents, toast }) {
       if (balloons.has(slug)) continue;
       const h = houseOf(slug);
       if (!h) continue;
-      const tx = world.island.tileAt(h.tx - 1, h.tz) === 'path' ? h.tx - 2 : h.tx - 1;   // 문 왼쪽 (오른쪽은 우편함)
-      const id = world.objects.add(kind, tx, h.tz, { persist: false, id: `${kind}@${slug}`, owner: slug });
+      // 문 왼쪽 두 칸 (오른쪽은 우편함). 풍선은 폭 1.7 이라 한 칸 옆이면 기둥이 문 앞을 막는다
+      const id = world.objects.add(kind, h.tx - 2, h.tz, { persist: false, id: `${kind}@${slug}`, owner: slug });
       if (id) balloons.set(slug, id);
     }
   }

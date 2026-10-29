@@ -8,7 +8,8 @@ import { dayMmdd } from '../../data/birthdays.js';
 
 /** 단계 사이 날 수: 시작 → 표지판, 표지판 → 이삿짐, 이삿짐 → 입주 */
 export const MOVEIN_DAYS = { lot: 1, boxes: 3, house: 1 };
-/** 소품: 배경 slug 후보(Z3 와 맞춘 이름) · 스펙 id · 없을 때 임시로 쓸 기존 배경 */
+/** 소품: 배경 slug 후보(Z3 와 맞춘 이름, p8-furniture 26f6e0c) · 스펙 id · 없을 때 임시로 쓸 기존 배경.
+ *  lot-sign 은 원점이 3×3 집터 가운데(말뚝이 네 귀퉁이), moving-boxes 는 2×1, party-balloons 는 폭 1.7 (기둥 ±0.75) */
 export const PROPS = {
   sign: { slugs: ['lot-sign'], id: 'PR-12', fallback: 'signboard' },
   boxes: { slugs: ['moving-boxes'], id: 'PR-10' },
@@ -104,7 +105,9 @@ export function createMovein(ctx, { mail, addResident, toast }) {
     if (!h) return;
     const st = stageOf(moveinState(ctx.state, slug));
     const L = h.lot;
-    if (st === 'lot' || st === 'boxes') put(slug, 'sign', propKind(world, PROPS.sign), L.cx, L.cz + 1, { owner: slug });
+    const sign = propKind(world, PROPS.sign);
+    // 집터 표지판은 집터 가운데에 (말뚝이 귀퉁이), 임시 안내판은 앞줄 가운데 칸에
+    if (st === 'lot' || st === 'boxes') put(slug, 'sign', sign, L.cx, sign === PROPS.sign.fallback ? L.cz + 1 : L.cz, { owner: slug });
     else drop(slug, 'sign');
     if (st === 'boxes') put(slug, 'boxes', propKind(world, PROPS.boxes), L.cx, L.cz, { owner: slug });
     else drop(slug, 'boxes');
