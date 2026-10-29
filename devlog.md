@@ -19,7 +19,7 @@
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 6: 요소 68 (배경 35 · 가구 33, 새 16개 + 단풍 지붕이 생긴 주민 집은 검수 대기). 스펙·통계는 묶음 목록 `editor-index.json` (`node tools/build-editor-index.mjs`) — 파일 511개 제한 때문, 지금 약 400개. db `env-refs` / `env-requests` |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
-| **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 1 (2026-10-29, `p8-festival`): 보드 id `z5`, 결정 D14–D25 (이모티콘 대화 방식·범위·그림·팔레트·판정, 축제 광장 위치, 부품 얻기, 부스 구성·서는 때, 축제 시작, 엔딩 사진, 엔딩 뒤). 리소스 EM-01–36 · TK-01–07 · BD-06·07 · TI-08 · FP-01–05 · FB-01–05 · PR-13–16 · FU-34 · IC-FE-01–04 · AN-01–05 · ED-01–06. **사용자 선택 대기**. 약속 제안 `docs/notes/z5-festival.md` |
+| **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 2 (SF-1–6 로 ID 바꿈). **반영 v1 (임시, 바뀔 수 있음)** = D14–D25 추천안 그대로(D20 만 B), 의견 없음 → Z5 구현 시작. |
 | **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1 (보드 id `wave6`). **반영 v1 (임시)** = D26–D35 모두 추천안 A, 의견 없음 → M6 시작. M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중
@@ -33,7 +33,7 @@
 | M6-P4 곡·효과음 | `local_39dc4cc6-d0a4-4da7-9548-f7402fc80c41` | `p9-sound` · 4224 | 소리 값을 `assets/sound/` 로, `sound-editor.html`, "소리 반영" |
 | M6-P5 지도·숫자 | `local_0c0f69c4-b37a-401d-87eb-0f625cf2ae73` | `p9-mapdata` · 4225 | `assets/island/layout.json`·`assets/data/`, `map-editor.html`·`data-editor.html`, "지도 반영"·"숫자 반영" |
 | M6-P6 스타일 | `local_cc18b756-21bf-405f-9ed0-8bcca8b82aed` | `p9-style` · 4226 | 프리셋을 `assets/style/` 로, 스타일 편집기 게시, "스타일 반영" |
-M5(Z5) 는 보드 선택 대기, 스토리는 고정 세션 대기. Z1~Z4 세션·폴더(`p8-items`·`p8-interior`·`p8-furniture`·`p8-town`)는 합쳤으니 정리 가능(사용자 확인 뒤).
+M5(Z5, `local_a4293983-fb69-490e-811d-32a97ceb52f4`, `p8-festival`) **구현 중** — 보드 z5 반영 v1, 결정은 설정 데이터로(바뀔 수 있게). 겹침 규칙: 광장 넓히기는 P5 합친 뒤, 축제 음식은 따로 파일, 축제 곡은 P4 합친 뒤, 게시는 P0 합친 뒤. 스토리는 main 맞춤(63e5cd4) 뒤 "시나리오 반영" 대기. Z1~Z4 세션·폴더(`p8-items`·`p8-interior`·`p8-furniture`·`p8-town`)는 합쳤으니 정리 가능(사용자 확인 뒤).
 
 없음. **리소스 61종 임시 확정 + 교체 준비 (2026-10-29)**: 캐릭터 9 · 배경 32 · 가구 20 을 status `approved` 로(편집기 두 개 버전 5). 나중에 고칠 때 코드를 안 건드리게, 코드에 박혀 있던 배경 충돌 모양·query 범위·건물 집터를 각 배경 스펙의 `world` 칸으로 옮김(`world/objects.js`·`island.js` 가 스펙에서 읽음). `tests/assets.test.mjs`(6개) 가 교체 약속(파일·재질=팔레트·캐릭터 동작/뼈·배경 이름·충돌/집터 ↔ 모델 크기·가구 칸 ↔ items.js)을 검사 — 테스트 165. 빌드 도구에 `--index`(Blender 없이 목록만). 교체 시험: 로컬 배경 편집기에서 벤치에 "하늘색 · 1.6칸" 요청 → 스펙·빌더 수정 → 빌드 11초 → 충돌을 안 고치면 테스트가 잡음 → world 칸 고침 → 편집기·게임에 그대로 반영(충돌 1.61 확인) → 원래대로 되돌림. 약속 정리는 CONTRACTS 끝 "리소스 교체 약속". **게임 링크 버전 4 로 다시 게시**(빌드 c9464ea, 바뀐 67파일, 전체 268 · 로컬 `/artifact/` 에서 12개 모듈·콘솔 오류 0·목록 밖 요청 0 확인, 게시본 objects.js·shop.json 이 로컬과 같은 바이트).
 
@@ -185,6 +185,7 @@ M5(Z5) 는 보드 선택 대기, 스토리는 고정 세션 대기. Z1~Z4 세션
 | 19 | 지시한 작업 다 끝났나, 모든 과정이 편집기로 고칠 수 있게 나뉘었나 점검, M·P 마일스톤 표기·진행·향후, 필요하면 6차 보드 | 점검: M4 브랜치 6개 임시 합치기(충돌 1곳 해결, 테스트 197, 모듈 13 로드)·합치기 승인 대기, 편집기 없는 것 9가지(아이템·실내·방 배치·주민 성격/대사·소리·지도·숫자·편집기 홈, 스타일은 로컬만). Z5 보드 ID FL-1–6 겹침 → SF 로 바꾸라고 Z5 에 알림. PLAN 맨 위 M0–M7 · P 표, `concept/README.md` ID 표, 6차 보드 게시 | 사용자 선택 대기 |
 | 20 | 합치고 게시 | M4 브랜치 6개를 main 에 `--no-ff` (충돌: `tests/assets.test.mjs` 개수 — 임시 합치기 때와 같게, `concept/README.md`·`devlog.md` 보드 줄 — 둘 다 살림), 테스트 197, main 에서 모듈 13·오류 0. 캐릭터 편집기 v6(단풍), 배경 편집기 v6 — 파일 512 한계에 걸려 스펙·통계를 묶음 목록으로 바꿈(bed3fc9), 게임 v6(266파일 두 번). Z5·스토리에 main 합쳐짐 알림, 임시 폴더 지움 | 끝 → 6차 보드대로 진행 |
 | 21 | (작업 중) 6차 보드 검수 완료, 임시 선택, 6차 보드대로 진행 | 보드 저장소 비어 있음 → 추천안 그대로 반영 v1 기록(boards·applied·history), D28-A 를 하려면 파일 수 한계를 먼저 풀어야 해서 M6-P0 묶음 파일 추가, PLAN 6차 표, 작업 폴더 6개, 세션 6개 시작(P3 는 M5-P2 뒤) | 진행 중 |
+| 22 | Z5 축제 보드 임시로 결정 완료, 이후 변경 가능성 염두하고 진행 | 보드 저장소 = 추천안 그대로(D20 B) → applied/z5 v1·history 기록, Z5 에 구현 시작 + "결정은 설정 데이터 하나로" + M6 과 겹치는 곳 규칙 전달, P5·P4 에 Z5 요구 알림 | 진행 중 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
