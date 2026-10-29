@@ -107,8 +107,12 @@ export default {
       /** 부드러운 해안선에서 바다 쪽으로의 거리 (칸, 땅 안쪽 ≤ 0). 이 값이 coastWaterline 보다 작으면 모래 비탈 위라 물이 안 보인다 */
       coastDistance: (x, z) => terrain.coast.field.at(x, z),
       coastWaterline: terrain.coast.waterline,
-      /** 가림 투명: 카메라와 플레이어(·대화 상대) 사이 나무·건물을 비치게. watch(getPoint) → 해제 함수 로 보이게 할 점을 더한다 */
-      occlusion: { watch: fn => occlusion.watch(fn), get enabled() { return occlusion.enabled; }, set enabled(v) { occlusion.enabled = v; }, list: () => occlusion.list() },
+      /** 가림 투명: 카메라와 플레이어(·대화 상대) 사이 나무·건물·주민·가구를 비치게. watch(getPoint) → 해제 함수 로 보이게 할 점을 더한다.
+       *  applyToonStyle 로 칠한 모델(root.userData.toonFade)은 저절로 대상, 그 밖의 것은 add({ box(out), setFade(v) }) → 해제 함수 */
+      occlusion: {
+        watch: fn => occlusion.watch(fn), add: item => occlusion.add(item),
+        get enabled() { return occlusion.enabled; }, set enabled(v) { occlusion.enabled = v; }, list: () => occlusion.list(),
+      },
       nativeFruit: gen.nativeFruit,
       /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */
       palette(kind, variant = null) {
