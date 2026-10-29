@@ -96,9 +96,30 @@ async function writeOne(res, req, [, col, id], data) {
 
 // 웹 빌드 확인 (node tools/build-web.mjs 뒤): /artifact/ 가 dist/web 을 아티팩트처럼 연다.
 // 페이지에 아티팩트 뼈대를 씌우고, 하위 경로에서, dist/web/files.json 에 있는 파일만 내준다 (없는 파일은 여기 로그).
+// 에셋은 묶음 파일(packs/*.json, 원본 dist/web/packs/)로 올라가므로 assets/… 를 직접 달라는 요청은 목록 밖 → 로그 (M6-P0).
+// 아티팩트가 게시를 거절할 목록(버전당 511파일·256MB, 글 16MB·그 밖 15MB, 웹 표준 형식만)이면 게임 대신 이유를 보여 준다.
 //   /artifact/?nostorage → localStorage 가 막힌 창 흉내,  /artifact-frame → claude.ai 처럼 iframe 안에서 열기
 const SKELETON = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
   + '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>';
+const MiB = 1024 * 1024;
+const PUBLISH = { files: 511, bytes: 256 * MiB, text: 16 * MiB, other: 15 * MiB };
+const PUBLISHABLE = /\.(html|m?js|css|json|txt|md|svg|png|jpe?g|webp|gif|mp4|webm)$/i;
+async function publishProblems(files) {
+  const out = [];
+  const list = Object.entries(files);
+  if (list.length + 1 > PUBLISH.files) out.push(`파일 ${list.length + 1}개 (페이지 포함) — 버전당 ${PUBLISH.files}개를 넘어요`);
+  let total = 0;
+  for (const [path, src] of list) {
+    if (!PUBLISHABLE.test(path)) out.push(`올릴 수 없는 형식: ${path}`);
+    const size = (await stat(join(root, src)).catch(() => null))?.size;
+    if (size == null) { out.push(`없는 원본: ${src}`); continue; }
+    total += size;
+    const max = /\.(html|m?js|css|json|txt|md|svg)$/i.test(path) ? PUBLISH.text : PUBLISH.other;
+    if (size > max) out.push(`너무 큰 파일 (${(size / MiB).toFixed(1)} MB > ${max / MiB} MB): ${path}`);
+  }
+  if (total > PUBLISH.bytes) out.push(`총 ${(total / MiB).toFixed(1)} MB — 버전당 ${PUBLISH.bytes / MiB} MB 를 넘어요`);
+  return out;
+}
 const NO_STORAGE = "<script>Object.defineProperty(window,'localStorage',{configurable:true,get(){throw new DOMException('막힌 저장소 (dev-server ?nostorage)','SecurityError')}})</script>";
 async function artifact(req, res, path) {
   const send = (type, data) => res.writeHead(200, { "content-type": type, "cache-control": "no-store", "content-security-policy": CSP }).end(data);
@@ -112,6 +133,11 @@ async function artifact(req, res, path) {
   if (rel === "index.html") {
     const page = await readFile(join(dir, "index.html"), "utf8").catch(() => null);
     if (page == null) return res.writeHead(404, { "content-type": MIME[".html"] }).end("dist/web 이 없어요 — 먼저 node tools/build-web.mjs");
+    const problems = await publishProblems(JSON.parse(await readFile(join(dir, "files.json"), "utf8").catch(() => "{}")));
+    if (problems.length) {
+      console.warn(`[artifact] 아티팩트가 받지 않을 게시 목록:\n  ${problems.join("\n  ")}`);
+      return res.writeHead(500, { "content-type": MIME[".html"] }).end(`<!doctype html><meta charset="utf-8"><h1>게시할 수 없는 목록이에요</h1><ul>${problems.map(p => `<li>${p.replace(/</g, "&lt;")}</li>`).join("")}</ul>`);
+    }
     const extra = new URLSearchParams(search).has("nostorage") ? NO_STORAGE : "";
     return send(MIME[".html"], `${SKELETON}${extra}</head><body>${page}</body></html>`);
   }
