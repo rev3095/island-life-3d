@@ -19,3 +19,5 @@ assets/furniture/editor-index.json
 assets/items/editor-index.json
 assets/items/editor-models-*.json
 assets/interior/editor-index.json
+assets/env/editor-models-*.json
+assets/furniture/editor-models-*.json

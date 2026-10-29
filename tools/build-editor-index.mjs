@@ -15,10 +15,29 @@ const write = (p, data) => { const text = JSON.stringify(data) + "\n"; writeFile
 const mb = n => `${(n / 1048576).toFixed(2)}MB`;
 const MODEL_CHUNK = 1.6 * 1048576;
 
+// 모델(.glb.json base64)을 목록 순서대로 MODEL_CHUNK 안쪽 묶음 editor-models-<n>.json 에 나눠 넣고, 요소마다 묶음 번호(bundle)를 돌려준다
+function bundleModels(dir, slugs) {
+  const bundles = [{}], at = {};
+  let size = 0;
+  for (const slug of slugs) {
+    const data = json(`${dir}/models/${slug}.glb.json`).data;
+    if (size && size + data.length > MODEL_CHUNK) { bundles.push({}); size = 0; }
+    bundles.at(-1)[slug] = data;
+    size += data.length;
+    at[slug] = bundles.length;
+  }
+  for (const f of readdirSync(resolve(root, dir))) if (/^editor-models-\d+\.json$/.test(f)) rmSync(resolve(root, dir, f));   // 예전 묶음 지우기
+  const sizes = bundles.map((b, i) => write(`${dir}/editor-models-${i + 1}.json`, b));
+  console.log(`${dir}/editor-models-1…${bundles.length}.json — ${sizes.map(mb).join(" · ")}`);
+  return { at, count: bundles.length };
+}
+
+// 배경·가구: 스펙·통계는 목록에, 모델은 묶음에 (요소마다 .glb.json 을 따로 올리면 파일 수가 511 을 넘어서 — 2026-10-30 축제 17개를 더할 때)
 for (const dir of ["assets/env", "assets/furniture"]) {
   const index = json(`${dir}/index.json`);
-  const models = index.models.map(m => ({ ...m, spec: json(`${dir}/specs/${m.slug}.json`), stats: json(`${dir}/models/${m.slug}.stats.json`) }));
-  write(`${dir}/editor-index.json`, { ...index, models });
+  const { at, count } = bundleModels(dir, index.models.map(m => m.slug));
+  const models = index.models.map(m => ({ ...m, bundle: at[m.slug], spec: json(`${dir}/specs/${m.slug}.json`), stats: json(`${dir}/models/${m.slug}.stats.json`) }));
+  write(`${dir}/editor-index.json`, { ...index, bundles: count, models });
   console.log(`${dir}/editor-index.json — 요소 ${models.length}개`);
 }
 
