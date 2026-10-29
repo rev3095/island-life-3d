@@ -1,21 +1,24 @@
-// 배경음 재생기: 곡 정의(songs.js)를 마디 단위로 펼쳐서 '조금 앞서 예약'(look-ahead) 방식으로 연주한다.
+// 배경음 재생기: 곡 정의(songs.js 가 곡 데이터로 만든 것)를 마디 단위로 펼쳐서 '조금 앞서 예약'(look-ahead) 방식으로 연주한다.
 // 실제 재생은 엔진 타이머가 50ms 마다 pump() 를 불러 0.3초 앞까지 음을 예약하고,
 // 레벨 측정(OfflineAudioContext)은 pump(끝시각) 한 번으로 전부 예약한 뒤 렌더링한다.
-import { SONGS } from './songs.js';
+import { SONGS, TRACKS } from './songs.js';
 import { INSTRUMENTS } from './instruments.js';
 import { voicing, bassNote, rng, hashString } from './notation.js';
 
-export const TRACKS = Object.keys(SONGS);
+export { TRACKS };
 
 class SongPlayer {
-  constructor(engine, def, t0) {
+  constructor(engine, def, t0, from = 0) {
     const ac = this.ac = engine.ac;
     this.engine = engine;
     this.def = def;
     this.beatSec = 60 / def.bpm;
     this.barSec = this.beatSec * def.meter;
-    this.t0 = t0;
-    this.nextBar = 0;
+    this.half = def.bars / 2;           // 반주 모양이 '곡 뒤쪽 절반' 변주에 쓴다
+    this.scale = def.scaleSet;          // 꾸밈음·아래 화음에 쓰는 음계
+    this.t0 = t0 - from * this.barSec;  // from 마디부터 (편집기에서 고친 뒤 그 자리부터 다시 듣기)
+    this.startAt = t0;
+    this.nextBar = from;
     this.queue = [];
     this.endAt = Infinity;
     this.nodes = [];          // 곡이 끝날 때 끊을 노드
@@ -57,7 +60,7 @@ class SongPlayer {
   }
 
   /** 곡 내내 도는 음원(빗소리 등)을 등록. 곡이 끝나면 멈춘다 */
-  loop(src, t = this.t0) {
+  loop(src, t = this.startAt) {
     this.engine.start(src, t);
     this.loops.push(src);
     return src;
@@ -81,13 +84,34 @@ class SongPlayer {
   voicing(chord, center, max) { return voicing(chord, center, max); }
   bass(chord, low) { return bassNote(chord, low); }
 
+  /**
+   * 파트로 음 하나 예약: 곡 데이터 parts[role] 의 악기·채널로, 세기(vel 배율)·옥타브를 적용해서.
+   * 끈 파트(on: false)도 난수는 똑같이 써서 다른 파트의 흔들림이 바뀌지 않게 한다.
+   */
+  play(role, midi, beat, dur, vel, opts) {
+    const p = this.def.parts[role];
+    if (!p) { this.warnOnce(`파트 없음 ${role}`); return; }
+    if (p.octave) midi = Array.isArray(midi) ? midi.map(m => m + 12 * p.octave) : midi + 12 * p.octave;
+    if (p.vel != null) vel *= p.vel;
+    if (p.opts) opts = opts ? { ...p.opts, ...opts } : p.opts;
+    if (p.inst === 'flute') opts = { ...opts, vibrato: this.vibrato(this.def.vibrato?.rate, this.def.vibrato?.cents) };
+    this.note(p.inst, p.ch, midi, beat, dur, vel, opts, p.on === false);
+  }
+
+  warnOnce(msg) {
+    if ((this._warned ??= new Set()).has(msg)) return;
+    this._warned.add(msg);
+    console.warn(`[audio] ${this.def.name}: ${msg}`);
+  }
+
   /** 음 하나 예약: beat = 마디 안 박, dur = 박 단위 */
-  note(inst, ch, midi, beat, dur, vel, opts) {
+  note(inst, ch, midi, beat, dur, vel, opts, mute = false) {
     let b = beat;
     if (this.def.swing && Math.abs((b % 1) - 0.5) < 1e-6) b += this.def.swing;
     const jitter = (this.rand() - 0.5) * 0.014 * (this.def.human ?? 1);
-    const time = Math.max(this.t0, this.barStart + b * this.beatSec + jitter + (opts?.nudge ?? 0));
+    const time = Math.max(this.startAt, this.barStart + b * this.beatSec + jitter + (opts?.nudge ?? 0));
     const v = vel * (1 + (this.rand() - 0.5) * 0.12);
+    if (mute) return;
     this.queue.push({ time, inst, ch, midi, dur: dur * this.beatSec, vel: v, opts });
   }
 
@@ -110,8 +134,12 @@ class SongPlayer {
       const ev = this.queue.shift();
       if (ev.time < now - 0.04) continue;           // 너무 늦은 음은 버린다 (탭 전환 직후 등)
       const dest = this.channels[ev.ch];
-      if (!dest || !INSTRUMENTS[ev.inst]) { console.warn(`[audio] ${this.def.name}: 채널/악기 없음 ${ev.ch}/${ev.inst}`); continue; }
-      INSTRUMENTS[ev.inst](this.engine, dest, Math.max(ev.time, now), ev.midi, ev.dur, ev.vel, ev.opts);
+      if (!dest || !INSTRUMENTS[ev.inst]) { this.warnOnce(`채널/악기 없음 ${ev.ch}/${ev.inst}`); continue; }
+      const t = Math.max(ev.time, now);
+      if (Array.isArray(ev.midi) && ev.inst !== 'pad') {     // 패드가 아닌 악기로 바꾼 화음 파트: 음마다 따로 (크기는 패드처럼 나눔)
+        const vel = ev.vel / Math.sqrt(ev.midi.length);
+        for (const m of ev.midi) INSTRUMENTS[ev.inst](this.engine, dest, t, m, ev.dur, vel, ev.opts);
+      } else INSTRUMENTS[ev.inst](this.engine, dest, t, ev.midi, ev.dur, ev.vel, ev.opts);
     }
   }
 
@@ -146,19 +174,22 @@ export function createMusic(engine) {
     get player() { return cur; },
     get position() {
       if (!cur) return null;
-      const t = engine.ac.currentTime - cur.t0;
+      const t = Math.max(engine.ac.currentTime, cur.startAt) - cur.t0;
       return { bar: Math.max(0, Math.floor(t / cur.barSec)) % cur.def.bars, pass: Math.floor(Math.max(0, t) / cur.barSec / cur.def.bars), loopSec: cur.barSec * cur.def.bars };
     },
-    /** name = null 이면 페이드아웃만 */
-    play(name, { fade = 2 } = {}) {
-      if ((cur?.def.name ?? null) === (name ?? null)) return;
+    /**
+     * name = null 이면 페이드아웃만. 같은 곡이면 그대로 둔다 (restart: true 면 새로 시작).
+     * from = 몇 번째 마디부터 (바퀴 포함: 두 번째 바퀴 첫 마디 = bars)
+     */
+    play(name, { fade = 2, restart = false, from = 0 } = {}) {
+      if (!restart && (cur?.def.name ?? null) === (name ?? null)) return;
       const now = engine.ac.currentTime;
       if (cur) { cur.fadeOut(now, fade); fading.add(cur); }
       cur = null;
       if (!name) return;
       const def = SONGS[name];
       if (!def) { console.warn(`[audio] 없는 배경음: ${name}`); return; }
-      cur = new SongPlayer(engine, def, now + 0.06);
+      cur = new SongPlayer(engine, def, now + 0.06, from);
       cur.fadeIn(now + 0.06, Math.max(0.02, fade * 0.8));
     },
     pump(ahead = 0.3) {

@@ -1,28 +1,25 @@
-// 사운드 모듈 (트랙 T4): 배경음 9곡 · 효과음 24종 · 주민 목소리를 전부 Web Audio 로 실시간 합성한다. 소리 파일은 쓰지 않는다.
+// 사운드 모듈 (트랙 T4): 배경음 · 효과음 · 주민 목소리를 전부 Web Audio 로 실시간 합성한다. 소리 파일은 쓰지 않는다.
+// 곡·효과음·목소리 값과 '언제 어느 곡' 표는 assets/sound/ 의 JSON 데이터다 (곡 편집기 sound-editor.html 로 고치고 "소리 반영").
 // 브라우저 자동재생 규칙 때문에 AudioContext 는 첫 클릭·키 입력(unlock) 때 만든다. 그 전의 bgm 요청은 기억했다가 그때 튼다.
-// 배경음 고르는 순서: 열린 창(상점·박물관) > 직접 고른 곡(bgm 이벤트) > 자동(비 오면 rain, 아니면 시각별 5곡).
+// 배경음 고르는 순서: 열린 창(panels: 상점·박물관) > 직접 고른 곡(bgm 이벤트, 이름이 places 에 있으면 그 자리 곡) > 자동(날씨 > 시간대).
 import { createEngine, volumeToGain, BUSES } from './engine.js';
 import { createMusic, TRACKS } from './music.js';
 import { SONGS } from './songs.js';
 import { playSfx, SFX_NAMES, SFX_LABELS } from './sfx.js';
 import { createVoice, VOICES } from './voice.js';
+import { SCHEDULE, autoSong, slotForHour, loadSound, installSound } from './bank.js';
 
-export { TRACKS, SONGS, SFX_NAMES, SFX_LABELS, VOICES };
+export { TRACKS, SONGS, SFX_NAMES, SFX_LABELS, VOICES, SCHEDULE };
 
-/** 시각(시) → 시간대 배경음. DAY_PARTS 의 dawn(5~8) · day(8~17) · dusk(17~19) · night 에서 day 를 오전/오후로 나눈다 */
-export function trackForHour(hour) {
-  if (hour >= 5 && hour < 8) return 'dawn';
-  if (hour >= 8 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 17) return 'afternoon';
-  if (hour >= 17 && hour < 19) return 'evening';
-  return 'night';
-}
+/** 시각(시) → 시간대 배경음 (index.json 의 schedule.time) */
+export function trackForHour(hour) { return slotForHour(hour)?.song ?? null; }
 
-const PANEL_MUSIC = { shop: 'shop', museum: 'museum' };
-const FADE = { auto: 4, manual: 2, panel: 1.2 };
 const LOOKAHEAD = 0.3;
+// 데이터 경로(assets/…)는 프로젝트 뿌리 기준 → 이 파일 자리에서 찾는다 (demos/ 아래 페이지에서도 맞게)
+const fetchJSON = url => fetch(new URL(`../../${url}`, import.meta.url)).then(r => { if (!r.ok) throw new Error(`불러오기 실패 (${r.status})`); return r.json(); });
 
-export function createAudio(ctx) {
+/** ctx: 게임 공용 ctx. opts.load = url → Promise<JSON> (게임은 core/assets.js 의 loadJSON) */
+export function createAudio(ctx, { load = fetchJSON } = {}) {
   const fallback = { bgm: 0.6, sfx: 0.8, voice: 0.7 };
   const S = () => ctx.state?.settings ?? fallback;     // 저장을 불러오면 객체가 바뀔 수 있어서 매번 읽는다
   let ac = null, engine = null, music = null, timer = null;
@@ -33,19 +30,22 @@ export function createAudio(ctx) {
 
   function autoTrack() {
     const t = ctx.services?.time;
-    const w = t?.weather ?? weather;
-    if (w === 'rain') return 'rain';
     const hour = t?.now?.().hour ?? new Date().getHours();
-    return trackForHour(hour);
+    return autoSong({ hour, weather: t?.weather ?? weather });
   }
   function wanted() {
-    if (panels.length) return PANEL_MUSIC[panels.at(-1)];
-    if (manual !== undefined) return manual;
+    if (panels.length) return SCHEDULE.panels[panels.at(-1)] || null;
+    if (manual === null) return null;
+    if (manual !== undefined) {
+      const place = SCHEDULE.places[manual];
+      if (place === undefined) return manual;
+      return place || autoTrack();
+    }
     return autoTrack();
   }
   // 타이머가 느려지면(창이 가려짐·무거운 프레임) 그만큼 더 앞까지 예약해서 음이 빠지지 않게 한다
   let lastTick = 0, ahead = LOOKAHEAD;
-  function refresh(fade = FADE.auto) {
+  function refresh(fade = SCHEDULE.fade.auto) {
     if (!music) return;
     music.play(wanted(), { fade });
     music.pump(ahead);
@@ -74,25 +74,39 @@ export function createAudio(ctx) {
       engine = createEngine(ac, { volumes: S() });
       music = createMusic(engine);
       timer = setInterval(tick, 50);
-      refresh(FADE.manual);
+      refresh(SCHEDULE.fade.manual);
     }
-    if (ac.state !== 'running') ac.resume().then(() => refresh(FADE.manual)).catch(() => {});
+    if (ac.state !== 'running') ac.resume().then(() => refresh(SCHEDULE.fade.manual)).catch(() => {});
+  }
+
+  // ── 소리 데이터 불러오기 (한 번). 다 읽으면 지금 골라야 할 곡을 다시 튼다 ──
+  let loading = null;
+  function loadData() {
+    loading ??= loadSound(load).then(data => {
+      const errors = [...data.errors, ...installSound(data)];
+      for (const e of errors) console.warn(`[audio] ${e}`);
+      refresh(SCHEDULE.fade.manual);
+      return { ...data, errors };
+    });
+    return loading;
   }
 
   const api = {
     unlock,
+    /** 소리 데이터 불러오기 → Promise<{ index, sfx, voices, songs, errors }> (init 이 기다린다) */
+    load: loadData,
     /** 효과음. opts: { volume, pitch, pan, delay } */
     sfx(name, opts) {
       if (!engine || ac.state !== 'running') return false;
       return playSfx(engine, name, opts);
     },
-    /** 배경음 고르기: 곡 이름 | 'auto'(자동으로 돌아가기) | null(끄기) */
+    /** 배경음 고르기: 곡 이름 | 자리 이름(places, 예: 'indoor' = 집 안) | 'auto'(자동으로 돌아가기) | null(끄기) */
     bgm(name) {
       if (name === 'auto' || name === undefined) manual = undefined;
       else if (name === null || name === 'off') manual = null;
-      else if (SONGS[name]) manual = name;
+      else if (SONGS[name] || SCHEDULE.places[name] !== undefined) manual = name;
       else { console.warn(`[audio] 없는 배경음: ${name}`); return; }
-      refresh(FADE.manual);
+      refresh(SCHEDULE.fade.manual);
     },
     /** 동물 목소리. → Promise<boolean> (다 말하면 true, 끊기면 false). 소리가 꺼져 있어도 같은 시간 뒤에 끝난다 */
     speak(text, voiceId) { return voice.speak(text, voiceId); },
@@ -120,7 +134,7 @@ export function createAudio(ctx) {
   document.addEventListener('visibilitychange', () => {
     if (!ac) return;
     if (document.hidden) { voice.stop(); ac.suspend().catch(() => {}); }
-    else ac.resume().then(() => refresh(FADE.manual)).catch(() => {});
+    else ac.resume().then(() => refresh(SCHEDULE.fade.manual)).catch(() => {});
   });
 
   // ── 이벤트 연결 (docs/CONTRACTS.md) ──
@@ -129,15 +143,15 @@ export function createAudio(ctx) {
     ev.on('sfx', p => p?.name && api.sfx(p.name, p));
     ev.on('bgm', p => api.bgm(p?.name ?? null));
     ev.on('dialog:line', p => { if (p?.text && p.voice) api.speak(p.text, p.voice); });
-    ev.on('time:part', () => refresh(FADE.auto));
-    ev.on('time:tick', () => { if (music && music.current !== wanted()) refresh(FADE.auto); });
-    ev.on('weather:change', p => { weather = p?.weather ?? null; refresh(FADE.auto); });
+    ev.on('time:part', () => refresh(SCHEDULE.fade.auto));
+    ev.on('time:tick', () => { if (music && music.current !== wanted()) refresh(SCHEDULE.fade.auto); });
+    ev.on('weather:change', p => { weather = p?.weather ?? null; refresh(SCHEDULE.fade.auto); });
     ev.on('ui:open', p => {
-      if (PANEL_MUSIC[p?.panel]) { panels.push(p.panel); refresh(FADE.panel); }
+      if (SCHEDULE.panels[p?.panel]) { panels.push(p.panel); refresh(SCHEDULE.fade.panel); }
     });
     ev.on('ui:close', p => {
       const i = panels.lastIndexOf(p?.panel);
-      if (i >= 0) { panels.splice(i, 1); refresh(FADE.panel); }
+      if (i >= 0) { panels.splice(i, 1); refresh(SCHEDULE.fade.panel); }
       if (p?.panel === 'dialog') voice.stop();
     });
     ev.on('settings:changed', p => {
@@ -153,9 +167,12 @@ let audio = null;
 
 export default {
   name: 'audio',
-  init(ctx) {
-    audio = createAudio(ctx);
+  async init(ctx) {
+    // 게임에서는 assets.js 의 loadJSON (웹 게시본 묶음 파일·다시 받기·로딩 화면 진행이 거기 있다). 못 부르면 fetch
+    const assets = await import('../core/assets.js').catch(() => null);
+    audio = createAudio(ctx, assets?.loadJSON ? { load: assets.loadJSON } : {});
     ctx.services.audio = audio;
+    await audio.load();
   },
   update() { audio?.pump(); },
 };

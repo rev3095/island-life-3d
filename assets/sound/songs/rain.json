@@ -1,0 +1,36 @@
+{
+  "id": "rain",
+  "version": 1,
+  "code": "BGM-06",
+  "title": "비 오는 날",
+  "mood": "낮은 패드 + 빗소리",
+  "bpm": 66,
+  "meter": 4,
+  "bars": 12,
+  "gain": 0.9,
+  "room": "large",
+  "key": "A",
+  "scale": "minorPenta",
+  "arrange": "rain",
+  "loops": [{ "kind": "rain", "gain": 0.12, "lfo": 0.06, "depth": 0.03 }],
+  "channels": {
+    "pad": { "label": "패드", "gain": 0.6, "pan": 0, "verb": 0.3 },
+    "mel": { "label": "멜로디", "gain": 0.62, "pan": 0.1, "verb": 0.36 },
+    "echo": { "label": "메아리", "gain": 0.5, "pan": -0.35, "verb": 0.5 },
+    "bass": { "label": "베이스", "gain": 0.55, "pan": 0, "verb": 0.04 },
+    "amb": { "label": "자연 소리", "gain": 0.5, "pan": 0.3, "verb": 0.3 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "kalimba", "ch": "mel" },
+    "echo": { "label": "메아리 (두 번째 바퀴)", "inst": "kalimba", "ch": "echo" },
+    "pad": { "label": "패드", "inst": "pad", "ch": "pad", "opts": { "attack": 1.8, "release": 2.2, "cutoff": 800 } },
+    "bass": { "label": "베이스", "inst": "bass", "ch": "bass" },
+    "drip": { "label": "빗방울", "inst": "drip", "ch": "amb" }
+  },
+  "prog": ["Am9 | Fmaj7 | Cmaj7 | G6 | Am9 | Fmaj7 | Dm9 | Em7 | Fmaj7 | G6 | Am9 | Esus4"],
+  "mel": [
+    "r:1 e5:1.5 d5:.5 c5:1 | a4:3 r:1 | r:1 g4 c5 d5 | e5:2 d5 |",
+    "r:1 e5:1.5 g5:.5 e5:1 | d5 c5 a4:2 | r:1 a4 c5 e5 | d5:3 r:1 |",
+    "c5:1.5 a4:.5 c5:1 e5 | d5:2 b4:1 g4 | c5 e5 a5:2 | e5:3 r:1"
+  ]
+}

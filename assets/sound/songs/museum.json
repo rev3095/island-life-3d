@@ -1,0 +1,37 @@
+{
+  "id": "museum",
+  "version": 1,
+  "code": "BGM-09",
+  "title": "박물관",
+  "mood": "잔향 큰 느린 멜로디",
+  "bpm": 60,
+  "meter": 4,
+  "bars": 12,
+  "gain": 1.22,
+  "room": "hall",
+  "key": "E",
+  "scale": "major",
+  "arrange": "museum",
+  "vibrato": { "rate": 4.6, "cents": 8 },
+  "channels": {
+    "pad": { "label": "패드", "gain": 0.5, "pan": 0, "verb": 0.55 },
+    "mel": { "label": "멜로디", "gain": 0.6, "pan": 0.08, "verb": 0.6 },
+    "flute": { "label": "플루트", "gain": 0.55, "pan": 0.15, "verb": 0.6 },
+    "harp": { "label": "하프", "gain": 0.5, "pan": -0.25, "verb": 0.55 },
+    "bass": { "label": "베이스", "gain": 0.5, "pan": 0, "verb": 0.25 }
+  },
+  "parts": {
+    "melody": { "label": "종 멜로디", "inst": "bell", "ch": "mel" },
+    "flute": { "label": "플루트 (두 번째 바퀴)", "inst": "flute", "ch": "flute" },
+    "bellHigh": { "label": "높은 종 (두 번째 바퀴)", "inst": "bell", "ch": "mel" },
+    "pad": { "label": "패드", "inst": "pad", "ch": "pad", "opts": { "attack": 2.2, "release": 3, "cutoff": 1700 } },
+    "harp": { "label": "하프", "inst": "harp", "ch": "harp" },
+    "bass": { "label": "베이스", "inst": "bass", "ch": "bass", "opts": { "release": 1.2 } }
+  },
+  "prog": ["Emaj9 | C#m9 | Amaj7 | Bsus4 | Emaj9 | G#m7 | Amaj7 | B6 | C#m7 | Amaj7 | F#m9 | Bsus4"],
+  "mel": [
+    "e5:2 f#5:1 g#5 | g#5:3 e5:1 | c#5:2 e5:1 b4 | b4:4 |",
+    "e5:2 f#5:1 b5 | b5:2 g#5 | c#6:1.5 b5:.5 g#5:1 e5 | f#5:4 |",
+    "e5:2 g#5 | e5:1 c#5 b4:2 | c#5:2 a4:1 b4 | b4:4"
+  ]
+}

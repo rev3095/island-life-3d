@@ -66,8 +66,9 @@
 </header>
 <main>
   <section>
-    <h2>배경음 9곡</h2>
-    <p class="muted">아무 곳이나 처음 누르면 소리가 켜져요. 곡을 바꾸면 부드럽게 겹쳐 넘어갑니다. 한 바퀴가 끝나면 변주가 붙은 두 번째 바퀴가 이어져요.</p>
+    <h2>배경음</h2>
+    <p class="muted">아무 곳이나 처음 누르면 소리가 켜져요. 곡을 바꾸면 부드럽게 겹쳐 넘어갑니다. 한 바퀴가 끝나면 변주가 붙은 두 번째 바퀴가 이어져요.
+      곡·효과음·목소리 값과 선곡 표는 <code>assets/sound/</code> 데이터예요 — 고치는 곳은 <a href="../sound-editor.html">곡 편집기</a> (이 페이지는 게임과 같은 모듈로 듣고 재는 작업대).</p>
     <div class="grid" id="tracks"></div>
     <div class="row" style="margin-top:10px">
       <button type="button" data-bgm="auto">자동 (시각·날씨)</button>
@@ -87,7 +88,7 @@
   </section>
 
   <section>
-    <h2>효과음 24종</h2>
+    <h2>효과음</h2>
     <p class="muted">누를 때마다 음높이가 조금씩 달라요.</p>
     <div class="grid" id="sfx"></div>
     <div class="row" style="margin-top:10px">
@@ -150,7 +151,7 @@ const ctx = {
   state: createState(),
   services: { time: { now: () => ({ hour: time.hour, minute: 0 }), get weather() { return time.weather; } } },
 };
-audioModule.init(ctx);
+await audioModule.init(ctx);          // 곡·효과음·목소리 데이터(assets/sound/)를 다 읽을 때까지
 const audio = ctx.services.audio;
 window.__audio = audio; window.__ctx = ctx; window.__levels = levels;
 setInterval(() => audioModule.update(0.016, ctx), 100);
@@ -299,7 +300,7 @@ $('measureOther').onclick = async () => {
   table(rows, [['이름', r => r.name], ['종류', r => r.kind], ['peak dBFS', warnPeak], ['LUFS', r => fmt(r.lufs)], ['0.4초 최대 RMS', r => fmt(r.shortDb)], ['clip', r => r.clipped]]);
 };
 
-log('준비됨 — 아무 곳이나 눌러서 소리를 켜세요.');
+log(`준비됨 — 곡 ${TRACKS.length} · 효과음 ${SFX_NAMES.length} · 목소리 ${Object.keys(VOICES).length} (assets/sound/). 아무 곳이나 눌러서 소리를 켜세요.`);
 </script>
 </body>
 </html>

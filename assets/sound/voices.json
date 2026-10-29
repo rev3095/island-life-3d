@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "note": "주민 목소리. f0 = 기본 높이(Hz), syl = 글자 길이(초), gap = 글자 사이(초), formant = 입 크기 배율, jitter = 높낮이 흔들림(반음), gain = 크기 맞춤(dB). droop·bounce·croak·crisp 는 말투. 캐릭터 → 목소리 연결은 town 의 voice 칸",
+  "voices": {
+    "coco": { "name": "코코", "desc": "높고 빠름", "f0": 410, "syl": 0.072, "gap": 0.012, "formant": 1.22, "jitter": 2.6, "wave": "glottal", "gain": -1 },
+    "bori": {
+      "name": "보리",
+      "desc": "중간 · 느림",
+      "f0": 245,
+      "syl": 0.125,
+      "gap": 0.03,
+      "formant": 1,
+      "jitter": 1.6,
+      "wave": "glottal",
+      "droop": 1.5,
+      "gain": 0.8
+    },
+    "mochi": { "name": "모찌", "desc": "가장 높음", "f0": 590, "syl": 0.085, "gap": 0.016, "formant": 1.38, "jitter": 2.4, "wave": "soft", "gain": -3 },
+    "dubu": {
+      "name": "두부",
+      "desc": "가장 낮음",
+      "f0": 118,
+      "syl": 0.12,
+      "gap": 0.03,
+      "formant": 0.8,
+      "jitter": 1.3,
+      "wave": "glottal",
+      "droop": 1,
+      "gain": 3.2
+    },
+    "pong": {
+      "name": "퐁",
+      "desc": "높고 통통 튐",
+      "f0": 370,
+      "syl": 0.085,
+      "gap": 0.022,
+      "formant": 1.12,
+      "jitter": 1.5,
+      "wave": "nasal",
+      "bounce": 4.5,
+      "gain": -0.4
+    },
+    "chorong": {
+      "name": "초롱",
+      "desc": "중간 · 빠름",
+      "f0": 290,
+      "syl": 0.066,
+      "gap": 0.01,
+      "formant": 1.05,
+      "jitter": 3,
+      "wave": "glottal",
+      "croak": 0.35,
+      "gain": 1.4
+    },
+    "bamtol": {
+      "name": "밤톨",
+      "desc": "높고 또박또박",
+      "f0": 475,
+      "syl": 0.085,
+      "gap": 0.04,
+      "formant": 1.25,
+      "jitter": 1.4,
+      "wave": "glottal",
+      "crisp": 1.6,
+      "gain": -2
+    },
+    "neuru": {
+      "name": "느루",
+      "desc": "낮고 아주 느림",
+      "f0": 160,
+      "syl": 0.19,
+      "gap": 0.055,
+      "formant": 0.92,
+      "jitter": 1,
+      "wave": "soft",
+      "droop": 3,
+      "gain": 2.2
+    },
+    "player": { "name": "플레이어", "desc": "보통", "f0": 320, "syl": 0.085, "gap": 0.02, "formant": 1.08, "jitter": 2, "wave": "glottal", "gain": -0.4 }
+  }
+}

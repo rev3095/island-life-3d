@@ -1,0 +1,41 @@
+{
+  "id": "morning",
+  "version": 1,
+  "code": "BGM-02",
+  "title": "오전",
+  "mood": "밝은 마림바",
+  "bpm": 96,
+  "meter": 4,
+  "bars": 16,
+  "gain": 1.05,
+  "room": "medium",
+  "key": "C",
+  "scale": "major",
+  "arrange": "morning",
+  "channels": {
+    "mel": { "label": "멜로디", "gain": 0.62, "pan": 0.12, "verb": 0.24 },
+    "har": { "label": "화음", "gain": 0.5, "pan": 0.3, "verb": 0.24 },
+    "comp": { "label": "반주", "gain": 0.5, "pan": -0.28, "verb": 0.2 },
+    "bass": { "label": "베이스", "gain": 0.62, "pan": 0, "verb": 0.05 },
+    "kick": { "label": "킥", "gain": 0.5, "pan": 0, "verb": 0 },
+    "perc": { "label": "타악기", "gain": 0.42, "pan": 0.32, "verb": 0.12 },
+    "amb": { "label": "자연 소리", "gain": 0.55, "pan": -0.45, "verb": 0.45 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "marimba", "ch": "mel" },
+    "harmony": { "label": "아래 화음 (두 번째 바퀴 뒤쪽)", "inst": "marimba", "ch": "har" },
+    "comp": { "label": "뒷박 화음", "inst": "marimba", "ch": "comp" },
+    "bass": { "label": "베이스", "inst": "bass", "ch": "bass" },
+    "kick": { "label": "킥", "inst": "kick", "ch": "kick" },
+    "shaker": { "label": "셰이커", "inst": "shaker", "ch": "perc" },
+    "wood": { "label": "우드블록 (두 번째 바퀴)", "inst": "wood", "ch": "perc" },
+    "bird": { "label": "새소리", "inst": "bird", "ch": "amb" }
+  },
+  "prog": ["C | Am | F | G | C | Em | F G | C | F | G | Em | Am | Dm7 | G | C/E F | G"],
+  "mel": [
+    "c5:.5 e5 g5:1 a5:.5 g5 e5:1 | d5:.5 e5 c5:1 a4:2 | a4:.5 c5 d5:1 e5:.5 d5 c5:1 | d5:1.5 e5:.5 d5:2 |",
+    "c5:.5 e5 g5:1 a5:.5 g5 c6:1 | b5:.5 g5 e5:1 g5:2 | a5:.5 g5 a5:1 g5:.5 e5 d5:1 | c5:3 r:1 |",
+    "c5:.5 d5 f5:1 a5 g5 | g5:.5 a5 g5 e5 d5:2 | e5:.5 g5 b5:1 a5:.5 g5 e5:1 | a5:1.5 g5:.5 e5:2 |",
+    "d5:.5 e5 f5 a5 c6:1 a5 | g5:1 d5:.5 e5 g5:2 | e5:.5 g5 c6:1 a5:.5 g5 f5:1 | e5:1 d5 r:2"
+  ]
+}

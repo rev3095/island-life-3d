@@ -1,0 +1,42 @@
+{
+  "id": "indoor",
+  "version": 1,
+  "code": "BGM-07",
+  "title": "실내",
+  "mood": "작은 라디오",
+  "bpm": 84,
+  "meter": 4,
+  "bars": 16,
+  "swing": 0.1,
+  "gain": 0.76,
+  "room": "small",
+  "key": "Bb",
+  "scale": "major",
+  "arrange": "indoor",
+  "radio": { "low": 320, "mid": 1500, "midGain": 4, "high": 3300, "drive": 1.8 },
+  "loops": [{ "kind": "hiss", "f": 2600, "q": 0.5, "gain": 0.02 }],
+  "channels": {
+    "keys": { "label": "건반", "gain": 0.5, "pan": -0.1, "verb": 0.15 },
+    "lead": { "label": "멜로디", "gain": 0.6, "pan": 0.08, "verb": 0.18 },
+    "bass": { "label": "베이스", "gain": 0.6, "pan": 0, "verb": 0.02 },
+    "drums": { "label": "드럼", "gain": 0.5, "pan": 0, "verb": 0.08 },
+    "hat": { "label": "하이햇", "gain": 0.4, "pan": 0.2, "verb": 0.05 },
+    "amb": { "label": "자연 소리", "gain": 0.5, "pan": 0, "verb": 0 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "vibes", "ch": "lead" },
+    "keys": { "label": "전자피아노 화음", "inst": "ep", "ch": "keys" },
+    "bass": { "label": "워킹 베이스", "inst": "bass", "ch": "bass" },
+    "kick": { "label": "킥", "inst": "kick", "ch": "drums" },
+    "brush": { "label": "브러시", "inst": "brush", "ch": "drums" },
+    "hat": { "label": "하이햇", "inst": "hat", "ch": "hat" },
+    "crackle": { "label": "판 긁힘", "inst": "crackle", "ch": "amb" }
+  },
+  "prog": ["Bbmaj7 | Gm7 | Cm7 | F7 | Dm7 | Gm7 | Cm7 | F7sus4 F7 |", "Ebmaj7 | Dm7 | Cm7 | Bbmaj7 | Ebmaj7 | Dm7 G7 | Cm7 | F7sus4"],
+  "mel": [
+    "d5:1 f5:.5 g5 f5:1 d5 | bb4:1.5 c5:.5 d5:2 | c5:.5 d5 eb5 g5 f5:1 eb5 | c5:3 r:1 |",
+    "f5:1 d5:.5 f5 a5:1 g5 | f5:1.5 d5:.5 bb4:2 | c5:1 eb5 g5 f5 | f5:2 r:2 |",
+    "g5:1.5 f5:.5 d5:1 bb4 | a4:1 c5 d5:2 | eb5:1 d5:.5 c5 bb4:1 g4 | d5:3 r:1 |",
+    "g4:.5 bb4 d5 f5 g5:2 | f5:1 d5 b4 d5 | c5:1.5 d5:.5 eb5:1 g5 | f5:2 r:2"
+  ]
+}

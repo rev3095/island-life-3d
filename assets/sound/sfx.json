@@ -1,0 +1,304 @@
+{
+  "version": 1,
+  "note": "효과음. pitch = 높이 배율, length = 길이 배율, trim = 크기 맞춤(dB). layers = 소리 층: tone(사인·삼각파) · noise(잡음 한 번) · sweep(잡음 휘기) · bubble(물방울) · note(악기 음) · buzz(윙윙). f·to 는 높이를 따라가고 keep 에 적은 칸은 그대로. [a, b] = 부를 때마다 a~b 사이 아무 값",
+  "jitter": 0.04,
+  "sfx": {
+    "step-grass": {
+      "label": "발소리·풀",
+      "trim": 9.3,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "noise", "type": "bandpass", "f": 2800, "q": 0.9, "peak": 0.32, "a": 0.004, "d": 0.07 },
+        { "kind": "noise", "at": 0.006, "type": "highpass", "f": 6000, "keep": ["f"], "q": 0.7, "peak": 0.08, "a": 0.002, "d": 0.035 }
+      ]
+    },
+    "step-sand": {
+      "label": "발소리·모래",
+      "trim": 12.2,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "noise", "type": "lowpass", "f": 1500, "q": 0.6, "peak": 0.42, "a": 0.012, "d": 0.09 },
+        { "kind": "noise", "at": 0.02, "type": "bandpass", "f": 4200, "q": 1.2, "peak": 0.07, "a": 0.004, "d": 0.05 }
+      ]
+    },
+    "step-wood": {
+      "label": "발소리·나무",
+      "trim": 9.1,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 175, "to": 120, "glide": 0.06, "peak": 0.42, "a": 0.002, "d": 0.08 },
+        { "kind": "noise", "type": "bandpass", "f": 1100, "q": 2, "peak": 0.2, "a": 0.001, "d": 0.03 }
+      ]
+    },
+    "cast": {
+      "label": "찌 던지기",
+      "trim": 8.6,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "sweep", "f": 500, "to": 2600, "q": 1.2, "peak": 0.3, "a": 0.12, "d": 0.18, "len": 0.3 },
+        { "kind": "tone", "at": 0.05, "type": "triangle", "f": 1300, "to": 600, "glide": 0.35, "peak": 0.03, "a": 0.02, "d": 0.3 }
+      ]
+    },
+    "nibble": {
+      "label": "톡톡(입질)",
+      "trim": 10.5,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 1100, "to": 700, "glide": 0.03, "peak": 0.22, "a": 0.002, "d": 0.04 },
+        { "kind": "tone", "at": 0.09, "type": "sine", "f": 1000, "to": 650, "glide": 0.03, "peak": 0.14, "a": 0.002, "d": 0.04 }
+      ]
+    },
+    "bite": {
+      "label": "덥석(물기)",
+      "trim": 11.8,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 520, "to": 160, "glide": 0.12, "peak": 0.45, "a": 0.003, "d": 0.14 },
+        { "kind": "noise", "type": "lowpass", "f": 1800, "keep": ["f"], "q": 0.7, "peak": 0.22, "a": 0.004, "d": 0.12 }
+      ]
+    },
+    "splash": {
+      "label": "첨벙",
+      "trim": 8.5,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        {
+          "kind": "sweep",
+          "type": "lowpass",
+          "f": 3400,
+          "to": 800,
+          "keep": ["to"],
+          "q": 0.6,
+          "peak": 0.42,
+          "a": 0.01,
+          "d": 0.4,
+          "len": 0.45
+        },
+        { "kind": "noise", "type": "highpass", "f": 3000, "keep": ["f"], "q": 0.7, "peak": 0.12, "a": 0.005, "d": 0.15 },
+        { "kind": "bubble", "n": 4, "at": [0.08, 0.4], "f": [500, 1100], "peak": 0.08 }
+      ]
+    },
+    "catch": {
+      "label": "낚시 성공",
+      "trim": -3.2,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "note", "inst": "marimba", "midi": 72, "dur": 0.4, "vel": 0.42 },
+        { "kind": "note", "at": 0.075, "inst": "marimba", "midi": 76, "dur": 0.4, "vel": 0.42 },
+        { "kind": "note", "at": 0.15, "inst": "marimba", "midi": 79, "dur": 0.4, "vel": 0.42 },
+        { "kind": "note", "at": 0.225, "inst": "marimba", "midi": 84, "dur": 0.8, "vel": 0.5 },
+        { "kind": "note", "at": 0.3, "inst": "bell", "midi": 91, "dur": 1, "vel": 0.16 },
+        { "kind": "note", "at": 0.42, "inst": "bell", "midi": 96, "dur": 1, "vel": 0.1 }
+      ]
+    },
+    "net-swing": {
+      "label": "잠자리채",
+      "trim": 8.6,
+      "pitch": 1,
+      "length": 1,
+      "layers": [{ "kind": "sweep", "f": 900, "to": 3500, "q": 1.5, "peak": 0.3, "a": 0.07, "d": 0.13, "len": 0.22 }]
+    },
+    "bug-catch": {
+      "label": "곤충 잡기",
+      "trim": 3.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 600, "to": 1250, "glide": 0.05, "peak": 0.22, "a": 0.002, "d": 0.06 },
+        { "kind": "note", "at": 0.06, "inst": "bell", "midi": 81, "dur": 0.5, "vel": 0.26 },
+        { "kind": "note", "at": 0.16, "inst": "bell", "midi": 88, "dur": 0.8, "vel": 0.26 },
+        { "kind": "note", "at": 0.26, "inst": "bell", "midi": 93, "dur": 0.8, "vel": 0.1 }
+      ]
+    },
+    "shake": {
+      "label": "나무 흔들기",
+      "trim": 5.7,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        {
+          "kind": "noise",
+          "n": 7,
+          "every": 0.07,
+          "at": [0, 0.03],
+          "type": "bandpass",
+          "f": [3000, 5200],
+          "q": 1.1,
+          "peak": [0.1, 0.2],
+          "a": 0.01,
+          "d": 0.07
+        },
+        { "kind": "noise", "type": "lowpass", "f": 900, "keep": ["f"], "q": 0.7, "peak": 0.08, "a": 0.05, "d": 0.3 }
+      ]
+    },
+    "fruit-drop": {
+      "label": "과일 떨어짐",
+      "trim": 7.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 240, "to": 110, "glide": 0.1, "peak": 0.5, "a": 0.002, "d": 0.15 },
+        { "kind": "noise", "type": "lowpass", "f": 900, "keep": ["f"], "q": 0.7, "peak": 0.2, "a": 0.002, "d": 0.05 },
+        { "kind": "tone", "at": 0.17, "type": "sine", "f": 210, "to": 120, "glide": 0.07, "peak": 0.2, "a": 0.002, "d": 0.08 }
+      ]
+    },
+    "acorn": {
+      "label": "도토리 짤랑",
+      "trim": 11.1,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 2600, "peak": 0.16, "a": 0.001, "d": 0.08 },
+        { "kind": "tone", "type": "sine", "f": 3900, "peak": 0.06, "a": 0.001, "d": 0.05 },
+        { "kind": "tone", "at": 0.06, "type": "sine", "f": 2300, "peak": 0.12, "a": 0.001, "d": 0.08 },
+        { "kind": "tone", "at": 0.06, "type": "sine", "f": 3450, "peak": 0.04, "a": 0.001, "d": 0.05 }
+      ]
+    },
+    "dig": {
+      "label": "삽 파기",
+      "trim": 12.2,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "noise", "type": "lowpass", "f": 700, "q": 0.7, "peak": 0.5, "a": 0.01, "d": 0.14 },
+        { "kind": "noise", "at": 0.01, "type": "bandpass", "f": 2500, "q": 1, "peak": 0.1, "a": 0.004, "d": 0.08 },
+        { "kind": "tone", "type": "sine", "f": 95, "to": 70, "keep": ["to"], "glide": 0.08, "peak": 0.3, "a": 0.003, "d": 0.1 }
+      ]
+    },
+    "fossil": {
+      "label": "화석 발견",
+      "trim": 1.6,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 150, "to": 90, "keep": ["to"], "glide": 0.12, "peak": 0.4, "a": 0.003, "d": 0.15 },
+        { "kind": "noise", "type": "lowpass", "f": 800, "keep": ["f"], "q": 0.7, "peak": 0.2, "a": 0.005, "d": 0.1 },
+        { "kind": "note", "at": 0.18, "inst": "bell", "midi": 76, "dur": 0.9, "vel": 0.28 },
+        { "kind": "note", "at": 0.27, "inst": "bell", "midi": 79, "dur": 0.9, "vel": 0.25 },
+        { "kind": "note", "at": 0.36, "inst": "bell", "midi": 84, "dur": 0.9, "vel": 0.22 },
+        { "kind": "note", "at": 0.45, "inst": "bell", "midi": 88, "dur": 0.9, "vel": 0.19 }
+      ]
+    },
+    "axe-wood": {
+      "label": "도끼·나무",
+      "trim": 13.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "triangle", "f": 320, "to": 200, "glide": 0.05, "peak": 0.42, "a": 0.001, "d": 0.07 },
+        { "kind": "noise", "type": "bandpass", "f": 1800, "q": 1.5, "peak": 0.3, "a": 0.001, "d": 0.04 },
+        { "kind": "tone", "type": "sine", "f": 140, "peak": 0.16, "a": 0.002, "d": 0.12 }
+      ]
+    },
+    "axe-rock": {
+      "label": "도끼·바위",
+      "trim": 14.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 1250, "peak": 0.18, "a": 0.001, "d": 0.25 },
+        { "kind": "tone", "type": "sine", "f": 3450, "peak": 0.1, "a": 0.001, "d": 0.12 },
+        { "kind": "tone", "type": "sine", "f": 6750, "peak": 0.05, "a": 0.001, "d": 0.06 },
+        { "kind": "noise", "type": "highpass", "f": 3500, "keep": ["f"], "q": 0.7, "peak": 0.25, "a": 0.001, "d": 0.02 }
+      ]
+    },
+    "water": {
+      "label": "물 주기",
+      "trim": 2.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "noise", "type": "bandpass", "f": 2200, "q": 0.6, "peak": 0.16, "a": 0.08, "d": 0.25, "hold": 0.35 },
+        { "kind": "bubble", "n": 6, "at": [0.02, 0.6], "f": [700, 1600], "peak": 0.06 }
+      ]
+    },
+    "pickup": {
+      "label": "줍기 뽁",
+      "trim": 14.7,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 380, "to": 980, "glide": 0.07, "peak": 0.36, "a": 0.003, "d": 0.08 },
+        { "kind": "noise", "type": "highpass", "f": 4000, "keep": ["f"], "q": 0.7, "peak": 0.05, "a": 0.001, "d": 0.01 }
+      ]
+    },
+    "bag-open": {
+      "label": "가방 열기",
+      "trim": 8.7,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "noise", "type": "bandpass", "f": 1800, "q": 0.7, "peak": 0.2, "a": 0.03, "d": 0.1 },
+        { "kind": "tone", "at": 0.08, "type": "sine", "f": 500, "to": 820, "glide": 0.04, "peak": 0.16, "a": 0.002, "d": 0.06 }
+      ]
+    },
+    "menu": {
+      "label": "메뉴 클릭",
+      "trim": 16.1,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "triangle", "f": 990, "peak": 0.14, "a": 0.002, "d": 0.05 },
+        { "kind": "tone", "type": "sine", "f": 1980, "peak": 0.04, "a": 0.002, "d": 0.03 }
+      ]
+    },
+    "sell": {
+      "label": "판매 짤랑",
+      "trim": 9.8,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 2093, "peak": 0.15, "a": 0.001, "d": 0.12 },
+        { "kind": "tone", "type": "sine", "f": 5776.68, "peak": 0.04, "a": 0.001, "d": 0.05 },
+        { "kind": "tone", "at": 0.055, "type": "sine", "f": 2490.67, "peak": 0.15, "a": 0.001, "d": 0.12 },
+        { "kind": "tone", "at": 0.055, "type": "sine", "f": 6874.2492, "peak": 0.04, "a": 0.001, "d": 0.05 },
+        { "kind": "tone", "at": 0.11, "type": "sine", "f": 3139.5, "peak": 0.15, "a": 0.001, "d": 0.12 },
+        { "kind": "tone", "at": 0.11, "type": "sine", "f": 8665.02, "peak": 0.04, "a": 0.001, "d": 0.05 },
+        { "kind": "note", "at": 0.18, "inst": "bell", "midi": 96, "dur": 0.8, "vel": 0.08 }
+      ]
+    },
+    "door": {
+      "label": "문 열기",
+      "trim": 10.9,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        { "kind": "tone", "type": "sine", "f": 110, "to": 85, "keep": ["to"], "glide": 0.12, "peak": 0.42, "a": 0.003, "d": 0.18 },
+        { "kind": "noise", "at": 0.02, "type": "highpass", "f": 2500, "keep": ["f"], "q": 0.7, "peak": 0.15, "a": 0.001, "d": 0.015 },
+        { "kind": "noise", "type": "bandpass", "f": 400, "q": 3, "peak": 0.2, "a": 0.004, "d": 0.1 }
+      ]
+    },
+    "bee": {
+      "label": "벌 윙윙",
+      "trim": 6.6,
+      "pitch": 1,
+      "length": 1,
+      "layers": [
+        {
+          "kind": "buzz",
+          "f": 210,
+          "mid": 245,
+          "end": 200,
+          "len": 0.85,
+          "vib": 18,
+          "vibDepth": 10,
+          "lp": 1400,
+          "q": 2,
+          "peak": 0.09,
+          "rise": 0.15,
+          "fall": 0.3,
+          "trem": 9,
+          "tremDepth": 0.025
+        }
+      ]
+    }
+  }
+}

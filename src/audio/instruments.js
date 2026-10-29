@@ -426,3 +426,15 @@ for (const kind of Object.keys(UNTONED)) {
   INSTRUMENTS[kind] = (engine, dest, t, _midi, _dur, vel, o = {}) =>
     playBuffer(engine, dest, hitBuffer(engine, kind, o.variant ?? 0), t, 99, vel, { rate: o.rate ?? 1 });
 }
+
+/** 편집기·검사용 악기 이름과 종류: tone = 음높이 있는 악기(서로 바꿔 끼울 수 있다), hit = 타악기, nature = 자연 소리(변형 번호가 악기마다 달라 바꾸지 않는다) */
+export const INSTRUMENT_INFO = {
+  piano: { label: '피아노', kind: 'tone' }, marimba: { label: '마림바', kind: 'tone' }, musicbox: { label: '오르골', kind: 'tone' },
+  kalimba: { label: '칼림바', kind: 'tone' }, bell: { label: '종', kind: 'tone' }, vibes: { label: '비브라폰', kind: 'tone' },
+  ep: { label: '전자피아노', kind: 'tone' }, bass: { label: '베이스', kind: 'tone' }, uke: { label: '우쿨렐레', kind: 'tone' },
+  pluck: { label: '뜯는 소리', kind: 'tone' }, harp: { label: '하프', kind: 'tone' }, pluckbass: { label: '뜯는 베이스', kind: 'tone' },
+  pad: { label: '패드', kind: 'tone' }, flute: { label: '플루트', kind: 'tone' },
+  kick: { label: '킥 드럼', kind: 'hit' }, shaker: { label: '셰이커', kind: 'hit' }, snap: { label: '핑거 스냅', kind: 'hit' },
+  brush: { label: '브러시', kind: 'hit' }, hat: { label: '하이햇', kind: 'hit' }, wood: { label: '우드블록', kind: 'hit' },
+  drip: { label: '빗방울', kind: 'nature' }, crackle: { label: '판 긁힘', kind: 'nature' }, cricket: { label: '귀뚜라미', kind: 'nature' }, bird: { label: '새소리', kind: 'nature' },
+};
