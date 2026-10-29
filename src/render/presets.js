@@ -109,7 +109,9 @@ export function checkStyle(data) {
 
 // 값 읽기: 브라우저는 게임 로더(assets.js 의 loadJSON — 웹 빌드 묶음·다시 받기까지 같이 탄다).
 // Node(테스트)는 읽지 않고 비워 둔다 — 테스트는 파일을 직접 읽어 checkStyle 에 넣는다.
-const data = typeof document === 'undefined' ? null : await (await import('../core/assets.js')).loadJSON(STYLE_FILE);
+// (node 인지는 process 로 본다 — 테스트가 잠깐 가짜 document 를 두는 일이 있어서 document 만으로는 모자란다)
+const inBrowser = typeof document !== 'undefined' && !globalThis.process?.versions?.node;
+const data = inBrowser ? await (await import('../core/assets.js')).loadJSON(STYLE_FILE) : null;
 if (data) { const bad = checkStyle(data); if (bad.length) console.warn(`[render] ${STYLE_FILE} 문제 ${bad.length}개 (범위 밖 값은 잘라 쓴다)`, bad); }
 
 /** 프리셋 { cozy: {...}, toon: {...} } — 'toon' = 2차 이전 모습 (2단 명암, 갈색 잉크 외곽선, 화면 효과 없음), 'cozy' = 동숲풍 기본 */

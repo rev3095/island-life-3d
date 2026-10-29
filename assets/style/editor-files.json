@@ -6,6 +6,7 @@
     "src/core/assets.js",
     "src/core/constants.js",
     "src/core/events.js",
+    "src/core/packs.js",
     "src/core/materials.js",
     "src/core/state.js",
     "src/render/cull.js",
