@@ -54,6 +54,11 @@ node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배�
 - 시나리오 편집기 `story-editor.html` (아티팩트, 링크는 `docs/notes/story.md` 첫 줄, capabilities `db`·`user`, `applied`·`history` 쓰기 admin): 사용자가 연출안을 고르고 컷·순서·글을 고치고 의견을 남기면 `drafts/<장면 id>`·`timeline/main` 에 저장된다.
 - 채팅에 "시나리오 반영"이 오면: `drafts`·`timeline` 을 읽어 장면 파일과 다른 것만 반영(고침 = `version` +1, 새 장면 = 파일 + index.json + files.js, 의견 = 컷을 고치거나 새 연출안으로, 되돌리기 = `history/story-v<n>.commit` 의 `assets/story/`) → `node --test tests/` → dev-server `/index.html?story=<id>&take=<key>` 로 재생 확인 → 커밋 → 편집기 다시 publish (바뀐 파일만) → `applied/story` 버전 +1 · `history/story-v<n>` 기록. 자세한 순서는 `docs/notes/story.md` "시나리오 반영".
 
+### 소리와 "소리 반영" 흐름
+- 배경음·효과음·목소리는 Web Audio 합성(소리 파일 없음)이고 값은 데이터다: 곡 하나 = `assets/sound/songs/<id>.json` (빠르기·박자·채널·파트(악기·세기·옥타브·끄기)·화음 `prog`·멜로디 `mel` 악보 글), 목록과 언제 틀까(시간대·날씨·자리 `indoor`·창 `shop`/`museum`) = `assets/sound/index.json`, 효과음 표 `sfx.json`(높이·길이·크기 + 소리 층), 목소리 표 `voices.json`. 파일 목록은 `src/audio/files.js` (웹 빌드가 이 글자로 묶는다). 반주 모양(마디마다 무엇을 치는지)은 코드 `src/audio/songs.js` 의 `ARRANGE` 이고 곡 데이터의 `arrange` 로 고른다. 데이터 모양·저장소 모양은 `docs/notes/m6-p4-sound.md`.
+- 곡 편집기 `sound-editor.html` (아티팩트, 링크는 `docs/notes/m6-p4-sound.md` 첫 줄, capabilities `db`·`user`, `applied`·`history` 쓰기 admin): 사용자가 곡·선곡 표·효과음·목소리를 고쳐 바로 들어 보고 의견을 남기면 `drafts/*` 에 저장된다.
+- 채팅에 "소리 반영"이 오면: `drafts`·`requests/sound`·`applied/sound` 읽기 → 초안 행을 파일로 저장해 `node tools/apply-sound.mjs <초안.json> --dry` 로 확인 → 실제 실행(바뀐 파일 `version` +1, 새 곡은 index·files.js 까지) → 의견은 직접 반영 → `node --test tests/` (`sound.test.mjs` 의 지문이 고치지 않은 곡·효과음 소리가 그대로인지 본다) → dev-server 에서 들어 보기 → 커밋 → 편집기 다시 publish (바뀐 파일만) → `applied/sound` 버전 +1 · `history/sound-v<n>` (`commit` = 그 버전 파일이 든 커밋) 기록. 되돌리기는 `git checkout <commit> -- assets/sound/ src/audio/files.js`. 자세한 순서는 `docs/notes/m6-p4-sound.md` "소리 반영".
+
 ### 웹 배포 (게임 링크)
 - 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면) · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.
 

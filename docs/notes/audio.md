@@ -28,13 +28,13 @@
 
 | 고칠 것 | 파일 · 위치 |
 |---|---|
-| 곡의 멜로디·화음 | `src/audio/songs.js` 곡마다 `mel`(음이름:박자, `\|` 마디선) · `prog`(화음 기호). 길이가 안 맞으면 불러올 때 오류로 알려 준다 |
-| 곡의 반주·변주 | 같은 파일 `bar(s, i, pass)` — `pass % 2 === 1` 이 두 번째 바퀴 |
-| 곡 전체 크기 | 곡 정의의 `gain`, 악기별 크기는 `setup` 의 `s.channel(이름, { gain, pan, verb })` |
+| 곡의 멜로디·화음·빠르기·악기 | `assets/sound/songs/<id>.json` 의 `mel`(음이름:박자, `\|` 마디선) · `prog`(화음 기호) · `bpm` · `parts` — **곡 편집기(`sound-editor.html`)로 고치고 "소리 반영"** (2026-10-29 M6-P4 부터, `docs/notes/m6-p4-sound.md`). 길이가 안 맞으면 한국어 오류 |
+| 곡의 반주·변주 | `src/audio/songs.js` 의 `ARRANGE` (반주 모양) — `pass % 2 === 1` 이 두 번째 바퀴 |
+| 곡 전체 크기·악기별 크기 | 곡 데이터의 `gain` · `channels` 의 `{ gain, pan, verb }` |
 | 악기 음색 | `src/audio/instruments.js` 의 `TONED`(배음·감쇠) · `UNTONED`(타악기·자연 소리) |
-| 효과음 소리·크기 | `src/audio/sfx.js` 의 `RECIPES`(소리) · `TRIM_DB`(크기, dB) |
-| 주민 목소리 | `src/audio/voice.js` 의 `VOICES` — `f0` 높이, `syl` 빠르기, `formant` 입 크기, `gain` 크기 |
-| 시각별 자동 곡 | `src/audio/index.js` 의 `trackForHour` |
+| 효과음 소리·크기 | `assets/sound/sfx.json` 의 `layers`(소리 층) · `pitch`·`length`·`trim`(크기, dB) |
+| 주민 목소리 | `assets/sound/voices.json` — `f0` 높이, `syl` 빠르기, `formant` 입 크기, `gain` 크기 |
+| 시각·날씨·자리별 곡 | `assets/sound/index.json` 의 `schedule` |
 
 고친 뒤에는 데모의 **레벨 측정** 버튼으로 크기를 다시 본다: 배경음은 곡끼리 LUFS 가 ±2dB 안, peak 는 −1 dBFS 아래(빨간 표시 없음)면 된다.
 
