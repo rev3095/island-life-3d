@@ -9,29 +9,25 @@
 ## 현재 상태 (2026-10-29 기준)
 
 ### 한 줄 요약
-1·2·3차 개발을 모두 `main` 에 합쳤고 **4차 세 트랙이 진행 중**이다.(마지막 ff74575, 테스트 133/133), **게임을 웹 링크로 처음 게시했다**: https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ (비공개, 파일 265개). 이름 정하기 → 밤톨 첫날 안내 → 첫날 할 일 7단계, 채집·꽃 교배·주민·편지·상점·박물관·집 꾸미기·제작, 휴대폰 터치 조작, cozy 셰이더·부드러운 해안선·가리는 나무 투명까지 들어 있다.
+1·2·3·4차 개발을 모두 `main` 에 합쳤다(62d53b7, 테스트 159).(마지막 ff74575, 테스트 133/133), **게임을 웹 링크로 처음 게시했다**: https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ (비공개, 파일 265개). 이름 정하기 → 밤톨 첫날 안내 → 첫날 할 일 7단계, 채집·꽃 교배·주민·편지·상점·박물관·집 꾸미기·제작, 휴대폰 터치 조작, cozy 셰이더·부드러운 해안선·가리는 나무 투명까지 들어 있다.
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | 버전 2 (빌드 ff74575). 한 번 255파일 제한이라 두 번에 나눠 게시(254 + 10). 다시 게시: 빌드 → 같은 `file_path` 로 바뀐 파일만(`git diff --name-only ff74575 HEAD` ∩ `files.json`), 다른 대화에서는 `url` 로 먼저 read. 순서는 `docs/notes/deploy.md` '게시 순서' |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 3 (빌드 62d53b7, 268파일)**. 버전 2 = 빌드 ff74575. 한 번 255파일 제한이라 두 번에 나눠 게시(254 + 10). 다시 게시: 빌드 → 같은 `file_path` 로 바뀐 파일만(`git diff --name-only ff74575 HEAD` ∩ `files.json`), 다른 대화에서는 `url` 로 먼저 read. 순서는 `docs/notes/deploy.md` '게시 순서' |
 | 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 9종 모두 검수 대기. db `refs` / `requests` — 2026-10-29 확인 때 요청 0건 |
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 4: 가구 20종 탭 + 다시 만든 곤충 상자. 요소 52개 모두 검수 대기. db `env-refs` / `env-requests` — 요청 0건 |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 
 ### 진행 중
-**4차 (2026-10-29 시작) — 다듬기와 콘텐츠, 새 모델·그림 없이.** main 3b98be9 에서 갈라짐, `docs/PLAN.md` 4차 표. 각 세션은 끝나면 이 세션에 보고한다.
-| 트랙 | 세션 id | 브랜치 · 작업 폴더 | 포트 | 고치는 곳 | 만드는 것 |
-|---|---|---|---|---|---|
-| Y1 조작 안내·편의 | `local_678353c3-ca85-405a-8e1b-71e193c08ae8` | `p7-ux` · `../island-worktrees/p7-ux` | 4201 | `gameplay/index.js`, `core/input.js`, `ui/`, `data/save.js`, `gameplay/intro/` | `interactions.peek` + A·B·키 힌트 글자, 섬폰 이름 보기·다시 정하기, `save.reset()` 전체 지우기, 저장 실패 알림 |
-| Y2 채집 콘텐츠 | `local_da502eac-6abd-47f5-b015-a56e725bfe9f` | `p7-content` · `../island-worktrees/p7-content` | 4202 | `gameplay/gather/`, `data/items·museum·spawns·harvest`, `town/keepers.js`·`lines/neuru.js` | 화석 감정, 큰 물고기 줄 당김, 곤충 들추기, 물고기 종별 색 |
-| Y3 그리기 다듬기 | `local_c56ae154-0fbc-4491-ba5a-03e232c9740f` | `p7-render` · `../island-worktrees/p7-render` | 4203 | `core/materials.js`, `render/`, `world/`, `player/index.js`, `town/actor.js`, `house/furniture.js` | 캐릭터 부품 합치기(호출 줄이기), 디더 가림 공용(주민·가구), 강 둑·땅 경계, 그림자에 바람 |
-**세 트랙 작업 끝 — 합치기 승인 대기.** Y1 `p7-ux` e5a867e (4커밋) · Y2 `p7-content` 18f5ed1 (4커밋) · Y3 `p7-render` 5811f1d (4커밋). 모두 담당 파일 안, 겹치는 파일 0. 임시 작업 폴더 `../island-worktrees/wave4-trial`(포트 4209, launch `island-wave4-trial`)에서 셋을 합쳐: 충돌 0, 테스트 159/159, `build-web --check` 통과(265 → 268파일, 255 + 13), 콘솔 오류 0, 모듈 12개, `peek('action')` 주민 옆 "말 걸기"·HUD 안내 "Space 말 걸기", 주민 메시 3개(합치기), `fossil.unknown` 있음, 낮 화면에 하늘 띠·주민 이름표.
-- Y1: `interactions.peek` + 버튼 글자 표, A·B·Space·F 글자, 섬폰 이름 보기·다시 정하기, `save.reset()` 전체 칸 지우기, 저장 실패 알림.
-- Y2: 화석 감정(느루), 큰 물고기 줄 당김(`gather/tug.js`), 바위·나무 곤충 들추기, 물고기 종별 색.
-- Y3: 캐릭터 부품 합치기(광장 그리기 호출 363 → 167), 디더 가림 공용(주민·가게 주인·가구), 강 둑 부드럽게·거품·풀/모래 경계, 그림자에 바람.
-- 확인 못 한 것: 실제 휴대폰·다른 GPU, 저장소 막힌 창 알림(직접 못 만듦), 사람 손으로 줄 당김.
-승인 뒤: `--no-ff` 셋 합치기 → 테스트 → `build-web` → 게임 링크에 바뀐 파일만 다시 게시(`git diff --name-only ff74575 HEAD` ∩ files.json, 묶음 나눔) → `wave4-trial`·p7 작업 폴더 정리.
+없음. **4차 합치고 게시 끝 (2026-10-29)**: Y1 `p7-ux` · Y2 `p7-content` · Y3 `p7-render` 를 main 에 합침(마지막 62d53b7), 테스트 159/159. 게임 링크 버전 3 — 바뀐 파일 35개만 다시 게시해 전체 268파일(빌드 62d53b7, 다음엔 `git diff --name-only 62d53b7 HEAD` ∩ files.json).
+| 트랙 | 세션 id | 들어온 것 |
+|---|---|---|
+| Y1 조작 안내·편의 | `local_678353c3-ca85-405a-8e1b-71e193c08ae8` | `interactions.peek` + 버튼 글자 표, A·B·Space·F 글자가 상황에 맞게, 섬폰 이름 보기·다시 정하기, `save.reset()` 전체 칸 지우기, 저장 실패 알림 |
+| Y2 채집 콘텐츠 | `local_da502eac-6abd-47f5-b015-a56e725bfe9f` | 화석 감정(`fossil.unknown` → 느루), 큰 물고기 줄 당김(`gather/tug.js`), 바위·나무 곤충 들추기, 물고기 종별 색 |
+| Y3 그리기 다듬기 | `local_c56ae154-0fbc-4491-ba5a-03e232c9740f` | 캐릭터 부품 합치기(광장 호출 363 → 167), 디더 가림 공용(주민·가게 주인·가구), 강 둑·풀/모래 경계·강 거품, 그림자에 바람 |
+확인 못 한 것: 실제 휴대폰·다른 GPU, 저장소 막힌 창 알림, 사람 손 줄 당김, claude.ai 에서 게시본 직접 열기.
+작업 폴더 `p7-*`·`wave4-trial` 등록 해제·브랜치 삭제(저장소엔 main 만). 빈 폴더 `../island-worktrees/p1-world`·`p6-firstday`·`p7-ux`·`p7-content`·`p7-render` 는 그 폴더 세션(T1·X3·Y1~Y3)이 잡고 있어 남음 → 세션 보관 뒤 `rmdir`.
 5차 후보(새 리소스라 검수 보드 먼저): 주민 집 안·이사·생일, 도구 아이콘(D2), 새 가구.
 
 **3차 결과 (main 에 합침: f3f7970 · a24ebbf · a69656f · 75901f9, 후속 ff74575)**
@@ -46,7 +42,7 @@
 ### 다음에 할 일
 1. 웹 링크 게임을 claude.ai 에서 직접 열어 보기(사용자) — 로딩 → 섬 → 한 번 클릭하면 소리·키보드. 휴대폰 앱에서도. 문제가 있으면 알려 주면 고쳐서 같은 링크로 다시 게시.
 2. 편집기 요청이 오면 "요청 확인" / "배경 요청 확인" 흐름.
-3. 4차 세 세션이 끝나면 위 '진행 중' 순서대로 합치고 다시 게시.
+3. 5차: 새 리소스가 필요한 일 → 검수 보드(ID 붙은 리소스 계획·그림)부터 보여 주고 승인받기.
 4. ~~작업 폴더 정리~~ 끝 (2026-10-29): 1·2·3차 작업 폴더 13개 등록 해제, 브랜치 13개 삭제 → 저장소에는 `main` 하나. 지우기 전 W3 가구 `.blend`(22개) → `assets/furniture/blender/`, X2 전후 스크린샷(43장) → `assets/references/` 로 옮겨 둠 (둘 다 gitignore). 끝난 세션 11개 보관(T2~T5, W1~W4, X1·X2·X4) 뒤 빈 폴더 8개 지움. **남은 것**: T1(`local_b15775df-…`)·X3(`local_7128a1e6-…`) 세션은 백그라운드 작업(개발 서버 등)이 살아 있어 보관이 안 됐고, 그래서 빈 폴더 `../island-worktrees/p1-world`·`p6-firstday` 가 남았다 — 사이드바에서 두 세션을 멈추거나 보관한 뒤 `rmdir` 하면 끝.
 
 ### 사용자 원칙·선호 (계속 지킬 것)
@@ -153,6 +149,7 @@
 | 9 | 네, 보관 | 세션 13개 보관 시도 → 11개 보관, 빈 폴더 8개 지움 | T1·X3 은 살아 있는 작업이 있어 남음 |
 | 10 | 이후 작업 진행 | T1·X3 보관 다시 시도(아직 살아 있는 작업 → 안 됨), 편집기 요청 0건 확인, 4차 계획(새 리소스 없는 것만, 파일 겹침 없게) → 작업 폴더 3개 → Y1~Y3 세션 시작 | 진행 중 |
 | 11 | (세션 보고들) | Y1~Y3 브랜치 검증, wave4-trial 에 임시로 합쳐 테스트 159·빌드 검사·브라우저 | 합치기 승인 요청 |
+| 12 | 합치고 게시 | 4차 셋 합치기(62d53b7), 테스트 159, 빌드 → 바뀐 35파일 게시(버전 3, 268파일 확인), 작업 폴더·브랜치 정리 | 끝 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
