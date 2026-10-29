@@ -28,6 +28,8 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
     if (tx < 0 || tz < 0 || tx >= isl.w || tz >= isl.h) return null;
     if (isl.flagsAt?.(tx, tz)) return null;                     // 다리·선착장 밑
     if (tile === 'sea') {
+      // 부드러운 해안선(X2): 물가 선 안쪽 바다 칸은 모래 비탈 밑이라 물고기가 안 보인다
+      if (world.coastDistance && world.coastDistance(x, z) < world.coastWaterline + 0.3) return null;
       const d = world.places.dock;
       if (d && Math.abs(x - d.x) < 3.2 && z > d.z - 2 && z < d.z + 4.5) return 'pier';
       return 'sea';

@@ -224,8 +224,11 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       toast(ok ? '저장했어요!' : '저장하지 못했어요', ok ? '💾' : '⚠️');
       ctx.events.emit('sfx', { name: 'menu' });
     } });
+    // 웹 링크(아티팩트)에서는 저장이 이 기기의 이 브라우저에만 남고, 저장소가 막힌 창이면 아예 안 된다 (X4)
+    const canSave = ctx.services.data?.save?.available !== false;
     view.append(h('div', { class: 'pk-save' }, h('div', { class: 'pk-save-icon', 'aria-hidden': 'true' }, '💾'),
-      h('p', null, '지금까지의 섬 생활을 저장할까요?'), go, result));
+      h('p', null, '지금까지의 섬 생활을 저장할까요?'), go, result,
+      h('p', { class: 'pk-muted pk-small' }, canSave ? '진행은 이 기기의 이 브라우저에만 저장돼요.' : '이 창에서는 저장할 수 없어요. 닫으면 처음부터 다시 시작해요.')));
   }
 
   return { open };

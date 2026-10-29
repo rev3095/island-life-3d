@@ -97,14 +97,7 @@ export function createOcclusion(ctx, objects) {
     return true;
   }
 
-  // 대화 중인 상대: town 이 world.occlusion.watch 를 쓰지 않아도 되게, 대화 모드인 주민·가게 주인을 찾는다 (town 개발용 서비스)
-  function talkPartners(out) {
-    const town = ctx.services.town;
-    if (!town) return;
-    for (const V of town.villagers ?? []) if (V.mode === 'talk' && V.actor?.position) out.push(V.actor.position);
-    for (const K of town.keepers ?? []) if ((K.mode === 'talk' || K.mode === 'talk-walk') && K.actor?.position) out.push(K.actor.position);
-  }
-
+  // 대화 중인 상대는 town 이 대화 동안 watch 로 넣는다
   const targets = [];
   function update(dt) {
     hit.clear();
@@ -112,7 +105,6 @@ export function createOcclusion(ctx, objects) {
     if (enabled && player) {
       targets.length = 0;
       targets.push(player.position);
-      talkPartners(targets);
       for (const fn of watchers) { const p = fn(); if (p) targets.push(p); }
       C.x = ctx.camera.position.x; C.y = ctx.camera.position.y; C.z = ctx.camera.position.z;
       const k = ctx.materials.curve.uCurve.value, fz = ctx.focus.z;

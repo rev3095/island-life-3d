@@ -104,8 +104,9 @@ export default {
         if (face) pl.face(who.actor.position.x, who.actor.position.z);
         who.beginTalk?.();
         who.actor.lookAt?.(pl.position.x, pl.position.z);
+        const unwatch = ctx.services.world?.occlusion?.watch?.(() => who.actor.position);   // 대화 상대 앞 나무도 비치게 (X2)
         try { await fn(); } catch (e) { console.error('[town] 대화', e); }
-        finally { who.endTalk?.(); pl.freeze(false); busy = false; }
+        finally { unwatch?.(); who.endTalk?.(); pl.freeze(false); busy = false; }
       },
     };
 
