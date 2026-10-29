@@ -14,13 +14,13 @@
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 3 (빌드 62d53b7, 268파일)**. 버전 2 = 빌드 ff74575. 한 번 255파일 제한이라 두 번에 나눠 게시(254 + 10). 다시 게시: 빌드 → 같은 `file_path` 로 바뀐 파일만(`git diff --name-only ff74575 HEAD` ∩ `files.json`), 다른 대화에서는 `url` 로 먼저 read. 순서는 `docs/notes/deploy.md` '게시 순서' |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 4 (빌드 c9464ea, 268파일)** — 리소스 61종 확정 + 배치값(world 칸) 스펙으로, 바뀐 67파일만 게시. 버전 3 = 빌드 62d53b7, 버전 2 = 빌드 ff74575. 한 번 255파일 제한이라 두 번에 나눠 게시(254 + 10). 다시 게시: 빌드 → 같은 `file_path` 로 바뀐 파일만(`git diff --name-only c9464ea HEAD` ∩ `files.json`), 다른 대화에서는 `url` 로 먼저 read. 순서는 `docs/notes/deploy.md` '게시 순서' |
 | 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 5: **9종 모두 확정(임시, 2026-10-29)**. db `refs` / `requests` — 요청 0건 |
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 5: **요소 52개(배경 32 · 가구 20) 모두 확정(임시, 2026-10-29)**. db `env-refs` / `env-requests` — 요청 0건 |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 
 ### 진행 중
-없음. **리소스 61종 임시 확정 + 교체 준비 (2026-10-29)**: 캐릭터 9 · 배경 32 · 가구 20 을 status `approved` 로(편집기 두 개 버전 5). 나중에 고칠 때 코드를 안 건드리게, 코드에 박혀 있던 배경 충돌 모양·query 범위·건물 집터를 각 배경 스펙의 `world` 칸으로 옮김(`world/objects.js`·`island.js` 가 스펙에서 읽음). `tests/assets.test.mjs`(6개) 가 교체 약속(파일·재질=팔레트·캐릭터 동작/뼈·배경 이름·충돌/집터 ↔ 모델 크기·가구 칸 ↔ items.js)을 검사 — 테스트 165. 빌드 도구에 `--index`(Blender 없이 목록만). 교체 시험: 로컬 배경 편집기에서 벤치에 "하늘색 · 1.6칸" 요청 → 스펙·빌더 수정 → 빌드 11초 → 충돌을 안 고치면 테스트가 잡음 → world 칸 고침 → 편집기·게임에 그대로 반영(충돌 1.61 확인) → 원래대로 되돌림. 약속 정리는 CONTRACTS 끝 "리소스 교체 약속". **게임 링크는 아직 버전 3**(이번 코드 변경은 다음 게시 때 같이 올라감, 화면 차이 없음).
+없음. **리소스 61종 임시 확정 + 교체 준비 (2026-10-29)**: 캐릭터 9 · 배경 32 · 가구 20 을 status `approved` 로(편집기 두 개 버전 5). 나중에 고칠 때 코드를 안 건드리게, 코드에 박혀 있던 배경 충돌 모양·query 범위·건물 집터를 각 배경 스펙의 `world` 칸으로 옮김(`world/objects.js`·`island.js` 가 스펙에서 읽음). `tests/assets.test.mjs`(6개) 가 교체 약속(파일·재질=팔레트·캐릭터 동작/뼈·배경 이름·충돌/집터 ↔ 모델 크기·가구 칸 ↔ items.js)을 검사 — 테스트 165. 빌드 도구에 `--index`(Blender 없이 목록만). 교체 시험: 로컬 배경 편집기에서 벤치에 "하늘색 · 1.6칸" 요청 → 스펙·빌더 수정 → 빌드 11초 → 충돌을 안 고치면 테스트가 잡음 → world 칸 고침 → 편집기·게임에 그대로 반영(충돌 1.61 확인) → 원래대로 되돌림. 약속 정리는 CONTRACTS 끝 "리소스 교체 약속". **게임 링크 버전 4 로 다시 게시**(빌드 c9464ea, 바뀐 67파일, 전체 268 · 로컬 `/artifact/` 에서 12개 모듈·콘솔 오류 0·목록 밖 요청 0 확인, 게시본 objects.js·shop.json 이 로컬과 같은 바이트).
 
 4차까지: **4차 합치고 게시 끝 (2026-10-29)**: Y1 `p7-ux` · Y2 `p7-content` · Y3 `p7-render` 를 main 에 합침(마지막 62d53b7), 테스트 159/159. 게임 링크 버전 3 — 바뀐 파일 35개만 다시 게시해 전체 268파일(빌드 62d53b7, 다음엔 `git diff --name-only 62d53b7 HEAD` ∩ files.json).
 | 트랙 | 세션 id | 들어온 것 |
@@ -153,7 +153,8 @@
 | 11 | (세션 보고들) | Y1~Y3 브랜치 검증, wave4-trial 에 임시로 합쳐 테스트 159·빌드 검사·브라우저 | 합치기 승인 요청 |
 | 12 | 합치고 게시 | 4차 셋 합치기(62d53b7), 테스트 159, 빌드 → 바뀐 35파일 게시(버전 3, 268파일 확인), 작업 폴더·브랜치 정리 | 끝 |
 | 13 | 네, 보관 | Y1~Y3 보관, p7 빈 폴더 지움, T1·X3 보관 다시 시도(안 됨) | 빈 폴더 2개만 남음 |
-| 14 | 캐릭터 9종, 배경 가구 52종 임시 요청 확인·확정. 나중에 고칠 때 바로 바뀌게 리소스가 나뉘어 있는지, 편집기에서 수정본 만들어 바꿀 수 있는지 확인 | 요청 0건 확인 → 61종 approved · `--index` · 편집기 2개 다시 게시(라이브 파일 54개가 git 과 같음을 먼저 확인), 충돌·집터를 스펙 `world` 칸으로, `assets.test.mjs`, 벤치로 교체 시험 후 되돌림 | 끝 (게임 재게시는 다음 묶음에) |
+| 14 | 캐릭터 9종, 배경 가구 52종 임시 요청 확인·확정. 나중에 고칠 때 바로 바뀌게 리소스가 나뉘어 있는지, 편집기에서 수정본 만들어 바꿀 수 있는지 확인 | 요청 0건 확인 → 61종 approved · `--index` · 편집기 2개 다시 게시(라이브 파일 54개가 git 과 같음을 먼저 확인), 충돌·집터를 스펙 `world` 칸으로, `assets.test.mjs`, 벤치로 교체 시험 후 되돌림 | 끝 |
+| 15 | Republish game | 빌드 c9464ea → 바뀐 67파일 게시(버전 4, 268파일), 로컬 `/artifact/` 확인 | 끝 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
