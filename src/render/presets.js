@@ -1,5 +1,8 @@
-// 스타일 프리셋과 조절 값 목록. 값 하나 = 슬라이더 하나 (demos/style.html 이 이 표로 조절판을 만든다).
-// 새 값을 더하려면: PARAMS 에 한 줄 + 두 프리셋에 기본값 + src/render/index.js 의 apply() 에서 uniform 에 연결. (docs/SHADERS.md)
+// 스타일 조절 값 표와 프리셋 읽기. 값 하나 = 슬라이더 하나 (style-editor.html 이 이 표로 조절판을 만든다).
+// 프리셋 값(cozy · toon · 집 안 덧씌우기)은 assets/style/presets.json 에 있다 — 스타일 편집기에서 고르고 채팅 "스타일 반영" 으로 고친다.
+// 새 값을 더하려면: PARAMS 에 한 줄 + presets.json 의 프리셋마다 기본값 + src/render/index.js 의 apply() 에서 uniform 에 연결. (docs/SHADERS.md)
+
+export const STYLE_FILE = 'assets/style/presets.json';
 
 /** 조절 값: key, 이름(화면), 묶음, 종류(range|color|select|bool), 범위 */
 export const PARAMS = [
@@ -58,36 +61,68 @@ export const PARAMS = [
   { key: 'vignetteSoft', label: '가장자리 퍼짐', group: '색 보정', type: 'range', min: 0.1, max: 1, step: 0.01 },
 ];
 
-// 'toon' = 2차 이전 모습 그대로 (2단 명암, 갈색 잉크 외곽선, 화면 효과 없음)
-const TOON = {
-  bands: 2, bandSoft: 0, shadeFloor: 0.659, wrap: 1, castDark: 1, ao: 0, aoHeight: 0.45,
-  shadeTint: '#FFFFFF', litTint: '#FFFFFF', shadeSat: 0, paint: 0, paintScale: 0.35,
-  rim: 0, rimChar: 0, rimPower: 3, spec: 0, specSize: 0.5, glow: 0,
-  wind: 0, windSpeed: 1, water: 0, waterScale: 1,
-  outline: 'ink', outlineScale: 1, outlineTint: 0, outlineDark: 0.55,
-  post: false, exposure: 1, shoulder: 1, bloom: 0, bloomRadius: 0.4, bloomThreshold: 1.1,
-  tiltTop: 0, tiltBottom: 0, tiltFocus: 0.45, tiltRange: 0.35, fxaa: false,
-  saturation: 1, contrast: 1, warmth: 0, lift: 0, liftTint: '#FFFFFF', gamma: 1, gain: 1, vignette: 0, vignetteSoft: 0.6,
-};
+/** 값 하나 검사: 맞으면 null, 아니면 이유 글 */
+export function checkValue(p, v) {
+  if (p.type === 'range') {
+    if (typeof v !== 'number' || !Number.isFinite(v)) return '숫자가 아니에요';
+    if (v < p.min || v > p.max) return `범위 ${p.min}~${p.max} 밖이에요`;
+    if (p.step >= 1 && !Number.isInteger(v)) return '정수여야 해요';
+    return null;
+  }
+  if (p.type === 'color') return /^#[0-9a-f]{6}$/i.test(String(v)) ? null : '#RRGGBB 색이 아니에요';
+  if (p.type === 'select') return p.options.some(([k]) => k === v) ? null : `${p.options.map(([k]) => k).join('·')} 중 하나여야 해요`;
+  if (p.type === 'bool') return typeof v === 'boolean' ? null : 'true/false 여야 해요';
+  return '모르는 종류';
+}
 
-// 'cozy' = 동숲풍 기본: 부드러운 3단 명암, 보랏빛 그늘·따뜻한 햇빛, 은은한 외곽선, 빛 번짐·위쪽 흐림·색 보정
-const COZY = {
-  bands: 3, bandSoft: 0.55, shadeFloor: 0.5, wrap: 0.45, castDark: 0.7, ao: 0.35, aoHeight: 0.45,
-  shadeTint: '#D8CEF2', litTint: '#FFF6E8', shadeSat: 0.3, paint: 0.07, paintScale: 0.35,
-  rim: 0.25, rimChar: 0.9, rimPower: 2.6, spec: 0.8, specSize: 0.5, glow: 1.2,
-  wind: 1, windSpeed: 1, water: 1, waterScale: 1,
-  outline: 'subtle', outlineScale: 0.6, outlineTint: 0.8, outlineDark: 0.5,
-  post: true, exposure: 1.06, shoulder: 0.72, bloom: 0.35, bloomRadius: 0.5, bloomThreshold: 1.05,
-  tiltTop: 1.2, tiltBottom: 0.45, tiltFocus: 0.5, tiltRange: 0.4, fxaa: true,
-  saturation: 1.12, contrast: 1.02, warmth: 0.1, lift: 0.03, liftTint: '#9C8FD0', gamma: 1, gain: 1, vignette: 0.25, vignetteSoft: 0.6,
-};
+/** presets.json 모양 검사 → 문제 목록 (빈 배열이면 통과). 테스트·스타일 편집기·"스타일 반영" 이 같이 쓴다 */
+export function checkStyle(data) {
+  const out = [];
+  if (!data || typeof data !== 'object') return ['스타일 값이 객체가 아니에요'];
+  const byKey = new Map(PARAMS.map(p => [p.key, p]));
+  if (!Number.isInteger(data.version) || data.version < 0) out.push('version 은 0 이상 정수');
+  const names = Object.keys(data.presets ?? {});
+  if (!names.length) out.push('presets 가 비었어요');
+  if (!names.includes(data.default)) out.push(`default '${data.default}' 프리셋이 없어요`);
+  for (const name of names) {
+    if (!/^[a-z][a-z0-9-]*$/.test(name)) out.push(`프리셋 이름 '${name}' 은 영문 소문자·숫자·- 로`);
+    if (typeof data.labels?.[name] !== 'string' || !data.labels[name]) out.push(`labels.${name} 이름이 없어요`);
+    const v = data.presets[name] ?? {};
+    for (const p of PARAMS) {
+      if (!(p.key in v)) { out.push(`${name}.${p.key} 값이 없어요`); continue; }
+      const why = checkValue(p, v[p.key]);
+      if (why) out.push(`${name}.${p.key} = ${JSON.stringify(v[p.key])}: ${why}`);
+    }
+    for (const k of Object.keys(v)) if (!byKey.has(k)) out.push(`${name}.${k}: 모르는 값`);
+  }
+  for (const [name, v] of Object.entries(data.indoor ?? {})) {
+    if (!names.includes(name)) out.push(`indoor.${name}: 그런 프리셋이 없어요`);
+    for (const [k, x] of Object.entries(v ?? {})) {
+      const p = byKey.get(k);
+      if (!p) { out.push(`indoor.${name}.${k}: 모르는 값`); continue; }
+      const why = checkValue(p, x);
+      if (why) out.push(`indoor.${name}.${k} = ${JSON.stringify(x)}: ${why}`);
+    }
+  }
+  return out;
+}
 
-export const PRESETS = { cozy: COZY, toon: TOON };
+// 값 읽기: 브라우저는 게임 로더(assets.js 의 loadJSON — 웹 빌드 묶음·다시 받기까지 같이 탄다).
+// Node(테스트)는 읽지 않고 비워 둔다 — 테스트는 파일을 직접 읽어 checkStyle 에 넣는다.
+const data = typeof document === 'undefined' ? null : await (await import('../core/assets.js')).loadJSON(STYLE_FILE);
+if (data) { const bad = checkStyle(data); if (bad.length) console.warn(`[render] ${STYLE_FILE} 문제 ${bad.length}개 (범위 밖 값은 잘라 쓴다)`, bad); }
 
-// 집 안(scene:indoor)에서 프리셋 위에 얹는 값: 실내 빛이 이미 따뜻해서 햇빛 색·따뜻함·채도를 덜고(크림 벽이 주황이 되지 않게),
-// 그늘은 덜 파랗게, 방이 작으니 흐림은 약하게
-export const INDOOR = {
-  cozy: { shadeTint: '#EDE4EE', litTint: '#FFFAF3', shadeSat: 0.15, saturation: 1.03, warmth: 0, tiltTop: 0.6, tiltBottom: 0.25, vignette: 0.3, ao: 0.42 },
-};
-export const DEFAULT_PRESET = 'cozy';
-export const PRESET_LABELS = { cozy: '포근 (동숲풍)', toon: '툰 (예전)' };
+/** 프리셋 { cozy: {...}, toon: {...} } — 'toon' = 2차 이전 모습 (2단 명암, 갈색 잉크 외곽선, 화면 효과 없음), 'cozy' = 동숲풍 기본 */
+export const PRESETS = structuredClone(data?.presets ?? {});
+/** 집 안(scene:indoor)에서 프리셋 위에 얹는 값: 실내 빛이 이미 따뜻해서 햇빛 색·따뜻함·채도를 덜고, 그늘은 덜 파랗게, 흐림은 약하게 */
+export const INDOOR = structuredClone(data?.indoor ?? {});
+export const DEFAULT_PRESET = data?.default ?? 'cozy';
+export const PRESET_LABELS = { ...(data?.labels ?? {}) };
+/** 게임에 들어간 스타일 반영 버전 (편집기의 applied/style 과 같다) */
+export const STYLE_VERSION = data?.version ?? 0;
+
+/** 스타일 편집기 전용: 집 안 덧씌우기 값을 통째로 바꿔 끼운다 (render 가 다음 apply 때 읽는다). 게임은 쓰지 않는다 */
+export function replaceIndoor(map) {
+  for (const k of Object.keys(INDOOR)) delete INDOOR[k];
+  Object.assign(INDOOR, structuredClone(map ?? {}));
+}
