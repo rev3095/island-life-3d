@@ -61,6 +61,7 @@
 - **대답 시험**: 날짜·날씨·때·친한 정도를 고르고 이모티콘을 세 개까지 담아 보내면 `festival/judge.js` 를 그대로 import 해서 판정 → 대답 말풍선·판정 이름·친밀도(하루 세 번까지, `countPoints` 그대로)·몸짓·이유, 3D 모델이 몸짓 (기뻐하기 동작 · 끄덕·갸웃·도리도리·물러남은 게임과 같은 기울이기). 인사·기다리기·오늘 원하는 것 들어줌이 대화 동안 이어진다. 선물 시험(아이템 → 반응·친밀도·선물 대사, `town/rules.js giftReaction`), 글 대사로 말 걸어 보기(`greetingLines`).
 - 아래에 **바뀐 것** (칸마다 이름표 + 경로, 생일은 rules.json) · **고칠 것** (`checkVillager`, 있으면 보내기 막음) · 의견·자유 요청 · **요청 보내기** / 글로 복사하기 / 처음 값으로. 고친 값은 그 창(localStorage, 주민 파일 버전마다)에 남는다.
 - 반영 기록 칸: `applied/character` 머리 줄 + `history` (board == 'character') 목록, 줄마다 "v<n> 로 되돌리기 요청".
+- 반영 기록 **v0** 을 써 두었다 (`applied/character` · `history/character-v0`, commit 0b643f4 = 주민 파일 9개 v1, 6차 전 값 그대로). 다음 반영이 v1.
 - 로컬: dev-server `/editor.html#coco.talk` — 요청은 `assets/review/requests.json`, 반영 기록 흉내는 `assets/review/char-applied.json`·`char-history.json` (행마다 `docId`).
 
 ### 저장소 문서 (캐릭터 편집기 저장소)
