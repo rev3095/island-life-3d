@@ -167,9 +167,8 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
 <script type="application/json" id="editors-list">
 [
   { "id": "character", "group": "editor", "name": "캐릭터 편집기", "url": "https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2", "file": "editor.html",
-    "edits": "캐릭터 10명의 모델·색·생김새·동작. 그림·영상 레퍼런스로 고치기, 새 캐릭터 요청.",
-    "command": "요청 확인", "openLabel": "새 요청", "reads": ["requests: status == 'new'"],
-    "later": "6차에 더해질 것: 성격·대화 탭 (ET-05, M5 이모티콘 대화 뒤)" },
+    "edits": "캐릭터 10명의 모델·색·생김새·동작, 그리고 주민 성격·좋아하는 것·이모티콘 반응·글 대사·생일·집 시간표(성격·대화 탭, 주소 끝 #coco.talk). 레퍼런스로 고치기, 새 캐릭터 요청.",
+    "command": "요청 확인", "openLabel": "새 요청", "reads": ["requests: status == 'new'"] },
   { "id": "env", "group": "editor", "name": "배경 편집기", "url": "https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh", "file": "bg-editor.html",
     "edits": "배경 35 · 가구 33 · 아이템 82 (아이콘 93) 의 모델과 색, 벽지·바닥 무늬 16, 주민 방 배치. 레퍼런스로 고치기, 새 요소 요청.",
     "command": "배경 요청 확인", "openLabel": "새 요청", "reads": ["env-requests: status == 'new'"] },
@@ -277,7 +276,7 @@ function renderTop() {
 function render() {
   for (const box of document.querySelectorAll('.cards[data-group]')) {
     const items = LIST.filter(e => e.group === box.dataset.group);
-    box.innerHTML = items.length ? items.map(card).join('') : `<p class="small muted">${box.dataset.group === 'soon' ? '6차 편집기가 모두 생겨서 위 「편집기」로 옮겼어요. (성격·대화 탭 ET-05 는 캐릭터 편집기에 더해질 예정)' : '없음'}</p>`;
+    box.innerHTML = items.length ? items.map(card).join('') : `<p class="small muted">${box.dataset.group === 'soon' ? '6차 편집기가 모두 생겨서 위 「편집기」로 옮겼어요 (성격·대화 탭 ET-05 는 캐릭터 편집기 안에).' : '없음'}</p>`;
   }
   $('archive').innerHTML = LIST.filter(e => e.group === 'archive').map(e => `지난 보드: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.name)} ↗</a> · ${esc(e.edits)}`).join('<br>');
   renderTop();

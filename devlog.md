@@ -14,14 +14,14 @@
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 9 (빌드 e676022, 게시 파일 160 = 페이지 1 · 에셋 묶음 8 · 모듈·css 151)** — M5 축제·이모티콘 대화 + M6 묶음 파일·소리·지도·숫자·스타일 데이터. 묶음 방식으로 처음 옮길 때 `--live` 차례 3번(지우기 254 → 지우기 120·올리기 134 → 올리기 25)으로 511 을 넘지 않게. 다음엔 바뀐 묶음(`build.json` packs hash)·모듈만 + 페이지 |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 10 (빌드 3e56237, 게시 파일 152 = 페이지 1 · 묶음 8 · 모듈·css 143)** — M6-P3 주민 데이터(글 대사 lines/*.js 10개는 지우고 데이터로) · 축제 곡 · 광장 자리. 지우기 10 · 올리기 12(island-1 묶음 + 모듈 11) 한 번에. 다음엔 `build.json` 의 packs hash 를 지난 것과 비교해 바뀐 묶음 + `git diff --name-only 3e56237 HEAD` 의 모듈 + 없어진 경로 null |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 2: 모든 편집기·보드·게임 링크, 편집기마다 명령·마지막 반영·처리할 것 (홈 저장소 `status/*`), **"전체 요청 확인"** |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
 | 섬 지도 편집기 | https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST | `map-editor.html` (+ `assets/island/layout.json`) | 반영 v0. "지도 반영" |
 | 게임 숫자 표 | https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj | `data-editor.html` (+ `assets/data/`) | 반영 v0. "숫자 반영" |
 | 스타일 편집기 | https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd | `style-editor.html` (+ `assets/style/`) | 반영 v0. "스타일 반영" (다음 게시 때 `src/core/packs.js` 같이) |
 | 시나리오 편집기 | https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF | `story-editor.html` (+ `assets/story/`) | 반영 v1 (12장면 추천안 A 임시 확정). "시나리오 반영" (스토리 고정 세션) |
-| 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 6: 캐릭터 10 (단풍 CH-10 은 검수 대기, 나머지 9 확정). db `refs` / `requests` |
+| 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 8 (M6-P3): 캐릭터 10 + **성격·대화 탭**(주민 9명 `assets/villagers/`, 이모티콘 반응 미리 보기, 주소 끝 `#coco.talk`). 단풍은 검수 대기. db `refs` / `requests` (`kind:'traits'`) |
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 7 (M6-P2): 배경 35 · 가구 33 · 아이템 82 · 벽지/바닥 16 · 방 배치 탭. 게시 파일 408/511 (스펙·통계·아이템은 묶음 `editor-index.json`·`editor-models-<n>.json`) |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
@@ -29,7 +29,7 @@
 | **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1 (보드 id `wave6`). **반영 v1 (임시)** = D26–D35 모두 추천안 A, 의견 없음 → M6 시작. M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중
-**2026-10-29 합침 (main e676022 → 7ec3912)**: M6-P0·P1·P2·P4·P5·P6 + M5 Z5 + 스토리 맞춤. 충돌 5곳(CLAUDE.md 4 — 두 절 모두, items.js — P5 새 구조 위에 축제 줄), 함께 돌릴 때 문제 3개(축제·이모티콘 에셋 boot 묶음, 스타일 값 읽기 node 건너뜀, 스타일 편집기 게시 목록에 packs.js) 고침. 테스트 246. 게임 v9 묶음 160파일, 편집기 홈 v2 에 새 편집기 4개 링크. **▶ 다시 진행 (2026-10-30, "이어서 작업 진행")** — 그 전 일시 중단(10-29) — 돌던 세션은 M6-P3 하나뿐이었고 멈춤(코드를 읽던 중, 바뀐 파일·커밋 없음). 다음 지시가 오면 이어서. **남은 것**: M6-P3 성격·대화 탭 **다시 진행 중** (`local_a6646d0d-3ed7-4564-a609-f0abd9d197da`, `p9-traits` · 4227), Z5 후속(광장 자리를 layout 에서·축제 곡 BGM-10, `p8-festival` b8bf135 — main 에 아직 안 합침), 정리 가능한 작업 폴더(p8-items·interior·furniture·town, p9-*).
+**2026-10-29 합침 (main e676022 → 7ec3912)**: M6-P0·P1·P2·P4·P5·P6 + M5 Z5 + 스토리 맞춤. 충돌 5곳(CLAUDE.md 4 — 두 절 모두, items.js — P5 새 구조 위에 축제 줄), 함께 돌릴 때 문제 3개(축제·이모티콘 에셋 boot 묶음, 스타일 값 읽기 node 건너뜀, 스타일 편집기 게시 목록에 packs.js) 고침. 테스트 246. 게임 v9 묶음 160파일, 편집기 홈 v2 에 새 편집기 4개 링크. **▶ 다시 진행 (2026-10-30, "이어서 작업 진행")** — 그 전 일시 중단(10-29) — 돌던 세션은 M6-P3 하나뿐이었고 멈춤(코드를 읽던 중, 바뀐 파일·커밋 없음). 다음 지시가 오면 이어서. **10-30 합침 (main 3e56237)**: M6-P3 · Z5 후속(b8bf135) · story 노트 → 게임 v10, 편집기 홈 v3. **M5·M6 끝.** **남은 것**: 처음부터 엔딩까지 이어서 해 보기, 실제 claude.ai·휴대폰 확인, 검수 대기 122개(캐릭터 1·배경 21·가구 14·아이템 86), 7차(M7 출시 준비) 보드, (예전 메모) M6-P3 성격·대화 탭 **끝** (`local_a6646d0d-3ed7-4564-a609-f0abd9d197da`, `p9-traits` · 4227), Z5 후속(광장 자리를 layout 에서·축제 곡 BGM-10, `p8-festival` b8bf135 — main 에 아직 안 합침), 정리 가능한 작업 폴더(p8-items·interior·furniture·town, p9-*).
 
 **6차 = M6 편집기 완성 진행 중 (main c289d39 에서 갈라짐, 보드 wave6 반영 v1)**:
 | P | 세션 id | 브랜치 · 포트 | 할 일 |
@@ -199,6 +199,8 @@ M5(Z5, `local_a4293983-fb69-490e-811d-32a97ceb52f4`, `p8-festival`) **구현 중
 | 25 | P3 시작 | 작업 폴더 `p9-traits`(main 21f7b80), M6-P3 세션 시작 (Z5 후속은 town 을 안 건드려 겹침 없음) | 진행 중 |
 | 26 | 일시 중단, 이어서 지시 후 진행 | 연결된 세션 확인 → 일하던 건 M6-P3 하나 → 멈춤(p9-traits 바뀐 것 없음). 나머지 세션은 모두 쉬는 중 | 대기 |
 | 27 | 이어서 작업 진행 (10-30) | M6-P3 세션이 같은 지시를 받아 멈춘 자리(주민 파일 9개 계획)부터 다시 돎. Z5 후속(b8bf135)은 P3 끝나면 같이 합칠지 묻기 | 진행 중 |
+| 28 | 현재 개발 과정, 이후 작업 정리 및 추천 | 남은 브랜치 3개 충돌 검사(따로는 없음, P3+Z5 는 테스트 파일 하나), 검수 대기 122개 셈, M0~M7 표·확인 못 한 것·추천 순서(합치기 → 직접 열어 보기 → 자동 플레이 점검 → 검수 정리 → 7차 보드 → 폴더 정리) | 끝 |
+| 29 | 합치고 게시 | p9-traits · p8-festival · story 를 main 에 (충돌 없음), 테스트 254, `/artifact/` 모듈 14·오류 0, 게임 v10 (지우기 10 · 올리기 12, 152파일 확인), 편집기 홈 v3·status 갱신, 스토리에 알림 | 끝 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
