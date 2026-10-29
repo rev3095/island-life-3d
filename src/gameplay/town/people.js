@@ -74,6 +74,19 @@ export const PEOPLE = {
     rewards: ['furn.wall-clock', 'furn.round-rug', 'furn.bookshelf'],
     gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'shell.scallop', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.plant-pot', w: 1 }],
   },
+  // 5차 새 주민 (CH-10): 처음엔 빈 집터, 이사 흐름(movein.js)이 끝나면 섬에 산다. joySeason = 이 계절엔 더 신난다
+  danpung: {
+    slug: 'danpung', name: '단풍', color: '#D9583B', voice: 'coco', joySeason: 'autumn',
+    pace: { walk: 1.2, run: 2.8, runChance: 0.1, idle: [2.5, 6], happy: 0.18 },
+    wake: 7.5, sleep: 22, rainStay: false, snowStay: true, range: 26,
+    haunts: { museum: 5, flowers: 2, beach: 1, home: 2, plaza: 1 },
+    loves: ['fossil', 'rare'],
+    likes: ['bug', 'shell', 'fish', 'furn.bookshelf'],
+    dislikes: ['mat.weed', 'mat.stone'],
+    wants: [{ cat: 'fossil', w: 3 }, { cat: 'bug', w: 2 }, { cat: 'shell', w: 2 }, { cat: 'fish', w: 1 }],
+    rewards: ['furn.bookshelf', 'furn.picture-frame', 'furn.wall-clock'],
+    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'shell.scallop', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.bookshelf', w: 1 }],
+  },
 };
 
 /** 가게 주인 (돌아다니지 않는다) */

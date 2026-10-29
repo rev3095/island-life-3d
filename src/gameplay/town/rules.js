@@ -53,6 +53,8 @@ export function villagerState(state, slug) {
   v.pending ??= [];        // 가방이 꽉 차서 못 준 물건: id 또는 { id, variant }
   v.photo ??= false;       // 친밀도 최고 사진을 줬나
   v.thankedDay ??= null;   // 고맙다는 편지를 보낸 부탁의 날
+  v.cakeDay ??= null;      // 생일 케이크를 나눠 준 날 (5차)
+  v.cheerDay ??= null;     // 플레이어 생일을 축하한 날 (5차)
   return v;
 }
 
@@ -73,6 +75,14 @@ export function dailyTalk(v, dayKey) {
   v.talkDays++;
   return { first: true, up: addFriendship(v, TALK_BONUS).up };
 }
+
+// ---------- 주민 방 (5차) ----------
+
+/** house:enter / house:leave 의 주인 slug (house 쪽 이름이 달라도 받게 여러 키를 본다). 플레이어 집이면 null */
+export const ownerOf = e => {
+  const o = e?.owner ?? e?.slug ?? e?.villager ?? e?.who ?? e?.house?.owner ?? null;
+  return typeof o === 'string' && o !== 'player' ? o : null;
+};
 
 // ---------- 날짜 ----------
 
@@ -213,12 +223,12 @@ export function giftReaction(person, item) {
   return 'normal';
 }
 
-/** 선물 받기 기록 → { reaction, points, up } */
-export function receiveGift(v, person, item, dayKey) {
+/** 선물 받기 기록 → { reaction, points, up }. mult = 친밀도 배수 (생일이면 BIRTHDAY_GIFT_MULT) */
+export function receiveGift(v, person, item, dayKey, mult = 1) {
   if (v.giftDay !== dayKey) { v.giftDay = dayKey; v.giftsToday = 0; }
   v.giftsToday++;
   const reaction = giftReaction(person, item);
-  const points = v.giftsToday <= GIFTS_COUNTED_PER_DAY ? GIFT_POINTS[reaction] : 0;
+  const points = v.giftsToday <= GIFTS_COUNTED_PER_DAY ? GIFT_POINTS[reaction] * mult : 0;
   return { reaction, points, up: addFriendship(v, points).up };
 }
 
