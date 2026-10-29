@@ -6,6 +6,7 @@
 |---|---|---|---|
 | 컨셉 보드 v0.1 (1차 계획, 저장 없음) | `concept-board.html` | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | — |
 | 5차 검수 보드 v0.5 | `wave5-board.html` + `board-kit.js` | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `wave5` |
+| Z5 축제 검수 보드 v0.1 (이모티콘 대화·축제 광장·부품·부스·엔딩, D14–D25) | `z5-festival-board.html` + `board-kit.js` | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `z5` |
 | 6차 검수 보드 v0.6 (M6 편집기 완성) | `wave6-board.html` + `board-kit.js` | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `wave6` |
 
 ## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
