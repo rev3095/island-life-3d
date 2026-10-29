@@ -61,22 +61,30 @@ export default {
 
     // ---- 이름 정하기 ----
     let naming = false, namingFailed = false;
-    async function askNames() {
-      if (naming) return;
+    /** 이름 정하기 창. rename = 이미 정한 이름 바꾸기 (그만두기 단추가 있다) → 정했으면 true */
+    async function askNames({ rename = false } = {}) {
+      if (naming) return false;
       naming = true;
       refresh();
+      let named = false;
       try {
-        const r = await openNaming(ctx, { mount: top, initial: { player: state.player.name, island: state.island.name }, again: !!state.flags?.intro });
-        state.player.name = r.player;
-        state.island.name = r.island;
-        events.emit('intro:named', { player: r.player, island: r.island });
-        S().data?.save?.save?.();
+        const r = await openNaming(ctx, { mount: top, initial: { player: state.player.name, island: state.island.name }, again: !!state.flags?.intro, rename });
+        if (r) {
+          const before = { player: state.player.name, island: state.island.name };
+          state.player.name = r.player;
+          state.island.name = r.island;
+          named = true;
+          events.emit('intro:named', { player: r.player, island: r.island, ...(rename ? { renamed: true, before } : {}) });
+          S().data?.save?.save?.();
+          if (rename) toast(`이제 ${r.player}, ${r.island}이에요!`, '🏝️');
+        }
       } catch (e) {
         namingFailed = true;
         console.error('[intro] 이름 정하기', e);
       } finally { naming = false; }
-      if (!S().town) complete('intro', { quiet: true });   // town 이 없는 브랜치: 첫 안내 없이 목록부터
+      if (!rename && !S().town) complete('intro', { quiet: true });   // town 이 없는 브랜치: 첫 안내 없이 목록부터
       refresh();
+      return named;
     }
 
     // ---- 목록 ----
@@ -221,9 +229,10 @@ export default {
       reward: { ...R.REWARD },
       claimReward,
       progress: () => ({ ...rec(), done: { ...rec().done } }),
+      /** 이름 다시 정하기 (섬폰 설정) → Promise<정했으면 true, 그만두면 false> */
+      rename: () => askNames({ rename: !!state.player.name }),
       // 개발용
       complete: id => complete(id),
-      rename: () => askNames(),
       reset() { if (state.flags) delete state.flags.firstday; hideT = -1; refresh(); },
     };
 

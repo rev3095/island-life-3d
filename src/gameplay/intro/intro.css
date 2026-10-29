@@ -63,7 +63,9 @@
 .fd-dice:hover { transform: rotate(-12deg); }
 .fd-dice:active { transform: translateY(2px) rotate(-12deg); box-shadow: 0 1px 0 var(--fd-edge); }
 .fd-err { min-height: 1.3em; font-size: 14px; color: #B5523B; }
-.fd-foot { display: flex; justify-content: flex-end; margin-top: 4px; }
+.fd-foot { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 4px; }
+.fd-stay { min-height: 44px; padding: 6px 16px; border: 0; border-radius: 999px; background: none; color: inherit; font: 16px var(--fd-display); cursor: pointer; opacity: .75; }
+.fd-stay:hover, .fd-stay:focus-visible { opacity: 1; background: rgba(74, 59, 50, .08); }
 .fd-go { min-height: 50px; padding: 8px 26px; border: 0; border-radius: 999px; background: var(--fd-accent); box-shadow: 0 3px 0 var(--fd-accent-deep); font: 19px var(--fd-display); cursor: pointer; transition: transform .1s, box-shadow .1s; }
 .fd-go:hover { transform: translateY(-1px); }
 .fd-go:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--fd-accent-deep); }
