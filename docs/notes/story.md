@@ -102,8 +102,9 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 
 ## "시나리오 반영" (Claude 가 하는 일)
 
-0. 먼저 `git merge main` 으로 story 브랜치를 맞춘다 (다른 트랙 결과가 main 에 들어와 있다. v1 은 main bed3fc9 에 합쳐짐, 게임 링크 버전 6).
-   - **파일 수 한계**: 게임 웹 빌드가 510파일로 아티팩트 한계(511)에 닿았다. 6차(M6) 묶음 파일 방식 전까지 **장면 파일을 새로 더하지 않는다** — 새 장면이 필요하면 사용자에게 알리고 기존 장면 고치기·연출안 더하기로 대신한다 (고치기는 괜찮다).
+0. 먼저 `git merge main` 으로 story 브랜치를 맞춘다 (다른 트랙 결과가 main 에 들어와 있다. v1 은 main bed3fc9 에 합쳐짐, 게임 링크 버전 6. Z5 축제·M6 은 main 7ec3912).
+   - 파일 수 한계는 풀렸다 (M6 묶음 파일, main 7ec3912 · 게임 링크 버전 9 · 160파일). 새 장면 파일을 더해도 된다 — `files.js` 의 `SCENE_FILES` 에만 넣는다.
+   - **다음 반영 때 같이 할 것 (Z5 맞추기)**: 축제 장면 s05~s12 를 실제 축제에 맞춘다 — `docs/notes/z5-festival.md` 의 이벤트·`world.places.festival` (가운데·무대 북쪽 5칸 `stage`·부스 `booths[].front`·진행판 `board`). ① s10·s11 줄 세우기 자리를 무대 앞(`stage.front`)·부스와 겹치지 않게, ② s05~s09 는 `booth` 자리 기준으로 부스 앞에서 보이게, ③ 말풍선 이모지를 섬 이모티콘 세트(`assets/emotes/emotes.json` key, `festival.emotes.svg(key)`)로 바꿀지 사용자에게 묻기 (H4). 게임에서 `festival.debug` 로 부품·축제를 불러 실제로 틀어 본다.
 1. ArtifactData `list` 로 편집기의 `drafts`·`timeline` 을 읽고, `get applied/story` (없으면 v0).
 2. drafts 의 `scene` 마다 `assets/story/scenes/<id>.json` 과 비교해 바뀐 장면만 고른다. 바뀐 게 없고 의견도 그대로면 그렇게 알리고 끝.
    - **고침**: 장면 파일을 drafts 내용으로 바꾸고 `version` +1, 확정(`approved`)이던 장면은 `review` 로.
@@ -159,6 +160,6 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 
 ## 아직 안 한 것
 
-- 진짜 축제 부품·축제 이벤트가 없어 s05~s10 은 `?story=` 로만 틀어 봤다 (부품 그림은 기본 🎁).
+- s05~s10 은 `?story=` 로만 틀어 봤다. Z5 의 실제 `festival:part`·`festival:start`·`story:shot` 연결은 코드로 맞물리는 것만 확인 (자리 맞추기는 위 0번, 다음 반영 때).
 - 장면 동안 상점·박물관 창 단축키(I·P·M)는 ui 가 따로 받아서 열릴 수 있다 (H2 와 같이 ui 가 `story.playing` 을 보면 막힌다).
 - 장면 시작 대기열은 저장하지 않는다 (집 안에서 부품을 얻고 바로 새로고침하면 그 장면은 다음 트리거까지 안 나온다).
