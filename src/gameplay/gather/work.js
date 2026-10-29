@@ -2,15 +2,17 @@
 //   삽: 앞 칸의 화석 자리를 파면 data.harvest.digFossil → 화석. 빈 풀밭·모래를 파면 구덩이(오늘 하루), 구덩이를 또 파면 메운다.
 //       꽃을 파면 꽃 아이템이 되고 구덩이가 남는다. 구덩이에 F 로 심는다 (garden.js).
 //   도끼: 바위 → harvest.hitRock (돌·철광석·점토·도토리 주머니가 튀어나온다), 나무 → harvest.chopTree (나무를 베지 않고 목재만)
+//         바위를 치면 가끔 밑에서 곤충(쥐며느리·집게벌레)이 튀어나와 도망간다 (harvest.rockBug, 4차 Y2). 삽으로 바위를 쳐도 같다.
 //   물뿌리개: 앞 꽃들이 오늘 하루 반짝이고, 새 날에 옆 같은 꽃과 새 꽃을 피울 수 있다 (garden.js)
-import { rand } from './util.js';
+//   화석 자리를 파면 '알 수 없는 화석' — 박물관 느루가 감정해 준다 (town/keepers.js)
+import { rand, iga } from './util.js';
 import { FLOWER_KINDS } from './garden.js';
 
 const ROCK = new Set(['rock']);
 const WOOD = new Set(['tree', 'cedar', 'fruit-tree']);
 const FLOWERS = new Set(['tulip', 'cosmos', 'pansy', 'bush']);
 
-export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, garden }) {
+export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, garden, bugs }) {
   const { THREE: T, scene, state, events } = ctx;
   const front = (d = 0.7) => kit.player.pointInFront(d);
   const sameLevel = o => Math.abs(o.y - kit.player.position.y) < 0.5;
@@ -65,6 +67,34 @@ export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, ga
     }
   }
 
+  // ---------- 바위 치기 (도끼·삽 공용) ----------
+  function strikeRock(target, tool) {
+    const p = kit.player;
+    const hit = { x: target.x + (p.position.x - target.x) * 0.35, y: target.y + 0.3, z: target.z + (p.position.z - target.z) * 0.35 };
+    kit.sfx('axe-rock', tool === 'shovel' ? { pitch: 1.15 } : {});
+    fx.chips(hit, 'stone', 6);
+    toolbelt.use(tool);
+    const r = kit.data?.harvest?.hitRock?.(target.id);
+    if (!r) return;
+    const toward = Math.atan2(p.position.x - target.x, p.position.z - target.z);
+    const spot = drops.findSpot(target.x, target.z, { rMin: 0.65, rMax: 1.05, toward });
+    if (!spot) results.gain(r.id, r.count);
+    else drops.drop(r.id, r.count, spot, { from: { x: hit.x, y: hit.y + 0.2, z: hit.z }, sound: r.id === 'mat.acorn-bag' ? 'acorn' : 'fruit-drop' });
+    // 바위 밑 곤충: 바위 옆(플레이어 쪽에서 조금 비켜)으로 기어 나온다
+    const { hour, month, weather } = kit.now();
+    const bug = kit.data.harvest.rockBug?.(target.id, { hour: Math.floor(hour), month, weather });
+    if (!bug || !bugs) return;
+    for (const side of [1, -1, 2.2, -2.2]) {
+      const a = toward + side * 1.1;
+      const x = target.x + Math.sin(a) * 0.55, z = target.z + Math.cos(a) * 0.55;
+      if (!kit.world.island.isWalkable(x, z)) continue;
+      bugs.popOut(bug, { x, z, from: 'rock' });
+      kit.sfx('bug-catch', { pitch: 1.6, volume: 0.5 });
+      kit.toast(`바위 밑에서 ${iga(kit.name(bug))} 튀어나왔다! 잠자리채로 잡자`, kit.icon(bug));
+      return;
+    }
+  }
+
   // ---------- 삽 ----------
   async function dig() {
     const world = kit.world, isl = world.island;
@@ -81,8 +111,13 @@ export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, ga
     const flower = onTile && FLOWER_KINDS.has(onTile.kind) && !onTile.data?.grow && level ? onTile : null;
     // 구덩이를 팔 수 있는 빈 땅 (길·절벽 가장자리 말고)
     const open = ['grass', 'sand'].includes(ground) && level && !onTile && isl.isWalkable(c.x, c.z);
+    // 앞에 바위가 있으면 삽으로 바위를 친다 (화석 자리·구덩이·꽃이 먼저)
+    const f = front(0.65);
+    const rock = !spot && !hasHole && !flower ? world.objects.query(f.x, f.z, 0.6).find(o => ROCK.has(o.kind) && sameLevel(o)) : null;
+    if (rock) kit.player.face(rock.x, rock.z);
     await act('dig', {
       onHit() {
+        if (rock) { strikeRock(rock, 'shovel'); return; }
         const at = { x: c.x, y: isl.heightAt(c.x, c.z), z: c.z };
         if (!spot && !hasHole && !soft) { kit.sfx('axe-rock', { volume: 0.4, pitch: 1.5 }); return; }
         kit.sfx('dig');
@@ -104,6 +139,12 @@ export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, ga
           if (fossil) {
             kit.sfx('fossil', { delay: 0.15 });
             results.gain(fossil, 1, { verb: '파냈다', show: true });
+            // 처음 한 번: 감정 안내
+            const flags = (state.flags ??= {});
+            if (!flags.fossilAppraiseHint) {
+              flags.fossilAppraiseHint = true;
+              setTimeout(() => kit.toast('무슨 화석일까? 박물관 느루에게 가져가면 감정해 준대요', '🏛️'), 1600);
+            }
           }
         } else if (hasHole) {
           world.daily.removeHole(t.tx, t.tz);
@@ -125,17 +166,16 @@ export function createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, ga
     await act('chop', {
       onHit() {
         if (!target) { kit.sfx('net-swing', { volume: 0.5, pitch: 0.7 }); return; }
-        const isRock = ROCK.has(target.kind);
-        const hit = { x: target.x + (p.position.x - target.x) * 0.35, y: target.y + (isRock ? 0.3 : 0.45), z: target.z + (p.position.z - target.z) * 0.35 };
-        kit.sfx(isRock ? 'axe-rock' : 'axe-wood');
-        fx.chips(hit, isRock ? 'stone' : 'wood', 6);
+        if (ROCK.has(target.kind)) { strikeRock(target, 'axe'); return; }
+        const hit = { x: target.x + (p.position.x - target.x) * 0.35, y: target.y + 0.45, z: target.z + (p.position.z - target.z) * 0.35 };
+        kit.sfx('axe-wood');
+        fx.chips(hit, 'wood', 6);
         toolbelt.use('axe');
-        const h = kit.data?.harvest;
-        const r = isRock ? h?.hitRock?.(target.id) : h?.chopTree?.(target.id);
-        if (!isRock) world.objects.shake(target.id);
+        const r = kit.data?.harvest?.chopTree?.(target.id);
+        world.objects.shake(target.id);
         if (!r) return;
         const toward = Math.atan2(p.position.x - target.x, p.position.z - target.z);
-        const spot = drops.findSpot(target.x, target.z, { rMin: isRock ? 0.65 : 0.55, rMax: 1.05, toward });
+        const spot = drops.findSpot(target.x, target.z, { rMin: 0.55, rMax: 1.05, toward });
         if (!spot) { results.gain(r.id, r.count); return; }
         drops.drop(r.id, r.count, spot, { from: { x: hit.x, y: hit.y + 0.2, z: hit.z }, sound: r.id === 'mat.acorn-bag' ? 'acorn' : 'fruit-drop' });
       },

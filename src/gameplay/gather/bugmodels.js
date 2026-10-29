@@ -1,4 +1,4 @@
-// 곤충 20종 + 꿀벌 모델 (도형을 합친 작은 툰 메시). 날개는 따로 두어 팔랑인다.
+// 곤충 22종(+4차 송충이·집게벌레) 모델 (도형을 합친 작은 툰 메시). 날개는 따로 두어 팔랑인다.
 // build(id) → { root: Group, wings: [{ mesh, side: ±1, axis: 'z'|'x' }], glow: Mesh|null, halo: Mesh|null, size }
 // 머리가 +Z 쪽. 실제보다 크게 만든다 (캐릭터 키 1.0 기준 손가락 한두 마디).
 
@@ -24,6 +24,8 @@ const LOOK = {
   snail: { type: 'snail', body: '#D9C7A3', shell: '#C47A4E', size: 1 },
   'pill-bug': { type: 'pill', body: '#6E7275', size: 0.85 },
   'pond-skater': { type: 'skater', body: '#4E4438', size: 1 },
+  caterpillar: { type: 'caterpillar', body: '#8CB84A', stripe: '#E8C23A', head: '#5E4A30', size: 1 },
+  earwig: { type: 'earwig', body: '#6A3E26', head: '#3E281A', size: 0.95 },
 };
 
 export function createBugModels(ctx, mk) {
@@ -146,6 +148,29 @@ export function createBugModels(ctx, mk) {
       case 'pill': {
         body(() => [part(G.sphere(s * 0.35, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), L.body, { sc: [0.85, 0.7, 1.3] }),
           ...[-0.2, 0, 0.2].map(z => part(G.torus(s * 0.28, s * 0.025, 4, 12, Math.PI), '#555A5C', { p: [0, 0, z * s], sc: [1, 0.85, 1] }))]);
+        break;
+      }
+      case 'caterpillar': {
+        // 마디 다섯 개 + 노란 띠 + 머리
+        body(() => [
+          ...[-0.36, -0.18, 0, 0.18].map((z, i) => part(G.sphere(s * (0.13 + i * 0.008), 8, 6), L.body, { p: [0, s * 0.12, z * s] })),
+          ...[-0.27, -0.09, 0.09].map(z => part(G.torus(s * 0.115, s * 0.022, 4, 10), L.stripe, { p: [0, s * 0.12, z * s] })),
+          part(G.sphere(s * 0.12, 8, 6), L.head, { p: [0, s * 0.14, s * 0.34] }),
+          ...[-1, 1].map(k => part(G.sphere(s * 0.03, 5, 4), '#F7F1E4', { p: [k * s * 0.06, s * 0.19, s * 0.44] })),
+        ]);
+        break;
+      }
+      case 'earwig': {
+        // 길쭉한 몸 + 꽁무니 집게 두 개 + 더듬이
+        body(() => [
+          part(G.sphere(s * 0.16, 8, 6), L.body, { p: [0, s * 0.08, -s * 0.05], sc: [0.9, 0.6, 2.4] }),
+          part(G.sphere(s * 0.12, 7, 5), L.head, { p: [0, s * 0.08, s * 0.38] }),
+          ...[-1, 1].flatMap(k => [
+            part(G.cone(s * 0.035, s * 0.32, 5), L.head, { p: [k * s * 0.07, s * 0.08, -s * 0.5], r: [-Math.PI / 2, 0, k * 0.35] }),
+            part(G.cyl(s * 0.012, s * 0.012, s * 0.35, 3), L.head, { p: [k * s * 0.07, s * 0.14, s * 0.58], r: [1.1, 0, k * 0.35] }),
+            ...[-0.15, 0.05, 0.22].map(z => part(G.cyl(s * 0.015, s * 0.015, s * 0.3, 3), '#2F2A26', { p: [k * s * 0.15, s * 0.03, z * s], r: [0, 0, k * 1.15] })),
+          ]),
+        ]);
         break;
       }
       case 'skater': {

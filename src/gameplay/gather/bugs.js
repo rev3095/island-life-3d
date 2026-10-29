@@ -1,6 +1,7 @@
 // 곤충: 지금 시각·달·날씨에 맞는 곤충이 꽃·나무·풀밭·바위·물가·가로등 둘레에 나온다 (무엇이 나올지는 data.spawns.bug).
 // 나는 곤충은 날아다니고, 앉아 있는 곤충은 꽃 위·나무 줄기·바위에 붙어 있다. 달려서 가까이 가면 도망간다.
 // 잠자리채를 휘두르면 앞에 있는 곤충을 잡는다 (빗나가면 둘레 곤충이 놀라 달아난다).
+// 들추기 (4차 Y2): 바위를 치면 밑에서, 나무를 흔들면 위에서 곤충이 나와(popOut) 플레이어 반대쪽으로 기어 도망간다 → 잠시 뒤 숨는다.
 import { rand, pickOne } from './util.js';
 
 const MAX_BUGS = 7, MAX_BUGS_LOW = 5;
@@ -224,6 +225,43 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
         if (b.drop && !drops.list.includes(b.drop)) return false;    // 과일을 주웠으면 개미도 간다
         break;
       }
+      case 'fall': {
+        // 나무에서 툭 떨어져 한 번 튕긴 뒤 기어간다
+        b.vy -= 9 * dt;
+        b.y += b.vy * dt;
+        b.x += b.vx * dt; b.z += b.vz * dt;
+        const gyNow = ground(b.x, b.z);
+        if (b.y <= gyNow) {
+          b.y = gyNow;
+          if (b.vy < -1.2) { b.vy *= -0.3; b.vx *= 0.4; b.vz *= 0.4; }
+          else { b.mode = 'scurry'; b.vy = 0; b.timer = 0; }
+        }
+        b.pitch = Math.sin(b.t * 14) * 0.6;
+        break;
+      }
+      case 'scurry': {
+        // 플레이어 반대쪽으로 기어간다. 막히면 옆으로 틀고, 시간이 다 되면 땅속·풀숲으로 숨는다
+        b.pitch = 0;
+        b.life -= dt;
+        if (b.life <= 0) {
+          b.model.root.scale.setScalar(Math.max(0.01, 1 + b.life / 0.6));
+          if (b.life < -0.6) return false;
+          break;
+        }
+        b.timer -= dt;
+        const p = kit.player.position;
+        if (b.timer <= 0) {
+          b.timer = rand(0.4, 0.9);
+          const away = Math.atan2(b.x - p.x, b.z - p.z);
+          b.want = away + rand(-0.9, 0.9);
+        }
+        b.heading += Math.atan2(Math.sin(b.want - b.heading), Math.cos(b.want - b.heading)) * Math.min(1, dt * 5);
+        const go = b.crawl * dt * (0.75 + 0.25 * Math.sin(b.t * 10));
+        const nx = b.x + Math.sin(b.heading) * go, nz = b.z + Math.cos(b.heading) * go;
+        if (isl().isWalkable(nx, nz) && Math.abs(ground(nx, nz) - b.y) < 0.3) { b.x = nx; b.z = nz; b.y = ground(nx, nz); }
+        else { b.want = b.heading + (Math.random() < 0.5 ? 1.6 : -1.6); b.timer = 0.5; }
+        break;
+      }
       default: break;     // perch · trunk · sit
     }
     bugModels.flap(b.model, b.t, b.mode === 'perch' ? 0.3 : 1);
@@ -260,6 +298,33 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
     /** 빗나간 잠자리채: 둘레 곤충이 놀란다 */
     startle(x, z, r) { for (const b of bugs) if (Math.hypot(b.x - x, b.z - z) < r) scare(b); },
     nearest(x, z, r) { return bugs.filter(b => b.state !== 'flee' && Math.hypot(b.x - x, b.z - z) < r).sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z))[0] ?? null; },
+    /**
+     * 들추기: 곤충이 (x, z) 에서 튀어나와 도망간다. from 'rock' = 바위 밑에서 기어 나옴, 'tree' = top 높이에서 떨어짐.
+     * 잠자리채로 잡을 수 있고, 몇 초 지나면 숨어 버린다.
+     */
+    popOut(id, { x, z, from = 'rock', top = 1 }) {
+      const gy = ground(x, z);
+      const b = add(id, from === 'tree' ? 'shake' : 'under', { x, z, y: gy });
+      const p = kit.player.position;
+      const away = Math.atan2(x - p.x, z - p.z);
+      const slug = id.split('.')[1];
+      b.crawl = slug === 'caterpillar' ? 0.32 : slug === 'earwig' ? 1.05 : slug === 'pill-bug' ? 0.8 : 0.6;
+      b.life = from === 'tree' ? 10 : 7;     // 바위는 도끼·삽에서 잠자리채로 바꿀 틈을 준다
+      b.heading = b.want = away + rand(-0.5, 0.5);
+      b.timer = 0.6;
+      b.age = 0;
+      b.popped = true;
+      if (from === 'tree') {
+        b.mode = 'fall';
+        b.y = gy + top;
+        b.vy = 0.4; b.vx = Math.sin(away) * 0.5; b.vz = Math.cos(away) * 0.5;
+      } else {
+        b.mode = 'scurry';
+        b.y = gy;
+      }
+      place3(b);
+      return b;
+    },
     /** 확인용: 곤충 하나 바로 놓기 */
     debugSpawn(id, place, x, z) { return add(id, place, { x, z, y: ground(x, z) }); },
     clear() { for (const b of [...bugs]) remove(b); },
@@ -274,7 +339,8 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
       for (const b of [...bugs]) {
         const d = Math.hypot(b.x - p.x, b.z - p.z);
         if (d > FAR || (b.age > 150 && d > 9)) { remove(b); continue; }
-        if (b.state !== 'flee' && ((speed > 3.6 && d < SCARE_RUN) || d < SCARE_NEAR)) scare(b);
+        const near = b.popped ? 0 : SCARE_NEAR;     // 들추기 곤충은 바로 옆에서 나오니까 걸어서 다가가도 된다
+        if (b.state !== 'flee' && b.mode !== 'fall' && ((speed > 3.6 && d < SCARE_RUN) || d < near)) scare(b);
         if (!step(b, dt)) remove(b);
       }
     },

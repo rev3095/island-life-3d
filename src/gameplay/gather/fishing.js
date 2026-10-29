@@ -1,7 +1,9 @@
 // 낚시: 낚싯대를 들고 물가를 보며 Space → 찌를 던진다. 근처 물고기 그림자가 다가와 1~3번 톡톡(입질)하다가
 // 덥석 물면 찌가 쑥 잠긴다 — 그 짧은 순간에 Space 를 누르면 잡는다. 너무 일찍 당기거나 늦으면 도망간다.
 // 그림자는 강·연못·바다·선착장·하구 물에서 헤엄치고, 종류(=크기)는 data.spawns.fish 가 서식지·시각·달·날씨로 정한다.
+// 큰 그림자(5~6)는 덥석 뒤 줄다리기(4차 Y2, 규칙은 tug.js): 찌가 떠오르는 틈에 당기고, 잠겨 있을 때 당기면 줄이 팽팽해진다.
 import { rand, eul } from './util.js';
+import { needsTug, createTug, tugStep, tugPress } from './tug.js';
 
 const MAX_FISH = 7;           // 플레이어 둘레 그림자 수
 const NEAR = 13, FAR = 19;    // 이 안에 생기고, 이보다 멀어지면 사라진다
@@ -131,14 +133,15 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
   const LINE_N = 16;
   const lineGeo = new T.BufferGeometry();
   lineGeo.setAttribute('position', new T.BufferAttribute(new Float32Array(LINE_N * 3), 3));
+  const LINE_COLOR = new T.Color('#F7F1E4'), LINE_TIGHT = new T.Color('#E8504F');
   const line = new T.Line(lineGeo, ctx.materials.toonMaterial('#F7F1E4', { flat: true, name: 'fishingLine' }));
   line.frustumCulled = false;
   line.visible = false;
   scene.add(line);
   const tip = new T.Vector3();
 
-  // state: idle | fly | wait | back
-  const bob = { state: 'idle', x: 0, z: 0, y: 0, t: 0, from: null, fish: null, dip: 0, look: 0, timer: 0, nibbles: 0, window: 0, hab: null, frozeIt: false };
+  // state: idle | cast | fly | wait | tug | back
+  const bob = { state: 'idle', x: 0, z: 0, y: 0, t: 0, from: null, fish: null, dip: 0, look: 0, timer: 0, nibbles: 0, window: 0, hab: null, frozeIt: false, tug: null, splashT: 0, warned: false };
 
   function castTarget() {
     const p = kit.player, isl = kit.world.island;
@@ -162,7 +165,8 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
   function endFishing() {
     bob.state = 'idle';
     bob.fish = null;
-    bob.window = 0; bob.dip = 0; bob.nibbles = 0;
+    bob.window = 0; bob.dip = 0; bob.nibbles = 0; bob.tug = null;
+    line.material.color.copy(LINE_COLOR);
     bobberMesh.visible = false;
     line.visible = false;
     rodBobber(true);
@@ -239,6 +243,8 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
       p.toolTip(tip);
       const k = Math.min(1, bob.t / 0.25);
       bobberMesh.position.set(bob.from.x + (tip.x - bob.from.x) * k, bob.from.y + (tip.y - bob.from.y) * k + Math.sin(k * Math.PI) * 0.4, bob.from.z + (tip.z - bob.from.z) * k);
+    } else if (bob.state === 'tug') {
+      tugTick(dt);
     } else if (bob.state === 'wait') {
       waitTick(dt);
       bob.dip = Math.max(0, bob.dip - dt * 0.6);
@@ -304,13 +310,76 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
     }
   }
 
+  // ---------- 큰 물고기 줄다리기 ----------
+  const pressKey = () => (ctx.input?.touch ? 'A' : 'Space');
+  function startTug(f) {
+    bob.state = 'tug';
+    bob.tug = createTug(f.size);
+    bob.window = 0;
+    bob.warned = false;
+    bob.splashT = 0;
+    f.state = 'hooked';
+    kit.sfx('bite', { pitch: 0.8 });
+    fx.splash({ x: bob.x, y: bob.y, z: bob.z }, true);
+    kit.toast(`큰 녀석이다! 찌가 떠오를 때 ${pressKey()}!`, '🎣');
+  }
+  function tugTick(dt) {
+    const f = bob.fish, g = bob.tug;
+    if (!f || !g) { reel(); return; }
+    const ev = tugStep(g, dt);
+    const at = { x: bob.x, y: bob.y, z: bob.z };
+    if (ev === 'slack') {
+      kit.sfx('nibble', { pitch: 1.25 });
+      fx.ripple(at, 0.35, 0.6);
+      fx.sparkle({ x: bob.x, y: bob.y + 0.15, z: bob.z }, 3);
+    } else if (ev === 'escape') {
+      scare(f);
+      kit.toast('물고기가 줄을 끌고 도망갔다…', '💨');
+      reel();
+      return;
+    }
+    // 당기는 동안: 물고기가 좌우로 몸부림치고 찌가 물에 잠긴다. 틈이 생기면 찌가 톡 떠오른다
+    const pulling = g.phase === 'pull';
+    const ang = Math.atan2(bob.x - f.x, bob.z - f.z);
+    const sway = pulling ? Math.sin(g.clock * 9) * 0.5 : Math.sin(g.clock * 3) * 0.15;
+    const back = ang + Math.PI + sway;
+    f.heading = ang + sway * 0.6;
+    f.x = bob.x + Math.sin(back) * f.len * 0.5; f.z = bob.z + Math.cos(back) * f.len * 0.5;
+    const wob = pulling ? Math.sin(g.clock * 13) * 0.05 : 0;
+    bobberMesh.position.set(bob.x + Math.cos(ang) * wob, bob.y + 0.012 - (pulling ? 0.09 : -0.015 + Math.sin(g.clock * 20) * 0.01), bob.z - Math.sin(ang) * wob);
+    if (pulling && (bob.splashT -= dt) <= 0) { bob.splashT = 0.32; fx.ripple(at, 0.3, 0.45); }
+    line.material.color.copy(LINE_COLOR).lerp(LINE_TIGHT, Math.min(1, g.tension * 1.1));
+  }
+  function tugPull() {
+    const f = bob.fish, g = bob.tug;
+    const r = tugPress(g);
+    const at = { x: bob.x, y: bob.y, z: bob.z };
+    if (r === 'caught') { reel({ caught: f }); return; }
+    if (r === 'good') {
+      kit.sfx('splash', { volume: 0.55, pitch: 1.15 });
+      fx.splash(at);
+      // 조금씩 끌려온다 (같은 물줄기 안에서만)
+      const p = kit.player.position, k = 0.18;
+      const nx = bob.x + (p.x - bob.x) * k, nz = bob.z + (p.z - bob.z) * k;
+      if (sameWater(habitatAt(nx, nz), bob.hab)) { bob.x = nx; bob.z = nz; bob.y = waterY(nx, nz); }
+    } else if (r === 'strain') {
+      kit.sfx('nibble', { pitch: 0.55, volume: 0.8 });
+      if (!bob.warned) { bob.warned = true; kit.toast('너무 세게 당기면 줄이 끊어져요! 찌가 떠오를 때만', '⚠️'); }
+    } else if (r === 'snap') {
+      kit.sfx('net-swing', { pitch: 1.6, volume: 0.7 });
+      kit.toast('툭! 줄이 끊어져 버렸다… 물고기가 도망갔다', '💨');
+      scare(f);
+      reel();
+    }
+  }
+
   function drawLine() {
     const p = kit.player;
     if (!p.toolTip(tip)) return;
     const a = tip, b = bobberMesh.position;
     const pos = lineGeo.attributes.position;
     const dist = Math.hypot(b.x - a.x, b.z - a.z);
-    const sag = bob.state === 'wait' ? (bob.window > 0 ? 0.05 : 0.18 + dist * 0.06) : 0.05;
+    const sag = bob.state === 'tug' ? 0.01 : bob.state === 'wait' ? (bob.window > 0 ? 0.05 : 0.18 + dist * 0.06) : 0.05;
     for (let i = 0; i < LINE_N; i++) {
       const k = i / (LINE_N - 1);
       pos.setXYZ(i, a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k - Math.sin(k * Math.PI) * sag, a.z + (b.z - a.z) * k);
@@ -320,9 +389,10 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
 
   /** 찌가 나가 있을 때 Space (또는 움직임) */
   function press() {
+    if (bob.state === 'tug') { tugPull(); return; }
     if (bob.state !== 'wait') return;
     const f = bob.fish;
-    if (f && bob.window > 0) { reel({ caught: f }); return; }
+    if (f && bob.window > 0) { if (needsTug(f.size)) startTug(f); else reel({ caught: f }); return; }
     if (f && f.state === 'nibble') { scare(f); kit.toast('너무 일찍 당겼다… 물고기가 도망갔다', '💨'); }
     else if (f) scare(f, true);
     reel();

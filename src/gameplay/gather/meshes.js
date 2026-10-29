@@ -5,13 +5,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 export const FRUIT_COLOR = { apple: '#E8504F', pear: '#D9D36A', peach: '#F7A6A0', cherry: '#B5232F', orange: '#F39A3B', coconut: '#7A5232' };
 const LEAF = '#5FAE5A', STEM = '#7F5636';
 
-// 물고기 몸 색 (그림자만 보이다가 잡으면 이 색으로 들어 보인다)
-const FISH_COLOR = {
-  crucian: '#A9B49A', 'pale-chub': '#B8C8D2', medaka: '#D9D2B0', carp: '#C9A062', loach: '#9A8462', sweetfish: '#B5C9AE',
-  catfish: '#6E6650', 'mandarin-fish': '#BFA25E', salmon: '#E58C6C', goldfish: '#F28A36', snakehead: '#605A48',
-  'horse-mackerel': '#A9BAC4', mackerel: '#6F9DB4', flounder: '#B39C80', squid: '#F2E4D6', octopus: '#D8605A',
-  seahorse: '#F2B262', 'sea-bream': '#F2A2AA', tuna: '#4F6C8C', shark: '#7E8F9C',
-};
+// 물고기 몸 색은 아이템 데이터 colors { body, back, belly, fin } (data/items.js, 4차 Y2). 없으면 이 색
+const FISH_FALLBACK = { body: '#8FA7B5', back: '#6E8898', belly: '#F7F1E4', fin: '#7E98A8' };
 
 export function createMeshKit(ctx) {
   const { THREE, materials } = ctx;
@@ -35,6 +30,21 @@ export function createMeshKit(ctx) {
     const n = g.attributes.position.count, c = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { c[i * 3] = col.r; c[i * 3 + 1] = col.g; c[i * 3 + 2] = col.b; }
     g.setAttribute('color', new T.BufferAttribute(c, 3));
+    return g;
+  }
+  /** 조각의 위쪽(높이 비율 from 이상)을 다른 색으로 — 물고기 등 색 */
+  function topTint(g, color, from = 0.58) {
+    const pos = g.attributes.position, c = g.attributes.color;
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < pos.count; i++) { const y = pos.getY(i); lo = Math.min(lo, y); hi = Math.max(hi, y); }
+    const top = new T.Color(color), base = new T.Color(), mix = new T.Color();
+    for (let i = 0; i < pos.count; i++) {
+      const k = (pos.getY(i) - lo) / (hi - lo || 1);
+      if (k <= from) continue;
+      base.setRGB(c.getX(i), c.getY(i), c.getZ(i));
+      mix.copy(base).lerp(top, Math.min(1, (k - from) / 0.2));
+      c.setXYZ(i, mix.r, mix.g, mix.b);
+    }
     return g;
   }
   const merge = parts => { const g = mergeGeometries(parts, false); g.computeBoundingSphere(); return g; };
@@ -108,6 +118,13 @@ export function createMeshKit(ctx) {
       part(G.torus(0.065, 0.016, 5, 14), '#A88A60', { p: [0, 0.12, 0.1], sc: [1, 1, 0.6] }),
       part(G.sphere(0.022, 6, 4), '#A88A60', { p: [0, 0.12, 0.11] }),
     ],
+    // 감정 전 화석: 흙투성이 덩어리에 뼈 끝이 살짝 보인다
+    'fossil.unknown': () => [
+      part(G.sphere(0.15, 8, 6), '#9C7E5A', { p: [0, 0.1, 0], sc: [1.1, 0.75, 0.95] }),
+      part(G.sphere(0.07, 6, 5), '#8A6E4C', { p: [0.08, 0.15, 0.04] }),
+      part(G.cyl(0.025, 0.03, 0.12, 6), '#E8DCC0', { p: [-0.06, 0.17, 0.06], r: [0.5, 0, 0.6] }),
+      part(G.sphere(0.035, 6, 4), '#E8DCC0', { p: [-0.1, 0.21, 0.09] }),
+    ],
   };
   function logParts(bark, ring) {
     return [part(G.cyl(0.07, 0.07, 0.3, 10), bark, { p: [0, 0.07, 0], r: [0, 0, Math.PI / 2] }),
@@ -122,7 +139,7 @@ export function createMeshKit(ctx) {
     let key = id, build = ITEM_PARTS[id];
     if (cat === 'fruit') { key = `fruit:${it?.variant ?? id.split('.')[1]}`; build = () => fruitParts(id.split('.')[1]); }
     else if (cat === 'furn') { key = 'present'; build = ITEM_PARTS.present; }
-    else if (cat === 'fossil') { key = 'fossil'; build = ITEM_PARTS.fossil; }
+    else if (cat === 'fossil' && !build) { key = 'fossil'; build = ITEM_PARTS.fossil; }
     else if (cat === 'fish') { key = `fish:${id}`; build = () => fishParts(id); }
     if (!build) { key = `cat:${cat}`; build = () => [part(G.box(0.16, 0.16, 0.16), CAT_COLOR[cat] ?? '#CCCCCC', { p: [0, 0.08, 0] })]; }
     return { key, geo: geometry(key, build) };
@@ -135,23 +152,23 @@ export function createMeshKit(ctx) {
     const slug = id.split('.')[1];
     const it = ctx.services.data?.items?.get?.(id);
     const L = 0.16 + (it?.shadow ?? 2) * 0.06;
-    const c = FISH_COLOR[slug] ?? '#8FA7B5';
+    const { body: c, back, belly, fin } = { ...FISH_FALLBACK, ...it?.colors };
     const dark = '#3B3530';
     if (slug === 'octopus') {
-      const out = [part(G.sphere(L * 0.4), c, { p: [0, L * 0.45, 0], sc: [1, 1.1, 1] })];
-      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; out.push(part(G.cyl(0.02, 0.012, L * 0.6, 5), c, { p: [Math.cos(a) * L * 0.18, L * 0.1, Math.sin(a) * L * 0.18], r: [Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5] })); }
+      const out = [topTint(part(G.sphere(L * 0.4), c, { p: [0, L * 0.45, 0], sc: [1, 1.1, 1] }), back, 0.62)];
+      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; out.push(part(G.cyl(0.02, 0.012, L * 0.6, 5), fin, { p: [Math.cos(a) * L * 0.18, L * 0.1, Math.sin(a) * L * 0.18], r: [Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5] })); }
       out.push(part(G.sphere(0.025, 6, 4), dark, { p: [L * 0.14, L * 0.5, L * 0.33] }), part(G.sphere(0.025, 6, 4), dark, { p: [-L * 0.14, L * 0.5, L * 0.33] }));
       return out;
     }
-    if (slug === 'squid') return [part(G.cone(L * 0.22, L, 8), c, { p: [0, L * 0.5, 0] }), part(G.box(L * 0.5, L * 0.18, 0.02), c, { p: [0, L * 0.9, 0] }),
-      ...[-1, 0, 1].map(k => part(G.cyl(0.015, 0.01, L * 0.45, 5), c, { p: [k * L * 0.08, -L * 0.15, 0] })), part(G.sphere(0.02, 6, 4), dark, { p: [L * 0.1, L * 0.2, L * 0.14] })];
-    // 보통 물고기: 머리가 +Z, 꼬리가 -Z
+    if (slug === 'squid') return [topTint(part(G.cone(L * 0.22, L, 8), c, { p: [0, L * 0.5, 0] }), back, 0.5), part(G.box(L * 0.5, L * 0.18, 0.02), back, { p: [0, L * 0.9, 0] }),
+      ...[-1, 0, 1].map(k => part(G.cyl(0.015, 0.01, L * 0.45, 5), fin, { p: [k * L * 0.08, -L * 0.15, 0] })), part(G.sphere(0.02, 6, 4), dark, { p: [L * 0.1, L * 0.2, L * 0.14] })];
+    // 보통 물고기: 머리가 +Z, 꼬리가 -Z. 몸 위쪽은 등 색, 꼬리·등지느러미는 지느러미 색, 배는 배 색
     return [
-      part(G.sphere(1, 12, 8), c, { sc: [L * 0.2, L * 0.28, L * 0.5] }),
-      part(G.cone(L * 0.2, L * 0.3, 6), c, { p: [0, 0, -L * 0.6], r: [-Math.PI / 2, 0, 0], sc: [0.35, 1, 1.2] }),
-      part(G.cone(L * 0.1, L * 0.25, 5), c, { p: [0, L * 0.3, -L * 0.05], r: [0.4, 0, 0], sc: [0.3, 1, 1] }),
+      topTint(part(G.sphere(1, 12, 8), c, { sc: [L * 0.2, L * 0.28, L * 0.5] }), back),
+      part(G.cone(L * 0.2, L * 0.3, 6), fin, { p: [0, 0, -L * 0.6], r: [-Math.PI / 2, 0, 0], sc: [0.35, 1, 1.2] }),
+      part(G.cone(L * 0.1, L * 0.25, 5), fin, { p: [0, L * 0.3, -L * 0.05], r: [0.4, 0, 0], sc: [0.3, 1, 1] }),
       part(G.sphere(0.022, 6, 4), dark, { p: [L * 0.13, L * 0.06, L * 0.33] }), part(G.sphere(0.022, 6, 4), dark, { p: [-L * 0.13, L * 0.06, L * 0.33] }),
-      part(G.sphere(1, 8, 6), '#F7F1E4', { p: [0, -L * 0.1, L * 0.05], sc: [L * 0.14, L * 0.12, L * 0.36] }),
+      part(G.sphere(1, 8, 6), belly, { p: [0, -L * 0.1, L * 0.05], sc: [L * 0.14, L * 0.12, L * 0.36] }),
     ];
   }
 

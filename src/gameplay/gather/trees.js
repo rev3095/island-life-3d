@@ -1,7 +1,8 @@
 // 맨손 나무 흔들기 (Space · 우선순위 60): data.harvest.shakeTree → 열매·나뭇가지·도토리 주머니·가구 선물이 떨어지거나 벌떼.
 // 열매를 따면 나무는 'picked' 모습이 되고, 사흘 뒤 world.daily 가 다시 열어 준다.
 // 벌떼는 플레이어를 쫓아온다: 잠자리채로 휘둘러 잡으면 꿀벌, 따라잡히면 쏘인다 (달리면 따돌릴 수 있다).
-import { rand } from './util.js';
+// 가끔 벌집 대신 곤충(송충이·매미 등)이 툭 떨어져 기어 도망간다 (4차 Y2, 출현은 data.spawns.shakeBugPool).
+import { rand, iga } from './util.js';
 
 const TREE_KINDS = new Set(['tree', 'fruit-tree', 'palm', 'cedar']);
 const CANOPY = { tree: 1.05, 'fruit-tree': 1.05, palm: 1.75, cedar: 1.3 };
@@ -9,7 +10,7 @@ const BEE_SPEED = 3.2;        // 걷기 2.6 보다 빠르고 달리기 5 보다 
 const BEE_TIME = 11;          // 이만큼 쫓다가 돌아간다 (초)
 const STING_R = 0.42;
 
-export function createTrees(ctx, kit, { drops, fx, mk, bugModels, results, act, lock }) {
+export function createTrees(ctx, kit, { drops, fx, mk, bugModels, bugs, results, act, lock }) {
   const { THREE: T, scene } = ctx;
 
   function find() {
@@ -26,10 +27,17 @@ export function createTrees(ctx, kit, { drops, fx, mk, bugModels, results, act, 
     if (!data?.harvest) return;
     const fruitSlug = o.data?.fruit ?? world.nativeFruit ?? 'apple';
     const orchard = world.places.orchard && Math.hypot(o.x - world.places.orchard.x, o.z - world.places.orchard.z) < 6;
-    const r = data.harvest.shakeTree(o.id, o.kind, { fruit: `fruit.${fruitSlug}`, orchard, hour: Math.floor(kit.now().hour) });
+    const now = kit.now();
+    const r = data.harvest.shakeTree(o.id, o.kind, { fruit: `fruit.${fruitSlug}`, orchard, hour: Math.floor(now.hour), month: now.month, weather: now.weather });
     if (!r) return;
     if (r.event === 'bees') { bees.start(o); return; }
     const toward = Math.atan2(p.position.x - o.x, p.position.z - o.z);
+    if (r.event === 'bug') {
+      const spot = drops.findSpot(o.x, o.z, { rMin: 0.45, rMax: 0.8, toward }) ?? { x: o.x + Math.sin(toward) * 0.6, z: o.z + Math.cos(toward) * 0.6 };
+      bugs?.popOut(r.id, { x: spot.x, z: spot.z, from: 'tree', top: (CANOPY[o.kind] ?? 1) * 0.85 });
+      kit.toast(`나무에서 ${iga(kit.name(r.id))} 떨어졌다! 잠자리채로 잡자`, kit.icon(r.id));
+      return;
+    }
     const top = { x: o.x, y: o.y + (CANOPY[o.kind] ?? 1), z: o.z };
     const isFruit = r.id.startsWith('fruit.');
     const pieces = isFruit ? r.count : 1;
