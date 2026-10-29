@@ -17,7 +17,7 @@
 | PR-13–16 | 깃발 줄 · 등불 기둥 · 부품 진행판 · 덮개 친 부스 자리 |
 | FU-34 · IC-FE-01–04 | 축제 단체 사진 액자 · 과일 파이·주스·화관·낚시 대회 메달 |
 | AN-01–05 | 새 동작 wave · nod · shake · tilt · cheer (캐릭터 빌더) |
-| ED-01–06 · FL-1–6 | 엔딩 컷 · 이야기 흐름 단계 |
+| ED-01–06 · SF-1–6 | 엔딩 컷 · 이야기 흐름 단계 |
 
 ## 다른 트랙과의 약속 (제안 — 합칠 때 CONTRACTS 로)
 - **상태**: 새 칸 `ctx.state.festival = { parts: {FP-id: dayKey}, booths: {FB-id: {...}}, readyDay, festivalDay, endedAt, photos: [] }` (주인: gameplay/festival). 주민별 이모티콘 기록은 `state.villagers[slug]` 에 `emote: { wins, todayCount, day, mistakes }` 를 더한다 (town 규칙과 같은 칸 정리 방식, `villagerState` 가 채움).
