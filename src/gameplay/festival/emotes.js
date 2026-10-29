@@ -1,5 +1,7 @@
-// 섬 전용 이모티콘 세트 (EM-01–36, assets/emotes/emotes.json) 읽기와 그리기. 대화 규칙은 assets/emotes/talk.json.
+// 섬 전용 이모티콘 세트 (EM-01–36, assets/emotes/emotes.json) 읽기와 그리기. 대화 규칙은 assets/emotes/talk.json (공통) + 주민 파일 emote 칸 (6차 M6-P3).
 // 말풍선·선택기에 쓰는 낱말(토큰): 이모티콘 key ('wave') 또는 아이템 'item:<아이템 id>' (그 아이템의 3D 아이콘, Z1).
+import { withVillagers } from './judge.js';
+
 export const EMOTES_FILE = 'assets/emotes/emotes.json';
 export const TALK_FILE = 'assets/emotes/talk.json';
 const INK = '#4A3B32';
@@ -12,7 +14,8 @@ export async function loadEmotes() {
     if (!r.ok) throw new Error(`${f} ${r.status}`);
     return r.json();
   })));
-  return createEmoteSet(set, rules);
+  const { VILLAGERS } = await import('../town/people.js');
+  return createEmoteSet(set, withVillagers(rules, VILLAGERS));
 }
 
 /** set = emotes.json, rules = talk.json → 그리기·이름 도구 */

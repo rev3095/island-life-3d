@@ -1,5 +1,6 @@
 // 이모티콘 대화 판정 (DOM·three 없음, node 로 확인). 같은 규칙·상태·입력이면 늘 같은 결과.
-// 규칙 데이터는 assets/emotes/talk.json (TK-01–07), 이모티콘은 assets/emotes/emotes.json (EM-01–36). 검수 보드 z5 D18-A.
+// 규칙 데이터: 공통(점수·인사·연습)은 assets/emotes/talk.json, 주민마다 읽는 법(TK-01–07)은 6차 M6-P3 부터 주민 파일 assets/villagers/<slug>.json 의
+// emote 칸 (withVillagers 로 합친다). 이모티콘은 assets/emotes/emotes.json (EM-01–36). 검수 보드 z5 D18-A.
 // 친밀도는 오르기만 한다 — 틀려도 깎지 않고, 갸웃·물러나며 💭 힌트를 다시 보여 준다 (오해는 벌이 아니라 단서).
 import { rngOf } from '../town/rules.js';
 
@@ -15,6 +16,9 @@ const at = i => KINDS[Math.max(0, Math.min(KINDS.length - 1, i))];
 const bump = (k, d) => at(rank(k) + d);
 const atLeast = (k, min) => (rank(k) < rank(min) ? min : k);
 
+/** talk.json(공통) + 주민 파일들(emote 칸) → 판정이 받는 규칙 { ...talk, villagers: { slug: 규칙 } }. docs = 주민 파일 (town/people.js VILLAGERS) */
+export const withVillagers = (talk, docs) => ({ ...talk, villagers: Object.fromEntries(docs.filter(d => d.emote).map(d => [d.slug, d.emote])) });
+
 /** 빈 보내기 = 기다리기. 넘치면 앞에서부터 자른다 */
 export function normalize(keys) {
   const list = (keys ?? []).filter(Boolean).slice(0, MAX_SEND);
@@ -29,7 +33,7 @@ export function wantOf(rule, slug, dayKey) {
 }
 
 /**
- * 판정. rules = talk.json 전체, slug = 주민, keys = 보낸 이모티콘 key 목록.
+ * 판정. rules = withVillagers(talk.json, 주민 파일), slug = 주민, keys = 보낸 이모티콘 key 목록.
  * c = { dayKey, weather, want (없으면 wantOf), greeted, waited, lastSaid: 주민이 바로 전에 보인 key 목록 }
  * → { kind, points, keys (정리한 입력), want, matchedWant, hint: key[] | null, reply: key[], gesture, flags: string[], greeted, waited }
  */

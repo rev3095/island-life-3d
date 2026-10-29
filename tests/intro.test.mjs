@@ -4,7 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as R from '../src/gameplay/intro/rules.js';
 import { fill } from '../src/gameplay/town/rules.js';
-import BAMTOL from '../src/gameplay/town/lines/bamtol.js';
+import LINES from '../src/gameplay/town/lines/index.js';
+const BAMTOL = LINES.bamtol;   // 대사는 assets/villagers/bamtol.json (6차 M6-P3)
 import { createState } from '../src/core/state.js';
 import { createSave } from '../src/data/save.js';
 import { fakeStorage } from './helpers.mjs';

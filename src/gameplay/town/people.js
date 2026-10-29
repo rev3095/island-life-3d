@@ -1,96 +1,25 @@
-// 주민·가게 주인 설정: 이름표 색(assets/specs 팔레트), 걸음 빠르기, 일과, 자주 가는 곳, 좋아하는 선물, 부탁, 보상.
-// 시각은 5~29 (24 넘으면 다음 날 새벽). haunts 이름은 index.js 의 장소 후보(spots)와 같다. range = 집에서 멀리 가는 한계(칸).
+// 주민·가게 주인 설정: 이름표 색(assets/specs 팔레트), 걸음 빠르기, 일과, 자주 가는 곳, 좋아하는 선물, 부탁, 보상, 대사.
+// 6차 M6-P3 부터 값은 주민마다 assets/villagers/<slug>.json 한 파일 (캐릭터 편집기 「성격·대화」 탭 → 채팅 "요청 확인").
+// 여기서는 파일을 받아 게임이 쓰던 모양(PEOPLE · KEEPERS · LINES)으로 펼친다 (traits.js toPerson). 이모티콘 규칙은 파일의 emote 칸,
+// 생일은 assets/data/rules.json birthdays (data/birthdays.js). 시각은 5~29 (24 넘으면 다음 날 새벽), haunts 이름은 index.js 의 장소 후보(spots).
+// 표 불러오기는 data/tables.js 와 같다: 쓰는 모듈이 바로 쓸 수 있게 파일을 다 받을 때까지 기다린다 (top-level await).
+import { VILLAGER_FILES } from './files.js';
+import { toPerson, toKeeper } from './traits.js';
 
-export const PEOPLE = {
-  coco: {
-    slug: 'coco', name: '코코', color: '#F2B36B',
-    pace: { walk: 1.55, run: 3.3, runChance: 0.35, idle: [1.2, 3.5], happy: 0.25 },
-    wake: 6, sleep: 22.5, rainStay: false, snowStay: false, range: 32,
-    haunts: { beach: 4, dock: 2, plaza: 2, home: 1, bridge: 2 },
-    loves: ['fruit.orange', 'fish.sweetfish', 'rare'],
-    likes: ['fish', 'bug', 'fruit'],
-    dislikes: ['mat.weed', 'mat.branch'],
-    wants: [{ cat: 'fish', w: 3 }, { cat: 'bug', w: 2 }, { cat: 'shell', w: 1 }, { id: 'native', w: 1 }],
-    rewards: ['furn.radio', 'furn.floor-lamp', 'furn.round-rug'],
-    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'fruit.orange', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.radio', w: 1 }],
-  },
-  bori: {
-    slug: 'bori', name: '보리', color: '#6CA0DC',
-    pace: { walk: 0.95, run: 2.4, runChance: 0, idle: [4, 9], happy: 0.12 },
-    wake: 8.5, sleep: 21, rainStay: true, snowStay: true, range: 12,
-    haunts: { plaza: 4, home: 4, bridge: 1 },
-    loves: ['furn.wood-bed', 'furn.sofa', 'fruit.peach'],
-    likes: ['fruit', 'flower', 'furn'],
-    dislikes: ['bug'],
-    wants: [{ cat: 'fruit', w: 3 }, { cat: 'flower', w: 2 }, { id: 'mat.wood', w: 1 }],
-    rewards: ['furn.sofa', 'furn.wall-clock', 'furn.plant-pot'],
-    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'fruit.peach', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.wall-clock', w: 1 }],
-  },
-  mochi: {
-    slug: 'mochi', name: '모찌', color: '#B9A6E0',
-    pace: { walk: 1.15, run: 2.6, runChance: 0.05, idle: [2.5, 5.5], happy: 0.2 },
-    wake: 7, sleep: 21.5, rainStay: true, snowStay: false, range: 16,
-    haunts: { flowers: 5, home: 2, plaza: 1, dock: 1 },
-    loves: ['hybrid', 'shell.coral'],
-    likes: ['flower', 'seed', 'shell', 'fruit'],
-    dislikes: ['bug.ant', 'mat.iron'],
-    wants: [{ cat: 'flower', w: 4 }, { cat: 'shell', w: 2 }, { cat: 'fruit', w: 1 }],
-    rewards: ['furn.plant-pot', 'furn.round-rug', 'furn.bookshelf'],
-    gifts: [{ id: 'seed.tulip', w: 2 }, { id: 'seed.cosmos', w: 2 }, { id: 'seed.pansy', w: 2 }, { id: 'mat.acorn-bag', w: 2 }, { id: 'furn.picture-frame', w: 1 }],
-  },
-  dubu: {
-    slug: 'dubu', name: '두부', color: '#7FA36B',
-    pace: { walk: 1.0, run: 2.5, runChance: 0, idle: [5, 11], happy: 0.06 },
-    wake: 5.5, sleep: 20.5, rainStay: false, snowStay: false, range: 22,
-    haunts: { river: 5, home: 2, dock: 2, bridge: 1 },
-    loves: ['fish.mandarin-fish', 'fish.catfish', 'fish.snakehead', 'fish.sea-bream', 'rare'],
-    likes: ['fish', 'mat.wood', 'mat.hardwood', 'fruit.pear'],
-    dislikes: ['flower.tulip-pink', 'mat.weed'],
-    wants: [{ cat: 'fish', w: 4 }, { id: 'mat.wood', w: 2 }, { id: 'mat.branch', w: 1 }],
-    rewards: ['furn.bookshelf', 'furn.wardrobe', 'furn.floor-lamp'],
-    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'mat.hardwood', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.wardrobe', w: 1 }],
-  },
-  pong: {
-    slug: 'pong', name: '퐁', color: '#FFD866',
-    pace: { walk: 1.3, run: 2.9, runChance: 0.15, idle: [2, 5], happy: 0.3 },
-    wake: 8, sleep: 23.5, rainStay: true, snowStay: false, range: 24,
-    haunts: { orchard: 4, shop: 2, home: 2, plaza: 1, beach: 1 },
-    loves: ['fruit.peach', 'fruit.cherry', 'fish.tuna'],
-    likes: ['fruit', 'fish', 'shell.clam', 'shell.scallop'],
-    dislikes: ['fossil', 'mat.stone', 'mat.iron'],
-    wants: [{ cat: 'fruit', w: 3 }, { id: 'native', w: 2 }, { cat: 'fish', w: 2 }, { id: 'fruit.coconut', w: 1 }],
-    rewards: ['furn.radio', 'furn.sofa', 'furn.plant-pot'],
-    gifts: [{ id: 'fruit.cherry', w: 2 }, { id: 'fruit.peach', w: 2 }, { id: 'mat.acorn-bag', w: 3 }, { id: 'furn.picture-frame', w: 1 }],
-  },
-  chorong: {
-    slug: 'chorong', name: '초롱', color: '#8CCB6E',
-    pace: { walk: 1.35, run: 3.0, runChance: 0.2, idle: [1.5, 4], happy: 0.25 },
-    wake: 7, sleep: 22, rainStay: false, snowStay: true, range: 30,
-    haunts: { pond: 3, river: 2, plaza: 2, home: 1, shop: 1, museum: 1 },
-    loves: ['bug.snail', 'bug.firefly', 'shell.coral'],
-    likes: ['bug', 'fish', 'shell', 'flower'],
-    dislikes: ['mat.iron'],
-    wants: [{ cat: 'bug', w: 3 }, { cat: 'shell', w: 2 }, { cat: 'fish', w: 1 }],
-    rewards: ['furn.wall-clock', 'furn.round-rug', 'furn.bookshelf'],
-    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'shell.scallop', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.plant-pot', w: 1 }],
-  },
-  // 5차 새 주민 (CH-10): 처음엔 빈 집터, 이사 흐름(movein.js)이 끝나면 섬에 산다. joySeason = 이 계절엔 더 신난다
-  danpung: {
-    slug: 'danpung', name: '단풍', color: '#D9583B', voice: 'coco', joySeason: 'autumn',
-    pace: { walk: 1.2, run: 2.8, runChance: 0.1, idle: [2.5, 6], happy: 0.18 },
-    wake: 7.5, sleep: 22, rainStay: false, snowStay: true, range: 26,
-    haunts: { museum: 5, flowers: 2, beach: 1, home: 2, plaza: 1 },
-    loves: ['fossil', 'rare'],
-    likes: ['bug', 'shell', 'fish', 'furn.bookshelf'],
-    dislikes: ['mat.weed', 'mat.stone'],
-    wants: [{ cat: 'fossil', w: 3 }, { cat: 'bug', w: 2 }, { cat: 'shell', w: 2 }, { cat: 'fish', w: 1 }],
-    rewards: ['furn.bookshelf', 'furn.picture-frame', 'furn.wall-clock'],
-    gifts: [{ id: 'mat.acorn-bag', w: 3 }, { id: 'shell.scallop', w: 2 }, { id: 'furn.picture-frame', w: 1 }, { id: 'furn.bookshelf', w: 1 }],
-  },
-};
+const fs = globalThis.process?.getBuiltinModule?.('node:fs');
+async function load(path) {
+  if (fs) return JSON.parse(fs.readFileSync(new URL(`../../../${path}`, import.meta.url), 'utf8'));
+  const { loadJSON } = await import('../../core/assets.js');
+  return loadJSON(path);
+}
+
+/** 주민 파일 그대로 (순서 = files.js) — festival 의 이모티콘 규칙, 편집기가 쓴다 */
+export const VILLAGERS = await Promise.all(VILLAGER_FILES.map(load));
+
+export const PEOPLE = Object.fromEntries(VILLAGERS.filter(d => d.role === 'villager').map(d => [d.slug, toPerson(d)]));
 
 /** 가게 주인 (돌아다니지 않는다) */
-export const KEEPERS = {
-  bamtol: { slug: 'bamtol', name: '밤톨', color: '#C7743E', pace: { walk: 1.6, run: 3.2, idle: [3, 7], happy: 0.1 } },
-  neuru: { slug: 'neuru', name: '느루', color: '#7A9A5A', pace: { walk: 0.6, run: 1.2, idle: [5, 10], happy: 0.05 } },
-};
+export const KEEPERS = Object.fromEntries(VILLAGERS.filter(d => d.role === 'keeper').map(d => [d.slug, toKeeper(d)]));
+
+/** 대사 묶음 (lines/index.js 가 그대로 내보낸다). 꺼 둔 대사(linesOff)는 넣지 않는다 */
+export const LINES = Object.fromEntries(VILLAGERS.map(d => [d.slug, d.lines]));
