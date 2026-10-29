@@ -1,0 +1,54 @@
+{
+  "id": "IC-SD-05",
+  "slug": "seed-cedar-sapling",
+  "name": "삼나무 묘목",
+  "group": "seed",
+  "category": "item",
+  "kind": "cedar-sapling",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "seed.cedar-sapling",
+      "code": "IC-SD-05"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "뿌리를 천으로 싼 작은 삼나무",
+    "keywords": [
+      "뿌리 싸개",
+      "원뿔 세 층"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "burlap": "#C9A87A",
+    "tie": "#8A5A3A",
+    "trunk": "#7F5636",
+    "leaf": "#3E8A5A"
+  },
+  "paletteLabels": {
+    "burlap": "뿌리 싸개",
+    "tie": "끈",
+    "trunk": "줄기",
+    "leaf": "잎"
+  }
+}

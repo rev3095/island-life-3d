@@ -1,0 +1,48 @@
+{
+  "id": "IC-FS-10",
+  "slug": "fish-goldfish",
+  "name": "금붕어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.goldfish"
+  ],
+  "hold": true,
+  "triangles": 1496,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.075,
+    0.287,
+    0.195
+  ],
+  "bounds": [
+    [
+      -0.037,
+      -0.143,
+      -0.097
+    ],
+    [
+      0.037,
+      0.143,
+      0.097
+    ]
+  ],
+  "glbBytes": 39568,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-goldfish_main.png",
+    "fish-goldfish_thumb.png"
+  ]
+}

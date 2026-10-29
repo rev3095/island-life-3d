@@ -1,0 +1,49 @@
+{
+  "id": "IC-SH-04",
+  "slug": "shell-whelk",
+  "name": "고둥",
+  "group": "shell",
+  "category": "item",
+  "kind": "whelk",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "shell.whelk",
+      "code": "IC-SH-04"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "뾰족하게 감아 올라간 고둥",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#D9C2A0",
+    "shellDark": "#A88A60",
+    "shellBase": "#F4E6D2"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellDark": "껍데기 무늬",
+    "shellBase": "껍데기 아래"
+  }
+}

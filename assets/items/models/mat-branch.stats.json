@@ -1,0 +1,44 @@
+{
+  "id": "IC-MA-03",
+  "slug": "mat-branch",
+  "name": "나뭇가지",
+  "group": "mat",
+  "kind": "branch",
+  "version": "0.1",
+  "items": [
+    "mat.branch"
+  ],
+  "hold": false,
+  "triangles": 292,
+  "parts": 1,
+  "materials": [
+    "bark",
+    "leaf"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.531,
+    0.268,
+    0.089
+  ],
+  "bounds": [
+    [
+      -0.265,
+      -0.134,
+      0.0
+    ],
+    [
+      0.265,
+      0.134,
+      0.089
+    ]
+  ],
+  "glbBytes": 9768,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-branch_main.png",
+    "mat-branch_thumb.png"
+  ]
+}

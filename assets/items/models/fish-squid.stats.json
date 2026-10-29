@@ -1,0 +1,47 @@
+{
+  "id": "IC-FS-15",
+  "slug": "fish-squid",
+  "name": "오징어",
+  "group": "fish",
+  "kind": "squid",
+  "version": "0.1",
+  "items": [
+    "fish.squid"
+  ],
+  "hold": true,
+  "triangles": 2316,
+  "parts": 1,
+  "materials": [
+    "back",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "squid"
+  ],
+  "size": [
+    0.12,
+    0.426,
+    0.075
+  ],
+  "bounds": [
+    [
+      -0.06,
+      -0.213,
+      -0.037
+    ],
+    [
+      0.06,
+      0.213,
+      0.037
+    ]
+  ],
+  "glbBytes": 47876,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-squid_main.png",
+    "fish-squid_thumb.png"
+  ]
+}

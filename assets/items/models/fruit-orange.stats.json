@@ -1,0 +1,47 @@
+{
+  "id": "IC-FR-05",
+  "slug": "fruit-orange",
+  "name": "오렌지",
+  "group": "fruit",
+  "kind": "fruit",
+  "version": "0.1",
+  "items": [
+    "fruit.orange"
+  ],
+  "hold": false,
+  "triangles": 1288,
+  "parts": 1,
+  "materials": [
+    "fruit",
+    "fruitDark",
+    "leaf",
+    "shine",
+    "stem"
+  ],
+  "objects": [
+    "fruit"
+  ],
+  "size": [
+    0.28,
+    0.28,
+    0.306
+  ],
+  "bounds": [
+    [
+      -0.14,
+      -0.14,
+      0.0
+    ],
+    [
+      0.14,
+      0.14,
+      0.306
+    ]
+  ],
+  "glbBytes": 29516,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-orange_main.png",
+    "fruit-orange_thumb.png"
+  ]
+}

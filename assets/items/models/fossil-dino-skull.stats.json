@@ -1,0 +1,46 @@
+{
+  "id": "IC-FO-08",
+  "slug": "fossil-dino-skull",
+  "name": "공룡 두개골",
+  "group": "fossil",
+  "kind": "dino-skull",
+  "version": "0.1",
+  "items": [
+    "fossil.dino-skull"
+  ],
+  "hold": true,
+  "triangles": 1712,
+  "parts": 1,
+  "materials": [
+    "bone",
+    "socket",
+    "stone",
+    "tooth"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.293,
+    0.371,
+    0.211
+  ],
+  "bounds": [
+    [
+      -0.147,
+      -0.185,
+      -0.106
+    ],
+    [
+      0.147,
+      0.185,
+      0.106
+    ]
+  ],
+  "glbBytes": 40100,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-dino-skull_main.png",
+    "fossil-dino-skull_thumb.png"
+  ]
+}

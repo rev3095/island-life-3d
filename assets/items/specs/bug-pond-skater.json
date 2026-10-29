@@ -1,0 +1,64 @@
+{
+  "id": "IC-BG-19",
+  "slug": "bug-pond-skater",
+  "name": "소금쟁이",
+  "group": "bug",
+  "category": "item",
+  "kind": "skater",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.pond-skater",
+      "code": "IC-BG-19"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "긴 다리로 물 위를 미끄러지듯 걷는다. 물에 빠지지 않는 신기한 곤충이다.",
+    "keywords": [
+      "강 위",
+      "낮"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.32,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#4E4438",
+    "leg": "#4E4438",
+    "ripple": "#BFE6F7"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "leg": "다리",
+    "ripple": "물결"
+  }
+}

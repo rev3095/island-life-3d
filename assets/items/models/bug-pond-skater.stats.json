@@ -1,0 +1,46 @@
+{
+  "id": "IC-BG-19",
+  "slug": "bug-pond-skater",
+  "name": "소금쟁이",
+  "group": "bug",
+  "kind": "skater",
+  "version": "0.1",
+  "items": [
+    "bug.pond-skater"
+  ],
+  "hold": true,
+  "triangles": 1216,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "ripple"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.312,
+    0.221,
+    0.06
+  ],
+  "bounds": [
+    [
+      -0.156,
+      -0.11,
+      -0.03
+    ],
+    [
+      0.156,
+      0.11,
+      0.03
+    ]
+  ],
+  "glbBytes": 26184,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-pond-skater_main.png",
+    "bug-pond-skater_thumb.png"
+  ]
+}

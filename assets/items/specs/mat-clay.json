@@ -1,0 +1,50 @@
+{
+  "id": "IC-MA-06",
+  "slug": "mat-clay",
+  "name": "점토",
+  "group": "mat",
+  "category": "item",
+  "kind": "clay",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.clay",
+      "code": "IC-MA-06"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "말랑한 주황빛 점토 덩어리",
+    "keywords": [
+      "둥근 덩어리",
+      "주황 갈색"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "clay": "#C47A4E",
+    "clayLight": "#D9976A"
+  },
+  "paletteLabels": {
+    "clay": "점토",
+    "clayLight": "밝은 점토"
+  }
+}

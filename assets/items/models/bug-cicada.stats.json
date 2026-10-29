@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-08",
+  "slug": "bug-cicada",
+  "name": "매미",
+  "group": "bug",
+  "kind": "cicada",
+  "version": "0.1",
+  "items": [
+    "bug.cicada"
+  ],
+  "hold": true,
+  "triangles": 1460,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "mark",
+    "wing",
+    "wingMark"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.131,
+    0.244,
+    0.062
+  ],
+  "bounds": [
+    [
+      -0.066,
+      -0.122,
+      -0.031
+    ],
+    [
+      0.066,
+      0.122,
+      0.031
+    ]
+  ],
+  "glbBytes": 39480,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-cicada_main.png",
+    "bug-cicada_thumb.png"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-08",
+  "slug": "fish-mandarin-fish",
+  "name": "쏘가리",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.mandarin-fish"
+  ],
+  "hold": true,
+  "triangles": 3856,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.084,
+    0.41,
+    0.153
+  ],
+  "bounds": [
+    [
+      -0.042,
+      -0.205,
+      -0.077
+    ],
+    [
+      0.042,
+      0.205,
+      0.077
+    ]
+  ],
+  "glbBytes": 82988,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-mandarin-fish_main.png",
+    "fish-mandarin-fish_thumb.png"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "IC-FL-05",
+  "slug": "flower-cosmos",
+  "name": "코스모스",
+  "group": "flower",
+  "kind": "cosmos",
+  "version": "0.1",
+  "items": [
+    "flower.cosmos-pink",
+    "flower.cosmos-white",
+    "flower.cosmos-orange",
+    "flower.cosmos-red"
+  ],
+  "hold": false,
+  "triangles": 1316,
+  "parts": 1,
+  "materials": [
+    "center",
+    "petal",
+    "stem"
+  ],
+  "objects": [
+    "flower"
+  ],
+  "size": [
+    0.24,
+    0.176,
+    0.452
+  ],
+  "bounds": [
+    [
+      -0.12,
+      -0.088,
+      0.0
+    ],
+    [
+      0.12,
+      0.088,
+      0.452
+    ]
+  ],
+  "glbBytes": 27112,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-cosmos_main.png",
+    "flower-cosmos_orange_main.png",
+    "flower-cosmos_orange_thumb.png",
+    "flower-cosmos_pink_main.png",
+    "flower-cosmos_pink_thumb.png",
+    "flower-cosmos_red_main.png",
+    "flower-cosmos_red_thumb.png",
+    "flower-cosmos_thumb.png",
+    "flower-cosmos_white_main.png",
+    "flower-cosmos_white_thumb.png"
+  ]
+}

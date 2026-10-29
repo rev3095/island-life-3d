@@ -1,0 +1,92 @@
+{
+  "id": "IC-SD-01",
+  "slug": "seed-bag",
+  "name": "씨앗 봉투",
+  "group": "seed",
+  "category": "item",
+  "kind": "seed-bag",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "seed.tulip",
+      "code": "IC-SD-01",
+      "variant": "tulip"
+    },
+    {
+      "item": "seed.cosmos",
+      "code": "IC-SD-02",
+      "variant": "cosmos"
+    },
+    {
+      "item": "seed.pansy",
+      "code": "IC-SD-03",
+      "variant": "pansy"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "꽃 그림이 그려진 종이 씨앗 봉투. 꽃마다 봉투 색이 다르다.",
+    "keywords": [
+      "종이 봉투",
+      "꽃 그림",
+      "씨앗 세 알"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bag": "#F7D2C8",
+    "bagDark": "#C9A86A",
+    "label": "#FFFFFF",
+    "emblem": "#E8504F",
+    "center": "#F6C84C",
+    "leaf": "#5FAE5A",
+    "seed": "#8C6A3A"
+  },
+  "paletteLabels": {
+    "bag": "주머니",
+    "bagDark": "봉투 띠",
+    "label": "이름표",
+    "emblem": "꽃 그림",
+    "center": "꽃술",
+    "leaf": "잎",
+    "seed": "씨앗"
+  },
+  "variants": {
+    "tulip": {
+      "label": "튤립 (기본)",
+      "palette": {}
+    },
+    "cosmos": {
+      "label": "코스모스",
+      "palette": {
+        "bag": "#F9DDEB",
+        "emblem": "#F28CB8"
+      }
+    },
+    "pansy": {
+      "label": "팬지",
+      "palette": {
+        "bag": "#E2D8F2",
+        "emblem": "#9C7BD6"
+      }
+    }
+  }
+}

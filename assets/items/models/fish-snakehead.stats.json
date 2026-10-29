@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-11",
+  "slug": "fish-snakehead",
+  "name": "가물치",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.snakehead"
+  ],
+  "hold": true,
+  "triangles": 2800,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.123,
+    0.541,
+    0.114
+  ],
+  "bounds": [
+    [
+      -0.061,
+      -0.27,
+      -0.057
+    ],
+    [
+      0.061,
+      0.27,
+      0.057
+    ]
+  ],
+  "glbBytes": 63108,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-snakehead_main.png",
+    "fish-snakehead_thumb.png"
+  ]
+}

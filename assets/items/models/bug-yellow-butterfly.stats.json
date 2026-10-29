@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-03",
+  "slug": "bug-yellow-butterfly",
+  "name": "노랑나비",
+  "group": "bug",
+  "kind": "butterfly",
+  "version": "0.1",
+  "items": [
+    "bug.yellow-butterfly"
+  ],
+  "hold": true,
+  "triangles": 1508,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "wing",
+    "wing2",
+    "wingMark"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.252,
+    0.235,
+    0.072
+  ],
+  "bounds": [
+    [
+      -0.126,
+      -0.117,
+      -0.036
+    ],
+    [
+      0.126,
+      0.117,
+      0.036
+    ]
+  ],
+  "glbBytes": 46840,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-yellow-butterfly_main.png",
+    "bug-yellow-butterfly_thumb.png"
+  ]
+}

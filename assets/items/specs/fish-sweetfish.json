@@ -1,0 +1,233 @@
+{
+  "id": "IC-FS-06",
+  "slug": "fish-sweetfish",
+  "name": "은어",
+  "group": "fish",
+  "category": "item",
+  "kind": "fish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fish.sweetfish",
+      "code": "IC-FS-06"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "맑은 여름 강에만 찾아오는 물고기. 몸에서 수박 같은 향이 난다고 한다.",
+    "keywords": [
+      "강",
+      "그림자 3"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.4,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "몸 높이 (길이 비)",
+      "value": 0.26,
+      "min": 0.12,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 두께 (길이 비)",
+      "value": 0.14,
+      "min": 0.08,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    },
+    "taper": {
+      "label": "꼬리로 갈수록 가늘게",
+      "value": 0.55,
+      "min": 0.2,
+      "max": 0.85,
+      "step": 0.01,
+      "live": false
+    },
+    "blunt": {
+      "label": "뭉툭한 머리",
+      "value": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "tail": {
+      "label": "꼬리 모양",
+      "value": "fork",
+      "options": [
+        "fork",
+        "moon",
+        "straight",
+        "round",
+        "fan",
+        "shark"
+      ]
+    },
+    "tailHeight": {
+      "label": "꼬리 높이",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "dorsal": {
+      "label": "등지느러미",
+      "value": "tri",
+      "options": [
+        "tri",
+        "long",
+        "spiky",
+        "sickle",
+        "shark",
+        "none"
+      ]
+    },
+    "dorsalStart": {
+      "label": "등지느러미 시작",
+      "value": -0.15,
+      "min": -0.6,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "dorsalEnd": {
+      "label": "등지느러미 끝",
+      "value": 0.35,
+      "min": -0.4,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "dorsalHeight": {
+      "label": "등지느러미 높이",
+      "value": 0.35,
+      "min": 0.1,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    },
+    "anal": {
+      "label": "뒷지느러미",
+      "value": "small",
+      "options": [
+        "small",
+        "long",
+        "none"
+      ]
+    },
+    "pectoral": {
+      "label": "가슴지느러미 크기",
+      "value": 1,
+      "min": 0,
+      "max": 2.5,
+      "step": 0.01,
+      "live": false
+    },
+    "whiskers": {
+      "label": "수염 쌍",
+      "value": 0,
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "live": false
+    },
+    "whiskerLength": {
+      "label": "수염 길이",
+      "value": 0.25,
+      "min": 0.05,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    },
+    "eyeSize": {
+      "label": "눈 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 2,
+      "step": 0.01,
+      "live": false
+    },
+    "gills": {
+      "label": "아가미 줄",
+      "value": 0,
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "live": false
+    },
+    "finlets": {
+      "label": "꼬리자루 작은 지느러미",
+      "value": 0,
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "live": false
+    },
+    "finThick": {
+      "label": "지느러미 두께",
+      "value": 0.006,
+      "min": 0.003,
+      "max": 0.012,
+      "step": 0.001,
+      "live": false
+    },
+    "pattern": {
+      "label": "무늬",
+      "value": "patch",
+      "options": [
+        "none",
+        "spots",
+        "bands",
+        "line",
+        "waves",
+        "patch"
+      ]
+    }
+  },
+  "palette": {
+    "body": "#B5C9AE",
+    "back": "#7E9A86",
+    "belly": "#F2F0DC",
+    "fin": "#E8C45A",
+    "mark": "#E8C45A",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

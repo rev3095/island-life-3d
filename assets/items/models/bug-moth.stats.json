@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-20",
+  "slug": "bug-moth",
+  "name": "나방",
+  "group": "bug",
+  "kind": "butterfly",
+  "version": "0.1",
+  "items": [
+    "bug.moth"
+  ],
+  "hold": true,
+  "triangles": 1588,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "wing",
+    "wing2",
+    "wingMark"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.299,
+    0.225,
+    0.084
+  ],
+  "bounds": [
+    [
+      -0.149,
+      -0.112,
+      -0.042
+    ],
+    [
+      0.149,
+      0.112,
+      0.042
+    ]
+  ],
+  "glbBytes": 49120,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-moth_main.png",
+    "bug-moth_thumb.png"
+  ]
+}

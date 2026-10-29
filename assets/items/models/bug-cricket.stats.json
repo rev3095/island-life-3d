@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-14",
+  "slug": "bug-cricket",
+  "name": "귀뚜라미",
+  "group": "bug",
+  "kind": "hopper",
+  "version": "0.1",
+  "items": [
+    "bug.cricket"
+  ],
+  "hold": true,
+  "triangles": 1988,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "leg2",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.235,
+    0.34,
+    0.17
+  ],
+  "bounds": [
+    [
+      -0.117,
+      -0.17,
+      -0.085
+    ],
+    [
+      0.117,
+      0.17,
+      0.085
+    ]
+  ],
+  "glbBytes": 42624,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-cricket_main.png",
+    "bug-cricket_thumb.png"
+  ]
+}

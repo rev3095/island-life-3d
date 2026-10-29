@@ -1,0 +1,46 @@
+{
+  "id": "IC-TL-03",
+  "slug": "tool-shovel",
+  "name": "삽",
+  "group": "tool",
+  "kind": "shovel",
+  "version": "0.1",
+  "items": [
+    "tool.shovel"
+  ],
+  "hold": false,
+  "triangles": 580,
+  "parts": 1,
+  "materials": [
+    "grip",
+    "metal",
+    "metalDark",
+    "wood"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.792,
+    0.086,
+    0.86
+  ],
+  "bounds": [
+    [
+      -0.396,
+      -0.043,
+      0.0
+    ],
+    [
+      0.396,
+      0.043,
+      0.86
+    ]
+  ],
+  "glbBytes": 16428,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-shovel_main.png",
+    "tool-shovel_thumb.png"
+  ]
+}

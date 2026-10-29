@@ -1,0 +1,47 @@
+{
+  "id": "IC-TL-04",
+  "slug": "tool-axe",
+  "name": "도끼",
+  "group": "tool",
+  "kind": "axe",
+  "version": "0.1",
+  "items": [
+    "tool.axe"
+  ],
+  "hold": false,
+  "triangles": 552,
+  "parts": 1,
+  "materials": [
+    "edge",
+    "grip",
+    "metal",
+    "metalDark",
+    "wood"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.605,
+    0.06,
+    0.89
+  ],
+  "bounds": [
+    [
+      -0.302,
+      -0.03,
+      0.0
+    ],
+    [
+      0.302,
+      0.03,
+      0.89
+    ]
+  ],
+  "glbBytes": 19088,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-axe_main.png",
+    "tool-axe_thumb.png"
+  ]
+}

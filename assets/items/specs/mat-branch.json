@@ -1,0 +1,50 @@
+{
+  "id": "IC-MA-03",
+  "slug": "mat-branch",
+  "name": "나뭇가지",
+  "group": "mat",
+  "category": "item",
+  "kind": "branch",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.branch",
+      "code": "IC-MA-03"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "잔가지가 갈라진 나뭇가지에 잎 두 장",
+    "keywords": [
+      "갈래 가지",
+      "잎 두 장"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bark": "#9A6B45",
+    "leaf": "#5FAE5A"
+  },
+  "paletteLabels": {
+    "bark": "껍질",
+    "leaf": "잎"
+  }
+}

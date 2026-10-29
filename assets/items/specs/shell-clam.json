@@ -1,0 +1,49 @@
+{
+  "id": "IC-SH-01",
+  "slug": "shell-clam",
+  "name": "바지락",
+  "group": "shell",
+  "category": "item",
+  "kind": "clam",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "shell.clam",
+      "code": "IC-SH-01"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "둥근 두 장 조개, 결 줄과 갈색 점",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#E8DCC8",
+    "shellRib": "#C9B89E",
+    "shellDark": "#9A8468"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "껍데기 줄",
+    "shellDark": "껍데기 무늬"
+  }
+}

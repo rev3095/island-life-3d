@@ -1,0 +1,59 @@
+{
+  "id": "IC-FO-09",
+  "slug": "fossil-unknown",
+  "name": "알 수 없는 화석",
+  "group": "fossil",
+  "category": "item",
+  "kind": "unknown-fossil",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fossil.unknown",
+      "code": "IC-FO-09"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "흙이 잔뜩 묻은 오래된 무언가. 박물관 느루에게 가져가면 무엇인지 감정해 준다.",
+    "keywords": [
+      "박물관 화석"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기",
+      "value": 0.32,
+      "min": 0.15,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "dirt": "#9C7E5A",
+    "dirtDark": "#6B5238",
+    "bone": "#E8DCC0"
+  },
+  "paletteLabels": {
+    "dirt": "흙",
+    "dirtDark": "흙 그늘",
+    "bone": "뼈"
+  }
+}

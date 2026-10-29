@@ -1,0 +1,50 @@
+{
+  "id": "IC-MA-05",
+  "slug": "mat-iron",
+  "name": "철광석",
+  "group": "mat",
+  "category": "item",
+  "kind": "iron",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.iron",
+      "code": "IC-MA-05"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "어두운 돌에 은빛 광석이 박혀 있다",
+    "keywords": [
+      "어두운 돌",
+      "은빛 알갱이"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "stone": "#6E7275",
+    "metal": "#C9D2D6"
+  },
+  "paletteLabels": {
+    "stone": "돌",
+    "metal": "쇠"
+  }
+}

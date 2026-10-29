@@ -1,0 +1,57 @@
+{
+  "id": "IC-FL-09",
+  "slug": "flower-pansy",
+  "name": "팬지",
+  "group": "flower",
+  "kind": "pansy",
+  "version": "0.1",
+  "items": [
+    "flower.pansy-purple",
+    "flower.pansy-yellow",
+    "flower.pansy-blue",
+    "flower.pansy-orange"
+  ],
+  "hold": false,
+  "triangles": 1668,
+  "parts": 1,
+  "materials": [
+    "center",
+    "petal",
+    "petalDark",
+    "stem"
+  ],
+  "objects": [
+    "flower"
+  ],
+  "size": [
+    0.284,
+    0.249,
+    0.209
+  ],
+  "bounds": [
+    [
+      -0.142,
+      -0.125,
+      0.0
+    ],
+    [
+      0.142,
+      0.125,
+      0.209
+    ]
+  ],
+  "glbBytes": 34184,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-pansy_blue_main.png",
+    "flower-pansy_blue_thumb.png",
+    "flower-pansy_main.png",
+    "flower-pansy_orange_main.png",
+    "flower-pansy_orange_thumb.png",
+    "flower-pansy_purple_main.png",
+    "flower-pansy_purple_thumb.png",
+    "flower-pansy_thumb.png",
+    "flower-pansy_yellow_main.png",
+    "flower-pansy_yellow_thumb.png"
+  ]
+}

@@ -44,7 +44,7 @@
 img.pk-icon, img.pk-slot-icon { width: 1.2em; height: 1.2em; object-fit: contain; }
 /* 그림 아이콘(가구 썸네일 등)이 이모지 자리에 맞는 크기로 */
 img.pk-toast-icon { width: 26px; height: 26px; object-fit: contain; }
-img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; height: 34px; object-fit: contain; }
+img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon, img.pk-dex-icon { width: 34px; height: 34px; object-fit: contain; }
 .pk-confirm-icon img { width: 72px; height: 72px; object-fit: contain; }
 
 /* 화면 전환 막 (ui.fade) */

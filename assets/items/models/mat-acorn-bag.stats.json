@@ -1,0 +1,46 @@
+{
+  "id": "IC-MA-08",
+  "slug": "mat-acorn-bag",
+  "name": "도토리 주머니",
+  "group": "mat",
+  "kind": "acorn-bag",
+  "version": "0.1",
+  "items": [
+    "mat.acorn-bag"
+  ],
+  "hold": false,
+  "triangles": 1168,
+  "parts": 1,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "bag",
+    "tie"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.3,
+    0.31,
+    0.311
+  ],
+  "bounds": [
+    [
+      -0.15,
+      -0.155,
+      0.0
+    ],
+    [
+      0.15,
+      0.155,
+      0.311
+    ]
+  ],
+  "glbBytes": 24752,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-acorn-bag_main.png",
+    "mat-acorn-bag_thumb.png"
+  ]
+}

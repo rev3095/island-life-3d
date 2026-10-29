@@ -21,10 +21,16 @@ const TEXT_EXT = /\.(html|js|mjs|css|json|svg|txt|md)$/i;
 //   env       — world·sky: assets.loadEnv / loadEnvSpec (src/core/assets.js PATHS)
 //   character — player·town: assets.loadCharacter / loadCharacterSpec (목록은 assets.loadCharacterIndex)
 //   furniture — house: src/gameplay/house/furniture.js, 썸네일 = data 아이템 icon (src/data/items.js)
+//   items     — 가구를 뺀 아이템 아이콘 = data 아이템 icon (변형마다 하나), 들어 보이는 모델(hold)만 .glb.json (gather/meshes.js heldModel, 5차 Z1)
+const itemFiles = slug => {
+  const m = JSON.parse(read('assets/items/index.json')).models.find(x => x.slug === slug);
+  return [...(m?.items ?? []).map(x => x.icon), ...(m?.hold ? [`assets/items/models/${slug}.glb.json`] : [])];
+};
 export const FAMILIES = [
   { name: 'env', index: 'assets/env/index.json', each: s => [`assets/env/models/${s}.glb.json`, `assets/env/specs/${s}.json`] },
   { name: 'character', index: 'assets/models/index.json', each: s => [`assets/models/${s}.glb.json`, `assets/specs/${s}.json`] },
   { name: 'furniture', index: 'assets/furniture/index.json', each: s => [`assets/furniture/models/${s}.glb.json`, `assets/furniture/specs/${s}.json`, `assets/furniture/renders/${s}_thumb.png`] },
+  { name: 'items', index: 'assets/items/index.json', each: itemFiles },
 ];
 
 // 로딩 화면의 단계: main.js MODULES 이름 → [그 모듈이 올리는 서비스, 진행 글, 실패 때 부르는 이름]
@@ -45,6 +51,8 @@ const GROUPS = [
   ['캐릭터 모델', p => p.startsWith('assets/models/') && p.endsWith('.glb.json')],
   ['배경 모델', p => p.startsWith('assets/env/models/')],
   ['가구 모델', p => p.startsWith('assets/furniture/models/')],
+  ['아이템 모델', p => p.startsWith('assets/items/models/')],
+  ['아이템 아이콘', p => p.startsWith('assets/items/renders/')],
   ['가구 썸네일', p => p.endsWith('.png')],
   ['목록 (index.json)', p => p.endsWith('/index.json')],
   ['스펙 (json)', p => p.endsWith('.json')],
@@ -188,8 +196,8 @@ function buildPage({ html, js, external, modules, assets }) {
   // 뼈대가 charset 을 넣는다. viewport 는 index.html 의 것을 그대로 둔다 (X1 이 정한 값, viewport-fit=cover)
   const viewport = head.match(/<meta name="viewport"[^>]*>/)?.[0] ?? '';
   const rest = head.replace(title, '').replace(viewport, '').replace(/<meta charset[^>]*>\s*/i, '').trim();
-  // 로딩 진행 어림값: 처음에 받는 모듈 수 + 처음에 읽는 에셋 수 (가구는 집에 들어갈 때 읽어서 뺀다)
-  const bootAssets = assets.filter(f => f.path.endsWith('.json') && f.path.startsWith('assets/') && !f.path.startsWith('assets/furniture/') && f.path !== 'assets/models/index.json').length;
+  // 로딩 진행 어림값: 처음에 받는 모듈 수 + 처음에 읽는 에셋 수 (가구는 집에 들어갈 때, 아이템 모델은 처음 잡았을 때 읽어서 뺀다)
+  const bootAssets = assets.filter(f => f.path.endsWith('.json') && f.path.startsWith('assets/') && !f.path.startsWith('assets/furniture/') && !f.path.startsWith('assets/items/') && f.path !== 'assets/models/index.json').length;
   const config = {
     build: buildStamp(),
     modules,

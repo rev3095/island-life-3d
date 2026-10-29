@@ -1,0 +1,45 @@
+{
+  "id": "IC-SH-04",
+  "slug": "shell-whelk",
+  "name": "고둥",
+  "group": "shell",
+  "kind": "whelk",
+  "version": "0.1",
+  "items": [
+    "shell.whelk"
+  ],
+  "hold": false,
+  "triangles": 3722,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellBase",
+    "shellDark"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.197,
+    0.205,
+    0.531
+  ],
+  "bounds": [
+    [
+      -0.098,
+      -0.102,
+      0.0
+    ],
+    [
+      0.098,
+      0.102,
+      0.531
+    ]
+  ],
+  "glbBytes": 70224,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-whelk_main.png",
+    "shell-whelk_thumb.png"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "IC-FR-04",
+  "slug": "fruit-cherry",
+  "name": "체리",
+  "group": "fruit",
+  "kind": "fruit",
+  "version": "0.1",
+  "items": [
+    "fruit.cherry"
+  ],
+  "hold": false,
+  "triangles": 1252,
+  "parts": 1,
+  "materials": [
+    "fruit",
+    "leaf",
+    "shine",
+    "stem"
+  ],
+  "objects": [
+    "fruit"
+  ],
+  "size": [
+    0.29,
+    0.15,
+    0.39
+  ],
+  "bounds": [
+    [
+      -0.145,
+      -0.075,
+      0.0
+    ],
+    [
+      0.145,
+      0.075,
+      0.39
+    ]
+  ],
+  "glbBytes": 27624,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-cherry_main.png",
+    "fruit-cherry_thumb.png"
+  ]
+}

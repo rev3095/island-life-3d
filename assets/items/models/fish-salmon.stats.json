@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-09",
+  "slug": "fish-salmon",
+  "name": "연어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.salmon"
+  ],
+  "hold": true,
+  "triangles": 3804,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.112,
+    0.57,
+    0.181
+  ],
+  "bounds": [
+    [
+      -0.056,
+      -0.285,
+      -0.09
+    ],
+    [
+      0.056,
+      0.285,
+      0.09
+    ]
+  ],
+  "glbBytes": 80796,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-salmon_main.png",
+    "fish-salmon_thumb.png"
+  ]
+}

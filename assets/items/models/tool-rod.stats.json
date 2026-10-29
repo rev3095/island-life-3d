@@ -1,0 +1,49 @@
+{
+  "id": "IC-TL-01",
+  "slug": "tool-rod",
+  "name": "낚싯대",
+  "group": "tool",
+  "kind": "rod",
+  "version": "0.1",
+  "items": [
+    "tool.rod"
+  ],
+  "hold": false,
+  "triangles": 836,
+  "parts": 1,
+  "materials": [
+    "bobber",
+    "bobberLight",
+    "grip",
+    "line",
+    "metal",
+    "metalDark",
+    "wood"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.63,
+    0.1,
+    0.717
+  ],
+  "bounds": [
+    [
+      -0.315,
+      -0.05,
+      0.0
+    ],
+    [
+      0.315,
+      0.05,
+      0.717
+    ]
+  ],
+  "glbBytes": 21100,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-rod_main.png",
+    "tool-rod_thumb.png"
+  ]
+}

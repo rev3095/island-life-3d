@@ -1,0 +1,61 @@
+{
+  "id": "IC-FO-01",
+  "slug": "fossil-ammonite",
+  "name": "암모나이트",
+  "group": "fossil",
+  "category": "item",
+  "kind": "ammonite",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fossil.ammonite",
+      "code": "IC-FO-01"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "소용돌이 껍데기를 가진 옛 바다 생물. 공룡보다도 먼저 바다를 누볐다.",
+    "keywords": [
+      "박물관 화석"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기",
+      "value": 0.34,
+      "min": 0.15,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "fossil": "#C9A77A",
+    "fossilDark": "#8C6440"
+  },
+  "paletteLabels": {
+    "fossil": "화석",
+    "fossilDark": "화석 무늬"
+  },
+  "render": {
+    "yaw": -15,
+    "pitch": 12
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "IC-SH-06",
+  "slug": "shell-coral",
+  "name": "분홍 산호",
+  "group": "shell",
+  "category": "item",
+  "kind": "coral",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "shell.coral",
+      "code": "IC-SH-06"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "가지가 갈라진 분홍 산호",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "coral": "#F4A6B8",
+    "coralDark": "#E88AA0"
+  },
+  "paletteLabels": {
+    "coral": "산호",
+    "coralDark": "산호 뿌리"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "IC-MA-01",
+  "slug": "mat-wood",
+  "name": "나무",
+  "group": "mat",
+  "category": "item",
+  "kind": "wood",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.wood",
+      "code": "IC-MA-01"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "통나무 세 토막을 쌓은 묶음",
+    "keywords": [
+      "밝은 나무",
+      "나이테"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bark": "#B98957",
+    "cut": "#E5C48F",
+    "ring": "#C49A6C"
+  },
+  "paletteLabels": {
+    "bark": "껍질",
+    "cut": "자른 면",
+    "ring": "나이테"
+  }
+}

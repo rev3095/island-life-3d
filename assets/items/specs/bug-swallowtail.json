@@ -1,0 +1,137 @@
+{
+  "id": "IC-BG-02",
+  "slug": "bug-swallowtail",
+  "name": "호랑나비",
+  "group": "bug",
+  "category": "item",
+  "kind": "butterfly",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.swallowtail",
+      "code": "IC-BG-02"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "호랑이 무늬 날개를 펄럭이는 큰 나비. 꽃 사이를 우아하게 미끄러진다.",
+    "keywords": [
+      "꽃 주변",
+      "낮"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.36,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "hind": {
+      "label": "뒷날개 모양",
+      "value": "hindTail",
+      "options": [
+        "hind",
+        "hindTail",
+        "oval"
+      ]
+    },
+    "foreMarks": {
+      "label": "앞날개 무늬 [x, y, 크기, 색]",
+      "value": [
+        [
+          0.15,
+          0.45,
+          0.08,
+          "wingMark"
+        ],
+        [
+          0.4,
+          0.55,
+          0.08,
+          "wingMark"
+        ],
+        [
+          0.65,
+          0.62,
+          0.08,
+          "wingMark"
+        ],
+        [
+          0.92,
+          0.5,
+          0.11,
+          "wingMark"
+        ],
+        [
+          0.8,
+          0.05,
+          0.09,
+          "wingMark"
+        ]
+      ]
+    },
+    "hindMarks": {
+      "label": "뒷날개 무늬",
+      "value": [
+        [
+          0.55,
+          -0.45,
+          0.1,
+          "wingMark"
+        ],
+        [
+          0.3,
+          -0.7,
+          0.07,
+          "wingSpot"
+        ],
+        [
+          0.48,
+          -1,
+          0.05,
+          "wingMark"
+        ]
+      ]
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#3B3530",
+    "wing": "#F5D66A",
+    "wing2": "#F5D66A",
+    "wingMark": "#3B3530",
+    "wingSpot": "#6FA8DC",
+    "leg": "#3B3530"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "wing": "날개",
+    "wing2": "뒷날개",
+    "wingMark": "날개 무늬",
+    "wingSpot": "날개 점",
+    "leg": "다리"
+  }
+}
