@@ -39,11 +39,71 @@
 | `festival` | **축제 광장 빈 자리** `{ at: [x, z], r }` — 아래 |
 | `density` | 나무·꽃 밀도: `trees` `cedars` `fruitTrees` `fruitChance` `forest`(숲 잡음에 곱하는 세기) `orchardTrees` `palms` `flowerClusters` `flowerSize: [적게, 많게]` `bushes` `weeds` `shells` `fossils` (모두 처음 섬에 놓는 최대 개수 — 날마다 새로 놓는 조개·잡초·화석은 rules.json `day`) |
 
-### 축제 광장 빈 자리 (M5 · Z5 몫)
+### 축제 광장 칸 (M5 · Z5 가 쓸 것)
 
-- `festival: { at: [0.453, 0.54], r: 6 }` = Z5 보드 D19-A 추천안(지금 광장을 동쪽으로 5칸, 지름 12칸) 자리를 미리 적어 둔 것. **지금 섬 만들기는 이 칸을 읽지 않는다** (섬이 그대로여야 해서). 지도 편집기에서 점선 원으로 보이고 끌어 옮길 수 있다.
-- Z5 가 광장을 넓힐 때: `island.js` 8단계(광장)에서 `lay.festival` 을 읽어 쓰면 된다 (`generateIsland` 안의 `lay` = `resolveLayout(layout)`, 결과 `gen.layout.festival`). 그러면 `tests/mapdata.test.mjs` 첫 지문 테스트는 기본값으로 만든 섬이 바뀌므로 그 숫자를 새로 뜨고 이유를 적는다. `places.festival` 은 Z5 notes 의 제안대로.
-- 사용자가 D19-B/C 를 고르면 `festival` 칸 모양(두 마당 · 네모 광장)을 Z5 가 바꾼다 — `resolveLayout` 의 `festival` 줄과 편집기 `PINS` 의 `festival/at` 만 고치면 된다.
+Z5 결정 **D19-A** "지금 광장을 동쪽 강가까지 넓혀 지름 12칸 원" 의 자리를 미리 넣어 두었다.
+
+| 칸 | 값 | 뜻 |
+|---|---|---|
+| `festival.at` | `[0.453, 0.54]` | 축제 광장 가운데 (섬 비율 [x, z]). 칸으로는 `(Math.round(64 × 0.453), Math.round(56 × 0.54))` = **(29, 30)** = 지금 광장 가운데 (24, 30) 에서 동쪽으로 5칸 |
+| `festival.r` | `6` | 반지름(칸) → **지름 12칸** 원 |
+
+- 기본값은 `island.js` 의 `DEFAULT_LAYOUT.festival` (같은 값). `resolveLayout` 은 `at` = 숫자 2개 배열, `r` = 숫자만 받고 틀리면 기본값을 쓴다.
+- **지금 섬 만들기는 이 칸을 읽지 않는다** (P5 는 섬이 그대로여야 해서). `gen.layout.festival` 로 그대로 나올 뿐이다. 지도 편집기에는 점선 원으로 보이고, 끌어 옮기거나 반지름 막대(3~10칸)로 바꿀 수 있다.
+- Z5 가 넓힐 때 (P5 가 main 에 들어간 뒤):
+  - `generateIsland` 8단계(광장)에서 `lay.festival` 을 읽는다 — 예: `const fc = { tx: Math.round(w * lay.festival.at[0]), tz: Math.round(h * lay.festival.at[1]) }`, 원 `dx² + dz² ≤ r²` 안을 광장(또는 새 축제 돌바닥 타일 TI-08)으로. 지금 광장 칸 `lay.plaza`(24, 30, 반지름 3.3)는 D19-A 대로 서쪽 입구 마당으로 남겨도 되고 같이 넓혀도 된다.
+  - 무대·부스·아치 자리처럼 칸이 더 필요하면 `festival` 안에 더한다 (예: `festival.stage: [x, z]`, `festival.booths: [[x, z], …]`). 세 곳을 같이 고친다: `DEFAULT_LAYOUT.festival` · `resolveLayout` 의 `festival:` 줄 · `assets/island/layout.json`. 지도 편집기에서 끌게 하려면 `map-editor.html` 의 `PINS` 에 한 줄 (`{ path: 'festival/stage', name: '무대', emo: '🎤' }`).
+  - 테스트: `tests/mapdata.test.mjs` 첫 테스트(기본 자리로 만든 섬 = 6차 전 섬 지문)가 깨진다 → 새 지문으로 바꾸고 커밋에 "축제 광장으로 기본 섬이 바뀜" 이라고 적는다. 셋째 테스트는 `festival.r ≤ 12`, 넷째는 축제 광장 가운데가 땅(바다·강 아님)인지 본다 — 더 키우면 그 줄도 고친다.
+  - `places.festival` 은 Z5 notes 제안대로 내보내고, 그 원본 자리는 `gen.layout.festival`.
+
+### island.js 바뀐 모양 (P5 가 main 에 먼저 들어갈 때 볼 것)
+
+- 새로 내보내는 것: `DEFAULT_LAYOUT` (얼린 객체, 6차 전 코드에 박혀 있던 값 그대로) · `resolveLayout(layout)`.
+- `generateIsland(seed, { w, h, villagers, newcomers, nativeFruit, lots, layout = null })` — `layout` 인자가 새로 생겼다. 함수 맨 위에서 `const lay = resolveLayout(layout), dens = lay.density;`. 시드는 인자 그대로 (layout.seed 는 부르는 쪽 world 가 고른다).
+- 단계마다 읽는 칸 (숫자가 박혀 있던 곳 → layout 칸):
+
+| 단계 | 예전 | 지금 |
+|---|---|---|
+| 2 선착장 쪽 모래사장 | `w * 0.47` | `w * lay.dock` |
+| 3 경사로 · 폭포 x | `[0.37, 0.48, 0.70]` · `w * 0.5625` | `lay.ramps` · `w * lay.pond[0]` |
+| 4 연못 · 강 · 다리 줄 | `0.5625, 0.255` · `S(0.5625, …)` · `h * 0.5`, `h * 0.75`, `w * 0.5625`, `w * 0.625` | `lay.pond` · `S(lay.pond[0], …)` · `lay.bridges` (`BRIDGE_ROWS`, `BX0`, `BX1`) |
+| 7 선착장 | `Math.round(w * 0.47)` | `Math.round(w * lay.dock)` |
+| 8 광장 | `w * 0.37`, `h * 0.54` | `lay.plaza` |
+| 9 건물 | 박물관·상점·내 집 숫자, `VILLAGER_SPOTS` 상수 | `lay.museum` · `lay.museumLow` · `lay.shop` · `lay.playerHouse` · `lay.villagers[slug]` (`VILLAGER_SPOTS` 는 없어짐) |
+| 11 과수원 · 바위 | `0.81, 0.76`, `n >= 7` · `rockTargets` 상수 | `lay.orchard`, `dens.orchardTrees` · `lay.rocks` (`rockTargets` 없어짐) |
+| 11 나무·꽃·그 밖 | `26`, `78`, `5`, `0.1`, `12`, `14`, `4 + rng()*5`, `8`, `32`, `11`, `4` | `dens.cedars` · `trees` · `fruitTrees` · `fruitChance` · `palms` · `flowerClusters` · `flowerSize` · `bushes` · `weeds` · `shells` · `fossils`, 나무 확률에 `× dens.forest` |
+
+- 이름이 바뀐 지역 변수: 11단계 나무 반복 안의 숲 잡음 값 `dens` → **`forest`** (함수 위쪽 `dens` = 밀도 표와 겹쳐서).
+- 돌려주는 값에 `layout: lay` 가 더해졌다. 타일·`places`·`pads`·`buildings`·`objects` 모양은 그대로.
+- 맨 아래에 도우미 `deepFreeze` 함수.
+- `src/world/index.js`: `const layout = resolveLayout(await assets.loadJSON('assets/island/layout.json').catch(…))` → `generateIsland(layout.seed ?? state.island.seed, { …, layout, lots })`.
+- **앞으로 island.js 를 고칠 때**: 자리·개수 숫자를 새로 박지 말고 layout 칸으로 (`DEFAULT_LAYOUT` + `resolveLayout` + `layout.json` 세 곳). 그래야 지도 편집기에서 보이고 "지도 반영" 으로 바뀐다.
+
+## 새 아이템 분류 더하기 (Z5 축제 음식 — 과일 파이·주스·화관·메달 등)
+
+`items.js` 는 이제 "표(items.json)를 받아 칸(id·code·icon·stack …)을 덧붙인 배열 `ITEMS` 하나" 라서, 새 분류는 그 배열 끝에 펼치면 된다. 두 가지 길:
+
+- **가 (권장 — 표 편집기에서 바로 고칠 수 있다)**: `assets/data/items.json` 에 줄 표를 더한다
+  ```json
+  "festival": [
+    { "slug": "fruit-pie", "name": "과일 파이", "emoji": "🥧", "price": 0, "desc": "…" }
+  ]
+  ```
+  `items.js` 에 한 덩어리 (다른 분류와 같은 모양):
+  ```js
+  ...(T.festival ?? []).map(({ slug, name, emoji, price, ...rest }, i) => ({
+    id: `festival.${slug}`, category: 'festival', code: code('FE', i), name, icon: itemIcon(`festival-${slug}`), emoji, price, ...rest,
+  })),
+  ```
+  그리고 `CATEGORIES` 에 `'festival'`, `CATEGORY_NAMES.festival = '축제'`, `items.json` 의 `stack` 에 `"festival": 10` (또는 줄마다 `stack`). 표 편집기는 `data-editor.html` 의 `SHEETS` 에 한 줄 + `CAT_KO`·`itemList` 에 한 줄:
+  ```js
+  { id: 'festival', name: '축제', file: 'items', section: 'festival', emo: '🎪', hint: '축제 부스에서 받는 것.', cols: () => [
+    { key: 'emoji', label: '', derived: r => r.emoji, emo: true }, { key: 'name', label: '이름', type: 'text', w: 'w-m', stick: true },
+    { key: 'price', label: '값', type: 'int', max: 999999 }, { key: 'desc', label: '설명', type: 'text', w: 'w-l' } ] },
+  ```
+  `tests/mapdata.test.mjs` 첫 숫자 표 테스트의 `groups` 에 `festival: T.festival ?? []` 한 줄이면 이름·값 검사도 같이 받는다. 반영 도구는 줄 이름표(`slug`)로 찾으므로 손댈 것 없다 (`items/festival/fruit-pie/price`).
+- **나 (Z5 계획대로 따로 파일)**: `src/data/festival-items.js` 에서 아이템 객체 배열을 내보내고 `items.js` 의 `ITEMS` 배열에 `...FESTIVAL_ITEMS,` 한 줄 + `CATEGORIES`·`CATEGORY_NAMES` 에 `festival`. 그대로 돈다 (끝의 `for (const it of ITEMS)` 가 `stack`·`buyPrice`·얼리기를 해 준다 — `STACK` 에 없으면 1). 다만 이 값은 표 편집기에 안 보인다 → 나중에 "숫자 반영" 으로 고치고 싶어지면 줄을 `items.json` 으로 옮겨 가 가 된다.
+- 어느 쪽이든: 새 분류는 `CATEGORIES` 에 있어야 `list('festival')` 에 잡힌다. 아이콘은 Z1 파이프라인 경로(`assets/items/renders/<모델>_thumb.png`)를 따르고 `tests/items-assets.test.mjs` 가 본다. 레시피 재료로 "축제 아무거나" 를 쓰려면 표 편집기 `CAT_KO` 에도.
 
 ## 저장과의 관계 (반영 v1 규칙)
 
