@@ -107,7 +107,7 @@ import { generateIsland, lotsOf, BUILDING_KINDS, KIND } from '../src/world/islan
 import { festivalLayout, carveFestival, rectCorners, overlaps, BOOTH_SIZE } from '../src/world/festival.js';
 
 const CONFIG = read('assets/festival/config.json');   // 보드 결정 (D14–D25) 설정 하나
-const FESTIVAL_RADIUS = CONFIG.plaza.radius;
+const FESTIVAL_RADIUS = read('assets/island/layout.json').festival.r;   // 광장 가운데·반지름 = 섬 지도
 
 const envSpec = slug => read(`assets/env/specs/${slug}.json`);
 const island = () => generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, envSpec(k)]))) });

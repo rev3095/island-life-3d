@@ -1,7 +1,7 @@
 {
   "version": 1,
   "note": "배경음 목록과 언제 어느 곡을 틀지. 곡 파일은 songs/<id>.json (src/audio/files.js 에도 적는다). 고르는 순서: 열린 창(panels) > 다른 모듈이 고른 곡·자리(bgm 이벤트, 이름이 places 에 있으면 그 자리 곡, 빈 칸이면 바깥처럼) > 날씨(weather, 빈 칸이면 시간대) > 시간대(time, from 시부터)",
-  "songs": ["dawn", "morning", "afternoon", "evening", "night", "rain", "indoor", "shop", "museum"],
+  "songs": ["dawn", "morning", "afternoon", "evening", "night", "rain", "indoor", "shop", "museum", "festival"],
   "schedule": {
     "time": [
       { "part": "dawn", "label": "새벽", "from": 5, "song": "dawn" },
@@ -11,7 +11,7 @@
       { "part": "night", "label": "밤", "from": 19, "song": "night" }
     ],
     "weather": { "clear": "", "cloudy": "", "rain": "rain", "snow": "", "rainbow": "" },
-    "places": { "indoor": "indoor" },
+    "places": { "indoor": "indoor", "festival": "festival" },
     "panels": { "shop": "shop", "museum": "museum" }
   },
   "fade": { "auto": 4, "manual": 2, "panel": 1.2 }

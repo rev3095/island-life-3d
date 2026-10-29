@@ -39,6 +39,7 @@ export function createFestival(ctx, emo, cfg) {
     const n = /^s0[5-9]-part[1-5]$/.test(id ?? '') ? Number(id[2]) - 4 : 0;
     if (n && waitingReveal.has(n)) waitingReveal.get(n)();
     if (id === 's11-ending-photo') ending();
+    else if (festivalOn) music(true);   // 축제 중 장면이 끝나면 story 가 bgm('auto') 를 보내니 다시 축제 곡
   });
   events.on('data:newday', () => {
     if (!f.started && !S().story) start('newday');   // 스토리 재생기가 없는 빌드: 둘째 날부터
@@ -152,11 +153,17 @@ export function createFestival(ctx, emo, cfg) {
     }
   }
 
+  // 축제 곡: 소리 데이터 assets/sound/index.json 의 schedule.places.festival (곡 BGM-10 섬 축제)
+  let festivalOn = false;
+  const music = on => events.emit('bgm', { name: on ? 'festival' : 'auto' });
+
   async function startFestival() {
     const key = today();
     const first = !f.heldDay;
     if (first) f.heldDay = key;
     f.lastYear = key.slice(0, 4);
+    festivalOn = true;
+    music(true);
     (f.festivals ??= []).push(key);
     hud.draw();
     events.emit('sfx', { name: 'acorn' });
@@ -197,6 +204,7 @@ export function createFestival(ctx, emo, cfg) {
       if (save) download(shot, `포근섬-축제-${key}.png`);
     }
     ending_ = false;
+    if (festivalOn) { festivalOn = false; music(false); }
   }
   function download(url, name) {
     try {
