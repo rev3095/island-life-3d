@@ -73,4 +73,6 @@ problems: ['라디오: (0, 1) 소파와 겹쳐요', …]   // 편집기 배치 �
 - 방: RM-01 공 바구니 마우스로 끌기, 벽시계(북쪽 벽 0번)·라디오 더하기·R 돌리기·방향키, 문 매트·소파 겹침을 검사가 잡고 빨갛게, 3D로 보기(가구 모델·벽시계·주민 자리), "요청 보내기" → 로컬 `/api/db/env-requests` 에 `layout`·`problems` 와 함께 저장 (확인 뒤 지움), RM-02–06 검사 통과(게임 테스트와 같음), RM-07 새 방 요청 글(id·owner 포함 JSON).
 - 휴대폰 폭 375px: 가로 스크롤 없음, 방 격자 294px. 콘솔 오류 없음 (가짜 포인터로 시험할 때 난 setPointerCapture 오류는 막아 둠).
 
+**게시 (2026-10-29)**: 배경 편집기 https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh **버전 7** — `bg-editor.html` + 새 묶음 5개만 올림, 파일 403 → **408** (capabilities db·assets·user 그대로). 다음 게시 때 아이템·무늬·방이 바뀌었으면 `node tools/build-editor-index.mjs` 뒤 바뀐 묶음만.
+
 못 한 것: 실제 휴대폰 손가락 끌기(마우스·합성 이벤트로만), claude.ai 게시본에서 요청 저장(게시 뒤 열어 보기는 사용자), 게임 checkRoom 과 편집기 검사를 같은 입력으로 자동 비교하는 테스트(편집기 코드는 HTML 안이라 node 테스트에서 못 부름).
