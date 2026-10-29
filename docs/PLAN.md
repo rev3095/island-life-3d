@@ -76,6 +76,13 @@
 | Z3 새 가구·소품 | `p8-furniture` · 4213 | `assets/furniture/` (FU-21–33), `assets/blender/build_furniture.py`, `assets/env/specs/` 의 PR-10–12 · `house-villager` 변형 하나, `assets/blender/build_env.py`, `src/data/items.js` 의 **`FURN` 표만**, `src/data/recipes.js` | 가구 13개·소품 3개 Blender 모델·렌더(스펙 `world` 칸 포함), 단풍 집 지붕색 변형, 제작 레시피 |
 | Z4 이사·생일·새 주민 | `p8-town` · 4214 | `src/gameplay/town/`, `src/data/birthdays.js` (새), `src/core/constants.js` 의 `VILLAGERS`, `src/world/island.js` (7번째 집터), `src/ui/phone.js` (플레이어 생일), `assets/specs/danpung.json` (새) · `assets/blender/build_character.py` (여우 FEATURES) | 단풍(CH-10) 모델, 빈 집터 → 이삿짐 → 입주 흐름, 주민 생일 파티·선물 3배·편지, 플레이어 생일, 주민이 자기 방 안에 있기 (house 가 주는 `house:enter` 이벤트) |
 
+**5차 추가 (2026-10-29 사용자 요청)** — 둘 다 검수 보드·편집기로 먼저 고르게 한 뒤 만든다.
+
+| 트랙 | 브랜치 · 포트 | 단계 | 결과물 |
+|---|---|---|---|
+| Z5 축제·이모티콘 대화·엔딩 | `p8-festival` · 4215 | ① 지금: Z5 검수 보드 (`concept/z5-festival-board.html`, 보드 id `z5`) — 대화 방식·이모티콘 팔레트·축제 광장·부스 5·부품 5·엔딩 사진·엔딩 뒤 계속하기의 선택지와 ID 붙은 3D 리소스 스케치. ② 사용자가 고른 뒤 + Z4 합친 뒤(town·world 를 Z4 가 고치는 중): 구현 | 섬 가운데 축제 광장, 주민과 **이모티콘으로 소통**(everyones_festival 방식, 규칙 판정·유료 API 없음), 축제 부품 5개 → 부품마다 부스·세부 공간 해금·상호작용, 5개 다 모으면 축제 → 주민들과 단체 사진 엔딩, 엔딩 뒤에도 채집·탐험·수집 계속 |
+| 스토리 (고정 세션) | `story` · 4216 | 계속: 사용자가 시나리오·스토리보드·연출을 편집기처럼 고르고 고치고 적용 | 시나리오 편집기 아티팩트(`story-editor.html`, db) + 장면 데이터 `assets/story/` + 장면 재생기 `src/gameplay/story/` (카메라·배우·이모티콘 말풍선·화면 전환·음악). 게임 시작부터 엔딩까지 |
+
 겹치면 안 되는 곳: `src/data/items.js` 는 Z1 이 `icon` 자리, Z3 가 `FURN` 표만. `src/ui/` 는 Z2 가 `shop.js`, Z4 가 `phone.js` 만. house ↔ town 은 이벤트·서비스로만 (`docs/notes/<트랙>.md` 에 약속 제안). 편집기 화면(`editor.html`·`bg-editor.html`)은 고치지 않는다 — 새 탭(아이템·벽지)은 조정 세션이 합친 뒤에. 새 리소스는 모두 스펙 파일로 두고 리소스 교체 약속(`docs/CONTRACTS.md` 끝)을 지킨다.
 
 ## 합치기
