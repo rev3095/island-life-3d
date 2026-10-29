@@ -228,8 +228,20 @@ export async function createKeepers(ctx, town, lines) {
     const firstVisit = !flags.museumVisit;
     flags.museumVisit = true;
     const greet = firstVisit ? LN.firstVisit : pickLines(LN.greet[c.slot] ?? LN.greet.morning, r, N.recent);
-    const a = await say(greet, ['기증하러 왔어요', '이야기 들려주세요', '다음에 올게요']);
+    const MENU = ['기증하러 왔어요', '이야기 들려주세요', '다음에 올게요'];
+    let a;
+    // 가방에 감정 전 화석이 있으면 먼저 감정해 줄지 묻는다
+    const unknown = unknownFossilSlots();
+    if (unknown.length && d?.harvest?.appraise) {
+      vars.n = unknown.length;
+      const ask = pickLines(unknown.length > 1 ? LN.appraise.noticeMany : LN.appraise.notice, r, N.recent);
+      const yes = await say([...greet, ...ask], ['감정해 주세요', '나중에 할게요']);
+      if (yes === 0) await appraiseTalk(say, vars);
+      else await say(pickLines(LN.appraise.later, r, N.recent));
+      a = await say(pickLines(LN.menu, r), MENU);
+    } else a = await say(greet, MENU);
     if (a === 0) {
+      if (unknownFossilSlots().length) await say(pickLines(LN.appraise.notYet, r));   // 감정을 미뤘으면 한 번 일러 준다
       const before = d.museum.progress();
       const got = [];
       const off = ctx.events.on('museum:changed', ({ id } = {}) => { if (id) got.push(id); });
@@ -237,6 +249,37 @@ export async function createKeepers(ctx, town, lines) {
       await donationTalk(got, before, d.museum.progress(), say, vars);
     } else if (a === 1) await story(say, vars);
     else await say(pickLines(LN.bye, r, N.recent));
+  }
+
+  // ---- 화석 감정 (4차 Y2) ----
+  // 파낸 '알 수 없는 화석'을 진짜 화석으로 바꾼다 (가방 칸 하나씩). 이미 기증한 종류면 '이미 있어요' → 상점에 팔면 된다.
+  // 다 바꾼 뒤 museum:appraised { ids } 를 보낸다
+  const unknownFossilSlots = () => {
+    const slots = ctx.services.data?.inventory?.slots ?? [];
+    return slots.map((s, i) => (s && ctx.services.data.items.get(s.id)?.unknown ? i : -1)).filter(i => i >= 0);
+  };
+  async function appraiseTalk(say, vars) {
+    const d = ctx.services.data, inv = d.inventory;
+    const ids = [];
+    let fresh = 0;
+    for (const i of unknownFossilSlots()) {
+      await say(pickLines(ids.length ? LN.appraise.next : LN.appraise.look, r, N.recent));
+      const id = d.harvest.appraise();
+      inv.batch(() => { inv.remove(i, 1); inv.add(id, 1); });
+      ids.push(id);
+      const it = d.items.get(id);
+      vars.item = it?.name ?? '';
+      const owned = d.museum.has(id);
+      if (!owned) fresh++;
+      ctx.events.emit('sfx', { name: 'fossil' });
+      ctx.services.ui?.toast?.(`${it?.name ?? '화석'}${owned ? ' (이미 기증함)' : ''}`, it?.icon);
+      if (!owned) N.happy();
+      await say(pickLines(owned ? LN.appraise.owned : it?.rare ? LN.appraise.rare : LN.appraise.result, r, N.recent));
+    }
+    if (ids.length) {
+      await say(pickLines(fresh ? LN.appraise.done : LN.appraise.doneOwned, r, N.recent));
+      ctx.events.emit('museum:appraised', { ids });
+    }
   }
 
   async function donationTalk(got, before, after, say, vars) {
