@@ -54,6 +54,11 @@ node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배�
 - 시나리오 편집기 `story-editor.html` (아티팩트, 링크는 `docs/notes/story.md` 첫 줄, capabilities `db`·`user`, `applied`·`history` 쓰기 admin): 사용자가 연출안을 고르고 컷·순서·글을 고치고 의견을 남기면 `drafts/<장면 id>`·`timeline/main` 에 저장된다.
 - 채팅에 "시나리오 반영"이 오면: `drafts`·`timeline` 을 읽어 장면 파일과 다른 것만 반영(고침 = `version` +1, 새 장면 = 파일 + index.json + files.js, 의견 = 컷을 고치거나 새 연출안으로, 되돌리기 = `history/story-v<n>.commit` 의 `assets/story/`) → `node --test tests/` → dev-server `/index.html?story=<id>&take=<key>` 로 재생 확인 → 커밋 → 편집기 다시 publish (바뀐 파일만) → `applied/story` 버전 +1 · `history/story-v<n>` 기록. 자세한 순서는 `docs/notes/story.md` "시나리오 반영".
 
+### 스타일과 "스타일 반영" 흐름
+- 셰이더 값(명암 띠·그늘 색·림·하이라이트·바람·물결·외곽선·화면 효과·집 안 덧씌우기)은 데이터다: `assets/style/presets.json` (`{version, default, labels, presets:{cozy,toon}, indoor}`), 조절 값 표(이름·묶음·범위)는 `src/render/presets.js` 의 `PARAMS`. 셰이더 구조는 `docs/SHADERS.md`.
+- 스타일 편집기 `style-editor.html` (아티팩트 https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd, capabilities `db`·`user`, `applied`·`history` 쓰기 admin, 게시 파일 목록 `assets/style/editor-files.json`): 대표 모델 5개 작은 섬 + 진짜 하늘에서 값을 고르고 나눠 보기로 비교, 값은 `drafts/style` 에 바로 저장, 저장본 `saves/<id>`, 의견은 프리셋마다. 로컬은 `?island` 로 진짜 섬.
+- 채팅에 "스타일 반영"이 오면: `drafts/style` 을 읽어 `presets.json` 과 다른 것만 반영(값 = 그대로 쓰고 `version` +1, 되돌리기 = `rollback: n` 이면 `history/style-v<n>.commit` 의 파일 값, 의견 = 그 프리셋 값을 고치거나 새 효과는 `docs/SHADERS.md` 순서로) → `node --test tests/` → dev-server 로 게임(`?style=<프리셋>` 낮·밤)·편집기 스크린샷 → 커밋 → 편집기 다시 publish (`files` 에 presets.json 등 바뀐 것만, capabilities 생략) → `applied/style` 새 버전 · `history/style-v<n>` (`{board:'style', version, style, notes, appliedAt, summary, commit}`), `drafts/style` 은 `status: 'editing'` → 게임 링크도 다시 게시 (웹 배포 절). 자세한 순서는 `docs/notes/m6-p6-style.md`.
+
 ### 웹 배포 (게임 링크)
 - 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면) · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.
 

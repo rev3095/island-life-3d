@@ -1,7 +1,7 @@
 # 스타일 셰이더 안내 (동숲풍 3D 모습)
 
 3D 모델(캐릭터 9종 · 배경 32종)은 그대로 두고 **그리는 방식만** 바꿔서 부드럽고 장난감 같은 동숲풍 모습을 낸다.
-비교·조절은 `demos/style.html` (스타일 편집기), 예전 모습은 주소 뒤에 `?style=toon`.
+비교·조절은 스타일 편집기 `style-editor.html` (링크 https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd), 값은 `assets/style/presets.json`, 예전 모습은 주소 뒤에 `?style=toon`.
 
 ## 한눈에
 
@@ -11,11 +11,11 @@
         가장자리 빛 · 장난감 하이라이트
         붓질 색 · 접촉 그늘 · 바람 · 물결 · 외곽선
                           ▲                                          ▲
-                          └──── 값(프리셋) src/render/presets.js ─────┘   ctx.services.style 이 나눠 넣는다 (src/render/index.js)
+                          └─ 값(프리셋) assets/style/presets.json ─┘   src/render/presets.js 가 읽고 ctx.services.style 이 나눠 넣는다 (src/render/index.js)
 ```
 
 - 모든 값은 **uniform** 이라 슬라이더를 움직여도 셰이더를 다시 만들지 않는다 (끊김 없음).
-- 프리셋 두 개: `cozy` (새 기본, 동숲풍) · `toon` (2차 이전 모습: 2단 명암, 갈색 잉크 외곽선, 화면 효과 없음).
+- 프리셋 두 개: `cozy` (새 기본, 동숲풍) · `toon` (2차 이전 모습: 2단 명암, 갈색 잉크 외곽선, 화면 효과 없음). 값은 `assets/style/presets.json` (6차 M6-P6 부터 — 편집기에서 고르고 채팅 "스타일 반영"), 조절 값 표(이름·묶음·범위)는 `src/render/presets.js` 의 `PARAMS`.
 
 ## 효과마다 어디에 있나
 
@@ -70,19 +70,21 @@ style.labels              // { cozy: '포근 (동숲풍)', toon: '툰 (예전)' 
 ```
 이벤트: `style:changed {preset, params}`. 주소: `?style=toon` · `?quality=low`.
 - **처음 프리셋**: `?style=` > 섬폰 설정 **화면 모습**(포근 / 툰, `state.settings.style` 로 저장) > `cozy`.
-- **집 안**: `scene:indoor {on}` 동안 프리셋 위에 `presets.js` 의 `INDOOR` 값(덜 푸른 그늘, 약한 흐림)을 얹는다. `get()` 은 얹기 전 값.
+- **집 안**: `scene:indoor {on}` 동안 프리셋 위에 `presets.json` 의 `indoor.<프리셋>` 값(덜 푸른 그늘, 약한 흐림)을 얹는다. `get()` 은 얹기 전 값.
 
-## 스타일 편집기 (`demos/style.html`)
-1. `node dev-server.mjs` 후 `/demos/style.html` 을 연다 (진짜 섬 — 모든 모듈이 돈다, WASD 로 걸을 수 있다).
-2. 가운데 ↔ 손잡이를 끌어 왼쪽(비교 프리셋)과 오른쪽(지금 값)을 비교한다. 오른쪽 판에서 시간(새벽·낮·노을·밤)·날씨·카메라를 바꾼다.
-3. 슬라이더를 움직이면 바로 바뀐다. 바꾼 값은 이름 옆에 • 표시. 값은 이 브라우저에 기억된다.
-4. **현재 값 복사** → 채팅에 붙여 넣으면 그 값으로 `presets.js` 를 고친다.
+## 스타일 편집기 (`style-editor.html`)
+게시 링크 https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd · 로컬 `node dev-server.mjs` 후 `/style-editor.html` (옛 주소 `/demos/style.html` 은 진짜 섬 보기로 넘겨 준다). 자세한 설계·저장소 모양은 `docs/notes/m6-p6-style.md`.
+1. **무대**: 대표 모델 5개(플레이어·퐁·집·나무·모닥불)로 꾸민 작은 섬 + 진짜 하늘 모듈. 게임과 같은 재질·화면 효과라 값이 그대로 보인다. 로컬 dev-server 에선 "진짜 섬에서 보기"(`?island`, 모든 모듈이 돈다, WASD).
+2. 위쪽 프리셋 단추로 고칠 프리셋(포근·툰)을 고르고, 가운데 ↔ 손잡이로 왼쪽(게임 값 · 반영 v<n> · 저장본)과 오른쪽(고치는 값)을 비교한다. 시간(새벽·낮·노을·밤)·날씨·계절·카메라를 바꿔 본다.
+3. 슬라이더를 움직이면 바로 바뀌고 **저장소에 바로 저장**된다 (어느 기기에서 열어도 같은 값). 게임 값과 다른 값은 이름 옆 •, ↺ 로 게임 값으로. **집 안** 을 켜면 슬라이더가 집 안 덧씌우기 값을 고친다.
+4. 의견 칸(프리셋마다), **저장본**(이름 붙여 남기기 · 불러오기 · 왼쪽에 놓고 비교).
+5. **반영 요청 표시** → 채팅에 **"스타일 반영"**. Claude 가 저장소를 읽어 `assets/style/presets.json` 을 고치고 테스트·스크린샷·커밋 → 편집기 다시 게시 → 반영 기록(`applied/style`, `history/style-v<n>`). 반영 기록의 **이 버전으로 되돌리기** → 다시 "스타일 반영" 이면 그 버전 값으로. 순서는 `CLAUDE.md` 의 스타일 반영 절과 `docs/notes/m6-p6-style.md`.
 
 ## 새 재질 효과 더하기
 1. `look` 에 uniform 하나 (`uFoo: { value: 0 }`), 기본값은 예전 모습이 그대로 나오게 (보통 0).
 2. 셰이더 조각에 쓴다: 조명 계산이면 `RE_Direct_Style`, 마지막에 더하는 빛이면 `STYLE_COMPOSE`, 색이면 `STYLE_PAINT`, 모양이면 `WIND_GLSL` 처럼 `begin_vertex` 뒤. uniform 선언은 `STYLE_FRAG_PARS`(조각) / `STYLE_VERT_PARS`(꼭짓점).
 3. 특정 재질만이면: 이름 표(`STYLE_NAMES`)에 넣고 `toonMaterial` 에서 재질별 값(`mat`)이나 `#define`(+ `keyOf` 열쇠)을 단다. **값으로 끌 수 있으면 `#define` 보다 uniform 이 낫다** (프리셋 전환 때 다시 컴파일 안 함).
-4. `presets.js` 의 `PARAMS` 에 한 줄 (이름·묶음·범위) + `TOON`(효과 없음 값)·`COZY` 기본값, `src/render/index.js` `apply()` 에서 `look.uFoo.value = p.foo`.
+4. `presets.js` 의 `PARAMS` 에 한 줄 (이름·묶음·범위) + `assets/style/presets.json` 의 프리셋마다 값(`toon` 은 효과 없음 값, `cozy` 기본값 — `tests/style.test.mjs` 가 빠진 값을 잡는다), `src/render/index.js` `apply()` 에서 `look.uFoo.value = p.foo`.
 5. 편집기에 슬라이더는 저절로 생긴다.
 
 ## 새 화면 효과(후처리 패스) 더하기
@@ -92,7 +94,7 @@ style.labels              // { cozy: '포근 (동숲풍)', toon: '툰 (예전)' 
 4. 재 보기: 콘솔에서 `__island.services.style.post.composer.passes`, 시간은 아래 "성능".
 
 ## 프리셋 다듬기
-- 편집기에서 고르고 **현재 값 복사** → 채팅에 붙여 넣기가 가장 빠르다. 직접 고칠 땐 `src/render/presets.js` 의 `COZY`.
+- 편집기에서 고르고 채팅 **"스타일 반영"** 이 가장 빠르다 (값 복사·붙여 넣기 필요 없음). 직접 고칠 땐 `assets/style/presets.json` — 고친 뒤 `node --test tests/style.test.mjs`, 편집기 다시 게시, 반영 기록 버전 +1 (`CLAUDE.md` 흐름).
 - 빛 번짐 문턱(`bloomThreshold`)은 해 비친 흰 벽(선형 ≈ 1.0)보다 높게, 등불(≈ 1.5~2)보다 낮게.
 - 노을·밤 색은 sky 의 하늘·조명 팔레트가 정한다. 스타일은 그 위에 색조만 얹는다 → 노을이 너무 누렇다면 sky 의 `SKY.dusk` 를 먼저 본다.
 

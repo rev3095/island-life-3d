@@ -1,0 +1,879 @@
+<title>포근섬 스타일 편집기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 무대 위 조절판 — 화면 가득 3D 작은 섬(진짜 셰이더·하늘), 오른쪽(휴대폰은 아래) 크림색 조절판: 반영 상태 → 프리셋·비교 → 장면 → 의견·저장본 → 값 슬라이더 */
+:root {
+  /* 게임 화면(ui 모듈)이 쓰는 값 — 진짜 섬 보기에서 HUD 가 그대로 보이게 */
+  --ink: #4A3B32; --cream: #FFF8E6; --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px); --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px); --safe-left: env(safe-area-inset-left, 0px);
+  /* 조절판 */
+  --e-bg: #BFE6F7;          /* 섬 하늘 (불러오는 동안) */
+  --e-panel: rgba(255, 248, 230, .96);
+  --e-solid: #FFF8E6;
+  --e-ink: #4A3B32;         /* 캐릭터 외곽선 갈색 */
+  --e-muted: #7A6656;
+  --e-line: #E2D2AE;
+  --e-chip: #F1E4C6;
+  --e-accent: #3F9C8D;      /* 박하 */
+  --e-accent-ink: #FFFFFF;
+  --e-mark: #D9714F;        /* 바꾼 값 표시 */
+  --e-home: #8A6FC2;        /* 집 안 덧씌우기 */
+  --e-shadow: rgba(74, 59, 50, .18);
+  --e-mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --e-bg: #1B2430; --e-panel: rgba(36, 31, 25, .95); --e-solid: #2A241D; --e-ink: #F0E7DB; --e-muted: #B8A998; --e-line: #4C4236;
+    --e-chip: #3A3229; --e-accent: #6FCAB9; --e-accent-ink: #10251F; --e-mark: #F2A07F; --e-home: #B9A2EE; --e-shadow: rgba(0, 0, 0, .4); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --e-bg: #1B2430; --e-panel: rgba(36, 31, 25, .95); --e-solid: #2A241D; --e-ink: #F0E7DB; --e-muted: #B8A998; --e-line: #4C4236;
+  --e-chip: #3A3229; --e-accent: #6FCAB9; --e-accent-ink: #10251F; --e-mark: #F2A07F; --e-home: #B9A2EE; --e-shadow: rgba(0, 0, 0, .4); color-scheme: dark;
+}
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--e-bg); color: var(--e-ink); font-family: var(--body); overscroll-behavior: none; }
+#game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--body); color: var(--ink); }
+#ui > * { pointer-events: auto; }
+.core-check { position: absolute; left: 50%; top: 16px; transform: translateX(-50%); background: var(--cream); padding: 6px 14px; border-radius: 999px; }
+
+/* 나눠 보기 손잡이 */
+#split { position: fixed; top: 0; bottom: 0; width: 0; z-index: 20; }
+#split .bar { position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: rgba(255, 248, 230, .9); box-shadow: 0 0 0 1px rgba(74, 59, 50, .25); }
+#split .knob { position: absolute; top: 50%; left: -22px; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%; background: var(--e-solid); color: var(--e-ink);
+  box-shadow: 0 3px 0 var(--e-line); display: grid; place-items: center; font: 18px var(--display); cursor: ew-resize; touch-action: none; user-select: none; }
+#split .tag { position: absolute; top: calc(12px + var(--safe-top)); padding: 3px 10px; border-radius: 999px; background: var(--e-panel); color: var(--e-ink); font-size: 12px; white-space: nowrap; }
+#split .tag.l { right: 10px; } #split .tag.r { left: 10px; }
+
+/* 조절판 */
+#panel { position: fixed; top: calc(10px + var(--safe-top)); right: calc(10px + var(--safe-right)); bottom: calc(10px + var(--safe-bottom)); width: 352px; z-index: 30;
+  display: flex; flex-direction: column; background: var(--e-panel); color: var(--e-ink); border-radius: 16px;
+  box-shadow: 0 4px 0 var(--e-line), 0 8px 24px var(--e-shadow); font-size: 13px; }
+#panel header { padding: 10px 12px 6px; display: flex; align-items: center; gap: 8px; }
+#panel header h1 { font: 19px var(--display); margin: 0; flex: 1; text-wrap: balance; }
+#panel .row { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 6px; align-items: center; }
+#panel .lab { color: var(--e-muted); font-size: 12px; min-width: 34px; }
+#panel button { border: 0; border-radius: 999px; padding: 4px 11px; background: var(--e-chip); color: var(--e-ink); font: inherit; cursor: pointer; }
+#panel button:focus-visible, #panel select:focus-visible, #panel input:focus-visible, #panel textarea:focus-visible, #panel summary:focus-visible { outline: 2px solid var(--e-accent); outline-offset: 2px; }
+#panel button.on, #panel button[aria-pressed="true"] { background: var(--e-accent); color: var(--e-accent-ink); }
+#panel button.primary { background: var(--e-ink); color: var(--e-solid); }
+#panel button:disabled { opacity: .5; cursor: default; }
+#panel button.tiny { padding: 2px 8px; font-size: 12px; }
+#panel a { color: var(--e-accent); }
+#panel select, #panel input[type=text], #panel textarea { font: inherit; color: var(--e-ink); background: var(--e-solid); border: 1px solid var(--e-line); border-radius: 8px; padding: 3px 6px; }
+#panel .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; border-top: 1px dashed var(--e-line); }
+#panel details { border-bottom: 1px dashed var(--e-line); padding: 6px 0; }
+#panel summary { font: 15px var(--display); cursor: pointer; padding: 2px 0; }
+#panel summary small { font: 12px var(--body); color: var(--e-muted); }
+
+/* 반영 상태 */
+#status { margin: 0 12px 8px; padding: 8px 10px; border-radius: 12px; background: var(--e-solid); border: 1px solid var(--e-line); display: grid; gap: 5px; }
+#status p { margin: 0; line-height: 1.45; }
+#status .muted, .muted { color: var(--e-muted); }
+.small { font-size: 12px; }
+#status .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-block; padding: 1px 7px; border-radius: 999px; background: var(--e-chip); font-size: 11px; }
+.chip.mark { background: color-mix(in srgb, var(--e-mark) 22%, transparent); color: var(--e-ink); }
+#status .btns { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#status .req { border-left: 3px solid var(--e-accent); padding-left: 8px; }
+#status .warn { border-left: 3px solid var(--e-mark); padding-left: 8px; }
+#status ol { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+#status ol li span { display: block; }
+
+/* 집 안 덧씌우기 안내 */
+#homeNote { margin: 0 12px 6px; padding: 5px 9px; border-radius: 10px; background: color-mix(in srgb, var(--e-home) 18%, transparent); font-size: 12px; }
+
+/* 값 */
+.param { display: grid; grid-template-columns: 1fr auto minmax(56px, max-content); gap: 2px 6px; align-items: center; margin: 6px 0; }
+.param label { font-size: 12px; min-width: 0; }
+.param .val { text-align: right; font: 12px var(--e-mono); font-variant-numeric: tabular-nums; color: var(--e-muted); }
+.param .tools { display: flex; gap: 3px; }
+.param .tools button { padding: 0 6px; font-size: 11px; line-height: 18px; }
+.param .tools .home { background: color-mix(in srgb, var(--e-home) 25%, transparent); }
+.param input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--e-accent); margin: 0; }
+.param input[type=color] { width: 56px; height: 24px; border: 0; padding: 0; background: none; }
+.param select { min-width: 0; }
+.param.changed label::after { content: " •"; color: var(--e-mark); }
+.param.over label { color: var(--e-home); }
+
+/* 의견 · 저장본 */
+.box { display: grid; gap: 6px; padding: 8px 0; border-bottom: 1px dashed var(--e-line); }
+.box h2 { font: 15px var(--display); margin: 0; }
+.box textarea { width: 100%; box-sizing: border-box; min-height: 64px; resize: vertical; line-height: 1.45; }
+.box .line { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.box .line input[type=text] { flex: 1; min-width: 0; }
+#saveList { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+#saveList li { display: grid; grid-template-columns: 1fr auto; gap: 2px 6px; align-items: center; padding: 4px 6px; border-radius: 8px; background: var(--e-solid); }
+#saveList li .meta { font-size: 11px; color: var(--e-muted); }
+#saveList li .acts { grid-row: 1 / 3; grid-column: 2; display: flex; gap: 3px; }
+
+#stats { font: 11px var(--e-mono); color: var(--e-muted); padding: 6px 12px 8px; font-variant-numeric: tabular-nums; border-top: 1px dashed var(--e-line); }
+#toast { position: fixed; left: 50%; bottom: calc(24px + var(--safe-bottom)); transform: translateX(-50%); z-index: 40; background: var(--e-ink); color: var(--e-solid);
+  padding: 8px 16px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: calc(100% - 32px); }
+#toast.show { opacity: 1; }
+#copyBox { margin: 0 12px 8px; height: 90px; font: 11px var(--e-mono); box-sizing: border-box; }
+#panel.min .scroll, #panel.min .row:not(.keep), #panel.min #status, #panel.min #stats, #panel.min #homeNote { display: none; }
+#panel.min { bottom: auto; }
+#loading { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--e-solid); color: var(--e-ink); padding: 8px 16px; border-radius: 999px; z-index: 50; max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+/* 휴대폰: 아래쪽 판 */
+@media (max-width: 720px) {
+  #panel { top: auto; left: max(8px, var(--safe-left)); right: max(8px, var(--safe-right)); bottom: calc(8px + var(--safe-bottom)); width: auto; max-height: 56vh; }
+}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+
+<canvas id="game" aria-label="스타일 미리 보기 화면"></canvas>
+<div id="ui"></div>
+<div id="split" aria-hidden="true" hidden><div class="bar"></div><div class="tag l" id="tagL">게임 값</div><div class="tag r">고치는 값</div><div class="knob" id="knob">↔</div></div>
+<div id="loading" role="status">작은 섬을 꾸미는 중…</div>
+<section id="panel" aria-label="스타일 조절판">
+  <header><h1>스타일 편집기</h1><button type="button" id="minBtn" aria-expanded="true">접기</button></header>
+  <div id="status" aria-live="polite"></div>
+  <div class="row keep"><span class="lab">프리셋</span><span id="presetBtns" class="row" style="padding:0"></span></div>
+  <div class="row"><span class="lab">처음</span>
+    <select id="defaultSel" aria-label="게임을 처음 켰을 때 모습"></select>
+  </div>
+  <div class="row"><span class="lab">비교</span>
+    <button type="button" id="cmpBtn" aria-pressed="true">나눠 보기</button>
+    <select id="cmpSel" aria-label="왼쪽에 보일 값"></select>
+  </div>
+  <div class="row" id="sceneRow"><span class="lab">장면</span>
+    <button type="button" id="homeBtn" aria-pressed="false">집 안</button>
+    <a id="sceneLink" hidden></a>
+  </div>
+  <div class="row"><span class="lab">시간</span>
+    <button type="button" data-hour="6.3">새벽</button><button type="button" data-hour="12">낮</button>
+    <button type="button" data-hour="18.1">노을</button><button type="button" data-hour="21.5">밤</button>
+  </div>
+  <div class="row"><span class="lab">날씨</span>
+    <button type="button" data-wx="clear">맑음</button><button type="button" data-wx="cloudy">흐림</button>
+    <button type="button" data-wx="rain">비</button><button type="button" data-wx="snow">눈</button>
+  </div>
+  <div class="row"><span class="lab">계절</span>
+    <button type="button" data-season="spring">봄</button><button type="button" data-season="summer">여름</button>
+    <button type="button" data-season="autumn">가을</button><button type="button" data-season="winter">겨울</button>
+  </div>
+  <div class="row"><span class="lab">카메라</span>
+    <button type="button" data-zoom="near">가까이</button><button type="button" data-zoom="mid">기본</button><button type="button" data-zoom="far">멀리</button>
+    <button type="button" id="hudBtn" hidden>게임 글자</button>
+  </div>
+  <div id="homeNote" hidden>집 안 덧씌우기를 고치는 중이에요. 여기서 바꾼 값은 집 안에서만 쓰여요 (<b>집</b> 표시).</div>
+  <div class="scroll">
+    <section class="box" aria-labelledby="noteHead">
+      <h2 id="noteHead">의견</h2>
+      <textarea id="note" placeholder="예) 노을 때 그늘이 너무 보라색이에요. 물결 반짝임은 조금만 더."></textarea>
+    </section>
+    <section class="box" aria-labelledby="saveHead">
+      <h2 id="saveHead">저장본</h2>
+      <div class="line"><input type="text" id="saveName" maxlength="30" placeholder="이름 (예: 노을 실험 1)" aria-label="저장본 이름"><button type="button" id="saveBtn">지금 값 저장</button></div>
+      <ul id="saveList"></ul>
+    </section>
+    <div id="params"></div>
+    <div class="box"><div class="line">
+      <button type="button" id="resetBtn">이 프리셋을 게임 값으로</button>
+      <button type="button" id="copyBtn">값 복사</button>
+    </div></div>
+  </div>
+  <textarea id="copyBox" readonly aria-label="복사할 값" hidden></textarea>
+  <div id="stats"></div>
+</section>
+<div id="toast" role="status"></div>
+
+<script type="module">
+// 스타일 편집기 (M6-P6, ET-10). 셰이더 값(src/render/presets.js 의 PARAMS 표)을 슬라이더로 고치고, 고친 값은 저장소에 바로 남긴다.
+//   무대: 기본은 대표 모델 5개로 꾸민 작은 섬 (게임과 같은 재질·화면 효과·하늘 모듈). 로컬 dev-server 에선 ?island 로 진짜 섬.
+//   저장소 (아티팩트 db, 로컬은 dev-server /api/db/style-*):
+//     drafts/style        고치는 값 { style: presets.json 모양, notes: {프리셋: 글}, status: 'editing'|'requested', rollback, updatedAt, updatedBy }
+//     saves/<id>          저장본 { name, preset, params, indoor, createdAt, by }
+//     applied/style       마지막 반영 { board:'style', version, style, notes, appliedAt, summary, commit }   ← Claude 가 씀
+//     history/style-v<n>  반영 기록 (applied 와 같은 모양)                                            ← Claude 가 씀
+//   채팅 "스타일 반영" → Claude 가 drafts/style 을 assets/style/presets.json 에 옮기고 테스트·스크린샷·커밋·다시 게시 (docs/SHADERS.md).
+import { PARAMS, STYLE_FILE, checkStyle, replaceIndoor } from './src/render/presets.js';
+import * as assets from './src/core/assets.js';
+
+const $ = s => document.querySelector(s);
+const clone = o => structuredClone(o);
+const canon = o => JSON.stringify(o ?? null);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const when = t => t ? new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const toast = text => { const t = $('#toast'); t.textContent = text; t.classList.add('show'); clearTimeout(toast.id); toast.id = setTimeout(() => t.classList.remove('show'), 2200); };
+const qs = new URLSearchParams(location.search);
+const ISLAND = qs.has('island');
+
+// 이 브라우저에만 남기는 편의 값 (나눔 위치·고르던 프리셋·비교 대상·접기)
+const UI_KEY = 'style-editor-ui-v2';
+const uiMem = {
+  get() { try { return JSON.parse(localStorage.getItem(UI_KEY) ?? 'null') ?? {}; } catch { return {}; } },
+  set(v) { try { localStorage.setItem(UI_KEY, JSON.stringify(v)); } catch { /* 못 남겨도 편집은 된다 */ } },
+};
+
+/* ================= 무대 ================= */
+// 대표 모델: 캐릭터 2 (림·부리 하이라이트) · 집 (창문 밤 불빛) · 나무 (바람) · 모닥불 (스스로 빛나기·빛 번짐). 바다·모래·풀은 여기서 만든다.
+// 게시할 파일 목록은 assets/style/editor-files.json — 모델을 바꾸면 같이 바꾼다 (tests/style.test.mjs 가 맞는지 본다).
+const STAGE = {
+  actors: [['player', -0.55, 1.15, 0.55], ['pong', 0.8, 1.95, -0.7]],
+  props: [['house-player', -2.7, -2.7, 0], ['tree', 2.7, -2.9, 0.4], ['tree', 4.9, -0.7, 1.7], ['tree', -5.5, -0.4, 2.6], ['campfire', 2.0, 0.9, 0]],
+};
+const ZOOM = { stage: { near: 9, mid: 19, far: 30 }, island: { near: 0, mid: 0.15, far: 0.7 } };
+
+async function buildStage() {
+  const THREE = await import('three');
+  const [{ OrbitControls }, { createEvents }, { createState }, materials, constants, { createView }, skyMod] = await Promise.all([
+    import('three/addons/controls/OrbitControls.js'), import('./src/core/events.js'), import('./src/core/state.js'),
+    import('./src/core/materials.js'), import('./src/core/constants.js'), import('./src/render/index.js'), import('./src/sky/index.js'),
+  ]);
+  const canvas = $('#game');
+  const quality = qs.get('quality') ?? (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.5 : 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = quality === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#BFE6F7');
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 300);
+  // 조명은 main.js 와 같게 (sky 모듈이 시간대에 맞춰 바꾼다)
+  const hemi = new THREE.HemisphereLight(0xeef8ff, 0xc9d79f, 1.5);
+  const sun = new THREE.DirectionalLight(0xffffff, 2.3);
+  sun.castShadow = true;
+  sun.shadow.mapSize.setScalar(quality === 'low' ? 1024 : 2048);
+  Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
+  sun.shadow.bias = -0.0008;
+  scene.add(hemi, sun, sun.target);
+  const envSlugs = [...new Set(STAGE.props.map(p => p[0]))];
+  const ctx = {
+    THREE, renderer, scene, camera, events: createEvents(), state: createState(),
+    // sky 의 계절 팔레트는 배경 스펙 목록을 훑는다 → 무대에 놓은 것만
+    assets: { ...assets, loadEnvIndex: async () => ({ models: envSlugs.map(slug => ({ slug })) }) },
+    materials, constants,
+    lights: { hemi, sun, sunOffset: new THREE.Vector3(-8, 16, 10) },
+    uiRoot: $('#ui'), services: {}, focus: new THREE.Vector3(0, 0, 0.4), debug: false, quality,
+  };
+  window.__island = ctx;                    // 개발용 (게임과 같은 이름)
+  const view = createView(ctx, {});
+  await skyMod.default.init(ctx);
+  const time = ctx.services.time;
+  time.setPaused(true); time.setHour(12); time.setWeather('clear', { instant: true });
+
+  // ── 땅: 바다 판 위에 모래·풀 판 (둥근 네모를 두께 있게) ──
+  const outside = new THREE.Group();
+  scene.add(outside);
+  const rounded = (w, d, r) => {
+    const s = new THREE.Shape(), x = -w / 2, y = -d / 2;
+    s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r);
+    s.quadraticCurveTo(x + w, y + d, x + w - r, y + d); s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r);
+    s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+    return s;
+  };
+  const slab = (w, d, r, depth, top, z, mat) => {
+    const g = new THREE.ExtrudeGeometry(rounded(w, d, r), { depth, bevelEnabled: false, curveSegments: 12 });
+    g.rotateX(-Math.PI / 2);
+    const m = new THREE.Mesh(g, mat);
+    m.position.set(0, top - depth, z);
+    m.receiveShadow = true;
+    outside.add(m);
+    return m;
+  };
+  const pal0 = time.seasonPalette();
+  const grassMat = materials.toonMaterial(pal0.grass, { name: 'ground' });
+  slab(16, 11.5, 2.4, 0.5, -0.06, -0.2, materials.toonMaterial('#F1DFAE', { name: 'sand' }));
+  slab(13.4, 8.2, 1.8, 0.2, 0, -0.75, grassMat);
+  {
+    const g = new THREE.PlaneGeometry(90, 90, 45, 45);
+    g.rotateX(-Math.PI / 2);
+    const pos = g.attributes.position, col = new Float32Array(pos.count * 3);
+    const mid = new THREE.Color('#5BAFD0'), deep = new THREE.Color('#4C9CC4'), shallow = new THREE.Color('#A6DCEA'), c = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) {
+      const d = Math.hypot(pos.getX(i) / 1.35, pos.getZ(i));
+      if (d < 9) c.copy(shallow).lerp(mid, THREE.MathUtils.smoothstep(d, 6.5, 9)); else c.copy(mid).lerp(deep, THREE.MathUtils.smoothstep(d, 9, 30));
+      col.set([c.r, c.g, c.b], i * 3);
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const m = materials.toonMaterial('#ffffff', { name: 'sea' });
+    m.vertexColors = true;
+    const sea = new THREE.Mesh(g, m);
+    sea.position.y = -0.32;
+    sea.receiveShadow = true;
+    outside.add(sea);
+  }
+
+  // ── 집 안 장면: 바닥·벽 두 면·깔개 (집 안 덧씌우기 값을 볼 때) ──
+  const room = new THREE.Group();
+  room.visible = false;
+  scene.add(room);
+  const box = (w, h, d, x, y, z, color, name) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), materials.toonMaterial(color, { name }));
+    m.position.set(x, y, z); m.receiveShadow = true; m.castShadow = name !== 'floor';
+    room.add(m);
+  };
+  box(7.2, 0.2, 5.8, 0, -0.1, 0.3, '#C99A66', 'floor');
+  box(7.2, 3, 0.2, 0, 1.5, -2.6, '#F4E7CF', 'wall');
+  box(0.2, 3, 5.8, -3.6, 1.5, 0.3, '#EADCC2', 'wall');
+  box(2.8, 0.02, 1.9, 0.2, 0.01, 1.4, '#E9A9A0', 'rug');
+
+  // ── 모델 ──
+  const props = [], mixers = [];
+  const loadProp = async ([slug, x, z, rot]) => {
+    const [gltf, spec] = await Promise.all([assets.loadEnv(slug), assets.loadEnvSpec(slug)]);
+    const { scene: obj } = assets.instantiate(gltf);
+    const toon = materials.applyToonStyle(obj, { spec });
+    obj.position.set(x, 0, z); obj.rotation.y = rot;
+    outside.add(obj);
+    props.push({ slug, toon });
+  };
+  const loadActor = async ([slug, x, z, rot]) => {
+    // 플레이어는 player 모듈처럼(스펙 없이 가는 외곽선), 주민은 town 처럼 스펙 + 합치기
+    const [gltf, spec] = await Promise.all([assets.loadCharacter(slug), slug === 'player' ? null : assets.loadCharacterSpec(slug)]);
+    const { scene: obj, animations } = assets.instantiate(gltf);
+    materials.applyToonStyle(obj, slug === 'player' ? { outlineWidth: 0.006, merge: true } : { spec, merge: true });
+    obj.position.set(x, 0, z); obj.rotation.y = rot;
+    scene.add(obj);
+    const mixer = new THREE.AnimationMixer(obj);
+    const idle = animations.find(a => a.name === 'idle');
+    if (idle) mixer.clipAction(idle).play();
+    mixers.push(mixer);
+  };
+  const jobs = [...STAGE.props.map(loadProp), ...STAGE.actors.map(loadActor)];
+  const results = await Promise.allSettled(jobs);
+  const failed = results.filter(r => r.status === 'rejected');
+  if (failed.length) console.warn('[style-editor] 못 불러온 모델', failed.map(r => r.reason?.message ?? r.reason));
+
+  /** 계절 색: 풀 판과 계절 변형이 있는 모델 (world.setSeason 이 하는 일의 작은 판) */
+  function recolor() {
+    const p = time.seasonPalette();
+    grassMat.color.set(p.grass);
+    for (const { slug, toon } of props) for (const [k, c] of Object.entries(p.bySlug?.[slug] ?? {})) toon.setColor(k, c);
+  }
+  recolor();
+
+  // ── 카메라 ──
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 0.55, 0.2);
+  camera.position.set(0, 10.6, 15.8);   // 게임 기본 카메라와 비슷한 각도·거리
+  Object.assign(controls, { enableDamping: true, minPolarAngle: 0.2, maxPolarAngle: 1.4, minDistance: 3.5, maxDistance: 40, screenSpacePanning: false });
+  const dir = new THREE.Vector3();
+  const setZoom = key => {
+    dir.copy(camera.position).sub(controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir, ZOOM.stage[key] ?? 19);
+  };
+
+  let indoor = false;
+  const setIndoor = on => {
+    indoor = !!on;
+    outside.visible = !indoor;
+    room.visible = indoor;
+    time.setIndoor(indoor);                // 실내 조명 + scene:indoor → 스타일의 집 안 덧씌우기
+  };
+
+  // 화면 중심을 조절판이 안 가린 곳 가운데로 (넓은 화면은 왼쪽, 휴대폰은 위쪽)
+  const resize = () => {
+    const w = innerWidth, h = innerHeight, r = $('#panel').getBoundingClientRect();
+    const side = r.left > w / 2;
+    view.setSize(w, h);
+    camera.aspect = w / h;
+    camera.setViewOffset(w, h, side ? (w - r.left) / 2 : 0, side ? 0 : Math.max(0, h - r.top) / 2, w, h);
+  };
+  addEventListener('resize', resize);
+  resize();
+  const clock = new THREE.Clock();
+  const step = dt => {
+    controls.update();
+    skyMod.default.update(dt, ctx);
+    for (const m of mixers) m.update(dt);
+    materials.curve.uCurveOrigin.value.copy(ctx.focus);
+    sun.target.position.copy(ctx.focus);
+    sun.position.copy(ctx.focus).add(ctx.lights.sunOffset);
+    view.render(dt);
+  };
+  ctx.step = step;                         // 창이 숨겨져 rAF 가 멈출 때 콘솔에서 __island.step(1/60)
+  renderer.setAnimationLoop(() => step(Math.min(clock.getDelta(), 0.05)));
+  ctx.events.emit('game:ready', { modules: ['sky'] });
+  return {
+    kind: 'stage', ctx, time, setZoom, setIndoor, recolor, reframe: resize,
+    get indoor() { return indoor; },
+    failed: failed.length,
+  };
+}
+
+async function bootIsland() {
+  await import('./src/main.js');
+  for (;;) {
+    const c = window.__island;
+    if (c?.services?.style && c.services.world && c.services.player) {
+      c.services.ui?.hud?.show?.(false);
+      return {
+        kind: 'island', ctx: c, time: c.services.time,
+        setZoom: key => c.services.player.camera?.setZoom?.(ZOOM.island[key] ?? 0.15),
+        setIndoor: null, recolor: null,
+        get indoor() { return !!c.services.time?.indoor; },
+        hud: on => c.services.ui?.hud?.show?.(on),
+      };
+    }
+    await sleep(100);
+  }
+}
+
+/* ================= 저장소: 웹 링크(아티팩트 db) 또는 로컬 dev-server ================= */
+function artifactStore(db, user) {
+  return {
+    label: '저장소에 저장돼요 — 어느 기기에서 열어도 같은 값이에요',
+    watchDoc: (path, cb) => db.doc(path).onSnapshot(s => cb(s.exists ? s.data() : null, s.metadata), () => {}),
+    watchCol: (col, cb) => db.collection(col).onSnapshot(q => cb(q.docs.map(d => ({ _id: d.id, ...d.data() }))), () => {}),
+    set: (path, data) => db.doc(path).set(data),
+    remove: path => db.doc(path).delete(),
+    who: async () => (await user?.id?.().catch(() => null)) ?? null,
+    canWrite: async () => (await user?.can?.('data.write').catch(() => null)) !== false,
+  };
+}
+function localStore() {
+  // dev-server 의 /api/db/<컬렉션> (행 목록) 위에 문서 흉내: 행마다 docId. 지우기는 deleted 표시
+  const col = path => `style-${path.split('/')[0]}`, did = path => path.split('/')[1];
+  const rows = c => fetch(`api/db/${c}`).then(r => r.json()).catch(() => []);
+  const subs = [];
+  setInterval(() => subs.forEach(f => f()), 4000);
+  const set = async (path, data) => {
+    const c = col(path), id = did(path);
+    const hit = (await rows(c)).find(r => r.docId === id);
+    const body = JSON.stringify({ ...data, docId: id });
+    const r = await fetch(hit ? `api/db/${c}/${hit.id}` : `api/db/${c}`, { method: hit ? 'PATCH' : 'POST', headers: { 'content-type': 'application/json' }, body });
+    if (!r.ok) throw Object.assign(new Error('저장 실패'), { code: `http_${r.status}` });
+  };
+  return {
+    label: '로컬 프로젝트 폴더(assets/review/style-*.json)에 저장돼요',
+    watchDoc(path, cb) { const f = async () => { const r = (await rows(col(path))).find(x => x.docId === did(path) && !x.deleted); cb(r ?? null, {}); }; subs.push(f); f(); },
+    watchCol(c, cb) { const f = async () => cb((await rows(`style-${c}`)).filter(r => !r.deleted).map(r => ({ ...r, _id: r.docId }))); subs.push(f); f(); },
+    set,
+    remove: path => set(path, { deleted: true }),
+    who: async () => 'local',
+    canWrite: async () => true,
+  };
+}
+async function connectStore() {
+  if (window.claude?.use) {
+    const [db, user] = await Promise.all(['db', 'user'].map(n => window.claude.use(n).catch(() => null)));
+    if (db) return artifactStore(db, user);
+  }
+  else try { if ((await fetch('api/ping')).ok) return localStore(); } catch {}   // 로컬 dev-server (claude.ai 안에서는 묻지 않는다)
+  return null;
+}
+
+/* ================= 편집 ================= */
+const loading = $('#loading');
+const fileStyle = clone(await assets.loadJSON(STYLE_FILE));     // 게임에 들어간 값 (이 게시본의 presets.json)
+let stage;
+try { stage = ISLAND ? await bootIsland() : await buildStage(); }
+catch (e) { console.error(e); loading.textContent = `장면을 열지 못했어요: ${e.message ?? e}`; throw e; }
+loading.remove();
+if (stage.failed) toast(`모델 ${stage.failed}개를 못 불러왔어요 — 나머지로 보여 드려요`);
+const { ctx, time } = stage;
+const style = ctx.services.style;
+const PRESET_NAMES = Object.keys(fileStyle.presets);
+const labelOf = k => k === 'all' ? '전체' : fileStyle.labels[k] ?? k;
+const byKey = new Map(PARAMS.map(p => [p.key, p]));
+
+/** 저장소 문서 → 편집 상태 (파일에 있는 프리셋·값은 빠짐없이 채운다) */
+function normalize(d) {
+  const st = d?.style && typeof d.style === 'object' ? clone(d.style) : clone(fileStyle);
+  st.presets = st.presets ?? {};
+  for (const [k, v] of Object.entries(fileStyle.presets)) st.presets[k] = { ...v, ...(st.presets[k] ?? {}) };
+  st.indoor = st.indoor ?? {};
+  st.labels = { ...fileStyle.labels, ...(st.labels ?? {}) };
+  if (!st.presets[st.default]) st.default = fileStyle.default;
+  st.version = fileStyle.version;
+  return { style: st, notes: { ...(d?.notes ?? {}) }, status: d?.status === 'requested' ? 'requested' : 'editing', rollback: d?.rollback ?? null };
+}
+
+const mem = uiMem.get();
+let draft = normalize(null);
+let cur = PRESET_NAMES.includes(mem.cur) ? mem.cur : fileStyle.default;
+let split = { on: mem.split?.on ?? true, x: mem.split?.x ?? Math.max(0.2, (innerWidth - (innerWidth > 720 ? 372 : 0)) / 2 / innerWidth), left: mem.split?.left ?? 'game:*' };
+let applied = null, history = [], saves = [];
+let store = null, me = null, writable = true, saveMsg = '저장소에 연결하는 중…', note = '';
+let saveT = null, saving = false, lastSaved = '';
+const remember = () => uiMem.set({ cur, split, min: $('#panel').classList.contains('min') });
+
+const indoorOn = () => !!stage.indoor;
+/** 지금 보이는 값 (집 안이면 덧씌우기까지) */
+const shownOf = (st, name) => (indoorOn() ? { ...st.presets[name], ...(st.indoor?.[name] ?? {}) } : st.presets[name]);
+
+function applyDraft() {
+  replaceIndoor(draft.style.indoor);
+  style.set({ preset: cur, ...draft.style.presets[cur] });
+  applySplit();
+}
+
+/** 값 하나 바꾸기: 집 안이면 덧씌우기에, 아니면 프리셋에 */
+function setValue(key, v) {
+  if (indoorOn()) (draft.style.indoor[cur] ??= {})[key] = v;
+  else draft.style.presets[cur][key] = v;
+  touched();
+}
+function resetValue(key) {
+  if (indoorOn() && key in (draft.style.indoor[cur] ?? {})) {
+    const f = fileStyle.indoor?.[cur];
+    if (f && key in f) draft.style.indoor[cur][key] = f[key]; else delete draft.style.indoor[cur][key];
+    if (!Object.keys(draft.style.indoor[cur]).length) delete draft.style.indoor[cur];
+  } else draft.style.presets[cur][key] = fileStyle.presets[cur][key];
+  touched();
+}
+function touched() {
+  draft.status = 'editing';
+  draft.rollback = null;
+  applyDraft();
+  syncParams();
+  scheduleSave();
+}
+
+/* ---------- 저장 ---------- */
+const sig = d => canon([d.style, d.notes, d.status, d.rollback]);
+function scheduleSave() {
+  clearTimeout(saveT);
+  saveMsg = '저장하는 중…';
+  renderStatus();
+  saveT = setTimeout(flush, 700);
+}
+async function flush() {
+  saveT = null;
+  if (!store) {
+    try { localStorage.setItem('style-editor-draft', JSON.stringify(draft)); } catch {}
+    saveMsg = '이 화면에서는 저장소를 쓸 수 없어서 이 브라우저에만 남겨 뒀어요. claude.ai 링크에서 열어 주세요.';
+    renderStatus(); return;
+  }
+  if (!writable) { saveMsg = '보기 전용이라 저장되지 않아요 — 바꿔 보는 것만 돼요.'; renderStatus(); return; }
+  if (saving) { scheduleSave(); return; }              // 한 문서에는 한 번에 하나씩
+  const s = sig(draft);
+  if (s === lastSaved) { saveMsg = `저장됨 · ${when(Date.now())}`; renderStatus(); return; }
+  saving = true;
+  try {
+    await store.set('drafts/style', { ...clone(draft), base: fileStyle.version, updatedAt: Date.now(), updatedBy: me });
+    lastSaved = s;
+    saveMsg = `저장됨 · ${when(Date.now())}`;
+  } catch (e) {
+    saveMsg = `저장하지 못했어요 (${e?.code ?? '오류'}). 잠시 뒤 다시 바꿔 보세요.`;
+  }
+  saving = false;
+  renderStatus();
+}
+
+/* ---------- 게임 값과 다른 것 ---------- */
+function changes() {
+  const out = [], a = draft.style, b = fileStyle;
+  if (a.default !== b.default) out.push('처음 모습');
+  for (const name of PRESET_NAMES) for (const p of PARAMS) if (canon(a.presets[name]?.[p.key]) !== canon(b.presets[name]?.[p.key])) out.push(`${labelOf(name)} · ${p.label}`);
+  for (const name of new Set([...Object.keys(a.indoor ?? {}), ...Object.keys(b.indoor ?? {})]))
+    for (const p of PARAMS) if (canon(a.indoor?.[name]?.[p.key]) !== canon(b.indoor?.[name]?.[p.key])) out.push(`집 안 ${labelOf(name)} · ${p.label}`);
+  const na = draft.notes ?? {}, nb = applied?.notes ?? {};
+  for (const k of new Set([...Object.keys(na), ...Object.keys(nb)])) if ((na[k] ?? '').trim() !== (nb[k] ?? '').trim()) out.push(`의견 (${labelOf(k)})`);
+  return out;
+}
+
+/* ---------- 반영 상태 칸 ---------- */
+function renderStatus() {
+  const ch = changes();
+  const ver = fileStyle.version;
+  const head = applied
+    ? `<p><b>게임에 들어간 스타일 v${ver}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}</p>`
+    : `<p><b>게임에 들어간 스타일 v${ver}</b> <span class="muted">· 아직 반영 기록이 없어요</span></p>`;
+  const stale = applied && applied.version !== ver
+    ? `<p class="warn small">반영 기록은 v${applied.version} 인데 이 편집기 파일은 v${ver} 예요. 편집기를 다시 게시하면 맞춰져요.</p>` : '';
+  const diff = ch.length
+    ? `<p>게임 값과 다른 것 <b>${ch.length}개</b></p><div class="chips">${ch.slice(0, 10).map(t => `<span class="chip mark">${esc(t)}</span>`).join('')}${ch.length > 10 ? `<span class="chip">외 ${ch.length - 10}개</span>` : ''}</div>`
+    : '<p class="muted">게임 값과 같아요. 슬라이더를 움직이면 바로 저장돼요.</p>';
+  const req = draft.status === 'requested'
+    ? `<p class="req">반영 요청을 표시했어요${draft.rollback ? ` (v${esc(draft.rollback)} 로 되돌리기)` : ''}. 채팅에 <b>"스타일 반영"</b>이라고 보내 주세요. 편집기가 Claude 를 직접 부르지는 못해요.</p>` : '';
+  const hist = history.length ? `<details><summary>반영 기록 ${history.length}개 <small>· 되돌리기</small></summary><ol>${history.map(h => `
+      <li><span><b>v${esc(h.version)}</b> · ${esc(when(h.appliedAt))}</span><span class="muted">${esc(h.summary ?? '')}</span>
+        <button type="button" class="tiny" data-rollback="${esc(h.version)}" ${!h.style || (h.version === ver && !ch.length) ? 'disabled' : ''}>이 버전으로 되돌리기</button></li>`).join('')}</ol></details>` : '';
+  $('#status').innerHTML = `${head}${stale}${diff}${req}
+    <div class="btns"><button type="button" id="reqBtn" ${draft.status === 'requested' ? 'aria-pressed="true"' : ''} ${store && writable ? '' : 'disabled'}>반영 요청 표시</button><span class="small muted">${esc(saveMsg)}</span></div>
+    ${note ? `<p class="small">${esc(note)}</p>` : ''}${hist}`;
+}
+$('#status').addEventListener('click', e => {
+  const rb = e.target.closest('[data-rollback]');
+  if (rb) {
+    const h = history.find(x => String(x.version) === rb.dataset.rollback);
+    if (!h?.style) return;
+    draft = normalize({ style: h.style, notes: draft.notes });
+    draft.status = 'requested'; draft.rollback = h.version;
+    note = `v${h.version} 값으로 바꿔 놨어요. 채팅에 "스타일 반영"이라고 보내면 게임도 되돌려요.`;
+    applyDraft(); syncAll(); scheduleSave();
+    return;
+  }
+  if (e.target.id === 'reqBtn') {
+    draft.status = 'requested';
+    note = '';
+    scheduleSave();
+    toast('반영 요청을 표시했어요 — 채팅에 "스타일 반영"이라고 보내 주세요');
+  }
+});
+
+/* ---------- 프리셋 · 처음 모습 ---------- */
+const presetBtns = $('#presetBtns');
+for (const name of PRESET_NAMES) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = labelOf(name); b.dataset.preset = name;
+  b.onclick = () => { cur = name; applyDraft(); syncAll(); remember(); toast(`${labelOf(name)} 프리셋을 고쳐요`); };
+  presetBtns.append(b);
+  $('#defaultSel').append(new Option(`게임 처음 모습: ${labelOf(name)}`, name));
+}
+$('#defaultSel').onchange = e => { draft.style.default = e.target.value; touched(); };
+
+/* ---------- 나눠 보기 ---------- */
+function compareOptions() {
+  const opts = [['game:*', '왼쪽: 게임 값 (같은 프리셋)'], ...PRESET_NAMES.map(n => [`game:${n}`, `왼쪽: 게임 값 · ${labelOf(n)}`])];
+  for (const h of history) if (h.style) opts.push([`hist:${h.version}`, `왼쪽: 반영 v${h.version} (같은 프리셋)`]);
+  for (const s of saves) opts.push([`save:${s._id}`, `왼쪽: 저장본 · ${s.name}`]);
+  return opts;
+}
+function renderCompare() {
+  const sel = $('#cmpSel'), opts = compareOptions();
+  if (!opts.some(([v]) => v === split.left)) split.left = 'game:*';
+  sel.replaceChildren(...opts.map(([v, t]) => new Option(t, v)));
+  sel.value = split.left;
+}
+function leftParams() {
+  const [kind, key] = [split.left.slice(0, split.left.indexOf(':')), split.left.slice(split.left.indexOf(':') + 1)];
+  let base = null, over = null;
+  if (kind === 'game') { const n = key === '*' ? cur : key; base = fileStyle.presets[n]; over = fileStyle.indoor?.[n]; }
+  else if (kind === 'hist') { const h = history.find(x => String(x.version) === key); base = h?.style?.presets?.[cur]; over = h?.style?.indoor?.[cur]; }
+  else if (kind === 'save') { const s = saves.find(x => x._id === key); base = s?.params; over = s?.indoor; }
+  base = base ?? fileStyle.presets[cur];
+  return indoorOn() ? { ...base, ...(over ?? {}) } : base;
+}
+const splitEl = $('#split');
+function applySplit() {
+  style.compare({ on: split.on, x: split.x, params: leftParams() });
+  splitEl.hidden = !split.on;
+  splitEl.style.left = `${split.x * 100}%`;
+  $('#cmpBtn').setAttribute('aria-pressed', String(split.on));
+  $('#tagL').textContent = ($('#cmpSel').selectedOptions[0]?.textContent ?? '게임 값').replace(/^왼쪽: /, '');
+}
+$('#cmpBtn').onclick = () => { split.on = !split.on; applySplit(); remember(); };
+$('#cmpSel').onchange = e => { split.left = e.target.value; applySplit(); remember(); };
+const knob = $('#knob');
+knob.addEventListener('pointerdown', e => {
+  knob.setPointerCapture(e.pointerId);
+  const move = ev => { split.x = Math.min(0.98, Math.max(0.02, ev.clientX / innerWidth)); applySplit(); };
+  const up = () => { knob.removeEventListener('pointermove', move); knob.removeEventListener('pointerup', up); remember(); };
+  knob.addEventListener('pointermove', move);
+  knob.addEventListener('pointerup', up);
+});
+
+/* ---------- 장면 · 시간 · 날씨 · 계절 · 카메라 ---------- */
+const sceneLink = $('#sceneLink');
+if (ISLAND) { sceneLink.href = 'style-editor.html'; sceneLink.textContent = '작은 섬으로'; sceneLink.hidden = false; }
+else if (!window.claude) fetch('api/ping').then(r => { if (r.ok) { sceneLink.href = 'style-editor.html?island'; sceneLink.textContent = '진짜 섬에서 보기 (로컬)'; sceneLink.hidden = false; } }).catch(() => {});
+if (stage.setIndoor) $('#homeBtn').onclick = () => { stage.setIndoor(!stage.indoor); };
+else $('#homeBtn').hidden = true;       // 진짜 섬: 집에 걸어 들어가면 집 안 값이 된다
+ctx.events.on('scene:indoor', () => {
+  $('#homeBtn').setAttribute('aria-pressed', String(indoorOn()));
+  $('#homeNote').hidden = !indoorOn();
+  applyDraft(); syncParams();
+});
+const pressOnly = (sel, attr, v) => document.querySelectorAll(sel).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(v))));
+for (const b of document.querySelectorAll('[data-hour]')) b.onclick = () => { time.setPaused(true); time.setHour(Number(b.dataset.hour)); pressOnly('[data-hour]', 'hour', b.dataset.hour); };
+for (const b of document.querySelectorAll('[data-wx]')) b.onclick = () => { time.setWeather(b.dataset.wx, { instant: true }); pressOnly('[data-wx]', 'wx', b.dataset.wx); };
+for (const b of document.querySelectorAll('[data-season]')) b.onclick = () => { time.setSeasonOverride(b.dataset.season); stage.recolor?.(); pressOnly('[data-season]', 'season', b.dataset.season); };
+for (const b of document.querySelectorAll('[data-zoom]')) b.onclick = () => stage.setZoom(b.dataset.zoom);
+if (stage.hud) {
+  let hud = false;
+  $('#hudBtn').hidden = false;
+  $('#hudBtn').onclick = () => { hud = !hud; stage.hud(hud); $('#hudBtn').setAttribute('aria-pressed', String(hud)); };
+}
+if (stage.kind === 'stage') { pressOnly('[data-hour]', 'hour', 12); pressOnly('[data-wx]', 'wx', 'clear'); }
+pressOnly('[data-season]', 'season', time.now().season);
+$('#minBtn').onclick = () => {
+  const m = $('#panel').classList.toggle('min');
+  $('#minBtn').textContent = m ? '펼치기' : '접기';
+  $('#minBtn').setAttribute('aria-expanded', String(!m));
+  stage.reframe?.();
+  remember();
+};
+if (mem.min) $('#minBtn').click();
+// 진짜 섬: 조절판에서 글을 쓸 때 게임이 키를 먹지 않게
+$('#panel').addEventListener('keydown', e => e.stopPropagation());
+
+/* ---------- 값 슬라이더 (PARAMS 표로 만든다) ---------- */
+const inputs = new Map(), groups = new Map();
+const fmt = (p, v) => p.type === 'range' ? (p.step >= 1 ? String(v) : Number(v).toFixed(p.step < 0.01 ? 3 : 2)) : '';
+for (const p of PARAMS) {
+  if (!groups.has(p.group)) {
+    const d = document.createElement('details');
+    d.open = ['명암', '색', '화면 효과'].includes(p.group);
+    d.innerHTML = `<summary>${esc(p.group)}</summary>`;
+    $('#params').append(d);
+    groups.set(p.group, d);
+  }
+  const row = document.createElement('div');
+  row.className = 'param';
+  const id = `p-${p.key}`;
+  const label = `<label for="${id}">${esc(p.label)}</label><span class="tools"><button type="button" class="home" data-act="home" title="집 안 덧씌우기 지우기" hidden>집</button><button type="button" data-act="reset" title="게임 값으로" hidden>↺</button></span>`;
+  if (p.type === 'range') row.innerHTML = `${label}<span class="val"></span><input id="${id}" type="range" min="${p.min}" max="${p.max}" step="${p.step}">`;
+  else if (p.type === 'color') row.innerHTML = `${label}<input id="${id}" type="color">`;
+  else if (p.type === 'bool') row.innerHTML = `${label}<span><input id="${id}" type="checkbox"></span>`;
+  else row.innerHTML = `${label}<select id="${id}">${p.options.map(([k, t]) => `<option value="${esc(k)}">${esc(t)}</option>`).join('')}</select>`;
+  groups.get(p.group).append(row);
+  const el = row.querySelector('input, select');
+  const val = row.querySelector('.val');
+  const read = () => p.type === 'range' ? Number(el.value) : p.type === 'bool' ? el.checked : p.type === 'color' ? el.value.toUpperCase() : el.value;
+  el.addEventListener('input', () => { if (val) val.textContent = fmt(p, read()); setValue(p.key, read()); });
+  row.querySelector('[data-act="reset"]').onclick = () => resetValue(p.key);
+  row.querySelector('[data-act="home"]').onclick = () => {
+    delete draft.style.indoor[cur]?.[p.key];
+    if (draft.style.indoor[cur] && !Object.keys(draft.style.indoor[cur]).length) delete draft.style.indoor[cur];
+    touched();
+  };
+  inputs.set(p.key, { p, el, val, row });
+}
+
+/** 슬라이더 값 바꾸지 않고 표시만 (바꾼 값 • · 되돌리기 ↺ · 집 안 덧씌우기) */
+function syncParams() {
+  const now = shownOf(draft.style, cur), game = shownOf(fileStyle, cur);
+  const over = indoorOn() ? draft.style.indoor?.[cur] ?? {} : {};
+  for (const { p, el, val, row } of inputs.values()) {
+    const v = now[p.key];
+    if (document.activeElement !== el) {
+      if (p.type === 'bool') el.checked = !!v; else el.value = v;
+      if (val) val.textContent = fmt(p, v);
+    }
+    const changed = canon(v) !== canon(game[p.key]);
+    row.classList.toggle('changed', changed);
+    row.classList.toggle('over', p.key in over);
+    row.querySelector('[data-act="reset"]').hidden = !changed;
+    row.querySelector('[data-act="home"]').hidden = !(p.key in over);
+  }
+  for (const b of presetBtns.children) b.setAttribute('aria-pressed', String(b.dataset.preset === cur));
+  $('#defaultSel').value = draft.style.default;
+  renderStatus();
+}
+function syncNote() {
+  const n = $('#note');
+  $('#noteHead').textContent = `의견 · ${labelOf(cur)}`;
+  if (document.activeElement !== n) n.value = draft.notes[cur] ?? '';
+}
+function syncAll() { syncParams(); syncNote(); renderCompare(); renderSaves(); applySplit(); }
+
+/* ---------- 의견 ---------- */
+$('#note').addEventListener('input', e => {
+  const t = e.target.value;
+  if (t.trim()) draft.notes[cur] = t; else delete draft.notes[cur];
+  draft.status = 'editing';
+  scheduleSave();
+});
+
+/* ---------- 저장본 ---------- */
+function renderSaves() {
+  const list = $('#saveList');
+  if (!saves.length) { list.innerHTML = `<li><span class="muted">${store ? '아직 저장본이 없어요. 마음에 드는 값을 이름 붙여 남겨 두면 나중에 불러오거나 왼쪽에 놓고 비교할 수 있어요.' : '저장소가 있는 곳(claude.ai 링크)에서 쓸 수 있어요.'}</span></li>`; return; }
+  list.innerHTML = saves.map(s => `<li><span>${esc(s.name)}</span><span class="meta">${esc(labelOf(s.preset))}${s.indoor ? ' · 집 안 포함' : ''} · ${esc(when(s.createdAt))}</span>
+    <span class="acts"><button type="button" class="tiny" data-load="${esc(s._id)}">불러오기</button><button type="button" class="tiny" data-left="${esc(s._id)}">왼쪽에</button><button type="button" class="tiny" data-del="${esc(s._id)}" ${writable ? '' : 'disabled'}>지우기</button></span></li>`).join('');
+}
+$('#saveList').addEventListener('click', async e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const s = saves.find(x => x._id === (b.dataset.load ?? b.dataset.left ?? b.dataset.del));
+  if (!s) return;
+  if (b.dataset.load) {
+    cur = PRESET_NAMES.includes(s.preset) ? s.preset : cur;
+    draft.style.presets[cur] = { ...fileStyle.presets[cur], ...s.params };
+    if (s.indoor) draft.style.indoor[cur] = clone(s.indoor);
+    syncNote(); touched(); remember();
+    toast(`저장본을 불러왔어요 — ${s.name}`);
+  } else if (b.dataset.left) {
+    split.left = `save:${s._id}`; split.on = true; renderCompare(); applySplit(); remember();
+  } else if (b.dataset.del) {
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = '정말 지우기'; setTimeout(() => { b.dataset.sure = ''; b.textContent = '지우기'; }, 3000); return; }
+    try { await store.remove(`saves/${s._id}`); toast('저장본을 지웠어요'); } catch (err) { toast(`지우지 못했어요 (${err?.code ?? '오류'})`); }
+  }
+});
+$('#saveBtn').onclick = async () => {
+  if (!store || !writable) { toast('저장소가 있는 곳(claude.ai 링크)에서 쓸 수 있어요'); return; }
+  const name = $('#saveName').value.trim() || `${labelOf(cur)} ${new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+  const id = `s${Date.now().toString(36)}`;
+  try {
+    await store.set(`saves/${id}`, { name, preset: cur, params: clone(draft.style.presets[cur]), indoor: draft.style.indoor[cur] ? clone(draft.style.indoor[cur]) : null, createdAt: Date.now(), by: me });
+    $('#saveName').value = '';
+    toast(`저장본을 남겼어요 — ${name}`);
+  } catch (e) { toast(`저장하지 못했어요 (${e?.code ?? '오류'})`); }
+};
+
+/* ---------- 되돌리기 · 복사 ---------- */
+$('#resetBtn').onclick = () => {
+  draft.style.presets[cur] = clone(fileStyle.presets[cur]);
+  if (fileStyle.indoor?.[cur]) draft.style.indoor[cur] = clone(fileStyle.indoor[cur]); else delete draft.style.indoor[cur];
+  touched();
+  toast(`${labelOf(cur)} 프리셋을 게임 값으로 되돌렸어요`);
+};
+$('#copyBtn').onclick = async () => {
+  const text = JSON.stringify({ preset: cur, ...draft.style.presets[cur], ...(draft.style.indoor[cur] ? { indoor: draft.style.indoor[cur] } : {}) }, null, 2);
+  const box = $('#copyBox');
+  try { await navigator.clipboard.writeText(text); box.hidden = true; toast('복사했어요'); }
+  catch {
+    box.value = text; box.hidden = false; box.focus(); box.select();
+    toast('복사가 막혔어요 — 상자 안 글을 직접 복사해 주세요');
+  }
+};
+
+/* ---------- 그리기 시간 ---------- */
+let frames = 0, lastT = performance.now(), acc = 0;
+(function tick() {
+  frames++; acc += style.stats().ms;
+  const t = performance.now();
+  if (t - lastT > 500) {
+    const s = style.stats();
+    $('#stats').textContent = `${Math.round(frames * 1000 / (t - lastT))} fps · 그리기 CPU ${(acc / frames).toFixed(1)}ms · 품질 ${style.quality} · ${s.passes.join(' → ')}`;
+    frames = 0; acc = 0; lastT = t;
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ---------- 시작 ---------- */
+{
+  const bad = checkStyle(fileStyle);
+  if (bad.length) console.warn('[style-editor] presets.json 문제', bad);
+}
+syncAll();
+applyDraft();
+
+store = await connectStore();
+if (!store) {
+  // 저장소가 없는 곳: 이 브라우저에 남긴 것만 되살린다
+  try { const d = JSON.parse(localStorage.getItem('style-editor-draft') ?? 'null'); if (d) { draft = normalize(d); applyDraft(); syncAll(); } } catch {}
+  saveMsg = '이 화면에서는 저장소를 쓸 수 없어요. claude.ai 링크에서 열면 값이 저장돼요.';
+  renderStatus();
+} else {
+  me = await store.who();
+  writable = await store.canWrite();
+  saveMsg = writable ? store.label : '보기 전용이에요 — 바꿔 볼 수는 있지만 저장되지 않아요.';
+  renderStatus();
+  const busy = () => saveT || saving || document.activeElement?.matches?.('#note, #saveName');
+  store.watchDoc('drafts/style', (d, meta) => {
+    if (!d || meta?.hasPendingWrites || busy()) return;
+    const n = normalize(d), s = sig(n);
+    if (s === lastSaved || s === sig(draft)) { lastSaved = s; return; }
+    const bad = checkStyle({ ...n.style, version: fileStyle.version });
+    if (bad.length) console.warn('[style-editor] 저장된 값 문제 (범위 밖은 잘라서 보여요)', bad);
+    draft = n; lastSaved = s;
+    applyDraft(); syncAll();
+  });
+  store.watchDoc('applied/style', d => { applied = d; renderStatus(); });
+  store.watchCol('history', rows => {
+    history = rows.filter(r => r.board === 'style').sort((a, b) => b.version - a.version);
+    renderStatus(); renderCompare(); applySplit();
+  });
+  store.watchCol('saves', rows => {
+    saves = rows.filter(r => r.name).sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)).slice(0, 40);
+    renderSaves(); renderCompare(); applySplit();
+  });
+}
+</script>
