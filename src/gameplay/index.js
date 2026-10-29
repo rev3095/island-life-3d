@@ -5,6 +5,7 @@ const PARTS = [
   ['gather', './gather/index.js'],
   ['town', './town/index.js'],
   ['house', './house/index.js'],
+  ['intro', './intro/index.js'],   // 3차 X3 첫날 흐름 (이름 정하기·첫날 할 일)
 ];
 
 const loaded = [];
