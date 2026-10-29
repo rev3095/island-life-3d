@@ -46,16 +46,31 @@ export function createHarvest({ state, day }) {
     if (r) d.rocks[rockId] = hits + 1;
     return r;
   }
+  /**
+   * 바위를 친 뒤: 밑에서 곤충이 튀어나오나 → bug id | null. 바위 하나에 하루 한 번까지 (state.island.daily.rockBugs).
+   * opts: { hour, month, weather, rng }
+   */
+  function rockBug(rockId, opts = {}) {
+    const d = day.daily();
+    const seen = (d.rockBugs ??= []);
+    const key = String(rockId);
+    if (seen.includes(key)) return null;
+    const id = spawns.rockBug(opts.rng ?? rngOf('rock-bug', key, d.rocks[key] ?? 0), opts);
+    if (id) seen.push(key);
+    return id;
+  }
   const rockHitsLeft = rockId => Math.max(0, spawns.ROCK_MAX_HITS - (day.daily().rocks[rockId] ?? 0));
 
-  /** 오늘의 화석 자리 파기 → 화석 id | null (이미 판 자리거나 오늘 4곳을 다 팠으면 null) */
-  function digFossil(spotKey, rng) {
+  /** 오늘의 화석 자리 파기 → 'fossil.unknown' | null (이미 판 자리거나 오늘 4곳을 다 팠으면 null). 무슨 화석인지는 느루가 감정한다 */
+  function digFossil(spotKey) {
     const d = day.daily();
     const key = String(spotKey);
     if (d.dug.includes(key) || d.dug.length >= d.fossils) return null;
     d.dug.push(key);
-    return spawns.fossil(rng ?? rngOf('fossil', key));
+    return spawns.FOSSIL_UNKNOWN;
   }
+  /** 감정 → 진짜 화석 id (가방 바꾸기는 부르는 쪽 몫) */
+  const appraise = rng => spawns.appraise(rng ?? Math.random);
   const fossilsLeft = () => Math.max(0, day.daily().fossils - day.daily().dug.length);
 
   /** 해변 조개 줍기 → 조개 id | null. 조개 자리마다 오늘 무엇이 있는지 정해져 있다 */
@@ -78,7 +93,7 @@ export function createHarvest({ state, day }) {
   }
 
   return {
-    fruitReady, shakeTree, chopTree, hitRock, rockHitsLeft, digFossil, fossilsLeft, pickShell, shellAt, pullWeed,
+    fruitReady, shakeTree, chopTree, hitRock, rockBug, rockHitsLeft, digFossil, appraise, fossilsLeft, pickShell, shellAt, pullWeed,
     /** 오늘 남은 수: 화석 자리·조개·잡초 (world 가 그만큼 배치한다) */
     today: () => {
       const d = day.daily();

@@ -15,9 +15,10 @@ export function createMuseum(state, { onChange = () => {} } = {}) {
     if (!Array.isArray(state.encyclopedia[cat])) state.encyclopedia[cat] = [];
     return state.encyclopedia[cat];
   };
+  // 감정 전 화석(unknown)은 받지 않는다 — 느루가 감정한 뒤에 기증한다
   const catOf = id => {
-    const c = items.get(id)?.category;
-    return KINDS.includes(c) ? c : null;
+    const it = items.get(id);
+    return it && !it.unknown && KINDS.includes(it.category) ? it.category : null;
   };
 
   const has = id => {

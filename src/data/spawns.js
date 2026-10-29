@@ -4,12 +4,14 @@ import { pickWeighted } from './rng.js';
 
 /** 낚시 자리 → 잡히는 서식지. 선착장은 바다 물고기도, 하구는 강 물고기도 잡힌다 */
 export const HABITAT_POOLS = { river: ['river'], pond: ['pond'], sea: ['sea'], pier: ['sea', 'pier'], mouth: ['river', 'mouth'] };
-export const BUG_PLACES = ['flower', 'tree', 'ground', 'air', 'rock', 'water', 'lamp', 'fruit', 'palm', 'shake'];
+export const BUG_PLACES = ['flower', 'tree', 'ground', 'air', 'rock', 'water', 'lamp', 'fruit', 'palm', 'shake', 'under'];
 
 export const FRUIT_PER_TREE = 5;      // 과일나무 한 그루 열매 수 (배경 스펙: 열매 5개)
 export const COCONUT_PER_PALM = 2;
 export const ROCK_MAX_HITS = 6;       // 바위 하나를 하루에 칠 수 있는 횟수
 export const CHOP_MAX_HITS = 3;       // 나무 하나를 하루에 도끼로 칠 수 있는 횟수
+export const SHAKE_BUG_CHANCE = 0.08; // 나무 흔들기: 벌집 대신 곤충이 떨어질 확률 (그 나무 그날 첫 '떨어짐' 몫)
+export const ROCK_BUG_CHANCE = 0.15;  // 바위 치기 한 번마다 밑에서 곤충이 튀어나올 확률 (바위 하나에 하루 한 번)
 
 const WET = new Set(['rain', 'snow']);
 export const inHours = (hours, hour) => hours.some(([a, b]) => hour >= a && hour < b);
@@ -58,9 +60,30 @@ export function bug({ rng = Math.random, ...opts } = {}) {
   return pickWeighted(bugPool(opts), e => e.weight, rng)?.item.id ?? null;
 }
 
-/** 화석 자리 파기 → itemId (공룡 두개골이 가장 드묾) */
+/** 화석 하나 정하기 → itemId (공룡 두개골이 가장 드묾). 감정 전 화석은 목록에 없다 */
 export function fossil(rng = Math.random) {
   return pickWeighted(items.list('fossil'), it => it.weight, rng).id;
+}
+/** 화석 자리를 파면 나오는 것: 감정 전 화석 */
+export const FOSSIL_UNKNOWN = items.UNKNOWN_FOSSIL;
+/** 느루의 감정 → 진짜 화석 id (fossil 과 같은 가중치) */
+export const appraise = (rng = Math.random) => fossil(rng);
+
+/** 나무를 흔들면 떨어질 수 있는 곤충 (꿀벌 빼고): 'shake' 곤충과 나무 줄기 곤충 */
+export function shakeBugPool({ hour = 12, month = 1, weather = 'clear' } = {}) {
+  return bugPool({ place: ['shake', 'tree'], hour, month, weather }).filter(e => e.item.id !== 'bug.honeybee');
+}
+/** 바위를 치면 밑에서 튀어나올 수 있는 곤충 ('under') */
+export const underRockPool = ({ hour = 12, month = 1, weather = 'clear' } = {}) => bugPool({ place: 'under', hour, month, weather });
+
+/**
+ * 바위 치기 한 번에 곤충이 튀어나오나 → itemId | null (ROCK_BUG_CHANCE, 그 시각·달에 나올 곤충이 있을 때만).
+ * 하루 한 번 제한은 harvest.rockBug 가 맡는다
+ */
+export function rockBug(rng = Math.random, opts = {}) {
+  const pool = underRockPool(opts);
+  if (!pool.length || rng() >= ROCK_BUG_CHANCE) return null;
+  return pickWeighted(pool, e => e.weight, rng)?.item.id ?? null;
 }
 
 /** 해변 조개 하나 → itemId */
@@ -96,19 +119,23 @@ export const SHAKE_FURNITURE = items.list('furn').filter(f => f.source === 'shop
  * kind: 배경 slug 'tree' | 'fruit-tree' | 'palm' | 'cedar'
  * opts.fruit: 과일나무 열매 id ('fruit.apple' …), opts.fruitReady: 열매가 열려 있나
  * opts.dropped: 오늘 이 나무에서 이미 가구·도토리·벌집이 떨어졌나 (하루 한 번)
- * opts.orchard: 과수원 언덕이면 벌집 확률이 높다, opts.hour: 밤에는 벌이 안 나온다
+ * opts.orchard: 과수원 언덕이면 벌집 확률이 높다, opts.hour: 밤에는 벌이 안 나온다, opts.month·weather: 떨어지는 곤충
  * event 'bees' = 벌집이 떨어져 벌떼가 나옴. 잠자리채로 잡아야 꿀벌을 얻는다 (그냥 가방에 넣지 말 것)
+ * event 'bug'  = 곤충이 툭 떨어져 기어 도망간다 (송충이 등). 이것도 잠자리채로 잡아야 한다
  */
 export function treeShake(kind, rng = Math.random, opts = {}) {
-  const { fruit = 'fruit.apple', fruitReady = false, dropped = false, orchard = false, hour = 12 } = opts;
+  const { fruit = 'fruit.apple', fruitReady = false, dropped = false, orchard = false, hour = 12, month = 1, weather = 'clear' } = opts;
   if (kind === 'fruit-tree' && fruitReady) return { id: fruit, count: FRUIT_PER_TREE };
   if (kind === 'palm') return fruitReady ? { id: 'fruit.coconut', count: COCONUT_PER_PALM } : null;
   const r = rng();
   if (!dropped) {
     const bees = inHours(items.get('bug.honeybee').hours, hour) ? (orchard ? 0.15 : 0.06) : 0;
     if (r < bees) return { id: 'bug.honeybee', count: 1, event: 'bees' };
-    if (r < bees + 0.03) return { id: SHAKE_FURNITURE[Math.floor(rng() * SHAKE_FURNITURE.length)], count: 1 };
-    if (r < bees + 0.1) return { id: 'mat.acorn-bag', count: 1 };
+    const pool = shakeBugPool({ hour, month, weather });
+    const bug = pool.length ? SHAKE_BUG_CHANCE : 0;
+    if (r < bees + bug) return { id: pickWeighted(pool, e => e.weight, rng).item.id, count: 1, event: 'bug' };
+    if (r < bees + bug + 0.03) return { id: SHAKE_FURNITURE[Math.floor(rng() * SHAKE_FURNITURE.length)], count: 1 };
+    if (r < bees + bug + 0.1) return { id: 'mat.acorn-bag', count: 1 };
   }
   if (rng() < 0.35) return { id: 'mat.branch', count: 1 };
   return null;

@@ -19,10 +19,10 @@ export const SEASON_MONTHS = {
 export const TIME_HOURS = { '종일': [[0, 24]], '낮': [[5, 19]], '밤': [[17, 24], [0, 5]], '비 올 때': [[0, 24]] };
 /** 물고기 장소 표기 → 서식지. 하구는 강 끝이라 강으로도 친다 */
 const FISH_PLACE = { '강': ['river'], '연못': ['pond'], '강 · 연못': ['river', 'pond'], '하구': ['river', 'mouth'], '바다': ['sea'], '선착장': ['pier'] };
-/** 곤충 장소 표기 → 계약의 place 값 ('shake' 는 나무 흔들기 때만) */
+/** 곤충 장소 표기 → 계약의 place 값 ('shake' 는 나무 흔들기 때만, 'under' 는 바위를 칠 때만 — 4차 Y2) */
 const BUG_PLACE = {
   '꽃 주변': ['flower'], '꽃 위': ['flower'], '나무 흔들기': ['shake'], '공중': ['air'], '물가 공중': ['water'], '나무 줄기': ['tree'],
-  '야자수': ['palm'], '풀밭': ['ground'], '떨어진 과일': ['fruit'], '바위': ['rock'], '바위 밑': ['rock'], '강 위': ['water'], '가로등·창문': ['lamp'],
+  '야자수': ['palm'], '풀밭': ['ground'], '떨어진 과일': ['fruit'], '바위': ['rock'], '바위 밑': ['under'], '강 위': ['water'], '가로등·창문': ['lamp'],
 };
 
 /** 출현 가중치: 희귀 1, 비쌀수록 드묾 */
@@ -74,6 +74,9 @@ const BUGS = [
   ['pill-bug', '쥐며느리', '바위 밑', '종일', '연중', 250, 0, 0, '🪲', '바위를 들추면 동그랗게 몸을 마는 작은 친구. 축축한 곳을 좋아한다.'],
   ['pond-skater', '소금쟁이', '강 위', '낮', '여름', 130, 0, 0, '🦟', '긴 다리로 물 위를 미끄러지듯 걷는다. 물에 빠지지 않는 신기한 곤충이다.'],
   ['moth', '나방', '가로등·창문', '밤', '연중', 130, 0, 1, '🦋', '밤이면 가로등과 창문 불빛으로 모여든다. 날개에 고운 가루가 묻어 있다.'],
+  // 4차 Y2: 들추기 곤충 (나무를 흔들면 떨어지고, 바위를 치면 밑에서 튀어나온다)
+  ['caterpillar', '송충이', '나무 흔들기', '종일', '봄~가을', 300, 0, 0, '🐛', '나뭇잎을 갉아 먹다가 흔들리면 실을 타고 툭 떨어진다. 언젠가 날개를 달 날을 꿈꾼다.'],
+  ['earwig', '집게벌레', '바위 밑', '밤', '봄~가을', 450, 0, 0, '🪲', '꽁무니에 작은 집게를 단 밤 손님. 무섭게 생겼지만 사실은 겁이 많다.'],
 ];
 
 // ---------- 화석 (FO-01 ~ FO-08): 이름, 가격, 희귀 ----------
@@ -87,6 +90,24 @@ const FOSSILS = [
   ['mammoth-tusk', '매머드 엄니', 2500, 0, '🦣', '털북숭이 코끼리의 휘어진 엄니. 추운 시대를 견뎌 낸 흔적이다.'],
   ['dino-skull', '공룡 두개골', 6000, 1, '🦖', '거대한 공룡의 머리뼈. 박물관 한가운데에 놓일 섬의 보물이다.'],
 ];
+
+// 감정 전 화석 (4차 Y2): 화석 자리를 파면 이것이 나오고, 박물관 느루가 감정하면 위 8종 중 하나가 된다.
+// 카테고리는 화석이지만 list('fossil')·박물관·도감에는 들어가지 않는다 (unknown: true). 상점에선 싸게 팔린다.
+export const UNKNOWN_FOSSIL = 'fossil.unknown';
+
+// 물고기 몸 색 (잡아서 들어 보일 때): 몸·등·배·지느러미. 모양은 모두 같고 색만 다르다
+const FISH_COLORS = {
+  crucian: ['#A9B49A', '#7D8A6E', '#E8E6D2', '#8E9A7E'], 'pale-chub': ['#B8C8D2', '#7E98A8', '#F4F2EA', '#E8907A'],
+  medaka: ['#D9D2B0', '#B4AA80', '#F6F2DE', '#C9BE92'], carp: ['#C9A062', '#8C6A3A', '#EEDDB4', '#B0844A'],
+  loach: ['#9A8462', '#6E5A40', '#D8C8A4', '#857050'], sweetfish: ['#B5C9AE', '#7E9A86', '#F2F0DC', '#E8C45A'],
+  catfish: ['#6E6650', '#4A4436', '#C8C0A4', '#5A5242'], 'mandarin-fish': ['#BFA25E', '#6E5A30', '#EADCAE', '#9C7E40'],
+  salmon: ['#E58C6C', '#7E8E98', '#F6E2D2', '#C86A50'], goldfish: ['#F28A36', '#E0602A', '#FBD9A8', '#F7B26A'],
+  snakehead: ['#605A48', '#3E3A2E', '#B8AE8E', '#4E4838'], 'horse-mackerel': ['#A9BAC4', '#6E8698', '#F2F4F2', '#D8C26A'],
+  mackerel: ['#6F9DB4', '#3E6A86', '#F0F2EE', '#5A88A0'], flounder: ['#B39C80', '#8A735A', '#F4EEE2', '#9C8468'],
+  squid: ['#F2E4D6', '#E2B8A0', '#FAF4EC', '#ECCDB8'], octopus: ['#D8605A', '#B84A46', '#F0A49A', '#C85650'],
+  seahorse: ['#F2B262', '#D88E3E', '#F8D69C', '#E8A050'], 'sea-bream': ['#F2A2AA', '#E07A86', '#FBE4E2', '#E88A94'],
+  tuna: ['#4F6C8C', '#2E4560', '#DCE4EA', '#E8C04A'], shark: ['#7E8F9C', '#5E6E7C', '#EEF0EE', '#6E808E'],
+};
 
 // ---------- 과일 (MA-01, MA-02) ----------
 // 섬 특산 과일(economy.nativeFruit)은 100, 나머지는 500. variant = 배경 fruit-tree 변형 이름
@@ -166,6 +187,7 @@ export const ITEMS = [
     id: `fish.${slug}`, category: 'fish', code: code('FI', i), name, icon, price, desc,
     place, time, season, habitats: FISH_PLACE[place], hours: TIME_HOURS[time], months: SEASON_MONTHS[season],
     shadow, rare: !!rare, weight: weightOf(price, rare),
+    colors: (([body, back, belly, fin]) => ({ body, back, belly, fin }))(FISH_COLORS[slug] ?? ['#8FA7B5', '#6E8898', '#F7F1E4', '#7E98A8']),
   })),
   ...BUGS.map(([slug, name, place, time, season, price, rare, flying, icon, desc], i) => ({
     id: `bug.${slug}`, category: 'bug', code: code('BU', i), name, icon, price, desc,
@@ -175,6 +197,8 @@ export const ITEMS = [
   ...FOSSILS.map(([slug, name, price, rare, icon, desc], i) => ({
     id: `fossil.${slug}`, category: 'fossil', code: `FO-0${i + 1}`, name, icon, price, desc, rare: !!rare, weight: weightOf(price, rare),
   })),
+  { id: UNKNOWN_FOSSIL, category: 'fossil', code: 'FO-00', name: '알 수 없는 화석', icon: '🦴', price: 200, unknown: true,
+    desc: '흙이 잔뜩 묻은 오래된 무언가. 박물관 느루에게 가져가면 무엇인지 감정해 준다.' },
   ...FRUITS.map(([slug, name, icon, price, variant]) => ({
     id: `fruit.${slug}`, category: 'fruit', code: slug === 'coconut' ? 'MA-02' : 'MA-01', name, icon, price,
     nativePrice: variant ? 100 : price, variant, tree: variant ? 'fruit-tree' : 'palm',
@@ -217,7 +241,8 @@ for (const it of ITEMS) {
 }
 
 const BY_ID = new Map(ITEMS.map(it => [it.id, it]));
-const BY_CAT = new Map(CATEGORIES.map(c => [c, ITEMS.filter(it => it.category === c)]));
+// 감정 전 화석은 카테고리 목록(도감·박물관 칸·화석 뽑기)에서 뺀다
+const BY_CAT = new Map(CATEGORIES.map(c => [c, ITEMS.filter(it => it.category === c && !it.unknown)]));
 
 /** id → 아이템 또는 null */
 export const get = id => BY_ID.get(id) ?? null;
