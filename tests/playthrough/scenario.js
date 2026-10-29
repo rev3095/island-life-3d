@@ -370,15 +370,12 @@ export function makeScenario(bot, sk, opts = {}) {
     for (const slug of who) {
       if (T.notes[`bday-${slug}`]) continue;
       const cake0 = bot.has('furn.birthday-cake');
-      const ok = await sk.emoteTalk(slug, { wins: 1 });
-      if (!ok.opened) {
-        // 생일엔 하루 종일 집에: 문 두드리기
-        await sk.toVillagerDoor(slug);
-        bot.policy = { emote: () => null };
-        await bot.act('action', { timeout: 40 });
-        bot.policy = {};
-      }
-      note(`bday-${slug}`, { day: bot.day(), opened: ok.opened, cake: bot.has('furn.birthday-cake') > cake0 });
+      // 생일엔 하루 종일 집에 있다 → 집에 찾아가 방에서 (밖에 나와 있으면 그냥 말 걸기)
+      const V = sk.villager(slug);
+      let opened = false, how = '';
+      if (V?.talkable) { opened = (await sk.emoteTalk(slug, { wins: 1 })).opened; how = '밖에서'; }
+      if (!opened) { const v = await sk.visit(slug, { goal: { wins: 1 } }); opened = !!v.talked || v.knocked; how = v.entered ? '방에서' : v.knocked ? '노크' : `문 ${v.peek}`; }
+      note(`bday-${slug}`, { day: bot.day(), opened, how, cake: bot.has('furn.birthday-cake') > cake0 });
     }
   }
 
@@ -403,7 +400,7 @@ export function makeScenario(bot, sk, opts = {}) {
     }
     const b = T.notes['bday-dubu'];
     if (!b) return block(`생일 날(11-03)에 못 감 (오늘 ${bot.day()})`);
-    return b.cake ? pass(`${b.day} 케이크 받음`) : awk(`${b.day} 생일 대화 ${b.opened ? '함' : '못 함'} · 케이크 ${b.cake ? '받음' : '없음'}`);
+    return b.cake ? pass(`${b.day} ${b.how} 생일 대화 · 케이크 받음`) : awk(`${b.day} 생일 대화 ${b.opened ? `함(${b.how})` : `못 함(${b.how})`} · 케이크 ${b.cake ? '받음' : '없음'}`);
   });
 
   add('movein', '이사: 집터 → 이삿짐 → 단풍 입주', async () => {
@@ -435,18 +432,11 @@ export function makeScenario(bot, sk, opts = {}) {
       if (S().town.atHome(homes[0].s) === 'home') who = homes[0].s;
     }
     if (!who) return awk('집에 있는 주민이 없어요 (저녁 6시 반)');
-    const peek = bot.peek();
-    await bot.act('action', { timeout: 20 });
-    const inRoom = await bot.until(() => Math.abs(bot.pos().x) > 100, { timeout: 6 });
-    if (!inRoom) return block(`${who} 집 문: 행동 키 ${peek}, 방에 못 들어감`);
-    await bot.wait(1);
-    await bot.shot('07-villager-room', `${who} 방`);
-    // 나오기: 문 매트로 (들어온 자리) — 남쪽을 보고 행동 키
-    const entry = bot.pos();
-    await bot.faceDir(180);
-    await bot.act('action', { timeout: 10 });
-    const out = await bot.until(() => Math.abs(bot.pos().x) < 100, { timeout: 6 });
-    return out ? pass(`${who} 방 (${S().town.atHome(who)})`) : awk(`${who} 방에서 못 나옴 (${bot.peek()})`);
+    const v = await sk.visit(who, { goal: { wins: 1 }, shot: '07-villager-room' });
+    note('visit', { who, ...v });
+    if (!v.entered) return block(`${who} 집 문: 행동 키 ${v.peek}, 방에 못 들어감`);
+    if (!v.left) return awk(`${who} 방에서 못 나옴`);
+    return v.talked ? pass(`${who} 방에서 대화 ${v.talked}`) : awk(`${who} 방에 들어갔는데 말을 못 걸었어요`);
   });
 
   add('festival-day', '다 모은 다음 날 저녁 6시 → 광장에서 축제 시작 → s10 → s11 사진 → s12', async () => {

@@ -519,6 +519,36 @@ export function createSkills(bot) {
     return true;
   };
 
+  /**
+   * 주민 집 찾아가기: 문 앞 행동 키 → 집에 있으면 그 주민 방으로 들어가 말 걸고(goal = emoteTalk 목표) 문 매트로 나온다.
+   * 자는 시간처럼 문이 '노크'면 노크 대화만. → { peek, entered, talked, left, knocked }
+   */
+  sk.visit = async (slug, { talk = true, goal = { wins: 1 }, shot = null } = {}) => {
+    const res = { peek: null, entered: false, talked: null, left: false, knocked: false };
+    if (!(await sk.toVillagerDoor(slug))) return res;
+    res.peek = bot.peek();
+    if (res.peek === 'town:knock') {
+      bot.policy = { emote: () => null };
+      await bot.act('action', { timeout: 40 });
+      bot.policy = {};
+      res.knocked = true;
+      return res;
+    }
+    await bot.act('action', { timeout: 20 });
+    res.entered = await bot.until(() => Math.abs(bot.pos().x) > 100, { timeout: 6 });
+    if (!res.entered) return res;
+    const entry = bot.pos();
+    await bot.wait(1);
+    if (shot) await bot.shot(shot, `${slug} 방`);
+    if (talk) { const r = await sk.emoteTalk(slug, goal); res.talked = r.opened ? r.sent.map(x => x.kind) : false; }
+    await bot.walkLocal(entry, { near: 0.25 });
+    await bot.faceDir(180);
+    await bot.act('action', { timeout: 10 });
+    res.left = await bot.until(() => Math.abs(bot.pos().x) < 100, { timeout: 6 });
+    if (!res.left) bot.issue('minor', 'house', `${slug} 방에서 문 매트로 나오기가 안 돼요 (${bot.peek()})`);
+    return res;
+  };
+
   // ---------- 우편함 ----------
   sk.mail = async () => {
     const ph = W().places.playerHouse;

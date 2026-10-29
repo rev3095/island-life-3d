@@ -179,7 +179,12 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
   // emote(state) → 보낼 낱말[] | null(잘 가) · emoteChoice(options) → 번호 · card(kind, el) → true(처리함)
   let lastUI = 0, uiStuck = 0;
   bot.transcript = [];
+  // 창 처리 중 봇 오류는 기록만 하고 단계는 계속 (봇 실수로 플레이가 멈추지 않게)
   bot.handleUI = async () => {
+    try { await handleUI(); }
+    catch (e) { bot.errors.push({ t: bot.gameT, step: bot.stepId, text: `[bot] 창 처리: ${e.message}` }); bot.issue('minor', 'bot', `창 처리 중 봇 오류: ${e.message}`); }
+  };
+  async function handleUI() {
     // 장면: 넘기기·고르기 (0.5초마다 A)
     if (bot.storyOn()) {
       const P = S().story.debug?.().P;
@@ -278,15 +283,29 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     // 리듬 놀이: 음표가 줄에 닿을 때 (사람 반응처럼 ±40ms 흔들림)
     if (top.el.dataset.botOn) return;
     top.el.dataset.botOn = '1';
-    // 게임 창 안에서 불러온다 (그쪽 importmap 으로 three 를 찾는다 · 게시본은 /artifact/ 아래)
-    const { RHYTHM } = await win.Function('u', 'return import(u)')(new URL('src/gameplay/festival/booths.js', win.location.href).href);
-    const t0 = performance.now();
+    const t0 = lastOpen;   // 놀이 시작 = 창이 열린 때 (booths.js 가 panel 을 연 바로 뒤 t0 를 잰다)
+    const RHYTHM = await rhythmTable();
     for (const b of RHYTHM.beats) {
       const at = t0 + (RHYTHM.lead + b * RHYTHM.beat) * 1000 + (Math.random() - 0.5) * 80;
       while (performance.now() < at) await bot.stepFrame();
       bot.key('Space');
     }
   }
+
+  /** 리듬 놀이 박자표 (booths.js RHYTHM). CSP 가 eval 을 막아서 게임 창에 인라인 모듈 스크립트로 불러온다 (importmap·게시본 경로 그대로) */
+  async function rhythmTable() {
+    if (!win.__botRhythm && !doc.querySelector('script[data-bot-rhythm]')) {
+      const s = doc.createElement('script');
+      s.type = 'module'; s.dataset.botRhythm = '';
+      s.textContent = `import { RHYTHM } from ${JSON.stringify(new URL('src/gameplay/festival/booths.js', win.location.href).href)}; window.__botRhythm = RHYTHM;`;
+      doc.head.append(s);
+    }
+    const end = performance.now() + 3000;
+    while (!win.__botRhythm && performance.now() < end) await new Promise(r => setTimeout(r, 20));
+    if (!win.__botRhythm) bot.issue('minor', 'bot', '리듬 박자표를 못 불러와 기본값으로 쳐요');
+    return win.__botRhythm ?? { beats: [0, 1, 2, 2.5, 3.5, 4, 5, 6], beat: 0.62, lead: 1.8 };
+  }
+  rhythmTable();   // 미리 불러 둔다
 
   // ---- 기록 ----
   /** 버그·어색함 기록: sev = 'critical'|'major'|'minor'|'polish' */
