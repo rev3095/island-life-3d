@@ -8,7 +8,7 @@
       "role": "주인공",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-02",
@@ -18,7 +18,7 @@
       "role": "주민 · 고양이",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-03",
@@ -28,7 +28,7 @@
       "role": "주민 · 강아지",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-04",
@@ -38,7 +38,7 @@
       "role": "주민 · 토끼",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-05",
@@ -48,7 +48,7 @@
       "role": "주민 · 곰",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-06",
@@ -58,7 +58,7 @@
       "role": "주민 · 오리",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-07",
@@ -68,7 +68,7 @@
       "role": "주민 · 개구리",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-08",
@@ -78,7 +78,7 @@
       "role": "도토리상점 주인 · 다람쥐",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-09",
@@ -88,7 +88,7 @@
       "role": "박물관장 · 거북",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

@@ -6,7 +6,7 @@
   "category": "furniture",
   "kind": "campfire",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "돌로 둘러싼 작은 모닥불. 집 안에서도 밖에서도 피울 수 있고 불꽃이 일렁인다.",
     "keywords": [

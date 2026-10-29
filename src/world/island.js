@@ -15,19 +15,21 @@ const SQRT2 = Math.SQRT2;
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const N8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
 
-// 건물 발자국(타일)과 모델 원점 기준 충돌 상자. 문은 +Z(남쪽)를 본다.
-export const BUILDINGS = {
-  'house-player': { fp: [3, 3] },
-  'house-villager': { fp: [3, 3] },
-  shop: { fp: [5, 4] },
-  museum: { fp: [6, 6] },
-};
+// 건물 집터(칸 수 [가로, 세로])는 배경 스펙의 world.lot 에서 받는다 (lots = { 종류: [가로, 세로] }). 문은 +Z(남쪽)를 본다.
+export const BUILDING_KINDS = ['house-player', 'house-villager', 'shop', 'museum'];
+/** 배경 스펙들(종류 → spec)에서 집터 표를 만든다 */
+export const lotsOf = specs => Object.fromEntries(BUILDING_KINDS.map(k => {
+  const lot = specs[k]?.world?.lot;
+  if (!lot) throw new Error(`[world] 배경 스펙 ${k} 에 world.lot(집터)이 없다`);
+  return [k, lot];
+}));
 
 /**
  * 섬 만들기. 돌려주는 값은 순수 데이터 (배열·목록) 이고, createIslandApi 가 조회 함수를 붙인다.
  * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads }}
  */
-export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], nativeFruit: fruitWanted = null } = {}) {
+export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], nativeFruit: fruitWanted = null, lots } = {}) {
+  if (!lots) throw new Error('[world] generateIsland 에 lots(건물 집터)가 필요하다 — lotsOf(배경 스펙)');
   const rng = mulberry32(seed);
   const N = w * h;
   const K = new Uint8Array(N);           // 타일 종류 (처음엔 모두 바다)
@@ -223,7 +225,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   const pads = [];                         // 걸을 수 있는 높은 바닥 (건물 앞 계단, 박물관 기단)
   const buildings = [];
   const fits = (b, tx0, tz0, lvl) => {
-    const [fw, fd] = BUILDINGS[b].fp;
+    const [fw, fd] = lots[b];
     for (let tz = tz0 - 1; tz <= tz0 + fd + 2; tz++) for (let tx = tx0 - 1; tx <= tx0 + fw; tx++) {
       if (!inside(tx, tz)) return false;
       const i = idx(tx, tz), k = K[i];
@@ -237,7 +239,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     return true;
   };
   const placeBuilding = (kind, fx, fz, lvl, data) => {
-    const [fw, fd] = BUILDINGS[kind].fp;
+    const [fw, fd] = lots[kind];
     const ox = Math.round(fx - fw / 2), oz = Math.round(fz - fd / 2);
     let spot = null;
     for (let r = 0; r <= 20 && !spot; r++) {             // 목표 자리 가까운 곳부터 넓혀 가며 찾는다

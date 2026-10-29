@@ -5,7 +5,7 @@
   "category": "building",
   "kind": "dock",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "섬에 처음 도착하는 선착장. 바다 위로 뻗은 나무 잔교 끝에 밧줄 감긴 말뚝이 있다.",
     "keywords": [
@@ -61,5 +61,23 @@
     "rope": "밧줄"
   },
   "heroGround": "water",
-  "animations": []
+  "animations": [],
+  "world": {
+    "collider": {
+      "boxes": [
+        [
+          -1.05,
+          4.05,
+          1.05,
+          5
+        ]
+      ]
+    },
+    "extent": [
+      0.85,
+      2.05,
+      0,
+      2.04
+    ]
+  }
 }

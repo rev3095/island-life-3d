@@ -6,7 +6,7 @@
   "category": "furniture",
   "kind": "round-rug",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "바닥에 까는 동그란 러그. 가운데와 테두리에 다른 색 동그라미 무늬가 있다. 위에 다른 가구를 올릴 수 있다.",
     "keywords": [

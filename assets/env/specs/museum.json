@@ -5,7 +5,7 @@
   "category": "building",
   "kind": "museum",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "느루가 관장인 박물관. 기둥 넷과 박공에 암모나이트 문양이 있는 작은 신전 모양.",
     "keywords": [
@@ -68,5 +68,43 @@
     "door": "문",
     "trim": "문양"
   },
-  "animations": []
+  "animations": [],
+  "world": {
+    "lot": [
+      6,
+      6
+    ],
+    "collider": {
+      "boxes": [
+        [
+          -2.95,
+          -2.25,
+          2.95,
+          1.62
+        ]
+      ],
+      "circles": [
+        [
+          -1.75,
+          2.02,
+          0.22
+        ],
+        [
+          -0.75,
+          2.02,
+          0.22
+        ],
+        [
+          0.75,
+          2.02,
+          0.22
+        ],
+        [
+          1.75,
+          2.02,
+          0.22
+        ]
+      ]
+    }
+  }
 }

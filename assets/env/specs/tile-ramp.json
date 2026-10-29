@@ -5,7 +5,7 @@
   "category": "tile",
   "kind": "tile-ramp",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "언덕을 오르내리는 2칸짜리 경사로. 나무 계단 판이 박혀 있다.",
     "keywords": [

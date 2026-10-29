@@ -1,6 +1,7 @@
 // 가구 스펙(assets/furniture/specs/<slug>.json)으로 Blender를 백그라운드 실행해 모델·렌더를 다시 만든다.
 // 사용: node tools/build-furniture.mjs log-chair [sofa ...] [--no-render]
 //       node tools/build-furniture.mjs --all
+//       node tools/build-furniture.mjs --index            (Blender 없이 목록만 다시 씀: 스펙의 status·이름만 바꿨을 때)
 // 빌드가 끝나면 게임이 읽는 가구 목록(assets/furniture/index.json)을 다시 쓴다.
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -19,8 +20,9 @@ const readSpecs = () => readdirSync(specDir).filter(f => f.endsWith(".json")).ma
 const flags = args.filter(a => a === "--no-render");
 const slugs = args.includes("--all") ? readSpecs().map(s => s.slug) : args.filter(a => !a.startsWith("--"));
 
-if (!existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
-if (!slugs.length) throw new Error("만들 가구를 지정하세요: node tools/build-furniture.mjs log-chair | --all");
+const indexOnly = args.includes("--index");
+if (!indexOnly && !existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
+if (!indexOnly && !slugs.length) throw new Error("만들 가구를 지정하세요: node tools/build-furniture.mjs log-chair | --all");
 
 let failed = 0;
 for (const slug of slugs) {

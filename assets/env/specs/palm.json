@@ -5,7 +5,7 @@
   "category": "nature",
   "kind": "palm",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "해변에만 자라는 야자수. 마디진 줄기가 바다 쪽으로 살짝 휘어 있고 야자열매가 열린다.",
     "keywords": [
@@ -64,5 +64,10 @@
   "animations": [
     "sway",
     "shake"
-  ]
+  ],
+  "world": {
+    "collider": {
+      "r": 0.28
+    }
+  }
 }

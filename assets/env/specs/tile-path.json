@@ -5,7 +5,7 @@
   "category": "tile",
   "kind": "tile-path",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "집과 광장을 잇는 흙길. 플레이어가 직접 깔 수도 있다.",
     "keywords": [

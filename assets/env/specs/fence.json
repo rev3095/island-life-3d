@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "fence",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "한 칸짜리 나무 울타리. 이어 붙여서 마당을 꾸민다.",
     "keywords": [
@@ -68,5 +68,13 @@
     1,
     1
   ],
-  "animations": []
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.07,
+        0.22
+      ]
+    }
+  }
 }

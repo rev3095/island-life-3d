@@ -5,7 +5,7 @@
   "species": "cat",
   "role": "주민 · 고양이",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "섬에서 제일 활발한 고양이 주민. 아침마다 해변을 달리고, 늘 신이 나 있어서 꼬리가 쉬지 않는다.",
     "keywords": [

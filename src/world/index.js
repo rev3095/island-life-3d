@@ -1,5 +1,5 @@
 // 트랙 T1: 섬 월드 — 지형 생성·그리기, 배경 물체, 충돌·높이. ctx.services.world 를 올린다 (docs/CONTRACTS.md).
-import { generateIsland, createIslandApi, KIND } from './island.js';
+import { generateIsland, createIslandApi, lotsOf, KIND } from './island.js';
 import { createKit } from './kit.js';
 import { buildTerrain } from './terrain.js';
 import { createObjects } from './objects.js';
@@ -19,13 +19,13 @@ export default {
     const data = ctx.services.data;
     const fruitId = data?.economy?.nativeFruit?.();
     const nativeFruit = fruitId ? (data.items?.get?.(fruitId)?.variant ?? String(fruitId).split('.')[1]) : null;
-    const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit });
-    const base = createIslandApi(gen);
-
-    // 배경 모델 32종을 한꺼번에 불러온다 (같은 모델은 assets 가 캐시)
+    // 배경 모델 32종을 한꺼번에 불러온다 (같은 모델은 assets 가 캐시). 건물 집터(world.lot)가 스펙에 있어서 섬 만들기보다 먼저
     const index = await assets.loadEnvIndex();
     const models = Object.fromEntries(await Promise.all(index.models.map(async m =>
       [m.slug, { gltf: await assets.loadEnv(m.slug), spec: await assets.loadEnvSpec(m.slug) }])));
+    const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit,
+      lots: lotsOf(Object.fromEntries(Object.entries(models).map(([k, v]) => [k, v.spec]))) });
+    const base = createIslandApi(gen);
 
     kit = createKit(ctx);
     const collision = createCollision(base);

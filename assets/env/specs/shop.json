@@ -5,7 +5,7 @@
   "category": "building",
   "kind": "shop",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "밤톨이 운영하는 상점. 초록·흰 줄무늬 차양과 지붕 위 커다란 도토리 간판이 눈에 띈다.",
     "keywords": [
@@ -81,5 +81,21 @@
     "acorn": "도토리",
     "acornCap": "도토리 모자"
   },
-  "animations": []
+  "animations": [],
+  "world": {
+    "lot": [
+      5,
+      4
+    ],
+    "collider": {
+      "boxes": [
+        [
+          -2.1,
+          -1.4,
+          2.1,
+          1.34
+        ]
+      ]
+    }
+  }
 }

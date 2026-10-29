@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "mailbox",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "집 앞 우편함. 편지가 오면 깃발이 올라간다. 주민마다 색이 다르다.",
     "keywords": [
@@ -76,5 +76,10 @@
     1,
     1
   ],
-  "animations": []
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.18
+    }
+  }
 }

@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "signboard",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "광장의 안내판. 오늘의 소식과 행사가 붙어 있다.",
     "keywords": [
@@ -48,5 +48,17 @@
     "paper": "종이",
     "roof": "지붕"
   },
-  "animations": []
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.15,
+        0.24
+      ]
+    },
+    "extent": [
+      0.6,
+      0.2
+    ]
+  }
 }

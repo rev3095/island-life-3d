@@ -1,6 +1,7 @@
 // 캐릭터 스펙(assets/specs/<slug>.json)으로 Blender를 백그라운드 실행해 모델·렌더를 다시 만든다.
 // 사용: node tools/build-character.mjs coco [--no-render]
 //       node tools/build-character.mjs --all          (스펙 전부)
+//       node tools/build-character.mjs --index            (Blender 없이 목록만 다시 씀: 스펙의 status·이름만 바꿨을 때)
 // 빌드가 끝나면 편집기가 읽는 모델 목록(assets/models/index.json)을 다시 쓴다.
 // Blender 경로가 다르면 BLENDER 환경변수로 지정한다.
 import { spawnSync } from "node:child_process";
@@ -19,8 +20,9 @@ const slugs = args.includes("--all")
   : args.filter(a => !a.startsWith("--"));
 const blender = process.env.BLENDER ?? "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe";
 
-if (!existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
-if (!slugs.length) throw new Error("만들 캐릭터를 지정하세요: node tools/build-character.mjs coco | --all");
+const indexOnly = args.includes("--index");
+if (!indexOnly && !existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
+if (!indexOnly && !slugs.length) throw new Error("만들 캐릭터를 지정하세요: node tools/build-character.mjs coco | --all");
 
 let failed = 0;
 for (const slug of slugs) {

@@ -1,21 +1,12 @@
 // 배경 물체 목록 (CONTRACTS 의 world.objects): 나무·바위·꽃·건물… 을 id 로 관리한다.
 // 그리기는 (종류 · 변형 · 구역) 별 인스턴스 묶음, 충돌은 collision.js, 저장은 state.island.removed / added.
-import { BUILDINGS, LEVEL_HEIGHT } from './island.js';
+import { LEVEL_HEIGHT } from './island.js';
 import { CHUNK } from './terrain.js';
 
-// 충돌 모양 (모델 원점 기준). r = 원, box = [가로, 세로] 가운데 정렬, boxes = [x0, z0, x1, z1] …
-const COLLIDERS = {
-  tree: { r: 0.34 }, 'fruit-tree': { r: 0.34 }, cedar: { r: 0.28 }, palm: { r: 0.28 },
-  rock: { r: 0.44 }, bush: { r: 0.4 }, lamp: { r: 0.15 }, mailbox: { r: 0.18 }, campfire: { r: 0.4 }, workbench: { box: [1.3, 0.8] },
-  fence: { box: [1.07, 0.22] }, bench: { box: [1.4, 0.5] }, signboard: { box: [1.15, 0.24] },
-  'house-player': { boxes: [[-1.3, -1.2, 1.3, 1.14]] }, 'house-villager': { boxes: [[-1.3, -1.2, 1.3, 1.14]] },
-  shop: { boxes: [[-2.1, -1.4, 2.1, 1.34]] },
-  museum: { boxes: [[-2.95, -2.25, 2.95, 1.62]], circles: [[-1.75, 2.02, 0.22], [-0.75, 2.02, 0.22], [0.75, 2.02, 0.22], [1.75, 2.02, 0.22]] },
-  dock: { boxes: [[-1.05, 4.05, 1.05, 5.0]] },
-};
-// 여러 칸을 차지하는 물체 (query 거리 계산용 반너비)
-const EXTENT = { bench: [0.7, 0.3], signboard: [0.6, 0.2], bridge: [1.5, 0.7], dock: [0.85, 2.05, 0, 2.04] };
-for (const [k, b] of Object.entries(BUILDINGS)) EXTENT[k] = [b.fp[0] / 2, b.fp[1] / 2];
+// 충돌 모양·차지하는 칸은 배경 스펙의 world 칸에 있다 (assets/env/specs/<slug>.json → world.collider · extent · lot).
+// 모델을 고칠 때 같은 파일에서 함께 고친다. collider (모델 원점 기준): r = 원, box = [가로, 세로] 가운데 정렬,
+// boxes = [[x0, z0, x1, z1] …], circles = [[x, z, r] …]. extent = query 거리 계산용 반너비 [x, z, (안 씀), z 중심 이동].
+// 건물은 extent 없이 집터(lot, 칸 수)의 절반을 쓴다.
 
 // 계절 변형이 있는 종류: 계절 → 변형 이름
 export const SEASONAL = {
@@ -29,6 +20,13 @@ const NO_SHADOW = new Set(['tulip', 'cosmos', 'pansy', 'weed', 'shell', 'fossil-
 export function createObjects(ctx, island, kit, models, collision) {
   const { THREE: T, state, events } = ctx;
   const { w, h } = island;
+  const COLLIDERS = {}, EXTENT = {};
+  for (const [kind, { spec }] of Object.entries(models)) {
+    const wd = spec.world ?? {};
+    if (wd.collider) COLLIDERS[kind] = wd.collider;
+    const e = wd.extent ?? (wd.lot && [wd.lot[0] / 2, wd.lot[1] / 2]);
+    if (e) EXTENT[kind] = e;
+  }
   const group = new T.Group();
   group.name = 'objects';
   ctx.scene.add(group);

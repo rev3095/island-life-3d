@@ -6,7 +6,7 @@
   "category": "furniture",
   "kind": "picture-frame",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "주민이 선물한 그림 액자. 언덕과 해가 있는 섬 풍경 그림.",
     "keywords": [

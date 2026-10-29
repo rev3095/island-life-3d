@@ -1,13 +1,16 @@
 // 강 둑·풀/모래 경계·해안 거리장 확인 (src/world/banksfield.js · coastfield.js — three 없이 도는 순수 계산). node --test tests/banks.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { generateIsland, KIND } from '../src/world/island.js';
+import { readFileSync } from 'node:fs';
+import { generateIsland, lotsOf, BUILDING_KINDS, KIND } from '../src/world/island.js';
 import { riverBanks, groundBlend, bankWaterline, bankY, BANK } from '../src/world/banksfield.js';
 import { coastField } from '../src/world/coastfield.js';
 import { ISLAND, VILLAGERS } from '../src/core/constants.js';
 
 const SEEDS = [12345, 777, 2026];
-const gens = SEEDS.map(seed => generateIsland(seed, { ...ISLAND, villagers: VILLAGERS }));
+// 건물 집터는 배경 스펙의 world.lot (게임과 같은 값)
+const lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, JSON.parse(readFileSync(new URL(`../assets/env/specs/${k}.json`, import.meta.url), 'utf8'))])));
+const gens = SEEDS.map(seed => generateIsland(seed, { ...ISLAND, villagers: VILLAGERS, lots }));
 
 /** 거리장 격자에서 (칸 좌표) 의 거리 — 꼭짓점 평균 (판 꼭짓점과 같은 값) */
 const nodeAt = (L, tx, tz) => L.nodeD(Math.round((tx - L.tx0) * L.R), Math.round((tz - L.tz0) * L.R));

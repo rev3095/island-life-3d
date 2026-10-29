@@ -6,7 +6,7 @@
   "category": "furniture",
   "kind": "floor-lamp",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "갓이 달린 키 큰 스탠드. 밤이 되면 갓 아래 전구가 따뜻하게 빛난다.",
     "keywords": [

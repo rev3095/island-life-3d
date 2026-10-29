@@ -5,7 +5,7 @@
   "category": "nature",
   "kind": "rock",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "하루에 한 번 도끼로 치면 돌·철광석·도토리가 나오는 바위.",
     "keywords": [
@@ -62,5 +62,10 @@
     1,
     1
   ],
-  "animations": []
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.44
+    }
+  }
 }

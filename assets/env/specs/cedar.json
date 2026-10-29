@@ -5,7 +5,7 @@
   "category": "nature",
   "kind": "cedar",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "언덕 위에 많은 뾰족한 상록수. 겨울에는 눈이 소복이 쌓인다.",
     "keywords": [
@@ -77,5 +77,10 @@
   "animations": [
     "sway",
     "shake"
-  ]
+  ],
+  "world": {
+    "collider": {
+      "r": 0.28
+    }
+  }
 }

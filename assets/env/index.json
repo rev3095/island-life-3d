@@ -13,7 +13,7 @@
       "category": "nature",
       "kind": "tree",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-02",
@@ -22,7 +22,7 @@
       "category": "nature",
       "kind": "fruit-tree",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-03",
@@ -31,7 +31,7 @@
       "category": "nature",
       "kind": "palm",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-04",
@@ -40,7 +40,7 @@
       "category": "nature",
       "kind": "cedar",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-05",
@@ -49,7 +49,7 @@
       "category": "nature",
       "kind": "rock",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-06",
@@ -58,7 +58,7 @@
       "category": "nature",
       "kind": "flower-tulip",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-07",
@@ -67,7 +67,7 @@
       "category": "nature",
       "kind": "flower-cosmos",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-08",
@@ -76,7 +76,7 @@
       "category": "nature",
       "kind": "flower-pansy",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-09",
@@ -85,7 +85,7 @@
       "category": "nature",
       "kind": "weed",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-10",
@@ -94,7 +94,7 @@
       "category": "nature",
       "kind": "shell",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "EN-11",
@@ -103,7 +103,7 @@
       "category": "nature",
       "kind": "bush",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-01",
@@ -112,7 +112,7 @@
       "category": "prop",
       "kind": "lamp",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-02",
@@ -121,7 +121,7 @@
       "category": "prop",
       "kind": "bench",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-03",
@@ -130,7 +130,7 @@
       "category": "prop",
       "kind": "mailbox",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-04",
@@ -139,7 +139,7 @@
       "category": "prop",
       "kind": "signboard",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-05",
@@ -148,7 +148,7 @@
       "category": "prop",
       "kind": "bridge",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-06",
@@ -157,7 +157,7 @@
       "category": "prop",
       "kind": "fence",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-07",
@@ -166,7 +166,7 @@
       "category": "prop",
       "kind": "fossil-spot",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-08",
@@ -175,7 +175,7 @@
       "category": "prop",
       "kind": "workbench",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-09",
@@ -184,7 +184,7 @@
       "category": "prop",
       "kind": "campfire",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -193,7 +193,7 @@
       "category": "building",
       "kind": "house",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-02",
@@ -202,7 +202,7 @@
       "category": "building",
       "kind": "house",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-03",
@@ -211,7 +211,7 @@
       "category": "building",
       "kind": "shop",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-04",
@@ -220,7 +220,7 @@
       "category": "building",
       "kind": "museum",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-05",
@@ -229,7 +229,7 @@
       "category": "building",
       "kind": "dock",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-01",
@@ -238,7 +238,7 @@
       "category": "tile",
       "kind": "tile-grass",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-02",
@@ -247,7 +247,7 @@
       "category": "tile",
       "kind": "tile-sand",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-03",
@@ -256,7 +256,7 @@
       "category": "tile",
       "kind": "tile-path",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-04",
@@ -265,7 +265,7 @@
       "category": "tile",
       "kind": "tile-water",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-05",
@@ -274,7 +274,7 @@
       "category": "tile",
       "kind": "tile-cliff",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-06",
@@ -283,7 +283,7 @@
       "category": "tile",
       "kind": "tile-ramp",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-07",
@@ -292,7 +292,7 @@
       "category": "tile",
       "kind": "tile-plaza",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

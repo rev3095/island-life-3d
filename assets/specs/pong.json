@@ -5,7 +5,7 @@
   "species": "duck",
   "role": "주민 · 오리",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "먹보 오리 주민. 요리를 좋아하고 맛있는 과일만 보면 신이 난다. 통통 튀는 말투.",
     "keywords": [

@@ -358,3 +358,15 @@ stats() → { ms, passes }
 - `outlineMaterial(width, { color, bend, base, wind, styleAttr })` — 외곽선 메시엔 계속 `userData.outline = true`. 섬폰 외곽선 끄기는 메시 `visible`, 스타일 `outline: 'off'` 는 재질 `visible` 을 끈다.
 - 셰이더를 덧씌울 때: `#include <begin_vertex>` 표시를 지우지 않는다. uniform 이름 `uTime` 은 world 가 쓰므로 스타일은 `uStyleTime`.
 - 새 `ShaderMaterial` 은 화면 색(sRGB)을 그대로 내보내도 render 가 화면 효과 때 선형으로 바꿔 준다. 직접 맞추려면 sky 처럼 `linearToOutputTexel( vec4( sRGBTransferEOTF( vec4(c, 1.0) ).rgb, a ) )`.
+
+## 리소스 교체 약속 (2026-10-29, 61종 임시 확정 뒤)
+
+모델은 편집기 요청으로 언제든 다시 만들어 바꿔 끼운다. 게임 코드를 고치지 않고 바꿀 수 있게, 요소마다 필요한 값은 그 요소의 스펙 JSON 하나에 둔다. `tests/assets.test.mjs` 가 아래 약속을 검사한다.
+
+- **파일**: 요소마다 `specs/<slug>.json` · `models/<slug>.glb.json`(+`.glb`, `.stats.json`) · `renders/<slug>_thumb.png` … 를 따로 둔다. 목록 `index.json` 은 빌드 도구가 스펙에서 만든다 (`id`·`version`·`status` 가 스펙과 같아야 한다).
+- **status**: `review`(검수 대기) | `approved`(확정). "<이름> 확정" → 스펙 status 를 approved 로 바꾸고 `node tools/build-*.mjs --index`. 확정한 요소를 다시 고치면 `version` 을 올리고 status 를 `review` 로 돌린다 (다시 "확정"할 때까지).
+- **재질 이름 = 팔레트 키** (빌더 고정 재질 `eyeHighlight` 만 예외). 열매 메시 `fruit`(fruit-tree)·`coconut`(palm), 땅 색 키 `tile-grass.grass/dirt` · `tile-sand.sand` · `tile-path.path` · `tile-plaza.stone` 는 이름을 바꾸지 않는다.
+- **캐릭터**: 동작 `idle walk run happy`, 뼈 `arm.L arm.R spine head`, 뼈대(skin) 하나.
+- **배경 `world` 칸** (게임 배치 정보, 빌더는 읽지 않는다): `collider` (충돌, 모델 원점 기준: `r` 원 · `box [가로, 세로]` · `boxes [[x0,z0,x1,z1]…]` · `circles [[x,z,r]…]`), `extent` (query 반너비 `[x, z, _, z중심이동]`), 건물 4종은 `lot` (집터 칸 수 `[가로, 세로]`, 섬 만들기가 씀). 모델 크기를 바꾸면 같은 파일의 world 값을 맞춘다 — 상자 충돌 가로가 모델 가로의 88%~+0.1, 건물 모델이 집터 안이어야 테스트가 통과한다.
+- **가구**: 배치는 스펙 `footprint`·`place`·`layer` 만 쓴다. `src/data/items.js` FURN 표의 칸 글자('2×1', '벽', '창문')는 화면 표시용이라 footprint 를 바꾸면 같이 고친다 (테스트가 어긋남을 잡는다). 벽시계 바늘 노드 `hourHand`·`minuteHand`.
+- **그대로 코드에 있는 것**: 해안선·바다·강 둑 모양(절차 생성, 색만 타일 팔레트), 집 안 작업대 칸 `[2, 1]`(house/index.js), 흔들림·그림자 제외 종류 표(world/objects.js `SWAY`·`NO_SHADOW`).

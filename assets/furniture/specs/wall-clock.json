@@ -6,7 +6,7 @@
   "category": "furniture",
   "kind": "wall-clock",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "벽에 거는 둥근 나무 시계. 바늘은 게임 시각을 그대로 가리킨다.",
     "keywords": [

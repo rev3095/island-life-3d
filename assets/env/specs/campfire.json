@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "campfire",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "돌로 둘러싼 모닥불. 불꽃이 일렁이고 밤에 주변을 밝힌다.",
     "keywords": [
@@ -58,5 +58,10 @@
   ],
   "animations": [
     "flicker"
-  ]
+  ],
+  "world": {
+    "collider": {
+      "r": 0.4
+    }
+  }
 }

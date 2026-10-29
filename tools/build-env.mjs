@@ -2,6 +2,7 @@
 // 사용: node tools/build-env.mjs tree [rock ...] [--no-render]
 //       node tools/build-env.mjs --all              (스펙 전부)
 //       node tools/build-env.mjs --category nature  (분류 하나: nature | prop | building | tile)
+//       node tools/build-env.mjs --index            (Blender 없이 목록만 다시 씀: 스펙의 status·이름만 바꿨을 때)
 // 빌드가 끝나면 배경 편집기가 읽는 목록(assets/env/index.json)을 다시 쓴다.
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -24,8 +25,9 @@ const slugs = args.includes("--all") ? readSpecs().map(s => s.slug)
   : catArg ? readSpecs().filter(s => s.category === catArg).map(s => s.slug)
   : args.filter(a => !a.startsWith("--") && a !== catArg);
 
-if (!existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
-if (!slugs.length) throw new Error("만들 요소를 지정하세요: node tools/build-env.mjs tree | --all | --category nature");
+const indexOnly = args.includes("--index");
+if (!indexOnly && !existsSync(blender)) throw new Error(`Blender를 찾을 수 없음: ${blender} (BLENDER 환경변수로 지정)`);
+if (!indexOnly && !slugs.length) throw new Error("만들 요소를 지정하세요: node tools/build-env.mjs tree | --all | --category nature");
 
 let failed = 0;
 for (const slug of slugs) {

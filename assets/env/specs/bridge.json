@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "bridge",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "강을 건너는 나무다리. 가운데가 살짝 둥글게 솟아 있다.",
     "keywords": [
@@ -58,5 +58,11 @@
     "wood": "판자·난간",
     "woodDark": "어두운 판자"
   },
-  "animations": []
+  "animations": [],
+  "world": {
+    "extent": [
+      1.5,
+      0.7
+    ]
+  }
 }

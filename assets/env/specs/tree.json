@@ -5,7 +5,7 @@
   "category": "nature",
   "kind": "tree",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "섬 곳곳에 심는 기본 나무. 흔들면 나뭇가지나 도토리가 떨어지고, 계절마다 잎 색이 바뀐다.",
     "keywords": [
@@ -91,5 +91,10 @@
   "animations": [
     "sway",
     "shake"
-  ]
+  ],
+  "world": {
+    "collider": {
+      "r": 0.34
+    }
+  }
 }

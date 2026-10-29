@@ -5,7 +5,7 @@
   "species": "tortoise",
   "role": "박물관장 · 거북",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "느릿느릿하지만 박식한 거북 박물관장. 화석 이야기만 나오면 눈이 반짝인다. 동그란 안경과 나비넥타이.",
     "keywords": [

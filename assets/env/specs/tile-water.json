@@ -5,7 +5,7 @@
   "category": "tile",
   "kind": "tile-water",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "강과 바다 칸. 땅보다 조금 낮고 물결 반짝임이 있다. 게임에서는 물결이 움직인다.",
     "keywords": [
