@@ -51,6 +51,12 @@
 
 고르는 순서는 예전과 같다: 열린 창 > `bgm(이름)`(이름이 places 에 있으면 그 자리 곡, 아니면 곡 id) > 날씨 > 시간대. 라디오는 house 가 곡 id(`dawn`…`night`)를 직접 부른다.
 
+### 새 곡 · 새 상황 더하기 (예: Z5 축제 무대·등불 축제·엔딩 사진)
+
+- **새 곡**: `assets/sound/songs/<id>.json` 하나 + `index.json` 의 `songs` 에 id + `src/audio/files.js` 의 `SONG_FILES` 에 경로. 있는 반주 모양(`arrange`)을 쓰면 코드는 안 고친다 (편집기 "복사해서 새 곡" → "소리 반영" 이면 `apply-sound.mjs` 가 세 곳을 다 고친다). 새 반주 모양이 필요하면 `songs.js` 의 `ARRANGE` 와 `ARRANGE_PARTS` 에 한 칸씩.
+- **새 상황**: `index.json` 의 `schedule.places` 에 이름 한 칸 (`"festival": "festival-stage"`, `"ending": "ending-photo"`) → 그 모듈이 들어갈 때 `ctx.services.audio.bgm('festival')`(또는 `events.emit('bgm', { name: 'festival' })`), 나올 때 `bgm('auto')`. 곡을 바꾸고 싶으면 표만 고치면 되고 코드는 그대로 (편집기 "언제 틀까" 의 자리 목록에 저절로 나온다 — 화면 이름은 `sound-editor.html` 의 `PLACE_LABEL` 에 한 줄, 없으면 키 그대로). 창을 여는 동안만이면 `panels` 에 (`ui:open { panel }`). 장면(컷신)도 `shot.music` 에 자리 이름을 쓸 수 있다.
+- 주의: `bgm(이름)` 은 "직접 고른 곡" 한 자리뿐이라 나중 부른 것이 이긴다. 축제 중에 장면이 끝나면 story 가 `bgm('auto')` 를 보내므로, 축제 쪽은 `story:end` 때 `bgm('festival')` 을 다시 부른다.
+
 ## 코드 바뀐 곳 (`src/audio/`)
 
 - `bank.js` (새): `loadSound(load)` → `installSound(data)` (곡·효과음·목소리·선곡 표에 넣음, 문제 목록), `SCHEDULE`·`slotForHour`·`autoSong`, `formatJSON`. DOM·Web Audio 없음 → node·편집기·게임이 같이 쓴다.
