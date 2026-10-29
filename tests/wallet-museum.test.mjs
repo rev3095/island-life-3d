@@ -64,9 +64,9 @@ test('박물관: progress', () => {
   m.donate('bug.moth');
   const p = m.progress();
   assert.deepEqual(p.fish, [0, 20]);
-  assert.deepEqual(p.bug, [2, 20]);
+  assert.deepEqual(p.bug, [2, 22]);
   assert.deepEqual(p.fossil, [0, 8]);
-  assert.deepEqual(p.total, [2, 48]);
+  assert.deepEqual(p.total, [2, 50]);
   assert.equal(p.complete, false);
 });
 

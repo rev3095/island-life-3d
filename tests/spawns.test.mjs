@@ -92,7 +92,7 @@ test('곤충: 여러 장소를 한 번에', () => {
 test('곤충: 날씨로 거른다', () => {
   assert.ok(!ids(spawns.bugPool({ place: 'rock', hour: 12, month: 6, weather: 'clear' })).includes('bug.snail'), '달팽이는 비 올 때만');
   assert.ok(ids(spawns.bugPool({ place: 'rock', hour: 12, month: 6, weather: 'rain' })).includes('bug.snail'));
-  assert.ok(ids(spawns.bugPool({ place: 'rock', hour: 12, month: 6, weather: 'rain' })).includes('bug.pill-bug'));
+  assert.ok(ids(spawns.bugPool({ place: 'under', hour: 12, month: 6, weather: 'rain' })).includes('bug.pill-bug'), '쥐며느리는 바위 밑 (비 와도)');
   assert.deepEqual(ids(spawns.bugPool({ place: 'flower', hour: 12, month: 4, weather: 'rain' })).sort(), ['bug.ladybug', 'bug.mantis'], '비 오면 나비는 숨는다');
   assert.ok(!ids(spawns.bugPool({ place: 'lamp', hour: 22, month: 1, weather: 'snow' })).includes('bug.moth'));
   assert.ok(ids(spawns.bugPool({ place: 'lamp', hour: 22, month: 1, weather: 'cloudy' })).includes('bug.moth'));

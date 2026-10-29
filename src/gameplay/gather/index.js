@@ -59,10 +59,10 @@ export default {
     const bugModels = createBugModels(ctx, mk);
     const garden = createGarden(ctx, kit, { fx, act });
     const pickup = createPickup(ctx, kit, { drops, results, fx, act, garden });
-    const trees = createTrees(ctx, kit, { drops, fx, mk, bugModels, results, act, lock });
-    fishing = createFishing(ctx, kit, { mk, fx, results, toolbelt, act });
     const bugs = createBugs(ctx, kit, { bugModels, drops });
-    const work = createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, garden });
+    const trees = createTrees(ctx, kit, { drops, fx, mk, bugModels, bugs, results, act, lock });
+    fishing = createFishing(ctx, kit, { mk, fx, results, toolbelt, act });
+    const work = createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, garden, bugs });
 
     // ---------- 잠자리채 ----------
     const bugMesh = id => { const m = bugModels.build(id); m.root.scale.setScalar(1.6); return m.root; };
