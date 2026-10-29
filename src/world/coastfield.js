@@ -29,7 +29,26 @@ export function coastField(gen) {
   }
   const v = blur(land, NX, NZ, SIGMA * R);
   const rv = blur(river, NX, NZ, 0.9 * R);
-  // 등고선 가까이는 기울기로 칸 안쪽까지 거리를 잰다 (부드럽게), 멀리는 모따기 거리 전파
+  const d = contourDistance(v, NX, NZ, R, THETA, DMAX);
+  return {
+    NX, NZ, x0, z0, R, d, river: rv,
+    /** 월드 (x, z) 의 해안 거리 (칸, 이중 선형). 땅 안쪽 ≤ 0 */
+    at(x, z) {
+      const fi = (x - x0) * R - 0.5, fj = (z - z0) * R - 0.5;
+      const i = Math.max(0, Math.min(NX - 2, Math.floor(fi))), j = Math.max(0, Math.min(NZ - 2, Math.floor(fj)));
+      const u = Math.min(1, Math.max(0, fi - i)), t = Math.min(1, Math.max(0, fj - j));
+      const c = j * NX + i;
+      return (d[c] * (1 - u) + d[c + 1] * u) * (1 - t) + (d[c + NX] * (1 - u) + d[c + NX + 1] * u) * t;
+    },
+  };
+}
+
+/**
+ * 흐린 가면 v 의 문턱 theta 등고선에서 바깥(v < theta 쪽)으로의 거리 (칸). 안쪽은 -1 ~ 0, 바깥은 dmax 까지.
+ * 등고선 가까이는 기울기로 칸 안쪽까지 잰다 (부드럽게), 멀리는 모따기 거리 전파. 강 둑(banksfield.js)도 같이 쓴다.
+ */
+export function contourDistance(v, NX, NZ, R, theta, dmax) {
+  const N = NX * NZ, THETA = theta;
   const d = new Float32Array(N).fill(1e9);
   for (let j = 1; j < NZ - 1; j++) for (let i = 1; i < NX - 1; i++) {
     const c = j * NX + i;
@@ -54,25 +73,15 @@ export function coastField(gen) {
       relax(c, c + 1, a); relax(c, c + NX, a); relax(c, c + NX + 1, b); relax(c, c + NX - 1, b);
     }
   }
-  for (let c = 0; c < N; c++) d[c] = Math.min(DMAX, d[c]);
+  for (let c = 0; c < N; c++) d[c] = Math.min(dmax, d[c]);
   // 모따기 거리의 꺾인 줄을 살짝 문지른다 (등고선 바깥만)
   const ds = blur(d, NX, NZ, 1.2);
   for (let c = 0; c < N; c++) if (d[c] > 0.6) d[c] = ds[c];
-  return {
-    NX, NZ, x0, z0, R, d, river: rv,
-    /** 월드 (x, z) 의 해안 거리 (칸, 이중 선형). 땅 안쪽 ≤ 0 */
-    at(x, z) {
-      const fi = (x - x0) * R - 0.5, fj = (z - z0) * R - 0.5;
-      const i = Math.max(0, Math.min(NX - 2, Math.floor(fi))), j = Math.max(0, Math.min(NZ - 2, Math.floor(fj)));
-      const u = Math.min(1, Math.max(0, fi - i)), t = Math.min(1, Math.max(0, fj - j));
-      const c = j * NX + i;
-      return (d[c] * (1 - u) + d[c + 1] * u) * (1 - t) + (d[c + NX] * (1 - u) + d[c + NX + 1] * u) * t;
-    },
-  };
+  return d;
 }
 
 /** 가우스 흐림 (가로·세로 따로) */
-function blur(src, nx, nz, sigma) {
+export function blur(src, nx, nz, sigma) {
   const r = Math.ceil(sigma * 3), k = new Float32Array(2 * r + 1);
   let sum = 0;
   for (let i = -r; i <= r; i++) sum += (k[i + r] = Math.exp(-(i * i) / (2 * sigma * sigma)));
