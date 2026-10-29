@@ -49,13 +49,13 @@ capabilities: `{ db: { rules: [ {path:'applied', read:'view', write:'admin'}, {p
 ## 반영 기록
 | 버전 | 날짜 | 내용 | 커밋 |
 |---|---|---|---|
-| v0 | 2026-10-29 | 처음 값 — `presets.js` 에 있던 cozy · toon · 집 안(cozy) 값을 그대로 `presets.json` 으로 | (이 노트를 넣은 커밋) |
+| v0 | 2026-10-29 | 처음 값 — `presets.js` 에 있던 cozy · toon · 집 안(cozy) 값을 그대로 `presets.json` 으로. 저장소 `applied/style`·`history/style-v0` 에 기록 | 021d7cd |
 
 ## 확인한 것
 - `node --test tests/` 201/201 (새 `style.test.mjs` 4개).
 - 게임 화면이 전과 같음: 바뀌기 전 사본(`git archive HEAD`, 포트 4227)과 바뀐 뒤(4226)에서 cozy·toon·집 안 cozy 의 `style.get()` 값 · 재질 uniform(`materials.look`) · 화면 효과 패스 목록을 JSON 으로 떠서 SHA-256 앞 16자 비교 → 둘 다 `551e7483fbb8158c`. 낮 12시 맑음 스크린샷도 같음 (주민 위치만 다름). 콘솔 오류 0.
 - 편집기 로컬(4226): 작은 섬 낮·밤(창문·모닥불 빛 번짐), 슬라이더 → 0.7초 뒤 `assets/review/style-drafts.json` 에 저장, 다시 열면 되살아남, 집 안 덧씌우기만 따로 저장(바깥 `ao` 그대로), 툰 프리셋 바꾸기(2단·잉크), 저장본 남기기 → 왼쪽에 놓고 비교, `demos/style.html` → `?island` 진짜 섬. 콘솔 오류 0. 시험 데이터는 지웠다.
-- 게시 뒤 저장소 읽기: `drafts`·`applied` 비어 있음(처음) → v0 기록을 넣었다.
+- 게시 뒤 저장소 읽기: `drafts`·`applied` 비어 있음(처음) → v0 기록을 넣었다 (한 번에 두 문서). 보기 권한(`as_level view`)으로 `history` 읽힘, 일반 사용자(`interact`)로 `applied` 쓰기는 거절됨.
 - 스크린샷: 공유 노트 폴더 `m6-p6-style-shots/`.
 
 ## 못 한 것
