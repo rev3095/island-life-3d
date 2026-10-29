@@ -295,6 +295,44 @@ export function makeScenario(bot, sk, opts = {}) {
     return pass(`s04 ${seen ? '봄' : '안 봄'} · 집터 ${S().town.movein.stage()}`);
   });
 
+  add('request-gift', '❓ 부탁 받고 들어주기 · 🎁 선물 주기', async () => {
+    await bot.setHour(9);
+    const out = { request: null, got: null, done: false, gift: null };
+    // 부탁: 들어줄 수 있을 것 같은 주민부터 (분류가 물고기·곤충·과일·꽃·조개·나무)
+    const can = r => r && (['fish', 'bug', 'fruit', 'flower', 'shell'].includes(r.cat) || ['mat.wood', 'mat.branch', 'fruit.coconut'].includes(r.id) || r.id?.startsWith('fruit.'));
+    for (const slug of residents()) {
+      if (out.request) break;
+      const r1 = await sk.emoteTalk(slug, { ask: true, wins: 0 });
+      const req = S().town.state(slug).request;
+      if (r1.opened && req) { out.request = { slug, ...req }; if (!can(req)) out.request.skip = true; }
+    }
+    if (!out.request) return awk('부탁을 받은 주민이 없어요');
+    const req = out.request;
+    if (!req.skip) {
+      const test = it => !!it && (req.id ? it.id === req.id : it.category === req.cat);
+      keep.add(req.id ?? '');
+      if (!bot.inv().some(s => s && test(bot.item(s.id)))) out.got = await sk.obtain(req);
+      const r2 = await sk.emoteTalk(req.slug, { ask: true, wins: 0, requestItem: test });
+      const v = S().town.state(req.slug);
+      out.done = v.doneDay === bot.day();
+      out.reward = bot.toasts.filter(t => t.step === 'request-gift').map(t => t.text).filter(t => /받았어요/.test(t)).at(-1) ?? null;
+    }
+    // 선물: 좋아하는 것을 가진 주민에게 하나 (없으면 아무 물건이나 — 보통 반응이라도 선물 흐름을 본다)
+    const anyGift = it => !!it && !['tool', 'festival'].includes(it.category) && !keep.has(it.id) && !isMaterialFor(it);
+    for (const [k, slug] of [...residents().map(s => [0, s]), ...residents().map(s => [1, s])]) {
+      const g = k === 0 ? giftTest(slug) : anyGift;
+      if (!bot.inv().some(s => s && g(bot.item(s.id), s))) continue;
+      const f0 = S().town.state(slug).friendship;
+      const r = await sk.emoteTalk(slug, { gift: g, wins: 0 });
+      out.gift = { slug, item: r.gift, before: f0, after: S().town.state(slug).friendship };
+      break;
+    }
+    note('requestGift', out);
+    const n = [`부탁 ${req.slug}: ${req.label}${req.skip ? ' (건너뜀)' : out.done ? ' → 들어줌' : ' → 못 들어줌'}${out.reward ? ` · ${out.reward}` : ''}`, out.gift ? `선물 ${out.gift.slug} ${out.gift.item} 친밀도 ${out.gift.before}→${out.gift.after}` : '선물할 것 없음'];
+    if (!req.skip && !out.done) return awk(n.join(' · '));
+    return pass(n.join(' · '));
+  });
+
   add('festival-loop', '부품 5개 모으기 (주민 마음 열기 → 🎉 → 채집 → 전달), 날마다 반복', async () => {
     const maxDays = opts.maxDays ?? 10;
     const log = [];
@@ -341,6 +379,18 @@ export function makeScenario(bot, sk, opts = {}) {
       note(`bday-${slug}`, { day: bot.day(), opened: ok.opened, cake: bot.has('furn.birthday-cake') > cake0 });
     }
   }
+
+  add('craft', '작업대에서 만들기 (나무 4 → 통나무 의자) · 방에 놓기', async () => {
+    await bot.setHour(10);
+    const w = await sk.wood(4);
+    if (bot.has('mat.wood') < 4) return awk(`나무가 모자라요 (${bot.has('mat.wood')}/4)`);
+    const made = await sk.craft('furn.log-chair');
+    let placed = false;
+    if (made) { await sk.enterHome(); sk.homeEntry = bot.pos(); await bot.walkLocal({ x: bot.pos().x - 1, z: bot.pos().z - 1.5 }); placed = await sk.placeFurniture(s => s.id === 'furn.log-chair'); await sk.leaveHome(); }
+    note('craft', { wood: w, made, placed });
+    if (!made) return block('작업대에서 만들기가 안 됐어요');
+    return placed ? pass('통나무 의자 만들어 방에 놓음') : awk('만들었는데 방에 못 놓음');
+  });
 
   add('birthday', '두부 생일 (11/3)', async () => {
     const r = T.notes['bday-dubu'];

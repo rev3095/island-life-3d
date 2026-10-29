@@ -278,7 +278,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     // 리듬 놀이: 음표가 줄에 닿을 때 (사람 반응처럼 ±40ms 흔들림)
     if (top.el.dataset.botOn) return;
     top.el.dataset.botOn = '1';
-    const { RHYTHM } = await import('../../src/gameplay/festival/booths.js');
+    // 게임 창 안에서 불러온다 (그쪽 importmap 으로 three 를 찾는다 · 게시본은 /artifact/ 아래)
+    const { RHYTHM } = await win.Function('u', 'return import(u)')(new URL('src/gameplay/festival/booths.js', win.location.href).href);
     const t0 = performance.now();
     for (const b of RHYTHM.beats) {
       const at = t0 + (RHYTHM.lead + b * RHYTHM.beat) * 1000 + (Math.random() - 0.5) * 80;
@@ -331,6 +332,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     if (inZone()) return bot.walkLocal(to, { near, timeout });
     const start = bot.gameT;
     const goalT = walkableNear(to);
+    // 목표가 물·건물처럼 못 서는 곳이면 가장 가까운 땅 칸 가운데로 (그 자리 자체로 걸어 들어가려다 막히지 않게)
+    if (goalT && !world().island.isWalkable(to.x, to.z)) { to = world().island.toWorld(goalT.tx, goalT.tz); near = Math.max(near, 0.3); }
     let pts = null, tries = 0;
     const plan = () => {
       const a = tileOf(bot.pos());

@@ -195,6 +195,26 @@ export function createSkills(bot) {
     return n;
   };
 
+  /** 부탁 물건 구하기: req = { cat, id } → 구한 아이템 id | null */
+  sk.obtain = async req => {
+    const test = it => !!it && (req.id ? it.id === req.id : it.category === req.cat);
+    const have = () => bot.inv().find(s => s && test(items().get(s.id)))?.id ?? null;
+    for (let k = 0; k < 4 && !have(); k++) {
+      if (req.cat === 'fish') await sk.fish({ tries: 2 });
+      else if (req.cat === 'bug') await sk.bug({ tries: 3 });
+      else if (req.cat === 'flower') await sk.flowers(1, { kinds: 1 });
+      else if (req.cat === 'shell') {
+        const o = sk.objects('shell')[0];
+        if (o) { await bot.tool(null); await bot.walkTo(o, { near: 0.5, label: '조개' }); await bot.face(o, { timeout: 0.6 }); await bot.act('pickup'); }
+      } else if (req.id === 'mat.wood') await sk.wood(1);
+      else if (req.id === 'mat.branch') { for (const o of sk.objects('tree').slice(k * 2, k * 2 + 2)) await sk.shakeTree(o); }
+      else if (req.id === 'fruit.coconut') { for (const o of sk.objects('palm').slice(k, k + 1)) await sk.shakeTree(o); }
+      else if (req.cat === 'fruit' || req.id?.startsWith('fruit.')) { for (const o of sk.objects('fruit-tree').slice(k, k + 1)) await sk.shakeTree(o); }
+      else break;
+    }
+    return have();
+  };
+
   // ---------- 상점·박물관 ----------
   const place = k => W().places[k];
   /** 건물 문 앞에 서서 북쪽(문)을 본다 */
@@ -339,6 +359,36 @@ export function createSkills(bot) {
     await bot.act('action');
     bot.policy = {};
     return (house().furniture?.length ?? 0) > before;
+  };
+
+  /** 집 작업대에서 만들기 (want = 레시피 id = 만들어지는 아이템 id) → 만들었으면 true */
+  sk.craft = async want => {
+    if (!(await sk.enterHome())) return false;
+    sk.homeEntry = bot.pos();
+    const R = house().room;
+    // 작업대는 서쪽 벽(칸 gx 0, gz 2~3)에 붙어 동쪽을 본다 → 그 앞에서 서쪽을 보고
+    await bot.walkLocal({ x: R.x0 + 1.5, z: R.z0 + 3.0 }, { near: 0.2 });
+    await bot.faceDir(90);
+    const pk = S().gameplay.interactions.peek('action');
+    if (pk?.label !== '만들기') bot.issue('minor', 'house', `작업대 앞인데 버튼이 '${pk?.label ?? '없음'}' 이에요`);
+    const n0 = bot.has(want) + (S().data.inventory.hasTool?.(want.replace('tool.', '')) ? 1 : 0);
+    const st = { picked: false, went: false };
+    bot.policy = {
+      card: (kind, el, card) => {
+        if (kind !== 'craft') return false;
+        const item = card.querySelector(`.pk-craft-item[data-id="${want}"]`);
+        if (!st.picked && item) { st.picked = true; bot.click(item); return true; }
+        const go = card.querySelector('.pk-craft-go');
+        if (!st.went && go && !go.disabled) { st.went = true; bot.click(go); return true; }
+        bot.click(card.querySelector('.pk-x'));
+        return true;
+      },
+    };
+    await bot.act('action', { timeout: 30 });
+    bot.policy = {};
+    const made = bot.has(want) + (S().data.inventory.hasTool?.(want.replace('tool.', '')) ? 1 : 0) > n0;
+    await sk.leaveHome();
+    return made;
   };
 
   // ---------- 주민 ----------
