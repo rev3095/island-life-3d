@@ -53,6 +53,18 @@
 
 겹치면 안 되는 곳: X1 만 `src/ui/` 를 고친다 (X3 의 이름 정하기 창은 `src/gameplay/intro/` 안에 자기 DOM 으로). X2 만 `src/world/`·`src/render/` 를 고친다. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안으로 적는다.
 
+### 4차 (2026-10-29 — 다듬기와 콘텐츠, 새 모델·그림 없이)
+
+`main` 에서 갈라진다. 새 모델·그림이 필요한 일(주민 집 안, 도구 아이콘 D2, 새 가구)은 검수 보드를 먼저 보여 준 뒤 5차로 미룬다.
+
+| 트랙 | 브랜치 · 포트 | 고치는 곳 (여기만) | 결과물 |
+|---|---|---|---|
+| Y1 조작 안내·편의 | `p7-ux` · 4201 | `src/gameplay/index.js`, `src/core/input.js`, `src/ui/`, `src/data/save.js`, `src/gameplay/intro/` | `interactions.peek(intent)` + 이름→글자 표로 A·B 버튼 글자가 상황에 맞게('말 걸기'·'흔들기'·'들어가기'·'줍기'), 키보드 화면 아래 같은 힌트, 섬폰에 내 이름·섬 이름과 이름 다시 정하기, `save.reset()` 이 모든 칸(편지 등)을 지우게, 저장 실패 알림 |
+| Y2 채집 콘텐츠 | `p7-content` · 4202 | `src/gameplay/gather/`, `src/data/items.js`·`museum.js`·`spawns.js`·`harvest.js`, `src/gameplay/town/keepers.js`·`lines/neuru.js` | 화석 감정(파면 '알 수 없는 화석' → 느루가 감정), 큰 물고기 줄 당김, 곤충 들추기(바위 → 쥐며느리, 나무 흔들기 → 떨어지는 곤충), 잡은 물고기 종별 색 |
+| Y3 그리기 다듬기 | `p7-render` · 4203 | `src/core/materials.js`, `src/render/`, `src/world/`, `src/player/index.js`, `src/gameplay/town/actor.js`, `src/gameplay/house/furniture.js` | 캐릭터 툰 부품 합치기(그리기 호출 줄이기), 디더 가림을 materials 공용으로(주민·가구도 비치게), 강 둑·풀/모래 경계 부드럽게, 그림자에 바람 |
+
+겹치면 안 되는 곳: data 는 Y1 이 `save.js` 만, Y2 가 나머지. town 은 Y2 가 `keepers.js`·`lines/neuru.js` 만, Y3 가 `actor.js` 만. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안으로 적는다.
+
 ## 합치기
 
 각 트랙은 자기 브랜치에 커밋만 하고, 합치기(merge)는 사용자 확인 후 `main` 에서 한다.
