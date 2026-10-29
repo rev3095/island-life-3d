@@ -182,13 +182,13 @@ details summary { cursor: pointer; font-size: 14px; }
 
   <section id="plan">
     <div class="sec-head"><p class="id">PLAN · M7</p><h2>승인 뒤 진행 계획</h2>
-      <p class="muted">지금처럼 트랙마다 세션과 브랜치를 나눠 동시에 만들고, 합치기 전에 다시 승인을 받아요. 파일이 겹치지 않게 맡는 곳을 나눴어요. 추천안이 아닌 안을 고르면 그 트랙의 할 일이 바뀌어요.</p></div>
+      <p class="muted">지금처럼 트랙마다 세션과 브랜치를 나눠 동시에 만들고, 합치기 전에 다시 승인을 받아요. 파일이 겹치지 않게 맡는 곳을 나눴어요. <b>반영 v1 (10-30, 임시)</b>: D37-B · D41-B, 나머지 추천안 A — 아래 표가 그 계획이에요. 다른 안으로 바꾸면 그 트랙의 할 일이 바뀌어요.</p></div>
     <div class="tblwrap"><table class="tbl"><thead><tr><th>트랙</th><th>만드는 것</th><th>맡는 파일</th><th>먼저 필요한 것</th></tr></thead><tbody>
-      <tr><td class="id">M7-P1</td><td>QA 자동 점검 (<b>이미 도는 중</b>, QA 고정 세션) — 처음부터 엔딩까지 자동 플레이, RC-01–04, 밸런스 숫자 재기, 큰 문제 QA-01–</td><td><code>docs/qa/</code> + QA 세션이 정한 점검 도구·테스트</td><td>—</td></tr>
-      <tr><td class="id">M7-P2</td><td>로딩·성능·기기 점검 — 처음 받는 묶음 줄이기, 로딩 화면 UI-06, 시작 단추 UI-11, 기기 점검 UI-07, 자동 저사양 기준</td><td><code>tools/build-web.mjs</code> 의 <code>PACKS</code> · <code>tools/web-loader.html</code> · <code>src/core/packs.js</code> · <code>src/render/quality.js</code> · 기기 점검 (새 파일, <code>src/render/</code> 안)</td><td>D37 · D39 · D45</td></tr>
+      <tr><td class="id">M7-P1</td><td>QA 자동 점검 (<b>이미 도는 중</b>, QA 고정 세션) — 처음부터 엔딩까지 자동 플레이, RC-01–04, 밸런스 숫자 재기, 큰 문제 QA-01– (막힘·저장 깨짐·오류는 바로 고침, D47-A)</td><td><code>docs/qa/</code> + QA 세션이 정한 점검 도구·테스트</td><td>—</td></tr>
+      <tr><td class="id">M7-P2</td><td>기기 점검·시작 단추 — 기기 점검 UI-07, 시작 단추 UI-11, 자동 저사양 기준 (광장 33ms). <span class="muted">D37-B 라 묶음·로딩 화면 UI-06 은 그대로</span></td><td><code>tools/web-loader.html</code> (시작 단추 자리만) · <code>src/render/quality.js</code> · 기기 점검 (새 파일, <code>src/render/</code> 안)</td><td>D39 · D45</td></tr>
       <tr><td class="id">M7-P3</td><td>휴대폰·접근성 — 세로 화면 시야·패드 자리, 보기 편하게 UI-10, 색만으로 구분하지 않기·흔들림 줄이기·이모티콘 뜻·소리 신호 글자, 섬폰 메뉴 줄(P4 창 포함)</td><td><code>src/ui/</code> (<code>phone.js</code>·<code>ui.css</code> 등, P4 새 파일 둘 빼고) · <code>src/core/input.js</code> · <code>src/player/camera.js</code> · <code>src/gameplay/festival/talkui.js</code>·<code>festival.css</code></td><td>D38 · D42</td></tr>
       <tr><td class="id">M7-P4</td><td>저장 옮기기·문제 알리기 — 내보내기·불러오기 UI-09, 문제 알리기 UI-08, 오류 모으기, 게임 저장소 <code>reports</code></td><td><code>src/data/save.js</code> · <code>src/ui/transfer.js</code>·<code>report.js</code> (새, <code>ui.panel</code> 로 창만) · <code>src/core/errors.js</code> (새) · 홈 <code>reads</code> 한 줄은 편집기 홈 세션에 부탁</td><td>D43 · D46</td></tr>
-      <tr><td class="id">M7-P5</td><td>밸런스·첫날 안내·소리 값 — P1 이 잰 숫자로 목표 맞추기(숫자 표 초안), 첫날 안내 다듬기, 소리 기본값</td><td><code>assets/data/*.json</code> ("숫자 반영"으로) · <code>assets/festival/config.json</code> 의 <code>parts</code> · <code>src/gameplay/intro/</code> · <code>src/core/state.js</code> 의 <code>settings</code> 줄만</td><td>P1 결과 · D40 · D41 · D44 · D45</td></tr>
+      <tr><td class="id">M7-P5</td><td>첫날 안내·밸런스 — 첫날 안내 다듬기 (QA 가 막힌 곳 힌트·건너뛰기·다시 보기), 밸런스는 <b>지금 빠르기 그대로</b>(D41-B, 임시) — QA 가 잰 값이 3~5일을 벗어날 때만 숫자 표 초안으로. 나중에 D41-A(5~7일)로 바꾸면 그때 초안. 소리 값은 그대로 (D45-A)</td><td><code>src/gameplay/intro/</code> · <code>assets/data/*.json</code> ("숫자 반영"으로) · (D41-A 때) <code>assets/festival/config.json</code> 의 <code>parts</code></td><td>P1 결과 · D40 · D41 · D44</td></tr>
       <tr><td class="id">M7-P6</td><td>출시 (조정 세션) — 합치기 → 게임 링크 다시 게시 → RC 점검 → 공유(사용자가 claude.ai 공유 단추)</td><td><code>README.md</code> · <code>docs/notes/release.md</code> (새) · <code>devlog.md</code></td><td>P1–P5 · D36 · D47</td></tr>
       <tr><td class="id">M8</td><td>다음 콘텐츠 — D48 에서 고른 방향으로 <b>8차 검수 보드</b>부터 (7차에서는 만들지 않아요)</td><td>—</td><td>D48 · M7 끝</td></tr>
     </tbody></table></div>
@@ -240,7 +240,7 @@ $('milesList').innerHTML = MILES.map(([id, name, st, what]) => `
 /* ---------- 지금 출시 준비 상태 ---------- */
 const AUDIT = [
   ['처음부터 엔딩까지', '이야기·축제·사진 엔딩·다음 해 축제까지 들어 있음. 한 번에 이어서 해 본 적은 없음', '⏳', 'QA 자동 점검 (M7-P1) · RC-01–03'],
-  ['처음 로딩', '게시 파일 152개 · 17.8 MB. 열자마자 받는 것 = 모듈 139개 1.07 MB + 묶음 3개 7.34 MB (섬·배경 모델 52·장면, 캐릭터 10)', '△', 'D37 · UI-06'],
+  ['처음 로딩', '게시 파일 152개 · 17.8 MB. 열자마자 받는 것 = 모듈 139개 1.07 MB + 묶음 3개 7.34 MB (섬·배경 모델 52·장면, 캐릭터 10)', '△', 'D37-B 그대로 · RC-08'],
   ['성능', '광장 낮 10.3ms (high) · 8.3ms (low) — 3차에 잰 값, 축제 광장이 생긴 뒤로는 다시 안 잼. 느리면 저사양으로 자동 낮춤', '△', 'D38 · D39 · RC-09'],
   ['휴대폰', '터치 패드·A/B·도구 고리, 세로·가로·안전 영역 맞춤. 실제 기기에서는 아직 안 열어 봄', '❌', 'D38 · D39 · RC-06'],
   ['다른 GPU', '이 컴퓨터(인텔 내장)에서만', '❌', 'D39 · RC-07'],
@@ -451,7 +451,7 @@ function mock(kind) {
 
 /* ---------- 새 화면 ---------- */
 const UI = [
-  ['UI-06', '로딩 화면 v2', 'loader', 'D37', '섬 그림, 받은 양 / 처음 받을 양, 짧은 팁 한 줄 (돌아가며), 실패하면 다시 시도. 느린 기기는 여기서 저사양을 미리 정해요.', '게시본 로딩 화면 (tools/web-loader.html)', 'M7-P2'],
+  ['UI-06', '로딩 화면 v2', 'loader', 'D37', '섬 그림, 받은 양 / 처음 받을 양, 짧은 팁 한 줄 (돌아가며), 실패하면 다시 시도. 느린 기기는 여기서 저사양을 미리 정해요.', '게시본 로딩 화면 (tools/web-loader.html)', '반영 v1: 만들지 않음 (D37-B — 로딩 화면은 지금 그대로)'],
   ['UI-07', '기기 점검 (?check)', 'check', 'D39', '30초 동안 광장·선착장·집 앞을 자동으로 돌며 잼: GPU 이름, 화면 크기·배율, 프레임 시간(가운데·느린 쪽), 품질 자동 판단, 오류 수. "결과 저장"이면 게임 저장소에.', '게임 주소 끝 ?check', 'M7-P2'],
   ['UI-08', '문제 알리기', 'report', 'D46', '짧은 글 + 같이 보낼 정보(고를 수 있음). 오류가 나면 화면 구석에 작은 단추로도. 받은 것은 "전체 요청 확인" 때 Claude 가 읽어요.', '섬폰 메뉴 · 오류 났을 때', 'M7-P4'],
   ['UI-09', '저장 옮기기', 'transfer', 'D43', '저장 파일 받기(.json) · 불러오기 (덮어쓰기 전에 한 번 더 묻기, 모양이 틀린 파일은 거절). B 를 고르면 칸 1·2·3 고르기가 더해져요.', '섬폰 저장 화면', 'M7-P4'],
@@ -473,7 +473,7 @@ const RC = [
   ['RC-05', 'claude.ai 게시본을 직접 열어 로딩 → 섬 → 소리·키보드', '🧑 사용자', 'todo', 'M7-P6'],
   ['RC-06', '휴대폰 iPhone 한 대 · Android 한 대, 세로·가로', '🧑 사용자 + UI-07', 'todo', 'M7-P2 · P3'],
   ['RC-07', '다른 GPU 한 대 더 (외장 GPU 나 Mac)', '🧑 사용자 + UI-07', 'todo', 'M7-P2'],
-  ['RC-08', '처음 로딩: 휴대폰 데이터로 섬까지 걸리는 시간 (D37 목표)', '🧑 사용자 + UI-07', 'todo', 'M7-P2'],
+  ['RC-08', '처음 로딩: 휴대폰 데이터로 섬까지 걸리는 시간 (D37-B: 지금 8.4 MB 그대로, 시간만 재기)', '🧑 사용자 + UI-07', 'todo', 'M7-P2'],
   ['RC-09', '광장 프레임 시간이 목표 안 (D38 · D39)', '🛠 Claude + UI-07', 'part', 'M7-P2'],
   ['RC-10', '가장 큰 글자에서 창이 넘치지 않음 · 색만으로 구분하는 곳 0', '🛠 Claude', 'todo', 'M7-P3'],
   ['RC-11', '내보낸 저장 파일을 다른 브라우저에서 불러와 이어 하기', '🛠 Claude + 🧑 사용자', 'todo', 'M7-P4'],
@@ -490,7 +490,7 @@ $('qaTable').tBodies[0].innerHTML = QA.length
   : '<tr><td class="id">—</td><td class="muted" colspan="3">아직 결과가 없어요 — QA 고정 세션이 도는 중 (2026-10-30). 결과가 오면 QA-01 부터 여기에 올려요.</td></tr>';
 
 /* ---------- 머리 숫자 ---------- */
-$('pills').innerHTML = ['<span class="pill wait">검수 대기</span>', '결정 13 (D36–D48)', '새 화면 6 (UI-06–11)', '출시 점검 12 (RC)', '트랙 6 (M7-P1–P6)', 'QA 결과 0']
+$('pills').innerHTML = ['<span class="pill wait">반영 v1 (임시) · D37-B · D41-B · 나머지 A</span>', '결정 13 (D36–D48)', '새 화면 6 (UI-06–11)', '출시 점검 12 (RC)', '트랙 6 (M7-P1–P6)', 'QA 결과 0']
   .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
 
 /* ---------- 요청 글 ---------- */

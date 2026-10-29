@@ -6,6 +6,16 @@
 
 보드 차례: 마일스톤 M0–M8 → 지금 출시 준비 상태(13줄) → 결정 D36–D48 → 새 화면 UI-06–11 → 출시 점검표 RC-01–12 → QA 결과(QA-01–, 지금 빈 표) → 진행 계획 M7-P1–P6 · M8 → 요청 글.
 
+## 반영 v1 (2026-10-30, 임시) — 사용자 "7차 검수 보드 작성 완료, 반영"
+- 보드 저장소 `boards/wave7` (v6, `status: requested`): **D37-B · D41-B**, 나머지 11개 추천안 A. 의견 하나 — **D41**: "D41-B 임시 실행, 추후 D41-A 방향으로 밸런스 변경 예정".
+- `applied/wave7` v1 · `history/wave7-v1` (`commit` 5223e1e = 반영 직전 main), `boards/wave7` → `editing`, 편집기 홈 `status/wave7`.
+- 아직 만든 것이 없어서 **계획만 바꿈** (`concept/README.md` 「"검수 보드 반영"」 3번):
+  - D37-B → 묶음(`PACKS`)·`packs.js`·로딩 화면 UI-06 은 손대지 않는다. P2 는 기기 점검 UI-07 · 시작 단추 UI-11 · 저사양 기준만. RC-08 은 지금 8.4 MB 로 휴대폰 데이터 로딩 시간만 잰다.
+  - D41-B → 밸런스 목표 = 지금 빠르기(3~5일). P5 는 QA 가 잰 값이 그 밖일 때만 숫자 표 초안. **D41-A 로 바꿀 예정** (사용자 의견) — 보드에서 D41 을 A 로 바꾸고 "검수 보드 반영"하면: P1 이 잰 값 기준으로 `assets/festival/config.json` `parts.open`(지금 tier friend · wins 2)·`parts.list[].need` 와 `assets/data/rules.json` `town`(talkBonus·giftPoints·giftsCountedPerDay) 을 5~7일에 맞춘 초안 → 숫자 표 편집기(`drafts/data`)·축제 설정 → "숫자 반영". 그때 `applied/wave7` v2.
+  - D45-A → 소리 값은 그대로 (`state.js` 손대지 않음). 시작 단추만 P2.
+- 보드 다시 게시(v2): 진행 계획 표를 v1 계획으로, UI-06 "만들지 않음", RC-08 글, 머리 줄 "반영 v1".
+- 트랙 표: `docs/PLAN.md` 「7차」. P2·P3·P4 는 바로 시작할 수 있고 P5 는 QA 결과 뒤, P6 은 조정 세션.
+
 ## 결정과 추천안
 
 "지금" 은 main 0c14b41 을 재 보고 노트에서 모은 것 (아래 「근거」).
@@ -43,14 +53,14 @@
 | P | 할 일 | 맡는 파일 (여기만) | 먼저 |
 |---|---|---|---|
 | M7-P1 | QA 자동 점검 (이미 도는 중, QA 고정 세션 `local_4f51f7d3-c776-4372-a16d-c2d94ef76528`) — RC-01–04, 밸런스 숫자 재기, 큰 문제 QA-01– | `docs/qa/` + 그 세션이 정한 도구·테스트 | — |
-| M7-P2 | 로딩·성능·기기 점검 (UI-06·07·11) | `tools/build-web.mjs` `PACKS` · `tools/web-loader.html` · `src/core/packs.js` · `src/render/quality.js` · 기기 점검 새 파일 (`src/render/` 안) | D37 · D39 · D45 |
+| M7-P2 | 기기 점검·시작 단추 (UI-07·11) — 반영 v1: D37-B 라 묶음·UI-06 은 그대로 | `tools/web-loader.html` 시작 단추 자리만 · `src/render/quality.js` · 기기 점검 새 파일 (`src/render/` 안) | D39 · D45 |
 | M7-P3 | 휴대폰·접근성 (UI-10) + 섬폰 메뉴 줄 | `src/ui/` (P4 새 파일 둘 빼고) · `src/core/input.js` · `src/player/camera.js` · `src/gameplay/festival/talkui.js`·`festival.css` | D38 · D42 |
 | M7-P4 | 저장 옮기기·문제 알리기 (UI-08·09) | `src/data/save.js` · `src/ui/transfer.js`·`report.js` (새, `ui.panel` 로 창만 — 섬폰 메뉴 줄은 P3) · `src/core/errors.js` (새) · 게임 아티팩트 capabilities (`db` `reports` 쓰기 interact 등, 게시는 P6) | D43 · D46 |
-| M7-P5 | 밸런스·첫날 안내·소리 값 | `assets/data/*.json` ("숫자 반영" 흐름으로) · `assets/festival/config.json` `parts` · `src/gameplay/intro/` · `src/core/state.js` `settings` 줄만 | P1 결과 · D40 · D41 · D44 · D45 |
+| M7-P5 | 첫날 안내·밸런스 — 반영 v1: 밸런스는 지금 빠르기(D41-B), 소리 값 그대로(D45-A) | `src/gameplay/intro/` · `assets/data/*.json` ("숫자 반영" 흐름으로, 3~5일 밖일 때만) · (D41-A 때) `assets/festival/config.json` `parts` | P1 결과 · D40 · D41 · D44 |
 | M7-P6 | 출시 (조정 세션): 합치기 → 게임 다시 게시 → RC 점검 → 공유는 사용자 | `README.md` · `docs/notes/release.md` (새) · `devlog.md` | P1–P5 · D36 · D47 |
 | M8 | D48 방향으로 8차 검수 보드부터 | — | M7 끝 |
 
-겹치면 안 되는 곳: `src/ui/` 는 P3 만 (P4 는 새 파일 둘만 만들고 메뉴 줄은 P3 에 부탁). `src/core/` 는 P2 `packs.js`, P4 `errors.js`(새), P5 `state.js` 의 `settings` 줄만. 로딩 화면(`web-loader.html`)은 P2 만 — 그래서 시작 단추 UI-11 도 P2. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안.
+겹치면 안 되는 곳: `src/ui/` 는 P3 만 (P4 는 새 파일 둘만 만들고 메뉴 줄은 P3 에 부탁). `src/core/` 는 P3 `input.js`, P4 `errors.js`(새)만 (반영 v1 로 P2 `packs.js`·P5 `state.js` 는 빠짐). 로딩 화면(`web-loader.html`)은 P2 만 — 그래서 시작 단추 UI-11 도 P2. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안.
 
 ## QA 결과 칸 (D47) 채우는 법
 - QA 세션 결과가 `docs/qa/` 에 오면: 큰 문제를 `concept/wave7-board.html` 의 `const QA = []` 에 `[id, 무엇, 크기, 처리]` 로 (`QA-01` 부터, 크기 = 막힘·저장·오류·밸런스·불편·보기, 처리 = D47 대로 "바로 고침 (P?)" 또는 "보드에서 고르기"), 밸런스 숫자는 `goalTable()` 의 "지금" 칸(지금은 "QA 가 잼")에 → 같은 file_path 로 다시 게시 (capabilities 생략). 머리 줄 `QA 결과 0` 숫자도.
