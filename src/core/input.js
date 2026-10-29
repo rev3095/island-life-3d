@@ -20,6 +20,7 @@ export function createInput(events, { touchRoot = document.body } = {}) {
   const held = new Set();
   const stick = { x: 0, z: 0, active: false };
   let enabled = true, pad = null;
+  const btnLabels = { action: '', pickup: '' };
   const api = {
     move: { x: 0, z: 0 },      // 길이 0~1
     run: false,
@@ -40,6 +41,11 @@ export function createInput(events, { touchRoot = document.body } = {}) {
     press(intent) { events.emit('input:press', { intent }); },
     /** 터치 조작 켜기 (이미 있으면 그대로) */
     enableTouch() { if (!pad) pad = buildTouch(); },
+    /**
+     * A·B 버튼 아래 작은 글자. labels = { action, pickup } (문자열, 빈 값이면 기본 '행동'·'줍기').
+     * 바뀐 것만 고친다 → 0.2초마다 불러도 된다. 터치 조작이 아직 없으면 기억만 해 둔다
+     */
+    setLabels(labels = {}) { Object.assign(btnLabels, labels); pad?.setLabels(btnLabels); },
   };
 
   addEventListener('keydown', e => {
@@ -152,7 +158,21 @@ export function createInput(events, { touchRoot = document.body } = {}) {
         if (!on) ctl.release();
       },
     };
+    const DEFAULT_LABEL = { action: '행동', pickup: '줍기' };
+    const ARIA = { action: 'A 버튼: ', pickup: 'B 버튼: ' };
+    const shown = {};
+    ctl.setLabels = labels => {
+      for (const b of wrap.querySelectorAll('.tc-btn')) {
+        const intent = b.dataset.intent, text = labels[intent] || DEFAULT_LABEL[intent];
+        if (shown[intent] === text) continue;
+        shown[intent] = text;
+        b.querySelector('small').textContent = text;
+        b.classList.toggle('is-ctx', !!labels[intent]);
+        b.setAttribute('aria-label', ARIA[intent] + text);
+      }
+    };
     ctl.setEnabled(enabled);
+    ctl.setLabels(btnLabels);
     return ctl;
   }
   return api;
@@ -181,7 +201,8 @@ function injectStyle() {
   color: #4A3B32; font-family: "Jua", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; line-height: 1; cursor: pointer;
   transition: transform .07s, box-shadow .07s, opacity .2s, background .07s; }
 #touch-controls .tc-btn b { font-weight: 400; }
-#touch-controls .tc-btn small { font-size: 11px; opacity: .8; }
+#touch-controls .tc-btn small { font-size: 11px; opacity: .8; white-space: nowrap; }
+#touch-controls .tc-btn.is-ctx small { opacity: 1; }
 #touch-controls .tc-a { right: calc(20px + var(--tc-r)); bottom: calc(62px + var(--tc-b)); width: 78px; height: 78px; font-size: 30px;
   background: #F2B36B; box-shadow: 0 4px 0 #C9772E, 0 8px 16px rgba(74, 59, 50, .22); }
 #touch-controls .tc-b { right: calc(108px + var(--tc-r)); bottom: calc(20px + var(--tc-b)); width: 64px; height: 64px; font-size: 25px;
@@ -191,6 +212,7 @@ function injectStyle() {
 #touch-controls.is-ui .tc-zone { pointer-events: none; }
 #touch-controls.is-ui .tc-stick { opacity: 0; }
 #touch-controls.is-ui .tc-btn:not(.is-down) { opacity: .72; }
+#touch-controls.is-ui .tc-btn small { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { #touch-controls * { transition: none !important; } }
 `;
   document.head.append(s);

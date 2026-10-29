@@ -82,6 +82,10 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-hint kbd { font: 12px var(--pk-display); background: var(--pk-ink); color: var(--pk-cream); border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
 .pk-hint-x { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: none; font-size: 12px; }
 .is-busy .pk-hint, .is-busy .pk-tool { opacity: 0; visibility: hidden; }
+.pk-act { position: absolute; left: 50%; bottom: calc(84px + var(--sab)); transform: translate(-50%, 6px); display: flex; gap: 14px; padding: 6px 14px; background: rgba(255, 248, 230, .92); border-radius: 999px; box-shadow: var(--pk-shadow-sm); font: 15px var(--pk-display); white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity .18s, transform .18s, visibility .18s; }
+.pk-act.is-on { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.pk-act kbd { font: 12px var(--pk-display); background: var(--pk-ink); color: var(--pk-cream); border-radius: 6px; padding: 1px 6px; margin-right: 6px; vertical-align: 1px; }
+.is-busy .pk-act, .pk-touch .pk-act { opacity: 0; visibility: hidden; }
 
 /* ---------- 알림 ---------- */
 .pk-toasts { position: absolute; z-index: 3; left: 50%; top: calc(14px + var(--sat)); transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
@@ -169,6 +173,9 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-phone-top:has(.pk-phone-greet) { flex-direction: column; gap: 2px; padding: 8px 0 14px; border: 0; }
 .pk-phone-title { font: 400 22px var(--pk-display); }
 .pk-phone-greet { font-size: 14px; color: var(--pk-ink-soft); }
+.pk-phone-me { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 2px 10px; max-width: 100%; margin-top: 2px; padding: 3px 14px; background: var(--pk-cream); border-radius: 999px; box-shadow: var(--pk-shadow-sm); font-family: var(--pk-display); }
+.pk-phone-me-name { font-weight: 400; font-size: 17px; }
+.pk-phone-me-island { font-size: 14px; color: var(--pk-ink-soft); }
 .pk-back { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); font: 28px/1 var(--pk-display); cursor: pointer; }
 .pk-phone-view { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 2px 4px 8px; overscroll-behavior: contain; touch-action: pan-y; }
 .pk-apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 6px; }
@@ -200,6 +207,10 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon { width: 34px; heigh
 .pk-set-head:first-child { margin-top: 2px; }
 .pk-set-row { display: grid; grid-template-columns: 4.4em 1fr 3em; align-items: center; gap: 8px; min-height: 46px; }
 .pk-set-row:has(.pk-switch) { grid-template-columns: 1fr auto; }
+.pk-set-names .pk-set-row { grid-template-columns: 1fr auto; min-height: 36px; }
+.pk-set-val { font: 400 16px var(--pk-display); overflow-wrap: anywhere; text-align: right; }
+.pk-set-names .pk-set-action { grid-template-columns: 1fr; min-height: 50px; }
+.pk-set-action .pk-btn { justify-self: stretch; }
 .pk-range { width: 100%; height: 30px; margin: 0; accent-color: var(--pk-accent-deep); cursor: pointer; }
 .pk-range-val { font-family: var(--pk-display); text-align: right; font-variant-numeric: tabular-nums; }
 .pk-switch { position: relative; width: 58px; height: 34px; border: 0; border-radius: 999px; background: #D8CCB2; cursor: pointer; transition: background .15s; }
@@ -374,7 +385,8 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
   .pk-phone { width: min(620px, 100%); height: 100%; border-radius: 28px; }
   .pk-phone .pk-card-body { padding: 8px 14px 2px; }
   .pk-phone-top { min-height: 44px; padding-bottom: 4px; margin-bottom: 6px; }
-  .pk-phone-top:has(.pk-phone-greet) { padding: 0 0 8px; }
+  .pk-phone-top:has(.pk-phone-greet) { padding: 0 0 8px; flex-direction: row; flex-wrap: wrap; justify-content: center; column-gap: 12px; }
+  .pk-phone-me { margin: 0; padding: 1px 12px; }
   .pk-phone-title { font-size: 19px; }
   .pk-apps { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px 4px; }
   .pk-app i { width: 54px; height: 54px; border-radius: 16px; font-size: 26px; }

@@ -14,6 +14,11 @@ const GREETING = { dawn: '좋은 새벽이에요', day: '좋은 하루예요', d
 
 export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }) {
   let current = null;
+  /** 내 이름·섬 이름 (intro 가 없으면 state, 그것도 없으면 빈 칸) */
+  const names = () => {
+    const n = ctx.services.intro?.names?.();
+    return { player: ctx.state.player?.name || n?.player || '', island: ctx.state.island?.name || n?.island || '' };
+  };
 
   function open() {
     if (current) return current.p.result;
@@ -38,7 +43,11 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       view.className = `pk-phone-view is-${id}`;
       if (id === 'home') {
         const now = ctx.services.time?.now?.();
+        const me = names();
         top.replaceChildren(h('h2', { class: 'pk-phone-title', id: shell.titleId }, '섬폰'),
+          (me.player || me.island) && h('p', { class: 'pk-phone-me' },
+            me.player && h('b', { class: 'pk-phone-me-name' }, me.player),
+            me.island && h('span', { class: 'pk-phone-me-island' }, h('span', { 'aria-hidden': 'true' }, '🏝️ '), me.island)),
           h('p', { class: 'pk-phone-greet' }, GREETING[now?.part] ?? '오늘도 포근한 섬이에요'));
         const grid = h('div', { class: 'pk-apps' }, APPS.map(a => h('button', { type: 'button', class: 'pk-app', dataset: { app: a.id }, onclick: () => launch(a.id) },
           h('i', { style: { background: a.color }, 'aria-hidden': 'true' }, a.icon), h('span', null, a.name))));
@@ -185,12 +194,31 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     };
     drawStyle();
     view.append(...[
+      nameRows(),
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
       h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
       h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, toggle('outline', '외곽선'), fullscreenRow(),
       !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
     ].filter(Boolean));
+  }
+
+  /** 이름: 지금 이름과 '이름 다시 정하기' (intro 의 이름 정하기 창을 다시 연다 — 섬폰은 닫는다) */
+  function nameRows() {
+    const intro = ctx.services.intro;
+    if (!intro?.rename) return null;
+    const me = names();
+    const go = button('이름 다시 정하기', { onclick: () => {
+      if (intro.naming) return;
+      current?.p.close(null);
+      // 창을 닫으면 panels 가 마이크로태스크에서 입력을 되돌린다 → 그 뒤에 열어야 이름 창이 입력을 막은 채로 남는다
+      setTimeout(() => intro.rename(), 0);
+    } });
+    return h('div', { class: 'pk-set-names' },
+      h('h3', { class: 'pk-set-head' }, '이름'),
+      h('div', { class: 'pk-set-row' }, h('span', null, '내 이름'), h('b', { class: 'pk-set-val' }, me.player || '아직 없어요')),
+      h('div', { class: 'pk-set-row' }, h('span', null, '섬 이름'), h('b', { class: 'pk-set-val' }, me.island || '아직 없어요')),
+      h('div', { class: 'pk-set-row pk-set-action' }, go));
   }
 
   /** 전체 화면 (휴대폰에서 주소창을 숨긴다). 브라우저·아티팩트 틀이 막으면 줄을 안 보인다. 저장하지 않는다 */

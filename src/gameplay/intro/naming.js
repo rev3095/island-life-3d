@@ -4,10 +4,10 @@ import { el } from './dom.js';
 import { checkPlayerName, checkIslandName, countChars, suggest, tidy, NAME_MAX, ISLAND_MAX, ISLAND_SUFFIX } from './rules.js';
 
 /**
- * opts: { mount, initial: { player, island }, again: 이미 하던 저장(첫 안내를 들은 뒤) }
- * → Promise<{ player, island }>   (island 는 '…섬' 까지)
+ * opts: { mount, initial: { player, island }, again: 이미 하던 저장(첫 안내를 들은 뒤), rename: 정한 이름 바꾸기 (그만둘 수 있다) }
+ * → Promise<{ player, island } | null>   (island 는 '…섬' 까지, null = 바꾸지 않고 그만둠 — rename 일 때만)
  */
-export function openNaming(ctx, { mount, initial = {}, again = false } = {}) {
+export function openNaming(ctx, { mount, initial = {}, again = false, rename = false } = {}) {
   return new Promise(resolve => {
     const touch = !!ctx.input?.touch;
     const field = ({ id, label, max, value, placeholder, suffix, enter }) => {
@@ -28,13 +28,16 @@ export function openNaming(ctx, { mount, initial = {}, again = false } = {}) {
 
     const name = field({ id: 'fd-player', label: '내 이름', max: NAME_MAX, value: initial.player, placeholder: '예) 하늘', enter: 'next' });
     const isle = field({ id: 'fd-island', label: '섬 이름', max: ISLAND_MAX, value: initial.island ? initial.island.replace(/섬$/, '') : '포근', placeholder: '예) 포근', suffix: ISLAND_SUFFIX, enter: 'done' });
-    const go = el('button', { type: 'button', class: 'fd-go' }, '이대로 정할래요');
-    const lead = again
+    const go = el('button', { type: 'button', class: 'fd-go' }, rename ? '이걸로 바꿀래요' : '이대로 정할래요');
+    const stay = rename ? el('button', { type: 'button', class: 'fd-stay' }, '그대로 둘래요') : null;
+    const lead = rename
+      ? el('p', { class: 'fd-lead' }, el('b', { text: '내 이름' }), '과 ', el('b', { text: '섬 이름' }), '을 새로 정해요. 주민들도 새 이름으로 불러 줄 거예요.')
+      : again
       ? el('p', { class: 'fd-lead' }, '아직 이름이 없네요! ', el('b', { text: '내 이름' }), '과 ', el('b', { text: '섬 이름' }), '을 정해 주세요. 주민들이 이 이름으로 불러 줄 거예요.')
       : el('p', { class: 'fd-lead' }, '섬 생활을 시작하기 전에 ', el('b', { text: '내 이름' }), '과 ', el('b', { text: '섬 이름' }), '을 정해 주세요. ',
         touch ? '🎲 단추를 누르면 이름을 추천해 줘요.' : '🎲 를 누르면 이름을 추천해 줘요.');
     const card = el('section', { class: 'fd-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'fd-name-title' },
-      el('h2', { class: 'fd-card-tag', id: 'fd-name-title', text: again ? '이름 정하기' : '어서 와요!' }), lead, name.box, isle.box, el('div', { class: 'fd-foot' }, go));
+      el('h2', { class: 'fd-card-tag', id: 'fd-name-title', text: rename ? '이름 다시 정하기' : again ? '이름 정하기' : '어서 와요!' }), lead, name.box, isle.box, el('div', { class: 'fd-foot' }, stay, go));
     const wrap = el('div', { class: 'fd-name' }, card);
 
     // 글자 수 (조합 중인 한글도 한 글자로 센다)
@@ -76,12 +79,14 @@ export function openNaming(ctx, { mount, initial = {}, again = false } = {}) {
       submit();
     });
     go.addEventListener('click', () => submit());
+    stay?.addEventListener('click', () => cancel());
 
     // 창 밖으로 가는 키는 막는다 (가방·섬폰·이동 키가 게임에 가지 않게). Tab 은 창 안에서만 돈다
     let asking = false;
-    const focusables = () => [name.input, name.dice, isle.input, isle.dice, go];
+    const focusables = () => [name.input, name.dice, isle.input, isle.dice, stay, go].filter(Boolean);
     const onKey = e => {
       if (asking) return;                                  // 확인 창(ui.confirm)이 키를 받는다
+      if (rename && e.key === 'Escape' && !e.isComposing) { e.preventDefault(); e.stopPropagation(); cancel(); return; }
       if (e.key === 'Tab') {
         const list = focusables(), i = list.indexOf(document.activeElement);
         e.preventDefault(); e.stopPropagation();
@@ -123,7 +128,7 @@ export function openNaming(ctx, { mount, initial = {}, again = false } = {}) {
         try {
           ok = await ui.confirm({
             title: '이렇게 정할까요?', icon: '🏝️', cancelValue: false,
-            text: `내 이름: ${a.value}\n섬 이름: ${b.value}\n\n이름은 한 번 정하면 바꿀 수 없어요.`,
+            text: `내 이름: ${a.value}\n섬 이름: ${b.value}\n\n이름은 나중에 섬폰 설정에서 다시 바꿀 수 있어요.`,
             buttons: [{ label: '좋아요!', value: true, primary: true }, { label: '다시 정할래요', value: false }],
           });
         } finally { asking = false; wrap.hidden = false; }
@@ -131,6 +136,12 @@ export function openNaming(ctx, { mount, initial = {}, again = false } = {}) {
       if (!ok) { if (!touch) name.input.focus({ preventScroll: true }); return; }
       close();
       resolve({ player: a.value, island: b.value });
+    }
+
+    function cancel() {
+      if (asking) return;
+      close();
+      resolve(null);
     }
 
     function close() {

@@ -12,7 +12,9 @@ import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
 import { createToolRing } from './toolring.js';
 
-let dialog = null, hud = null;
+let dialog = null, hud = null, uiCtx = null;
+const PEEK_EVERY = 0.2;    // 행동 안내(A·B 글자, Space·F) 갱신 간격 (초)
+let peekT = 0;
 
 function loadCss() {
   if (document.querySelector('link[data-pk-ui]')) return Promise.resolve();
@@ -20,6 +22,20 @@ function loadCss() {
   const done = new Promise(res => { link.onload = link.onerror = res; setTimeout(res, 4000); });
   document.head.append(link);
   return done;
+}
+
+/** 지금 행동 키를 누르면 할 일 → 휴대폰 A·B 글자와 키보드 Space·F 안내 (gameplay.interactions.peek) */
+function showActions(ctx) {
+  const peek = ctx.services.gameplay?.interactions?.peek;
+  if (!peek) return;
+  const labels = {};
+  for (const intent of ['action', 'pickup']) {
+    let r = null;
+    try { r = peek(intent); } catch (e) { console.error('[ui] peek', e); }
+    labels[intent] = r?.label ?? '';
+  }
+  ctx.input?.setLabels?.(labels);
+  hud?.setActions(labels);
 }
 
 export default {
@@ -81,6 +97,26 @@ export default {
     events.on('inventory:changed', () => bag.refresh());
     events.on('toast', ({ text, icon } = {}) => toast(text, icon));
 
+    // 저장이 안 되는 창·저장 실패: 한 번만 알린다 (섬폰 저장 앱이 열려 있으면 그쪽이 알린다)
+    let saveWarned = false;
+    const warnSave = () => {
+      if (saveWarned) return;
+      const save = ctx.services.data?.save;
+      if (!save) return;
+      saveWarned = true;
+      if (save.available === false) toast('이 창에서는 저장할 수 없어요. 닫으면 처음부터 다시 시작해요', '⚠️');
+      else if (save.blocked) toast('더 새 게임의 저장이 있어서 저장하지 않았어요', '⚠️');
+      else toast('저장하지 못했어요. 저장 공간을 확인해 주세요', '⚠️');
+    };
+    events.on('save:done', ({ ok } = {}) => { if (ok === false && !panels.isOpen()) warnSave(); });
+    events.once('game:ready', () => {
+      if (ctx.services.data?.save?.available !== false) return;
+      // 이름 정하기 창이 떠 있으면 다 정한 뒤에
+      const later = () => setTimeout(warnSave, 1200);
+      if (ctx.services.intro?.holding) events.once('intro:named', later);
+      else later();
+    });
+
     // 키·버튼 의도로 창 열기 (창이 열려 있을 땐 panels 가 키를 먼저 받으므로 여기 오지 않는다)
     events.on('input:press', ({ intent } = {}) => {
       if (panels.blocking()) return;
@@ -94,6 +130,7 @@ export default {
       setSetting('keyHint', state.settings.keyHint === false);
     });
 
+    uiCtx = ctx;
     ctx.services.ui = {
       hud: {
         setClock: now => hud.setClock(now),
@@ -119,5 +156,6 @@ export default {
   update(dt) {
     dialog?.update(dt);
     hud?.update();
+    if (uiCtx && (peekT += dt) >= PEEK_EVERY) { peekT = 0; showActions(uiCtx); }
   },
 };

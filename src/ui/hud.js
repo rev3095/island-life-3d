@@ -1,4 +1,5 @@
-// HUD: 왼쪽 위 시계·날짜·날씨, 오른쪽 위 도토리와 메뉴 단추, 오른쪽 아래 지금 든 도구, 왼쪽 아래 키 안내.
+// HUD: 왼쪽 위 시계·날짜·날씨, 오른쪽 위 도토리와 메뉴 단추, 오른쪽 아래 지금 든 도구, 왼쪽 아래 키 안내,
+// 아래 가운데 '지금 Space·F 를 누르면' 안내 (키보드만 — 휴대폰은 A·B 버튼 글자가 바뀐다).
 import { h, fmt, clockText, nowFromDate, toolSvg, TOOL_NAME, WEATHER_ICON, WEATHER_NAME, iconEl } from './dom.js';
 
 const HINT_KEYS = [['WASD', '이동'], ['Shift', '달리기'], ['Space', '행동'], ['F', '줍기'], ['Q/E', '도구'], ['I', '가방'], ['P', '섬폰'], ['M', '지도'], ['H', '안내 숨기기']];
@@ -26,7 +27,12 @@ export function createHud(ctx, { openBag, openPhone, openMap, openTools, setHint
     h('span', { class: 'pk-hint-keys' }, HINT_KEYS.map(([k, t]) => h('span', { class: 'pk-hint-item' }, h('kbd', null, k), t))),
     h('button', { type: 'button', class: 'pk-hint-x', 'aria-label': '키 안내 숨기기', onclick: () => setHint(false) }, '✕'));
 
-  const root = h('div', { class: 'pk-hud' }, clock, h('div', { class: 'pk-top-right' }, acorns, quickRow), tool, hint);
+  // 지금 누르면 할 일: 빈 글자면 그 키는 숨긴다. 사라질 때는 글자를 남긴 채 흐려지게 해서 깜빡이지 않는다
+  const actItem = key => { const t = h('span', { class: 'pk-act-text' }); return { t, el: h('span', { class: 'pk-act-item', hidden: true }, h('kbd', null, key), t) }; };
+  const act = { action: actItem('Space'), pickup: actItem('F') };
+  const actRoot = h('div', { class: 'pk-act', 'aria-hidden': 'true' }, act.action.el, act.pickup.el);
+
+  const root = h('div', { class: 'pk-hud' }, clock, h('div', { class: 'pk-top-right' }, acorns, quickRow), tool, hint, actRoot);
 
   let lastAcorns = null, gotTick = false, lastMinute = -1;
   const api = {
@@ -58,6 +64,19 @@ export function createHud(ctx, { openBag, openPhone, openMap, openTools, setHint
       tool.classList.remove('is-swap'); void tool.offsetWidth; tool.classList.add('is-swap');
     },
     show(on = true) { root.hidden = !on; },
+    /** labels = { action, pickup } (빈 값·null = 그 키로 할 일 없음). 바뀐 것만 고친다 */
+    setActions(labels = {}) {
+      let any = false;
+      for (const k of ['action', 'pickup']) {
+        const text = labels[k] || '';
+        if (!text) continue;
+        any = true;
+        if (act[k].t.textContent !== text) act[k].t.textContent = text;
+      }
+      if (!any) { actRoot.classList.remove('is-on'); return; }
+      for (const k of ['action', 'pickup']) act[k].el.hidden = !labels[k];
+      actRoot.classList.add('is-on');
+    },
     showHint(on) { hint.hidden = !on; },
     /** time:tick 을 받으면 그 값을 쓰고, time 서비스가 없으면 브라우저 시계로 분마다 바꾼다 */
     tick(now) { gotTick = true; api.setClock(now); },
