@@ -1,0 +1,681 @@
+<title>포근섬 축제 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 5차 검수 보드와 같은 섬 안내 책자 — 결정이 맨 위, 아래로 대화·이모티콘·광장·부품·부스·엔딩 시트가 ID 순서로. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정 */
+.dec { display: grid; gap: 10px; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+
+/* 아이콘 */
+.iconrow { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ico { display: grid; justify-items: center; gap: 2px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; }
+.ico svg { width: 100%; max-width: 64px; height: auto; }
+.ico .was { font-size: 20px; line-height: 1; }
+.compare { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.thumbB { width: 96px; height: 96px; border-radius: 10px; background: var(--stage); }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+
+/* 벽지·바닥 견본 */
+.swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.sw { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.sw svg { width: 100%; height: 72px; border-radius: 8px; display: block; }
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .card, .ico { transition: border-color .15s; } }
+
+/* Z5: 이모티콘 격자 · 지도 · 스토리보드 */
+.emcat { display: grid; gap: 8px; }
+.emgrid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+.em { display: grid; justify-items: center; gap: 2px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px 6px; min-width: 0; }
+.em svg { width: 52px; height: 52px; }
+.em .was { font-size: 15px; line-height: 1; opacity: .8; }
+.em .note { font-size: 12px; padding: 4px 6px; }
+.mini { display: inline-block; width: 26px; height: 26px; vertical-align: middle; }
+.mini svg { width: 26px; height: 26px; display: block; }
+.minis { display: flex; flex-wrap: wrap; gap: 2px; }
+.maps { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.story { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.story .stage svg { border-radius: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid #4A3B3244; }
+.hero svg { width: 100%; height: auto; display: block; border-radius: 12px; }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 5차 Z5 · 축제 검수 보드 v0.1 · 2026-10-29</p>
+    <h1>포근섬 축제 검수 보드</h1>
+    <p class="lede">주민과 <b>이모티콘으로 이야기</b>하고, 섬 가운데 <b>축제 광장</b>에 필요한 <b>부품 5개</b>를 모아 부스를 하나씩 열고, 다 모이면 축제를 열어 <b>주민들과 단체 사진</b>을 찍는 엔딩까지 — 만들기 전에 고를 것과 새로 만들 3D 리소스를 ID와 함께 모았어요. 추천안이 미리 골라져 있으니 바꾸고 싶은 것만 고르고, 카드마다 의견을 적어 주세요. 선택과 의견은 이 보드 저장소에 바로 저장되고, 채팅에 <b>"검수 보드 반영"</b>이라고 하면 그대로 만들기 시작해요. 판정은 모두 규칙으로 하고 유료 API·AI 호출은 쓰지 않아요.</p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#decide">결정 D14–D25</a><a href="#talk">이모티콘 대화 UI · TK</a><a href="#emoji">이모티콘 EM</a><a href="#plaza">축제 광장</a>
+    <a href="#parts">부품 FP</a><a href="#booths">부스 FB</a><a href="#props">무대·소품 BD · PR · FU · IC</a><a href="#flow">이야기 흐름</a><a href="#ending">엔딩 ED · AN</a><a href="#plan">진행 계획</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS</p><h2>먼저 정할 것 열두 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요. (D1–D7 컨셉 보드 v0.1, D8–D13 5차 보드에서 정했어요.) 아래 카드들은 추천안 기준으로 그렸어요 — 다른 안을 고르면 반영할 때 카드도 다시 그려요.</p></div>
+    <div id="decisions" class="grid wide" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="talk">
+    <div class="sec-head"><p class="id">UI-04 · TK-01 – TK-07 · 이모티콘 대화</p><h2>말 대신 이모티콘으로</h2>
+      <p class="muted">지금 대화는 글 대사(주민마다 100줄 남짓)와 메뉴 네 개(잡담·부탁·선물·잘 가)예요. 아래는 D14 세 가지 방식의 대화 화면이에요. 어느 방식이든 주민이 먼저 이모티콘으로 말하고, 플레이어는 이모티콘을 <b>최대 3개</b> 골라 보내요. 비워서 보내면 ⏳ 기다리기예요.</p></div>
+    <div class="compare" id="talkModes"></div>
+    <h3>주민마다 다르게 읽어요 (D18-A)</h3>
+    <p class="small muted">같은 이모티콘도 주민 성격대로 다르게 받아들여요. 결과는 6단계(아주 기쁨 · 기쁨 · 그냥 · 갸웃 · 어색 · 물러남)이고, 친밀도는 오르기만 하고 깎이지 않아요. 틀리면 주민이 갸웃하거나 한 발 물러나며 💭로 힌트를 다시 보여 줘요 — 오해는 벌이 아니라 단서예요.</p>
+    <div class="tblwrap"><table class="tbl" id="tkTable"><thead><tr><th>ID</th><th>주민</th><th>읽는 법 (규칙)</th><th>좋아함</th><th>어색해함</th><th>대답에 쓰는 것</th><th>몸짓 (기쁨 / 갸웃)</th><th>축제 역할</th><th>의견</th></tr></thead><tbody></tbody></table></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>판정</th><th>친밀도</th><th>주민 모습</th></tr></thead><tbody>
+      <tr><td>아주 기쁨</td><td>+3</td><td class="small">기쁨 동작(happy) + ✨ + 좋아하는 이모티콘 둘</td></tr>
+      <tr><td>기쁨</td><td>+2</td><td class="small">끄덕(AN-02) + 😄</td></tr>
+      <tr><td>그냥</td><td>+1</td><td class="small">🙂 … (그날 처음 말 걸기 보너스 +2 는 지금처럼 따로)</td></tr>
+      <tr><td>갸웃</td><td>0</td><td class="small">갸웃(AN-04) + ❓ → 💭 힌트 다시</td></tr>
+      <tr><td>어색 · 물러남</td><td>0</td><td class="small">도리도리(AN-03)·한 발 물러남 + 💦 → 💭 힌트 다시. 화내거나 울지 않아요</td></tr>
+    </tbody></table></div>
+    <p class="small muted">하루에 친밀도가 오르는 이모티콘 대화는 주민마다 3번(지금 선물 2번 규칙과 같은 생각). 판정은 주민 데이터·상태·보낸 이모티콘만으로 정해져서 같은 입력이면 늘 같은 결과예요(테스트로 확인). 모든 주민에게 마음을 여는 방법이 최소 하나 있는지도 테스트해요.</p>
+  </section>
+
+  <section id="emoji">
+    <div class="sec-head"><p class="id">EM-01 – EM-36 · 이모티콘 세트</p><h2>섬 전용 이모티콘 36개</h2>
+      <p class="muted">D16-A 손그림 견본이에요. 아이템 아이콘과 같은 밤색 선·한 겹 칠. 위에 작게 붙은 것은 같은 뜻의 기기 이모지(D16-B 를 고르면 이것이 그대로 나와요). 플레이어가 고르는 30개(D17-A, 6묶음)와 주민 대답에만 나오는 6개예요. <b>물건</b> 묶음의 다섯은 분류 이모티콘이고, 부탁·축제에서 특정 물건이 필요하면 그 아이템의 3D 아이콘(Z1, D8-B)이 물건 칸에 저절로 더해져요. 국기·종교 상징·피부색 변형은 넣지 않아요. 🙏(두 손 모으기)은 기도로 읽힐 수 있어 뺐어요.</p></div>
+    <div id="emCats" class="emcat"></div>
+  </section>
+
+  <section id="plaza">
+    <div class="sec-head"><p class="id">BD-06 · BD-07 · TI-08 · 축제 광장</p><h2>섬 가운데 축제 광장</h2>
+      <p class="muted">지금 섬(시드 20261028) 가운데를 그대로 옮겼어요. 광장(지름 7칸, 모닥불·안내판·벤치 둘·가로등 넷)은 섬 한가운데보다 조금 서쪽에 있고, 그 동쪽으로 강까지 9칸쯤 풀밭(나무 몇 그루)이 비어 있어요. 아래 세 그림이 D19 의 세 안이에요.</p></div>
+    <div class="legend" id="mapLegend"></div>
+    <div class="maps" id="plazaMaps"></div>
+    <div class="card"><div class="head"><span class="id">D19-A</span><h3>추천안 자세히 — 지름 12칸 원형 광장</h3></div>
+      <div class="maps" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+        <div class="stage" id="plazaDetail"></div>
+        <div class="stage hero" id="plazaHero"></div>
+      </div>
+      <ul class="steps small">
+        <li>광장 가운데를 지금보다 동쪽으로 5칸 옮겨 지름 12칸 원(약 113칸, 지금의 3배). 지금 광장 돌바닥은 서쪽 입구 마당으로 남아요.</li>
+        <li>북쪽 끝에 무대(BD-06, 5×3), 둘레에 부스 자리 다섯(FB, 3×2, 가운데를 봐요). 처음엔 덮개 친 빈 자리(PR-16)와 부품 진행판(PR-15)만 있어요.</li>
+        <li>길 네 갈래(서쪽 집들 · 북쪽 박물관 · 동쪽 다리 · 남쪽 모찌 집)가 그대로 광장으로 들어와요. 서쪽·동쪽 입구에 축제 아치(BD-07).</li>
+        <li>모닥불은 새 가운데로, 둘레 가로등 넷은 등불 기둥(PR-14) 여덟으로 바꿔요(부스 FB-01 을 열면 밤에 켜져요). 나무 7그루·덤불 3개는 둘레로 옮겨요.</li>
+        <li>바닥은 축제 돌바닥(TI-08). 휠체어로도 갈 수 있게 광장 안은 계단 없이 평평하고, 무대는 옆 경사로로 올라가요.</li>
+      </ul>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">
+        <div class="sw"><svg viewBox="0 0 132 72" role="img" aria-label="TI-08 견본"><rect width="132" height="72" fill="url(#ti-08)"/></svg><span class="small"><b>축제 돌바닥</b></span><span class="small muted">한 칸에 둥근 색 돌. 가운데 큰 원 무늬는 칸을 이어 그려요.</span><span class="id">TI-08</span><input class="note" id="note-TI-08" data-id="TI-08" data-label="축제 돌바닥" placeholder="TI-08 의견 (비우면 그대로 승인)" aria-label="축제 돌바닥 의견"></div>
+      </div>
+      <input class="note" id="note-PLAZA" data-id="PLAZA" data-label="축제 광장 배치" placeholder="PLAZA 광장 배치 의견 (비우면 그대로 승인)" aria-label="축제 광장 배치 의견">
+    </div>
+  </section>
+
+  <section id="parts">
+    <div class="sec-head"><p class="id">FP-01 – FP-05 · 축제 부품 5개</p><h2>모아야 축제가 열리는 부품</h2>
+      <p class="muted">D20-B: 주민과 이모티콘으로 마음을 열고(친구 단계 + 기쁨 2번) 🎉로 물으면, 그 주민이 💭 안에 필요한 것을 이모티콘으로 보여 줘요. 섬에서 채집해 가져다주면 부품을 받아요(삽으로 판 화석처럼 머리 위로 들어 보이는 연출). 부품은 가방이 아니라 진행판에 바로 들어가요. 3D 모델 하나로 들어 보이기·진행판·부스 위 장식에 같이 써요.</p></div>
+    <div class="grid" id="partCards"></div>
+  </section>
+
+  <section id="booths">
+    <div class="sec-head"><p class="id">FB-01 – FB-05 · 축제 부스 5개</p><h2>부품 하나에 부스 하나</h2>
+      <p class="muted">D21-A 놀이 축제: 부스마다 섬에서 채집한 것을 쓰는 놀이가 하나씩 있어요. 부스는 배경 파이프라인(스펙 → Blender)으로 만드는 3D 건물이고, 처음엔 천 덮개(PR-16)로 덮여 있다가 부품을 건네면 덮개가 걷혀요(D22-A). 모두 3×2칸, 앞이 광장 가운데를 봐요.</p></div>
+    <div class="grid wide" id="boothCards"></div>
+  </section>
+
+  <section id="props">
+    <div class="sec-head"><p class="id">BD-06 · BD-07 · PR-13 – PR-16 · FU-34 · IC-FE-01 – 04</p><h2>무대·장식·받는 것</h2>
+      <p class="muted">무대와 아치는 건물, 장식 넷은 소품(배경 편집기), 단체 사진은 가구(집에 걸어요), 부스에서 만드는 것 넷은 아이템(가방·선물, Z1 방식 3D 아이콘)이에요. 모두 스펙 파일로 두고 리소스 교체 약속을 지켜서 나중에 편집기에서 바로 고칠 수 있어요.</p></div>
+    <div class="grid" id="propCards"></div>
+  </section>
+
+  <section id="flow">
+    <div class="sec-head"><p class="id">FLOW</p><h2>축제까지 이야기 흐름</h2>
+      <p class="muted">모두의 축제 시나리오(말이 안 통함 → 깨달음 → 이모티콘 → 부탁 → 마음 열기 → 재료 → 축제 → 사진)를 이 섬의 첫날 흐름에 맞췄어요. 카메라·컷 연출은 스토리 세션의 장면 재생기가 맡고, 이 트랙은 판정·상태·이벤트를 줘요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="flowTable"><thead><tr><th>#</th><th>때</th><th>일어나는 일</th><th>플레이어가 하는 것</th><th>의견</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="ending">
+    <div class="sec-head"><p class="id">ED-01 – ED-06 · AN-01 – AN-05 · 엔딩</p><h2>축제 날과 단체 사진</h2>
+      <p class="muted">D23-A · D24-A · D25-A 기준 여섯 컷이에요. 컷마다 탭·클릭·Enter 로 넘기고 건너뛰기 단추가 늘 있어요. 사진 번쩍임은 한 번, 화면 일부만 — 동작 줄이기 설정이면 번쩍임 없이 흰색으로 천천히 바뀌어요. 줄 서는 자리·포즈는 주민마다 데이터로 정하고, 서 있기·뛰기를 꼭 하지 않아도 되는 포즈로 해요.</p></div>
+    <div class="story" id="storyCards"></div>
+    <h3>새 동작 다섯 (캐릭터 빌더 — 9명 + 단풍 모두)</h3>
+    <p class="small muted">지금 동작은 idle · walk · run · happy 넷이에요. 이모티콘 대화와 사진에 아래 다섯을 더해요. 캐릭터 빌더(<code>build_character.py</code>)에 동작을 더하는 일이라 Z4(단풍 모델)를 합친 뒤에 해요.</p>
+    <div class="grid" id="animCards" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))"></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN</p><h2>고른 뒤 진행 계획</h2>
+      <p class="muted">이 트랙(Z5, 브랜치 <code>p8-festival</code>)은 지금 보드만 만들어요. 고른 뒤 구현은 Z4(이사·생일, town·world 를 고치는 중)를 main 에 합친 다음 이 브랜치를 맞추고 시작해요. 합치기·게임 게시는 지금처럼 승인 뒤에 조정 세션이 해요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>단계</th><th>만드는 것</th><th>고치는 곳</th><th>먼저 필요한 것</th></tr></thead><tbody>
+      <tr><td class="id">Z5-1</td><td>이모티콘 판정 규칙·주민 7명 데이터·테스트</td><td><code>src/gameplay/festival/</code> (새) · <code>tests/festival.test.mjs</code> (새)</td><td>D14 · D17 · D18</td></tr>
+      <tr><td class="id">Z5-2</td><td>이모티콘 그림 36개 · 선택기 화면(UI-04) · 진행판 화면</td><td><code>assets/emotes/</code> (새) · <code>src/ui/emote.js</code> (새 파일)</td><td>D16 · D17</td></tr>
+      <tr><td class="id">Z5-3</td><td>대화를 이모티콘으로 바꾸기 (글 대사는 설정으로 보관)</td><td><code>src/gameplay/town/talk.js</code> · <code>villager.js</code> (Z4 합친 뒤)</td><td>D14 · D15 · Z4</td></tr>
+      <tr><td class="id">Z5-4</td><td>광장·무대·아치·부스·소품 3D (스펙 → Blender, world 칸)</td><td><code>assets/env/specs/</code> · <code>build_env.py</code> · <code>src/world/island.js</code> 광장 단계 (Z4 합친 뒤)</td><td>D19 · D21 · 의견</td></tr>
+      <tr><td class="id">Z5-5</td><td>부품 5 · 부스 놀이 5 · 음식 아이템 4 · 단체 사진 가구</td><td><code>src/gameplay/festival/booths/</code> · <code>assets/items/</code>(Z1 방식) · <code>assets/furniture/</code> · <code>src/data/items.js</code> 축제 칸</td><td>D20 · D21 · D22 · Z1 · Z3</td></tr>
+      <tr><td class="id">Z5-6</td><td>축제 날 · 단체 사진 엔딩 · 엔딩 뒤 계속하기 · 새 동작 5</td><td><code>src/gameplay/festival/ending.js</code> · 스토리 장면 재생기와 이벤트 · <code>build_character.py</code> 동작</td><td>D23 · D24 · D25 · 스토리</td></tr>
+    </tbody></table></div>
+    <p class="small muted">저장은 <code>ctx.state.festival</code> 한 칸(부품·부스·축제 날·사진)을 새로 두고, 주민별 이모티콘 대화 기록은 지금 <code>state.villagers[slug]</code> 에 칸을 더해요. 다른 트랙과의 약속(이벤트 <code>festival:part</code> · <code>festival:booth</code> · <code>festival:start</code> · <code>festival:photo</code>, 스토리 장면 이름)은 <code>docs/notes/z5-festival.md</code> 에 적어 두었어요.</p>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="ti-08" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#E6DCC6"/>
+      <g stroke="#B9A88A" stroke-width="1"><circle cx="6" cy="6" r="4.6" fill="#F2B36B"/><circle cx="18" cy="6" r="4.6" fill="#F3EAD6"/><circle cx="6" cy="18" r="4.6" fill="#F3EAD6"/><circle cx="18" cy="18" r="4.6" fill="#9CC3EA"/></g></pattern>
+  </defs>
+</svg>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+const C = { y: '#FFD866', r: '#E8504F', p: '#F7A6A0', b: '#6CA0DC', g: '#5FAE5A', w: '#FBF7F2', o: '#F39A3B', v: '#B9A6E0', br: '#C99A63', dk: '#8C6440', gold: '#F6C84C', sky: '#CDEBF5', leaf: '#8CCB6E' };
+const VCOL = { coco: '#F2B36B', bori: '#6CA0DC', mochi: '#B9A6E0', dubu: '#7FA36B', pong: '#FFD866', chorong: '#8CCB6E', danpung: '#D9583B', bamtol: '#C7743E', neuru: '#7A9A5A', player: '#F7A6A0' };
+
+/* ---------- 결정 ---------- */
+const DECISIONS = [
+  { id: 'D14', q: '주민과 대화는 어떤 방식으로?', opts: [
+    ['A', '이모티콘으로만', '주민은 이모티콘 1–3개 말풍선 + 표정·몸짓, 플레이어도 이모티콘 최대 3개로 답해요. 지금 글 대사(lines/)는 지우지 않고 섬폰 설정 "글 대사 보기"(기본 꺼짐)로 남겨요 — 글을 다시 더할지는 나중에 정해도 돼요.', true],
+    ['B', '이모티콘 + 짧은 글', '이모티콘 말풍선 아래에 주민 말투로 한 줄. 플레이어는 이모티콘으로 답해요. 글 대사를 한 줄짜리로 다시 써야 해요.'],
+    ['C', '글 대사 그대로 + 이모티콘 반응', '지금 대화창·메뉴는 그대로, 메뉴에 "이모티콘 보내기"를 더하고 주민 머리 위에 반응만 떠요. 축제 부탁도 글로.'] ] },
+  { id: 'D15', q: '어디까지 이모티콘으로?', opts: [
+    ['A', '주민 7명만', '밤톨(상점)·느루(박물관)·첫날 안내·편지·알림은 지금처럼 글. 가게 주인은 섬 사람들과 말을 맞춰 주는 "통역" 역할이에요.', true],
+    ['B', '가게 주인 인사·잡담도', '밤톨·느루도 인사·잡담은 이모티콘. 사고팔기·기증 메뉴는 지금 단추 그대로.'],
+    ['C', '섬 전부', '첫날 안내·편지까지 그림·이모티콘으로. 글자는 메뉴·알림에만 남아요.'] ] },
+  { id: 'D16', q: '이모티콘 그림은?', opts: [
+    ['A', '섬 전용 손그림 세트 (EM)', '아이콘과 같은 밤색 선·칠로 36개를 SVG로. 어느 기기에서나 같은 모양이고, 물건 이모티콘은 Z1 의 3D 아이템 아이콘을 그대로 써요.', true],
+    ['B', '기기 이모지 글꼴', '그리지 않아 가장 빨라요. 기기마다 모양·색이 다르고 오래된 휴대폰에선 빈칸이 나올 수 있어요.'],
+    ['C', '3D 렌더 이모티콘', '얼굴 표정까지 Blender 로 찍어요. 가장 입체적이지만 36개 모델링이 필요해요.'] ] },
+  { id: 'D17', q: '플레이어 이모티콘 팔레트는?', opts: [
+    ['A', '30개 · 6묶음 · 3칸', '인사·감정·행동·물건·자연·묻기 6탭, 최대 3개 이어 보내기, 빈 채로 보내면 ⏳ 기다리기. 부탁받은 물건은 물건 탭에 저절로 더해져요.', true],
+    ['B', '12개 한 판', '탭 없이 한 화면. 가장 쉽지만 표현이 적어요.'],
+    ['C', '18개로 시작해 늘어남', '주민과 친해지면 그 주민의 이모티콘을 배워요(코코 🏃, 단풍 🍁 …). 최대 36개.'] ] },
+  { id: 'D18', q: '이모티콘 판정은? (규칙으로만 · 유료 API·AI 없음)', opts: [
+    ['A', '주민마다 다르게 읽기 + 원하는 것 맞히기', '같은 이모티콘도 주민 성격대로 달라요(TK-01–07). 주민이 💭로 원하는 것을 보여 주면 맞게 답해요. 6단계 결과 → 친밀도 0~+3, 깎이지 않아요.', true],
+    ['B', '원하는 것 맞히기만', '주민마다 정답 묶음만 있어요. 성격 규칙이 없어 단순하고 예측하기 쉬워요.'],
+    ['C', '판정 없이 반응만', '무엇을 보내도 좋아해요. 친밀도는 지금처럼 말 걸기·선물·부탁으로만 올라요.'] ] },
+  { id: 'D19', q: '축제 광장은 어디에, 얼마나 크게?', opts: [
+    ['A', '지금 광장을 넓혀 섬 한가운데로', '광장을 동쪽 강가까지 키워 지름 12칸 원형(지금의 3배). 길 네 갈래가 이미 모여 있어요. 둘레 나무 7·덤불 3만 옮겨요.', true],
+    ['B', '강 양쪽 두 마당 + 북쪽 다리', '서쪽 = 무대 마당(지금 광장), 동쪽 = 부스 거리(6×13), 섬 정중앙 다리를 장식해 잇기. 가장 넓지만 강을 건너 오가요.'],
+    ['C', '북쪽 언덕 위 새 광장', '연못 옆 언덕에 8×6 네모 광장. 섬 어디서나 올려다보이지만 좁아서 부스는 언덕 아래로 내려가요.'] ] },
+  { id: 'D20', q: '축제 부품 5개는 어떻게 얻을까요?', opts: [
+    ['A', '이모티콘으로 마음 열기만', '주민과 이모티콘 대화가 2~3번 통하면 마음을 열고 부품을 줘요 (모두의 축제 방식). 채집은 필요 없어요.'],
+    ['B', '마음 열기 + 그 주민 분야의 채집', '마음을 연 주민에게 🎉로 물으면 필요한 것을 이모티콘으로 알려 주고(🐟❗), 채집해 가져가면 부품. 이모티콘 대화와 섬 채집을 같이 해요.', true],
+    ['C', '섬 탐험으로 찾기', '부품이 섬 곳곳(화석 자리·나무·바다 병·바위 밑)에 숨어 있고, 주민은 👉 + 장소 이모티콘으로 힌트만 줘요.'] ] },
+  { id: 'D21', q: '부스 다섯은 무엇으로?', opts: [
+    ['A', '놀이 축제', '등불 길(곤충) · 음악 무대(리듬) · 꽃 공방(화관) · 먹거리(과일 요리) · 낚시 대회(물고기 기록). 부스마다 채집한 것을 쓰는 놀이 하나.', true],
+    ['B', '장터 축제', '다섯 부스 모두 주민이 여는 작은 가게. 부스마다 하루 진열 3칸, 도토리로 사고팔아요.'],
+    ['C', '전시 축제', '박물관처럼 채집물을 부스에 걸어 두는 전시(곤충·물고기·꽃·과일·화석). 놀이는 없어요.'] ] },
+  { id: 'D22', q: '부스는 언제 서나요?', opts: [
+    ['A', '부품을 건네면 그 자리에서', '짧은 연출(덮개가 걷히고 부스가 섬) 뒤 바로 놀 수 있어요. 모으는 순서는 자유.', true],
+    ['B', '다음 날 아침', '밤새 공사 — 덮개 친 자리가 하루 서 있다가 아침에 열려요. 순서 자유.'],
+    ['C', '정해진 순서로 하나씩', '등불 → 꽃 → 먹거리 → 낚시 → 무대. 이야기 순서가 분명하지만 주민을 고를 수 없어요.'] ] },
+  { id: 'D23', q: '축제는 언제 열리나요?', opts: [
+    ['A', '다 모은 다음 날 저녁 6시', '아침에 주민들이 그림 편지로 초대해요. 저녁에 광장 가운데에서 행동 키로 시작. 놓쳐도 다음 저녁에 다시.', true],
+    ['B', '다 모은 그 자리에서 바로', '주민들이 광장으로 모여들고 곧바로 시작해요 (낮이어도).'],
+    ['C', '플레이어가 고른 때', '무대(BD-06)의 종을 치면 언제든 시작. 밤이면 등불이 켜져요.'] ] },
+  { id: 'D24', q: '엔딩 사진은?', opts: [
+    ['A', '무대 위 단체 사진', '주민 7 + 밤톨·느루 + 플레이어가 무대에 줄 서서 각자 이모티콘·포즈 → 찰칵. 사진은 가구(FU-34 액자)로 집에, 그림 파일로 저장 단추도.', true],
+    ['B', '사진 모드로 직접 찍기', '플레이어가 카메라 각도·주민 포즈·이모티콘을 고르고 찍어요. 여러 장.'],
+    ['C', '사진 + 돌아보기', '단체 사진 뒤 부품을 모은 순간 다섯 장을 앨범처럼 넘겨 보고 크레딧.'] ] },
+  { id: 'D25', q: '엔딩 뒤에는?', opts: [
+    ['A', '광장이 남고 해마다 축제', '부스는 매일 열려 있고, 축제를 연 날이 "섬 축제 날"이 돼 해마다 다시 열려요(사진도 한 장씩 더). 채집·꾸미기·주민은 그대로 계속.', true],
+    ['B', 'A + 섬 앨범 도전', 'A 에 더해 엔딩 뒤 새 목표 20개(도감 완성·주민 모두 절친·부스 기록 …)를 섬폰 앨범에서.'],
+    ['C', '부스만 남김', '축제는 한 번. 부스는 그대로 두고 다른 것은 더하지 않아요.'] ] },
+];
+$('decisions').innerHTML = DECISIONS.map(d => `
+  <div class="card dec"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+      <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+        <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div>
+    ${noteBox(d.id, d.q)}</div>`).join('');
+
+/* ---------- 이모티콘 그림 (48칸) ---------- */
+const face = (inner, fill = C.y) => `<circle cx="24" cy="25" r="18" fill="${fill}"/>${inner}`;
+const dots = `<circle cx="18" cy="22" r="2.4" fill="${INK}" stroke="none"/><circle cx="30" cy="22" r="2.4" fill="${INK}" stroke="none"/>`;
+const arcs = `<path d="M14.5 23 q3.5 -5 7 0 M26.5 23 q3.5 -5 7 0" fill="none"/>`;
+const cheeks = `<circle cx="13.5" cy="29" r="3" fill="${C.p}" stroke="none"/><circle cx="34.5" cy="29" r="3" fill="${C.p}" stroke="none"/>`;
+const mitt = (x, y, rot = 0, fill = C.y) => `<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M-7 11 V-3 q0 -9 7 -9 q7 0 7 9 V11 z" fill="${fill}"/><path d="M-7 3 q-7 -1 -7 -8 q5 -2 7 3" fill="${fill}"/></g>`;
+const heart = (x, y, s, fill) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 10 C-10 3 -10 -6 -4 -7 C-1.5 -7.5 0 -5.5 0 -4 C0 -5.5 1.5 -7.5 4 -7 C10 -6 10 3 0 10z" fill="${fill}"/>`;
+const star4 = (x, y, s) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -8 Q1.5 -1.5 8 0 Q1.5 1.5 0 8 Q-1.5 1.5 -8 0 Q-1.5 -1.5 0 -8z" fill="${C.gold}"/>`;
+const EM_CATS = [['greet', '인사'], ['feel', '감정'], ['act', '행동'], ['thing', '물건'], ['nature', '자연'], ['ask', '묻기'], ['reply', '주민 대답 전용']];
+const EM = [
+  ['EM-01', 'wave', '손 흔들기', 'greet', '👋', `${mitt(26, 24, 18)}<path d="M9 14 q-3 6 0 12 M40 10 q4 6 1 13" fill="none" stroke-width="2"/>`],
+  ['EM-02', 'deal', '악수', 'greet', '🤝', `${mitt(18, 26, -62)}${mitt(30, 26, 62, '#F2B36B')}`],
+  ['EM-03', 'good', '좋아', 'greet', '👍', `<path d="M17 23 V11 q0 -6 5 -6 q4 0 4 6 V23" fill="${C.y}"/><rect x="12" y="22" width="24" height="19" rx="7" fill="${C.y}"/><path d="M15 29 h17 M15 35 h17" fill="none" stroke-width="2"/>`],
+  ['EM-04', 'cheer', '만세', 'greet', '🙌', `${mitt(15, 28, -16)}${mitt(33, 28, 16)}<path d="M24 6 v5 M17 8 l2 4 M31 8 l-2 4" fill="none" stroke-width="2"/>`],
+  ['EM-05', 'heart', '마음', 'greet', '💛', heart(24, 25, 1.9, C.gold)],
+  ['EM-06', 'grin', '활짝', 'feel', '😄', face(`${arcs}<path d="M15 28 q9 11 18 0z" fill="${C.r}"/>`)],
+  ['EM-07', 'smile', '살짝 웃음', 'feel', '🙂', face(`${dots}<path d="M17 30 q7 5 14 0" fill="none"/>`)],
+  ['EM-08', 'love', '좋아해', 'feel', '🥰', face(`${arcs}${cheeks}<path d="M18 31 q6 4 12 0" fill="none"/>`) + heart(39, 10, 0.7, C.r)],
+  ['EM-09', 'sad', '시무룩', 'feel', '😢', face(`${dots}<path d="M17 34 q7 -6 14 0" fill="none"/><path d="M31 26 q3.5 5 0 7.5 q-3.5 -2.5 0 -7.5z" fill="${C.b}" stroke-width="1.5"/>`)],
+  ['EM-10', 'wow', '놀람', 'feel', '😮', face(`<circle cx="18" cy="21" r="3" fill="${C.w}"/><circle cx="30" cy="21" r="3" fill="${C.w}"/><ellipse cx="24" cy="32" rx="4" ry="5" fill="${INK}"/>`)],
+  ['EM-11', 'yum', '맛있겠다', 'feel', '😋', face(`${arcs}<path d="M15 29 q9 8 18 0" fill="none"/><path d="M25 31.5 q4 7 8 0" fill="${C.r}"/>`)],
+  ['EM-12', 'party', '축제·축하', 'act', '🎉', `<path d="M7 43 L17 17 L31 31z" fill="${C.o}"/><path d="M12 30 l9 9 M14 24 l11 11" fill="none" stroke="${C.w}" stroke-width="2.5"/><path d="M28 8 q2 6 -2 9 M36 14 q-4 3 -2 8 M40 26 q-5 -1 -7 3" fill="none" stroke="${C.b}" stroke-width="2.5"/><circle cx="22" cy="9" r="2.4" fill="${C.r}"/><circle cx="41" cy="9" r="2.4" fill="${C.gold}"/><circle cx="40" cy="37" r="2.4" fill="${C.g}"/>`],
+  ['EM-13', 'shout', '크게 외치기', 'act', '📢', `<path d="M8 19 h8 l16 -10 v30 l-16 -10 h-8z" fill="${C.r}"/><path d="M14 29 l3 10 h5 l-2 -10" fill="${C.w}"/><path d="M37 17 q4 7 0 14 M42 13 q6 11 0 22" fill="none" stroke-width="2"/>`],
+  ['EM-14', 'run', '달리기', 'act', '🏃', `<path d="M10 35 q0 -13 11 -13 l6 4 q11 2 16 6 q3 3 1 6 H10z" fill="${C.b}"/><path d="M8 40 H44" stroke-width="4"/><path d="M22 26 l3 -3 M26 28 l3 -3" fill="none" stroke="${C.w}" stroke-width="2"/><path d="M2 22 h7 M1 29 h6" fill="none" stroke-width="2"/>`],
+  ['EM-15', 'music', '노래', 'act', '🎵', `<path d="M18 36 V12 L37 7 V31" fill="none"/><path d="M18 17 L37 12" fill="none"/><ellipse cx="13" cy="36" rx="5.5" ry="4.5" fill="${INK}"/><ellipse cx="32" cy="31" rx="5.5" ry="4.5" fill="${INK}"/>`],
+  ['EM-16', 'sleep', '낮잠', 'act', '😴', face(`<path d="M14.5 24 q3.5 3 7 0 M26.5 24 q3.5 3 7 0" fill="none"/><ellipse cx="24" cy="33" rx="3" ry="2.2" fill="${INK}"/>`) + `<path d="M33 3 h8 l-8 8 h8" fill="none" stroke-width="2.4"/>`],
+  ['EM-17', 'gift', '선물', 'thing', '🎁', `<rect x="9" y="20" width="30" height="21" rx="2" fill="${C.r}"/><rect x="7" y="14" width="34" height="8" rx="2" fill="${C.r}"/><path d="M24 14 V41" stroke="${C.gold}" stroke-width="5"/><path d="M24 14 q-10 -10 -12 -2 q0 4 12 2 q10 -10 12 -2 q0 4 -12 2" fill="${C.gold}"/>`],
+  ['EM-18', 'fruit', '과일', 'thing', '🍎', `<circle cx="24" cy="28" r="15" fill="${C.r}"/><path d="M24 14 q1 -6 6 -8" fill="none" stroke="${C.dk}" stroke-width="3"/><path d="M26 10 q8 -5 11 1 q-6 5 -11 -1z" fill="${C.g}"/><path d="M15 24 q2 -5 7 -5" fill="none" stroke="${C.p}" stroke-width="3"/>`],
+  ['EM-19', 'fish', '물고기', 'thing', '🐟', `<path d="M5 24 C11 11 30 11 36 24 C30 37 11 37 5 24z" fill="${C.b}"/><path d="M36 24 L45 15 V33z" fill="${C.b}"/><circle cx="13" cy="22" r="2.2" fill="${INK}" stroke="none"/><path d="M22 18 q4 6 0 12" fill="none" stroke="${C.sky}" stroke-width="2"/>`],
+  ['EM-20', 'bug', '곤충', 'thing', '🦋', `<ellipse cx="15" cy="17" rx="10" ry="11" fill="${C.o}"/><ellipse cx="33" cy="17" rx="10" ry="11" fill="${C.o}"/><ellipse cx="16" cy="34" rx="7.5" ry="7.5" fill="${C.gold}"/><ellipse cx="32" cy="34" rx="7.5" ry="7.5" fill="${C.gold}"/><path d="M24 12 V42" stroke-width="4"/><path d="M24 12 q-3 -6 -7 -7 M24 12 q3 -6 7 -7" fill="none" stroke-width="2"/>`],
+  ['EM-21', 'flower', '꽃', 'thing', '🌷', `<path d="M24 26 V45" stroke="${C.g}" stroke-width="4"/><path d="M24 40 q-12 -2 -14 -11 q11 0 14 9z" fill="${C.g}"/><path d="M12 7 l6 8 6 -10 6 10 6 -8 v13 c0 11 -24 11 -24 0z" fill="#E86AA0"/>`],
+  ['EM-22', 'sun', '해', 'nature', '☀️', `<circle cx="24" cy="24" r="10" fill="${C.gold}"/><path d="M24 4 v6 M24 38 v6 M4 24 h6 M38 24 h6 M10 10 l4 4 M34 34 l4 4 M38 10 l-4 4 M14 34 l-4 4" fill="none" stroke="${C.o}" stroke-width="3"/>`],
+  ['EM-23', 'rain', '비', 'nature', '☔', `<path d="M6 23 a18 16 0 0 1 36 0 q-4.5 -4 -9 0 q-4.5 -4 -9 0 q-4.5 -4 -9 0 q-4.5 -4 -9 0z" fill="${C.v}"/><path d="M24 23 V39 q0 4 -4 4 q-3.5 0 -3.5 -3.5" fill="none"/><path d="M9 32 v3 M39 30 v3 M33 38 v3" fill="none" stroke="${C.b}" stroke-width="2.5"/>`],
+  ['EM-24', 'moon', '달', 'nature', '🌙', `<path d="M29 6 A18 18 0 1 0 42 33 A14 14 0 1 1 29 6z" fill="${C.gold}"/>`],
+  ['EM-25', 'rainbow', '무지개', 'nature', '🌈', `<path d="M5 38 a19 19 0 0 1 38 0" fill="none" stroke="${C.r}" stroke-width="5"/><path d="M11 38 a13 13 0 0 1 26 0" fill="none" stroke="${C.gold}" stroke-width="5"/><path d="M17 38 a7 7 0 0 1 14 0" fill="none" stroke="${C.b}" stroke-width="5"/>`],
+  ['EM-26', 'maple', '단풍잎', 'nature', '🍁', `<path d="M24 5 l4 9 7 -4 -2 9 9 1 -7 7 4 6 -9 -1 -1 7 -5 -5 -5 5 -1 -7 -9 1 4 -6 -7 -7 9 -1 -2 -9 7 4z" fill="#D9583B"/><path d="M24 33 V44" stroke-width="3"/>`],
+  ['EM-27', 'ask', '물음', 'ask', '❓', `<path d="M8 10 h32 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-17 l-8 7 v-7 h-7 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4z" fill="${C.w}"/><path d="M19 19 q0 -5 5 -5 q5 0 5 5 q0 4 -5 5 v3" fill="none" stroke-width="3"/><circle cx="24" cy="32" r="1.8" fill="${INK}"/>`],
+  ['EM-28', 'think', '생각하기', 'ask', '🤔', face(`${dots}<path d="M16 16 q3 -3 6 -1" fill="none" stroke-width="2"/><path d="M19 31 h9" fill="none"/>`) + mitt(33, 40, -40)],
+  ['EM-29', 'look', '바라보기', 'ask', '👀', `<ellipse cx="15" cy="24" rx="9" ry="12" fill="${C.w}"/><ellipse cx="33" cy="24" rx="9" ry="12" fill="${C.w}"/><circle cx="18" cy="26" r="4" fill="${INK}"/><circle cx="36" cy="26" r="4" fill="${INK}"/>`],
+  ['EM-30', 'wait', '기다리기', 'ask', '⏳', `<path d="M12 6 h24 M12 42 h24" stroke-width="4"/><path d="M14 8 q0 12 10 16 q-10 4 -10 16 h20 q0 -12 -10 -16 q10 -4 10 -16z" fill="${C.sky}"/><path d="M18 38 q6 -7 12 0z" fill="${C.gold}"/><path d="M19 12 h10 q-1 5 -5 7 q-4 -2 -5 -7z" fill="${C.gold}" stroke-width="1.5"/>`],
+  ['EM-31', 'bubble', '생각 풍선', 'reply', '💭', `<path d="M14 30 a9 9 0 0 1 -2 -17 a10 10 0 0 1 17 -5 a9 9 0 0 1 12 9 a8 8 0 0 1 -5 13z" fill="${C.w}"/><circle cx="11" cy="37" r="3.5" fill="${C.w}"/><circle cx="6" cy="43" r="2" fill="${C.w}"/>`],
+  ['EM-32', 'bang', '깨달음', 'reply', '❗', `<path d="M19 5 h10 l-2 27 h-6z" fill="${C.r}"/><circle cx="24" cy="40" r="4.5" fill="${C.r}"/>`],
+  ['EM-33', 'sweat', '당황', 'reply', '💦', `<path d="M17 8 q9 13 0 18 q-9 -5 0 -18z" fill="${C.b}"/><path d="M32 20 q8 11 0 16 q-8 -5 0 -16z" fill="${C.b}"/>`],
+  ['EM-34', 'dots', '말 줄임', 'reply', '…', `<circle cx="11" cy="26" r="4" fill="${INK}"/><circle cx="24" cy="26" r="4" fill="${INK}"/><circle cx="37" cy="26" r="4" fill="${INK}"/>`],
+  ['EM-35', 'zz', '졸음', 'reply', '💤', `<path d="M8 30 h10 l-10 10 h10 M22 16 h8 l-8 8 h8 M33 5 h6 l-6 6 h6" fill="none" stroke="${C.b}" stroke-width="3"/>`],
+  ['EM-36', 'sparkle', '반짝', 'reply', '✨', `${star4(18, 26, 1.6)}${star4(36, 12, 0.9)}${star4(37, 36, 0.7)}`],
+];
+const EMK = Object.fromEntries(EM.map(e => [e[1], e]));
+const emInner = key => `<g stroke="${INK}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">${EMK[key][5]}</g>`;
+const emSvg = (key, label = true) => `<svg viewBox="0 0 48 48" ${label ? `role="img" aria-label="${EMK[key][2]}"` : 'aria-hidden="true"'}>${emInner(key)}</svg>`;
+const emAt = (key, x, y, s) => `<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 48 48">${emInner(key)}</svg>`;
+const minis = keys => `<span class="minis">${keys.map(k => `<span class="mini" title="${EMK[k][2]}">${emSvg(k)}</span>`).join('')}</span>`;
+/** 말풍선 (x, y = 꼬리 끝) */
+const bubble = (x, y, keys, s = 20) => {
+  const w = keys.length * (s + 4) + 10, h = s + 10, bx = x - w / 2, by = y - h - 7;
+  return `<g><path d="M${bx + 6} ${by} h${w - 12} q6 0 6 6 v${h - 12} q0 6 -6 6 h${-(w / 2 - 12)} l-6 7 l-2 -7 h${-(w / 2 - 8)} q-6 0 -6 -6 v${-(h - 12)} q0 -6 6 -6z" fill="${C.w}" stroke="${INK}" stroke-width="2"/>${keys.map((k, i) => emAt(k, bx + 7 + i * (s + 4), by + 5, s)).join('')}</g>`;
+};
+/** 캐릭터 실루엣 (발 x, y). s = 크기 */
+const chr = (x, y, col, s = 1, { eye = 'dot', arm = null } = {}) => {
+  const k = v => v * s;
+  const eyes = eye === 'arc'
+    ? `<path d="M${x - k(5)} ${y - k(29)} q${k(2)} ${-k(3)} ${k(4)} 0 M${x + k(1)} ${y - k(29)} q${k(2)} ${-k(3)} ${k(4)} 0" fill="none" stroke="${INK}" stroke-width="${k(1.6)}"/>`
+    : `<circle cx="${x - k(3.5)}" cy="${y - k(29)}" r="${k(1.6)}" fill="${INK}"/><circle cx="${x + k(3.5)}" cy="${y - k(29)}" r="${k(1.6)}" fill="${INK}"/>`;
+  const arms = arm === 'up' ? `<path d="M${x - k(7)} ${y - k(14)} l${-k(6)} ${-k(10)} M${x + k(7)} ${y - k(14)} l${k(6)} ${-k(10)}" stroke="${col}" stroke-width="${k(4)}" stroke-linecap="round"/>`
+    : arm === 'wave' ? `<path d="M${x + k(7)} ${y - k(14)} l${k(7)} ${-k(9)}" stroke="${col}" stroke-width="${k(4)}" stroke-linecap="round"/>` : '';
+  return `<g stroke="${INK}" stroke-width="${k(2)}">${arms}<path d="M${x - k(8)} ${y} q0 ${-k(18)} ${k(8)} ${-k(18)} q${k(8)} 0 ${k(8)} ${k(18)}z" fill="${col}"/>
+    <path d="M${x - k(9)} ${y - k(34)} l${k(1)} ${-k(9)} l${k(6)} ${k(5)}z M${x + k(9)} ${y - k(34)} l${-k(1)} ${-k(9)} l${-k(6)} ${k(5)}z" fill="${col}"/>
+    <circle cx="${x}" cy="${y - k(28)}" r="${k(10)}" fill="${col}"/></g>${eyes}`;
+};
+
+$('emCats').innerHTML = EM_CATS.map(([cat, name]) => {
+  const list = EM.filter(e => e[3] === cat);
+  return `<h3>${name} <span class="id">${list[0][0]}–${list.at(-1)[0].slice(3)}</span></h3><div class="emgrid">${list.map(([id, key, nm, , was]) =>
+    `<div class="em"><span class="was" title="기기 이모지">${was}</span>${emSvg(key)}<span class="small">${nm}</span><span class="id">${id}</span>${noteBox(id, nm)}</div>`).join('')}</div>`;
+}).join('');
+
+/* ---------- 대화 화면 (UI-04) ---------- */
+const talkScene = (mode) => {
+  const top = `<rect width="320" height="210" fill="#BFE0A0"/><ellipse cx="160" cy="214" rx="210" ry="70" fill="#A9CF8A"/>${chr(118, 128, VCOL.coco, 1.5, { eye: mode === 'C' ? 'dot' : 'arc' })}${chr(212, 130, VCOL.player, 1.35)}`;
+  if (mode === 'A' || mode === 'B') {
+    const bub = bubble(126, 66, ['bubble', 'fish', 'bang'], 22);
+    const sub = mode === 'B' ? `<rect x="40" y="62" width="172" height="18" rx="9" fill="${C.w}" stroke="${INK}" stroke-width="1.5"/><text x="126" y="75" text-anchor="middle" font-size="10" fill="${INK}">큰 물고기 잡았냥? 보고 싶다냥!</text>` : '';
+    const tabs = ['wave', 'grin', 'party', 'gift', 'sun', 'ask'].map((k, i) => `<rect x="${14 + i * 30}" y="146" width="26" height="22" rx="6" fill="${i === 3 ? C.gold : C.w}" stroke="${INK}" stroke-width="1.5"/>${emAt(k, 18 + i * 30, 148, 18)}`).join('');
+    const grid = ['gift', 'fruit', 'fish', 'bug', 'flower'].map((k, i) => `<rect x="${14 + i * 34}" y="174" width="30" height="28" rx="7" fill="${C.w}" stroke="${INK}" stroke-width="1.5"/>${emAt(k, 18 + i * 34, 177, 22)}`).join('');
+    const slots = [['fish', 0], ['grin', 1], [null, 2]].map(([k, i]) => `<rect x="${196 + i * 30}" y="150" width="26" height="26" rx="6" fill="${k ? C.w : 'none'}" stroke="${INK}" stroke-width="1.5" ${k ? '' : 'stroke-dasharray="3 3"'}/>${k ? emAt(k, 199 + i * 30, 153, 20) : ''}`).join('');
+    const send = `<rect x="196" y="180" width="86" height="24" rx="12" fill="${C.g}" stroke="${INK}" stroke-width="1.5"/><path d="M228 186 l14 6 -14 6 2 -6z" fill="${C.w}" stroke="${INK}" stroke-width="1.2"/><rect x="288" y="180" width="24" height="24" rx="12" fill="${C.w}" stroke="${INK}" stroke-width="1.5"/><path d="M294 186 l12 12 M306 186 l-12 12" stroke="${INK}" stroke-width="2"/>`;
+    return `${top}${bub}${sub}<rect x="6" y="140" width="308" height="68" rx="12" fill="${C.w}" fill-opacity=".92" stroke="${INK}" stroke-width="2"/>${tabs}${grid}${slots}${send}`;
+  }
+  return `${top}${bubble(212, 70, ['grin'], 20)}<rect x="10" y="140" width="300" height="62" rx="12" fill="${C.w}" stroke="${INK}" stroke-width="2"/><rect x="22" y="132" width="44" height="16" rx="8" fill="${VCOL.coco}" stroke="${INK}" stroke-width="1.5"/><text x="44" y="144" text-anchor="middle" font-size="10" fill="${INK}">코코</text>
+    <text x="24" y="166" font-size="11" fill="${INK}">어제 강가에서 엄청 큰 그림자 봤다냥!</text><text x="24" y="184" font-size="10" fill="#5F7268">잡담 · 부탁 있어? · 선물 주기 · 이모티콘 보내기 · 잘 가</text>`;
+};
+$('talkModes').innerHTML = [
+  ['A', '이모티콘으로만 (추천)', '코코가 💭🐟❗ — "큰 물고기"를 보여 줘요. 아래 선택기에서 물건 탭을 열고 🐟😄 를 골라 보내요. 글자는 없어요.'],
+  ['B', '이모티콘 + 짧은 글', '같은 말풍선 아래에 코코 말투 한 줄. 플레이어 입력은 A 와 같아요.'],
+  ['C', '글 대사 + 이모티콘 반응', '지금 대화창 그대로. 메뉴의 "이모티콘 보내기"로 하나를 보내면 코코 머리 위에 반응만 떠요.'],
+].map(([k, t, d]) => `<div class="card"><div class="stage"><svg viewBox="0 0 320 210" role="img" aria-label="D14-${k} 대화 화면 스케치">${talkScene(k)}</svg></div>
+  <div class="head"><span class="id">D14-${k}</span><h3>${t}</h3></div><p class="small">${d}</p></div>`).join('')
+  + `<div class="card"><div class="head"><span class="id">UI-04</span><h3>이모티콘 선택기</h3><span class="tag new">새로</span></div>
+  <dl class="facts"><dt>자리</dt><dd>화면 아래 (휴대폰 세로는 아래 절반, 가로는 오른쪽). 지금 대화창 자리</dd><dt>구성</dt><dd>묶음 탭 6 · 이모티콘 격자 · 보낼 칸 3 · 보내기 · 닫기</dd><dt>조작</dt><dd>누르면 칸에, 칸을 누르면 빠짐, 네 번째는 칸이 흔들리며 안 들어감. 키보드 1–6 탭, 방향키·Space</dd><dt>접근성</dt><dd>단추마다 이름(스크린리더), 누를 곳 44px 이상, 색만으로 알리지 않음</dd></dl>${noteBox('UI-04', '이모티콘 선택기')}</div>`;
+
+/* ---------- 주민 규칙 ---------- */
+const TK = [
+  ['TK-01', 'coco', '코코 · 고양이', '이어 말하면 신나요. 3개 = 최고, 1개면 "더!" 하고 갸웃', ['wave', 'grin', 'run', 'sun'], ['wait'], ['grin', 'run', 'sun', 'bang', 'sweat'], '제자리 뛰기 / 갸웃', 'FP-02 응원 북'],
+  ['TK-02', 'bori', '보리 · 강아지', '하나만 천천히. 2개면 한 단계, 3개면 두 단계 덜 기뻐요', ['sleep', 'moon', 'smile'], ['shout', 'party'], ['zz', 'smile', 'moon', 'dots'], '꼬리 살랑 / 하품', '개막 종 (부품 없음)'],
+  ['TK-03', 'mochi', '모찌 · 토끼', '먼저 인사(👋·💛)를 받아야 다음 말을 들어요. 꽃·색 이야기를 좋아해요', ['flower', 'rainbow', 'love', 'heart'], ['bug'], ['flower', 'love', 'sparkle', 'heart'], '귀 쫑긋 / 귀 처짐', 'FP-03 꽃 가랜드'],
+  ['TK-04', 'dubu', '두부 · 곰', '기다려 주는 걸 좋아해요. ⏳ 뒤에야 말문을 열고, 3개를 한꺼번에 받으면 물러나요', ['wait', 'fish', 'good'], ['shout'], ['dots', 'fish', 'good', 'smile'], '천천히 끄덕 / 고개 돌림', 'FP-05 낚시 대회 깃발'],
+  ['TK-05', 'pong', '퐁 · 오리', '먹을 것이 하나라도 들어가면 무엇이든 좋아요. 배고프면 😋 를 먼저 보여 줘요', ['yum', 'fruit', 'fish'], ['sleep'], ['yum', 'fruit', 'bang', 'grin'], '날개 퍼덕 / 배 문지르기', 'FP-04 과일 솥'],
+  ['TK-06', 'chorong', '초롱 · 개구리', '❓로 물으면 꼭 대답(힌트)해요. 비 오는 날엔 모든 판정이 한 단계 더 좋아요', ['ask', 'rain', 'music'], ['sun'], ['rain', 'music', 'ask', 'sparkle'], '폴짝 / 볼 부풀리기', 'FP-01 반딧불 등불'],
+  ['TK-07', 'danpung', '단풍 · 여우 (이사 온 뒤)', '자기가 보낸 이모티콘을 같은 순서로 따라 하면 기뻐요 (꼼꼼한 수집가)', ['maple', 'look', 'sparkle'], ['shout'], ['maple', 'look', 'think', 'sparkle'], '꼬리 흔들기 / 꼬리 감기', '사진사 (엔딩 사진기)'],
+];
+$('tkTable').tBodies[0].innerHTML = TK.map(([id, slug, name, rule, like, dis, reply, ges, role]) => `
+  <tr><td class="id">${id}</td><td><span class="tag" style="background:${VCOL[slug]};color:${INK}">${name}</span></td><td class="small">${rule}</td><td>${minis(like)}</td><td>${minis(dis)}</td><td>${minis(reply)}</td><td class="small">${ges}</td><td class="small">${role}</td><td style="min-width:170px">${noteBox(id, name.split(' ·')[0] + ' 대화 규칙')}</td></tr>`).join('');
+
+/* ---------- 섬 가운데 지도 (tx 10–49, tz 8–46) ---------- */
+const MAP = ["~~~~~~~T.....,T,T,,,,,,T,,,,,T....T..~~~","~~~~~~....,,T,,,,,^^,,,,,^^^,,,T,,.....~","~~~~....,*,,,,^^^^^^^^^^^^t^^,,,,,,.....","~~~....T,,,^^^^:::::::t:::::^^^^^,,,,...","~~...,,,,^^^t:::::::::::::#::::t^^,,,,T.","~....,,,^^t:::::::::::::#####::::^^^,,,.","....T,,^^::::t::::::::t:#####::::::^^,,T","...,,,^^:t:::::::::::::::###:::::t::^^,,","..,,,^^:::::t::::::::::t:##:::::::::t^,,","..T,^^::t:::::=====::::::##::t::::t::^^,",".,,,^:t::::::t=:::::::t::##:::::::::::^,",".,,^^::::t::::=::::::::::##:t:::t::=::^^",".,,^:::t::::::=:^^^^:=:::##:::t:^^^/^^^^",".,,^^^^^^:t^^^/^^,,^^/^^^##^^^^^^,,/,,^,",".,,,^^,,^^^^,,/,,,,,,/,,,##,,^^,,,,=,,,,",",T,,,,,,,,,,,,=,,,,,,=,,,##,,,,,,,,=,,T,",",,,,,,,T,,,,,,=,,,T,,,,,,##,,T,T,T,=,,,,",",,,,,T,,,,T,T,=T,,,,,,T,,##,,,,,,,,=T,,,",",,,,,,,T,,,*,,=,,*,,,,,,,##,T,T,*,T=====",",,,,,,,,,T*,,PPP,,*,T,,,,##,,,,,,===,,,,",",,,,,,,T,,,,PPPPP========BB=======,,,,,,",",*,,,*,,,,,PPPPPPP,,T,,,,##,,,,,,=,,,,,,",",,,========PPPPPPP,,,,,T,##,T,,T,=,,,,,,",",,,,,,,,,,=PPPPPPP===,,,,##,,,,,,*,,,,,*",",,,,,,,,,,=,PPPPP,,*=T,,##,,T,T,,=======",",,,T,T*,,,*,,PPP,,**=,,,##,,,,,,,=,,,,,,","T,,,,,,,===,,,,,,,,*=,,,##,,,,,T,=,,,,,,",",,,,,T,,,,=,,,,,T,,,=T,,###,T,,,,=,,,,,T",",,,T,,,,,,=,,,,,,,,*=,,,,##,,,T,,=,,,,,,","T,,,,,,,,,=T,,,,,,,,=,,,,###,,,,T=T,,T,T",",,T,,,,,,,=,,,,,,,,,=,,T,,####,,,=,,,,,,",",,,,T,,,,,=,,,,T,,,,=T,,,,,####,,=,T,T,,",".,,,,*,,,*=,,T,,*,,,*,,,,T,,,##,,=,,,,,,","..T,,,,====,,,,,,,===,,,,,,,,##,,=,,,,,,","~...,,,,,,,,T,,T,,,,=,,,,====BB===,T,,T,","~~~T.,,,,,,,,,,,,T,,=,,,,=,,,##,,,,,,,,,","~~~~.....,,T,T,,,,,,=*,,,*,,,###,,,,,,,,","~~~~~~...T..,,,T,,T,======,,,,##,,,,,,,,","~~~~~~~~~......,,,,,=,,,,,,,,,,##,,,,,T,"];
+const BLD = [['박물관', 15, 3, 6, 6], ['상점', 34, 20, 5, 4], ['내 집', 6, 30, 3, 3], ['코코', 2, 19, 3, 3], ['보리', 7, 23, 3, 3], ['모찌', 17, 30, 3, 3], ['두부', 22, 34, 3, 3], ['초롱', 41, 21, 3, 3]];
+const TILE = { '~': '#9CD3E8', '.': '#EBD9A8', ',': '#BFE0A0', '=': '#D9B382', P: '#E3DCCB', '#': '#6CB4D8', '^': '#A58D6E', '/': '#C9A77A', ':': '#A9CF8A', B: '#B98957', T: '#BFE0A0', '*': '#BFE0A0', t: '#A9CF8A' };
+$('mapLegend').innerHTML = [['#BFE0A0', '풀밭'], ['#A9CF8A', '언덕'], ['#D9B382', '흙길'], ['#E3DCCB', '지금 광장'], ['#6CB4D8', '강'], ['#3F8F5C', '나무'], ['#E89A9A', '꽃덤불'], ['#C96F4A', '건물'], ['#F6C84C', '축제 자리']]
+  .map(([c, n]) => `<span><i style="background:${c}"></i>${n}</span>`).join('');
+function mapSvg(region, cell, overlay) {
+  const [c0, r0, c1, r1] = region;
+  let out = '';
+  for (let r = r0; r <= r1; r++) {
+    const row = MAP[r];
+    let c = c0;
+    while (c <= c1) {        // 같은 바닥은 한 줄로 이어 그린다
+      const t = TILE[row[c]] ?? '#9CD3E8';
+      let e = c;
+      while (e + 1 <= c1 && (TILE[row[e + 1]] ?? '#9CD3E8') === t) e++;
+      out += `<rect x="${(c - c0) * cell}" y="${(r - r0) * cell}" width="${(e - c + 1) * cell + 0.5}" height="${cell + 0.5}" fill="${t}"/>`;
+      c = e + 1;
+    }
+    for (let c2 = c0; c2 <= c1; c2++) {
+      const ch = row[c2];
+      if (ch === 'T' || ch === 't') out += `<circle cx="${(c2 - c0 + 0.5) * cell}" cy="${(r - r0 + 0.5) * cell}" r="${cell * 0.42}" fill="#3F8F5C"/>`;
+      if (ch === '*') out += `<circle cx="${(c2 - c0 + 0.5) * cell}" cy="${(r - r0 + 0.5) * cell}" r="${cell * 0.34}" fill="#E89A9A"/>`;
+    }
+  }
+  for (const [n, x, z, w, d] of BLD) {
+    if (x + w < c0 || x > c1 + 1 || z + d < r0 || z > r1 + 1) continue;
+    out += `<rect x="${(x - c0) * cell}" y="${(z - r0) * cell}" width="${w * cell}" height="${d * cell}" rx="2" fill="#C96F4A" stroke="${INK}" stroke-width="1.2"/><text x="${(x - c0 + w / 2) * cell}" y="${(z - r0 + d / 2) * cell + 3.5}" text-anchor="middle" font-size="${Math.max(8, cell * 0.95)}" fill="#FBFDF8">${n}</text>`;
+  }
+  const P = (c, r) => [(c - c0) * cell, (r - r0) * cell];
+  return `<svg viewBox="0 0 ${(c1 - c0 + 1) * cell} ${(r1 - r0 + 1) * cell}" role="img" aria-label="섬 가운데 지도">${out}${overlay(P, cell)}</svg>`;
+}
+const FEST = 'fill="#F6C84C" fill-opacity=".55" stroke="#A8642E" stroke-width="2" stroke-dasharray="5 3"';
+const tag = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" fill="${INK}" font-weight="700" paint-order="stroke" stroke="#FBFDF8" stroke-width="3">${t}</text>`;
+const PLANS = [
+  ['D19-A', '지금 광장을 넓혀 한가운데로', (P, k) => { const [x, y] = P(18.5, 22.5); return `<circle cx="${x}" cy="${y}" r="${6 * k}" ${FEST}/>${tag(x, y + 4, '지름 12칸')}`; }],
+  ['D19-B', '강 양쪽 두 마당 + 다리', (P, k) => { const [x, y] = P(14.5, 22.5); const [ex, ey] = P(27, 13); const [bx, by] = P(25, 20); return `<circle cx="${x}" cy="${y}" r="${4.5 * k}" ${FEST}/><rect x="${ex}" y="${ey}" width="${6 * k}" height="${13 * k}" rx="4" ${FEST}/><rect x="${bx - 2}" y="${by - 2}" width="${2 * k + 4}" height="${k + 4}" fill="none" stroke="#A8642E" stroke-width="2.5"/>${tag(x, y + 4, '무대 마당')}${tag(ex + 3 * k, ey + 7 * k, '부스 거리')}`; }],
+  ['D19-C', '북쪽 언덕 위 새 광장', (P, k) => { const [x, y] = P(27, 7); return `<rect x="${x}" y="${y}" width="${8 * k}" height="${6 * k}" rx="4" ${FEST}/>${tag(x + 4 * k, y + 3.4 * k, '8×6')}`; }],
+];
+$('plazaMaps').innerHTML = PLANS.map(([id, t, ov]) => `<div class="card"><div class="stage">${mapSvg([0, 2, 39, 34], 8, ov)}</div><div class="head"><span class="id">${id}</span><h3>${t}</h3></div></div>`).join('');
+
+/* 추천안 자세히: 무대·부스 다섯·아치·진행판 */
+const CEN = [18.5, 22.5], RING = 4.4;
+const BOOTH_AT = [['FB-01', 62, '#8CCB6E'], ['FB-02', 0, '#F2B36B'], ['FB-03', 298, '#B9A6E0'], ['FB-04', 135, '#FFD866'], ['FB-05', 225, '#7FA36B']];
+$('plazaDetail').innerHTML = mapSvg([9, 13, 29, 32], 16, (P, k) => {
+  const [cx, cy] = P(...CEN);
+  let s = `<circle cx="${cx}" cy="${cy}" r="${6 * k}" fill="url(#ti-08)" stroke="#A8642E" stroke-width="2"/>`;
+  s += `<rect x="${cx - 2.5 * k}" y="${cy - 5.6 * k}" width="${5 * k}" height="${2.4 * k}" rx="4" fill="#B98957" stroke="${INK}" stroke-width="2"/>${tag(cx, cy - 4.1 * k, 'BD-06 무대 · FB-02')}`;
+  for (const [id, deg, col] of BOOTH_AT.slice(0)) {
+    if (deg === 0) continue;
+    const a = deg * Math.PI / 180, x = cx + Math.sin(a) * RING * k, y = cy - Math.cos(a) * RING * k;
+    s += `<g transform="translate(${x} ${y}) rotate(${deg})"><rect x="${-1.5 * k}" y="${-1 * k}" width="${3 * k}" height="${2 * k}" rx="3" fill="${col}" stroke="${INK}" stroke-width="2"/></g>${tag(x, y + 4, id)}`;
+  }
+  // FB-02 음악 무대 = 무대 앞
+
+  s += `<circle cx="${cx}" cy="${cy}" r="${0.6 * k}" fill="${C.o}" stroke="${INK}" stroke-width="2"/>`;
+  for (let i = 0; i < 8; i++) { const a = (i * 45 + 22.5) * Math.PI / 180; s += `<circle cx="${cx + Math.sin(a) * 5.8 * k}" cy="${cy - Math.cos(a) * 5.8 * k}" r="4" fill="${C.gold}" stroke="${INK}" stroke-width="1.5"/>`; }
+  const [ax, ay] = P(12.3, 22.5), [bx, by] = P(24.6, 20.5);
+  s += `<path d="M${ax} ${ay - 22} v44" stroke="#D9583B" stroke-width="6" stroke-linecap="round"/>${tag(ax, ay - 28, 'BD-07')}<path d="M${bx} ${by - 22} v44" stroke="#D9583B" stroke-width="6" stroke-linecap="round"/>${tag(bx - 4, by + 36, 'BD-07')}`;
+  const [px, py] = P(10.6, 24.8);
+  s += `<rect x="${px - 14}" y="${py - 8}" width="28" height="14" rx="3" fill="${C.w}" stroke="${INK}" stroke-width="1.5"/>${tag(px, py + 22, 'PR-15')}`;
+  return s;
+});
+
+/* 부스 그림 (앞에서 본 모습, 0 0 160 130) */
+function boothArt(c1, c2, signKey, goods) {
+  const n = 7, T0 = 26, T1 = 134, B0 = 10, B1 = 150;
+  let aw = '';
+  for (let i = 0; i < n; i++) {
+    const ta = T0 + (T1 - T0) * i / n, tb = T0 + (T1 - T0) * (i + 1) / n, ba = B0 + (B1 - B0) * i / n, bb = B0 + (B1 - B0) * (i + 1) / n;
+    aw += `<path d="M${ta} 18 L${tb} 18 L${bb} 42 A${(bb - ba) / 2} 7 0 0 1 ${ba} 42 Z" fill="${i % 2 ? c2 : c1}"/>`;
+  }
+  return `<g stroke="${INK}" stroke-width="3" stroke-linejoin="round"><rect x="26" y="40" width="108" height="56" fill="#F3E0BC"/><path d="M24 40 V124 M136 40 V124" stroke="${C.dk}" stroke-width="7"/>${aw}
+    ${goods}<rect x="12" y="88" width="136" height="36" rx="3" fill="#B98957"/><rect x="12" y="97" width="136" height="9" fill="${c1}" stroke-width="2"/>
+    <rect x="58" y="0" width="44" height="22" rx="7" fill="${C.w}"/></g>${emAt(signKey, 70, 1, 20)}`;
+}
+const jar = (x, y, glow = C.gold) => `<rect x="${x}" y="${y}" width="16" height="22" rx="6" fill="#FFF4D0"/><rect x="${x + 2}" y="${y - 4}" width="12" height="5" rx="2" fill="${C.dk}"/><circle cx="${x + 6}" cy="${y + 10}" r="2.5" fill="${glow}" stroke="none"/><circle cx="${x + 11}" cy="${y + 15}" r="2" fill="${glow}" stroke="none"/>`;
+const BOOTHS = [
+  ['FB-01', '등불 길', 'FP-01', 'chorong', '#8CCB6E', '#E8F5D8', 'moon', `${jar(40, 64)}${jar(72, 62, '#C9F08A')}${jar(104, 64)}`,
+    '광장 둘레 등불 기둥(PR-14) 여덟이 밤마다 켜져요.', '잡은 곤충 하나를 등불 병에 넣어 밤하늘로 띄워요 → 그날 밤 광장 등불이 그 곤충 색. 하루 한 번, 초롱이 💛.', '곤충 (가방에서 빠짐, 도감 기록은 그대로)'],
+  ['FB-02', '음악 무대', 'FP-02', 'coco', '#F2B36B', '#FCE3C4', 'music', `<ellipse cx="80" cy="80" rx="26" ry="8" fill="${C.w}"/><path d="M54 80 V92 q26 10 52 0 V80" fill="${C.r}"/><path d="M60 66 l16 12 M100 66 l-16 12" stroke="${C.dk}" stroke-width="4"/>`,
+    '무대(BD-06) 바로 앞에 북 놀이 자리.', '리듬 놀이: 주민들이 🎵 이모티콘으로 박자를 보여 주면 행동 키로 맞춰 북을 쳐요(곡 3개, 지금 배경음 재사용). 맞힌 만큼 주민들이 무대 앞에서 춤. 최고 기록판.', '없음 (기록만)'],
+  ['FB-03', '꽃 공방', 'FP-03', 'mochi', '#B9A6E0', '#EFE8FA', 'flower', `<circle cx="80" cy="72" r="16" fill="none" stroke="${C.g}" stroke-width="5"/>${[0, 60, 120, 180, 240, 300].map((d, i) => `<circle cx="${80 + 16 * Math.sin(d * Math.PI / 180)}" cy="${72 - 16 * Math.cos(d * Math.PI / 180)}" r="4.5" fill="${['#E86AA0', C.gold, C.w, '#E86AA0', C.v, C.gold][i]}" stroke-width="2"/>`).join('')}<path d="M36 88 V74 h14 v14 M110 88 V74 h14 v14" fill="${C.br}" stroke-width="2.5"/>`,
+    '꽃 선반과 작업대.', '꽃 3송이 → 화관(IC-FE-03, 선물하면 모두 좋아함). 광장 화단 꽃 색을 골라 바꿀 수 있어요.', '꽃 3 → 화관'],
+  ['FB-04', '먹거리 부스', 'FP-04', 'pong', '#FFD866', '#FFF4D0', 'yum', `<path d="M40 88 q0 -16 18 -16 q18 0 18 16z" fill="${C.br}"/><path d="M44 80 h28" stroke="#E8504F" stroke-width="3"/><rect x="92" y="66" width="14" height="22" rx="3" fill="${C.o}"/><rect x="110" y="70" width="14" height="18" rx="3" fill="${C.r}"/>`,
+    '과일 솥(FP-04)이 화로 위에.', '과일 2개 → 과일 파이(IC-FE-01) 또는 과일 주스(IC-FE-02). 누구에게나 아주 좋아하는 선물. 하루 3번, 퐁이 한 입 맛봐요.', '과일 2 → 파이·주스'],
+  ['FB-05', '낚시 대회', 'FP-05', 'dubu', '#7FA36B', '#DCEFD3', 'fish', `<rect x="38" y="60" width="56" height="28" rx="4" fill="#9CD3E8"/><path d="M52 74 q8 -8 16 0 q-8 8 -16 0z M68 74 l7 -5 v10z" fill="${C.o}" stroke-width="2"/><rect x="104" y="54" width="26" height="34" rx="3" fill="${C.w}"/><path d="M110 82 v-8 M117 82 v-18 M124 82 v-12" stroke-width="4"/>`,
+    '수조와 기록판.', '잡은 물고기를 수조에 넣으면 길이(cm)를 재서 기록판에 올려요. 한 주 1–3위(플레이어와 두부의 기록), 1위면 메달(IC-FE-04). 물고기는 하루 뒤 바다로.', '물고기 (하루 뒤 돌려보냄)'],
+];
+$('boothCards').innerHTML = BOOTHS.map(([id, name, fp, who, c1, c2, sign, goods, where, play, uses]) => `
+  <div class="card"><div class="stage"><svg viewBox="0 0 160 130" role="img" aria-label="${name} 부스 스케치">${boothArt(c1, c2, sign, goods)}</svg></div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로 · 3D</span><span class="tag" style="background:${VCOL[who]};color:${INK}">${TK.find(t => t[1] === who)[2].split(' ·')[0]}</span></div>
+    <dl class="facts"><dt>여는 부품</dt><dd>${fp}</dd><dt>자리</dt><dd>${where}</dd><dt>놀이</dt><dd>${play}</dd><dt>쓰는 것</dt><dd>${uses}</dd><dt>크기</dt><dd>3×2칸, 높이 약 2.3 (지붕 천 색 = 주민 색)</dd></dl>${noteBox(id, name + ' 부스')}</div>`).join('');
+
+/* ---------- 부품 ---------- */
+const PARTS = [
+  ['FP-01', '반딧불 등불', 'chorong', '곤충 3마리 (반딧불이면 1마리로)', ['bubble', 'bug', 'moon'], 'FB-01 등불 길',
+    `<path d="M44 26 h32 l6 10 v44 q0 12 -12 12 h-20 q-12 0 -12 -12 v-44z" fill="#FFF4D0"/><rect x="42" y="16" width="36" height="12" rx="3" fill="${C.dk}"/><path d="M50 16 q10 -16 20 0" fill="none" stroke-width="3"/>${[[52, 50], [66, 44], [60, 66], [72, 72], [54, 80]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="#C9F08A" stroke-width="1.5"/>`).join('')}`],
+  ['FP-02', '응원 북', 'coco', '나무 5개 (북통)', ['bubble', 'music', 'good'], 'FB-02 음악 무대',
+    `<ellipse cx="60" cy="34" rx="34" ry="11" fill="${C.w}"/><path d="M26 34 V74 q34 18 68 0 V34" fill="${C.r}"/><path d="M26 44 l17 28 17 -26 17 26 17 -28" fill="none" stroke="${C.gold}" stroke-width="3"/><path d="M30 6 l20 26 M92 4 l-22 26" stroke="${C.dk}" stroke-width="5"/><circle cx="30" cy="6" r="5" fill="${C.w}"/><circle cx="92" cy="4" r="5" fill="${C.w}"/>`],
+  ['FP-03', '꽃 가랜드', 'mochi', '꽃 6송이 (색 3가지 이상)', ['bubble', 'flower', 'rainbow'], 'FB-03 꽃 공방',
+    `<path d="M6 22 q54 40 108 0" fill="none" stroke-width="3"/>${[[18, 32, '#E86AA0'], [36, 41, C.gold], [54, 44, C.v], [72, 44, '#E86AA0'], [90, 40, C.gold], [104, 31, C.v]].map(([x, y, c]) => `<path d="M${x - 7} ${y - 2} l7 16 7 -16z" fill="${c}"/><circle cx="${x}" cy="${y - 3}" r="4" fill="${C.w}"/>`).join('')}<circle cx="60" cy="72" r="10" fill="#E86AA0"/><circle cx="60" cy="72" r="4" fill="${C.gold}"/>`],
+  ['FP-04', '과일 솥', 'pong', '과일 5개 (섬 특산 아닌 과일 1개 포함)', ['bubble', 'fruit', 'yum'], 'FB-04 먹거리 부스',
+    `<path d="M22 44 h76 v22 q0 24 -38 24 q-38 0 -38 -24z" fill="#4E5A57"/><rect x="16" y="38" width="88" height="10" rx="5" fill="#6B7774"/><circle cx="46" cy="34" r="9" fill="${C.r}"/><circle cx="62" cy="30" r="9" fill="${C.o}"/><circle cx="76" cy="36" r="8" fill="${C.p}"/><path d="M40 20 q-4 -8 2 -14 M60 16 q-4 -8 2 -14 M80 20 q-4 -8 2 -14" fill="none" stroke="#9DB2A6" stroke-width="2.5"/>`],
+  ['FP-05', '낚시 대회 깃발', 'dubu', '큰 물고기 1마리 (그림자가 큰 것)', ['bubble', 'fish', 'bang'], 'FB-05 낚시 대회',
+    `<path d="M26 8 V94" stroke="${C.dk}" stroke-width="6"/><path d="M29 12 h66 l-12 20 12 20 h-66z" fill="#7FA36B"/><path d="M44 32 q10 -10 20 0 q-10 10 -20 0z M64 32 l9 -6 v12z" fill="${C.w}" stroke-width="2"/><ellipse cx="26" cy="94" rx="14" ry="4" fill="${C.br}"/>`],
+];
+$('partCards').innerHTML = PARTS.map(([id, name, who, bring, hint, booth, art]) => `
+  <div class="card"><div class="stage"><svg viewBox="0 0 120 100" role="img" aria-label="${name} 스케치"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round">${art}</g></svg></div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로 · 3D</span></div>
+    <dl class="facts"><dt>주는 주민</dt><dd><span class="tag" style="background:${VCOL[who]};color:${INK}">${TK.find(t => t[1] === who)[2].split(' ·')[0]}</span></dd><dt>💭 힌트</dt><dd>${minis(hint)}</dd><dt>가져갈 것</dt><dd>${bring}</dd><dt>여는 부스</dt><dd>${booth}</dd></dl>${noteBox(id, name)}</div>`).join('')
+  + `<div class="card"><div class="head"><span class="id">FP · 주민 몫</span><h3>부품 없는 두 주민도 축제에</h3></div>
+    <p class="small">보리는 축제 날 개막 종을 치고, 단풍은 엔딩 사진사예요(단풍이 아직 이사 오지 않았으면 밤톨이 찍어요). 한 사람이라도 빠지면 사진이 완성되지 않아요 — 축제 날 모두 광장에 와요.</p>
+    <p class="small muted">D20-A 를 고르면 "부품마다 정해진 주민" 대신 마음을 연 주민이 아직 없는 부품 하나를 줘요. D20-C 면 💭 힌트가 👉 + 장소예요.</p></div>`;
+
+/* ---------- 무대·소품 ---------- */
+const PROPS = [
+  ['BD-06', '축제 무대', '건물 5×3 · 높이 3.4', '광장 북쪽. 나무 무대 + 천막 지붕 + 현수막(🎉). 옆 경사로로 올라가요. 단체 사진을 여기서 찍어요. 밤에 지붕 끝 전구가 빛나요(glow).',
+    `<path d="M10 60 L100 22 L190 60z" fill="#F2B36B"/><path d="M10 60 q15 12 30 0 q15 12 30 0 q15 12 30 0 q15 12 30 0 q15 12 30 0 q15 12 30 0" fill="#FCE3C4"/><path d="M22 60 V100 M178 60 V100" stroke="${C.dk}" stroke-width="7"/><rect x="40" y="64" width="120" height="22" rx="4" fill="${C.w}"/>${emAt('party', 78, 65, 20)}${emAt('music', 100, 65, 20)}${emAt('sparkle', 122, 65, 20)}<rect x="8" y="100" width="184" height="24" rx="3" fill="#B98957"/><path d="M192 104 l10 20 h-10z" fill="#C99A63"/>`, '0 0 210 130', null],
+  ['BD-07', '축제 아치', '건물 3×1 · 2곳', '서쪽·동쪽 입구. 나무 기둥 둘 + 꽃 덩굴 + 깃발. 지나가면 꽃잎이 살짝 날려요.',
+    `<path d="M24 120 V40 M96 120 V40" stroke="${C.dk}" stroke-width="9"/><path d="M14 46 q46 -50 92 0" fill="none" stroke="#B98957" stroke-width="12"/>${[[22, 60], [26, 82], [94, 64], [98, 88], [40, 26], [60, 18], [80, 26]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="7" fill="${['#E86AA0', C.gold, C.v, '#E86AA0', C.w, C.gold, C.v][i]}" stroke-width="2"/>`).join('')}`, '0 0 120 130', null],
+  ['PR-13', '깃발 줄', '소품 · 길이 6칸', '무대 지붕 끝에서 등불 기둥까지 걸리는 세모 깃발 줄. 바람에 흔들려요. 부스가 열릴 때마다 그 주민 색 깃발이 늘어요.',
+    `<path d="M4 20 q56 40 112 0" fill="none" stroke-width="2.5"/>${[14, 30, 46, 62, 78, 94, 108].map((x, i) => { const y = 20 + 40 * (x / 112) * (1 - x / 112) * 2 - 2; return `<path d="M${x - 6} ${y} l6 16 6 -16z" fill="${Object.values(VCOL)[i]}"/>`; }).join('')}`, '0 0 120 70', null],
+  ['PR-14', '등불 기둥', '소품 1×1 · 8개', '광장 둘레. 유리병 등불이 달린 나무 기둥. FB-01 을 열면 밤에 켜져요(glow), 색은 그날 띄운 곤충 색.',
+    `<path d="M60 30 V122" stroke="${C.dk}" stroke-width="7"/><path d="M60 30 h22" stroke="${C.dk}" stroke-width="5"/>${jar(74, 36)}<ellipse cx="60" cy="122" rx="14" ry="4" fill="${C.br}"/>`, '0 0 120 130', null],
+  ['PR-15', '부품 진행판', '소품 2×1', '서쪽 입구 옆. 부품 다섯 자리가 검은 실루엣으로 그려진 판. 부품을 모으면 그 자리가 색으로 채워지고 ✨. 섬폰 화면(UI-05)과 같은 그림.',
+    `<rect x="8" y="14" width="164" height="58" rx="8" fill="#F3E0BC"/><path d="M30 72 V96 M150 72 V96" stroke="${C.dk}" stroke-width="6"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${18 + i * 31}" y="24" width="26" height="38" rx="5" fill="${i < 2 ? ['#8CCB6E', '#F2B36B'][i] : '#4A3B32'}" fill-opacity="${i < 2 ? 1 : 0.8}"/>`).join('')}`, '0 0 180 100', null],
+  ['PR-16', '덮개 친 부스 자리', '소품 3×2', '아직 안 연 부스 자리. 천을 덮고 끈으로 묶었어요. 앞에 💭 + 부품 실루엣 팻말. 부품을 건네면 천이 걷혀요.',
+    `<path d="M16 120 L26 40 q54 -34 108 0 L144 120z" fill="#E6DCC6"/><path d="M26 40 q54 -34 108 0 M20 80 q60 14 120 0" fill="none" stroke="${C.br}" stroke-width="4"/><rect x="62" y="84" width="36" height="30" rx="5" fill="${C.w}"/>${emAt('bubble', 68, 86, 24)}`, '0 0 160 130', null],
+  ['FU-34', '축제 단체 사진', '가구 · 벽', '엔딩에 받는 액자. 찍은 사진이 그대로 들어가요(해마다 축제를 열면 한 장씩 더 — 변형).',
+    `<rect x="10" y="10" width="100" height="78" rx="4" fill="${C.br}"/><rect x="20" y="20" width="80" height="58" fill="#CDEBF5"/><rect x="20" y="60" width="80" height="18" fill="#B98957"/>${['coco', 'bori', 'mochi', 'player', 'dubu', 'pong', 'chorong'].map((v, i) => `<circle cx="${28 + i * 10.6}" cy="56" r="5" fill="${VCOL[v]}" stroke-width="1.5"/>`).join('')}`, '0 0 120 100', null],
+  ['IC-FE-01', '과일 파이', '아이템 · 선물', 'FB-04 에서 과일 2개로. 누구에게나 아주 좋아하는 선물.',
+    `<path d="M14 64 q0 -30 46 -30 q46 0 46 30z" fill="${C.br}"/><path d="M14 64 h92 v10 h-92z" fill="#B98957"/><path d="M34 46 l10 10 M54 40 l10 12 M76 44 l10 10" stroke="${C.r}" stroke-width="4"/>`, '0 0 120 100', null],
+  ['IC-FE-02', '과일 주스', '아이템 · 선물', 'FB-04 에서 과일 2개로. 과일 종류마다 색이 달라요(변형 5).',
+    `<path d="M38 22 h44 l-6 66 h-32z" fill="${C.o}"/><path d="M40 34 h40" stroke="${C.w}" stroke-width="3"/><path d="M70 22 l10 -16" stroke-width="4"/><circle cx="80" cy="24" r="8" fill="${C.r}"/>`, '0 0 120 100', null],
+  ['IC-FE-03', '화관', '아이템 · 선물·장식', 'FB-03 에서 꽃 3송이로. 꽃 색을 따라가요.',
+    `<ellipse cx="60" cy="52" rx="40" ry="22" fill="none" stroke="${C.g}" stroke-width="6"/>${[0, 45, 90, 135, 180, 225, 270, 315].map((d, i) => `<circle cx="${60 + 40 * Math.cos(d * Math.PI / 180)}" cy="${52 + 22 * Math.sin(d * Math.PI / 180)}" r="8" fill="${['#E86AA0', C.gold, C.w, C.v][i % 4]}" stroke-width="2"/>`).join('')}`, '0 0 120 100', null],
+  ['IC-FE-04', '낚시 대회 메달', '아이템 · 가구처럼 장식', 'FB-05 한 주 1위면. 집에 걸 수 있어요.',
+    `<path d="M44 8 l16 30 16 -30" fill="none" stroke="#6CA0DC" stroke-width="8"/><circle cx="60" cy="60" r="26" fill="${C.gold}"/><path d="M48 60 q8 -8 16 0 q-8 8 -16 0z M64 60 l7 -5 v10z" fill="${C.w}" stroke-width="2"/>`, '0 0 120 100', null],
+];
+$('propCards').innerHTML = PROPS.map(([id, name, kind, what, art, vb, bub]) => `
+  <div class="card"><div class="stage"><svg viewBox="${vb}" role="img" aria-label="${name} 스케치"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round">${art}</g>${bub ? bubble(100, 66, bub, 18).replace('<g>', '<g transform="translate(0 -6)">') : ''}</svg></div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로</span></div>
+    <dl class="facts"><dt>분류</dt><dd>${kind}</dd><dt>모양·쓰임</dt><dd>${what}</dd></dl>${noteBox(id, name)}</div>`).join('');
+
+/* 광장 그림 (앞에서 본 모습) */
+$('plazaHero').innerHTML = (() => {
+  const b = (x, y, s, i) => { const B = BOOTHS[i]; return `<svg x="${x}" y="${y}" width="${160 * s}" height="${130 * s}" viewBox="0 0 160 130">${boothArt(B[4], B[5], B[6], B[7])}</svg>`; };
+  let s = `<rect width="400" height="260" fill="#CDEBF5"/><circle cx="340" cy="44" r="18" fill="${C.gold}"/><ellipse cx="200" cy="250" rx="240" ry="96" fill="#BFE0A0"/><ellipse cx="200" cy="200" rx="170" ry="52" fill="url(#ti-08)" stroke="#A8642E" stroke-width="2"/>`;
+  s += `<g stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"><path d="M120 92 L200 64 L280 92z" fill="#F2B36B"/><path d="M128 92 V140 M272 92 V140" stroke="${C.dk}" stroke-width="5"/><rect x="150" y="98" width="100" height="16" rx="3" fill="${C.w}"/><rect x="116" y="140" width="168" height="16" rx="2" fill="#B98957"/></g>${emAt('party', 190, 98, 16)}`;
+  s += `<path d="M128 92 q-60 30 -110 40 M272 92 q60 30 110 40" fill="none" stroke="${INK}" stroke-width="1.5"/>`;
+  s += b(28, 118, 0.42, 0) + b(306, 118, 0.42, 3) + b(2, 168, 0.55, 2) + b(312, 170, 0.55, 4);
+  s += `<g stroke="${INK}" stroke-width="2"><ellipse cx="200" cy="206" rx="16" ry="6" fill="#8C8C84"/><path d="M190 204 q10 -26 20 0z" fill="${C.o}"/></g>`;
+  s += chr(150, 222, VCOL.coco, 0.9, { arm: 'wave', eye: 'arc' }) + chr(176, 236, VCOL.player, 0.9) + chr(226, 234, VCOL.mochi, 0.9, { eye: 'arc' }) + chr(254, 222, VCOL.pong, 0.9, { arm: 'up', eye: 'arc' });
+  s += bubble(150, 186, ['party'], 16) + bubble(254, 186, ['yum', 'fruit'], 16);
+  return `<svg viewBox="0 0 400 260" role="img" aria-label="축제 광장 그림">${s}</svg>`;
+})();
+
+/* ---------- 이야기 흐름 ---------- */
+const FLOW = [
+  ['FL-1', '첫날', '밤톨이 글로 안내(지금 첫날 흐름 그대로)하다가 "이 섬 주민들은 섬 말 — 이모티콘으로 이야기해요"', '첫날 할 일 7단계'],
+  ['FL-2', '첫 주민 만남', '주민이 💭👋 하는데 플레이어 말이 안 통함 → 고개 갸웃 → 💭 → ❗ → 이모티콘 선택기가 처음 열림 (스토리 장면)', '연습 3번: 👋 받으면 👋·😄 / 🎁 받으면 🙌·😄 / 😢 받으면 💛·🤝. 틀리면 갸웃 → 다시'],
+  ['FL-3', '며칠 뒤 (주민 3명 이상 아는 사이)', '보리가 광장에서 💭🎉😢 — 축제가 멈췄어요. 광장에 덮개 친 부스 자리 다섯(PR-16)과 진행판(PR-15)이 생기고, 섬폰에 축제 앱(UI-05)', '진행판 보기'],
+  ['FL-4', '되풀이', '주민과 이모티콘으로 마음 열기 → 🎉로 묻기 → 💭 필요한 것 → 채집 → 부품 → 부스가 열림', '부스 놀이·채집·꾸미기 자유'],
+  ['FL-5', '다섯 다 모인 날', '진행판이 다 채워지고 주민들이 💭🎉. 다음 날 아침 그림 편지', '—'],
+  ['FL-6', '축제 날 저녁 → 엔딩', 'ED-01–06', '사진 → 크레딧 → 계속 놀기'],
+];
+$('flowTable').tBodies[0].innerHTML = FLOW.map(([id, when, what, you]) => `<tr><td class="id">${id}</td><td class="small">${when}</td><td class="small">${what}</td><td class="small">${you}</td><td style="min-width:170px">${noteBox(id, when)}</td></tr>`).join('');
+
+/* ---------- 엔딩 스토리보드 ---------- */
+const row7 = (y, s, poses = {}) => ['coco', 'bori', 'mochi', 'player', 'dubu', 'pong', 'chorong'].map((v, i) => chr(34 + i * 32, y, VCOL[v], s, poses[v] ?? {})).join('');
+const STORY = [
+  ['ED-01', '다섯 번째 부품', '진행판이 다 채워져 반짝여요. 근처 주민들이 💭🎉 하며 모여들어요.', `<rect width="260" height="150" fill="#BFE0A0"/><rect x="60" y="30" width="140" height="50" rx="6" fill="#F3E0BC" stroke="${INK}" stroke-width="2"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${68 + i * 26}" y="38" width="22" height="34" rx="4" fill="${['#8CCB6E', '#F2B36B', '#B9A6E0', '#FFD866', '#7FA36B'][i]}" stroke="${INK}" stroke-width="1.5"/>`).join('')}${star4(206, 30, 1.2)}${chr(70, 140, VCOL.pong, 0.8, { eye: 'arc' })}${chr(190, 140, VCOL.mochi, 0.8, { eye: 'arc' })}${chr(130, 146, VCOL.player, 0.8)}${bubble(70, 104, ['bubble', 'party'], 14)}`],
+  ['ED-02', '그림 편지', '다음 날 아침 우편함에 편지 — 🎉 + 🌙 + 광장 그림. 섬폰 축제 앱에 "오늘 저녁 6시".', `<rect width="260" height="150" fill="#F3E0BC"/><rect x="50" y="22" width="160" height="108" rx="6" fill="${C.w}" stroke="${INK}" stroke-width="2"/>${emAt('party', 66, 34, 34)}${emAt('moon', 106, 34, 34)}${emAt('heart', 146, 34, 34)}<ellipse cx="130" cy="100" rx="56" ry="16" fill="url(#ti-08)" stroke="${INK}" stroke-width="1.5"/>`],
+  ['ED-03', '개막', '저녁, 광장에 모두 모여요. 가운데에서 행동 키 → 보리가 무대 종을 치고 등불이 하나씩 켜져요.', `<rect width="260" height="150" fill="#2E3A66"/><ellipse cx="130" cy="150" rx="170" ry="50" fill="#56705A"/><path d="M70 60 L130 38 L190 60z" fill="#F2B36B" stroke="${INK}" stroke-width="2"/><rect x="74" y="60" width="112" height="40" fill="#B98957" stroke="${INK}" stroke-width="2"/>${chr(130, 98, VCOL.bori, 0.9, { arm: 'up', eye: 'arc' })}${[20, 60, 200, 240].map(x => `<circle cx="${x}" cy="94" r="7" fill="${C.gold}" stroke="${INK}" stroke-width="1.5"/><path d="M${x} 101 v34" stroke="${C.dk}" stroke-width="4"/>`).join('')}${bubble(130, 50, ['music', 'party'], 14)}`],
+  ['ED-04', '축제 밤', '부스마다 주인 주민이 기다려요. 이 밤엔 부스 놀이 보상이 두 배, 자유롭게 돌아다녀요(서두르지 않아도 돼요).', `<rect width="260" height="150" fill="#2E3A66"/><ellipse cx="130" cy="150" rx="170" ry="60" fill="#56705A"/><svg x="10" y="40" width="110" height="90" viewBox="0 0 160 130">${boothArt(BOOTHS[3][4], BOOTHS[3][5], 'yum', BOOTHS[3][7])}</svg><svg x="140" y="40" width="110" height="90" viewBox="0 0 160 130">${boothArt(BOOTHS[4][4], BOOTHS[4][5], 'fish', BOOTHS[4][7])}</svg>${chr(130, 146, VCOL.player, 0.8)}${bubble(130, 104, ['grin', 'sparkle'], 14)}`],
+  ['ED-05', '줄 서기', '단풍이 사진기(삼각대)를 세우면 모두 무대에 줄 서요. 주민마다 자기 포즈 + 이모티콘 말풍선. 플레이어는 내 이모티콘 하나를 골라요.', `<rect width="260" height="150" fill="#2E3A66"/><rect x="8" y="96" width="244" height="20" rx="3" fill="#B98957" stroke="${INK}" stroke-width="2"/>${row7(96, 0.72, { coco: { arm: 'up', eye: 'arc' }, mochi: { eye: 'arc' }, pong: { arm: 'wave', eye: 'arc' }, player: { arm: 'wave' } })}${bubble(34, 52, ['run'], 12)}${bubble(98, 52, ['flower'], 12)}${bubble(130, 52, ['heart'], 12)}${bubble(194, 52, ['yum'], 12)}${chr(230, 148, VCOL.danpung, 0.7)}<path d="M206 148 l8 -22 8 22 M214 126 v-6" stroke="${INK}" stroke-width="2" fill="none"/><rect x="204" y="112" width="20" height="12" rx="2" fill="#4E5A57" stroke="${INK}" stroke-width="1.5"/>`],
+  ['ED-06', '찰칵 → 계속', '찰칵! 사진이 액자(FU-34)로 가방에, 그림 파일로 저장 단추. 짧은 크레딧 뒤 "계속 놀기" — 섬은 그대로, 부스는 매일 열려요(D25-A).', `<rect width="260" height="150" fill="${C.w}"/><rect x="40" y="14" width="180" height="110" rx="6" fill="${C.br}" stroke="${INK}" stroke-width="2"/><rect x="50" y="24" width="160" height="90" fill="#2E3A66"/><rect x="50" y="88" width="160" height="26" fill="#B98957"/>${['coco', 'bori', 'mochi', 'player', 'dubu', 'pong', 'chorong', 'danpung'].map((v, i) => chr(62 + i * 19.5, 92, VCOL[v], 0.48, { eye: 'arc' })).join('')}<rect x="88" y="130" width="84" height="16" rx="8" fill="${C.g}" stroke="${INK}" stroke-width="1.5"/>${emAt('run', 122, 131, 14)}`],
+];
+$('storyCards').innerHTML = STORY.map(([id, t, d, art]) => `<div class="card"><div class="stage"><svg viewBox="0 0 260 150" role="img" aria-label="${t} 장면 스케치">${art}</svg></div>
+  <div class="head"><span class="id">${id}</span><h3>${t}</h3></div><p class="small">${d}</p>${noteBox(id, t + ' 장면')}</div>`).join('');
+
+const ANIMS = [
+  ['AN-01', '손 흔들기 (wave)', '인사 이모티콘을 받거나 보낼 때', { arm: 'wave', eye: 'arc' }, '<path d="M62 30 q6 -4 10 0" fill="none" stroke="#4A3B32" stroke-width="2"/>'],
+  ['AN-02', '끄덕 (nod)', '"기쁨" 판정', { eye: 'arc' }, '<path d="M70 18 v12 m-4 -4 l4 4 4 -4" fill="none" stroke="#4A3B32" stroke-width="2"/>'],
+  ['AN-03', '도리도리 (shake)', '"어색" 판정 — 부드럽게 두 번', {}, '<path d="M28 20 h-10 m3 -3 l-3 3 3 3 M52 20 h10 m-3 -3 l3 3 -3 3" fill="none" stroke="#4A3B32" stroke-width="2"/>'],
+  ['AN-04', '갸웃 (tilt)', '"갸웃" 판정 · 생각할 때', {}, '<path d="M58 14 q8 2 8 10" fill="none" stroke="#4A3B32" stroke-width="2"/>'],
+  ['AN-05', '만세 (cheer)', '부품 받기 · 사진 포즈', { arm: 'up', eye: 'arc' }, ''],
+];
+$('animCards').innerHTML = ANIMS.map(([id, t, when, pose, mark]) => `<div class="card"><div class="stage"><svg viewBox="0 0 80 64" role="img" aria-label="${t} 스케치" style="max-width:140px">${chr(40, 62, VCOL.chorong, 1, pose)}${mark}</svg></div>
+  <div class="head"><span class="id">${id}</span><h3>${t}</h3></div><p class="small muted">${when}</p>${noteBox(id, t)}</div>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+$('pills').innerHTML = ['<span class="pill wait">검수 대기</span>', '결정 12', '이모티콘 36', '대화 규칙 7', '광장 BD-06·07 · TI-08', '부품 5', '부스 5', '소품 4 · 가구 1 · 아이템 4', '새 동작 5', '엔딩 6컷']
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 의견 저장 · 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'z5', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 Z5 축제 검수 보드 v0.1 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>
