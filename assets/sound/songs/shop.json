@@ -1,0 +1,40 @@
+{
+  "id": "shop",
+  "version": 1,
+  "code": "BGM-08",
+  "title": "도토리상점",
+  "mood": "경쾌한 리듬",
+  "bpm": 112,
+  "meter": 4,
+  "bars": 16,
+  "gain": 1.35,
+  "room": "small",
+  "key": "D",
+  "scale": "major",
+  "arrange": "shop",
+  "channels": {
+    "mel": { "label": "멜로디", "gain": 0.62, "pan": 0.12, "verb": 0.16 },
+    "bell": { "label": "종", "gain": 0.5, "pan": 0.3, "verb": 0.25 },
+    "keys": { "label": "건반", "gain": 0.5, "pan": -0.25, "verb": 0.14 },
+    "bass": { "label": "베이스", "gain": 0.62, "pan": 0, "verb": 0.02 },
+    "drums": { "label": "드럼", "gain": 0.5, "pan": 0, "verb": 0.05 },
+    "perc": { "label": "타악기", "gain": 0.4, "pan": 0.3, "verb": 0.08 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "pluck", "ch": "mel" },
+    "bell": { "label": "종 겹치기 (두 번째 바퀴)", "inst": "bell", "ch": "bell" },
+    "keys": { "label": "뒷박 화음", "inst": "marimba", "ch": "keys" },
+    "bass": { "label": "베이스", "inst": "pluckbass", "ch": "bass" },
+    "kick": { "label": "킥", "inst": "kick", "ch": "drums" },
+    "snap": { "label": "핑거 스냅", "inst": "snap", "ch": "drums" },
+    "shaker": { "label": "셰이커", "inst": "shaker", "ch": "perc" },
+    "wood": { "label": "우드블록", "inst": "wood", "ch": "perc" }
+  },
+  "prog": ["D | Bm | G | A | D | Bm | Em A | D | G | A | F#m | Bm | G | A | Em A | D"],
+  "mel": [
+    "f#5:.5 a5 r a5 b5 a5 f#5:1 | d5:.5 f#5 r e5 d5:1 b4 | b4:.5 d5 r e5 d5 b4 d5:1 | e5:.5 e5 r f#5 e5:1 r |",
+    "f#5:.5 a5 r a5 b5 a5 d6:1 | b5:.5 a5 r f#5 e5:1 d5 | e5:.5 g5 b5:1 a5:.5 g5 e5:1 | d5:2 r |",
+    "d5:.5 e5 d5 b4 d5:1 e5 | e5:.5 f#5 e5 c#5 e5:1 a5 | a5:.5 f#5 r e5 f#5:1 a5 | b5:2 a5:1 f#5 |",
+    "g5:.5 f#5 e5 d5 b4:1 d5 | e5:.5 f#5 a5 b5 a5:2 | b4:.5 d5 e5:1 a4:.5 c#5 e5:1 | d5:.5 r a4 d5 r:2"
+  ]
+}

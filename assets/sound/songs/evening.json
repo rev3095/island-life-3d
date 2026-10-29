@@ -1,0 +1,39 @@
+{
+  "id": "evening",
+  "version": 1,
+  "code": "BGM-04",
+  "title": "저녁",
+  "mood": "따뜻한 패드",
+  "bpm": 76,
+  "meter": 4,
+  "bars": 16,
+  "gain": 0.77,
+  "room": "medium",
+  "key": "Eb",
+  "scale": "major",
+  "arrange": "evening",
+  "vibrato": { "rate": 4.8, "cents": 10 },
+  "channels": {
+    "pad": { "label": "패드", "gain": 0.55, "pan": 0, "verb": 0.35 },
+    "lead": { "label": "멜로디", "gain": 0.6, "pan": 0.1, "verb": 0.34 },
+    "keys": { "label": "건반", "gain": 0.5, "pan": -0.25, "verb": 0.3 },
+    "bass": { "label": "베이스", "gain": 0.55, "pan": 0, "verb": 0.05 }
+  },
+  "parts": {
+    "lead": { "label": "멜로디", "inst": "flute", "ch": "lead" },
+    "leadAlt": { "label": "멜로디 (두 번째 바퀴 앞쪽)", "inst": "ep", "ch": "lead" },
+    "pad": { "label": "패드", "inst": "pad", "ch": "pad", "opts": { "attack": 0.9, "release": 1.6, "cutoff": 1400 } },
+    "keys": { "label": "전자피아노 반주", "inst": "ep", "ch": "keys" },
+    "bass": { "label": "베이스", "inst": "bass", "ch": "bass" }
+  },
+  "prog": [
+    "Ebmaj7 | Cm7 | Abmaj7 | Bb7sus4 | Ebmaj7 | Gm7 | Abmaj7 | Bbsus4 Bb |",
+    "Abmaj7 | Bb | Gm7 | Cm7 | Fm7 | Bb7sus4 | Ebmaj7 Abmaj7 | Bbsus4"
+  ],
+  "mel": [
+    "g4:2 bb4:1 c5 | bb4:3 g4:1 | c5:1.5 bb4:.5 g4:1 f4 | f4:4 |",
+    "g4:2 bb4:1 eb5 | d5:2 bb4 | c5:1 eb5 f5 eb5 | bb4:4 |",
+    "c5:2 eb5:1 f5 | f5:2 d5:1 bb4 | bb4:1.5 c5:.5 d5:1 bb4 | g4:3 r:1 |",
+    "ab4:1 c5 eb5 f5 | f5:2 eb5:1 c5 | bb4:2 c5 | bb4:4"
+  ]
+}

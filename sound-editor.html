@@ -1,0 +1,858 @@
+<title>포근섬 소리</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 오르골 작업대 — 맨 위 반영 상태, 탭 넷(곡 · 언제 틀까 · 효과음 · 목소리). 곡 탭은 왼쪽 곡 목록 + 오른쪽 악보 띠·악보 글·파트·채널, 아래에 늘 붙어 있는 듣기 막대 */
+:root {
+  --bg: #EDF0EA;          /* 오선지 종이 */
+  --panel: #FFFFFF;
+  --ink: #2C3833;         /* 짙은 잎 먹색 */
+  --muted: #64716B;
+  --line: #D2DAD3;
+  --accent: #2E7D6C;      /* 오선 청록 */
+  --accent-ink: #FFFFFF;
+  --reed: #C98E1E;        /* 갈대 노랑 — 지금 소리 나는 곳 */
+  --chip: #E1E8E2;
+  --warn: #B4532A;
+  --note: #6B5BA8;
+  --roll: #F6F8F4;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121715; --panel: #1A211E; --ink: #E3EBE6; --muted: #9CABA4; --line: #2F3A35; --accent: #5FC0AA; --accent-ink: #0E1F1A;
+    --reed: #E8B64E; --chip: #25302B; --warn: #EE8A62; --note: #A99BE6; --roll: #151B18; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121715; --panel: #1A211E; --ink: #E3EBE6; --muted: #9CABA4; --line: #2F3A35; --accent: #5FC0AA; --accent-ink: #0E1F1A;
+  --reed: #E8B64E; --chip: #25302B; --warn: #EE8A62; --note: #A99BE6; --roll: #151B18; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 22px 110px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: clamp(28px, 4.4vw, 38px); }
+h2 { font-size: 21px; }
+h3 { font-size: 16px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 12px; letter-spacing: .03em; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { white-space: nowrap; border: 1px solid var(--ink); background: var(--panel); border-radius: 999px; padding: 5px 14px; font-size: 14px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { border-color: var(--line); background: transparent; }
+.btn.tiny { padding: 1px 10px; font-size: 12.5px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.play { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: inline-grid; place-items: center; flex: none; }
+.play svg { width: 13px; height: 13px; fill: currentColor; }
+.play.on { background: var(--reed); color: #1F1604; }
+input[type=text], input[type=number], select, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; min-width: 0; }
+input[type=number] { width: 72px; font-variant-numeric: tabular-nums; }
+input[type=range] { accent-color: var(--accent); width: 100%; min-width: 0; }
+textarea { width: 100%; resize: vertical; }
+textarea.score { font-family: var(--mono); font-size: 13px; line-height: 1.7; }
+label.f { display: grid; gap: 2px; font-size: 12.5px; color: var(--muted); min-width: 0; }
+label.f > :is(input, select, textarea) { color: var(--ink); font-size: 14px; }
+.chip { font-size: 12px; padding: 1px 9px; border-radius: 999px; background: var(--chip); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chip.changed { background: var(--warn); color: var(--accent-ink); }
+.chip.note { background: var(--note); color: var(--accent-ink); }
+.chip.new { background: var(--reed); color: #1F1604; }
+.err { color: var(--warn); font-size: 13.5px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+
+/* 머리 + 반영 상태 */
+header { display: grid; gap: 4px; }
+.status .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.status details summary { cursor: pointer; font-size: 14px; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+.hist li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+
+/* 탭 */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.tab { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 16px; font-family: var(--display); font-size: 16px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab .chip { margin-left: 6px; font-family: var(--body); }
+
+/* 곡 탭 */
+.songs { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.slist { display: grid; gap: 8px; }
+.sitem { text-align: left; border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 9px 12px; display: grid; gap: 2px; }
+.sitem[aria-current="true"] { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.sitem .top { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.sitem b { font-family: var(--display); font-weight: 400; font-size: 17px; }
+.swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+.sedit { display: grid; gap: 14px; min-width: 0; }
+.shead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.shead input.title { font-family: var(--display); font-size: 22px; width: 9em; }
+.grid-f { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 14px; }
+.rollbox { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--roll); }
+.rollbox svg { display: block; }
+.roll-hint { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.score-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; }
+table.t { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.t th { text-align: left; font-weight: 400; color: var(--muted); font-size: 12.5px; padding: 2px 6px; }
+table.t td { padding: 5px 6px; border-top: 1px solid var(--line); vertical-align: middle; }
+table.t td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-family: var(--mono); font-size: 12px; }
+.tbox { overflow-x: auto; }
+.rng { display: grid; grid-template-columns: minmax(70px, 1fr) 52px; gap: 6px; align-items: center; min-width: 120px; }
+.rng output { font-family: var(--mono); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 언제 틀까 */
+.strip { display: grid; grid-template-columns: 64px repeat(24, minmax(10px, 1fr)); gap: 2px; align-items: center; font-size: 12px; min-width: 520px; }
+.strip .cell { height: 26px; border-radius: 4px; }
+.strip .hh { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.sched { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.srow { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.srow.time { grid-template-columns: 90px 72px minmax(0, 1fr) auto; }
+
+/* 효과음 · 목소리 */
+.fx { display: grid; gap: 8px; }
+.fxrow { display: grid; grid-template-columns: 32px minmax(110px, 1.1fr) repeat(3, minmax(120px, 1fr)) auto; gap: 8px 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.fxrow .name b { font-family: var(--display); font-weight: 400; font-size: 16px; }
+.fxrow details { grid-column: 2 / -1; font-size: 13px; }
+.fxrow details summary { cursor: pointer; color: var(--muted); }
+.fxrow input.notein { width: 100%; }
+.vrow { grid-template-columns: 32px minmax(110px, 1fr) repeat(3, minmax(120px, 1fr)) auto; }
+.vrow .more { grid-column: 3 / -2; display: grid; grid-template-columns: repeat(3, minmax(110px, 1fr)); gap: 8px 14px; }
+
+/* 듣기 막대 */
+.transport { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--ink); color: var(--bg);
+  padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.transport .in { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.transport .now { font-variant-numeric: tabular-nums; min-width: 0; flex: 1 1 220px; }
+.transport .vol { display: flex; gap: 8px; align-items: center; flex: 0 1 220px; font-size: 13px; }
+.transport .btn { background: transparent; color: var(--bg); border-color: var(--bg); }
+.transport .btn.primary { background: var(--reed); color: #1F1604; border-color: var(--reed); }
+
+@media (max-width: 860px) {
+  .songs { grid-template-columns: 1fr; }
+  .slist { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .score-grid { grid-template-columns: 1fr; }
+  .fxrow, .vrow { grid-template-columns: 32px minmax(0, 1fr); }
+  .fxrow > .rng, .fxrow > .acts, .vrow .more { grid-column: 1 / -1; }
+  .vrow .more { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .fxrow details { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>포근섬 소리</h1>
+    <p class="muted">배경음 곡 · 언제 어느 곡을 틀지 · 효과음 · 주민 목소리를 고르고 고쳐서 바로 들어 봐요. 고친 값과 의견은 저장소에 남고, 채팅에 <b>"소리 반영"</b>이라고 하면 게임에 들어가요.</p>
+  </header>
+
+  <section class="card status" id="status" aria-live="polite"><p class="muted">소리 데이터를 읽는 중…</p></section>
+
+  <nav class="tabs" role="tablist" aria-label="편집할 것">
+    <button type="button" class="tab" role="tab" id="tab-songs" data-tab="songs">곡</button>
+    <button type="button" class="tab" role="tab" id="tab-schedule" data-tab="schedule">언제 틀까</button>
+    <button type="button" class="tab" role="tab" id="tab-sfx" data-tab="sfx">효과음</button>
+    <button type="button" class="tab" role="tab" id="tab-voices" data-tab="voices">목소리</button>
+  </nav>
+
+  <section id="pane-songs" class="songs" role="tabpanel" aria-labelledby="tab-songs">
+    <div class="slist" id="slist"></div>
+    <div class="sedit" id="sedit"></div>
+  </section>
+  <section id="pane-schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden></section>
+  <section id="pane-sfx" role="tabpanel" aria-labelledby="tab-sfx" hidden></section>
+  <section id="pane-voices" role="tabpanel" aria-labelledby="tab-voices" hidden></section>
+</div>
+
+<div class="transport" role="region" aria-label="듣기">
+  <div class="in">
+    <button type="button" class="btn primary" id="unlock">소리 켜기</button>
+    <button type="button" class="btn" id="stopAll">모두 멈춤</button>
+    <span class="now" id="now">아직 소리가 꺼져 있어요 · 브라우저는 단추를 누른 뒤에만 소리를 내요</span>
+    <label class="vol" for="vol">듣기 크기 <input type="range" id="vol" min="0" max="1" step="0.01" value="0.7"></label>
+  </div>
+</div>
+
+<script type="module">
+import { createEngine, volumeToGain, BUSES } from './src/audio/engine.js';
+import { createMusic } from './src/audio/music.js';
+import { SONGS, setSong, buildSong, ARRANGE_PARTS, ROOMS } from './src/audio/songs.js';
+import { playSfx } from './src/audio/sfx.js';
+import { createVoice, VOICES, VOICE_WAVES } from './src/audio/voice.js';
+import { loadSound, installSound, autoSong } from './src/audio/bank.js';
+import { INSTRUMENT_INFO } from './src/audio/instruments.js';
+import { parseSeq, parseProg, SCALES } from './src/audio/notation.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const canon = o => JSON.stringify(o);
+const when = t => t ? new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+const PLAY = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1 L9 5 L2 9z"/></svg>';
+const STOP = '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="2" y="2" width="6" height="6" rx="1"/></svg>';
+const SID = Math.random().toString(36).slice(2, 10);        // 이 창 표시 (내가 저장한 초안이 되돌아올 때 다시 덮지 않게)
+
+/* ---------- 이름표 ---------- */
+const SONG_COLORS = ['#E6A24A', '#E8CD5A', '#9CC56A', '#E7876A', '#6E7FC9', '#6AAFC9', '#B98552', '#D9708F', '#9C86C9', '#7BC2A0', '#C9A26A', '#8FA3B0'];
+const ROOM_LABEL = { small: '작은 방', medium: '보통 방', large: '큰 방', hall: '큰 홀' };
+const SCALE_LABEL = { major: '장음계', pentatonic: '장조 5음계', minor: '단음계', minorPenta: '단조 5음계' };
+const ARRANGE_LABEL = { dawn: '새벽 — 피아노 분산화음', morning: '오전 — 뒷박 마림바', afternoon: '오후 — 우쿨렐레 스트럼', evening: '저녁 — 패드와 플루트', night: '밤 — 오르골 3박자', rain: '비 — 칼림바와 빗방울', indoor: '실내 — 라디오 재즈', shop: '상점 — 통통 튀는 리듬', museum: '박물관 — 하프와 종' };
+const WEATHER_LABEL = { clear: '맑음', cloudy: '흐림', rain: '비', snow: '눈', rainbow: '무지개' };
+const PLACE_LABEL = { indoor: '집 안 (내 집 · 주민 집, 라디오 끔)' };
+const PANEL_LABEL = { shop: '도토리상점 창', museum: '박물관 창' };
+const LAYER_LABEL = { tone: '음', noise: '잡음', sweep: '휘는 잡음', bubble: '물방울', note: '악기', buzz: '윙윙' };
+const VOICE_LINES = {
+  coco: '오늘 바람 진짜 시원하다냥~', bori: '음… 햇볕 좋은 데서 자고 싶다멍.', mochi: '꽃에 물 줬어? 같이 하자깡!', dubu: '…낚시라면 좀 하지. 따라와.',
+  pong: '복숭아 있으면 하나만 줄래꽥?', chorong: '비 온다! 오늘 운 좋은 날이개굴!', bamtol: '어서 와! 오늘의 추천은 이거야.', neuru: '오오… 이건… 아주… 귀한… 것이로군요…', player: '안녕하세요! 반가워요.',
+};
+const VOICE_KNOBS = [['f0', '높이', 60, 900, 1, 'Hz'], ['syl', '글자 길이', 0.04, 0.3, 0.001, '초'], ['gain', '크기', -12, 12, 0.1, 'dB'], ['gap', '글자 사이', 0, 0.12, 0.001, '초'], ['formant', '입 크기', 0.6, 1.6, 0.01, '배'], ['jitter', '흔들림', 0, 5, 0.1, '반음']];
+const SFX_KNOBS = [['pitch', '높이', 0.5, 2, 0.01, '배'], ['length', '길이', 0.5, 2.5, 0.01, '배'], ['trim', '크기', -12, 24, 0.1, 'dB']];
+
+/* ---------- 데이터 ---------- */
+let base = null;          // 게임에 들어간 것 (파일) { index, songs: {id}, sfx, voices }
+const work = { songs: {}, order: [], schedule: null, sfx: {}, voices: {}, notes: {} };
+let applied = null, records = [], request = null;
+let tab = 'songs', sel = null;
+
+async function loadBase() {
+  const data = await loadSound(url => fetch(url).then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); }));
+  const errors = [...data.errors, ...installSound(data)];
+  base = { index: data.index, songs: Object.fromEntries(data.songs.map(s => [s.id, s])), sfx: data.sfx, voices: data.voices, errors };
+  work.order = [...data.index.songs];
+  work.songs = clone(base.songs);
+  work.schedule = clone(data.index.schedule);
+  work.sfx = clone(data.sfx.sfx);
+  work.voices = clone(data.voices.voices);
+}
+const songColor = id => SONG_COLORS[Math.max(0, work.order.indexOf(id)) % SONG_COLORS.length];
+const songTitle = id => work.songs[id]?.title ?? id;
+const noVersion = s => { if (!s) return s; const { version, ...rest } = s; return rest; };
+
+/* ---------- 바뀐 것 (파일 = 게임에 들어간 것과 비교) ---------- */
+const noteChanged = key => (work.notes[key] ?? '') !== (applied?.notes?.[key] ?? '');
+function songChanges(id) {
+  const out = [];
+  const a = work.songs[id], b = base.songs[id];
+  if (!b && a) out.push('새 곡');
+  else if (b && !a) out.push('뺌');
+  else if (canon(noVersion(a)) !== canon(noVersion(b))) out.push('고침');
+  if (noteChanged(`song:${id}`)) out.push('의견');
+  return out;
+}
+const SFX_KEYS = SFX_KNOBS.map(k => k[0]);
+const VOICE_KEYS = VOICE_KNOBS.map(k => k[0]);
+const pickKeys = (o, keys) => Object.fromEntries(keys.map(k => [k, o?.[k]]));
+const sfxChanged = n => canon(pickKeys(work.sfx[n], SFX_KEYS)) !== canon(pickKeys(base.sfx.sfx[n], SFX_KEYS));
+const voiceChanged = id => canon(pickKeys(work.voices[id], VOICE_KEYS)) !== canon(pickKeys(base.voices.voices[id], VOICE_KEYS));
+const scheduleChanged = () => canon(work.schedule) !== canon(base.index.schedule);
+function changes() {
+  const out = [];
+  for (const id of new Set([...work.order, ...Object.keys(base.songs)])) for (const c of songChanges(id)) out.push(`곡 ${songTitle(id) || id} ${c}`);
+  if (scheduleChanged()) out.push('언제 틀까 고침');
+  if (noteChanged('schedule')) out.push('언제 틀까 의견');
+  for (const n of Object.keys(work.sfx)) { if (sfxChanged(n)) out.push(`효과음 ${work.sfx[n].label} 고침`); if (noteChanged(`sfx:${n}`)) out.push(`효과음 ${work.sfx[n].label} 의견`); }
+  for (const id of Object.keys(work.voices)) { if (voiceChanged(id)) out.push(`목소리 ${work.voices[id].name} 고침`); if (noteChanged(`voice:${id}`)) out.push(`목소리 ${work.voices[id].name} 의견`); }
+  return out;
+}
+
+/* ---------- 저장소: 웹 링크(아티팩트 db) 또는 로컬 dev-server ---------- */
+function artifactStore(db, user) {
+  return {
+    label: '이 페이지의 저장소에 저장돼요 (어느 기기에서 열어도 같아요)',
+    watchDoc: (path, cb) => db.doc(path).onSnapshot(s => cb(s.exists ? s.data() : null), () => {}),
+    watchCol: (col, cb) => db.collection(col).onSnapshot(qs => cb(qs.docs.map(d => ({ _id: d.id, ...d.data() }))), () => {}),
+    set: (path, data) => db.doc(path).set(data),
+    who: async () => (await user?.id?.().catch(() => null)) ?? null,
+    canWrite: async () => (await user?.can?.('data.write').catch(() => null)) !== false,
+  };
+}
+function localStore() {
+  // dev-server 의 /api/db/<컬렉션> (행 목록) 위에 문서 흉내: 행마다 docId → assets/review/sound-*.json
+  const col = path => `sound-${path.split('/')[0]}`, did = path => path.split('/')[1];
+  const rows = c => fetch(`api/db/${c}`).then(r => r.json()).catch(() => []);
+  const subs = [];
+  setInterval(() => subs.forEach(f => f()), 4000);
+  return {
+    label: '로컬 프로젝트 폴더(assets/review/sound-*.json)에 저장돼요',
+    watchDoc(path, cb) { const f = async () => cb((await rows(col(path))).find(r => r.docId === did(path)) ?? null); subs.push(f); f(); },
+    watchCol(c, cb) { const f = async () => cb((await rows(`sound-${c}`)).map(r => ({ _id: r.docId, ...r }))); subs.push(f); f(); },
+    async set(path, data) {
+      const c = col(path), id = did(path);
+      const hit = (await rows(c)).find(r => r.docId === id);
+      const opt = { headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...data, docId: id }) };
+      const r = await fetch(hit ? `api/db/${c}/${hit.id}` : `api/db/${c}`, { method: hit ? 'PATCH' : 'POST', ...opt });
+      if (!r.ok) throw new Error(`${r.status}`);
+    },
+    who: async () => 'local',
+    canWrite: async () => true,
+  };
+}
+async function connectStore() {
+  if (window.claude?.use) {
+    const [db, user] = await Promise.all(['db', 'user'].map(n => window.claude.use(n).catch(() => null)));
+    if (db) return artifactStore(db, user);
+  }
+  try { if ((await fetch('api/ping')).ok) return localStore(); } catch {}
+  return null;
+}
+
+let store = null, me = null, writable = true, saveMsg = '저장소에 연결하는 중…';
+const pending = new Map();
+function saveSoon(path, make) {
+  clearTimeout(pending.get(path));
+  pending.set(path, setTimeout(async () => {
+    pending.delete(path);
+    if (!store) { saveMsg = '이 화면에서는 저장소를 쓸 수 없어요. 고친 내용은 창을 닫으면 사라져요.'; renderStatus(); return; }
+    if (!writable) { saveMsg = '보기 권한이라 저장되지 않아요. 미리 듣기는 그대로 돼요.'; renderStatus(); return; }
+    try { await store.set(path, { ...make(), sid: SID, updatedAt: Date.now(), updatedBy: me }); saveMsg = `저장됨 · ${when(Date.now())}`; }
+    catch (e) { saveMsg = `저장하지 못했어요 (${e?.code ?? e?.message ?? '오류'}). 잠시 뒤 다시 고쳐 보세요.`; }
+    renderStatus();
+  }, 700));
+  saveMsg = '저장하는 중…';
+  renderStatus();
+}
+const saveSong = id => saveSoon(`drafts/song-${id}`, () => ({ kind: 'song', id, song: work.songs[id] ?? null, isNew: !base.songs[id], removed: !work.songs[id], note: work.notes[`song:${id}`] ?? '' }));
+const saveSchedule = () => saveSoon('drafts/schedule', () => ({ kind: 'schedule', schedule: work.schedule, note: work.notes.schedule ?? '' }));
+const saveSfx = () => saveSoon('drafts/sfx', () => ({
+  kind: 'sfx',
+  changes: Object.fromEntries(Object.keys(work.sfx).filter(sfxChanged).map(n => [n, pickKeys(work.sfx[n], SFX_KEYS)])),
+  notes: Object.fromEntries(Object.keys(work.sfx).filter(n => work.notes[`sfx:${n}`]).map(n => [n, work.notes[`sfx:${n}`]])),
+}));
+const saveVoices = () => saveSoon('drafts/voices', () => ({
+  kind: 'voices',
+  changes: Object.fromEntries(Object.keys(work.voices).filter(voiceChanged).map(id => [id, pickKeys(work.voices[id], VOICE_KEYS)])),
+  notes: Object.fromEntries(Object.keys(work.voices).filter(id => work.notes[`voice:${id}`]).map(id => [id, work.notes[`voice:${id}`]])),
+}));
+
+/** 저장소의 초안을 화면에 (처음 한 번 + 다른 창에서 고친 것) */
+const seen = {};
+function applyDrafts(rows) {
+  let touched = false;
+  for (const d of rows) {
+    const key = d._id;
+    if (d.sid === SID || (seen[key] ?? 0) >= (d.updatedAt ?? 0)) continue;
+    seen[key] = d.updatedAt ?? 0;
+    touched = true;
+    if (d.kind === 'song') {
+      if (d.removed || !d.song) { if (!base.songs[d.id]) { delete work.songs[d.id]; work.order = work.order.filter(x => x !== d.id); } }
+      else {
+        work.songs[d.id] = d.song;
+        if (!work.order.includes(d.id)) work.order.push(d.id);
+        try { setSong(d.song); } catch { /* 틀린 초안은 화면에서 오류로 보인다 */ }
+      }
+      work.notes[`song:${d.id}`] = d.note ?? '';
+    } else if (d.kind === 'schedule') {
+      if (d.schedule) work.schedule = d.schedule;
+      work.notes.schedule = d.note ?? '';
+    } else if (d.kind === 'sfx') {
+      for (const [n, v] of Object.entries(d.changes ?? {})) if (work.sfx[n]) Object.assign(work.sfx[n], v);
+      for (const [n, t] of Object.entries(d.notes ?? {})) work.notes[`sfx:${n}`] = t;
+    } else if (d.kind === 'voices') {
+      for (const [id, v] of Object.entries(d.changes ?? {})) if (work.voices[id]) Object.assign(work.voices[id], v);
+      for (const [id, t] of Object.entries(d.notes ?? {})) work.notes[`voice:${id}`] = t;
+    }
+  }
+  if (touched) renderAll();
+}
+
+/* ---------- 반영 상태 ---------- */
+function renderStatus() {
+  if (!base) return;
+  const ch = changes();
+  const head = applied
+    ? `<b>게임에 들어간 소리 v${applied.version}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}`
+    : '<b>게임에 들어간 소리 (파일 그대로)</b> <span class="muted">· 아직 반영 기록이 없어요</span>';
+  const diff = ch.length
+    ? `<p>반영 뒤 바뀐 것 <b>${ch.length}개</b>: ${ch.slice(0, 14).map(c => `<span class="chip changed">${esc(c)}</span>`).join(' ')}${ch.length > 14 ? ` <span class="muted">외 ${ch.length - 14}개</span>` : ''}</p>`
+    : '<p class="muted small">게임에 들어간 소리와 같아요. 곡·효과음·목소리를 고치면 여기에 모여요.</p>';
+  const req = request?.status === 'requested'
+    ? `<p class="small"><b>반영 요청을 표시했어요${request.rollback ? ` (v${request.rollback} 로 되돌리기)` : ''}.</b> 채팅에 <b>"소리 반영"</b>이라고 보내 주세요. 편집기가 Claude 를 직접 부르지는 못해요.</p>` : '';
+  const hist = records.length ? `<details><summary>반영 기록 ${records.length}개 · 되돌리기</summary><ol class="hist">${records.map(h => `
+      <li><span><b>v${h.version}</b> · ${esc(when(h.appliedAt))} · ${esc(h.summary ?? '')}</span>
+      <button type="button" class="btn ghost tiny" data-rollback="${h.version}" ${applied && h.version === applied.version ? 'disabled' : ''}>이 버전으로 되돌리기 요청</button></li>`).join('')}</ol></details>` : '';
+  const problems = base.errors.length ? `<p class="err">소리 데이터 문제: ${base.errors.map(esc).join(' · ')}</p>` : '';
+  $('status').innerHTML = `<div class="row">${head}</div>${problems}${diff}${req}
+    <div class="row"><button type="button" class="btn ${ch.length ? 'primary' : 'ghost'}" id="markRequest" ${!store || !writable ? 'disabled' : ''}>반영 요청 표시</button>
+      <span class="small muted">${esc(store ? `${store.label} · ${saveMsg}` : saveMsg)}</span></div>${hist}`;
+  const counts = { songs: work.order.filter(id => songChanges(id).length).length, schedule: (scheduleChanged() || noteChanged('schedule')) ? 1 : 0,
+    sfx: Object.keys(work.sfx).filter(n => sfxChanged(n) || noteChanged(`sfx:${n}`)).length, voices: Object.keys(work.voices).filter(id => voiceChanged(id) || noteChanged(`voice:${id}`)).length };
+  for (const t of document.querySelectorAll('.tab')) {
+    const n = counts[t.dataset.tab];
+    t.innerHTML = `${{ songs: '곡', schedule: '언제 틀까', sfx: '효과음', voices: '목소리' }[t.dataset.tab]}${n ? `<span class="chip changed">${n}</span>` : ''}`;
+  }
+}
+$('status').addEventListener('click', async e => {
+  const rb = e.target.closest('[data-rollback]');
+  if (e.target.id === 'markRequest' || rb) {
+    const body = { status: 'requested', at: Date.now(), by: me, changed: changes(), ...(rb ? { rollback: Number(rb.dataset.rollback) } : {}) };
+    try { await store.set('requests/sound', body); request = body; saveMsg = '반영 요청을 표시했어요'; }
+    catch (err) { saveMsg = `요청을 저장하지 못했어요 (${err?.code ?? err?.message ?? '오류'})`; }
+    renderStatus();
+  }
+});
+
+/* ---------- 소리 엔진 (단추를 누른 뒤에만) ---------- */
+let ac = null, engine = null, music = null, voice = null;
+let playing = null;           // { kind: 'song', id } | null
+function unlock() {
+  if (!ac) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { $('now').textContent = '이 브라우저는 소리를 낼 수 없어요.'; return false; }
+    ac = new AC({ latencyHint: 'interactive' });
+    engine = createEngine(ac, { volumes: { bgm: Number($('vol').value), sfx: Number($('vol').value), voice: Number($('vol').value) } });
+    music = createMusic(engine);
+    voice = createVoice(() => engine);
+    setInterval(() => music.pump(0.4), 50);
+    requestAnimationFrame(tickNow);
+  }
+  if (ac.state !== 'running') ac.resume().catch(() => {});
+  $('unlock').textContent = '소리 켜짐';
+  return true;
+}
+$('unlock').onclick = unlock;
+$('stopAll').onclick = () => { music?.play(null, { fade: 0.3 }); voice?.stop(); playing = null; renderPlayButtons(); };
+$('vol').oninput = () => { if (engine) for (const k of BUSES) engine.buses[k].gain.setTargetAtTime(volumeToGain($('vol').value), ac.currentTime, 0.05); };
+
+function songDefFor(id) {
+  try { return { def: setSong(work.songs[id]), error: null }; }
+  catch (e) { return { def: SONGS[id] ?? null, error: e.message }; }
+}
+function playSong(id, { from = 0 } = {}) {
+  if (!id || !unlock()) return;
+  const { def, error } = songDefFor(id);
+  if (!def) { $('now').textContent = `들을 수 없어요: ${error}`; return; }
+  music.play(id, { restart: true, fade: 0.25, from });
+  playing = { kind: 'song', id };
+  renderPlayButtons();
+}
+/** 고친 곡을 지금 자리부터 다시 (듣는 중일 때만) */
+function replaySong(id) {
+  if (playing?.id !== id || !music?.player) return;
+  const p = music.player;
+  const bar = Math.max(0, Math.floor((ac.currentTime - p.t0) / p.barSec));
+  const { def, error } = songDefFor(id);
+  if (error || !def) return;
+  music.play(id, { restart: true, fade: 0.25, from: bar % (def.bars * 2) });
+}
+function tickNow() {
+  requestAnimationFrame(tickNow);
+  const p = music?.player;
+  if (!p || !playing) { if (ac) $('now').textContent = ac.state === 'running' ? '듣고 있는 곡 없음 · ▶ 를 눌러 들어 보세요' : '소리가 멈춰 있어요 · 소리 켜기'; drawHead(null); return; }
+  const t = Math.max(0, ac.currentTime - p.t0);
+  const beats = t / p.beatSec, total = p.def.bars * p.def.meter;
+  const bar = Math.floor(beats / p.def.meter) % p.def.bars, pass = Math.floor(beats / total);
+  $('now').textContent = `지금: ${p.def.title} · ${bar + 1}/${p.def.bars}마디 · ${pass % 2 ? '두 번째 바퀴(변주)' : '첫 바퀴'} · ${p.def.bpm}bpm`;
+  drawHead(p.def.name === sel ? beats % total : null);
+}
+function renderPlayButtons() {
+  for (const b of document.querySelectorAll('[data-play-song]')) {
+    const on = playing?.id === b.dataset.playSong;
+    b.classList.toggle('on', on);
+    b.innerHTML = on ? STOP : PLAY;
+    b.setAttribute('aria-label', on ? '멈춤' : '듣기');
+  }
+}
+
+/* ---------- 곡 탭 ---------- */
+function renderSongList() {
+  const used = id => {
+    const s = work.schedule, out = [];
+    for (const t of s.time) if (t.song === id) out.push(t.label);
+    for (const [w, v] of Object.entries(s.weather)) if (v === id) out.push(WEATHER_LABEL[w] ?? w);
+    for (const [k, v] of Object.entries(s.places)) if (v === id) out.push('집 안');
+    for (const [k, v] of Object.entries(s.panels)) if (v === id) out.push(PANEL_LABEL[k] ?? k);
+    return out;
+  };
+  $('slist').innerHTML = work.order.map(id => {
+    const s = work.songs[id], c = songChanges(id), u = used(id);
+    return `<button type="button" class="sitem" data-song="${esc(id)}" aria-current="${id === sel}">
+      <span class="top"><span class="swatch" style="background:${songColor(id)}"></span><b>${esc(s.title)}</b><span class="mono muted">${esc(s.code ?? id)}</span>
+        ${c.map(x => `<span class="chip ${x === '의견' ? 'note' : x === '새 곡' ? 'new' : 'changed'}">${x}</span>`).join('')}</span>
+      <span class="small muted">${esc(s.mood)} · ${s.bpm}bpm · ${s.meter}박자 · ${s.bars}마디</span>
+      <span class="small">${u.length ? `틀 때: ${esc(u.join(', '))}` : '<span class="muted">아직 틀 곳 없음</span>'}</span></button>`;
+  }).join('') + `<button type="button" class="btn ghost" id="copySong">고른 곡을 복사해서 새 곡</button>`;
+}
+$('slist').addEventListener('click', e => {
+  const b = e.target.closest('[data-song]');
+  if (b) { sel = b.dataset.song; renderSongs(); return; }
+  if (e.target.id === 'copySong' && sel) {
+    let n = 1; while (work.songs[`new${n}`] || base.songs[`new${n}`]) n++;
+    const id = `new${n}`, src = clone(work.songs[sel]);
+    work.songs[id] = { ...src, id, version: 1, code: `BGM-새${n}`, title: `${src.title} 2` };
+    work.order.push(id);
+    sel = id;
+    saveSong(id);
+    renderSongs(); renderStatus();
+  }
+});
+
+function instOptions(cur) {
+  const kind = INSTRUMENT_INFO[cur]?.kind ?? 'tone';
+  return Object.entries(INSTRUMENT_INFO).filter(([, v]) => v.kind === kind).map(([k, v]) => `<option value="${k}" ${k === cur ? 'selected' : ''}>${esc(v.label)}</option>`).join('');
+}
+const rng = (id, val, min, max, step, unit, dataset) => `<span class="rng"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" ${dataset}><output for="${id}">${fmtNum(val, step)}${unit ? ` ${unit}` : ''}</output></span>`;
+const fmtNum = (v, step) => Number(v).toFixed(step >= 1 ? 0 : step >= 0.1 ? 1 : step >= 0.01 ? 2 : 3);
+
+function renderSongs() {
+  renderSongList();
+  const s = work.songs[sel];
+  if (!s) { $('sedit').innerHTML = '<p class="muted">왼쪽에서 곡을 골라 주세요.</p>'; return; }
+  let error = null;
+  try { buildSong(s); } catch (e) { error = e.message; }
+  const keyOpts = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+  const partRows = Object.entries(s.parts).map(([role, p]) => {
+    const kind = INSTRUMENT_INFO[p.inst]?.kind;
+    return `<tr><td>${esc(p.label ?? role)}<div class="mono muted">${esc(role)} → ${esc(s.channels[p.ch]?.label ?? p.ch)}</div></td>
+      <td>${kind === 'nature' ? esc(INSTRUMENT_INFO[p.inst].label) : `<select id="pi-${role}" data-part="${role}" data-k="inst" aria-label="${esc(p.label)} 악기">${instOptions(p.inst)}</select>`}</td>
+      <td>${rng(`pv-${role}`, p.vel ?? 1, 0, 2, 0.05, '배', `data-part="${role}" data-k="vel" aria-label="${esc(p.label)} 세기"`)}</td>
+      <td>${kind === 'tone' ? `<select id="po-${role}" data-part="${role}" data-k="octave" aria-label="${esc(p.label)} 옥타브">${[-2, -1, 0, 1, 2].map(o => `<option value="${o}" ${(p.octave ?? 0) === o ? 'selected' : ''}>${o > 0 ? '+' : ''}${o}</option>`).join('')}</select>` : '<span class="muted small">—</span>'}</td>
+      <td><input type="checkbox" id="pn-${role}" data-part="${role}" data-k="on" ${p.on === false ? '' : 'checked'} aria-label="${esc(p.label)} 켜기"></td></tr>`;
+  }).join('');
+  const chRows = Object.entries(s.channels).map(([ch, c]) => `<tr><td>${esc(c.label ?? ch)}<div class="mono muted">${esc(ch)}</div></td>
+      <td>${rng(`cg-${ch}`, c.gain, 0, 1.5, 0.01, '', `data-ch="${ch}" data-k="gain" aria-label="${esc(c.label)} 크기"`)}</td>
+      <td>${rng(`cp-${ch}`, c.pan, -1, 1, 0.01, '', `data-ch="${ch}" data-k="pan" aria-label="${esc(c.label)} 좌우"`)}</td>
+      <td>${rng(`cv-${ch}`, c.verb, 0, 1, 0.01, '', `data-ch="${ch}" data-k="verb" aria-label="${esc(c.label)} 울림"`)}</td></tr>`).join('');
+  const isNew = !base.songs[sel];
+  $('sedit').innerHTML = `
+    <div class="card">
+      <div class="shead">
+        <button type="button" class="play" data-play-song="${esc(sel)}" aria-label="듣기">${PLAY}</button>
+        <input type="text" class="title" id="s-title" value="${esc(s.title)}" aria-label="곡 이름">
+        <input type="text" id="s-mood" value="${esc(s.mood)}" aria-label="분위기" style="flex:1 1 160px">
+        <button type="button" class="btn ghost tiny" id="s-pass2">두 번째 바퀴부터</button>
+        ${isNew ? '<button type="button" class="btn ghost tiny" id="s-remove">새 곡 빼기</button>' : '<button type="button" class="btn ghost tiny" id="s-reset">원래대로</button>'}
+      </div>
+      <div class="grid-f">
+        <label class="f">빠르기 (bpm) ${rng('s-bpm', s.bpm, 40, 180, 1, '', 'data-k="bpm"')}</label>
+        <label class="f">박자 (한 마디 박 수)<select id="s-meter" data-k="meter">${[2, 3, 4, 5, 6].map(m => `<option value="${m}" ${s.meter === m ? 'selected' : ''}>${m}박자</option>`).join('')}</select></label>
+        <label class="f">마디 수<input type="number" id="s-bars" data-k="bars" min="1" max="64" value="${s.bars}"></label>
+        <label class="f">스윙 (뒷박 늦추기) ${rng('s-swing', s.swing ?? 0, 0, 0.25, 0.01, '박', 'data-k="swing"')}</label>
+        <label class="f">곡 크기 ${rng('s-gain', s.gain, 0.2, 2, 0.01, '배', 'data-k="gain"')}</label>
+        <label class="f">울림<select id="s-room" data-k="room">${Object.keys(ROOMS).map(r => `<option value="${r}" ${s.room === r ? 'selected' : ''}>${ROOM_LABEL[r]}</option>`).join('')}</select></label>
+        <label class="f">조성 · 음계 (꾸밈음에 씀)<span style="display:flex;gap:6px"><select id="s-key" data-k="key">${keyOpts.map(k => `<option ${s.key === k ? 'selected' : ''}>${k}</option>`).join('')}</select><select id="s-scale" data-k="scale">${Object.keys(SCALES).map(k => `<option value="${k}" ${s.scale === k ? 'selected' : ''}>${SCALE_LABEL[k]}</option>`).join('')}</select></span></label>
+        <label class="f">반주 모양<select id="s-arrange" data-k="arrange">${Object.keys(ARRANGE_PARTS).map(k => `<option value="${k}" ${s.arrange === k ? 'selected' : ''}>${ARRANGE_LABEL[k]}</option>`).join('')}</select></label>
+      </div>
+      ${error ? `<p class="err" role="alert">${esc(error)}</p>` : ''}
+    </div>
+    <div class="card">
+      <div class="roll-hint"><h3>악보 띠</h3><span class="small muted">마디를 누르면 그 마디부터 들어요 · 위 줄 = 화음, 점 = 멜로디 음</span></div>
+      <div class="rollbox" id="rollbox">${rollSvg(s)}</div>
+      <div class="score-grid">
+        <label class="f">멜로디 — 음이름:박자 (생략하면 앞 박자), r = 쉼표, | = 마디선 <textarea class="score" id="s-mel" rows="5" spellcheck="false">${esc([].concat(s.mel).join('\n'))}</textarea></label>
+        <label class="f">화음 — 마디마다 기호, 한 마디에 둘이면 반씩 <textarea class="score" id="s-prog" rows="5" spellcheck="false">${esc([].concat(s.prog).join('\n'))}</textarea></label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>파트 · 악기</h3>
+      <div class="tbox"><table class="t"><tr><th>파트</th><th>악기</th><th>세기</th><th>옥타브</th><th>켜기</th></tr>${partRows}</table></div>
+    </div>
+    <div class="card">
+      <h3>채널 · 섞기</h3>
+      <div class="tbox"><table class="t"><tr><th>채널</th><th>크기</th><th>좌우 (왼 −1 · 오른 +1)</th><th>울림 보내기</th></tr>${chRows}</table></div>
+    </div>
+    <div class="card">
+      <label class="f">의견 (Claude 에게 — 새 반주 모양, 악기 음색 바꾸기처럼 여기서 못 고치는 것)<textarea id="s-note" rows="2">${esc(work.notes[`song:${sel}`] ?? '')}</textarea></label>
+    </div>`;
+  renderPlayButtons();
+}
+
+/** 악보 띠 SVG: 마디 칸 · 화음 기호 · 멜로디 음 (박당 18px) */
+let roll = null;
+function rollSvg(s) {
+  const meter = s.meter, bars = s.bars, PX = 18, TOP = 24, H = 150;
+  let seq = null, prog = null;
+  try { seq = parseSeq([].concat(s.mel).join('\n'), meter); } catch {}
+  try { prog = parseProg([].concat(s.prog).join('\n'), meter); } catch {}
+  const W = Math.max(bars * meter, seq?.length ?? 0) * PX + 2;
+  const midis = seq?.notes.map(n => n.midi) ?? [60, 72];
+  const lo = Math.min(...midis) - 1, hi = Math.max(...midis) + 1;
+  const y = m => TOP + 8 + (hi - m) / Math.max(1, hi - lo) * (H - TOP - 18);
+  roll = { PX, W, H, meter, bars };
+  let g = '';
+  for (let b = 0; b < bars; b++) {
+    const x = b * meter * PX;
+    g += `<rect x="${x}" y="0" width="${meter * PX}" height="${H}" fill="${b % 2 ? 'var(--roll)' : 'var(--panel)'}" data-bar="${b}"/>`;
+    g += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="var(--line)"/>`;
+    g += `<text x="${x + 3}" y="${H - 4}" font-size="10" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${b + 1}</text>`;
+    for (const c of prog?.[b] ?? []) g += `<text x="${x + c.beat * PX + 3}" y="15" font-size="11.5" fill="var(--accent)" font-family="IBM Plex Mono, monospace">${esc(c.chord.sym)}</text>`;
+  }
+  for (const n of seq?.notes ?? []) g += `<rect x="${n.beat * PX + 1}" y="${y(n.midi) - 4}" width="${Math.max(5, n.dur * PX - 2)}" height="8" rx="4" fill="var(--note)"/>`;
+  g += `<line id="playhead" x1="0" y1="0" x2="0" y2="${H}" stroke="var(--reed)" stroke-width="2.5" visibility="hidden"/>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)} 악보 띠">${g}</svg>`;
+}
+function drawHead(beat) {
+  const h = document.getElementById('playhead');
+  if (!h || !roll) return;
+  if (beat == null || beat > roll.bars * roll.meter) { h.setAttribute('visibility', 'hidden'); return; }
+  const x = beat * roll.PX;
+  h.setAttribute('x1', x); h.setAttribute('x2', x); h.setAttribute('visibility', 'visible');
+}
+
+let scoreTimer = null;
+function songEdited({ rerender = false, replay = true } = {}) {
+  saveSong(sel);
+  renderStatus();
+  if (rerender) { renderSongs(); }
+  else {
+    renderSongList();
+    let error = null;
+    try { buildSong(work.songs[sel]); } catch (e) { error = e.message; }
+    const card = $('sedit').querySelector('.card');
+    card.querySelector('.err')?.remove();
+    if (error) card.insertAdjacentHTML('beforeend', `<p class="err" role="alert">${esc(error)}</p>`);
+  }
+  if (replay) replaySong(sel);
+}
+$('sedit').addEventListener('input', e => {
+  const t = e.target, s = work.songs[sel];
+  if (!s) return;
+  const out = t.nextElementSibling?.tagName === 'OUTPUT' ? t.nextElementSibling : null;
+  if (out) { const unit = out.textContent.split(' ')[1]; out.textContent = `${fmtNum(t.value, Number(t.step))}${unit ? ` ${unit}` : ''}`; }
+  if (t.id === 's-title') { s.title = t.value; return songEdited({ replay: false }); }
+  if (t.id === 's-mood') { s.mood = t.value; return songEdited({ replay: false }); }
+  if (t.id === 's-note') { work.notes[`song:${sel}`] = t.value; saveSong(sel); return renderStatus(); }
+  if (t.id === 's-mel' || t.id === 's-prog') {
+    s[t.id === 's-mel' ? 'mel' : 'prog'] = t.value.split('\n').map(x => x.trim()).filter(Boolean);
+    clearTimeout(scoreTimer);
+    scoreTimer = setTimeout(() => { $('rollbox').innerHTML = rollSvg(s); songEdited(); }, 350);
+    return;
+  }
+  if (t.type === 'range' && t.dataset.k && !t.dataset.part && !t.dataset.ch) {
+    const v = Number(t.value);
+    if (t.dataset.k === 'swing' && !v) delete s.swing; else s[t.dataset.k] = v;
+    return songEdited();
+  }
+  if (t.type === 'range' && t.dataset.part) {
+    const p = s.parts[t.dataset.part], v = Number(t.value);
+    if (v === 1) delete p.vel; else p.vel = v;
+    return songEdited();
+  }
+  if (t.type === 'range' && t.dataset.ch) { s.channels[t.dataset.ch][t.dataset.k] = Number(t.value); return songEdited(); }
+});
+$('sedit').addEventListener('change', e => {
+  const t = e.target, s = work.songs[sel];
+  if (!s) return;
+  if (t.id === 's-bars') { s.bars = Math.max(1, Math.min(64, Math.round(Number(t.value) || 1))); $('rollbox').innerHTML = rollSvg(s); return songEdited(); }
+  if (t.id === 's-meter') { s.meter = Number(t.value); $('rollbox').innerHTML = rollSvg(s); return songEdited(); }
+  if (['s-room', 's-key', 's-scale'].includes(t.id)) { s[t.dataset.k] = t.value; return songEdited(); }
+  if (t.id === 's-arrange') {
+    // 반주 모양을 바꾸면 그 모양을 처음 쓴 곡의 파트·채널을 가져온다 (악보·빠르기·빗소리 같은 배경 소리는 그대로)
+    const src = Object.values(base.songs).find(x => x.arrange === t.value);
+    s.arrange = t.value;
+    if (src) { s.parts = clone(src.parts); s.channels = clone(src.channels); if (src.vibrato) s.vibrato = clone(src.vibrato); else delete s.vibrato; }
+    return songEdited({ rerender: true });
+  }
+  if (t.dataset.part) {
+    const p = s.parts[t.dataset.part];
+    if (t.dataset.k === 'inst') p.inst = t.value;
+    if (t.dataset.k === 'octave') { const o = Number(t.value); if (o) p.octave = o; else delete p.octave; }
+    if (t.dataset.k === 'on') { if (t.checked) delete p.on; else p.on = false; }
+    return songEdited();
+  }
+});
+$('sedit').addEventListener('click', e => {
+  const pb = e.target.closest('[data-play-song]');
+  if (pb) { if (playing?.id === sel) { music.play(null, { fade: 0.3 }); playing = null; renderPlayButtons(); } else playSong(sel); return; }
+  if (e.target.id === 's-pass2') return playSong(sel, { from: work.songs[sel].bars });
+  if (e.target.id === 's-reset') { work.songs[sel] = clone(base.songs[sel]); songEdited({ rerender: true }); return; }
+  if (e.target.id === 's-remove') {
+    const id = sel;
+    delete work.songs[id]; work.order = work.order.filter(x => x !== id);
+    for (const t of work.schedule.time) if (t.song === id) t.song = base.index.schedule.time.find(x => x.part === t.part)?.song ?? '';
+    saveSong(id); sel = work.order[0]; renderAll(); return;
+  }
+  const bar = e.target.closest?.('[data-bar]');
+  if (bar) playSong(sel, { from: Number(bar.dataset.bar) });
+});
+
+/* ---------- 언제 틀까 ---------- */
+function songSelect(id, cur, { empty } = {}) {
+  return `<select id="${id}" aria-label="곡">${empty ? `<option value="" ${!cur ? 'selected' : ''}>${esc(empty)}</option>` : ''}${work.order.map(s => `<option value="${esc(s)}" ${cur === s ? 'selected' : ''}>${esc(songTitle(s))}</option>`).join('')}</select>`;
+}
+function renderSchedule() {
+  const S = work.schedule;
+  const sorted = { ...S, time: [...S.time].sort((a, b) => a.from - b.from) };
+  const row = (label, w) => `<span class="small">${label}</span>` + Array.from({ length: 24 }, (_, h) => {
+    const id = autoSong({ hour: h, weather: w }, sorted);
+    return `<span class="cell" style="background:${id ? songColor(id) : 'var(--chip)'}" title="${h}시 · ${esc(songTitle(id) ?? '없음')}"></span>`;
+  }).join('');
+  const hours = '<span></span>' + Array.from({ length: 24 }, (_, h) => `<span class="hh">${h % 3 ? '' : h}</span>`).join('');
+  const usedSongs = new Set(['clear', 'rain', 'snow'].flatMap(w => Array.from({ length: 24 }, (_, h) => autoSong({ hour: h, weather: w }, sorted))));
+  $('pane-schedule').innerHTML = `
+    <div class="card">
+      <h2>하루 동안 바깥에서 나는 곡</h2>
+      <div class="tbox"><div class="strip">${hours}${row('맑음', 'clear')}${row('비', 'rain')}${row('눈', 'snow')}</div></div>
+      <div class="legend">${[...usedSongs].filter(Boolean).map(id => `<span><span class="swatch" style="background:${songColor(id)}"></span>${esc(songTitle(id))}</span>`).join('')}</div>
+    </div>
+    <div class="sched">
+      <div class="card"><h3>시간대</h3><p class="small muted">시작 시각부터 다음 줄 전까지. 가장 이른 줄보다 이른 시각은 마지막 줄 곡이에요.</p>
+        ${S.time.map((t, i) => `<div class="srow time"><span>${esc(t.label)}</span><input type="number" id="tf-${i}" min="0" max="23" value="${t.from}" data-time="${i}" aria-label="${esc(t.label)} 시작 시각"> ${songSelect(`ts-${i}`, t.song).replace('<select', `<select data-time-song="${i}"`)}
+          <button type="button" class="play" data-play-song="${esc(t.song)}" aria-label="듣기">${PLAY}</button></div>`).join('')}</div>
+      <div class="card"><h3>날씨 (시간대보다 먼저)</h3>
+        ${Object.entries(S.weather).map(([w, v]) => `<div class="srow"><span>${esc(WEATHER_LABEL[w] ?? w)}</span>${songSelect(`ws-${w}`, v, { empty: '시간대 곡 그대로' }).replace('<select', `<select data-weather="${w}"`)}
+          ${v ? `<button type="button" class="play" data-play-song="${esc(v)}" aria-label="듣기">${PLAY}</button>` : '<span></span>'}</div>`).join('')}</div>
+      <div class="card"><h3>자리 · 창</h3>
+        ${Object.entries(S.places).map(([k, v]) => `<div class="srow"><span class="small">${esc(PLACE_LABEL[k] ?? k)}</span>${songSelect(`pl-${k}`, v, { empty: '바깥과 같게' }).replace('<select', `<select data-place="${k}"`)}
+          ${v ? `<button type="button" class="play" data-play-song="${esc(v)}" aria-label="듣기">${PLAY}</button>` : '<span></span>'}</div>`).join('')}
+        ${Object.entries(S.panels).map(([k, v]) => `<div class="srow"><span class="small">${esc(PANEL_LABEL[k] ?? k)}</span>${songSelect(`pn-${k}`, v).replace('<select', `<select data-panel="${k}"`)}
+          <button type="button" class="play" data-play-song="${esc(v)}" aria-label="듣기">${PLAY}</button></div>`).join('')}
+        <p class="small muted">집 안 라디오를 켜면 라디오 곡(새벽~밤)이 나와요. 장면(컷신)이 고른 곡은 시나리오 편집기에서.</p></div>
+    </div>
+    <div class="card"><label class="f">의견 (언제 틀까)<textarea id="sched-note" rows="2">${esc(work.notes.schedule ?? '')}</textarea></label></div>`;
+  renderPlayButtons();
+}
+$('pane-schedule').addEventListener('change', e => {
+  const t = e.target, S = work.schedule;
+  if (t.dataset.time != null) S.time[t.dataset.time].from = Math.max(0, Math.min(23, Math.round(Number(t.value) || 0)));
+  else if (t.dataset.timeSong != null) S.time[t.dataset.timeSong].song = t.value;
+  else if (t.dataset.weather) S.weather[t.dataset.weather] = t.value;
+  else if (t.dataset.place) S.places[t.dataset.place] = t.value;
+  else if (t.dataset.panel) S.panels[t.dataset.panel] = t.value;
+  else return;
+  saveSchedule(); renderSchedule(); renderSongList(); renderStatus();
+});
+$('pane-schedule').addEventListener('input', e => { if (e.target.id === 'sched-note') { work.notes.schedule = e.target.value; saveSchedule(); renderStatus(); } });
+$('pane-schedule').addEventListener('click', e => {
+  const b = e.target.closest('[data-play-song]');
+  if (!b) return;
+  if (playing?.id === b.dataset.playSong) { music.play(null, { fade: 0.3 }); playing = null; renderPlayButtons(); }
+  else playSong(b.dataset.playSong);
+});
+
+/* ---------- 효과음 ---------- */
+function layerText(l) {
+  const v = x => (Array.isArray(x) ? `${x[0]}~${x[1]}` : x);
+  const bits = [LAYER_LABEL[l.kind] ?? l.kind];
+  if (l.kind === 'note') bits.push(`${INSTRUMENT_INFO[l.inst]?.label ?? l.inst} ${l.midi}`);
+  else if (l.f != null) bits.push(`${l.type ? `${l.type} ` : ''}${v(l.f)}${l.to ? `→${v(l.to)}` : ''}Hz`);
+  if (l.n) bits.push(`×${l.n}`);
+  if (l.at) bits.push(`+${v(l.at)}초`);
+  return bits.join(' ');
+}
+function renderSfx() {
+  $('pane-sfx').innerHTML = `<div class="fx">
+    <p class="small muted">▶ 로 들어 보고 높이·길이·크기를 바꿔요. 부를 때마다 높이가 조금씩 흔들리는 건 그대로예요. 소리 모양(층)을 바꾸고 싶으면 의견에 적어 주세요.</p>
+    ${Object.entries(work.sfx).map(([n, d]) => {
+      const b = base.sfx.sfx[n], ch = sfxChanged(n);
+      return `<div class="fxrow">
+        <button type="button" class="play" data-sfx="${esc(n)}" aria-label="${esc(d.label)} 듣기">${PLAY}</button>
+        <div class="name"><b>${esc(d.label)}</b> ${ch ? '<span class="chip changed">고침</span>' : ''}${noteChanged(`sfx:${n}`) ? ' <span class="chip note">의견</span>' : ''}<div class="mono muted">${esc(n)}</div></div>
+        ${SFX_KNOBS.map(([k, label, min, max, step, unit]) => `<label class="f">${label}${rng(`fx-${k}-${n}`, d[k] ?? (k === 'trim' ? 0 : 1), min, max, step, unit, `data-sfxk="${k}" data-name="${esc(n)}"`)}</label>`).join('')}
+        <span class="acts"><button type="button" class="btn ghost tiny" data-sfx-reset="${esc(n)}" ${ch ? '' : 'disabled'}>원래대로</button></span>
+        <details><summary>소리 층 ${d.layers.length}개 · 의견</summary>
+          <p class="small muted">${d.layers.map(layerText).map(esc).join(' · ')}</p>
+          <input type="text" class="notein" id="fxn-${esc(n)}" data-sfx-note="${esc(n)}" value="${esc(work.notes[`sfx:${n}`] ?? '')}" placeholder="의견 (예: 더 통통하게, 물방울 많이)">
+        </details>
+      </div>`;
+    }).join('')}</div>`;
+}
+$('pane-sfx').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.sfxk) {
+    const d = work.sfx[t.dataset.name];
+    d[t.dataset.sfxk] = Number(t.value);
+    const out = t.nextElementSibling, unit = out.textContent.split(' ')[1];
+    out.textContent = `${fmtNum(t.value, Number(t.step))} ${unit}`;
+    saveSfx(); renderStatus();
+    clearTimeout(t._t); t._t = setTimeout(() => previewSfx(t.dataset.name), 180);
+  }
+  if (t.dataset.sfxNote) { work.notes[`sfx:${t.dataset.sfxNote}`] = t.value; saveSfx(); renderStatus(); }
+});
+$('pane-sfx').addEventListener('change', e => { if (e.target.dataset.sfxk) renderSfx(); });
+$('pane-sfx').addEventListener('click', e => {
+  const b = e.target.closest('[data-sfx]');
+  if (b) return previewSfx(b.dataset.sfx);
+  const r = e.target.closest('[data-sfx-reset]');
+  if (r) { const n = r.dataset.sfxReset; Object.assign(work.sfx[n], pickKeys(base.sfx.sfx[n], SFX_KEYS)); saveSfx(); renderSfx(); renderStatus(); }
+});
+function previewSfx(n) { if (unlock()) playSfx(engine, n, {}, work.sfx[n]); }
+
+/* ---------- 목소리 ---------- */
+function renderVoices() {
+  $('pane-voices').innerHTML = `<div class="fx">
+    <label class="f">들어 볼 말 (비우면 캐릭터마다 예시 대사)<input type="text" id="vline" value="" placeholder="예: 안녕! 오늘 날씨 정말 좋다."></label>
+    ${Object.entries(work.voices).map(([id, v]) => {
+      const ch = voiceChanged(id);
+      const knob = ([k, label, min, max, step, unit]) => `<label class="f">${label}${rng(`vk-${k}-${id}`, v[k] ?? 0, min, max, step, unit, `data-vk="${k}" data-voice="${id}"`)}</label>`;
+      return `<div class="fxrow vrow">
+        <button type="button" class="play" data-speak="${id}" aria-label="${esc(v.name)} 목소리 듣기">${PLAY}</button>
+        <div class="name"><b>${esc(v.name)}</b> ${ch ? '<span class="chip changed">고침</span>' : ''}${noteChanged(`voice:${id}`) ? ' <span class="chip note">의견</span>' : ''}<div class="small muted">${esc(v.desc)} · <span class="mono">${esc(id)}</span></div></div>
+        ${VOICE_KNOBS.slice(0, 3).map(knob).join('')}
+        <span class="acts"><button type="button" class="btn ghost tiny" data-voice-reset="${id}" ${ch ? '' : 'disabled'}>원래대로</button></span>
+        <div class="more">${VOICE_KNOBS.slice(3).map(knob).join('')}</div>
+        <details><summary>의견</summary><input type="text" class="notein" id="vn-${id}" data-voice-note="${id}" value="${esc(work.notes[`voice:${id}`] ?? '')}" placeholder="의견 (예: 조금 더 졸린 말투로)"></details>
+      </div>`;
+    }).join('')}</div>`;
+}
+$('pane-voices').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.vk) {
+    work.voices[t.dataset.voice][t.dataset.vk] = Number(t.value);
+    const out = t.nextElementSibling, unit = out.textContent.split(' ')[1];
+    out.textContent = `${fmtNum(t.value, Number(t.step))} ${unit}`;
+    saveVoices(); renderStatus();
+  }
+  if (t.dataset.voiceNote) { work.notes[`voice:${t.dataset.voiceNote}`] = t.value; saveVoices(); renderStatus(); }
+});
+$('pane-voices').addEventListener('change', e => { if (e.target.dataset.vk) { renderVoices(); speak(e.target.dataset.voice); } });
+$('pane-voices').addEventListener('click', e => {
+  const b = e.target.closest('[data-speak]');
+  if (b) return speak(b.dataset.speak);
+  const r = e.target.closest('[data-voice-reset]');
+  if (r) { const id = r.dataset.voiceReset; Object.assign(work.voices[id], pickKeys(base.voices.voices[id], VOICE_KEYS)); saveVoices(); renderVoices(); renderStatus(); }
+});
+function speak(id) {
+  if (!unlock()) return;
+  VOICES[id] = work.voices[id];                 // 고친 값으로 바로
+  voice.speak($('vline')?.value.trim() || VOICE_LINES[id] || '안녕하세요!', id);
+}
+
+/* ---------- 탭 ---------- */
+const TABS = ['songs', 'schedule', 'sfx', 'voices'];
+function showTab(t) {
+  tab = TABS.includes(t) ? t : 'songs';
+  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', String(b.dataset.tab === tab));
+  for (const k of TABS) $(`pane-${k}`).hidden = k !== tab;
+  try { localStorage.setItem('sound-editor-tab', tab); } catch {}
+  if (location.hash !== `#${tab}`) history.replaceState?.(null, '', `#${tab}`);
+}
+document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) showTab(b.dataset.tab); });
+function renderAll() {
+  if (!work.songs[sel]) sel = work.order[0];
+  renderSongs(); renderSchedule(); renderSfx(); renderVoices(); renderStatus();
+}
+
+/* ---------- 시작 ---------- */
+window.__sound = { work, get base() { return base; }, get engine() { return engine; }, get music() { return music; } };   // 개발 확인용
+try {
+  await loadBase();
+  sel = work.order[0];
+  let first = location.hash.slice(1);
+  if (!TABS.includes(first)) { try { first = localStorage.getItem('sound-editor-tab'); } catch {} }
+  showTab(first);
+  renderAll();
+} catch (e) {
+  $('status').innerHTML = `<p class="err">소리 데이터를 읽지 못했어요 (${esc(e.message)}). 페이지를 새로 고쳐 보세요.</p>`;
+  throw e;
+}
+store = await connectStore();
+if (store) {
+  me = await store.who();
+  writable = await store.canWrite();
+  saveMsg = writable ? '고치면 바로 저장돼요' : '보기 권한이에요. 미리 듣기는 되지만 저장은 안 돼요.';
+  store.watchDoc('applied/sound', d => { applied = d; renderStatus(); renderSongList(); });
+  store.watchDoc('requests/sound', d => { request = d; renderStatus(); });
+  store.watchCol('history', rows => { records = rows.filter(r => r.board === 'sound').sort((a, b) => b.version - a.version); renderStatus(); });
+  store.watchCol('drafts', applyDrafts);
+} else saveMsg = '저장소에 연결하지 못했어요. 고친 내용은 창을 닫으면 사라져요 (미리 듣기는 돼요).';
+renderStatus();
+</script>

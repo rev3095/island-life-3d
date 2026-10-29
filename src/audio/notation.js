@@ -103,6 +103,18 @@ export function scaleStep(midi, scale, step) {
 export const pentatonic = key => [0, 2, 4, 7, 9].map(i => (i + key) % 12);
 /** 장음계 */
 export const major = key => [0, 2, 4, 5, 7, 9, 11].map(i => (i + key) % 12);
+/** 자연단음계 · 단조 5음계 */
+export const minor = key => [0, 2, 3, 5, 7, 8, 10].map(i => (i + key) % 12);
+export const minorPenta = key => [0, 3, 5, 7, 10].map(i => (i + key) % 12);
+/** 곡 데이터의 scale 이름 → 음계 함수 */
+export const SCALES = { major, pentatonic, minor, minorPenta };
+
+/** 'Eb' → 3, 'F#' → 6 (곡 데이터의 key) */
+export function keyToPc(name) {
+  const m = /^([A-Ga-g])([#b]?)$/.exec(String(name ?? 'C'));
+  if (!m) throw new Error(`조성을 읽을 수 없어요: ${name}`);
+  return (PC[m[1].toLowerCase()] + acc(m[2]) + 12) % 12;
+}
 
 /** 시드가 같으면 같은 순서로 나오는 난수 (곡 변주를 매번 똑같이 만들 때) */
 export function rng(seed) {

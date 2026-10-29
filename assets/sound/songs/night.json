@@ -1,0 +1,34 @@
+{
+  "id": "night",
+  "version": 1,
+  "code": "BGM-05",
+  "title": "밤",
+  "mood": "오르골",
+  "bpm": 64,
+  "meter": 3,
+  "bars": 16,
+  "gain": 1.29,
+  "room": "medium",
+  "key": "D",
+  "scale": "major",
+  "arrange": "night",
+  "channels": {
+    "mel": { "label": "멜로디", "gain": 0.6, "pan": 0.12, "verb": 0.3 },
+    "low": { "label": "반주", "gain": 0.55, "pan": -0.15, "verb": 0.28 },
+    "pad": { "label": "패드", "gain": 0.5, "pan": 0, "verb": 0.3 },
+    "amb": { "label": "자연 소리", "gain": 0.5, "pan": 0.5, "verb": 0.4 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "musicbox", "ch": "mel" },
+    "arp": { "label": "오르골 반주", "inst": "musicbox", "ch": "low" },
+    "pad": { "label": "낮은 패드", "inst": "pad", "ch": "pad", "opts": { "attack": 1.2, "release": 1.8, "cutoff": 650 } },
+    "cricket": { "label": "귀뚜라미", "inst": "cricket", "ch": "amb" }
+  },
+  "prog": ["D | Bm | G | A | D | F#m | G | A | G | A | F#m | Bm | Em | A | D/F# G | A"],
+  "mel": [
+    "a5:1.5 f#5:.5 e5:1 | d5:2 b4:1 | b4:1 d5 e5 | e5:2 r:1 |",
+    "a5:1.5 b5:.5 a5:1 | f#5:2 e5:1 | d5:.5 e5 f#5:1 d5 | e5:3 |",
+    "b5:1.5 a5:.5 f#5:1 | e5:1.5 f#5:.5 a5:1 | a5:1 f#5 e5 | d5:2 b4:1 |",
+    "e5:1 g5 b5 | a5:2 e5:1 | f#5:1.5 e5:.5 d5:1 | e5:2 r:1"
+  ]
+}
