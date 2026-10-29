@@ -85,6 +85,11 @@ Z3 가 같은 이름으로 맞췄다(p8-furniture 26f6e0c, 원점 = 바닥 가�
 - 충돌은 `tests/assets.test.mjs` 머리 주석·개수 줄 하나 → **캐릭터 10 · 배경 35 · 가구 33** 으로 풀면 된다. 풀고 나서 테스트 174/174.
 - 화면: 10/30 `lot-sign`(네 귀퉁이 말뚝 + '집터' 팻말) → 11/2 `moving-boxes` 가 집터 가운데 → 11/3 단풍 집(`danpung` 지붕 변형)·우편함, 두부 집 문 왼쪽 두 칸에 `party-balloons`(문 앞 길 안 막음), 두부가 생일이라 집 안에. 두부에게 말 걸면 자기소개 → 생일 인사 → `furn.birthday-cake` 가 가방에 들어옴.
 
+## Z2·Z3 와 함께 합쳐 본 확인 (임시 작업 폴더, p8-town cc57295 + p8-interior 75ba666 + p8-furniture 26f6e0c)
+- Z2 와는 충돌 없음, Z3 와는 위의 `tests/assets.test.mjs` 한 곳. 셋을 합치면 테스트 184/184.
+- Z2 확정 약속: `house:enter {owner: slug|'player', spot, facing, room, roomId, name}` / `house:leave {owner}`, 문 들어가기 `house-visit-in` 91 이 `town.atHome` 으로 열림/잠김/노크를 가른다, `town.residents()` 에 없는 주민은 문 없음 — town 쪽 수정 필요 없음.
+- 11/3 두부 생일: 두부 집 문 앞 '들어가기' → 두부 방(난로·장작) 안에 두부가 서 있음(`spot` 자리) → '말 걸기' → 자기소개 → 생일 인사 → 케이크가 가방에 → 나가면 두부는 다시 보이지 않는 집 안(`home`). 콘솔 오류 없음.
+- 단풍 방(RM-07)은 아직 없어 Z2 기본 방으로 열린다 (Z2 몫).
+
 ## 못 한 것
-- Z2 의 실제 주민 방·문과 함께 돌려 보기 (이벤트만 흉내 냄).
 - 창이 보이는 상태에서 사람 손으로 걷기·애니메이션 확인, 휴대폰 화면에서 섬폰 생일 줄 배치.
