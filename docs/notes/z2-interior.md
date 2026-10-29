@@ -35,7 +35,7 @@ visit: null,                 // 주민 방 안에서 저장했으면 그 주민 
 | `house-visit-idle` | 20 | 주민 방 안 빈 곳 — 도구(10)를 쓰지 않게 막기만 |
 
 ## 이벤트
-- `house:enter { owner }` — 플레이어 집이면 `owner: 'player'`. 주민 방이면 `{ owner: slug, room: 'rm-01', name: '해변 운동방', spot: { x, z }, facing }` (spot = 방 스펙 `host` 의 월드 좌표, 주민을 세울 곳. facing 은 player 와 같은 라디안, π = 남쪽·문 쪽). **Z4 town 이 받아 주민을 방 안에 세운다** (Z4 노트의 `spot?`·`facing?` 모양 그대로).
+- `house:enter { owner }` — 플레이어 집이면 `owner: 'player'`. 주민 방이면 `{ owner: slug, roomId: 'rm-01', name: '해변 운동방', spot: { x, z }, facing, room: { x0, z0, x1, z1 } }` (spot = 방 스펙 `host` 의 월드 좌표, 주민을 세울 곳. facing 은 player 와 같은 라디안, π = 남쪽·문 쪽. room = 방 범위(월드), roomId = 방 스펙 slug — Z4 제안 모양). **Z4 town 이 받아 주민을 방 안에 세운다** (Z4 노트의 `spot?`·`facing?` 모양 그대로).
 - `house:leave { owner }` — 위와 같은 owner.
 - `house:owned { slug, kind }` — 벽지·바닥을 새로 가짐 (상점). `house:decor { kind, slug }` — 플레이어 방 벽지·바닥을 바꿈.
 
@@ -80,7 +80,7 @@ interior: {
 - `node --test tests/` **175/175** (새 interior 10개). `node tools/build-web.mjs --check` 오류 없음, 295파일 (interior 24개 들어감, 묶음 255 + 40).
 - 새 게임 → 이름 정하기 → 첫날 안내 → 내 집 문 Space → 방이 크림 줄무늬·나무 판자(지금과 같은 색) 무늬로 나옴. 북쪽 벽 보고 Space → 꾸미기 → 벽지 바꾸기 → 가진 6개 중 5개 + '다른 것 보기 ▶' → 연보라 꽃무늬 고르면 바로 바뀌고 징두리 색도 바뀜. 통나무 벽·연못 돌바닥·밤하늘 별(금색 몰딩)·폭신 카펫·빗방울·노랑 체크 모두 붙여 봄.
 - 상점(`ui.shop.open`) 사기 탭 맨 위 '오늘의 벽지·바닥' = 통나무 벽 벽지 1,600 · 노랑 체크 타일 바닥 1,400 (견본 그림). 바닥 → "사서 바로 붙일게요" → 도토리 5,501 → 4,101, 방 바닥이 바뀌고 줄이 '가지고 있어요'. 새로 고침 뒤에도 벽지·바닥·가진 목록이 남음.
-- 코코 집 문 Space → 해변 운동방(오렌지 줄무늬·밝은 판자, 오렌지 소파·스탠드 모델, 서핑보드·공 바구니는 임시 상자), `house:enter {owner:'coco', room:'rm-01', spot, facing}`. 문 매트 Space → 코코 집 문 앞으로, `house:leave {owner:'coco'}`, 실내 조명 꺼짐. 보리·모찌·두부·퐁·초롱 방도 차례로 들어가 봄 (벽 낚싯대 걸이 임시 상자 포함). 가구 칸 걷기 막힘(isWalkable false). 초롱 방 안에서 저장 → 새로 고침 → 초롱 방 안에서 이어하기.
+- 코코 집 문 Space → 해변 운동방(오렌지 줄무늬·밝은 판자, 오렌지 소파·스탠드 모델, 서핑보드·공 바구니는 임시 상자), `house:enter {owner:'coco', room:'rm-01', spot, facing}` (그 뒤 `room` 은 범위, slug 는 `roomId` 로 옮김). 문 매트 Space → 코코 집 문 앞으로, `house:leave {owner:'coco'}`, 실내 조명 꺼짐. 보리·모찌·두부·퐁·초롱 방도 차례로 들어가 봄 (벽 낚싯대 걸이 임시 상자 포함). 가구 칸 걷기 막힘(isWalkable false). 초롱 방 안에서 저장 → 새로 고침 → 초롱 방 안에서 이어하기.
 - 웹 빌드본: `node tools/build-web.mjs` → dev-server `/artifact/` 에서 interior 스펙 17개·방을 읽고 초롱 방 이어하기 → 보리 집 문 Space → `house:enter {owner:'bori', room:'rm-02', spot:{x:539.5, z:-0.4}, facing:π}`. 문 규칙: `town.atHome` 을 흉내 내 'out' → 글자 '노크'(잠김), 'sleep' → 비킴, 'home' → '들어가기'.
 - 콘솔 오류 0.
 

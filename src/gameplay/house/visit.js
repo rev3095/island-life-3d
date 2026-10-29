@@ -190,7 +190,9 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
     ctx.services.time?.setIndoor?.(true);
     ctx.services.audio?.bgm?.('indoor');
     const spot = hostSpot();
-    events.emit('house:enter', { owner: slug, room: V.spec?.slug ?? null, name: V.spec?.name ?? '', spot: spot && { x: spot.x, z: spot.z }, facing: spot?.facing ?? Math.PI });
+    // room = 방 범위(월드, Z4 town 이 주인 세울 때 씀), roomId = 방 스펙 slug
+    events.emit('house:enter', { owner: slug, roomId: V.spec?.slug ?? null, name: V.spec?.name ?? '', spot: spot && { x: spot.x, z: spot.z }, facing: spot?.facing ?? Math.PI,
+      room: { x0: vx0, z0: vz0, x1: vx0 + ROOM_W, z1: vz0 + ROOM_D } });
     saveSoon(0.5);
   }
 
