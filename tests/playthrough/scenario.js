@@ -320,7 +320,7 @@ export function makeScenario(bot, sk, opts = {}) {
       out.reward = bot.toasts.filter(t => t.step === 'request-gift').map(t => t.text).filter(t => /받았어요/.test(t)).at(-1) ?? null;
     }
     // 선물: 좋아하는 것을 가진 주민에게 하나 (없으면 아무 물건이나 — 보통 반응이라도 선물 흐름을 본다)
-    const anyGift = it => !!it && !['tool', 'festival'].includes(it.category) && !keep.has(it.id) && !isMaterialFor(it);
+    const anyGift = it => !!it && !['tool', 'festival', 'furn'].includes(it.category) && !keep.has(it.id) && !isMaterialFor(it);   // 가구(받은 보상)는 남긴다
     for (const [k, slug] of [...residents().map(s => [0, s]), ...residents().map(s => [1, s])]) {
       const g = k === 0 ? giftTest(slug) : anyGift;
       if (!bot.inv().some(s => s && g(bot.item(s.id), s))) continue;

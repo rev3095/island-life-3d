@@ -348,7 +348,17 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
    * 길이 없거나 오래 막히면 issue 로 남기고 false (allowTeleport 면 그 자리로 옮겨 계속)
    */
   bot.walkTo = async (to, { near = 0.35, run = true, timeout = 90, label = '', allowTeleport = true, quiet = false } = {}) => {
-    if (inZone()) return bot.walkLocal(to, { near, timeout });
+    if (inZone()) {
+      if (Math.abs(to.x) > 100) return bot.walkLocal(to, { near, timeout });
+      // 방 안인데 섬 쪽 목표: 먼저 문 매트(방 남쪽 가운데)로 가서 나온다 (내 집 x 500 · 주민 방 x 540, 방 8×8)
+      bot.issue('minor', 'bot', `방 안에서 바깥으로 가라고 해서 먼저 나왔어요 (${label || '목표'})`);
+      const cx = Math.abs(bot.pos().x - 540) < 10 ? 540 : 500;
+      await bot.walkLocal({ x: cx, z: 3.3 }, { near: 0.25, label: '문 매트' });
+      await bot.faceDir(180);
+      bot.press('action');
+      await bot.until(() => !inZone(), { timeout: 8 });
+      if (inZone()) return false;
+    }
     const start = bot.gameT;
     const goalT = walkableNear(to);
     // 목표가 물·건물처럼 못 서는 곳이면 가장 가까운 땅 칸 가운데로 (그 자리 자체로 걸어 들어가려다 막히지 않게)
@@ -399,19 +409,56 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     return false;
   };
   /** 집 안·주민 방처럼 섬 밖 구역: 곧게 걷기 */
-  bot.walkLocal = async (to, { near = 0.3, timeout = 20 } = {}) => {
+  bot.walkLocal = async (to, { near = 0.3, timeout = 20, label = '방 안' } = {}) => {
     const end = bot.gameT + timeout;
+    // 방 안 가구를 돌아가는 길 (0.25칸 격자 BFS, 구역의 isWalkable — 플레이어가 구역 안이면 island.isWalkable 이 구역 것)
+    const pts = [...(localPath(bot.pos(), to) ?? []), to];
+    let i = 0, lastP = bot.pos(), lastProg = bot.gameT;
     while (bot.gameT < end) {
-      if (bot.blocking() || player().frozen) { bot.release(); await bot.handleUI(); await bot.stepFrame(); continue; }
+      if (bot.blocking() || player().frozen) { bot.release(); await bot.handleUI(); await bot.stepFrame(); lastProg = bot.gameT; continue; }
       const p = bot.pos(), d = bot.dist(to, p);
       if (d < near) { bot.release(); await bot.frames(2); return true; }
-      const k = d < 0.8 ? Math.max(0.3, d / 0.8) : 1;
-      bot.stick(((to.x - p.x) / d) * k, ((to.z - p.z) / d) * k, false);
+      while (i < pts.length - 1 && bot.dist(pts[i], p) < 0.18) i++;
+      const w = pts[i], dw = bot.dist(w, p) || 1;
+      const k = i === pts.length - 1 && dw < 0.8 ? Math.max(0.3, dw / 0.8) : 0.8;
+      bot.stick(((w.x - p.x) / dw) * k, ((w.z - p.z) / dw) * k, false);
       await bot.stepFrame();
+      if (bot.dist(p, lastP) > 0.15) { lastP = bot.pos(); lastProg = bot.gameT; }
+      else if (bot.gameT - lastProg > 2.5) break;
     }
     bot.release();
-    return false;
+    // 사람이라면 돌아서 갔을 자리 — 막힘으로 남기고 그 자리로 옮긴다 (다음 단계가 방에 갇히지 않게)
+    bot.issue('minor', 'house', `${label}에서 걷다가 막혔어요 (남은 거리 ${bot.dist(to).toFixed(1)}칸)`, { at: bot.pos(), to });
+    bot.stats.teleports++;
+    player().teleport(to.x, to.z);
+    await bot.frames(2);
+    return true;
   };
+  function localPath(from, to) {
+    const isl = world().island, S = 0.25, R = 0.2;
+    const free = (x, z) => [[0, 0], [R, 0], [-R, 0], [0, R], [0, -R]].every(([a, b]) => isl.isWalkable(x + a, z + b));
+    const x0 = Math.min(from.x, to.x) - 4, z0 = Math.min(from.z, to.z) - 4;
+    const W = Math.ceil((Math.abs(from.x - to.x) + 8) / S), H = Math.ceil((Math.abs(from.z - to.z) + 8) / S);
+    if (W * H > 40000) return null;   // 방 하나(8×8)를 넘는 거리는 곧게
+    const cell = p => [Math.round((p.x - x0) / S), Math.round((p.z - z0) / S)];
+    const [sx, sz] = cell(from), [gx, gz] = cell(to);
+    const prev = new Map([[`${sx},${sz}`, null]]), q = [[sx, sz]];
+    while (q.length) {
+      const [cx, cz] = q.shift();
+      if (Math.abs(cx - gx) <= 1 && Math.abs(cz - gz) <= 1) {
+        const out = [];
+        for (let k = `${cx},${cz}`; k; k = prev.get(k)) { const [a, b] = k.split(',').map(Number); out.unshift({ x: x0 + a * S, z: z0 + b * S }); }
+        return out.filter((_, j) => j % 2 === 0 || j === out.length - 1);
+      }
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const nx = cx + dx, nz = cz + dz, key = `${nx},${nz}`;
+        if (nx < 0 || nz < 0 || nx > W || nz > H || prev.has(key) || !free(x0 + nx * S, z0 + nz * S)) continue;
+        prev.set(key, `${cx},${cz}`);
+        q.push([nx, nz]);
+      }
+    }
+    return null;
+  }
   function teleport(to) {
     bot.stats.teleports++;
     const t = walkableNear(to, 4);
