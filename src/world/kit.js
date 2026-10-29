@@ -30,24 +30,19 @@ const SWAY_GLSL = /* glsl */ `
   transformed.xz += swD;
 `;
 
-// 가림 투명(디더): aFade = 0(그대로) ~ 1. 화면 점마다 4×4 바이어 문턱을 달리해 그만큼 구멍을 낸다 → 정렬·반투명 없이 뒤가 비친다.
-// 그림자는 three 기본 깊이 재질로 그려서 그대로 남는다. 맨 끝까지 지우지 않고 FADE_MAX 만큼만 (물체가 있다는 건 보이게)
-const FADE_MAX = 0.7;
-const FADE_VERT = /* glsl */ `
-  vKitFade = aFade;
-`;
-const FADE_FRAG = /* glsl */ `
-  if ( vKitFade > 0.004 ) {
-    const float KIT_BAYER[ 16 ] = float[ 16 ]( 0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0 );
-    ivec2 kp = ivec2( mod( floor( gl_FragCoord.xy ), 4.0 ) );
-    if ( ( KIT_BAYER[ kp.y * 4 + kp.x ] + 0.5 ) / 16.0 < vKitFade * ${FADE_MAX.toFixed(2)} ) discard;
-  }
-`;
+// 가림 투명(디더)은 materials 공용: 묶음이 칸마다 aFade(0~1) 인스턴스 속성을 주면 모든 kit 재질(툰·평면·외곽선)이 그만큼 비친다.
 
 export function createKit(ctx) {
   const { materials } = ctx;
   const uTime = { value: 0 };
   const matCache = new Map();
+
+  /** 흔들림(aSway·aShake) 셰이더를 덧붙인다 — 그리는 재질과 그림자 깊이 재질이 같은 모양으로 흔들리게 */
+  const addSway = sh => {
+    sh.uniforms.uTime = uTime;
+    sh.vertexShader = ('attribute vec2 aSway;\nattribute float aShake;\nuniform float uTime;\n' + sh.vertexShader)
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n' + SWAY_GLSL);
+  };
 
   /** 꼭짓점 색 재질 (공유). type: toon | flat | outline, name: 재질 이름 (sky 가 이름으로 찾는다) */
   function material(type, { sway = false, width = 0.01, name = `kit-${type}` } = {}) {
@@ -57,25 +52,21 @@ export function createKit(ctx) {
     if (type === 'outline') m = materials.outlineMaterial(width, { styleAttr: true });
     else m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name, styleAttr: true });
     m.vertexColors = true;
-    const base = m.onBeforeCompile;
-    const baseKey = m.customProgramCacheKey();
-    m.onBeforeCompile = (sh, r) => {
-      base.call(m, sh, r);
-      let vs = 'attribute float aFade;\nvarying float vKitFade;\n' + sh.vertexShader;
-      let after = FADE_VERT;
-      if (sway) {
-        sh.uniforms.uTime = uTime;
-        vs = 'attribute vec2 aSway;\nattribute float aShake;\nuniform float uTime;\n' + vs;
-        after += SWAY_GLSL;
-      }
-      sh.vertexShader = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n' + after);
-      sh.fragmentShader = 'varying float vKitFade;\n'
-        + sh.fragmentShader.replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' + FADE_FRAG);
-    };
-    m.customProgramCacheKey = () => baseKey + (sway ? '-sway' : '') + '-fade';
-    m.defaultAttributeValues = { ...m.defaultAttributeValues, aFade: [0] };   // aFade 가 없는 메시에 써도 0 (그대로)
+    if (sway) {
+      const base = m.onBeforeCompile;
+      const baseKey = m.customProgramCacheKey();
+      m.onBeforeCompile = (sh, r) => { base.call(m, sh, r); addSway(sh); };
+      m.customProgramCacheKey = () => baseKey + '-sway';
+    }
     matCache.set(key, m);
     return m;
+  }
+
+  /** 그림자 깊이 재질: 바람(aStyle 1)과 흔들림·흔들기를 그림자에도 (materials.shadowDepthMaterial 위에 흔들림을 얹는다) */
+  function depthMaterial(sway) {
+    if (!materials.shadowDepthMaterial) return undefined;
+    return sway ? materials.shadowDepthMaterial({ attr: true }, { key: 'kit-sway', extra: addSway })
+      : materials.shadowDepthMaterial({ attr: true });
   }
 
   /**
@@ -124,6 +115,8 @@ export function createKit(ctx) {
     });
 
     const parts = [];
+    // 바람(aStyle 1) 부품이나 흔들림이 있으면 그림자도 같이 흔들리게
+    const windy = sway || [...groups.values()].some(list => list.some(p => materials.styleClass?.(p.name) === 1));
     for (const [key, list] of groups) {
       const [type, matName] = key.split('|');
       const ranges = [];
@@ -136,6 +129,7 @@ export function createKit(ctx) {
         type, geometry: geo, ranges,
         material: material(type, { sway, width, name: matName || undefined }),
         castShadow: type !== 'outline' && castShadow, receiveShadow: type !== 'outline',
+        depth: type !== 'outline' && castShadow && windy ? depthMaterial(sway) : undefined,
       });
     }
     // 판 전체를 감싸는 구 (칸마다 화면 밖 판정에 쓴다). 흔들림·흔들기 몫만큼 여유
@@ -212,6 +206,7 @@ export function createKit(ctx) {
         m.renderOrder = this.tpl.renderOrder ?? 0;
         m.castShadow = part.castShadow;
         m.receiveShadow = part.receiveShadow;
+        if (part.depth) m.customDepthMaterial = part.depth;
         if (part.type === 'outline') m.userData.outline = true;
         return m;
       });

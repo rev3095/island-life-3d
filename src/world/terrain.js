@@ -1,9 +1,11 @@
 // 지형 그리기: 타일 모델을 종류별 InstancedMesh 로 (칸마다 화면 밖 판정은 kit), 섬 밖 바다는 큰 판 하나로, 폭포는 따로.
 // 바닷가는 coast.js: 부드러운 모래 앞치마 + 바다 셰이더의 얕은 물빛·물가 거품·밀려오는 물결.
+// 강 둑·풀/모래 경계는 banks.js: 강물 칸 안의 둥근 둑 판 + 물가 거품, 땅 재질의 모래 정도 텍스처로 경계 곡선.
 import * as THREE from 'three';
 import { KIND, LEVEL_HEIGHT, WATER_TOP } from './island.js';
 import { mulberry32 } from './rng.js';
 import { buildCoast, patchSea } from './coast.js';
+import { buildBanks } from './banks.js';
 
 // 구역 크기. 화면 밖 판정은 kit 묶음이 칸마다 하므로 구역을 섬 전체로 크게 둔다 → 종류마다 묶음 하나 (그리기 호출 적게).
 // (예전 16×16 구역: 섬 하나에 묶음 180여 개, 보이는 묶음 통째로 그림)
@@ -38,6 +40,16 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     templates[k].renderOrder = 1;
   }
 
+  // 강 둑·풀/모래 경계 (banks.js): 풀·모래 판에 aGround 를 묶음 만들기 전에 단다. 시계는 해안과 같이 쓴다
+  const coast = buildCoast(ctx, gen, models['tile-sand'].spec.palette, SEA_Y);
+  const pal = slug => models[slug].spec.palette;
+  const banks = buildBanks(ctx, gen, {
+    grass: pal('tile-grass').grass, dirt: pal('tile-grass').dirt, sand: pal('tile-sand').sand,
+    path: pal('tile-path').path, plaza: pal('tile-plaza').stone,
+  }, coast.uniforms.uSeaTime);
+  banks.markGround(templates[KIND.GRASS], KIND.GRASS);
+  banks.markGround(templates[KIND.SAND], KIND.SAND);
+
   const batches = new Map();
   const batchFor = (k, tx, tz) => {
     const key = `${k}|${Math.floor(tx / CHUNK)},${Math.floor(tz / CHUNK)}`;
@@ -65,9 +77,8 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     batchFor(k, tx, tz).add(i, m4);
   }
 
-  const coast = buildCoast(ctx, gen, models['tile-sand'].spec.palette, SEA_Y);
   coast.apron.renderOrder = 1;
-  group.add(coast.apron);
+  group.add(coast.apron, banks.mesh, banks.foam);
   const sea = buildSea(ctx, gen, island, models['tile-water'].spec, coast);
   sea.renderOrder = 2;                          // 바다 판은 섬 밑까지 깔려 있다 → 맨 나중에 (땅에 가린 곳은 칠하지 않게)
   group.add(sea);
@@ -75,7 +86,7 @@ export function buildTerrain(ctx, gen, island, kit, models) {
   group.add(falls.group);
 
   return {
-    group, templates, batches, coast,
+    group, templates, batches, coast, banks,
     update(dt, t) { coast.uniforms.uSeaTime.value = t; falls.update(dt, t); },
     setOutlineVisible(v) { for (const b of batches.values()) b.setOutlineVisible(v); },
   };

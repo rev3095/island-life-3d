@@ -32,10 +32,14 @@
 | 물결 | 짧은 물결 조각 + 반짝 점, 멀면 줄어든다. 바다 판·폭포는 재질 이름, 강물 타일은 `aStyle` 2 | `styleWater` (이름 표 `STYLE_NAMES.water`: `sea` `water` `waterLight` `waterfall` …) | `water` `waterScale` |
 | 스스로 빛나기 | 불꽃·반딧불·반짝이를 밝게 → 빛 번짐이 걸린다 | `STYLE_GLOW` (이름 표 `STYLE_NAMES.glow`) | `glow` |
 | 외곽선 | `off` / `subtle`(가늘게, 물체 색을 어둡게 — 바탕색 `base` 또는 꼭짓점 색) / `ink`(예전 갈색) | `outlineMaterial` · `OUTLINE_FRAG`, 숨기기 `setOutlinesVisible` | `outline` `outlineScale` `outlineTint` `outlineDark` |
+| 가림 투명 (디더) | 카메라와 플레이어 사이 물체에 4×4 바이어 구멍 (최대 `FADE_MAX` 70%). 세기 = max(재질 uniform `uStyleFade`, 꼭짓점·인스턴스 속성 `aFade`). 그림자는 그대로 | `FADE_FRAG` (모든 툰·평면·외곽선 재질), 판정은 world `occlusion.js` | — |
+| 그림자 바람 | 바람(이름·`aStyle` 1)과 배경 묶음 흔들림·흔들기로 움직이는 물체의 그림자가 같이 흔들린다 | `shadowDepthMaterial()` → 메시 `customDepthMaterial` (render `cull.js` 가 붙이고, kit 은 흔들림까지 얹어 직접) | `wind` `windSpeed` |
 | 빛 번짐 (bloom) | 문턱보다 밝은 곳(등불·모닥불·해)만 번진다. 1/4 해상도 | `post.js` `UnrealBloomPass` | `bloom` `bloomRadius` `bloomThreshold` |
 | 위쪽 흐림 (틸트시프트) | 곡면 월드가 넘어가는 화면 위쪽을 더 흐리게, 아래는 살짝. three 의 `Horizontal/VerticalTiltShiftShader` 를 절반 해상도로 돌리고 색 보정에서 섞는다 | `post.js` `TiltBlurPass` + `GradeShader` | `tiltTop` `tiltBottom` `tiltFocus` `tiltRange` |
 | 색 보정 | 노출 → 밝은 곳 눌러주기(파스텔 색 유지) → sRGB → lift/gamma/gain · 대비 · 채도 · 따뜻함 · 비네트 | `post.js` `GradeShader` (OutputPass 역할도 한다) | `exposure` `shoulder` `lift` `liftTint` `gamma` `gain` `contrast` `saturation` `warmth` `vignette` `vignetteSoft` |
 | 가장자리 매끈 | FXAA (화면 색 위에서, 맨 끝) | `post.js` | `fxaa` |
+
+world 쪽 땅 다듬기 (재질이 아니라 판·덧씌우기): 해안선 `coast.js`(X2), 강 둑·물가 거품·풀/모래 경계 `banks.js`(Y3) — 거리장은 three 없이 도는 `coastfield.js` · `banksfield.js`.
 
 ### 꼭 알아 둘 것
 - **곡면 월드**는 예전처럼 `project_vertex` 자리에서 휜다. 스타일 효과는 휘기 **전** 월드 좌표(`vStyleWorld`)를 쓴다 → 그림자·물결 무늬가 땅에 붙어 있다.
@@ -45,6 +49,9 @@
 - **합친 메시(world 배경 묶음)**: 여러 재질이 한 메시라 이름이 없다 → `kit.js` 가 꼭짓점마다 `aStyle = styleClass(재질 이름)` 을 넣고 재질은 `styleAttr: true`. 외곽선 판도 `aStyle`(바람을 같이 따라가게)과 꼭짓점 색(은은한 외곽선 색)을 가진다.
 - 화면 효과를 쓰면 장면은 **선형** 버퍼에 그린다. sky 의 `ShaderMaterial` 들은 `skyOut()`(sRGB → 선형 → `linearToOutputTexel`)으로 내보내 어느 쪽에 그려도 같은 색이다. 그렇게 하지 않은 새 `ShaderMaterial` 은 `src/render/index.js` 의 `linearize()` 가 끝에 변환을 붙여 준다 (1초마다 훑음, `uStyleLinear` 가 1 일 때만).
 - 외곽선 메시에는 계속 `userData.outline = true`. 섬폰 설정(`settings:changed {key:'outline'}`)은 메시 `visible` 을, 스타일 `outline: 'off'` 는 재질 `visible` 을 끈다 → 둘이 부딪치지 않는다.
+- **캐릭터 합치기** (`applyToonStyle(root, { merge: true })`, 플레이어·주민·가게 주인): 캐릭터 glTF 는 부품(재질)마다 뼈대 메시라 한 명이 20~30번 그렸다. 같은 뼈대의 부품을 꼭짓점 색 + `aStyle`(부리·코·껍데기 하이라이트)로 굳혀 **[몸(툰) · 눈·볼(평면) · 외곽선]** 세 메시, 뼈대 하나로 줄인다. 굳힌 모양은 같은 모델끼리 나눠 쓴다. `toon.materials[이름]` 은 합친 재질(모든 부품 공유)이라 `.color` 를 바꾸지 말고 `setColor(이름, 색)` 을 쓴다 (꼭짓점 색). 부품별 메시가 필요한 곳(캐릭터 편집기)은 `merge` 를 쓰지 않는다.
+- **가림 투명**: `applyToonStyle` 은 모델마다 uniform 하나(`root.userData.toonFade`)를 재질 전부에 나눠 준다 → world 가 장면에서 찾아 카메라와 플레이어(·대화 상대) 사이면 통째로 디더 (`setFade(v)`). 빠지려면 `root.userData.occluder = false` (플레이어). 공유 재질 인스턴스는 `aFade` 인스턴스 속성 + `world.occlusion.add({ box, setFade })`.
+- **그림자 깊이 재질**은 곡면을 걸지 않고(그림자는 휘기 전 좌표), 디더도 없다(비쳐도 그림자는 남는다). 재질에 `userData.shadowSway = { wind, attr }` 가 있으면 render 가 1초마다 훑어 붙인다. 비교: `__island.services.style.culler.windShadow = false`.
 
 ## 쓰는 법 (`ctx.services.style`)
 
@@ -105,6 +112,7 @@ style.labels              // { cozy: '포근 (동숲풍)', toon: '툰 (예전)' 
 | 1920×1200 | high | 15.1 ms | 21.3 ms (+6) |
 | 1280×800, 2차 네 트랙 임시로 합친 섬 (주민·채집·집) | high | 10.3 ms | 12.2 ms (+1.9) |
 
+- 4차(Y3) 캐릭터 합치기 뒤 주민이 모인 광장: 363 → 167 그리기 호출, 처리량 10.6 → 9.9ms, CPU 4.5 → 1.0ms. 그림자 바람 +0.15ms. 표는 `docs/notes/render.md`.
 - toon 은 화면에 바로 그려서 4× MSAA 를 쓰고, cozy 는 MSAA 없는 HDR 버퍼 + FXAA 다. 그래서 작은 화면에선 거의 같다.
 - 1920×1200 cozy 의 덧셈: 빛 번짐 ≈ 1.5ms, FXAA ≈ 2ms, 틸트 ≈ 1ms, HDR 버퍼·색 보정 ≈ 1.5ms. 재질 자체는 toon 과 같은 값.
 - low: 빛 번짐 1/8 · 틸트 1/4 해상도, 화소 배율 1.5 이상이면 FXAA 끔. 그림자 1024·PCF (main.js).

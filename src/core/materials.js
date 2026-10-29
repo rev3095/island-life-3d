@@ -303,6 +303,25 @@ const STYLE_COMPOSE = /* glsl */ `
 }
 `;
 
+// 가림 투명(디더): 화면 점마다 4×4 바이어 문턱을 달리해 그만큼 구멍을 낸다 → 정렬·반투명 없이 뒤가 비친다.
+// 세기 = max(재질 uniform uStyleFade (물체 하나 통째로), 꼭짓점·인스턴스 속성 aFade (배경 묶음의 칸마다)).
+// 맨 끝까지 지우지 않고 FADE_MAX 만큼만 (물체가 있다는 건 보이게). 그림자(깊이 재질)에는 안 건다 → 비쳐도 그림자는 남는다.
+export const FADE_MAX = 0.7;
+const NO_FADE = { value: 0 };          // 물체별 값이 없는 재질이 함께 쓰는 0 (바꾸지 않는다)
+const FADE_VERT = /* glsl */ `
+  vStyleFadeI = aFade;
+`;
+const FADE_FRAG = /* glsl */ `
+{
+  float sf = max( uStyleFade, vStyleFadeI );
+  if ( sf > 0.004 ) {
+    const float STYLE_BAYER[ 16 ] = float[ 16 ]( 0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0 );
+    ivec2 kp = ivec2( mod( floor( gl_FragCoord.xy ), 4.0 ) );
+    if ( ( STYLE_BAYER[ kp.y * 4 + kp.x ] + 0.5 ) / 16.0 < sf * ${FADE_MAX.toFixed(2)} ) discard;
+  }
+}
+`;
+
 const STYLE_UNIFORM_KEYS = Object.keys(look);
 
 // lights_fragment_begin 을 복사해 방향광 그림자 값을 따로 꺼낸다 (띠 명암 · 그림자 진하기를 따로 다루려고)
@@ -337,10 +356,11 @@ const OUTLINE_FRAG = /* glsl */ `
 `;
 
 /**
- * 셰이더 고치기. opts: { bend, outline(uniform), lit(툰 조명), wind, water, paintWorld, mat(재질별 uniform), base(외곽선 바탕색 uniform) }
+ * 셰이더 고치기. opts: { bend, outline(uniform), lit(툰 조명), wind, water, paintWorld, mat(재질별 uniform), base(외곽선 바탕색 uniform),
+ *   fade(가림 투명 uniform, false = 디더 없음 — 그림자 깊이 재질) }
  */
 function patch(shader, opts) {
-  const { bend = true, outline = null, lit = false, wind = false, water = false, paintWorld = false, attr = false, glow = false, mat = null, base = null } = opts;
+  const { bend = true, outline = null, lit = false, wind = false, water = false, paintWorld = false, attr = false, glow = false, mat = null, base = null, fade = NO_FADE } = opts;
   Object.assign(shader.uniforms, { uCurve: curve.uCurve, uCurveOrigin: curve.uCurveOrigin });
   for (const k of STYLE_UNIFORM_KEYS) shader.uniforms[k] = look[k];
   if (mat) Object.assign(shader.uniforms, mat);
@@ -355,6 +375,11 @@ function patch(shader, opts) {
 
   let vs = `${defs}uniform float uCurve;\nuniform vec3 uCurveOrigin;\n${STYLE_VERT_PARS.replace('NOISE_CORE', NOISE_CORE)}` + shader.vertexShader;
   let begin = '#include <begin_vertex>\n' + WIND_GLSL;
+  if (fade) {
+    shader.uniforms.uStyleFade = fade;
+    vs = 'attribute float aFade;\nvarying float vStyleFadeI;\n' + vs;
+    begin += FADE_VERT;
+  }
   if (outline) {
     shader.uniforms.uOutline = outline;
     vs = 'uniform float uOutline, uOutlineScale;\n' + vs;
@@ -383,8 +408,12 @@ function patch(shader, opts) {
     shader.uniforms.uOutlineBase = base ?? look.uOutlineFallback;
     fs = 'uniform vec3 uOutlineBase;\nuniform float uOutlineTint, uOutlineDark;\n' + fs.replace('#include <color_fragment>', `#include <color_fragment>\n${OUTLINE_FRAG}`);
   }
+  if (fade) fs = 'uniform float uStyleFade;\nvarying float vStyleFadeI;\n' + fs.replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>\n${FADE_FRAG}`);
   shader.fragmentShader = fs;
 }
+
+/** 재질에 aFade 기본값 0 (속성이 없는 메시에 써도 그대로 보이게) */
+const fadeDefaults = m => { m.defaultAttributeValues = { ...m.defaultAttributeValues, aFade: [0] }; };
 
 /** 프로그램 캐시 열쇠: 셰이더 글자가 달라지는 선택지만 담는다 (값은 uniform 이라 안 들어감) */
 const keyOf = (kind, o) => [kind, o.bend === false ? 'flat' : 'curved', o.wind && 'wind', o.water && 'water', o.paintWorld && 'pw', o.attr && 'attr', o.glow && 'glow'].filter(Boolean).join('-');
@@ -410,8 +439,9 @@ export const OUTLINE_COLOR = '#4A3B32';
  * 툰 재질. name 으로 효과가 정해진다 (STYLE_NAMES). 추가 선택지:
  *   character: 캐릭터(림 세게, 접촉 그늘·무늬는 약하게), wind / water / spec / glow: 이름과 상관없이 켜기
  *   styleAttr: 여러 재질을 합친 메시 — 꼭짓점 속성 aStyle(styleClass)로 바람·물결·하이라이트를 고른다 (world 배경 묶음)
+ *   fade: 가림 투명 uniform ({ value: 0~1 }) — 같은 물체의 재질끼리 나눠 쓴다 (applyToonStyle 이 만든다). 없으면 aFade 속성만
  */
-export function toonMaterial(color, { flat = false, bend = true, name = '', character = false, wind, water, spec, glow, styleAttr = false } = {}) {
+export function toonMaterial(color, { flat = false, bend = true, name = '', character = false, wind, water, spec, glow, styleAttr = false, fade = NO_FADE } = {}) {
   const o = {
     bend,
     wind: wind ?? STYLE_NAMES.wind.has(name),
@@ -419,6 +449,7 @@ export function toonMaterial(color, { flat = false, bend = true, name = '', char
     paintWorld: STYLE_NAMES.worldPaint.has(name),
     glow: glow ?? STYLE_NAMES.glow.has(name),
     attr: !flat && styleAttr,
+    fade,
   };
   let m;
   if (flat) {
@@ -439,11 +470,34 @@ export function toonMaterial(color, { flat = false, bend = true, name = '', char
     m.customProgramCacheKey = () => keyOf('toon', o);
   }
   m.name = name;
-  if (o.attr) m.defaultAttributeValues = { aStyle: [0] };   // aStyle 이 없는 메시에 써도 0(효과 없음)으로
+  if (o.attr) m.defaultAttributeValues = { ...m.defaultAttributeValues, aStyle: [0] };   // aStyle 이 없는 메시에 써도 0(효과 없음)으로
+  fadeDefaults(m);
+  m.userData.fade = fade;
+  // 바람에 흔들리는 재질: 그림자도 같이 흔들리게 (render 가 그림자 드리우는 메시에 shadowDepthMaterial 을 붙인다)
+  if (o.wind || o.attr) m.userData.shadowSway = { wind: o.wind, attr: o.attr, bend };
   if (!bend && !o.water && !o.glow && flat) {   // 곡면도 효과도 없는 평면 재질은 그대로
     m.onBeforeCompile = () => {};
     m.customProgramCacheKey = () => 'plain';
   }
+  return m;
+}
+
+/**
+ * 그림자 깊이 재질: 바람(wind · aStyle 1)으로 흔들리는 재질의 그림자도 같이 흔들리게 (customDepthMaterial).
+ * 곡면은 걸지 않는다 (그림자는 휘기 전 좌표로 그린다). 디더 가림도 없다 (비쳐도 그림자는 남는다).
+ * 같은 선택지끼리 하나를 나눠 쓴다. extra(sh) 로 셰이더를 더 고칠 수 있다 (world 배경 묶음의 흔들림·흔들기) — 그때는 key 를 달리 준다.
+ */
+const depthCache = new Map();
+export function shadowDepthMaterial({ wind = false, attr = false } = {}, { key = '', extra = null } = {}) {
+  const k = `${wind}|${attr}|${key}`;
+  if (depthCache.has(k)) return depthCache.get(k);
+  const m = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+  const o = { bend: false, wind, attr, fade: false };
+  m.onBeforeCompile = (sh, r) => { patch(sh, o); extra?.(sh, r); };
+  m.customProgramCacheKey = () => keyOf('depth', o) + (key ? `-${key}` : '');
+  if (attr) m.defaultAttributeValues = { ...m.defaultAttributeValues, aStyle: [0] };
+  m.name = 'style-shadow';
+  depthCache.set(k, m);
   return m;
 }
 
@@ -461,17 +515,19 @@ export function setOutlinesVisible(v) {
  * base: 바탕색 (외곽선 'subtle' 모드에서 이 색을 어둡게 해서 쓴다. 없으면 꼭짓점 색(vertexColors), 그것도 없으면 look.uOutlineFallback)
  * wind: 바람 따라 흔들리기, styleAttr: 합친 메시의 aStyle 로 바람 (툰 재질과 같은 모양으로 흔들리게)
  */
-export function outlineMaterial(width = 0.01, { color = OUTLINE_COLOR, bend = true, base = null, wind = false, styleAttr = false } = {}) {
+export function outlineMaterial(width = 0.01, { color = OUTLINE_COLOR, bend = true, base = null, wind = false, styleAttr = false, fade = NO_FADE } = {}) {
   const m = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide });
   const uOutline = { value: width };
   const uBase = base ? { value: new THREE.Color(base) } : null;
   m.userData.uOutline = uOutline;
   if (uBase) m.userData.uOutlineBase = uBase;
   const o = { bend, wind, attr: styleAttr };
-  m.onBeforeCompile = sh => patch(sh, { ...o, outline: uOutline, base: uBase });
+  m.onBeforeCompile = sh => patch(sh, { ...o, outline: uOutline, base: uBase, fade });
   m.customProgramCacheKey = () => keyOf('outline', o);
   m.visible = outlineState.visible;
-  if (styleAttr) m.defaultAttributeValues = { aStyle: [0] };
+  if (styleAttr) m.defaultAttributeValues = { ...m.defaultAttributeValues, aStyle: [0] };
+  fadeDefaults(m);
+  m.userData.fade = fade;
   outlineMaterials.add(m);
   return m;
 }
@@ -480,28 +536,153 @@ const DEFAULT_NO_OUTLINE = ['eye', 'eyeHighlight', 'blush', 'marking', 'innerEar
   'waterLight', 'center', 'petalDark', 'rockDark', 'shellRib', 'flower', 'grassDark', 'pebble', 'window'];
 const DEFAULT_FLAT = ['eye', 'eyeHighlight', 'blush'];
 
+// ── 캐릭터 합치기 ──
+// 캐릭터 glTF 는 메시 하나에 재질(부품)이 7~12개라 three 가 부품마다 SkinnedMesh(+ 뼈대 객체)를 만든다 → 한 명이 몸·외곽선·그림자로 20~30번 그린다.
+// 같은 뼈대의 부품을 꼭짓점 색(color) + 스타일 번호(aStyle: 부리·코·껍데기 하이라이트)로 한 덩어리로 굳혀 [툰 · 평면(눈·볼) · 외곽선] 세 메시로 줄인다.
+// 굳힌 모양(위치·법선·뼈 번호·무게·aStyle)은 같은 모델끼리 나눠 쓰고, 색 속성은 setColor 를 부를 때만 따로 떼어 낸다.
+const bakeCache = new WeakMap();       // 첫 부품 geometry → { 'toon'|'flat'|'outline' → 굳힌 판 }
+
+/** 부품 목록 → 굳힌 판 { attrs, index, ranges: [{ name, start, count, color }] } */
+function bakeParts(parts) {
+  let nv = 0, ni = 0;
+  for (const { geo } of parts) { nv += geo.attributes.position.count; ni += geo.index ? geo.index.count : geo.attributes.position.count; }
+  const P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), SI = new Uint16Array(nv * 4), SW = new Float32Array(nv * 4);
+  const C = new Float32Array(nv * 3), ST = new Float32Array(nv);
+  const I = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
+  const ranges = [];
+  let v0 = 0, i0 = 0;
+  for (const { geo, name, color } of parts) {
+    const a = geo.attributes, n = a.position.count, si = a.skinIndex, sw = a.skinWeight, cls = styleClass(name);
+    for (let i = 0; i < n; i++) {
+      const v = v0 + i;
+      P[v * 3] = a.position.getX(i); P[v * 3 + 1] = a.position.getY(i); P[v * 3 + 2] = a.position.getZ(i);
+      N[v * 3] = a.normal.getX(i); N[v * 3 + 1] = a.normal.getY(i); N[v * 3 + 2] = a.normal.getZ(i);
+      SI[v * 4] = si.getX(i); SI[v * 4 + 1] = si.getY(i); SI[v * 4 + 2] = si.getZ(i); SI[v * 4 + 3] = si.getW(i);
+      SW[v * 4] = sw.getX(i); SW[v * 4 + 1] = sw.getY(i); SW[v * 4 + 2] = sw.getZ(i); SW[v * 4 + 3] = sw.getW(i);
+      C[v * 3] = color.r; C[v * 3 + 1] = color.g; C[v * 3 + 2] = color.b;
+      ST[v] = cls;
+    }
+    const idx = geo.index;
+    const m = idx ? idx.count : n;
+    for (let k = 0; k < m; k++) I[i0 + k] = v0 + (idx ? idx.getX(k) : k);
+    ranges.push({ name, start: v0, count: n, color: color.clone() });
+    v0 += n; i0 += m;
+  }
+  return {
+    attrs: {
+      position: new THREE.BufferAttribute(P, 3), normal: new THREE.BufferAttribute(N, 3),
+      skinIndex: new THREE.Uint16BufferAttribute(SI, 4), skinWeight: new THREE.BufferAttribute(SW, 4),
+      color: new THREE.BufferAttribute(C, 3), aStyle: new THREE.BufferAttribute(ST, 1),
+    },
+    index: new THREE.BufferAttribute(I, 1),
+    ranges,
+  };
+}
+
+/** 굳힌 판 → 이 캐릭터의 geometry (모양 속성은 나눠 쓴다) */
+function geometryOf(baked) {
+  const g = new THREE.BufferGeometry();
+  for (const [k, v] of Object.entries(baked.attrs)) g.setAttribute(k, v);
+  g.setIndex(baked.index);
+  g.computeBoundingSphere();
+  g.userData.ranges = baked.ranges;
+  return g;
+}
+
+/**
+ * 뼈대 메시들을 뼈대(같은 부모·같은 뼈)마다 합친다. 원래 부품 메시는 빼고 합친 메시를 같은 자리에 넣는다.
+ * 돌려주는 값: [{ mesh, kind: 'toon'|'flat'|'outline' }]
+ */
+function mergeSkinned(meshes, { flatSet, noOutlineSet, width, bend, fade }) {
+  const groups = new Map();
+  for (const o of meshes) {
+    // 같은 부모·같은 뼈를 쓰는 것끼리 (glTF 의 메시 하나 = 부모 하나라 보통 한 묶음)
+    const key = `${o.parent.uuid}|${o.skeleton.bones[0]?.uuid}|${o.skeleton.bones.length}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(o);
+  }
+  const out = [];
+  for (const same of groups.values()) {
+    const first = same[0];
+    let baked = bakeCache.get(first.geometry);
+    if (!baked) {
+      const part = o => ({ geo: o.geometry, name: o.material.name, color: o.material.color });
+      const toon = same.filter(o => !flatSet.has(o.material.name)), flat = same.filter(o => flatSet.has(o.material.name));
+      const lined = same.filter(o => !noOutlineSet.has(o.material.name));
+      baked = {
+        toon: toon.length ? bakeParts(toon.map(part)) : null,
+        flat: flat.length ? bakeParts(flat.map(part)) : null,
+        outline: lined.length && width > 0 ? bakeParts(lined.map(part)) : null,
+      };
+      bakeCache.set(first.geometry, baked);
+    }
+    const mats = {
+      toon: () => toonMaterial('#ffffff', { bend, name: 'character', character: true, styleAttr: true, fade }),
+      flat: () => toonMaterial('#ffffff', { flat: true, bend, name: 'face', fade }),
+      outline: () => outlineMaterial(width, { bend, styleAttr: true, fade }),
+    };
+    for (const kind of ['toon', 'flat', 'outline']) {
+      if (!baked[kind]) continue;
+      const m = mats[kind]();
+      m.vertexColors = true;
+      const mesh = new THREE.SkinnedMesh(geometryOf(baked[kind]), m);
+      mesh.name = `${first.name}:${kind}`;
+      mesh.bind(first.skeleton, first.bindMatrix);
+      mesh.position.copy(first.position); mesh.quaternion.copy(first.quaternion); mesh.scale.copy(first.scale);
+      mesh.castShadow = kind === 'toon';          // 눈·볼은 몸에 붙어 있어 그림자 몫이 없다
+      mesh.receiveShadow = kind !== 'outline';
+      mesh.frustumCulled = false;                 // render 의 cull.js 가 쉰 자세 구로 다시 켠다
+      if (kind === 'outline') mesh.userData.outline = true;
+      first.parent.add(mesh);
+      out.push({ mesh, kind });
+    }
+    for (const o of same) o.parent.remove(o);
+  }
+  return out;
+}
+
 /**
  * glTF 장면의 재질을 툰 재질로 바꾸고 외곽선을 붙인다.
- * 돌려주는 값: { materials: {재질이름: [재질...]}, outlines: [메시...], setColor(name, hex), setOutlineVisible(bool) }
+ * 돌려주는 값: { materials: {재질이름: [재질...]}, outlines: [메시...], setColor(name, hex), setOutlineVisible(bool), fade, setFade(v) }
  * spec(편집기 스펙)을 넘기면 style.flat / style.outlineWidth 를 그대로 따른다.
  * 뼈대가 있는 메시(캐릭터)는 가장자리 빛을 더 세게 받는다.
+ * merge: true 면 뼈대 메시(캐릭터)의 부품을 합친다 (위 '캐릭터 합치기'). materials 는 이름마다 합친 재질 하나, setColor 는 꼭짓점 색을 칠한다.
+ * 가림 투명: 이 모델의 재질은 uniform 하나(fade)를 나눠 쓴다 → setFade(0~1) 로 통째로 디더. root.userData.toonFade 에도 둔다
+ *   (world 의 가림 투명이 장면에서 찾아 카메라와 플레이어 사이면 비치게 한다. root.userData.occluder = false 면 빠진다).
  */
-export function applyToonStyle(root, { spec = null, flat = [], noOutline = [], outlineWidth, bend = true } = {}) {
+export function applyToonStyle(root, { spec = null, flat = [], noOutline = [], outlineWidth, bend = true, merge = false } = {}) {
   const flatSet = new Set([...DEFAULT_FLAT, ...flat, ...(spec?.style?.flat ?? [])]);
   const noOutlineSet = new Set([...DEFAULT_NO_OUTLINE, ...noOutline, ...(spec?.style?.noOutline ?? [])]);
   const width = outlineWidth ?? spec?.style?.outlineWidth ?? 0.006;
+  const fade = { value: 0 };
+  root.userData.toonFade = fade;
   const olCache = new Map();          // 재질 이름별 외곽선 재질 (바탕색 = 그 재질 색, 같은 모델 안에서 나눠 쓴다)
   const outlineFor = (name, base, wind) => {
     const key = `${name}|${base.getHexString()}|${wind}`;
-    if (!olCache.has(key)) olCache.set(key, outlineMaterial(width, { bend, base, wind }));
+    if (!olCache.has(key)) olCache.set(key, outlineMaterial(width, { bend, base, wind, fade }));
     return olCache.get(key);
   };
   const materials = {};
-  const meshes = [];
+  let meshes = [];
   root.traverse(o => { if (o.isMesh && !o.userData.outline) meshes.push(o); });
+  const merged = [];
+  if (merge) {
+    const skinned = meshes.filter(o => o.isSkinnedMesh && o.geometry.attributes.skinIndex && !o.geometry.morphAttributes.position && !Array.isArray(o.material));
+    if (skinned.length) {
+      merged.push(...mergeSkinned(skinned, { flatSet, noOutlineSet, width, bend, fade }));
+      meshes = meshes.filter(o => !skinned.includes(o));
+      for (const { mesh, kind } of merged) {
+        if (kind === 'outline') continue;
+        for (const r of mesh.geometry.userData.ranges) {
+          const list = (materials[r.name] ||= []);
+          if (!list.includes(mesh.material)) list.push(mesh.material);
+        }
+      }
+    }
+  }
   for (const o of meshes) {
     const src = o.material;
-    const m = toonMaterial(src.color.clone(), { flat: flatSet.has(src.name), bend, name: src.name, character: !!o.isSkinnedMesh });
+    const m = toonMaterial(src.color.clone(), { flat: flatSet.has(src.name), bend, name: src.name, character: !!o.isSkinnedMesh, fade });
     o.material = m;
     o.castShadow = true;
     o.receiveShadow = true;
@@ -528,14 +709,30 @@ export function applyToonStyle(root, { spec = null, flat = [], noOutline = [], o
     outlines.push(hull);
   }
   for (const o of meshes) if (o.isSkinnedMesh) o.frustumCulled = false;
-  const outlineMats = [...olCache.values()];
+  for (const { mesh, kind } of merged) if (kind === 'outline') outlines.push(mesh);
+  const outlineMats = [...olCache.values(), ...merged.filter(e => e.kind === 'outline').map(e => e.mesh.material)];
+  const tmp = new THREE.Color();
   return {
-    materials, outlines, outlineMaterial: outlineMats[0] ?? null, outlineMaterials: outlineMats,
+    materials, outlines, outlineMaterial: outlineMats[0] ?? null, outlineMaterials: outlineMats, fade,
     setColor(name, hex) {
-      (materials[name] ?? []).forEach(m => m.color.set(hex));
+      // 합친 메시: 그 부품의 꼭짓점 색 (나눠 쓰던 색 속성은 이 캐릭터 것으로 떼어 낸다)
+      if (merged.length) {
+        tmp.set(hex);
+        for (const { mesh } of merged) {
+          const g = mesh.geometry, rs = g.userData.ranges.filter(r => r.name === name);
+          if (!rs.length) continue;
+          if (!g.userData.ownColor) { g.setAttribute('color', g.attributes.color.clone()); g.userData.ownColor = true; }
+          const col = g.attributes.color;
+          for (const r of rs) for (let i = r.start; i < r.start + r.count; i++) col.setXYZ(i, tmp.r, tmp.g, tmp.b);
+          col.needsUpdate = true;
+        }
+      }
+      for (const m of materials[name] ?? []) if (!m.vertexColors) m.color.set(hex);
       // 외곽선 바탕색도 따라간다
       for (const h of outlines) if (h.userData.outlineOf === name) h.material.userData.uOutlineBase?.value.set(hex);
     },
     setOutlineVisible(v) { outlines.forEach(h => { h.visible = v; }); },
+    /** 가림 투명 0~1 (이 모델 통째로 디더) */
+    setFade(v) { fade.value = Math.max(0, Math.min(1, v)); },
   };
 }

@@ -2,6 +2,10 @@
 // 그리기는 kit.js 의 칸마다 aFade(0~1). 여기서는 매 프레임 광선(카메라 → 발·몸·머리)이 물체 모양에 닿는지 보고 aFade 를 부드럽게 올리고 내린다.
 // 물체 모양은 판(템플릿) 꼭짓점으로 한 번 잰다: 나무류는 높이 띠마다 반지름(돌려도 같다), 건물은 돌린 상자.
 // 곡면 월드: 화면에는 초점에서 떨어진 만큼(dz²·uCurve) 낮게 보이므로 모양도 그만큼 내려서 잰다.
+// 묶음 밖 모델(주민·가게 주인·가구·배경 단독 물체 등 applyToonStyle 로 칠한 것)은 root.userData.toonFade(재질 uniform)를 단다 →
+// 1초마다 장면에서 찾아 감싸는 상자로 같은 광선 시험을 하고, 모델 통째로 디더한다 (materials 공용 디더).
+// 바깥 모듈이 직접 넣을 수도 있다: add({ box(out: Box3) → Box3|null, setFade(v) }) — 공유 재질 인스턴스(채집 물체) 같은 것.
+import { Box3, Matrix4 } from 'three';
 
 // 가리는 물체 종류 → 모양. 키 작은 것(꽃·바위·덤불·울타리)과 밟고 서는 것(다리·선착장)은 빼고, 가는 가로등도 뺀다
 const OCCLUDERS = {
@@ -12,6 +16,9 @@ const BANDS = 8;               // 나무 모양 높이 띠 수
 const BODY = [0.18, 0.55, 0.92];   // 캐릭터 몸에서 보는 점 (발·몸·머리, 키 ≈ 1)
 const SPEED = 7;               // 비치는 빠르기 (1/초)
 const AHEAD = 3.2, RADIUS = 4.6;   // 물체를 찾는 범위: 대상에서 카메라 쪽(남쪽)으로 AHEAD 떨어진 곳 둘레
+const MODEL_NEAR = 14;         // 묶음 밖 모델: 대상에서 이 거리 안만 본다
+const MODEL_MIN_H = 0.45;      // 이보다 낮은 모델(러그·작은 물건)은 가리지 않는 것으로 친다
+const SELF_PAD = 0.15;         // 대상 발밑이 상자 안(+여유)이면 그 대상 자신(대화 상대)이나 대상이 들어가 선 것 → 뺀다
 
 export function createOcclusion(ctx, objects) {
   const shapes = new Map();    // 판 → 모양
@@ -20,6 +27,10 @@ export function createOcclusion(ctx, objects) {
   const hit = new Set();
   const C = { x: 0, y: 0, z: 0 };
   let enabled = true;
+  // 묶음 밖 모델: root(또는 add 로 넣은 것) → { local: 모델 좌표 상자 | null, box(out), setFade(v), v: 지금 값, hit }
+  const models = new Map();
+  let scanIn = 0;
+  const wb = new Box3(), inv = new Matrix4(), mm = new Matrix4(), bb = new Box3();
 
   /** 판 꼭짓점으로 모양 재기 (판마다 한 번) */
   function shapeOf(tpl, type) {
@@ -84,8 +95,13 @@ export function createOcclusion(ctx, objects) {
     const c = Math.cos(o.rot), si = Math.sin(o.rot);
     const wx = o.x + (cx * c + cz * si) * sc, wz = o.z + (-cx * si + cz * c) * sc;
     const hx = (ex * cs + ez * sn) * sc, hz = (ex * sn + ez * cs) * sc;
-    const lo = [wx - hx, o.y - drop + s.y0 * sc, wz - hz], hi = [wx + hx, o.y - drop + s.y1 * sc, wz + hz];
-    const org = [C.x, C.y, C.z], dir = [dx, dy, dz];
+    return rayBox(wx - hx, o.y - drop + s.y0 * sc, wz - hz, wx + hx, o.y - drop + s.y1 * sc, wz + hz, P);
+  }
+
+  /** 광선 C → P (t 0 ~ 0.97) 가 축 정렬 상자를 지나는가 */
+  function rayBox(x0, y0, z0, x1, y1, z1, P) {
+    const lo = [x0, y0, z0], hi = [x1, y1, z1];
+    const org = [C.x, C.y, C.z], dir = [P.x - C.x, P.y - C.y, P.z - C.z];
     let t0 = 0, t1 = 0.97;
     for (let k = 0; k < 3; k++) {
       if (Math.abs(dir[k]) < 1e-9) { if (org[k] < lo[k] || org[k] > hi[k]) return false; continue; }
@@ -97,11 +113,63 @@ export function createOcclusion(ctx, objects) {
     return true;
   }
 
+  // ── 묶음 밖 모델 ──
+  /** 장면에서 toonFade 를 단 모델 찾기 (1초마다). 장면에서 빠진 것은 원래대로 돌리고 목록에서 뺀다 */
+  function scan() {
+    const seen = new Set();
+    ctx.scene.traverse(o => {
+      const f = o.userData.toonFade;
+      if (!f || o.userData.occluder === false) return;
+      seen.add(o);
+      if (models.has(o)) return;
+      models.set(o, { root: o, local: localBox(o), v: 0, hit: false, setFade: v => { f.value = v; }, box: out => worldBox(o, models.get(o).local, out) });
+    });
+    for (const [k, m] of models) {
+      if (!m.root || seen.has(k)) continue;
+      m.setFade(0);
+      models.delete(k);
+    }
+  }
+  /** 모델 좌표 상자 (외곽선 껍데기 빼고, 뼈대 메시는 쉰 자세). 너무 낮으면 null */
+  function localBox(root) {
+    root.updateMatrixWorld(true);
+    inv.copy(root.matrixWorld).invert();
+    const out = new Box3();
+    root.traverse(o => {
+      if (!o.isMesh || o.userData.outline || !o.geometry?.attributes.position) return;
+      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+      out.union(bb.copy(o.geometry.boundingBox).applyMatrix4(mm.multiplyMatrices(inv, o.matrixWorld)));
+    });
+    return out.isEmpty() || out.max.y - out.min.y < MODEL_MIN_H ? null : out;
+  }
+  /** 월드 상자 (숨겨진 모델은 null) */
+  function worldBox(root, local, out) {
+    if (!local) return null;
+    for (let p = root; p; p = p.parent) if (!p.visible) return null;
+    return out.copy(local).applyMatrix4(root.matrixWorld);
+  }
+  /** 이번 프레임 모델들이 대상들을 가리는지 */
+  function testModels(k, fz) {
+    for (const m of models.values()) {
+      m.hit = false;
+      if (!m.box(wb)) continue;
+      const cz = (wb.min.z + wb.max.z) / 2, drop = k * (cz - fz) ** 2;
+      for (const T of targets) {
+        if (Math.hypot((wb.min.x + wb.max.x) / 2 - T.x, cz - T.z) > MODEL_NEAR) continue;
+        // 대상 자신(대화 상대)·대상이 들어가 선 것은 빼고
+        if (T.x > wb.min.x - SELF_PAD && T.x < wb.max.x + SELF_PAD && T.z > wb.min.z - SELF_PAD && T.z < wb.max.z + SELF_PAD) continue;
+        if (BODY.some(h => rayBox(wb.min.x, wb.min.y - drop, wb.min.z, wb.max.x, wb.max.y - drop, wb.max.z, { x: T.x, y: T.y + h, z: T.z }))) { m.hit = true; break; }
+      }
+    }
+  }
+
   // 대화 중인 상대는 town 이 대화 동안 watch 로 넣는다
   const targets = [];
   function update(dt) {
     hit.clear();
     const player = ctx.services.player;
+    if ((scanIn -= dt) <= 0) { scanIn = 1; scan(); }
+    for (const m of models.values()) m.hit = false;
     if (enabled && player) {
       targets.length = 0;
       targets.push(player.position);
@@ -123,6 +191,7 @@ export function createOcclusion(ctx, objects) {
           }
         }
       }
+      testModels(k, fz);
     }
     // 부드럽게: 가리는 것은 1 쪽으로, 아닌 것은 0 쪽으로 (0 이 되면 목록에서 뺀다)
     const a = 1 - Math.exp(-dt * SPEED);
@@ -136,15 +205,36 @@ export function createOcclusion(ctx, objects) {
       o.batch.setFade(o.slot, v);
       if (v === 0) fades.delete(id); else fades.set(id, v);
     }
+    for (const m of models.values()) {
+      const goal = m.hit ? 1 : 0;
+      if (m.v === goal) continue;
+      let v = m.v + (goal - m.v) * a;
+      if (Math.abs(goal - v) < 0.01) v = goal;
+      m.v = v;
+      m.setFade(v);
+    }
   }
 
   return {
     update,
     /** 더 보이게 할 점: getPoint() → {x, y(발 높이), z} | null. 돌려받은 함수로 해제 */
     watch(getPoint) { watchers.add(getPoint); return () => watchers.delete(getPoint); },
+    /**
+     * 비치게 할 것 직접 넣기 (toonFade 를 단 모델은 저절로 들어간다): { box(out: Box3) → 월드 상자 | null, setFade(v 0~1) } → 해제 함수.
+     * 공유 재질 인스턴스(채집 물체)는 aFade 인스턴스 속성을 두고 setFade 에서 그 칸 값을 바꾸면 된다
+     */
+    add(item) {
+      const m = { root: null, v: 0, hit: false, box: out => item.box(out), setFade: v => item.setFade(v) };
+      models.set(item, m);
+      return () => { if (models.get(item) === m) { m.setFade(0); models.delete(item); } };
+    },
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; },
-    /** 지금 비치는 물체 { id: 정도 } (확인용) */
-    list() { return Object.fromEntries(fades); },
+    /** 지금 비치는 물체 { id 또는 모델 이름: 정도 } (확인용) */
+    list() {
+      const out = Object.fromEntries(fades);
+      for (const m of models.values()) if (m.v > 0) out[m.root?.parent?.name || m.root?.name || 'model'] = +m.v.toFixed(2);
+      return out;
+    },
   };
 }
