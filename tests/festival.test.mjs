@@ -160,3 +160,69 @@ test('축제 광장: 원 안은 광장 칸, 안에 있던 물체는 치우고 �
   assert.ok(gen.pads.some(p => p.festival && p.steps[0] === 0.36), '무대 위는 걸을 수 있는 높은 바닥');
   assert.deepEqual(BOOTHS.map(b => b.id).sort(), ['FB-01', 'FB-02', 'FB-03', 'FB-04', 'FB-05']);
 });
+
+// ---------- 축제 부품·부스 놀이 규칙 (src/gameplay/festival/parts.js · booths.js) ----------
+import { PARTS, heartOpen, takeAny, takeVaried, takeWithOne, festState, allParts } from '../src/gameplay/festival/parts.js';
+import { fishLength, dubuRecord, weekOf, lanternColorOf, LANTERN_COLORS, RHYTHM } from '../src/gameplay/festival/booths.js';
+import * as itemsDb from '../src/data/items.js';
+
+const bag = list => list.map(x => (x ? { id: x[0], count: x[1] } : null));
+const total = plan => plan.reduce((s, x) => s + x.n, 0);
+
+test('축제 부품 다섯: 주민 다섯이 하나씩, 부스 하나씩, 말풍선 낱말은 세트(또는 아이템)에 있다', () => {
+  assert.equal(PARTS.length, 5);
+  assert.deepEqual(PARTS.map(p => p.who).sort(), ['chorong', 'coco', 'dubu', 'mochi', 'pong']);
+  assert.deepEqual(PARTS.map(p => p.booth).sort(), ['FB-01', 'FB-02', 'FB-03', 'FB-04', 'FB-05']);
+  for (const p of PARTS) {
+    assert.ok(envSpec(p.slug), `${p.id} 모델 스펙`);
+    for (const t of p.hint) assert.ok(KEYS.has(t) || (t.startsWith('item:') && itemsDb.get(t.slice(5))), `${p.id} ${t}`);
+  }
+});
+
+test('부품에 필요한 것: 모자라면 null, 맞으면 가방 칸·개수', () => {
+  const items = itemsDb;
+  const [lantern, drum, garland, pot, flag] = PARTS;
+  assert.equal(lantern.pick(bag([['bug.ant', 1], ['bug.cicada', 1]]), items), null);
+  assert.equal(total(lantern.pick(bag([['bug.ant', 1], ['bug.cicada', 1], ['bug.moth', 1]]), items)), 3);
+  assert.equal(total(lantern.pick(bag([['bug.ant', 1], ['bug.firefly', 1]]), items)), 1, '반딧불이면 하나로');
+  assert.equal(drum.pick(bag([['mat.wood', 4]]), items), null);
+  assert.deepEqual(drum.pick(bag([['mat.wood', 3], null, ['mat.wood', 7]]), items), [{ slot: 0, n: 3 }, { slot: 2, n: 2 }]);
+  assert.equal(garland.pick(bag([['flower.tulip-red', 6]]), items), null, '색 셋 이상');
+  assert.equal(total(garland.pick(bag([['flower.tulip-red', 4], ['flower.tulip-white', 1], ['flower.cosmos-pink', 1]]), items)), 6);
+  const native = 'fruit.apple';
+  assert.equal(pot.pick(bag([['fruit.apple', 9]]), items, { nativeFruit: native }), null, '특산 아닌 과일 하나는 있어야');
+  assert.equal(total(pot.pick(bag([['fruit.apple', 9], ['fruit.pear', 1]]), items, { nativeFruit: native })), 5);
+  const small = items.list('fish').find(f => f.shadow < 5), big = items.list('fish').find(f => f.shadow >= 5);
+  assert.equal(flag.pick(bag([[small.id, 1]]), items), null);
+  assert.equal(total(flag.pick(bag([[small.id, 1], [big.id, 1]]), items)), 1);
+  assert.equal(takeAny([], items, () => true, 1), null);
+  assert.equal(takeVaried(bag([['flower.tulip-red', 2]]), items, it => it.category === 'flower', 2, 2), null);
+  assert.equal(takeWithOne(bag([['fruit.pear', 2]]), items, it => it.category === 'fruit', 2, it => it.id === 'fruit.cherry'), null);
+});
+
+test('마음 열기·상태: 친구 단계 + 기쁨 두 번, 다섯 다 모으면 끝', () => {
+  assert.ok(!heartOpen({ friendship: 40, emote: { wins: 1 } }));
+  assert.ok(!heartOpen({ friendship: 20, emote: { wins: 5 } }));
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: 2 } }));
+  const st = {};
+  const f = festState(st);
+  assert.deepEqual([f.parts, f.booths, f.asked], [{}, {}, {}]);
+  assert.ok(!allParts(f));
+  for (const p of PARTS) f.parts[p.id] = '2026-11-01';
+  assert.ok(allParts(f));
+});
+
+test('부스 놀이 규칙: 물고기 길이·두부 기록은 날마다 같고, 등불 색은 정해진 넷, 리듬은 8박', () => {
+  const big = itemsDb.list('fish').find(f => f.shadow >= 5), small = itemsDb.list('fish').find(f => f.shadow <= 2);
+  assert.equal(fishLength(big, '2026-11-01', 1), fishLength(big, '2026-11-01', 1));
+  assert.ok(fishLength(big, '2026-11-01', 1) > fishLength(small, '2026-11-01', 1));
+  const w = weekOf('2026-11-02');
+  assert.equal(weekOf('2026-11-08'), w, '월요일부터 한 주');
+  assert.notEqual(weekOf('2026-11-09'), w);
+  assert.ok(dubuRecord(w) >= 38 && dubuRecord(w) < 60);
+  assert.equal(lanternColorOf('bug.firefly'), 'green');
+  for (const b of itemsDb.list('bug')) assert.ok(LANTERN_COLORS.includes(lanternColorOf(b.id)));
+  const lantern = envSpec('festival-lantern');
+  for (const c of LANTERN_COLORS) assert.ok(lantern.variants?.[c]?.palette?.glow, `등불 변형 ${c}`);
+  assert.equal(RHYTHM.beats.length, 8);
+});

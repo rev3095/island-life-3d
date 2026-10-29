@@ -217,6 +217,7 @@ const matchAny = (rules, item) => (rules ?? []).some(rule => matchOne(rule, item
 
 export function giftReaction(person, item) {
   if (!item) return 'normal';
+  if (item.category === 'festival') return 'love';   // 5차 Z5: 축제 부스에서 만든 것은 누구나 좋아한다
   if (matchAny(person.loves, item)) return 'love';
   if (matchAny(person.dislikes, item)) return 'dislike';
   if (matchAny(person.likes, item)) return 'like';

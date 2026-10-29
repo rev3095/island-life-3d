@@ -1,0 +1,56 @@
+{
+  "id": "IC-FE-02",
+  "slug": "festival-juice",
+  "name": "과일 주스",
+  "group": "festival",
+  "category": "item",
+  "kind": "juice",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "festival.juice",
+      "code": "IC-FE-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "먹거리 부스에서 과일 두 개로 만든 주스. 빨대와 과일 조각.",
+    "keywords": [
+      "유리컵",
+      "빨대",
+      "과일 조각"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "glass": "#E6F4F8",
+    "juice": "#F39A3B",
+    "straw": "#E8504F",
+    "slice": "#F6C84C"
+  },
+  "paletteLabels": {
+    "glass": "컵",
+    "juice": "주스",
+    "straw": "빨대",
+    "slice": "과일 조각"
+  }
+}

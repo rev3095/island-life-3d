@@ -110,7 +110,7 @@ export function carveFestival(gen, { opened = new Set(), specs = {} } = {}) {
   gen.places.festival = {
     x: C.x, z: C.z, center: C, radius: R, tile: T,
     stage: { x: F.stage.x, z: F.stage.z, front: { x: F.stage.x, z: F.stage.z + sd / 2 - 0.3 }, y: pad.steps[0] },
-    booths: F.booths.map(b => ({ id: b.id, slug: b.slug, part: b.part, x: b.x, z: b.z, rot: b.rot, angle: b.angle, front: around(C, b.angle, BOOTH_R - 1.45) })),
+    booths: F.booths.map(b => ({ id: b.id, slug: b.slug, part: b.part, x: b.x, z: b.z, rot: b.rot, angle: b.angle, scale: BOOTH_SCALE, front: around(C, b.angle, BOOTH_R - 1.35) })),
     board: { x: F.board.x, z: F.board.z, rot: F.board.rot, front: around(C, BOARD_ANGLE, FESTIVAL_RADIUS - 0.1) },
     arches: F.arches.map(a => ({ x: a.x, z: a.z })),
     lanterns: F.lanterns.map(l => ({ x: l.x, z: l.z })),

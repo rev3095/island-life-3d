@@ -1,0 +1,54 @@
+{
+  "id": "IC-FE-01",
+  "slug": "festival-pie",
+  "name": "과일 파이",
+  "group": "festival",
+  "category": "item",
+  "kind": "pie",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "festival.pie",
+      "code": "IC-FE-01"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "먹거리 부스에서 과일 두 개로 구운 파이. 격자 반죽 사이로 과일 속.",
+    "keywords": [
+      "둥근 파이",
+      "격자 반죽",
+      "접시"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "plate": "#FBF7F2",
+    "crust": "#E4B378",
+    "filling": "#E8504F"
+  },
+  "paletteLabels": {
+    "plate": "접시",
+    "crust": "반죽",
+    "filling": "과일 속"
+  }
+}

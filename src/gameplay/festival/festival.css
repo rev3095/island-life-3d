@@ -62,3 +62,30 @@
   .fe-dock { left: auto; right: max(12px, env(safe-area-inset-right, 0px)); transform: none; width: min(420px, 52vw); bottom: 8px; }
   .fe-grid { grid-template-columns: repeat(5, 1fr); }
 }
+
+/* 축제 진행판 (UI-05): 화면 위 가운데, 부품 다섯 칸 */
+.fe-hud { position: absolute; left: 50%; top: max(10px, env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 3; pointer-events: none;
+  display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(251, 247, 242, .9); border: 2px solid #4A3B32; border-radius: 999px; }
+.fe-hud[hidden] { display: none; }
+.fe-hud .fe-emo { width: 22px; height: 22px; }
+.fe-part { width: 34px; height: 28px; }
+.fe-part.is-empty g { stroke: #4A3B32; }
+.fe-part.is-empty g * { fill: #4A3B32 !important; stroke: #4A3B32 !important; opacity: .55; }
+.fe-hud-due { margin-left: 2px; }
+body.story-on .fe-hud { visibility: hidden; }
+
+/* 리듬 놀이 (FB-02) */
+.fe-rhythm { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: max(18px, env(safe-area-inset-bottom, 0px)); pointer-events: auto; }
+.fe-rh-card { width: min(560px, calc(100vw - 24px)); background: rgba(251, 247, 242, .97); border: 3px solid #4A3B32; border-radius: 18px; padding: 10px 12px; display: grid; gap: 8px; }
+.fe-rh-head { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #4A3B32; }
+.fe-rh-head .fe-emo { width: 28px; height: 28px; }
+.fe-rh-track { position: relative; height: 64px; border-radius: 12px; background: #F3E0BC; overflow: hidden; }
+.fe-rh-line { position: absolute; left: 18%; top: 6px; bottom: 6px; width: 6px; margin-left: -3px; background: #E8504F; border-radius: 3px; }
+.fe-rh-note { position: absolute; left: 0; top: 10px; width: 44px; height: 44px; margin-left: -22px; display: grid; place-items: center; will-change: transform; }
+.fe-rh-note .fe-emo { width: 40px; height: 40px; }
+.fe-rh-note.is-great .fe-emo, .fe-rh-note.is-ok .fe-emo { opacity: .25; }
+.fe-rh-note.is-great::after { content: '✦'; position: absolute; color: #F6C84C; font-size: 28px; text-shadow: 0 0 2px #4A3B32; }
+.fe-rh-note.is-miss .fe-emo { opacity: .2; filter: grayscale(1); }
+.fe-rh-hit { justify-self: center; min-width: 96px; min-height: 52px; border-radius: 14px; border: 3px solid #4A3B32; background: #F6C84C; cursor: pointer; display: grid; place-items: center; }
+.fe-rh-hit .fe-emo { width: 34px; height: 34px; }
+.fe-rh-hit:focus-visible { outline: 3px solid #2F86A6; outline-offset: 2px; }

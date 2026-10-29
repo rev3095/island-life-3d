@@ -21,7 +21,7 @@ const gltfOf = p => {
 const SETS = [
   { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 10 },
   { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 52 },
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 33 },
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 34 },
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;

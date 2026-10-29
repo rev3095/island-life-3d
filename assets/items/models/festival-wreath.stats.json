@@ -1,0 +1,47 @@
+{
+  "id": "IC-FE-03",
+  "slug": "festival-wreath",
+  "name": "화관",
+  "group": "festival",
+  "kind": "wreath",
+  "version": "0.1",
+  "items": [
+    "festival.wreath"
+  ],
+  "hold": false,
+  "triangles": 3968,
+  "parts": 1,
+  "materials": [
+    "center",
+    "leaf",
+    "petalA",
+    "petalB",
+    "petalC"
+  ],
+  "objects": [
+    "wreath"
+  ],
+  "size": [
+    0.411,
+    0.415,
+    0.078
+  ],
+  "bounds": [
+    [
+      -0.206,
+      -0.207,
+      0.0
+    ],
+    [
+      0.206,
+      0.207,
+      0.078
+    ]
+  ],
+  "glbBytes": 78276,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-wreath_main.png",
+    "festival-wreath_thumb.png"
+  ]
+}

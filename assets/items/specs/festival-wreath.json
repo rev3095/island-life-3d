@@ -1,0 +1,57 @@
+{
+  "id": "IC-FE-03",
+  "slug": "festival-wreath",
+  "name": "화관",
+  "group": "festival",
+  "category": "item",
+  "kind": "wreath",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "festival.wreath",
+      "code": "IC-FE-03"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "꽃 공방에서 꽃 세 송이로 엮은 화관.",
+    "keywords": [
+      "잎 고리",
+      "꽃 아홉"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "leaf": "#5FAE5A",
+    "petalA": "#E86AA0",
+    "petalB": "#F6C84C",
+    "petalC": "#FBF7F2",
+    "center": "#F39A3B"
+  },
+  "paletteLabels": {
+    "leaf": "잎",
+    "petalA": "꽃 분홍",
+    "petalB": "꽃 노랑",
+    "petalC": "꽃 흰색",
+    "center": "꽃술"
+  }
+}

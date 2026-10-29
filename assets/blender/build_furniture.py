@@ -385,6 +385,30 @@ def b_villager_photo(M):
     p.add(box((0, 0.13, 0.66), (0.05, 0.02, 0.3), bevel=0.006, rot=rot_xyz(x=0.42)), 'frame')   # 뒤 받침
 
 
+def b_festival_photo(M):
+    """FU-34 축제 단체 사진 (5차 Z5): 협탁 위 가로 사진틀, 무대 앞에 줄 선 여덟 얼굴 (주민 색)"""
+    m = M.part('table')
+    side_table(m, top_z=0.46, w=0.8, d=0.44)
+    p = M.part('photo')
+    T = rot_xyz(x=-0.18)
+    base = V((0, 0.02, 0.485))
+    at = lambda x, y, z: base + T @ V((x, y, z))
+    p.add(box(at(0, 0, 0.2), (0.7, 0.04, 0.4), bevel=0.02, rot=T), 'frame')
+    p.add(box(at(0, -0.018, 0.23), (0.6, 0.01, 0.3), bevel=0.004, rot=T), 'photoBg')
+    p.add(box(at(0, -0.02, 0.12), (0.6, 0.01, 0.08), bevel=0.003, rot=T), 'stage')
+    faces = ('faceA', 'faceB', 'faceC', 'faceD', 'faceE', 'faceF', 'faceG', 'faceH')
+    for k, mat in enumerate(faces):
+        x = -0.245 + 0.07 * k
+        p.add(ellipsoid(at(x, -0.026, 0.2), (0.028, 0.006, 0.03), rot=T, seg=12, rings=6), mat)
+        for sx in (1, -1):
+            p.add(ellipsoid(at(x + sx * 0.018, -0.026, 0.232), (0.009, 0.005, 0.013), rot=T, seg=8, rings=5), mat)
+        p.add(ellipsoid(at(x, -0.031, 0.205), (0.012, 0.003, 0.004), rot=T, seg=8, rings=4), 'ink')
+    for k in range(7):   # 위 깃발 줄
+        x = -0.24 + 0.08 * k
+        p.add(cone(at(x, -0.024, 0.36), at(x, -0.024, 0.33), 0.016, 0.0, seg=4), faces[k])
+    p.add(box((0, 0.12, 0.6), (0.06, 0.02, 0.26), bevel=0.006, rot=rot_xyz(x=0.42)), 'frame')
+
+
 def b_fish_tank(M):
     m = M.part('stand')
     m.add(box((0, 0, 0.24), (0.72, 0.46, 0.48), bevel=0.03), 'wood')
@@ -957,7 +981,7 @@ BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,
     'sofa': b_sofa, 'wardrobe': b_wardrobe, 'wall-clock': b_wall_clock, 'fish-tank': b_fish_tank, 'bug-case': b_bug_case,
-    'picture-frame': b_picture_frame, 'villager-photo': b_villager_photo, 'shell-curtain': b_shell_curtain,
+    'picture-frame': b_picture_frame, 'villager-photo': b_villager_photo, 'festival-photo': b_festival_photo, 'shell-curtain': b_shell_curtain,
     'fruit-chair': b_fruit_chair, 'dino-model': b_dino_model,
     'surfboard': b_surfboard, 'ball-basket': b_ball_basket, 'cushion-bed': b_cushion_bed, 'bone-cushion': b_bone_cushion,
     'flower-shelf': b_flower_shelf, 'terrarium': b_terrarium, 'rod-rack': b_rod_rack, 'wood-stove': b_wood_stove,

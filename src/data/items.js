@@ -2,11 +2,11 @@
 // 표 값(이름·장소·시간·계절·가격)은 그대로 두고, 게임에서 쓰기 좋은 칸(habitats, hours, months …)을 덧붙인다.
 // price = 파는 값(도토리), buy = 상점에서 살 때 값.
 
-export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
-export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
+export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed', 'festival'];
+export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목', festival: '축제' };
 
 /** 한 칸에 쌓이는 최대 개수 (아이템에 stack 이 있으면 그 값) */
-export const STACK = { fish: 1, bug: 1, fossil: 1, fruit: 10, shell: 10, flower: 10, mat: 30, tool: 1, furn: 1, seed: 10 };
+export const STACK = { fish: 1, bug: 1, fossil: 1, fruit: 10, shell: 10, flower: 10, mat: 30, tool: 1, furn: 1, seed: 10, festival: 5 };
 
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 /** 계절 표기 → 달 목록 */
@@ -182,6 +182,13 @@ const FURN = [
   ['umbrella-stand', '우산꽂이', '1×1', '상점', '☂️', 280, 1120, 'shop'],
   ['lotus-chair', '연잎 의자', '1×1', '초롱 친밀도 선물', '🪷', 700, 0, 'friend'],
   ['birthday-cake', '생일 케이크', '1×1', '생일 선물', '🎂', 1000, 0, 'birthday'],
+  ['festival-photo', '축제 단체 사진', '1×1', '축제 엔딩', '📸', 10, 0, 'festival'],   // FU-34 (5차 Z5, 검수 보드 z5)
+];
+
+// ---------- 축제 부스에서 만드는 것 (5차 Z5 IC-FE-01–04) — 누구에게나 아주 좋아하는 선물 (town/rules.js giftReaction) ----------
+const FESTIVAL = [
+  ['pie', 'IC-FE-01', '과일 파이', '🥧', 400, '먹거리 부스에서 과일 2개로'], ['juice', 'IC-FE-02', '과일 주스', '🧃', 300, '먹거리 부스에서 과일 2개로'],
+  ['wreath', 'IC-FE-03', '화관', '💐', 360, '꽃 공방에서 꽃 3송이로'], ['medal', 'IC-FE-04', '낚시 대회 메달', '🏅', 1000, '낚시 대회에서 두부의 기록을 넘으면'],
 ];
 
 // ---------- 씨앗·묘목 (상점 판매) ----------
@@ -240,6 +247,9 @@ export const ITEMS = [
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,
     ...(slug === 'campfire' ? { outdoor: true } : {}), ...(slug === 'radio' ? { plays: 'bgm' } : {}),
     ...(slug === 'fish-tank' ? { holds: 'fish' } : {}), ...(slug === 'bug-case' ? { holds: 'bug' } : {}),
+  })),
+  ...FESTIVAL.map(([slug, code, name, icon, price, from]) => ({
+    id: `festival.${slug}`, category: 'festival', code, name, icon: itemIcon(`festival-${slug}`), emoji: icon, price, from,
   })),
   ...SEEDS.map(([slug, name, icon, price, buy, extra]) => ({
     id: `seed.${slug}`, category: 'seed', name, icon: extra.flower ? itemIcon('seed-bag', extra.flower) : itemIcon(`seed-${slug}`), emoji: icon, price, buy, ...extra,

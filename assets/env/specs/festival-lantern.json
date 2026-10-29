@@ -71,5 +71,31 @@
       0.2,
       0.2
     ]
+  },
+  "variants": {
+    "green": {
+      "label": "초록 (반딧불)",
+      "palette": {
+        "glow": "#C9F08A"
+      }
+    },
+    "gold": {
+      "label": "금빛",
+      "palette": {
+        "glow": "#F6C84C"
+      }
+    },
+    "blue": {
+      "label": "하늘",
+      "palette": {
+        "glow": "#9CD3E8"
+      }
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "glow": "#F7A6A0"
+      }
+    }
   }
 }

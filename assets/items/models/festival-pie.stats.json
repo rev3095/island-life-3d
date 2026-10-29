@@ -1,0 +1,45 @@
+{
+  "id": "IC-FE-01",
+  "slug": "festival-pie",
+  "name": "과일 파이",
+  "group": "festival",
+  "kind": "pie",
+  "version": "0.1",
+  "items": [
+    "festival.pie"
+  ],
+  "hold": false,
+  "triangles": 1524,
+  "parts": 1,
+  "materials": [
+    "crust",
+    "filling",
+    "plate"
+  ],
+  "objects": [
+    "pie"
+  ],
+  "size": [
+    0.42,
+    0.42,
+    0.129
+  ],
+  "bounds": [
+    [
+      -0.21,
+      -0.21,
+      0.0
+    ],
+    [
+      0.21,
+      0.21,
+      0.129
+    ]
+  ],
+  "glbBytes": 29816,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-pie_main.png",
+    "festival-pie_thumb.png"
+  ]
+}

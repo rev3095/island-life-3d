@@ -1,0 +1,46 @@
+{
+  "id": "IC-FE-04",
+  "slug": "festival-medal",
+  "name": "낚시 대회 메달",
+  "group": "festival",
+  "kind": "medal",
+  "version": "0.1",
+  "items": [
+    "festival.medal"
+  ],
+  "hold": false,
+  "triangles": 562,
+  "parts": 1,
+  "materials": [
+    "fish",
+    "gold",
+    "goldLight",
+    "ribbon"
+  ],
+  "objects": [
+    "medal"
+  ],
+  "size": [
+    0.2,
+    0.05,
+    0.41
+  ],
+  "bounds": [
+    [
+      -0.1,
+      -0.025,
+      0.0
+    ],
+    [
+      0.1,
+      0.025,
+      0.41
+    ]
+  ],
+  "glbBytes": 13104,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-medal_main.png",
+    "festival-medal_thumb.png"
+  ]
+}

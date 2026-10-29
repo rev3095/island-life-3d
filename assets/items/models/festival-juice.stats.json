@@ -1,0 +1,46 @@
+{
+  "id": "IC-FE-02",
+  "slug": "festival-juice",
+  "name": "과일 주스",
+  "group": "festival",
+  "kind": "juice",
+  "version": "0.1",
+  "items": [
+    "festival.juice"
+  ],
+  "hold": false,
+  "triangles": 300,
+  "parts": 1,
+  "materials": [
+    "glass",
+    "juice",
+    "slice",
+    "straw"
+  ],
+  "objects": [
+    "cup"
+  ],
+  "size": [
+    0.22,
+    0.18,
+    0.402
+  ],
+  "bounds": [
+    [
+      -0.11,
+      -0.09,
+      0.0
+    ],
+    [
+      0.11,
+      0.09,
+      0.402
+    ]
+  ],
+  "glbBytes": 8440,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-juice_main.png",
+    "festival-juice_thumb.png"
+  ]
+}

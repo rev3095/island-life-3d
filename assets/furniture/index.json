@@ -719,6 +719,26 @@
       ],
       "version": "0.1",
       "status": "review"
+    },
+    {
+      "id": "FU-34",
+      "slug": "festival-photo",
+      "item": "furn.festival-photo",
+      "name": "축제 단체 사진",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.8,
+        0.44,
+        0.88
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }
