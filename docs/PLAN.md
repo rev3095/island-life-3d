@@ -14,7 +14,7 @@
 | **M3** | 다듬기 (4차) | ✅ 10-29 | P1 조작 안내(Y1) · P2 채집 콘텐츠(Y2) · P3 그리기 다듬기(Y3) → v3 · P4 리소스 61종 임시 확정·교체 준비 → v4 |
 | **M4** | 섬 생활 확장 (5차) | ✅ 10-29 합침 → 게임 v6 | P1 아이템 모델·아이콘 93(Z1) · P2 벽지·바닥·주민 방(Z2) · P3 새 가구 13·소품 3(Z3) · P4 이사·생일·단풍(Z4) · P5 시나리오 편집기·장면 12(스토리 v1) · P6 합치기 → 편집기 재게시 → 게임 v5 |
 | **M5** | 축제와 엔딩 | 🔶 1차 합침 10-29 → 게임 v9 (보드 z5 반영 v1, 결정은 `assets/festival/config.json`). 남은 것: 축제 곡(P4 형식)·광장 자리 맞추기 등 Z5 notes "합친 뒤" | P1 Z5 검수 보드 ✅ · P2 이모티콘 대화 · P3 축제 광장·부스·부품 3D · P4 부스 해금·상호작용 · P5 축제·단체 사진 엔딩 · P6 엔딩 뒤 계속(해마다 축제) · P7 장면 05~12 를 실제 이벤트에 연결(스토리) |
-| **M6** | 편집기 완성 (6차) | 🔶 P0·P1·P2·P4·P5·P6 합침 10-29 (게임 v9 = 묶음 160파일), P3 남음 | P0 묶음 파일(파일 511 한계) · P1 편집기 홈·전체 요청·반영 기록 공용 · P2 배경 편집기 아이템·실내 탭·방 배치 · P3 성격·대화 탭(M5-P2 뒤) · P4 곡·효과음 편집기 · P5 지도·숫자 편집기 · P6 스타일 편집기 게시 |
+| **M6** | 편집기 완성 (6차) | 🔶 P0·P1·P2·P4·P5·P6 합침 10-29 (게임 v9 = 묶음 160파일), P3 진행 중 | P0 묶음 파일(파일 511 한계) · P1 편집기 홈·전체 요청·반영 기록 공용 · P2 배경 편집기 아이템·실내 탭·방 배치 · P3 성격·대화 탭(M5-P2 뒤) · P4 곡·효과음 편집기 · P5 지도·숫자 편집기 · P6 스타일 편집기 게시 |
 | **M7** | 출시 준비 (7차) | 예정 | 처음부터 엔딩까지 플레이 확인, 도토리·출현 밸런스, 실제 휴대폰·다른 GPU, 성능, 접근성(색만으로 구분하지 않기), 저장 옮기기, 공유 |
 
 순서: M4 합치기 ✅ → M5 구현 (광장 넓히기는 M6-P5 합친 뒤, 축제 곡은 M6-P4 합친 뒤, 게시는 M6-P0 합친 뒤)(이모티콘 대화가 town 을 고치므로 Z4 합친 뒤) → M6 의 대화 편집은 M5-P2 뒤, 나머지 M6 는 M5 와 함께 가능.
@@ -111,7 +111,7 @@
 | M6-P0 묶음 파일 | `p9-pack` · 4221 | `tools/build-web.mjs`, `src/core/assets.js`, `src/ui/dom.js` 의 `iconEl` 만, `dev-server.mjs` 의 `/artifact/`, `docs/notes/deploy.md`, `tests/build-web.test.mjs` | 게임 게시본의 JSON·모델·그림을 묶음 파일 몇 개로 (게시 파일 수 150 아래), 로더가 묶음에서 꺼내 쓰기, 개발 서버(`/index.html`)는 그대로 |
 | M6-P1 편집기 홈 (ET-01 · ET-11) | `p9-hub` · 4222 | `editors.html` (새), `concept/board-kit.js`, `concept/README.md`, `CLAUDE.md` 의 편집기 절 | 편집기 홈 아티팩트, "전체 요청 확인" 순서, 모든 편집기가 같이 쓰는 반영 기록 모양 |
 | M6-P2 배경 편집기 탭 (ET-02 – ET-04) | `p9-bgtabs` · 4223 | `bg-editor.html`, `tools/build-editor-index.mjs` | 아이템 탭(82 모델 — 편집기 묶음 파일로), 실내 무늬 탭, 방 배치 격자 |
-| M6-P3 성격·대화 탭 (ET-05) | (M5-P2 뒤) | `editor.html`, `assets/villagers/` | 대기 — 이모티콘 대화가 town 을 고친 뒤 |
+| M6-P3 성격·대화 탭 (ET-05) | `p9-traits` · 4227 | `editor.html`, `assets/villagers/` (새), `src/gameplay/town/`(데이터 읽기), `assets/emotes/talk.json`·`assets/data/rules.json` 주민 칸, `src/gameplay/festival/judge.js`(읽는 곳만) | 주민 데이터를 `assets/villagers/<slug>.json` 으로, 캐릭터 편집기 성격·대화 탭(반응 미리 보기), "요청 확인" 으로 적용 — 10-29 시작 |
 | M6-P4 곡·효과음 (ET-06 · ET-07) | `p9-sound` · 4224 | `src/audio/`, `assets/sound/` (새), `sound-editor.html` (새) | 곡·효과음·목소리 값을 데이터로, 곡 편집기 아티팩트, "소리 반영" |
 | M6-P5 지도·숫자 (ET-08 · ET-09) | `p9-mapdata` · 4225 | `src/world/island.js` (고정 자리 읽기만), `src/data/` 의 표, `assets/island/`·`assets/data/` (새), `map-editor.html`·`data-editor.html` (새) | 섬 지도 편집기, 게임 숫자 표 편집기, "지도 반영"·"숫자 반영" |
 | M6-P6 스타일 편집기 (ET-10) | `p9-style` · 4226 | `demos/style.html`, `docs/SHADERS.md`, `src/render/presets.js`, `assets/style/` (새) | 스타일 편집기 아티팩트 게시, 값 저장(db), "스타일 반영" |
