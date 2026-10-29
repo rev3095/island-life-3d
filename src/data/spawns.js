@@ -1,17 +1,21 @@
 // 출현표: 어디서·몇 시에·몇 월에·어떤 날씨에 무엇이 나오나. 순수 함수라 rng 만 넘기면 결과가 정해진다.
+// 확률·횟수는 assets/data/rules.json 의 gather 칸 (표 편집기 → "숫자 반영"), 아이템별 출현은 items.json.
 import * as items from './items.js';
 import { pickWeighted } from './rng.js';
+import { RULES } from './tables.js';
+
+const G = RULES.gather;
 
 /** 낚시 자리 → 잡히는 서식지. 선착장은 바다 물고기도, 하구는 강 물고기도 잡힌다 */
 export const HABITAT_POOLS = { river: ['river'], pond: ['pond'], sea: ['sea'], pier: ['sea', 'pier'], mouth: ['river', 'mouth'] };
 export const BUG_PLACES = ['flower', 'tree', 'ground', 'air', 'rock', 'water', 'lamp', 'fruit', 'palm', 'shake', 'under'];
 
-export const FRUIT_PER_TREE = 5;      // 과일나무 한 그루 열매 수 (배경 스펙: 열매 5개)
-export const COCONUT_PER_PALM = 2;
-export const ROCK_MAX_HITS = 6;       // 바위 하나를 하루에 칠 수 있는 횟수
-export const CHOP_MAX_HITS = 3;       // 나무 하나를 하루에 도끼로 칠 수 있는 횟수
-export const SHAKE_BUG_CHANCE = 0.08; // 나무 흔들기: 벌집 대신 곤충이 떨어질 확률 (그 나무 그날 첫 '떨어짐' 몫)
-export const ROCK_BUG_CHANCE = 0.15;  // 바위 치기 한 번마다 밑에서 곤충이 튀어나올 확률 (바위 하나에 하루 한 번)
+export const FRUIT_PER_TREE = G.fruitPerTree;         // 과일나무 한 그루 열매 수 (배경 스펙: 열매 5개)
+export const COCONUT_PER_PALM = G.coconutPerPalm;
+export const ROCK_MAX_HITS = G.rockMaxHits;           // 바위 하나를 하루에 칠 수 있는 횟수
+export const CHOP_MAX_HITS = G.chopMaxHits;           // 나무 하나를 하루에 도끼로 칠 수 있는 횟수
+export const SHAKE_BUG_CHANCE = G.shakeBugChance;     // 나무 흔들기: 벌집 대신 곤충이 떨어질 확률 (그 나무 그날 첫 '떨어짐' 몫)
+export const ROCK_BUG_CHANCE = G.rockBugChance;       // 바위 치기 한 번마다 밑에서 곤충이 튀어나올 확률 (바위 하나에 하루 한 번)
 
 const WET = new Set(['rain', 'snow']);
 export const inHours = (hours, hour) => hours.some(([a, b]) => hour >= a && hour < b);
@@ -25,8 +29,8 @@ export function fishPool({ habitat = 'river', hour = 12, month = 1, weather = 'c
     if (!it.habitats.some(h => pool.includes(h))) continue;
     if (!inHours(it.hours, hour) || !it.months.includes(month)) continue;
     let w = it.weight;
-    if (WET.has(weather) && it.shadow >= 5) w *= 2;            // 비·눈 오는 날은 큰 물고기가 잘 문다
-    if (habitat === 'mouth' && it.habitats.includes('mouth')) w *= 3;
+    if (WET.has(weather) && it.shadow >= G.wetBigFish.shadow) w *= G.wetBigFish.mult;   // 비·눈 오는 날은 큰 물고기가 잘 문다
+    if (habitat === 'mouth' && it.habitats.includes('mouth')) w *= G.mouthMult;
     out.push({ item: it, weight: w });
   }
   return out;
@@ -99,16 +103,16 @@ export function rock(rng = Math.random, hits = 0) {
   if (hits >= ROCK_MAX_HITS) return null;
   const fade = 1 - hits / ROCK_MAX_HITS;                       // 1 → 1/6
   const table = [
-    ['mat.acorn-bag', 0.16 * fade * fade],
-    ['mat.iron', 0.18 * fade],
-    ['mat.clay', 0.2],
+    ['mat.acorn-bag', G.rock.acornBag * fade * fade],
+    ['mat.iron', G.rock.iron * fade],
+    ['mat.clay', G.rock.clay],
   ];
   let r = rng();
   for (const [id, p] of table) {
     if (r < p) return { id, count: 1 };
     r -= p;
   }
-  return { id: 'mat.stone', count: hits === 0 && rng() < 0.3 ? 2 : 1 };
+  return { id: 'mat.stone', count: hits === 0 && rng() < G.rock.doubleStone ? 2 : 1 };
 }
 
 /** 나무에서 떨어질 수 있는 가구 (상점 가구 중 하나) */
@@ -129,20 +133,21 @@ export function treeShake(kind, rng = Math.random, opts = {}) {
   if (kind === 'palm') return fruitReady ? { id: 'fruit.coconut', count: COCONUT_PER_PALM } : null;
   const r = rng();
   if (!dropped) {
-    const bees = inHours(items.get('bug.honeybee').hours, hour) ? (orchard ? 0.15 : 0.06) : 0;
+    const S = G.shake;
+    const bees = inHours(items.get('bug.honeybee').hours, hour) ? (orchard ? S.beesOrchard : S.bees) : 0;
     if (r < bees) return { id: 'bug.honeybee', count: 1, event: 'bees' };
     const pool = shakeBugPool({ hour, month, weather });
     const bug = pool.length ? SHAKE_BUG_CHANCE : 0;
     if (r < bees + bug) return { id: pickWeighted(pool, e => e.weight, rng).item.id, count: 1, event: 'bug' };
-    if (r < bees + bug + 0.03) return { id: SHAKE_FURNITURE[Math.floor(rng() * SHAKE_FURNITURE.length)], count: 1 };
-    if (r < bees + bug + 0.1) return { id: 'mat.acorn-bag', count: 1 };
+    if (r < bees + bug + S.furniture) return { id: SHAKE_FURNITURE[Math.floor(rng() * SHAKE_FURNITURE.length)], count: 1 };
+    if (r < bees + bug + (S.furniture + S.acornBag)) return { id: 'mat.acorn-bag', count: 1 };
   }
-  if (rng() < 0.35) return { id: 'mat.branch', count: 1 };
+  if (rng() < G.shake.branch) return { id: 'mat.branch', count: 1 };
   return null;
 }
 
 /** 도끼로 나무 치기 → { id, count } | null. hits = 오늘 이 나무를 친 횟수 (CHOP_MAX_HITS 번까지) */
 export function chopWood(rng = Math.random, hits = 0) {
   if (hits >= CHOP_MAX_HITS) return null;
-  return { id: rng() < 0.6 ? 'mat.wood' : 'mat.hardwood', count: 1 };
+  return { id: rng() < G.chop.wood ? 'mat.wood' : 'mat.hardwood', count: 1 };
 }

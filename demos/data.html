@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 숫자 표(assets/data/*.json)를 저장소 맨 위 기준 경로로 읽으므로 base 를 한 칸 위로, 표 로더가 assets.js 를 쓰므로 three importmap -->
+<base href="../">
 <title>포근섬 데이터 확인</title>
 <style>
   /* 데이터 트랙(T2) 확인 페이지: 아이템 사전, 출현표 굴려 보기, 상점·하루 리셋, 가방 */
@@ -32,6 +34,12 @@
   @media (min-width: 900px) { main { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
   @media (max-width: 560px) { .bag { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 </style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
 <header><h1>포근섬 데이터 확인 <span class="muted" id="summary"></span></h1></header>
@@ -82,19 +90,19 @@
   </section>
 </main>
 <script type="module">
-import * as items from '../src/data/items.js';
-import * as spawns from '../src/data/spawns.js';
-import { rngFor } from '../src/data/rng.js';
-import { shopStock, nativeFruit } from '../src/data/economy.js';
-import { runDailyReset } from '../src/data/day.js';
-import { createDataService } from '../src/data/index.js';
-import { createEvents } from '../src/core/events.js';
-import { createState } from '../src/core/state.js';
+import * as items from './src/data/items.js';
+import * as spawns from './src/data/spawns.js';
+import { rngFor } from './src/data/rng.js';
+import { shopStock, nativeFruit } from './src/data/economy.js';
+import { runDailyReset } from './src/data/day.js';
+import { createDataService } from './src/data/index.js';
+import { createEvents } from './src/core/events.js';
+import { createState } from './src/core/state.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const won = n => Number(n).toLocaleString('ko-KR');
-const nameOf = id => { const it = items.get(id); return it ? `${it.icon} ${esc(it.name)}` : esc(id); };
+const nameOf = id => { const it = items.get(id); return it ? `${it.emoji} ${esc(it.name)}` : esc(id); };
 
 // ---------- 아이템 사전 ----------
 $('summary').textContent = `· 아이템 ${items.ITEMS.length}개`;
@@ -111,7 +119,7 @@ function detail(it) {
 function showItems() {
   const list = items.list($('cat').value);
   $('items').innerHTML = `<thead><tr><th>코드</th><th></th><th>id</th><th>이름</th><th>값</th><th>쌓임</th><th>정보</th></tr></thead><tbody>${list.map(it => `
-    <tr><td class="muted">${it.code ?? ''}</td><td>${it.icon}</td><td class="muted">${it.id}</td>
+    <tr><td class="muted">${it.code ?? ''}</td><td>${it.emoji}</td><td class="muted">${it.id}</td>
     <td class="${it.rare ? 'rare' : ''}">${esc(it.name)}</td><td class="num">${won(it.price)}</td><td class="num">${it.stack}</td>
     <td>${esc(detail(it))}${it.desc ? `<div class="muted">${esc(it.desc)}</div>` : ''}</td></tr>`).join('')}</tbody>`;
 }
@@ -181,7 +189,7 @@ inst.start();
 data.day.check();
 const log = msg => { $('log').insertAdjacentHTML('afterbegin', `<div>${msg}</div>`); };
 function render() {
-  $('bag').innerHTML = data.inventory.slots.map(s => `<div class="cell" title="${s ? esc(items.get(s.id).name) : ''}">${s ? items.get(s.id).icon : ''}${s && (s.count > 1 || s.uses) ? `<small>${s.uses ? `${s.uses}회` : s.count}</small>` : ''}</div>`).join('');
+  $('bag').innerHTML = data.inventory.slots.map(s => `<div class="cell" title="${s ? esc(items.get(s.id).name) : ''}">${s ? items.get(s.id).emoji : ''}${s && (s.count > 1 || s.uses) ? `<small>${s.uses ? `${s.uses}회` : s.count}</small>` : ''}</div>`).join('');
   $('acorns').textContent = won(data.wallet.get());
   const p = data.museum.progress();
   $('museum').textContent = `물고기 ${p.fish.join('/')} · 곤충 ${p.bug.join('/')} · 화석 ${p.fossil.join('/')}`;

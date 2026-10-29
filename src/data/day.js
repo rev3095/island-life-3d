@@ -3,15 +3,18 @@
 //   island.dayKey  마지막으로 리셋한 날
 //   island.fruit   { 나무id: 딴 날 }  → FRUIT_REGROW_DAYS 지나면 다시 열림
 //   island.daily   { fossils, dug, shells, shellsPicked, weeds, rocks, chops, trees }  그날 남은 수·친 횟수
+// 숫자는 assets/data/rules.json 의 day 칸 (표 편집기 → "숫자 반영").
 import { rngFor, randInt, sample } from './rng.js';
+import { RULES } from './tables.js';
 
-export const DAY_BOUNDARY_HOUR = 5;
-export const FRUIT_REGROW_DAYS = 3;
-export const FOSSILS_PER_DAY = 4;
-export const SHELLS_PER_DAY = [5, 8];     // 날마다 이 범위에서 새로 밀려온다 (전날 것은 쓸려 감)
-export const WEEDS_PER_DAY = [2, 4];      // 날마다 이만큼 더 돋는다 (안 뽑으면 쌓임)
-export const WEEDS_START = 8;
-export const WEEDS_MAX = 24;
+const D = RULES.day;
+export const DAY_BOUNDARY_HOUR = D.boundaryHour;
+export const FRUIT_REGROW_DAYS = D.fruitRegrowDays;
+export const FOSSILS_PER_DAY = D.fossilsPerDay;
+export const SHELLS_PER_DAY = D.shellsPerDay;     // 날마다 이 범위에서 새로 밀려온다 (전날 것은 쓸려 감)
+export const WEEDS_PER_DAY = D.weedsPerDay;       // 날마다 이만큼 더 돋는다 (안 뽑으면 쌓임)
+export const WEEDS_START = D.weedsStart;
+export const WEEDS_MAX = D.weedsMax;
 
 const pad = n => String(n).padStart(2, '0');
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;

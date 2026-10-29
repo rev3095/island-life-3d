@@ -1,0 +1,62 @@
+{
+  "version": 0,
+  "about": "게임 규칙 숫자 — 시작 지급·상점·채집 확률·하루 리셋·제작 레시피·생일·주민 친밀도와 부탁 보상. 표 편집기(data-editor.html) → 채팅 \"숫자 반영\". 읽는 곳 src/data/ (town 칸은 src/gameplay/town/rules.js 연결 제안 — docs/notes/m6-p5-mapdata.md)",
+  "starter": { "items": [["tool.rod", 1], ["tool.net", 1]], "acorns": 500 },
+  "shop": { "open": 8, "close": 22, "furniturePerDay": 2, "flowerSeedsPerDay": 2 },
+  "gather": {
+    "fruitPerTree": 5,
+    "coconutPerPalm": 2,
+    "rockMaxHits": 6,
+    "chopMaxHits": 3,
+    "shakeBugChance": 0.08,
+    "rockBugChance": 0.15,
+    "wetBigFish": { "shadow": 5, "mult": 2 },
+    "mouthMult": 3,
+    "rock": { "acornBag": 0.16, "iron": 0.18, "clay": 0.2, "doubleStone": 0.3 },
+    "shake": { "bees": 0.06, "beesOrchard": 0.15, "furniture": 0.03, "acornBag": 0.07, "branch": 0.35 },
+    "chop": { "wood": 0.6 }
+  },
+  "day": {
+    "boundaryHour": 5,
+    "fruitRegrowDays": 3,
+    "fossilsPerDay": 4,
+    "shellsPerDay": [5, 8],
+    "weedsPerDay": [2, 4],
+    "weedsStart": 8,
+    "weedsMax": 24
+  },
+  "recipes": [
+    { "result": "tool.rod", "needs": [{ "id": "mat.branch", "n": 5 }], "note": "" },
+    { "result": "tool.net", "needs": [{ "id": "mat.branch", "n": 5 }], "note": "" },
+    { "result": "tool.shovel", "needs": [{ "id": "mat.wood", "n": 5 }], "note": "컨셉: 나무 5" },
+    { "result": "tool.axe", "needs": [{ "id": "mat.branch", "n": 5 }, { "id": "mat.stone", "n": 1 }], "note": "컨셉: 나뭇가지 5 + 돌 1" },
+    { "result": "tool.can", "needs": [{ "id": "mat.wood", "n": 5 }], "note": "컨셉: 나무 5" },
+    { "result": "furn.log-chair", "needs": [{ "id": "mat.wood", "n": 4 }], "note": "" },
+    { "result": "furn.log-table", "needs": [{ "id": "mat.wood", "n": 8 }], "note": "" },
+    { "result": "furn.wood-bed", "needs": [{ "id": "mat.wood", "n": 6 }, { "id": "mat.hardwood", "n": 4 }], "note": "" },
+    { "result": "furn.campfire", "needs": [{ "id": "mat.branch", "n": 3 }, { "id": "mat.stone", "n": 3 }], "note": "" },
+    { "result": "furn.woodpile", "needs": [{ "id": "mat.wood", "n": 6 }], "note": "" },
+    { "result": "furn.fish-tank", "needs": [{ "id": "mat.hardwood", "n": 2 }, { "id": "mat.clay", "n": 2 }], "note": "" },
+    { "result": "furn.bug-case", "needs": [{ "id": "mat.wood", "n": 3 }, { "id": "mat.branch", "n": 2 }], "note": "" },
+    { "result": "furn.shell-curtain", "needs": [{ "category": "shell", "n": 6 }], "note": "컨셉: 조개 6" },
+    { "result": "furn.fruit-chair", "needs": [{ "category": "fruit", "n": 10 }], "note": "컨셉: 과일 10" },
+    { "result": "furn.flower-shelf", "needs": [{ "id": "mat.wood", "n": 6 }, { "category": "flower", "n": 4 }], "note": "보드: 나무 6 · 꽃 4" },
+    { "result": "furn.wood-stove", "needs": [{ "id": "mat.iron", "n": 4 }, { "id": "mat.wood", "n": 4 }], "note": "보드: 철광석 4 · 나무 4" },
+    { "result": "furn.fruit-basket", "needs": [{ "category": "fruit", "n": 5 }], "note": "보드: 과일 5" }
+  ],
+  "birthdays": {
+    "dates": { "coco": "07-14", "bori": "03-21", "mochi": "04-08", "dubu": "11-03", "pong": "09-27", "chorong": "06-18", "danpung": null },
+    "giftMult": 3,
+    "cake": "furn.birthday-cake"
+  },
+  "town": {
+    "friendMax": 100,
+    "tiers": [["new", 0], ["known", 10], ["friend", 30], ["close", 60], ["best", 90]],
+    "talkBonus": 2,
+    "giftPoints": { "love": 6, "like": 3, "normal": 2, "dislike": 0 },
+    "giftsCountedPerDay": 2,
+    "requestPoints": 6,
+    "requestDays": 3,
+    "requestReward": { "furnitureChance": 0.4, "valueDefault": 200, "valueMult": 1.2, "valuePlus": 250, "bagMin": 2, "bagMax": 12 }
+  }
+}

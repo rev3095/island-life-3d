@@ -16,6 +16,57 @@ const SQRT2 = Math.SQRT2;
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const N8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
 
+// 지도 자리·시드·밀도 (6차 M6-P5): assets/island/layout.json 이 섬 지도 편집기(map-editor.html) → "지도 반영" 으로 바뀐다.
+// 자리는 섬 크기에 대한 비율 [x, z] (0 = 서쪽·북쪽, 1 = 동쪽·남쪽). 건물은 이 자리 가까운 곳부터 넓혀 가며 집터를 찾는다.
+// 파일이 없거나 칸이 빠지면 아래 값 그대로 = 지금 섬. 모양은 docs/notes/m6-p5-mapdata.md.
+export const DEFAULT_LAYOUT = deepFreeze({
+  seed: 20261028,                          // 지도 시드 (world 가 쓴다, null = 저장의 섬 시드). generateIsland 는 인자로 받은 시드를 쓴다
+  pond: [0.5625, 0.255],                   // 언덕 위 연못 → 폭포 (강이 언덕을 넘는 x)
+  bridges: [[0.5625, 0.5], [0.625, 0.75]], // 다리 2개: 강이 이 자리를 곧게 지난다 (z = 다리 줄)
+  ramps: [0.37, 0.48, 0.70],               // 경사로 3곳 x (언덕 남쪽 가장자리)
+  dock: 0.47,                              // 선착장 x (남쪽 바닷가)
+  plaza: [0.37, 0.54],
+  museum: [0.345, 0.3],                    // 언덕 위
+  museumLow: [0.345, 0.42],                // 언덕에 자리가 없을 때 아래에
+  shop: [0.728, 0.535],
+  playerHouse: [0.273, 0.73],
+  villagers: { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47], danpung: [0.73, 0.67] },
+  orchard: [0.81, 0.76],                   // 과수원 언덕 (고장 과일나무)
+  rocks: [[0.18, 0.37], [0.2, 0.4], [0.22, 0.36], [0.62, 0.2], [0.86, 0.62], [0.4, 0.86]],
+  festival: { at: [0.453, 0.54], r: 6 },   // 축제 광장 빈 자리 (M5 Z5 몫 — 지금 섬 만들기는 안 읽는다)
+  density: {                               // 나무·꽃 밀도: 최대 개수, forest = 숲 잡음에 곱하는 세기
+    trees: 78, cedars: 26, fruitTrees: 5, fruitChance: 0.1, forest: 1, orchardTrees: 7, palms: 12,
+    flowerClusters: 14, flowerSize: [4, 8], bushes: 8, weeds: 32, shells: 11, fossils: 4,
+  },
+});
+
+/** layout.json 을 기본값에 얹는다. 빠졌거나 모양이 틀린 칸은 기본값 그대로 */
+export function resolveLayout(layout) {
+  const L = layout && typeof layout === 'object' ? layout : {};
+  const D = DEFAULT_LAYOUT;
+  const num = (v, d) => (Number.isFinite(v) ? v : d);
+  const pt = (v, d) => (Array.isArray(v) && v.length === 2 && v.every(Number.isFinite) ? [v[0], v[1]] : d);
+  const same = (v, d, one) => (Array.isArray(v) && v.length === d.length ? v.map((x, i) => one(x, d[i])) : d);
+  const dens = L.density && typeof L.density === 'object' ? L.density : {};
+  return {
+    seed: L.seed === null || Number.isInteger(L.seed) ? L.seed : D.seed,
+    pond: pt(L.pond, D.pond),
+    bridges: same(L.bridges, D.bridges, pt),
+    ramps: same(L.ramps, D.ramps, num),
+    dock: num(L.dock, D.dock),
+    plaza: pt(L.plaza, D.plaza),
+    museum: pt(L.museum, D.museum),
+    museumLow: pt(L.museumLow, D.museumLow),
+    shop: pt(L.shop, D.shop),
+    playerHouse: pt(L.playerHouse, D.playerHouse),
+    villagers: { ...D.villagers, ...Object.fromEntries(Object.entries(L.villagers ?? {}).filter(([, v]) => pt(v, null))) },
+    orchard: pt(L.orchard, D.orchard),
+    rocks: Array.isArray(L.rocks) ? L.rocks.filter(v => pt(v, null)) : D.rocks,
+    festival: { at: pt(L.festival?.at, D.festival.at), r: num(L.festival?.r, D.festival.r) },
+    density: Object.fromEntries(Object.entries(D.density).map(([k, d]) => [k, Array.isArray(d) ? pt(dens[k], d) : num(dens[k], d)])),
+  };
+}
+
 // 건물 집터(칸 수 [가로, 세로])는 배경 스펙의 world.lot 에서 받는다 (lots = { 종류: [가로, 세로] }). 문은 +Z(남쪽)를 본다.
 export const BUILDING_KINDS = ['house-player', 'house-villager', 'shop', 'museum'];
 /** 배경 스펙들(종류 → spec)에서 집터 표를 만든다 */
@@ -27,10 +78,12 @@ export const lotsOf = specs => Object.fromEntries(BUILDING_KINDS.map(k => {
 
 /**
  * 섬 만들기. 돌려주는 값은 순수 데이터 (배열·목록) 이고, createIslandApi 가 조회 함수를 붙인다.
- * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads }}
+ * layout = assets/island/layout.json (빠진 칸은 DEFAULT_LAYOUT). 시드는 인자로 받은 것을 쓴다 (layout.seed 는 부르는 쪽이 고른다)
+ * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads, layout }}
  */
-export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], newcomers = NEWCOMERS, nativeFruit: fruitWanted = null, lots } = {}) {
+export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], newcomers = NEWCOMERS, nativeFruit: fruitWanted = null, lots, layout = null } = {}) {
   if (!lots) throw new Error('[world] generateIsland 에 lots(건물 집터)가 필요하다 — lotsOf(배경 스펙)');
+  const lay = resolveLayout(layout), dens = lay.density;
   const rng = mulberry32(seed);
   const N = w * h;
   const K = new Uint8Array(N);           // 타일 종류 (처음엔 모두 바다)
@@ -72,7 +125,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   // 선착장 쪽(남쪽 가운데) 모래사장은 넉넉하게 3칸 이상
   for (let tz = 0; tz < h; tz++) for (let tx = 0; tx < w; tx++) {
     const i = idx(tx, tz);
-    if (K[i] === GRASS && dSea[i] <= 3.2 && tz > h * 0.75 && Math.abs(tx + 0.5 - w * 0.47) < 6) K[i] = SAND;
+    if (K[i] === GRASS && dSea[i] <= 3.2 && tz > h * 0.75 && Math.abs(tx + 0.5 - w * lay.dock) < 6) K[i] = SAND;
   }
   // 모래 속 외톨이 풀은 모래로
   for (let tz = 0; tz < h; tz++) for (let tx = 0; tx < w; tx++) {
@@ -81,10 +134,10 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
 
   // ── 3. 북쪽 언덕 (한 단 높은 땅) ──
   const dGrass = distanceFrom(i => K[i] !== GRASS);
-  const RAMP_X = [0.37, 0.48, 0.70].map(f => Math.round(w * f));     // 경사로 3곳 (지도 12번)
+  const RAMP_X = lay.ramps.map(f => Math.round(w * f));               // 경사로 3곳 (지도 12번)
   const ePh = [rng() * 6.28, rng() * 6.28];
   const edgeAt = x => h * 0.395 + 0.9 * Math.sin(x * 0.33 + ePh[0]) + 0.6 * Math.sin(x * 0.71 + ePh[1]);
-  const RIVER_X = Math.round(w * 0.5625);                              // 강이 언덕을 넘는 곳 (폭포)
+  const RIVER_X = Math.round(w * lay.pond[0]);                        // 강이 언덕을 넘는 곳 (폭포)
   const FLAT_X = [...RAMP_X.map(r => r + 0.5), RIVER_X];               // 경사로·폭포 둘레는 가장자리를 곧게
   const edgeZ = x => {
     for (const f of FLAT_X) if (Math.abs(x - f) < 2.6) return Math.round(edgeAt(f)) + 0.01;
@@ -113,13 +166,14 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
 
   // ── 4. 강: 언덕 위 연못 → 폭포 → 북쪽 다리 → 남쪽 다리 → 남동쪽 바다 (폭 2칸) ──
   const S = (fx, fz) => [fx * w, fz * h];
-  const pond = { x: w * 0.5625 + 0.5, z: h * 0.255, rx: 2.7, rz: 1.8 };
-  const BRIDGE_ROWS = [Math.round(h * 0.5), Math.round(h * 0.75)];      // 28, 42
+  const pond = { x: w * lay.pond[0] + 0.5, z: h * lay.pond[1], rx: 2.7, rz: 1.8 };
+  const BRIDGE_ROWS = lay.bridges.map(([, fz]) => Math.round(h * fz));  // 28, 42
+  const [BX0, BX1] = lay.bridges.map(([fx]) => w * fx);
   const riverPts = [
-    [pond.x - 0.5, pond.z], [pond.x - 0.5, pond.z + 3], S(0.5625, 0.36), S(0.5625, 0.46),             // 폭포까지 곧게
-    [w * 0.5625, BRIDGE_ROWS[0] - 2.5], [w * 0.5625, BRIDGE_ROWS[0] + 3],                          // 북쪽 다리 (곧게)
+    [pond.x - 0.5, pond.z], [pond.x - 0.5, pond.z + 3], S(lay.pond[0], 0.36), S(lay.pond[0], 0.46),   // 폭포까지 곧게
+    [BX0, BRIDGE_ROWS[0] - 2.5], [BX0, BRIDGE_ROWS[0] + 3],                                        // 북쪽 다리 (곧게)
     S(0.54 + (rng() - 0.5) * 0.02, 0.6), S(0.575 + (rng() - 0.5) * 0.02, 0.68),
-    [w * 0.625, BRIDGE_ROWS[1] - 2.5], [w * 0.625, BRIDGE_ROWS[1] + 2],                            // 남쪽 다리 (곧게)
+    [BX1, BRIDGE_ROWS[1] - 2.5], [BX1, BRIDGE_ROWS[1] + 2],                                        // 남쪽 다리 (곧게)
     S(0.66, 0.84), S(0.7, 0.91), S(0.72, 1.05),
   ];
   const river = new Uint8Array(N);
@@ -197,7 +251,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   // ── 7. 선착장 (남쪽 바닷가, 바다 쪽으로 4칸) ──
   let dock = null;
   for (let off = 0; off <= 6 && !dock; off++) for (const sx of off ? [off, -off] : [0]) {
-    const c = Math.round(w * 0.47) + sx;
+    const c = Math.round(w * lay.dock) + sx;
     let s = -1;
     for (let tz = h - 1; tz >= 0; tz--) if (at(c - 1, tz) !== SEA && at(c, tz) !== SEA) { s = tz; break; }
     if (s < 0 || at(c - 1, s) !== SAND || at(c, s) !== SAND) continue;
@@ -209,7 +263,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   }
 
   // ── 8. 광장 (지도 2번) ──
-  const plazaC = { tx: Math.round(w * 0.37), tz: Math.round(h * 0.54) };
+  const plazaC = { tx: Math.round(w * lay.plaza[0]), tz: Math.round(h * lay.plaza[1]) };
   for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
     if (dx * dx + dz * dz > 3.3 * 3.3) continue;
     const i = idx(plazaC.tx + dx, plazaC.tz + dz);
@@ -266,13 +320,12 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     return b;
   };
 
-  const museum = placeBuilding('museum', w * 0.345, h * 0.3, 1, {}) ?? placeBuilding('museum', w * 0.345, h * 0.42, 0, {});   // 언덕에 자리가 없으면 아래에
-  const shop = placeBuilding('shop', w * 0.728, h * 0.535, 0, {});
-  const playerHouse = placeBuilding('house-player', w * 0.273, h * 0.73, 0, { owner: 'player' });
-  const VILLAGER_SPOTS = { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47], danpung: [0.73, 0.67] };
+  const museum = placeBuilding('museum', w * lay.museum[0], h * lay.museum[1], 1, {}) ?? placeBuilding('museum', w * lay.museumLow[0], h * lay.museumLow[1], 0, {});   // 언덕에 자리가 없으면 아래에
+  const shop = placeBuilding('shop', w * lay.shop[0], h * lay.shop[1], 0, {});
+  const playerHouse = placeBuilding('house-player', w * lay.playerHouse[0], h * lay.playerHouse[1], 0, { owner: 'player' });
   const villagerHouses = [];
   for (const slug of villagers) {
-    const [fx, fz] = VILLAGER_SPOTS[slug] ?? [0.5, 0.5];
+    const [fx, fz] = lay.villagers[slug] ?? [0.5, 0.5];
     const lot = newcomers.includes(slug);   // 이사 올 주민: 처음엔 빈 집터
     const b = placeBuilding('house-villager', w * fx, h * fz, 0, { owner: slug, variant: slug, ...(lot ? { lot: true } : {}) });
     if (b) villagerHouses.push(b);
@@ -401,14 +454,14 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   const FRUITS = ['apple', 'pear', 'peach', 'cherry', 'orange'];
   const fruitRolled = pick(FRUITS, rng);                            // 난수 순서를 지키려고 늘 뽑는다
   const nativeFruit = FRUITS.includes(fruitWanted) ? fruitWanted : fruitRolled;   // data 모듈이 정한 특산 과일이 있으면 그걸로
-  const orchard = { tx: Math.round(w * 0.81), tz: Math.round(h * 0.76) };
+  const orchard = { tx: Math.round(w * lay.orchard[0]), tz: Math.round(h * lay.orchard[1]) };
   {
     const spots = [];
     for (let dz = -4; dz <= 4; dz++) for (let dx = -5; dx <= 5; dx++) spots.push([orchard.tx + dx, orchard.tz + dz]);
     spots.sort((p, q) => Math.hypot(p[0] - orchard.tx, p[1] - orchard.tz) - Math.hypot(q[0] - orchard.tx, q[1] - orchard.tz));
     let n = 0;
     for (const [tx, tz] of spots) {
-      if (n >= 7) break;
+      if (n >= dens.orchardTrees) break;
       if ((tx + tz) % 2 || !freeGrass(tx, tz, { level: 0 }) || nearAny(tx, tz, 1, isWaterT) || !treeOk(tx, tz, 2.2) || levelEdge(tx, tz)) continue;
       const o = addObj('fruit-tree', tx, tz, { rot: rot(), scale: 0.95 + rng() * 0.1, variant: nativeFruit, data: { fruit: nativeFruit } });
       if (o) { trees.push(o); n++; }
@@ -416,8 +469,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   }
 
   // 바위 지대 (지도 14번) + 섬 곳곳: 바위 6개
-  const rockTargets = [[0.18, 0.37], [0.2, 0.4], [0.22, 0.36], [0.62, 0.2], [0.86, 0.62], [0.4, 0.86]];
-  for (const [fx, fz] of rockTargets) {
+  for (const [fx, fz] of lay.rocks) {
     const t = [Math.round(w * fx), Math.round(h * fz)];
     let done = false;
     for (let r = 0; r <= 4 && !done; r++) for (let dz = -r; dz <= r && !done; dz++) for (let dx = -r; dx <= r && !done; dx++) {
@@ -438,14 +490,14 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     const i = idx(tx, tz);
     if (nearAny(tx, tz, 1, isWaterT) || levelEdge(tx, tz) || rampNear(tx, tz, 2)) continue;
     if (nearAny(tx, tz, 1, (a, b) => at(a, b) === PATH || at(a, b) === PLAZA) && rng() < 0.6) continue;
-    const dens = noise(tx, tz);
+    const forest = noise(tx, tz);
     if (L[i]) {
-      if (nCedar >= 26 || !treeOk(tx, tz, 2.2) || rng() > (dens - 0.15) * 1.4) continue;
+      if (nCedar >= dens.cedars || !treeOk(tx, tz, 2.2) || rng() > (forest - 0.15) * 1.4 * dens.forest) continue;
       const o = addObj('cedar', tx, tz, { rot: rot(), scale: 0.9 + rng() * 0.25 });
       if (o) { trees.push(o); nCedar++; }
     } else {
-      if (nTree >= 78 || !treeOk(tx, tz, 2) || rng() > (dens - 0.22) * 1.3) continue;
-      const fruit = nFruit < 5 && rng() < 0.1;
+      if (nTree >= dens.trees || !treeOk(tx, tz, 2) || rng() > (forest - 0.22) * 1.3 * dens.forest) continue;
+      const fruit = nFruit < dens.fruitTrees && rng() < dens.fruitChance;
       const o = addObj(fruit ? 'fruit-tree' : 'tree', tx, tz, { rot: rot(), scale: 0.9 + rng() * 0.2, variant: fruit ? nativeFruit : null, data: fruit ? { fruit: nativeFruit } : {} });
       if (o) { trees.push(o); fruit ? nFruit++ : nTree++; }
     }
@@ -454,7 +506,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   // 야자수: 모래사장 안쪽 (풀밭 가까이)
   const palms = [];
   for (const [tx, tz] of cells) {
-    if (palms.length >= 12 || !freeGrass(tx, tz, { kinds: [SAND] })) continue;
+    if (palms.length >= dens.palms || !freeGrass(tx, tz, { kinds: [SAND] })) continue;
     if (!nearAny(tx, tz, 2, (a, b) => at(a, b) === GRASS) || nearAny(tx, tz, 1, (a, b) => at(a, b) === WATER)) continue;
     if (dock && Math.abs(tx - dock.tx) < 5 && tz > dock.tz - 4) continue;
     if (!treeOk(tx, tz, 2) || palms.some(p => Math.hypot(p.tx - tx, p.tz - tz) < 5)) continue;
@@ -466,13 +518,14 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   const FLOWERS = { tulip: ['red', 'yellow', 'white', 'pink'], cosmos: ['pink', 'white', 'orange', 'red'], pansy: ['purple', 'yellow', 'blue', 'orange'] };
   const clusters = [];
   for (const [tx, tz] of cells) {
-    if (clusters.length >= 14) break;
+    if (clusters.length >= dens.flowerClusters) break;
     if (!freeGrass(tx, tz) || clusters.some(c => Math.hypot(c[0] - tx, c[1] - tz) < 6)) continue;
     if (noise2(tx, tz) < 0.35) continue;
     clusters.push([tx, tz]);
     const sp = pick(Object.keys(FLOWERS), rng);
     const cols = shuffle(FLOWERS[sp].slice(), rng).slice(0, 2);
-    const n = 4 + Math.floor(rng() * 5);
+    const [nMin, nMax] = dens.flowerSize;
+    const n = nMin + Math.floor(rng() * (nMax - nMin + 1));
     let made = 0;
     for (let r = 0; r <= 2 && made < n; r++) for (let dz = -r; dz <= r && made < n; dz++) for (let dx = -r; dx <= r && made < n; dx++) {
       if (Math.max(Math.abs(dx), Math.abs(dz)) !== r || rng() < 0.25) continue;
@@ -484,24 +537,24 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   // 꽃덤불 몇 개, 잡초, 조개, 화석 자리
   let nBush = 0, nWeed = 0, nShell = 0, nFossil = 0;
   for (const [tx, tz] of cells) {
-    if (nBush >= 8) break;
+    if (nBush >= dens.bushes) break;
     if (!freeGrass(tx, tz, { level: 0 }) || nearAny(tx, tz, 1, isWaterT) || levelEdge(tx, tz) || noise(tx, tz) < 0.55 || !treeOk(tx, tz, 1.5)) continue;
     if (addObj('bush', tx, tz, { rot: rot(), variant: pick(['pink', 'white', 'blue', 'red'], rng) })) nBush++;
   }
   for (const [tx, tz] of cells) {
-    if (nWeed >= 32) break;
+    if (nWeed >= dens.weeds) break;
     if (!freeGrass(tx, tz) || rng() < 0.5) continue;
     if (addObj('weed', tx, tz, { rot: rot(), scale: 1.2 + rng() * 0.3 })) nWeed++;
   }
   for (const [tx, tz] of cells) {
-    if (nShell >= 11) break;
+    if (nShell >= dens.shells) break;
     if (!freeGrass(tx, tz, { kinds: [SAND] }) || !nearAny(tx, tz, 1, (a, b) => at(a, b) === SEA)) continue;
     if (dock && Math.abs(tx - dock.tx) < 3 && tz > dock.tz - 3) continue;
     if (objects.some(o => o.kind === 'shell' && Math.abs(o.tx - tx) + Math.abs(o.tz - tz) < 5)) continue;
     if (addObj('shell', tx, tz, { rot: rot(), scale: 1.4, variant: pick(['peach', 'white', 'pink'], rng) })) nShell++;
   }
   for (const [tx, tz] of cells) {
-    if (nFossil >= 4) break;
+    if (nFossil >= dens.fossils) break;
     if (!freeGrass(tx, tz) || nearAny(tx, tz, 1, (a, b) => at(a, b) === PATH)) continue;
     if (objects.some(o => o.kind === 'fossil-spot' && Math.hypot(o.tx - tx, o.tz - tz) < 12)) continue;
     if (addObj('fossil-spot', tx, tz, { rot: rot() })) nFossil++;
@@ -527,7 +580,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     orchard: tw(orchard.tx, orchard.tz),
   };
 
-  return { w, h, seed, kind: K, level: L, flags: F, rampMap, ramps, bridges, dock, waterfalls, objects, places, pads, buildings, nativeFruit };
+  return { w, h, seed, kind: K, level: L, flags: F, rampMap, ramps, bridges, dock, waterfalls, objects, places, pads, buildings, nativeFruit, layout: lay };
 
   // ── 도우미 ──
   function nearAny(tx, tz, r, test) {
@@ -685,6 +738,11 @@ export function createIslandApi(gen) {
     },
   };
   return api;
+}
+
+function deepFreeze(v) {
+  if (v && typeof v === 'object') { Object.freeze(v); Object.values(v).forEach(deepFreeze); }
+  return v;
 }
 
 function segDist(px, pz, [ax, az], [bx, bz]) {

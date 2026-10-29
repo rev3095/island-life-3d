@@ -1,0 +1,41 @@
+{
+  "version": 0,
+  "about": "섬 지도 자리·시드·밀도. 섬 지도 편집기(map-editor.html)에서 고치고 채팅 \"지도 반영\" 으로 들어온다. 자리는 섬 크기에 대한 비율 [x, z] (0 = 서쪽·북쪽, 1 = 동쪽·남쪽). 빠진 칸은 src/world/island.js 의 DEFAULT_LAYOUT. 모양: docs/notes/m6-p5-mapdata.md",
+  "seed": 20261028,
+  "pond": [0.5625, 0.255],
+  "bridges": [[0.5625, 0.5], [0.625, 0.75]],
+  "ramps": [0.37, 0.48, 0.7],
+  "dock": 0.47,
+  "plaza": [0.37, 0.54],
+  "museum": [0.345, 0.3],
+  "museumLow": [0.345, 0.42],
+  "shop": [0.728, 0.535],
+  "playerHouse": [0.273, 0.73],
+  "villagers": {
+    "coco": [0.21, 0.5],
+    "bori": [0.26, 0.61],
+    "mochi": [0.44, 0.71],
+    "dubu": [0.5, 0.8],
+    "pong": [0.72, 0.445],
+    "chorong": [0.81, 0.47],
+    "danpung": [0.73, 0.67]
+  },
+  "orchard": [0.81, 0.76],
+  "rocks": [[0.18, 0.37], [0.2, 0.4], [0.22, 0.36], [0.62, 0.2], [0.86, 0.62], [0.4, 0.86]],
+  "festival": { "at": [0.453, 0.54], "r": 6 },
+  "density": {
+    "trees": 78,
+    "cedars": 26,
+    "fruitTrees": 5,
+    "fruitChance": 0.1,
+    "forest": 1,
+    "orchardTrees": 7,
+    "palms": 12,
+    "flowerClusters": 14,
+    "flowerSize": [4, 8],
+    "bushes": 8,
+    "weeds": 32,
+    "shells": 11,
+    "fossils": 4
+  }
+}

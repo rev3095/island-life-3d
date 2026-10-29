@@ -12,14 +12,15 @@ import { createEconomy } from './economy.js';
 import { createSave } from './save.js';
 import { createDay } from './day.js';
 import { createHarvest } from './harvest.js';
+import { RULES } from './tables.js';
 
 export const AUTOSAVE_GAME_MINUTES = 5;   // time:tick(게임 1분) 이만큼마다 저장
 export const AUTOSAVE_MIN_GAP_SEC = 15;   // 빠른 시간 모드에서 너무 자주 저장하지 않게
 export const AUTOSAVE_FALLBACK_SEC = 60;  // time 서비스가 없으면 실제 시간으로
 const DAY_POLL_SEC = 10;                  // 5시가 넘었는지 가끔 확인 (time:newday 가 없을 때 대비)
 
-/** 새 게임 시작 지급: 낚싯대·잠자리채 (컨셉 보드 TL-01·02) + 도토리 조금 */
-export const STARTER = { items: [['tool.rod', 1], ['tool.net', 1]], acorns: 500 };
+/** 새 게임 시작 지급: 낚싯대·잠자리채 (컨셉 보드 TL-01·02) + 도토리 조금 — assets/data/rules.json 의 starter */
+export const STARTER = { items: RULES.starter.items, acorns: RULES.starter.acorns };
 
 /** 서비스 만들기. 테스트·데모에서도 쓴다. opts.storage 로 가짜 localStorage 를 넣을 수 있다 */
 export function createDataService(ctx, opts = {}) {
