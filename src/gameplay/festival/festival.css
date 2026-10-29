@@ -62,6 +62,11 @@
   .fe-dock { left: auto; right: max(12px, env(safe-area-inset-right, 0px)); transform: none; width: min(420px, 52vw); bottom: 8px; }
   .fe-grid { grid-template-columns: repeat(5, 1fr); }
 }
+/* 터치(휴대폰): 화면 A·B 단추를 피해서 — ui 대화창(.pk-touch .pk-dlg-wrap)과 같은 자리. 전엔 A 가 이모티콘 칸을, B(= 대화 끝)가 보내기를 덮었다 (QA-15) */
+.pk-touch .fe-dock { bottom: calc(152px + var(--sab, 0px)); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .pk-touch .fe-dock { bottom: calc(8px + var(--sab, 0px)); right: calc(182px + var(--sar, 0px)); width: min(420px, calc(100vw - 206px)); }
+}
 
 /* 축제 진행판 (UI-05): 화면 위 가운데, 부품 다섯 칸 */
 .fe-hud { position: absolute; left: 50%; top: max(10px, env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 3; pointer-events: none;
@@ -73,6 +78,12 @@
 .fe-part.is-empty g * { fill: #4A3B32 !important; stroke: #4A3B32 !important; opacity: .55; }
 .fe-hud-due { margin-left: 2px; }
 body.story-on .fe-hud { visibility: hidden; }
+/* 좁은 화면(휴대폰 세로): 위 가운데에 두면 시계·도토리 수를 덮는다 (판 폭 ≈ 258px) → 시계 밑 왼쪽에 작게 (QA-16) */
+@media (max-width: 600px) {
+  .fe-hud { left: calc(14px + env(safe-area-inset-left, 0px)); top: calc(76px + env(safe-area-inset-top, 0px)); transform: none; gap: 2px; padding: 3px 8px; }
+  .fe-hud .fe-emo { width: 18px; height: 18px; }
+  .fe-part { width: 22px; height: 18px; }
+}
 
 /* 리듬 놀이 (FB-02) */
 .fe-rhythm { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: max(18px, env(safe-area-inset-bottom, 0px)); pointer-events: auto; }

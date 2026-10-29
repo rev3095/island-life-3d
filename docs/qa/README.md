@@ -9,6 +9,7 @@
 node tools/playtest.mjs                      # 개발판 /index.html · 1280×800 · 머리 없는 Chrome — 처음부터 엔딩까지
 node tools/playtest.mjs --target=artifact    # 게시본 조건 /artifact/ (dist/web 이 없으면 --build 로 node tools/build-web.mjs 먼저)
 node tools/playtest.mjs --mobile             # 375×812 터치 흉내 (화면 A·B 단추로 누름)
+node tools/playtest.mjs --novice             # 처음 하는 사람 흉내: 주민 좋아함·축제 설정을 모르고 💭 힌트·주민이 알려 준 준비물만 (최대 20일)
 node tools/playtest.mjs --only=boot,naming,arrival,clock,fd-tool,fd-gather,fd-catch,fd-sell,fd-donate,fd-home   # 첫날만 (1분)
 ```
 

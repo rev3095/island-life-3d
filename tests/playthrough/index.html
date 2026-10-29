@@ -85,7 +85,8 @@ if (win.__island.input.touch || q.get('touch') === '1') {
 }
 if (host.wantShots) bot.uiShots = new Set();   // 창 종류마다 처음 뜰 때 스크린샷
 const sk = createSkills(bot);
-const sc = makeScenario(bot, sk, { maxDays: Number(q.get('days') ?? 10), yearly: q.get('yearly') === '1' });
+sk.novice = q.get('novice') === '1';   // 처음 하는 사람 흉내: 주민 좋아함·축제 설정을 모르고 💭 힌트만 따른다
+const sc = makeScenario(bot, sk, { maxDays: Number(q.get('days') ?? (sk.novice ? 20 : 10)), yearly: q.get('yearly') === '1', novice: sk.novice });
 host.bot = bot; host.sk = sk; host.T = sc.T;
 host.status = 'running';
 const icon = { pass: '✅', awkward: '🟡', block: '⛔', skip: '⏭' };

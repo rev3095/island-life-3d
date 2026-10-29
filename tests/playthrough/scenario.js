@@ -32,6 +32,7 @@ export function makeScenario(bot, sk, opts = {}) {
   // ---------- 매일 하는 일 ----------
   /** 주민이 좋아하는 선물 고르기 (공략: 주민 파일의 gifts.loves/likes) — 부품 재료는 빼고 */
   function giftTest(slug) {
+    if (opts.novice) return (it) => !!it && ['fruit', 'flower', 'shell'].includes(it.category) && !isMaterialFor(it);   // 처음 하는 사람: 과일·꽃·조개를 아무에게나
     const P = S().town.villagers.find(V => V.slug === slug)?.person;
     const g = P?.gifts ?? {};
     const hit = (rules, it) => (rules ?? []).some(r => (r.includes('.') ? it.id === r : r === 'rare' ? it.rare : r === 'hybrid' ? it.hybrid : it.category === r));
@@ -62,7 +63,8 @@ export function makeScenario(bot, sk, opts = {}) {
   /** 부품 재료 모으기 (아직 안 낸 것만) */
   async function gatherForParts() {
     const got = {};
-    const need = slug => fest().started && !hasPart(slug) && residents().includes(slug);
+    // 처음 하는 사람(opts.novice)은 주민이 🎉 로 준비물을 알려 준 뒤에야 모은다 (설정 파일을 모른다)
+    const need = slug => fest().started && !hasPart(slug) && residents().includes(slug) && (!opts.novice || !!fest().asked?.[slug]);
     if (need('pong') && bot.count(it => it?.category === 'fruit') < 5) {
       // 섬 과일 + 섬 특산 아닌 과일 하나 (야자열매)
       for (const o of sk.objects('fruit-tree').slice(0, 3)) { if (bot.count(it => it?.category === 'fruit') >= 6) break; await sk.shakeTree(o); }

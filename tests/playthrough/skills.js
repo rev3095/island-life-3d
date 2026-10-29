@@ -439,14 +439,15 @@ export function createSkills(bot) {
       emote: ({ bubble }) => {
         res.opened = true;
         const tutorial = !bot.ctx.state.festival?.talkTutorial;
+        const hintI = bubble.indexOf('bubble');
+        const hint = hintI >= 0 ? bubble[hintI + 1] : null;
         if (tutorial) {
-          // 연습: 말풍선에 맞는 대답 (talk.json tutorial ok 첫 낱말)
+          // 연습: 말풍선에 맞는 대답 (talk.json tutorial ok 첫 낱말). 처음 하는 사람은 따라 하다가 💭 힌트를 본다
+          if (sk.novice) return hint ? [hint] : [bubble.find(k => !['bubble', 'think'].includes(k)) ?? 'smile'];
           const t = tut.find(x => x.say.every(k => bubble.includes(k))) ?? tut[tutI] ?? tut[0];
           tutI++;
           return [t.ok[0]];
         }
-        const hintI = bubble.indexOf('bubble');
-        const hint = hintI >= 0 ? bubble[hintI + 1] : null;
         if (hint) st.lastHint = hint;
         const v = want();
         const today = v.emote?.day === bot.day() ? v.emote.today ?? 0 : 0;
@@ -468,6 +469,8 @@ export function createSkills(bot) {
           return [k];
         }
         st.steps.push('msg');
+        // 처음 하는 사람: 주민 좋아함을 모른다 → 💭 힌트가 보이면 그 낱말 하나, 아니면 인사 (판정 시뮬레이션의 '힌트 하나만')
+        if (sk.novice) return hint ? [hint] : ['wave', 'smile'];
         return message(R, st, hint);
       },
       emoteChoice: (labels) => {

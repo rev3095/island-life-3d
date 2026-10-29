@@ -5,6 +5,7 @@
 //   node tools/playtest.mjs --target=artifact     # 게시본 조건 /artifact/ (먼저 node tools/build-web.mjs, 없으면 --build)
 //   node tools/playtest.mjs --mobile              # 375×812 터치 (A·B 단추)
 //   node tools/playtest.mjs --only=boot,naming,arrival,clock,fd-tool   # 단계 몇 개만
+//   node tools/playtest.mjs --novice             # 처음 하는 사람 흉내 (좋아함·축제 설정을 모르고 💭 힌트만, 최대 20일)
 //   옵션: --port=4232 --days=10 --speed=4 --yearly --headed --browser=edge --out=<폴더> --build
 // 결과: docs/qa/runs/<날짜>-<대상>[-mobile]/report.json · report.md · shots/*.jpg  (종료 코드: 막힌 단계가 있으면 1)
 import { spawn } from 'node:child_process';
@@ -21,7 +22,7 @@ const target = arg('target', 'dev');
 const mobile = !!arg('mobile');
 const headed = !!arg('headed');
 const stamp = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16).replace(/[T:]/g, '-');
-const outDir = arg('out') || join(root, 'docs/qa/runs', `${stamp}-${target}${mobile ? '-mobile' : ''}`);
+const outDir = arg('out') || join(root, 'docs/qa/runs', `${stamp}-${target}${mobile ? '-mobile' : ''}${arg('novice') ? '-novice' : ''}`);
 const BROWSERS = {
   chrome: ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe', '/usr/bin/google-chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'],
   edge: ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe', '/usr/bin/microsoft-edge'],
@@ -72,6 +73,7 @@ async function main() {
   if (arg('only')) params.set('only', arg('only'));
   if (arg('from')) params.set('from', arg('from'));
   if (arg('yearly')) params.set('yearly', '1');
+  if (arg('novice')) { params.set('novice', '1'); if (!arg('days')) params.set('days', '20'); }
   const url = `http://localhost:${port}/tests/playthrough/index.html?${params}`;
   await mkdir(join(outDir, 'shots'), { recursive: true });
   say(`열기: ${url}\n결과: ${outDir}`);
