@@ -117,6 +117,13 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 7. `applied/story` 를 `version + 1` 로 (`scenes`·`picks`·`notes`·`summary`·`commit` = 5의 해시), 같은 내용 + `board: 'story'` 로 `history/story-v<새 버전>`. `timeline/main` 의 `status` 는 `editing`, `rollback` 은 지운다.
 8. 게임 링크 게시는 조정 세션이 main 에 합친 뒤 (이 브랜치는 커밋만).
 
+## 반영 기록
+
+| 버전 | 날짜 | 내용 | 커밋 |
+|---|---|---|---|
+| v0 | 2026-10-29 | 첫 초안 12장면 (status draft) | 4f90074 |
+| v1 | 2026-10-29 | **추천안 A 로 12장면 모두 임시 확정** (status approved, 사용자: "향후 변경될 수 있음"). 고치면 그 장면 version +1 · status review | (이 표 다음 커밋) |
+
 ## 첫 시나리오 초안 (v0, 12장면)
 
 | # | 장면 | 트리거 | 연출안 (★ 추천) |

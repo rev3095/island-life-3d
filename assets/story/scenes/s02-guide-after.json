@@ -1,7 +1,7 @@
 {
   "id": "s02-guide-after",
   "version": 1,
-  "status": "draft",
+  "status": "approved",
   "chapter": "첫날",
   "title": "오늘 할 일 시작",
   "summary": "밤톨의 첫날 안내 대화(지금 있는 대화)가 끝나면, 밤톨이 할 일 목록을 가리키고 카메라가 올라가 섬을 보여 준다.",
