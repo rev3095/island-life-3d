@@ -1,0 +1,230 @@
+<!-- 웹 빌드 로딩 화면 — tools/build-web.mjs 가 게시 페이지의 main.js 앞에 넣는다 (로컬 index.html 에는 없다).
+     게임 코드는 건드리지 않고 지켜보기만 한다: 모듈 파일 받기(PerformanceObserver), 에셋 받기(src/core/assets.js 의
+     window 'island:load' 이벤트), 모듈 준비(window.__island.services), 끝(game:ready). -->
+<style>
+  /* Layout: 하늘색 막 가운데에 작은 섬 그림 → 게임 이름 → 도토리가 굴러가는 진행 막대 → 단계·파일 수 → 저장 안내.
+     다 받으면 막이 걷히고, 소리가 아직 잠겨 있으면 화면 아래쪽에 안내 한 줄 */
+  :root {
+    --ld-sky: #BFE6F7;
+    --ld-sky-low: #EAF7FC;
+    --ld-cream: #FFF8E6;
+    --ld-edge: #E2D2AE;
+    --ld-ink: #4A3B32;
+    --ld-muted: #76675B;
+    --ld-leaf: #7DB356;
+    --ld-warn: #B4532A;
+    --ld-display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --ld-body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+  #loader [hidden], #sound-hint[hidden] { display: none !important; }
+  #loader {
+    --ld-p: 0;
+    position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; box-sizing: border-box;
+    padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: linear-gradient(var(--ld-sky), var(--ld-sky-low)); color: var(--ld-ink); font-family: var(--ld-body);
+    transition: opacity .45s ease;
+  }
+  #loader.is-done { opacity: 0; pointer-events: none; }
+  .ld-box { width: min(340px, 100%); display: grid; gap: 12px; justify-items: center; text-align: center; }
+  .ld-island { width: 176px; max-width: 60%; height: auto; animation: ld-bob 3.4s ease-in-out infinite; }
+  .ld-title { margin: 4px 0 6px; font: 400 34px/1.1 var(--ld-display); letter-spacing: .02em; text-wrap: balance; }
+  .ld-bar { position: relative; width: 100%; height: 16px; border-radius: 999px; background: var(--ld-cream); box-shadow: inset 0 0 0 2px var(--ld-edge), 0 3px 0 var(--ld-edge); }
+  /* 막대는 옮겨 가는 효과 없이 바로 그린다: 섬을 만드는 동안 화면이 띄엄띄엄 그려져서 효과를 넣으면 늦게 따라온다 */
+  .ld-fill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) * var(--ld-p)); border-radius: 999px; background: var(--ld-leaf); }
+  .ld-acorn { position: absolute; top: 50%; left: calc(4px + (100% - 8px) * var(--ld-p)); width: 24px; height: 24px; transform: translate(-50%, -58%) rotate(calc(var(--ld-p) * 720deg)); }
+  .ld-step { margin: 6px 0 0; font: 400 18px/1.35 var(--ld-display); min-height: 1.35em; }
+  .ld-count { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ld-muted); font-variant-numeric: tabular-nums; }
+  .ld-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 4px; }
+  .ld-btn { font: 400 17px/1 var(--ld-display); padding: 12px 22px; border: 0; border-radius: 999px; cursor: pointer; background: var(--ld-ink); color: var(--ld-cream); box-shadow: 0 3px 0 #2E2420; }
+  .ld-btn.is-soft { background: var(--ld-cream); color: var(--ld-ink); box-shadow: 0 3px 0 var(--ld-edge); }
+  .ld-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2E2420; }
+  .ld-btn:focus-visible { outline: 3px solid var(--ld-leaf); outline-offset: 3px; }
+  .ld-note { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--ld-muted); }
+  .ld-note.is-warn { color: var(--ld-warn); }
+  #loader.is-error .ld-fill { background: var(--ld-warn); }
+  #loader.is-error .ld-island { animation: none; }
+  /* 위쪽 HUD(시계·도토리·섬폰 단추) 바로 아래 가운데. 아래쪽은 휴대폰 조이스틱·A/B·도구 단추 자리라 피한다 */
+  #sound-hint {
+    position: fixed; left: 0; right: 0; top: calc(118px + env(safe-area-inset-top, 0px)); margin: 0 auto;
+    display: flex; align-items: center; gap: 8px; width: max-content; max-width: calc(100% - 32px); box-sizing: border-box; padding: 9px 16px;
+    border-radius: 999px; background: var(--ld-cream); color: var(--ld-ink); box-shadow: 0 3px 0 var(--ld-edge);
+    font: 400 15px/1.3 var(--ld-display); pointer-events: none; transition: opacity .4s ease;
+  }
+  #sound-hint svg { flex: none; width: 20px; height: 20px; }
+  #sound-hint.is-gone { opacity: 0; }
+  @keyframes ld-bob { 50% { transform: translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .ld-island { animation: none; }
+    #loader, #sound-hint { transition: none; }
+  }
+</style>
+<div id="loader" role="status" aria-live="polite" aria-busy="true">
+  <div class="ld-box">
+    <svg class="ld-island" viewBox="0 0 176 104" aria-hidden="true">
+      <ellipse cx="88" cy="88" rx="84" ry="13" fill="#9AD6EC"/>
+      <path d="M14 86 Q30 60 88 58 Q146 60 162 86 Q88 98 14 86Z" fill="#F3DFA8"/>
+      <path d="M30 76 Q44 52 88 51 Q132 52 146 76 Q88 86 30 76Z" fill="#9CCB62"/>
+      <path d="M40 92 Q50 89 60 92 M112 93 Q122 90 132 93" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".8"/>
+      <rect x="55" y="34" width="7" height="24" rx="3" fill="#8A5A3C"/>
+      <circle cx="58" cy="28" r="17" fill="#6FAE4A"/>
+      <circle cx="47" cy="35" r="10" fill="#7DBB55"/>
+      <circle cx="51" cy="24" r="3" fill="#E8554D"/>
+      <rect x="96" y="44" width="28" height="18" rx="3" fill="#FFF8E6"/>
+      <path d="M91 47 L110 30 L129 47Z" fill="#E07A5F"/>
+      <rect x="106" y="51" width="8" height="11" rx="2" fill="#8A5A3C"/>
+    </svg>
+    <h1 class="ld-title">포근섬 이야기</h1>
+    <div class="ld-bar" role="progressbar" aria-label="불러오기" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="ld-fill"></span>
+      <svg class="ld-acorn" viewBox="0 0 24 24" aria-hidden="true">
+        <ellipse cx="12" cy="14.5" rx="6.5" ry="7.5" fill="#C98A4B"/>
+        <path d="M4.5 11 Q12 2.5 19.5 11 Q12 13.5 4.5 11Z" fill="#7A5234"/>
+        <rect x="11" y="2.5" width="2" height="4" rx="1" fill="#7A5234"/>
+      </svg>
+    </div>
+    <p class="ld-step" id="ld-step">게임 파일을 받는 중…</p>
+    <p class="ld-count" id="ld-count">&nbsp;</p>
+    <div class="ld-actions" id="ld-actions" hidden>
+      <button class="ld-btn" id="ld-retry" type="button">다시 시도</button>
+      <button class="ld-btn is-soft" id="ld-skip" type="button" hidden>이대로 할래요</button>
+    </div>
+    <p class="ld-note" id="ld-note"></p>
+  </div>
+</div>
+<div id="sound-hint" role="status" hidden>
+  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="#4A3B32"/><path d="M13 7a4 4 0 0 1 0 6M15.5 4.5a7.5 7.5 0 0 1 0 11" stroke="#4A3B32" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+  <span>화면을 한 번 누르면 소리가 켜져요</span>
+</div>
+<script>
+(() => {
+  const CFG = /*CONFIG*/{};
+  const $ = id => document.getElementById(id);
+  const box = $('loader'), bar = box.querySelector('.ld-bar'), stepEl = $('ld-step'), countEl = $('ld-count');
+  const actions = $('ld-actions'), retry = $('ld-retry'), skip = $('ld-skip'), note = $('ld-note'), hint = $('sound-hint');
+  const js = new Set();
+  let assets = { started: 0, done: 0, failed: 0, failedUrls: [] };
+  let ready = false, stopped = false, slow = false, best = 0, lastKey = '', lastChange = performance.now();
+
+  // 소리 안내는 게임 화면 위·창(#ui) 아래에 둔다 → 대화·이름 정하기 창이 덮는다
+  $('ui')?.before(hint);
+  retry.addEventListener('click', () => location.reload());
+  skip.addEventListener('click', () => done());
+
+  // 저장소: 게임(src/data/save.js)과 같은 방법으로 써 본다. 막힌 창이면 처음부터 알려 준다
+  let canSave = false;
+  try { const s = window.localStorage; s.setItem('__island_probe__', '1'); s.removeItem('__island_probe__'); canSave = true; } catch { /* 막힘 */ }
+  note.textContent = canSave ? '진행은 이 기기의 이 브라우저에만 저장돼요.' : '이 창에서는 저장할 수 없어요. 닫으면 처음부터 다시 시작해요.';
+  note.classList.toggle('is-warn', !canSave);
+
+  // 모듈 파일: 같은 출처의 .js 받기를 센다 (modulepreload 포함)
+  try { performance.setResourceTimingBufferSize(1000); } catch { /* 옛 브라우저 */ }
+  try {
+    new PerformanceObserver(list => {
+      for (const e of list.getEntries()) {
+        try { const u = new URL(e.name); if (u.origin === location.origin && /\.m?js$/.test(u.pathname)) js.add(u.pathname); } catch { /* 이상한 주소 */ }
+      }
+    }).observe({ type: 'resource', buffered: true });
+  } catch { /* 진행률만 덜 정확해진다 */ }
+  addEventListener('island:load', e => { assets = e.detail ?? assets; });
+
+  // main.js 가 window.__island = ctx 를 넣는 순간 game:ready 를 듣는다 (놓치지 않게)
+  let ctxRef;
+  const hook = ctx => ctx?.events?.on?.('game:ready', p => finish(p?.modules ?? []));
+  try {
+    Object.defineProperty(window, '__island', {
+      configurable: true, enumerable: true,
+      get: () => ctxRef,
+      set(v) { ctxRef = v; Object.defineProperty(window, '__island', { value: v, writable: true, configurable: true, enumerable: true }); hook(v); },
+    });
+  } catch { /* 이미 있으면 아래 tick 이 늦게라도 잡는다 */ }
+
+  // 시작 실패: main.js 가 화면에 남기는 .core-check, 모듈 파일 받기 실패, ctx 전의 오류
+  const ui = $('ui');
+  if (ui) new MutationObserver(recs => {
+    for (const r of recs) for (const n of r.addedNodes) if (n.classList?.contains('core-check')) fail('게임을 시작하지 못했어요', n.textContent.replace(/^\s*시작하지 못했어요:\s*/, '').trim());
+  }).observe(ui, { childList: true });
+  addEventListener('error', e => {
+    if (ready) return;
+    if (e.target instanceof HTMLScriptElement) fail('게임 파일을 받지 못했어요', '인터넷 연결을 확인하고 다시 시도해 주세요.');
+    else if (e instanceof ErrorEvent && !window.__island) fail('게임을 시작하지 못했어요', e.message);
+  }, true);
+  addEventListener('unhandledrejection', e => {
+    if (!ready && !window.__island) fail('게임을 시작하지 못했어요', String(e.reason?.message ?? e.reason));
+  });
+
+  function stage() {
+    const s = window.__island?.services;
+    let n = 0;
+    if (s) for (const m of CFG.modules) { if (!s[CFG.stages[m].service]) return { n, name: m }; n++; }
+    return { n, name: null };
+  }
+
+  function paint() {
+    const st = stage();
+    const units = Math.min(js.size, CFG.js) + Math.min(assets.done, CFG.assets);
+    const frac = ready ? 1 : Math.min(0.97, 0.8 * units / (CFG.js + CFG.assets) + 0.2 * st.n / CFG.modules.length);
+    best = Math.max(best, frac);
+    box.style.setProperty('--ld-p', best.toFixed(3));
+    bar.setAttribute('aria-valuenow', String(Math.round(best * 100)));
+    if (stopped) return;
+    stepEl.textContent = ready ? '섬에 도착했어요!'
+      : !window.__island ? '게임 파일을 받는 중…'
+      : `${st.name ? CFG.stages[st.name].label : '마무리하는 중'}…`;
+    const total = Math.max(CFG.js + CFG.assets, js.size + assets.started);
+    const key = `${js.size}|${assets.done}|${st.n}`;
+    if (key !== lastKey) { lastKey = key; lastChange = performance.now(); }
+    const isSlow = performance.now() - lastChange > 20000;
+    if (isSlow !== slow) { slow = isSlow; actions.hidden = !slow; skip.hidden = true; }
+    countEl.textContent = `파일 ${js.size + assets.done} / ${total}${slow ? ' · 조금 오래 걸리고 있어요' : ''}`;
+  }
+
+  function fail(title, detail, { soft = false } = {}) {
+    if (stopped) return;
+    stopped = true;
+    box.classList.add('is-error');
+    box.setAttribute('aria-busy', 'false');
+    stepEl.textContent = title;
+    countEl.textContent = detail;
+    actions.hidden = false;
+    skip.hidden = !soft;
+    retry.focus();
+  }
+
+  function finish(modules) {
+    if (ready) return;
+    ready = true;
+    paint();
+    const missing = CFG.modules.filter(m => !modules.includes(m));
+    if (missing.length) {
+      return fail('섬의 일부를 불러오지 못했어요', `${missing.map(m => CFG.stages[m].name).join(', ')} — 인터넷 연결을 확인하고 다시 시도해 주세요.`, { soft: true });
+    }
+    if (assets.failed) return fail(`파일 ${assets.failed}개를 받지 못했어요`, '섬은 열렸지만 일부가 안 보일 수 있어요.', { soft: true });
+    done();
+  }
+
+  // 막 걷기 → 소리가 아직 잠겨 있으면 안내 (audio 서비스의 unlocked 를 보다가 켜지면 지운다)
+  function done() {
+    stopped = true;
+    box.setAttribute('aria-busy', 'false');
+    box.classList.add('is-done');
+    setTimeout(() => box.remove(), 600);
+    const audio = () => window.__island?.services?.audio;
+    if (!audio() || audio().unlocked) return hint.remove();
+    // claude.ai 안(iframe)에서는 한 번 눌러야 키보드도 게임에 들어온다
+    if (!window.__island.input?.touch) hint.querySelector('span').textContent = '화면을 한 번 클릭하면 소리와 키보드가 켜져요';
+    hint.hidden = false;
+    const watch = setInterval(() => {
+      if (audio()?.unlocked === false) return;
+      clearInterval(watch);
+      hint.classList.add('is-gone');
+      setTimeout(() => hint.remove(), 500);
+    }, 300);
+  }
+
+  const timer = setInterval(() => {
+    if (!box.isConnected) return clearInterval(timer);
+    if (!ctxRef && window.__island && hook(window.__island)) ctxRef = window.__island;
+    paint();
+  }, 150);
+})();
+</script>
