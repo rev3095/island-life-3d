@@ -90,7 +90,7 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 | `map` 섬 지도 자리·시드·밀도 | `assets/island/layout.json` 칸마다 | 값 데이터 → `marks` | 섬 지도 편집기 |
 | `data` 숫자 표 묶음 | 숫자 표 편집기 `SHEETS` + `assets/data/*.json` | 값 데이터 → `marks` | 숫자 표 `#<표 id>` |
 | `style` 스타일 프리셋 | `assets/style/presets.json` | 값 데이터 → `marks` | 스타일 편집기 |
-| `decision` 보드 결정 D8– | 보드 html `DECISIONS` + `--boards` | 고른 안이 있으면 확정 → `marks` | 그 보드 |
+| `decision` 보드 결정 D8– | 보드 html `DECISIONS` + `--boards` (보드 파일이 아직 이 작업 트리에 없으면 그 보드는 건너뛰고 알린다) | 고른 안이 있으면 확정 → `marks` | 그 보드 |
 
 `catalog/<분류>` 모양: `{ group, label, editor, editorName, how: 'spec'|'value'|'board', count, approved, review, new, icons?, builtAt, commit, by: 'claude', items: [{ id, ref, name, sub, state: 'approved'|'review'|'new', version, link, file, board?, pick?, rec?, icons? }] }` (문서 하나 256 KiB 안 — 지금 가장 큰 아이템이 21 KB).
 
@@ -147,7 +147,7 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
   items: { bench: 3 } }     // 시나리오는 이 칸이 지금 `scenes`, 연출안 고른 것은 `picks`
 ```
 
-편집기 id = 홈 목록 id: `character` · `env` · `story` · `sound` · `map` · `data` · `style` (보드는 `wave5` · `z5` · `wave6`).
+편집기 id = 홈 목록 id: `character` · `env` · `story` · `sound` · `map` · `data` · `style` (보드는 `wave5` · `z5` · `wave6` · `wave7`).
 
 **되돌리기 요청** (사용자 → Claude):
 - 보드: `history` 의 선택을 다시 고른다 (`board-kit.js` 단추 — 지금 그대로).

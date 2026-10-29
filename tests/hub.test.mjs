@@ -3,7 +3,7 @@
 // 전체 관리 표(tools/hub-catalog.mjs 목록 + 홈 계산 hub-logic)가 저장소 파일·편집기 주소와 맞는다.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import vm from 'node:vm';
@@ -35,16 +35,21 @@ test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 �
 test('홈 링크 = 문서 링크 (CLAUDE.md · concept/README.md · 시나리오 노트)', () => {
   const claude = read('CLAUDE.md'), readme = read('concept/README.md');
   for (const id of ['character', 'env', 'game']) assert.ok(claude.includes(byId[id].url), `${id} 링크가 CLAUDE.md 와 다르다`);
-  for (const id of ['wave5', 'z5', 'wave6', 'concept']) {
-    const row = readme.split('\n').find(l => l.includes(byId[id].file.replace('concept/', '`')));
-    assert.ok(row?.includes(byId[id].url), `${id} 링크가 concept/README.md 보드 표와 다르다`);
-  }
-  assert.ok(read('docs/notes/story.md').split('\n')[0].includes(byId.story.url), 'story 링크가 docs/notes/story.md 첫 줄과 다르다');
-  // 보드 id = 보드 페이지의 window.BOARD.id = reads 의 boards/<id>
-  for (const e of LIST.filter(x => x.group === 'board')) {
+  // 보드 링크 = README 보드 표 줄, 보드 id = 보드 페이지의 window.BOARD.id = reads 의 boards/<id>.
+  // 다른 브랜치에서 막 생긴 보드는 합치기 전엔 이 작업 트리에 파일·README 줄이 없다 → 여기 적은 것만 기다려 주고, 파일이 생기면 같은 검사를 받는다.
+  const PENDING_BOARDS = { wave7: 'p10-board7' };
+  for (const e of LIST.filter(x => x.group === 'board' || x.group === 'archive')) {
+    if (!existsSync(resolve(root, e.file))) {
+      assert.ok(PENDING_BOARDS[e.id], `${e.id}: ${e.file} 가 없다 (다른 브랜치에서 오는 보드면 PENDING_BOARDS 에)`);
+      continue;
+    }
+    const row = readme.split('\n').find(l => l.includes(e.file.replace('concept/', '`')));
+    assert.ok(row?.includes(e.url), `${e.id} 링크가 concept/README.md 보드 표와 다르다`);
+    if (e.group !== 'board') continue;
     assert.ok(read(e.file).includes(`id: '${e.id}'`), `${e.file} 의 window.BOARD.id 가 ${e.id} 가 아니다`);
     assert.deepEqual(e.reads, [`boards/${e.id}`, `applied/${e.id}`]);
   }
+  assert.ok(read('docs/notes/story.md').split('\n')[0].includes(byId.story.url), 'story 링크가 docs/notes/story.md 첫 줄과 다르다');
 });
 
 test('"전체 요청 확인" 순서와 status 모양이 문서에 있다', () => {
@@ -154,6 +159,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
   assert.ok(docs.decision.items.some(d => d.id === 'D8' && d.pick === 'B' && d.state === 'approved'));
   assert.ok(docs.decision.items.some(d => d.id === 'D9' && d.pick === null && d.state === 'review'), '반영에 없는 결정은 검수 대기');
   for (let n = 8; n <= 35; n++) assert.ok(docs.decision.items.some(d => d.id === `D${n}`), `보드 결정 D${n}`);
+  if (existsSync(resolve(root, 'concept/wave7-board.html'))) for (let n = 36; n <= 48; n++) assert.ok(docs.decision.items.some(d => d.id === `D${n}`), `보드 결정 D${n} (wave7)`);
   assert.deepEqual(Object.keys(docs), GROUPS.map(g => g.id));
   assert.equal(meta.total, Object.values(docs).reduce((n, d) => n + d.count, 0));
 

@@ -155,12 +155,15 @@ function rowsFor(g, R, ctx) {
     }
     case 'decision':
       return ctx.list.filter(e => e.group === 'board').sort((a, b) => a.file.localeCompare(b.file, 'en', { numeric: true })).flatMap(b => {
+        // 다른 브랜치에서 막 생긴 보드는 합치기 전엔 파일이 없다 → 건너뛰고 알린다 (합친 뒤 다시 돌리면 들어간다)
+        if (!R.has(b.file)) { ctx.skipped.push(`${b.id} (${b.file} 없음)`); return []; }
         const ap = ctx.boards?.[b.id] ?? null;
         return boardDecisions(R.text(b.file)).map(d => {
           const rec = d.opts.find(o => o[3])?.[0] ?? null;
           const pick = ap?.picks?.[d.id] ?? null;
           const opt = d.opts.find(o => o[0] === pick);
-          return { id: d.id, ref: d.id, name: d.q, sub: `${b.id} · ${pick ? `고른 안 ${pick}${opt ? ` ${opt[1]}` : ''}` : '아직 안 고름'}${rec && pick && rec !== pick ? ` (추천 ${rec})` : ''}`,
+          const note = ap?.notes?.[d.id] ? ` · 의견: ${String(ap.notes[d.id]).slice(0, 60)}` : '';
+          return { id: d.id, ref: d.id, name: d.q, sub: `${b.id} · ${pick ? `고른 안 ${pick}${opt ? ` ${opt[1]}` : ''}` : '아직 안 고름'}${rec && pick && rec !== pick ? ` (추천 ${rec})` : ''}${note}`,
             state: pick ? 'approved' : 'review', version: version(ap?.version), board: b.id, pick, rec, link: b.url, file: b.file };
         });
       }).sort((a, b) => +a.id.slice(1) - +b.id.slice(1));
@@ -176,10 +179,10 @@ export function buildCatalog({ root = ROOT, boards = null, now = Date.now(), com
   const R = reader(root);
   const list = editorsList(R.text('editors.html'));
   const byId = Object.fromEntries(list.map(e => [e.id, e]));
-  const docs = {};
+  const docs = {}, skipped = [];
   for (const g of GROUPS) {
     const ed = g.editor ? byId[g.editor] : null;
-    const items = rowsFor(g, R, { list, boards }).map(({ hash, ...it }) => ({
+    const items = rowsFor(g, R, { list, boards, skipped }).map(({ hash, ...it }) => ({
       ...it, link: it.link ?? (ed?.url ? ed.url + (hash ? `#${hash}` : '') : null) }));
     const count = s => items.filter(i => i.state === s).length;
     docs[g.id] = {
@@ -194,8 +197,9 @@ export function buildCatalog({ root = ROOT, boards = null, now = Date.now(), com
     total: Object.values(docs).reduce((n, d) => n + d.count, 0),
     review: Object.values(docs).reduce((n, d) => n + d.review + d.new, 0),
     groups: GROUPS.map(g => ({ id: g.id, label: g.label, count: docs[g.id].count, review: docs[g.id].review, new: docs[g.id].new })),
+    ...(skipped.length ? { skipped } : {}),
   };
-  return { docs, meta };
+  return { docs, meta, skipped };
 }
 function gitHead(root) {
   try { return execSync('git rev-parse --short HEAD', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return null; }
@@ -208,7 +212,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   const boardsPath = opt('--boards');
   const boards = boardsPath ? JSON.parse(readFileSync(boardsPath, 'utf8')) : null;
   const out = resolve(ROOT, opt('--out') ?? 'assets/review/hub');
-  const { docs, meta } = buildCatalog({ boards });
+  const { docs, meta, skipped } = buildCatalog({ boards });
   mkdirSync(join(out, 'catalog'), { recursive: true });
   for (const [id, d] of Object.entries(docs)) writeFileSync(join(out, 'catalog', `${id}.json`), JSON.stringify(d, null, 1));
   writeFileSync(join(out, 'meta-catalog.json'), JSON.stringify(meta, null, 1));
@@ -224,5 +228,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   console.log(`catalog ${Object.keys(docs).length}개 → ${out} (커밋 ${meta.commit ?? '?'})`);
   for (const d of Object.values(docs)) console.log(`  ${d.group.padEnd(10)} ${String(d.count).padStart(3)}개 · 확정 ${d.approved} · 검수 대기 ${d.review}${d.new ? ` · 새로 ${d.new}` : ''} · ${(size(d) / 1024).toFixed(1)} KB`);
   console.log(`  합계 ${meta.total}개 · 검수 대기·새로 ${meta.review}${boards ? '' : ' (--boards 없음: 보드 결정은 "아직 안 고름")'}`);
+  if (skipped.length) console.warn(`  ⚠ 건너뛴 보드: ${skipped.join(', ')} — 그 브랜치를 합친 뒤 다시 돌린다`);
   if (args.includes('--print')) console.log(JSON.stringify(meta, null, 1));
 }
