@@ -1,0 +1,68 @@
+{
+  "id": "IC-BG-09",
+  "slug": "bug-firefly",
+  "name": "반딧불이",
+  "group": "bug",
+  "category": "item",
+  "kind": "firefly",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.firefly",
+      "code": "IC-BG-09"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "초여름 밤 물가에 작은 불빛을 켠다. 깨끗한 물이 있는 곳에만 산다.",
+    "keywords": [
+      "물가 공중",
+      "밤"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.2,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#3B3530",
+    "head": "#D8493A",
+    "wing": "#3E3834",
+    "glow": "#E8F77A",
+    "leg": "#2F2A26"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "head": "머리",
+    "wing": "날개",
+    "glow": "빛",
+    "leg": "다리"
+  }
+}

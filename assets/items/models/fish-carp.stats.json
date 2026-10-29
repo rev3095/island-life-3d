@@ -1,0 +1,48 @@
+{
+  "id": "IC-FS-04",
+  "slug": "fish-carp",
+  "name": "잉어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.carp"
+  ],
+  "hold": true,
+  "triangles": 1752,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.106,
+    0.49,
+    0.175
+  ],
+  "bounds": [
+    [
+      -0.053,
+      -0.245,
+      -0.087
+    ],
+    [
+      0.053,
+      0.245,
+      0.087
+    ]
+  ],
+  "glbBytes": 42764,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-carp_main.png",
+    "fish-carp_thumb.png"
+  ]
+}

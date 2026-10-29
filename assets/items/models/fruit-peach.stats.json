@@ -1,0 +1,47 @@
+{
+  "id": "IC-FR-03",
+  "slug": "fruit-peach",
+  "name": "복숭아",
+  "group": "fruit",
+  "kind": "fruit",
+  "version": "0.1",
+  "items": [
+    "fruit.peach"
+  ],
+  "hold": false,
+  "triangles": 860,
+  "parts": 1,
+  "materials": [
+    "fruit",
+    "fruitDark",
+    "leaf",
+    "shine",
+    "stem"
+  ],
+  "objects": [
+    "fruit"
+  ],
+  "size": [
+    0.28,
+    0.263,
+    0.341
+  ],
+  "bounds": [
+    [
+      -0.14,
+      -0.132,
+      0.0
+    ],
+    [
+      0.14,
+      0.132,
+      0.341
+    ]
+  ],
+  "glbBytes": 21220,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-peach_main.png",
+    "fruit-peach_thumb.png"
+  ]
+}

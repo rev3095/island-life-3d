@@ -1,0 +1,46 @@
+{
+  "id": "IC-SH-02",
+  "slug": "shell-cowrie",
+  "name": "개오지",
+  "group": "shell",
+  "kind": "cowrie",
+  "version": "0.1",
+  "items": [
+    "shell.cowrie"
+  ],
+  "hold": false,
+  "triangles": 2424,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellBase",
+    "shellDark",
+    "shine"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.2,
+    0.3,
+    0.15
+  ],
+  "bounds": [
+    [
+      -0.1,
+      -0.15,
+      0.0
+    ],
+    [
+      0.1,
+      0.15,
+      0.15
+    ]
+  ],
+  "glbBytes": 48544,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-cowrie_main.png",
+    "shell-cowrie_thumb.png"
+  ]
+}

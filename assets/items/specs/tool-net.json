@@ -1,0 +1,60 @@
+{
+  "id": "IC-TL-02",
+  "slug": "tool-net",
+  "name": "잠자리채",
+  "group": "tool",
+  "category": "item",
+  "kind": "net",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "tool.net",
+      "code": "IC-TL-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "둥근 테에 하얀 그물을 단 잠자리채",
+    "keywords": [
+      "둥근 테",
+      "하얀 그물",
+      "나무 자루"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "grip": "#5E4A3A",
+    "hoop": "#9AA6A8",
+    "net": "#EAF6F8",
+    "netLine": "#9DB9C0"
+  },
+  "paletteLabels": {
+    "wood": "나무 자루",
+    "grip": "손잡이",
+    "hoop": "테",
+    "net": "그물",
+    "netLine": "그물 줄"
+  },
+  "pose": {
+    "y": 40
+  }
+}

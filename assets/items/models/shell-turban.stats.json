@@ -1,0 +1,45 @@
+{
+  "id": "IC-SH-05",
+  "slug": "shell-turban",
+  "name": "소라",
+  "group": "shell",
+  "kind": "turban",
+  "version": "0.1",
+  "items": [
+    "shell.turban"
+  ],
+  "hold": false,
+  "triangles": 1258,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellBase",
+    "shellDark"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.382,
+    0.368,
+    0.31
+  ],
+  "bounds": [
+    [
+      -0.191,
+      -0.184,
+      0.0
+    ],
+    [
+      0.191,
+      0.184,
+      0.31
+    ]
+  ],
+  "glbBytes": 26024,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-turban_main.png",
+    "shell-turban_thumb.png"
+  ]
+}

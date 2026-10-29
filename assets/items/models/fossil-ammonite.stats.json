@@ -1,0 +1,44 @@
+{
+  "id": "IC-FO-01",
+  "slug": "fossil-ammonite",
+  "name": "암모나이트",
+  "group": "fossil",
+  "kind": "ammonite",
+  "version": "0.1",
+  "items": [
+    "fossil.ammonite"
+  ],
+  "hold": true,
+  "triangles": 3984,
+  "parts": 1,
+  "materials": [
+    "fossil",
+    "fossilDark"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.232,
+    0.079,
+    0.191
+  ],
+  "bounds": [
+    [
+      -0.116,
+      -0.039,
+      -0.095
+    ],
+    [
+      0.116,
+      0.039,
+      0.095
+    ]
+  ],
+  "glbBytes": 74648,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-ammonite_main.png",
+    "fossil-ammonite_thumb.png"
+  ]
+}

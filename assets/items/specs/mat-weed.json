@@ -1,0 +1,51 @@
+{
+  "id": "IC-MA-07",
+  "slug": "mat-weed",
+  "name": "잡초",
+  "group": "mat",
+  "category": "item",
+  "kind": "weed",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.weed",
+      "code": "IC-MA-07"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "뽑은 잡초 한 줌, 뿌리에 흙이 조금",
+    "keywords": [
+      "풀 잎사귀 9장"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "weed": "#6E9E3E",
+    "weedDark": "#557E2E",
+    "soil": "#7A5A3E"
+  },
+  "paletteLabels": {
+    "weed": "잡초",
+    "weedDark": "진한 잡초",
+    "soil": "흙"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "IC-FO-07",
+  "slug": "fossil-mammoth-tusk",
+  "name": "매머드 엄니",
+  "group": "fossil",
+  "kind": "tusk",
+  "version": "0.1",
+  "items": [
+    "fossil.mammoth-tusk"
+  ],
+  "hold": true,
+  "triangles": 748,
+  "parts": 1,
+  "materials": [
+    "ivory",
+    "ivoryDark"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.469,
+    0.092,
+    0.244
+  ],
+  "bounds": [
+    [
+      -0.234,
+      -0.046,
+      -0.122
+    ],
+    [
+      0.234,
+      0.046,
+      0.122
+    ]
+  ],
+  "glbBytes": 15720,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-mammoth-tusk_main.png",
+    "fossil-mammoth-tusk_thumb.png"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-02",
+  "slug": "bug-swallowtail",
+  "name": "호랑나비",
+  "group": "bug",
+  "kind": "butterfly",
+  "version": "0.1",
+  "items": [
+    "bug.swallowtail"
+  ],
+  "hold": true,
+  "triangles": 2100,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "wing",
+    "wing2",
+    "wingMark",
+    "wingSpot"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.338,
+    0.341,
+    0.093
+  ],
+  "bounds": [
+    [
+      -0.169,
+      -0.17,
+      -0.046
+    ],
+    [
+      0.169,
+      0.17,
+      0.046
+    ]
+  ],
+  "glbBytes": 74208,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-swallowtail_main.png",
+    "bug-swallowtail_thumb.png"
+  ]
+}

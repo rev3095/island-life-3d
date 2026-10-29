@@ -1,0 +1,80 @@
+{
+  "id": "IC-FS-14",
+  "slug": "fish-flounder",
+  "name": "광어",
+  "group": "fish",
+  "category": "item",
+  "kind": "flatfish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fish.flounder",
+      "code": "IC-FS-14"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "두 눈이 한쪽에 몰린 납작한 물고기. 모래 바닥에 몸을 묻고 숨어 있다.",
+    "keywords": [
+      "바다",
+      "그림자 4"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.48,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "spots": {
+      "label": "점 수",
+      "value": 9,
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#B39C80",
+    "back": "#8A735A",
+    "belly": "#F4EEE2",
+    "fin": "#9C8468",
+    "mark": "#685644",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -20,
+    "pitch": 62
+  }
+}

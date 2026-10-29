@@ -1,0 +1,49 @@
+{
+  "id": "IC-SH-05",
+  "slug": "shell-turban",
+  "name": "소라",
+  "group": "shell",
+  "category": "item",
+  "kind": "turban",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "shell.turban",
+      "code": "IC-SH-05"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "뿔 돌기가 난 둥근 소라",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#9AA07A",
+    "shellDark": "#6E7458",
+    "shellBase": "#F0E6D0"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellDark": "껍데기 무늬",
+    "shellBase": "껍데기 아래"
+  }
+}

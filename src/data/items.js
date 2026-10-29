@@ -180,42 +180,45 @@ const SEEDS = [
 const code = (p, i) => `${p}-${String(i + 1).padStart(2, '0')}`;
 const sizeOf = s => (s.includes('×') ? s.split('×').map(Number) : [1, 1]);
 const placeOf = s => (s === '벽' ? 'wall' : s === '창문' ? 'window' : 'floor');
+// 아이콘 = 아이템 모델 썸네일 그림 (assets/items, 5차 Z1 · tools/build-item.mjs). 색 변형(꽃·씨앗 봉투)은 <모델>_<변형>_thumb.png.
+// 글자로 써야 하는 곳(대화 선택지 등)은 emoji — 위 표의 이모지 그대로
+const itemIcon = (model, variant) => `assets/items/renders/${model}${variant ? `_${variant}` : ''}_thumb.png`;
 
 /** @type {object[]} 모든 아이템 (읽기 전용) */
 export const ITEMS = [
   ...FISH.map(([slug, name, place, time, season, shadow, price, rare, icon, desc], i) => ({
-    id: `fish.${slug}`, category: 'fish', code: code('FI', i), name, icon, price, desc,
+    id: `fish.${slug}`, category: 'fish', code: code('FI', i), name, icon: itemIcon(`fish-${slug}`), emoji: icon, price, desc,
     place, time, season, habitats: FISH_PLACE[place], hours: TIME_HOURS[time], months: SEASON_MONTHS[season],
     shadow, rare: !!rare, weight: weightOf(price, rare),
     colors: (([body, back, belly, fin]) => ({ body, back, belly, fin }))(FISH_COLORS[slug] ?? ['#8FA7B5', '#6E8898', '#F7F1E4', '#7E98A8']),
   })),
   ...BUGS.map(([slug, name, place, time, season, price, rare, flying, icon, desc], i) => ({
-    id: `bug.${slug}`, category: 'bug', code: code('BU', i), name, icon, price, desc,
+    id: `bug.${slug}`, category: 'bug', code: code('BU', i), name, icon: itemIcon(`bug-${slug}`), emoji: icon, price, desc,
     place, time, season, places: BUG_PLACE[place], hours: TIME_HOURS[time], months: SEASON_MONTHS[season],
     rainOnly: time === '비 올 때', flying: !!flying, rare: !!rare, weight: weightOf(price, rare),
   })),
   ...FOSSILS.map(([slug, name, price, rare, icon, desc], i) => ({
-    id: `fossil.${slug}`, category: 'fossil', code: `FO-0${i + 1}`, name, icon, price, desc, rare: !!rare, weight: weightOf(price, rare),
+    id: `fossil.${slug}`, category: 'fossil', code: `FO-0${i + 1}`, name, icon: itemIcon(`fossil-${slug}`), emoji: icon, price, desc, rare: !!rare, weight: weightOf(price, rare),
   })),
-  { id: UNKNOWN_FOSSIL, category: 'fossil', code: 'FO-00', name: '알 수 없는 화석', icon: '🦴', price: 200, unknown: true,
+  { id: UNKNOWN_FOSSIL, category: 'fossil', code: 'FO-00', name: '알 수 없는 화석', icon: itemIcon('fossil-unknown'), emoji: '🦴', price: 200, unknown: true,
     desc: '흙이 잔뜩 묻은 오래된 무언가. 박물관 느루에게 가져가면 무엇인지 감정해 준다.' },
   ...FRUITS.map(([slug, name, icon, price, variant]) => ({
-    id: `fruit.${slug}`, category: 'fruit', code: slug === 'coconut' ? 'MA-02' : 'MA-01', name, icon, price,
+    id: `fruit.${slug}`, category: 'fruit', code: slug === 'coconut' ? 'MA-02' : 'MA-01', name, icon: itemIcon(`fruit-${slug}`), emoji: icon, price,
     nativePrice: variant ? 100 : price, variant, tree: variant ? 'fruit-tree' : 'palm',
   })),
   ...SHELLS.map(([slug, name, icon, price, weight, variant]) => ({
-    id: `shell.${slug}`, category: 'shell', code: 'MA-07', name, icon, price, weight, variant,
+    id: `shell.${slug}`, category: 'shell', code: 'MA-07', name, icon: itemIcon(`shell-${slug}`), emoji: icon, price, weight, variant,
   })),
   ...FLOWERS.flatMap(([kind, kindName, icon, colors]) => colors.map(([variant, color], ci) => ({
-    id: `flower.${kind}-${variant}`, category: 'flower', code: 'PR-06', name: `${color} ${kindName}`, icon,
+    id: `flower.${kind}-${variant}`, category: 'flower', code: 'PR-06', name: `${color} ${kindName}`, icon: itemIcon(`flower-${kind}`, variant), emoji: icon,
     price: ci === 3 ? 240 : 80, kind, variant, hybrid: ci === 3,
   }))),
   ...MATS.map(([slug, name, icon, price, from], i) => ({
-    id: `mat.${slug}`, category: 'mat', code: ['MA-03', 'MA-03', 'MA-04', 'MA-05', 'MA-05', 'MA-05', 'MA-06'][i], name, icon, price, from,
+    id: `mat.${slug}`, category: 'mat', code: ['MA-03', 'MA-03', 'MA-04', 'MA-05', 'MA-05', 'MA-05', 'MA-06'][i], name, icon: itemIcon(`mat-${slug}`), emoji: icon, price, from,
   })),
-  { id: 'mat.acorn-bag', category: 'mat', code: 'MA-08', name: '도토리 주머니', icon: '💰', price: 100, acorns: 100, stack: 10, from: '나무·바위에서 가끔' },
+  { id: 'mat.acorn-bag', category: 'mat', code: 'MA-08', name: '도토리 주머니', icon: itemIcon('mat-acorn-bag'), emoji: '💰', price: 100, acorns: 100, stack: 10, from: '나무·바위에서 가끔' },
   ...TOOLS.map(([slug, name, icon, use, from, durability, buy], i) => ({
-    id: `tool.${slug}`, category: 'tool', code: code('TL', i), name, icon, price: buy / 4, buy, tool: slug, use, from, durability,
+    id: `tool.${slug}`, category: 'tool', code: code('TL', i), name, icon: itemIcon(`tool-${slug}`), emoji: icon, price: buy / 4, buy, tool: slug, use, from, durability,
   })),
   // 가구 아이콘 = 가구 모델 썸네일 그림 (assets/furniture, W3). 글자로 써야 하는 곳(대화 선택지 등)은 emoji
   ...FURN.map(([slug, name, size, from, icon, price, buy, source], i) => ({
@@ -224,7 +227,9 @@ export const ITEMS = [
     ...(slug === 'campfire' ? { outdoor: true } : {}), ...(slug === 'radio' ? { plays: 'bgm' } : {}),
     ...(slug === 'fish-tank' ? { holds: 'fish' } : {}), ...(slug === 'bug-case' ? { holds: 'bug' } : {}),
   })),
-  ...SEEDS.map(([slug, name, icon, price, buy, extra]) => ({ id: `seed.${slug}`, category: 'seed', name, icon, price, buy, ...extra })),
+  ...SEEDS.map(([slug, name, icon, price, buy, extra]) => ({
+    id: `seed.${slug}`, category: 'seed', name, icon: extra.flower ? itemIcon('seed-bag', extra.flower) : itemIcon(`seed-${slug}`), emoji: icon, price, buy, ...extra,
+  })),
 ];
 
 const deepFreeze = v => {

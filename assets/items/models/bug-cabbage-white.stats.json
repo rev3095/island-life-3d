@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-01",
+  "slug": "bug-cabbage-white",
+  "name": "배추흰나비",
+  "group": "bug",
+  "kind": "butterfly",
+  "version": "0.1",
+  "items": [
+    "bug.cabbage-white"
+  ],
+  "hold": true,
+  "triangles": 1596,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "wing",
+    "wing2",
+    "wingMark"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.27,
+    0.251,
+    0.077
+  ],
+  "bounds": [
+    [
+      -0.135,
+      -0.126,
+      -0.039
+    ],
+    [
+      0.135,
+      0.126,
+      0.039
+    ]
+  ],
+  "glbBytes": 50820,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-cabbage-white_main.png",
+    "bug-cabbage-white_thumb.png"
+  ]
+}

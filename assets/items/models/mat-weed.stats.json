@@ -1,0 +1,45 @@
+{
+  "id": "IC-MA-07",
+  "slug": "mat-weed",
+  "name": "잡초",
+  "group": "mat",
+  "kind": "weed",
+  "version": "0.1",
+  "items": [
+    "mat.weed"
+  ],
+  "hold": false,
+  "triangles": 732,
+  "parts": 1,
+  "materials": [
+    "soil",
+    "weed",
+    "weedDark"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.291,
+    0.301,
+    0.328
+  ],
+  "bounds": [
+    [
+      -0.145,
+      -0.15,
+      0.0
+    ],
+    [
+      0.145,
+      0.15,
+      0.328
+    ]
+  ],
+  "glbBytes": 16396,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-weed_main.png",
+    "mat-weed_thumb.png"
+  ]
+}

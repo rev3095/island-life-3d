@@ -1,0 +1,45 @@
+{
+  "id": "IC-SH-01",
+  "slug": "shell-clam",
+  "name": "바지락",
+  "group": "shell",
+  "kind": "clam",
+  "version": "0.1",
+  "items": [
+    "shell.clam"
+  ],
+  "hold": false,
+  "triangles": 2236,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellDark",
+    "shellRib"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.3,
+    0.242,
+    0.086
+  ],
+  "bounds": [
+    [
+      -0.15,
+      -0.121,
+      0.0
+    ],
+    [
+      0.15,
+      0.121,
+      0.086
+    ]
+  ],
+  "glbBytes": 43464,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-clam_main.png",
+    "shell-clam_thumb.png"
+  ]
+}

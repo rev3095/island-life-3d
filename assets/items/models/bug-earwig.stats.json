@@ -1,0 +1,47 @@
+{
+  "id": "IC-BG-22",
+  "slug": "bug-earwig",
+  "name": "집게벌레",
+  "group": "bug",
+  "kind": "earwig",
+  "version": "0.1",
+  "items": [
+    "bug.earwig"
+  ],
+  "hold": true,
+  "triangles": 2356,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "head",
+    "leg",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.116,
+    0.267,
+    0.065
+  ],
+  "bounds": [
+    [
+      -0.058,
+      -0.134,
+      -0.033
+    ],
+    [
+      0.058,
+      0.134,
+      0.033
+    ]
+  ],
+  "glbBytes": 47736,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-earwig_main.png",
+    "bug-earwig_thumb.png"
+  ]
+}

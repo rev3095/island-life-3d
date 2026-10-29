@@ -1,0 +1,96 @@
+{
+  "id": "IC-BG-01",
+  "slug": "bug-cabbage-white",
+  "name": "배추흰나비",
+  "group": "bug",
+  "category": "item",
+  "kind": "butterfly",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.cabbage-white",
+      "code": "IC-BG-01"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "하얀 날개에 까만 점 몇 개. 봄 들판을 가장 먼저 날아다닌다.",
+    "keywords": [
+      "꽃 주변",
+      "낮"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.3,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "foreMarks": {
+      "label": "앞날개 무늬 [x, y, 크기, 색]",
+      "value": [
+        [
+          0.9,
+          0.6,
+          0.1,
+          "wingMark"
+        ],
+        [
+          0.55,
+          0.25,
+          0.07,
+          "wingMark"
+        ]
+      ]
+    },
+    "hindMarks": {
+      "label": "뒷날개 무늬",
+      "value": [
+        [
+          0.45,
+          -0.1,
+          0.06,
+          "wingMark"
+        ]
+      ]
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#4A4440",
+    "wing": "#F7F5EE",
+    "wing2": "#F0EEE4",
+    "wingMark": "#4A4440",
+    "leg": "#4A4440"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "wing": "날개",
+    "wing2": "뒷날개",
+    "wingMark": "날개 무늬",
+    "leg": "다리"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "IC-MA-01",
+  "slug": "mat-wood",
+  "name": "나무",
+  "group": "mat",
+  "kind": "wood",
+  "version": "0.1",
+  "items": [
+    "mat.wood"
+  ],
+  "hold": false,
+  "triangles": 792,
+  "parts": 1,
+  "materials": [
+    "bark",
+    "cut",
+    "ring"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.31,
+    0.385,
+    0.258
+  ],
+  "bounds": [
+    [
+      -0.155,
+      -0.192,
+      0.0
+    ],
+    [
+      0.155,
+      0.192,
+      0.258
+    ]
+  ],
+  "glbBytes": 19728,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-wood_main.png",
+    "mat-wood_thumb.png"
+  ]
+}

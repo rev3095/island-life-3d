@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-09",
+  "slug": "bug-firefly",
+  "name": "반딧불이",
+  "group": "bug",
+  "kind": "firefly",
+  "version": "0.1",
+  "items": [
+    "bug.firefly"
+  ],
+  "hold": true,
+  "triangles": 1928,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "glow",
+    "head",
+    "leg",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.113,
+    0.246,
+    0.063
+  ],
+  "bounds": [
+    [
+      -0.057,
+      -0.123,
+      -0.031
+    ],
+    [
+      0.057,
+      0.123,
+      0.031
+    ]
+  ],
+  "glbBytes": 40576,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-firefly_main.png",
+    "bug-firefly_thumb.png"
+  ]
+}

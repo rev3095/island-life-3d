@@ -1,0 +1,47 @@
+{
+  "id": "IC-SH-03",
+  "slug": "shell-scallop",
+  "name": "가리비",
+  "group": "shell",
+  "category": "item",
+  "kind": "scallop",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "shell.scallop",
+      "code": "IC-SH-03"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "부채꼴 가리비, 부챗살 줄 아홉",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#F7C6A0",
+    "shellRib": "#E8A27A"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "껍데기 줄"
+  }
+}

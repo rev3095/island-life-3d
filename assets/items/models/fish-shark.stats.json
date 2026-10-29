@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-20",
+  "slug": "fish-shark",
+  "name": "상어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.shark"
+  ],
+  "hold": true,
+  "triangles": 1568,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.19,
+    0.81,
+    0.235
+  ],
+  "bounds": [
+    [
+      -0.095,
+      -0.405,
+      -0.117
+    ],
+    [
+      0.095,
+      0.405,
+      0.117
+    ]
+  ],
+  "glbBytes": 39848,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-shark_main.png",
+    "fish-shark_thumb.png"
+  ]
+}

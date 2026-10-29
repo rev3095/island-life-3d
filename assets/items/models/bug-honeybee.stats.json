@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-05",
+  "slug": "bug-honeybee",
+  "name": "꿀벌",
+  "group": "bug",
+  "kind": "bee",
+  "version": "0.1",
+  "items": [
+    "bug.honeybee"
+  ],
+  "hold": true,
+  "triangles": 2642,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fuzz",
+    "stripe",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.162,
+    0.247,
+    0.13
+  ],
+  "bounds": [
+    [
+      -0.081,
+      -0.123,
+      -0.065
+    ],
+    [
+      0.081,
+      0.123,
+      0.065
+    ]
+  ],
+  "glbBytes": 59072,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-honeybee_main.png",
+    "bug-honeybee_thumb.png"
+  ]
+}

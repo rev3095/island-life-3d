@@ -1,0 +1,57 @@
+{
+  "id": "IC-SD-01",
+  "slug": "seed-bag",
+  "name": "씨앗 봉투",
+  "group": "seed",
+  "kind": "seed-bag",
+  "version": "0.1",
+  "items": [
+    "seed.tulip",
+    "seed.cosmos",
+    "seed.pansy"
+  ],
+  "hold": false,
+  "triangles": 964,
+  "parts": 1,
+  "materials": [
+    "bag",
+    "bagDark",
+    "center",
+    "emblem",
+    "label",
+    "leaf",
+    "seed"
+  ],
+  "objects": [
+    "seed"
+  ],
+  "size": [
+    0.25,
+    0.087,
+    0.355
+  ],
+  "bounds": [
+    [
+      -0.125,
+      -0.044,
+      0.0
+    ],
+    [
+      0.125,
+      0.044,
+      0.355
+    ]
+  ],
+  "glbBytes": 23128,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "seed-bag_cosmos_main.png",
+    "seed-bag_cosmos_thumb.png",
+    "seed-bag_main.png",
+    "seed-bag_pansy_main.png",
+    "seed-bag_pansy_thumb.png",
+    "seed-bag_thumb.png",
+    "seed-bag_tulip_main.png",
+    "seed-bag_tulip_thumb.png"
+  ]
+}

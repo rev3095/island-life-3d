@@ -22,7 +22,7 @@ test('build-web: .glb·렌더·stats 는 빠지고 모델은 .glb.json 만', () 
     assert.ok(!p.endsWith('.glb'), p);
     assert.ok(!p.endsWith('.stats.json'), p);
     assert.ok(!/\.(blend|blend1|py|mjs|md)$/.test(p), p);
-    if (p.endsWith('.png')) assert.match(p, /^assets\/furniture\/renders\/[\w-]+_thumb\.png$/);
+    if (p.endsWith('.png')) assert.match(p, /^assets\/(furniture|items)\/renders\/[\w-]+_thumb\.png$/);   // 가구·아이템 썸네일 = 아이콘
     if (/\/models\/[^/]+$/.test(p) && !p.endsWith('index.json')) assert.ok(p.endsWith('.glb.json'), p);
   }
 });

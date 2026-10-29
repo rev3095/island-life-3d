@@ -1,0 +1,47 @@
+{
+  "id": "IC-TL-02",
+  "slug": "tool-net",
+  "name": "잠자리채",
+  "group": "tool",
+  "kind": "net",
+  "version": "0.1",
+  "items": [
+    "tool.net"
+  ],
+  "hold": false,
+  "triangles": 1196,
+  "parts": 1,
+  "materials": [
+    "grip",
+    "hoop",
+    "net",
+    "netLine",
+    "wood"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.77,
+    0.31,
+    0.868
+  ],
+  "bounds": [
+    [
+      -0.385,
+      -0.155,
+      0.0
+    ],
+    [
+      0.385,
+      0.155,
+      0.868
+    ]
+  ],
+  "glbBytes": 25868,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-net_main.png",
+    "tool-net_thumb.png"
+  ]
+}

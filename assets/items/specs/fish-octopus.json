@@ -1,0 +1,72 @@
+{
+  "id": "IC-FS-16",
+  "slug": "fish-octopus",
+  "name": "문어",
+  "group": "fish",
+  "category": "item",
+  "kind": "octopus",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fish.octopus",
+      "code": "IC-FS-16"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "다리 여덟 개로 무엇이든 붙잡는 똑똑한 친구. 병뚜껑도 연다는 소문이 있다.",
+    "keywords": [
+      "바다",
+      "그림자 3"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.4,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#D8605A",
+    "back": "#B84A46",
+    "belly": "#F0A49A",
+    "fin": "#C85650",
+    "mark": "#8A3835",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -40,
+    "pitch": 22
+  }
+}

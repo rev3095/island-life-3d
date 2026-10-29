@@ -1,0 +1,2246 @@
+{
+  "models": [
+    {
+      "id": "IC-BG-01",
+      "slug": "bug-cabbage-white",
+      "name": "배추흰나비",
+      "group": "bug",
+      "kind": "butterfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.cabbage-white",
+          "code": "IC-BG-01",
+          "icon": "assets/items/renders/bug-cabbage-white_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.27,
+        0.251,
+        0.077
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-02",
+      "slug": "bug-swallowtail",
+      "name": "호랑나비",
+      "group": "bug",
+      "kind": "butterfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.swallowtail",
+          "code": "IC-BG-02",
+          "icon": "assets/items/renders/bug-swallowtail_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.338,
+        0.341,
+        0.093
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-03",
+      "slug": "bug-yellow-butterfly",
+      "name": "노랑나비",
+      "group": "bug",
+      "kind": "butterfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.yellow-butterfly",
+          "code": "IC-BG-03",
+          "icon": "assets/items/renders/bug-yellow-butterfly_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.252,
+        0.235,
+        0.072
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-04",
+      "slug": "bug-ladybug",
+      "name": "무당벌레",
+      "group": "bug",
+      "kind": "beetle",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.ladybug",
+          "code": "IC-BG-04",
+          "icon": "assets/items/renders/bug-ladybug_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.128,
+        0.182,
+        0.071
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-05",
+      "slug": "bug-honeybee",
+      "name": "꿀벌",
+      "group": "bug",
+      "kind": "bee",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.honeybee",
+          "code": "IC-BG-05",
+          "icon": "assets/items/renders/bug-honeybee_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.162,
+        0.247,
+        0.13
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-06",
+      "slug": "bug-red-dragonfly",
+      "name": "고추잠자리",
+      "group": "bug",
+      "kind": "dragonfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.red-dragonfly",
+          "code": "IC-BG-06",
+          "icon": "assets/items/renders/bug-red-dragonfly_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.356,
+        0.374,
+        0.054
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-07",
+      "slug": "bug-skimmer",
+      "name": "밀잠자리",
+      "group": "bug",
+      "kind": "dragonfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.skimmer",
+          "code": "IC-BG-07",
+          "icon": "assets/items/renders/bug-skimmer_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.376,
+        0.394,
+        0.056
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-08",
+      "slug": "bug-cicada",
+      "name": "매미",
+      "group": "bug",
+      "kind": "cicada",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.cicada",
+          "code": "IC-BG-08",
+          "icon": "assets/items/renders/bug-cicada_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.131,
+        0.244,
+        0.062
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-09",
+      "slug": "bug-firefly",
+      "name": "반딧불이",
+      "group": "bug",
+      "kind": "firefly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.firefly",
+          "code": "IC-BG-09",
+          "icon": "assets/items/renders/bug-firefly_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.113,
+        0.246,
+        0.063
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-10",
+      "slug": "bug-rhino-beetle",
+      "name": "장수풍뎅이",
+      "group": "bug",
+      "kind": "beetle",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.rhino-beetle",
+          "code": "IC-BG-10",
+          "icon": "assets/items/renders/bug-rhino-beetle_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.209,
+        0.328,
+        0.166
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-11",
+      "slug": "bug-stag-beetle",
+      "name": "사슴벌레",
+      "group": "bug",
+      "kind": "beetle",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.stag-beetle",
+          "code": "IC-BG-11",
+          "icon": "assets/items/renders/bug-stag-beetle_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.215,
+        0.368,
+        0.099
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-12",
+      "slug": "bug-mantis",
+      "name": "사마귀",
+      "group": "bug",
+      "kind": "hopper",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.mantis",
+          "code": "IC-BG-12",
+          "icon": "assets/items/renders/bug-mantis_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.131,
+        0.36,
+        0.186
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-13",
+      "slug": "bug-grasshopper",
+      "name": "메뚜기",
+      "group": "bug",
+      "kind": "hopper",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.grasshopper",
+          "code": "IC-BG-13",
+          "icon": "assets/items/renders/bug-grasshopper_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.131,
+        0.27,
+        0.102
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-14",
+      "slug": "bug-cricket",
+      "name": "귀뚜라미",
+      "group": "bug",
+      "kind": "hopper",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.cricket",
+          "code": "IC-BG-14",
+          "icon": "assets/items/renders/bug-cricket_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.235,
+        0.34,
+        0.17
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-15",
+      "slug": "bug-bell-cricket",
+      "name": "방울벌레",
+      "group": "bug",
+      "kind": "hopper",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.bell-cricket",
+          "code": "IC-BG-15",
+          "icon": "assets/items/renders/bug-bell-cricket_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.238,
+        0.321,
+        0.185
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-16",
+      "slug": "bug-ant",
+      "name": "개미",
+      "group": "bug",
+      "kind": "ant",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.ant",
+          "code": "IC-BG-16",
+          "icon": "assets/items/renders/bug-ant_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.156,
+        0.143,
+        0.071
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-17",
+      "slug": "bug-snail",
+      "name": "달팽이",
+      "group": "bug",
+      "kind": "snail",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.snail",
+          "code": "IC-BG-17",
+          "icon": "assets/items/renders/bug-snail_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.071,
+        0.175,
+        0.112
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-18",
+      "slug": "bug-pill-bug",
+      "name": "쥐며느리",
+      "group": "bug",
+      "kind": "pillbug",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.pill-bug",
+          "code": "IC-BG-18",
+          "icon": "assets/items/renders/bug-pill-bug_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.08,
+        0.171,
+        0.042
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-19",
+      "slug": "bug-pond-skater",
+      "name": "소금쟁이",
+      "group": "bug",
+      "kind": "skater",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.pond-skater",
+          "code": "IC-BG-19",
+          "icon": "assets/items/renders/bug-pond-skater_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.312,
+        0.221,
+        0.06
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-20",
+      "slug": "bug-moth",
+      "name": "나방",
+      "group": "bug",
+      "kind": "butterfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.moth",
+          "code": "IC-BG-20",
+          "icon": "assets/items/renders/bug-moth_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.299,
+        0.225,
+        0.084
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-21",
+      "slug": "bug-caterpillar",
+      "name": "송충이",
+      "group": "bug",
+      "kind": "caterpillar",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.caterpillar",
+          "code": "IC-BG-21",
+          "icon": "assets/items/renders/bug-caterpillar_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.049,
+        0.192,
+        0.062
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-22",
+      "slug": "bug-earwig",
+      "name": "집게벌레",
+      "group": "bug",
+      "kind": "earwig",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.earwig",
+          "code": "IC-BG-22",
+          "icon": "assets/items/renders/bug-earwig_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.116,
+        0.267,
+        0.065
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FL-01",
+      "slug": "flower-tulip",
+      "name": "튤립",
+      "group": "flower",
+      "kind": "tulip",
+      "hold": false,
+      "items": [
+        {
+          "item": "flower.tulip-red",
+          "code": "IC-FL-01",
+          "variant": "red",
+          "icon": "assets/items/renders/flower-tulip_red_thumb.png"
+        },
+        {
+          "item": "flower.tulip-yellow",
+          "code": "IC-FL-02",
+          "variant": "yellow",
+          "icon": "assets/items/renders/flower-tulip_yellow_thumb.png"
+        },
+        {
+          "item": "flower.tulip-white",
+          "code": "IC-FL-03",
+          "variant": "white",
+          "icon": "assets/items/renders/flower-tulip_white_thumb.png"
+        },
+        {
+          "item": "flower.tulip-pink",
+          "code": "IC-FL-04",
+          "variant": "pink",
+          "icon": "assets/items/renders/flower-tulip_pink_thumb.png"
+        }
+      ],
+      "variants": [
+        "red",
+        "yellow",
+        "white",
+        "pink"
+      ],
+      "size": [
+        0.166,
+        0.162,
+        0.499
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FL-05",
+      "slug": "flower-cosmos",
+      "name": "코스모스",
+      "group": "flower",
+      "kind": "cosmos",
+      "hold": false,
+      "items": [
+        {
+          "item": "flower.cosmos-pink",
+          "code": "IC-FL-05",
+          "variant": "pink",
+          "icon": "assets/items/renders/flower-cosmos_pink_thumb.png"
+        },
+        {
+          "item": "flower.cosmos-white",
+          "code": "IC-FL-06",
+          "variant": "white",
+          "icon": "assets/items/renders/flower-cosmos_white_thumb.png"
+        },
+        {
+          "item": "flower.cosmos-orange",
+          "code": "IC-FL-07",
+          "variant": "orange",
+          "icon": "assets/items/renders/flower-cosmos_orange_thumb.png"
+        },
+        {
+          "item": "flower.cosmos-red",
+          "code": "IC-FL-08",
+          "variant": "red",
+          "icon": "assets/items/renders/flower-cosmos_red_thumb.png"
+        }
+      ],
+      "variants": [
+        "pink",
+        "white",
+        "orange",
+        "red"
+      ],
+      "size": [
+        0.24,
+        0.176,
+        0.452
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FL-09",
+      "slug": "flower-pansy",
+      "name": "팬지",
+      "group": "flower",
+      "kind": "pansy",
+      "hold": false,
+      "items": [
+        {
+          "item": "flower.pansy-purple",
+          "code": "IC-FL-09",
+          "variant": "purple",
+          "icon": "assets/items/renders/flower-pansy_purple_thumb.png"
+        },
+        {
+          "item": "flower.pansy-yellow",
+          "code": "IC-FL-10",
+          "variant": "yellow",
+          "icon": "assets/items/renders/flower-pansy_yellow_thumb.png"
+        },
+        {
+          "item": "flower.pansy-blue",
+          "code": "IC-FL-11",
+          "variant": "blue",
+          "icon": "assets/items/renders/flower-pansy_blue_thumb.png"
+        },
+        {
+          "item": "flower.pansy-orange",
+          "code": "IC-FL-12",
+          "variant": "orange",
+          "icon": "assets/items/renders/flower-pansy_orange_thumb.png"
+        }
+      ],
+      "variants": [
+        "purple",
+        "yellow",
+        "blue",
+        "orange"
+      ],
+      "size": [
+        0.284,
+        0.249,
+        0.209
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-01",
+      "slug": "fossil-ammonite",
+      "name": "암모나이트",
+      "group": "fossil",
+      "kind": "ammonite",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.ammonite",
+          "code": "IC-FO-01",
+          "icon": "assets/items/renders/fossil-ammonite_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.232,
+        0.079,
+        0.191
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-02",
+      "slug": "fossil-trilobite",
+      "name": "삼엽충",
+      "group": "fossil",
+      "kind": "trilobite",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.trilobite",
+          "code": "IC-FO-02",
+          "icon": "assets/items/renders/fossil-trilobite_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.28,
+        0.341,
+        0.044
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-03",
+      "slug": "fossil-amber",
+      "name": "호박",
+      "group": "fossil",
+      "kind": "amber",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.amber",
+          "code": "IC-FO-03",
+          "icon": "assets/items/renders/fossil-amber_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.209,
+        0.177,
+        0.156
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "glint"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-04",
+      "slug": "fossil-fern-fossil",
+      "name": "고사리 화석",
+      "group": "fossil",
+      "kind": "fern-fossil",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.fern-fossil",
+          "code": "IC-FO-04",
+          "icon": "assets/items/renders/fossil-fern-fossil_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.348,
+        0.243,
+        0.05
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-05",
+      "slug": "fossil-shark-tooth",
+      "name": "상어 이빨",
+      "group": "fossil",
+      "kind": "shark-tooth",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.shark-tooth",
+          "code": "IC-FO-05",
+          "icon": "assets/items/renders/fossil-shark-tooth_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.212,
+        0.049,
+        0.289
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-06",
+      "slug": "fossil-dino-track",
+      "name": "공룡 발자국",
+      "group": "fossil",
+      "kind": "dino-track",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.dino-track",
+          "code": "IC-FO-06",
+          "icon": "assets/items/renders/fossil-dino-track_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.418,
+        0.387,
+        0.078
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-07",
+      "slug": "fossil-mammoth-tusk",
+      "name": "매머드 엄니",
+      "group": "fossil",
+      "kind": "tusk",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.mammoth-tusk",
+          "code": "IC-FO-07",
+          "icon": "assets/items/renders/fossil-mammoth-tusk_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.469,
+        0.092,
+        0.244
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-08",
+      "slug": "fossil-dino-skull",
+      "name": "공룡 두개골",
+      "group": "fossil",
+      "kind": "dino-skull",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.dino-skull",
+          "code": "IC-FO-08",
+          "icon": "assets/items/renders/fossil-dino-skull_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.293,
+        0.371,
+        0.211
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FO-09",
+      "slug": "fossil-unknown",
+      "name": "알 수 없는 화석",
+      "group": "fossil",
+      "kind": "unknown-fossil",
+      "hold": true,
+      "items": [
+        {
+          "item": "fossil.unknown",
+          "code": "IC-FO-09",
+          "icon": "assets/items/renders/fossil-unknown_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.26,
+        0.224,
+        0.165
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-01",
+      "slug": "fruit-apple",
+      "name": "사과",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.apple",
+          "code": "IC-FR-01",
+          "icon": "assets/items/renders/fruit-apple_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.28,
+        0.28,
+        0.323
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-02",
+      "slug": "fruit-pear",
+      "name": "배",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.pear",
+          "code": "IC-FR-02",
+          "icon": "assets/items/renders/fruit-pear_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.258,
+        0.24,
+        0.379
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-03",
+      "slug": "fruit-peach",
+      "name": "복숭아",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.peach",
+          "code": "IC-FR-03",
+          "icon": "assets/items/renders/fruit-peach_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.28,
+        0.263,
+        0.341
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-04",
+      "slug": "fruit-cherry",
+      "name": "체리",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.cherry",
+          "code": "IC-FR-04",
+          "icon": "assets/items/renders/fruit-cherry_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.29,
+        0.15,
+        0.39
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-05",
+      "slug": "fruit-orange",
+      "name": "오렌지",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.orange",
+          "code": "IC-FR-05",
+          "icon": "assets/items/renders/fruit-orange_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.28,
+        0.28,
+        0.306
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-06",
+      "slug": "fruit-coconut",
+      "name": "야자열매",
+      "group": "fruit",
+      "kind": "coconut",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.coconut",
+          "code": "IC-FR-06",
+          "icon": "assets/items/renders/fruit-coconut_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.315,
+        0.297,
+        0.284
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-01",
+      "slug": "fish-crucian",
+      "name": "붕어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.crucian",
+          "code": "IC-FS-01",
+          "icon": "assets/items/renders/fish-crucian_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.066,
+        0.33,
+        0.14
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-02",
+      "slug": "fish-pale-chub",
+      "name": "피라미",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.pale-chub",
+          "code": "IC-FS-02",
+          "icon": "assets/items/renders/fish-pale-chub_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.05,
+        0.27,
+        0.084
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-03",
+      "slug": "fish-medaka",
+      "name": "송사리",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.medaka",
+          "code": "IC-FS-03",
+          "icon": "assets/items/renders/fish-medaka_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.051,
+        0.27,
+        0.078
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-04",
+      "slug": "fish-carp",
+      "name": "잉어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.carp",
+          "code": "IC-FS-04",
+          "icon": "assets/items/renders/fish-carp_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.106,
+        0.49,
+        0.175
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-05",
+      "slug": "fish-loach",
+      "name": "미꾸라지",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.loach",
+          "code": "IC-FS-05",
+          "icon": "assets/items/renders/fish-loach_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.062,
+        0.33,
+        0.065
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-06",
+      "slug": "fish-sweetfish",
+      "name": "은어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.sweetfish",
+          "code": "IC-FS-06",
+          "icon": "assets/items/renders/fish-sweetfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.074,
+        0.41,
+        0.112
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-07",
+      "slug": "fish-catfish",
+      "name": "메기",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.catfish",
+          "code": "IC-FS-07",
+          "icon": "assets/items/renders/fish-catfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.353,
+        0.495,
+        0.174
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-08",
+      "slug": "fish-mandarin-fish",
+      "name": "쏘가리",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.mandarin-fish",
+          "code": "IC-FS-08",
+          "icon": "assets/items/renders/fish-mandarin-fish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.084,
+        0.41,
+        0.153
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-09",
+      "slug": "fish-salmon",
+      "name": "연어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.salmon",
+          "code": "IC-FS-09",
+          "icon": "assets/items/renders/fish-salmon_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.112,
+        0.57,
+        0.181
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-10",
+      "slug": "fish-goldfish",
+      "name": "금붕어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.goldfish",
+          "code": "IC-FS-10",
+          "icon": "assets/items/renders/fish-goldfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.075,
+        0.287,
+        0.195
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-11",
+      "slug": "fish-snakehead",
+      "name": "가물치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.snakehead",
+          "code": "IC-FS-11",
+          "icon": "assets/items/renders/fish-snakehead_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.123,
+        0.541,
+        0.114
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-12",
+      "slug": "fish-horse-mackerel",
+      "name": "전갱이",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.horse-mackerel",
+          "code": "IC-FS-12",
+          "icon": "assets/items/renders/fish-horse-mackerel_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.062,
+        0.33,
+        0.103
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-13",
+      "slug": "fish-mackerel",
+      "name": "고등어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.mackerel",
+          "code": "IC-FS-13",
+          "icon": "assets/items/renders/fish-mackerel_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.079,
+        0.41,
+        0.104
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-14",
+      "slug": "fish-flounder",
+      "name": "광어",
+      "group": "fish",
+      "kind": "flatfish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.flounder",
+          "code": "IC-FS-14",
+          "icon": "assets/items/renders/fish-flounder_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.281,
+        0.49,
+        0.06
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-15",
+      "slug": "fish-squid",
+      "name": "오징어",
+      "group": "fish",
+      "kind": "squid",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.squid",
+          "code": "IC-FS-15",
+          "icon": "assets/items/renders/fish-squid_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.12,
+        0.426,
+        0.075
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-16",
+      "slug": "fish-octopus",
+      "name": "문어",
+      "group": "fish",
+      "kind": "octopus",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.octopus",
+          "code": "IC-FS-16",
+          "icon": "assets/items/renders/fish-octopus_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.432,
+        0.429,
+        0.196
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-17",
+      "slug": "fish-seahorse",
+      "name": "해마",
+      "group": "fish",
+      "kind": "seahorse",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.seahorse",
+          "code": "IC-FS-17",
+          "icon": "assets/items/renders/fish-seahorse_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.062,
+        0.11,
+        0.218
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-18",
+      "slug": "fish-sea-bream",
+      "name": "도미",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.sea-bream",
+          "code": "IC-FS-18",
+          "icon": "assets/items/renders/fish-sea-bream_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.097,
+        0.49,
+        0.238
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-19",
+      "slug": "fish-tuna",
+      "name": "참치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.tuna",
+          "code": "IC-FS-19",
+          "icon": "assets/items/renders/fish-tuna_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.165,
+        0.701,
+        0.262
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-20",
+      "slug": "fish-shark",
+      "name": "상어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.shark",
+          "code": "IC-FS-20",
+          "icon": "assets/items/renders/fish-shark_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.19,
+        0.81,
+        0.235
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-01",
+      "slug": "mat-wood",
+      "name": "나무",
+      "group": "mat",
+      "kind": "wood",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.wood",
+          "code": "IC-MA-01",
+          "icon": "assets/items/renders/mat-wood_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.31,
+        0.385,
+        0.258
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-02",
+      "slug": "mat-hardwood",
+      "name": "단단한 나무",
+      "group": "mat",
+      "kind": "hardwood",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.hardwood",
+          "code": "IC-MA-02",
+          "icon": "assets/items/renders/mat-hardwood_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.218,
+        0.393,
+        0.229
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-03",
+      "slug": "mat-branch",
+      "name": "나뭇가지",
+      "group": "mat",
+      "kind": "branch",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.branch",
+          "code": "IC-MA-03",
+          "icon": "assets/items/renders/mat-branch_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.531,
+        0.268,
+        0.089
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-04",
+      "slug": "mat-stone",
+      "name": "돌",
+      "group": "mat",
+      "kind": "stone",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.stone",
+          "code": "IC-MA-04",
+          "icon": "assets/items/renders/mat-stone_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.398,
+        0.304,
+        0.215
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-05",
+      "slug": "mat-iron",
+      "name": "철광석",
+      "group": "mat",
+      "kind": "iron",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.iron",
+          "code": "IC-MA-05",
+          "icon": "assets/items/renders/mat-iron_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.358,
+        0.261,
+        0.234
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-06",
+      "slug": "mat-clay",
+      "name": "점토",
+      "group": "mat",
+      "kind": "clay",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.clay",
+          "code": "IC-MA-06",
+          "icon": "assets/items/renders/mat-clay_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.38,
+        0.3,
+        0.21
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-07",
+      "slug": "mat-weed",
+      "name": "잡초",
+      "group": "mat",
+      "kind": "weed",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.weed",
+          "code": "IC-MA-07",
+          "icon": "assets/items/renders/mat-weed_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.291,
+        0.301,
+        0.328
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-08",
+      "slug": "mat-acorn-bag",
+      "name": "도토리 주머니",
+      "group": "mat",
+      "kind": "acorn-bag",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.acorn-bag",
+          "code": "IC-MA-08",
+          "icon": "assets/items/renders/mat-acorn-bag_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.3,
+        0.31,
+        0.311
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SD-01",
+      "slug": "seed-bag",
+      "name": "씨앗 봉투",
+      "group": "seed",
+      "kind": "seed-bag",
+      "hold": false,
+      "items": [
+        {
+          "item": "seed.tulip",
+          "code": "IC-SD-01",
+          "variant": "tulip",
+          "icon": "assets/items/renders/seed-bag_tulip_thumb.png"
+        },
+        {
+          "item": "seed.cosmos",
+          "code": "IC-SD-02",
+          "variant": "cosmos",
+          "icon": "assets/items/renders/seed-bag_cosmos_thumb.png"
+        },
+        {
+          "item": "seed.pansy",
+          "code": "IC-SD-03",
+          "variant": "pansy",
+          "icon": "assets/items/renders/seed-bag_pansy_thumb.png"
+        }
+      ],
+      "variants": [
+        "tulip",
+        "cosmos",
+        "pansy"
+      ],
+      "size": [
+        0.25,
+        0.087,
+        0.355
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SD-04",
+      "slug": "seed-sapling",
+      "name": "어린 나무",
+      "group": "seed",
+      "kind": "sapling",
+      "hold": false,
+      "items": [
+        {
+          "item": "seed.sapling",
+          "code": "IC-SD-04",
+          "icon": "assets/items/renders/seed-sapling_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.315,
+        0.25,
+        0.633
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SD-05",
+      "slug": "seed-cedar-sapling",
+      "name": "삼나무 묘목",
+      "group": "seed",
+      "kind": "cedar-sapling",
+      "hold": false,
+      "items": [
+        {
+          "item": "seed.cedar-sapling",
+          "code": "IC-SD-05",
+          "icon": "assets/items/renders/seed-cedar-sapling_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.335,
+        0.34,
+        0.64
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-01",
+      "slug": "shell-clam",
+      "name": "바지락",
+      "group": "shell",
+      "kind": "clam",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.clam",
+          "code": "IC-SH-01",
+          "icon": "assets/items/renders/shell-clam_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.3,
+        0.242,
+        0.086
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-02",
+      "slug": "shell-cowrie",
+      "name": "개오지",
+      "group": "shell",
+      "kind": "cowrie",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.cowrie",
+          "code": "IC-SH-02",
+          "icon": "assets/items/renders/shell-cowrie_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.2,
+        0.3,
+        0.15
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-03",
+      "slug": "shell-scallop",
+      "name": "가리비",
+      "group": "shell",
+      "kind": "scallop",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.scallop",
+          "code": "IC-SH-03",
+          "icon": "assets/items/renders/shell-scallop_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.32,
+        0.293,
+        0.082
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-04",
+      "slug": "shell-whelk",
+      "name": "고둥",
+      "group": "shell",
+      "kind": "whelk",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.whelk",
+          "code": "IC-SH-04",
+          "icon": "assets/items/renders/shell-whelk_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.197,
+        0.205,
+        0.531
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-05",
+      "slug": "shell-turban",
+      "name": "소라",
+      "group": "shell",
+      "kind": "turban",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.turban",
+          "code": "IC-SH-05",
+          "icon": "assets/items/renders/shell-turban_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.382,
+        0.368,
+        0.31
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SH-06",
+      "slug": "shell-coral",
+      "name": "분홍 산호",
+      "group": "shell",
+      "kind": "coral",
+      "hold": false,
+      "items": [
+        {
+          "item": "shell.coral",
+          "code": "IC-SH-06",
+          "icon": "assets/items/renders/shell-coral_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.225,
+        0.144,
+        0.339
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-01",
+      "slug": "tool-rod",
+      "name": "낚싯대",
+      "group": "tool",
+      "kind": "rod",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.rod",
+          "code": "IC-TL-01",
+          "icon": "assets/items/renders/tool-rod_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.63,
+        0.1,
+        0.717
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-02",
+      "slug": "tool-net",
+      "name": "잠자리채",
+      "group": "tool",
+      "kind": "net",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.net",
+          "code": "IC-TL-02",
+          "icon": "assets/items/renders/tool-net_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.77,
+        0.31,
+        0.868
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-03",
+      "slug": "tool-shovel",
+      "name": "삽",
+      "group": "tool",
+      "kind": "shovel",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.shovel",
+          "code": "IC-TL-03",
+          "icon": "assets/items/renders/tool-shovel_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.792,
+        0.086,
+        0.86
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-04",
+      "slug": "tool-axe",
+      "name": "도끼",
+      "group": "tool",
+      "kind": "axe",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.axe",
+          "code": "IC-TL-04",
+          "icon": "assets/items/renders/tool-axe_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.605,
+        0.06,
+        0.89
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-05",
+      "slug": "tool-can",
+      "name": "물뿌리개",
+      "group": "tool",
+      "kind": "can",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.can",
+          "code": "IC-TL-05",
+          "icon": "assets/items/renders/tool-can_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.614,
+        0.304,
+        0.394
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    }
+  ]
+}

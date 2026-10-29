@@ -1,0 +1,45 @@
+{
+  "id": "IC-TL-05",
+  "slug": "tool-can",
+  "name": "물뿌리개",
+  "group": "tool",
+  "kind": "can",
+  "version": "0.1",
+  "items": [
+    "tool.can"
+  ],
+  "hold": false,
+  "triangles": 796,
+  "parts": 1,
+  "materials": [
+    "can",
+    "canDark",
+    "mark"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.614,
+    0.304,
+    0.394
+  ],
+  "bounds": [
+    [
+      -0.307,
+      -0.152,
+      0.0
+    ],
+    [
+      0.307,
+      0.152,
+      0.394
+    ]
+  ],
+  "glbBytes": 17276,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-can_main.png",
+    "tool-can_thumb.png"
+  ]
+}

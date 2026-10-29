@@ -1,0 +1,70 @@
+{
+  "id": "IC-BG-22",
+  "slug": "bug-earwig",
+  "name": "집게벌레",
+  "group": "bug",
+  "category": "item",
+  "kind": "earwig",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.earwig",
+      "code": "IC-BG-22"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "꽁무니에 작은 집게를 단 밤 손님. 무섭게 생겼지만 사실은 겁이 많다.",
+    "keywords": [
+      "바위 밑",
+      "밤"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.26,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#6A3E26",
+    "wing": "#8A5A36",
+    "head": "#3E281A",
+    "leg": "#4A3020"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "wing": "날개",
+    "head": "머리",
+    "leg": "다리"
+  },
+  "render": {
+    "yaw": -60,
+    "pitch": 30
+  }
+}

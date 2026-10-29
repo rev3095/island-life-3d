@@ -1,0 +1,44 @@
+{
+  "id": "IC-SH-06",
+  "slug": "shell-coral",
+  "name": "분홍 산호",
+  "group": "shell",
+  "kind": "coral",
+  "version": "0.1",
+  "items": [
+    "shell.coral"
+  ],
+  "hold": false,
+  "triangles": 1400,
+  "parts": 1,
+  "materials": [
+    "coral",
+    "coralDark"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.225,
+    0.144,
+    0.339
+  ],
+  "bounds": [
+    [
+      -0.112,
+      -0.072,
+      0.0
+    ],
+    [
+      0.112,
+      0.072,
+      0.339
+    ]
+  ],
+  "glbBytes": 28284,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-coral_main.png",
+    "shell-coral_thumb.png"
+  ]
+}

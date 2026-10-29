@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-12",
+  "slug": "fish-horse-mackerel",
+  "name": "전갱이",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.horse-mackerel"
+  ],
+  "hold": true,
+  "triangles": 1540,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.062,
+    0.33,
+    0.103
+  ],
+  "bounds": [
+    [
+      -0.031,
+      -0.165,
+      -0.052
+    ],
+    [
+      0.031,
+      0.165,
+      0.052
+    ]
+  ],
+  "glbBytes": 38980,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-horse-mackerel_main.png",
+    "fish-horse-mackerel_thumb.png"
+  ]
+}

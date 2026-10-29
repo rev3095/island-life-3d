@@ -1,0 +1,45 @@
+{
+  "id": "IC-BG-16",
+  "slug": "bug-ant",
+  "name": "개미",
+  "group": "bug",
+  "kind": "ant",
+  "version": "0.1",
+  "items": [
+    "bug.ant"
+  ],
+  "hold": true,
+  "triangles": 1476,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.156,
+    0.143,
+    0.071
+  ],
+  "bounds": [
+    [
+      -0.078,
+      -0.072,
+      -0.036
+    ],
+    [
+      0.078,
+      0.072,
+      0.036
+    ]
+  ],
+  "glbBytes": 29952,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-ant_main.png",
+    "bug-ant_thumb.png"
+  ]
+}

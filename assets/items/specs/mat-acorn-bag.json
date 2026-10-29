@@ -1,0 +1,54 @@
+{
+  "id": "IC-MA-08",
+  "slug": "mat-acorn-bag",
+  "name": "도토리 주머니",
+  "group": "mat",
+  "category": "item",
+  "kind": "acorn-bag",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.acorn-bag",
+      "code": "IC-MA-08"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "끈으로 묶은 자루에 도토리 그림",
+    "keywords": [
+      "자루",
+      "도토리 그림"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bag": "#D9B27C",
+    "tie": "#8A5A3A",
+    "acorn": "#9A6B45",
+    "acornCap": "#5E3D26"
+  },
+  "paletteLabels": {
+    "bag": "주머니",
+    "tie": "끈",
+    "acorn": "도토리",
+    "acornCap": "도토리 모자"
+  }
+}

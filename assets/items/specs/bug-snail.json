@@ -1,0 +1,66 @@
+{
+  "id": "IC-BG-17",
+  "slug": "bug-snail",
+  "name": "달팽이",
+  "group": "bug",
+  "category": "item",
+  "kind": "snail",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.snail",
+      "code": "IC-BG-17"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "비 오는 날 바위 위로 느릿느릿 산책을 나온다. 집을 등에 지고 다닌다.",
+    "keywords": [
+      "바위",
+      "비 올 때"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.26,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#3B3530",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#D9C7A3",
+    "shell": "#C47A4E"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "shell": "껍데기"
+  },
+  "render": {
+    "yaw": -60,
+    "pitch": 30
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-06",
+  "slug": "fish-sweetfish",
+  "name": "은어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.sweetfish"
+  ],
+  "hold": true,
+  "triangles": 1604,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.074,
+    0.41,
+    0.112
+  ],
+  "bounds": [
+    [
+      -0.037,
+      -0.205,
+      -0.056
+    ],
+    [
+      0.037,
+      0.205,
+      0.056
+    ]
+  ],
+  "glbBytes": 40136,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-sweetfish_main.png",
+    "fish-sweetfish_thumb.png"
+  ]
+}

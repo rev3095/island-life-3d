@@ -1,5 +1,6 @@
 // 채집에서 쓰는 작은 모델: 떨어진 물건(과일·나뭇가지·재료·도토리 주머니·선물), 들어 보이는 물고기·화석, 찌, 물고기 그림자.
 // 도형 여러 개를 꼭짓점 색으로 합쳐 메시 하나 + 외곽선 하나로 그린다 (재질은 ctx.materials 의 툰·곡면 월드).
+// 잡은 물고기·곤충·화석을 들어 보일 때는 아이콘과 같은 Blender 모델(assets/items, 5차 Z1)을 heldModel 로 받아 쓴다 — 받기 전·못 받으면 이 코드 모델.
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export const FRUIT_COLOR = { apple: '#E8504F', pear: '#D9D36A', peach: '#F7A6A0', cherry: '#B5232F', orange: '#F39A3B', coconut: '#7A5232' };
@@ -200,5 +201,34 @@ export function createMeshKit(ctx) {
     part(G.sphere(0.07, 6, 4), '#B79870', { p: [0.3, 0.04, 0.1], sc: [1, 0.5, 1] }),
   ]), { outline: 0.004 });
 
-  return { part, merge, geometry, mesh, G, toon, flat, outlineMat, item, itemGeometry, fishShadow, bobber, hole, fishParts };
+  // ---------- 아이템 모델 (assets/items/index.json 의 hold 인 것: 물고기·곤충·화석) ----------
+  const ITEM_INDEX = 'assets/items/index.json';
+  let itemIndex = null;                       // Promise<Map 아이템 id → 목록 항목>
+  const templates = new Map();                // slug → Promise<툰 재질을 입힌 원본> (사본은 도형·재질을 같이 쓴다)
+  const loadItemIndex = () => (itemIndex ??= ctx.assets.loadJSON(ITEM_INDEX)
+    .then(j => new Map(j.models.flatMap(m => m.items.map(x => [x.item, m]))))
+    .catch(() => { itemIndex = null; return new Map(); }));      // 못 받으면 다음에 다시
+  function template(m) {
+    if (!templates.has(m.slug)) {
+      const job = ctx.assets.loadModel(`assets/items/models/${m.slug}`).then(gltf => {
+        const { scene: model } = ctx.assets.instantiate(gltf);
+        materials.applyToonStyle(model, { spec: { style: m.style ?? {} } });
+        model.name = `item:${m.slug}`;
+        return model;
+      });
+      job.catch(() => templates.delete(m.slug));
+      templates.set(m.slug, job);
+    }
+    return templates.get(m.slug);
+  }
+  /** 아이템 id → 들어 보일 모델 사본 (Promise). 목록에 없거나 hold 가 아니거나 못 받으면 null */
+  async function heldModel(id) {
+    const m = (await loadItemIndex()).get(id);
+    if (!m?.hold || !ctx.assets?.loadModel) return null;
+    try { return (await template(m)).clone(); } catch { return null; }
+  }
+  /** 미리 받아 두기 (기다리지 않아도 된다): 낚싯대에 물고기가 물었을 때 등 */
+  const preloadHeld = id => { heldModel(id).catch(() => {}); };
+
+  return { part, merge, geometry, mesh, G, toon, flat, outlineMat, item, itemGeometry, fishShadow, bobber, hole, fishParts, heldModel, preloadHeld };
 }

@@ -1,0 +1,62 @@
+{
+  "id": "IC-FO-03",
+  "slug": "fossil-amber",
+  "name": "호박",
+  "group": "fossil",
+  "category": "item",
+  "kind": "amber",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fossil.amber",
+      "code": "IC-FO-03"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "나뭇진이 굳어 생긴 노란 보석. 안에 작은 벌레가 갇혀 있기도 하다.",
+    "keywords": [
+      "박물관 화석"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": [
+      "glint"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기",
+      "value": 0.26,
+      "min": 0.15,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "amber": "#F0A030",
+    "inclusion": "#5E3A1A",
+    "glint": "#FFE6A8"
+  },
+  "paletteLabels": {
+    "amber": "호박",
+    "inclusion": "갇힌 벌레",
+    "glint": "반짝임"
+  }
+}

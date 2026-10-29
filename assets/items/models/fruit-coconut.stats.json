@@ -1,0 +1,44 @@
+{
+  "id": "IC-FR-06",
+  "slug": "fruit-coconut",
+  "name": "야자열매",
+  "group": "fruit",
+  "kind": "coconut",
+  "version": "0.1",
+  "items": [
+    "fruit.coconut"
+  ],
+  "hold": false,
+  "triangles": 728,
+  "parts": 1,
+  "materials": [
+    "coconut",
+    "coconutDark"
+  ],
+  "objects": [
+    "fruit"
+  ],
+  "size": [
+    0.315,
+    0.297,
+    0.284
+  ],
+  "bounds": [
+    [
+      -0.158,
+      -0.148,
+      0.0
+    ],
+    [
+      0.158,
+      0.148,
+      0.284
+    ]
+  ],
+  "glbBytes": 15764,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-coconut_main.png",
+    "fruit-coconut_thumb.png"
+  ]
+}
