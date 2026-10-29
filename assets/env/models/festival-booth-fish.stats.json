@@ -1,0 +1,43 @@
+{
+  "id": "FB-05",
+  "slug": "festival-booth-fish",
+  "name": "낚시 대회 부스",
+  "category": "building",
+  "kind": "festival-booth",
+  "version": "0.1",
+  "triangles": 2468,
+  "parts": 2,
+  "materials": [
+    "awningA",
+    "awningB",
+    "band",
+    "boardW",
+    "counter",
+    "fish",
+    "glass",
+    "sign",
+    "wall",
+    "water",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    2.96,
+    1.93,
+    2.64
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 55272,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-booth-fish_front.png",
+    "festival-booth-fish_hero.jpg",
+    "festival-booth-fish_main.png",
+    "festival-booth-fish_thumb.png",
+    "festival-booth-fish_top.png"
+  ]
+}

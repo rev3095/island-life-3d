@@ -573,6 +573,116 @@
       "status": "review"
     },
     {
+      "id": "IC-FE-01",
+      "slug": "festival-pie",
+      "name": "과일 파이",
+      "group": "festival",
+      "kind": "pie",
+      "hold": false,
+      "items": [
+        {
+          "item": "festival.pie",
+          "code": "IC-FE-01",
+          "icon": "assets/items/renders/festival-pie_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.42,
+        0.42,
+        0.129
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FE-02",
+      "slug": "festival-juice",
+      "name": "과일 주스",
+      "group": "festival",
+      "kind": "juice",
+      "hold": false,
+      "items": [
+        {
+          "item": "festival.juice",
+          "code": "IC-FE-02",
+          "icon": "assets/items/renders/festival-juice_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.22,
+        0.18,
+        0.402
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FE-03",
+      "slug": "festival-wreath",
+      "name": "화관",
+      "group": "festival",
+      "kind": "wreath",
+      "hold": false,
+      "items": [
+        {
+          "item": "festival.wreath",
+          "code": "IC-FE-03",
+          "icon": "assets/items/renders/festival-wreath_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.411,
+        0.415,
+        0.078
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FE-04",
+      "slug": "festival-medal",
+      "name": "낚시 대회 메달",
+      "group": "festival",
+      "kind": "medal",
+      "hold": false,
+      "items": [
+        {
+          "item": "festival.medal",
+          "code": "IC-FE-04",
+          "icon": "assets/items/renders/festival-medal_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.2,
+        0.05,
+        0.41
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "goldLight"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-FL-01",
       "slug": "flower-tulip",
       "name": "튤립",

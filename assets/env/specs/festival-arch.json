@@ -1,0 +1,89 @@
+{
+  "id": "BD-07",
+  "slug": "festival-arch",
+  "name": "축제 아치",
+  "category": "building",
+  "kind": "festival-arch",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "축제 광장 서쪽·동쪽 입구의 나무 아치. 꽃 덩굴과 세모 깃발.",
+    "keywords": [
+      "기둥 둘",
+      "꽃 덩굴",
+      "깃발 다섯"
+    ],
+    "references": [
+      "꽃 아치"
+    ],
+    "avoid": [
+      "문"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "너비",
+      "value": 2.6,
+      "min": 2,
+      "max": 3.4,
+      "step": 0.1
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "stone": "#A9B8A0",
+    "leaf": "#5FAE5A",
+    "flowerA": "#E86AA0",
+    "flowerB": "#F6C84C",
+    "flowerC": "#FBF7F2",
+    "flagA": "#E8504F",
+    "flagB": "#6CA0DC",
+    "flagC": "#F6C84C"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "stone": "받침돌",
+    "leaf": "덩굴 잎",
+    "flowerA": "꽃 분홍",
+    "flowerB": "꽃 노랑",
+    "flowerC": "꽃 흰색",
+    "flagA": "깃발 빨강",
+    "flagB": "깃발 파랑",
+    "flagC": "깃발 노랑"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -1.3,
+          0,
+          0.18
+        ],
+        [
+          1.3,
+          0,
+          0.18
+        ]
+      ]
+    },
+    "extent": [
+      1.4,
+      0.3
+    ]
+  }
+}

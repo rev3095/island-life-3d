@@ -1,0 +1,40 @@
+{
+  "id": "BD-07",
+  "slug": "festival-arch",
+  "name": "축제 아치",
+  "category": "building",
+  "kind": "festival-arch",
+  "version": "0.1",
+  "triangles": 4092,
+  "parts": 1,
+  "materials": [
+    "flagA",
+    "flagB",
+    "flagC",
+    "flowerA",
+    "flowerB",
+    "flowerC",
+    "leaf",
+    "stone",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    2.95,
+    0.39,
+    2.96
+  ],
+  "footprint": [
+    3,
+    1
+  ],
+  "glbBytes": 82420,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-arch_front.png",
+    "festival-arch_hero.jpg",
+    "festival-arch_main.png",
+    "festival-arch_thumb.png",
+    "festival-arch_top.png"
+  ]
+}

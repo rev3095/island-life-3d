@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "status": "approved",
+  "note": "Z5 이모티콘 대화 규칙 (검수 보드 z5 · D18-A, TK-01–07). 판정은 src/gameplay/festival/judge.js. likes 보내면 +2 · dislikes -2 · 오늘 원하는 것(wants 중 하루 하나) +3. rule 은 주민마다 하나 이상: more(이어 말하기) · fewer(하나만) · greetFirst(인사 먼저) · waitFirst(기다리기 먼저) · food(먹을 것) · askAnswers(물으면 힌트) · rainBonus · echo(따라 하기)",
+  "points": { "delight": 3, "happy": 2, "okay": 1, "puzzled": 0, "awkward": 0, "retreat": 0 },
+  "countedPerDay": 3,
+  "friendly": ["wave", "smile", "grin", "heart", "good", "cheer", "love"],
+  "food": ["yum", "fruit", "fish"],
+  "greet": {
+    "dawn": ["sun", "wave"], "morning": ["sun", "wave"], "afternoon": ["wave", "smile"], "evening": ["moon", "wave"], "night": ["moon", "zz"],
+    "rain": ["rain", "wave"], "snow": ["sparkle", "wave"]
+  },
+  "tutorial": [
+    { "say": ["wave", "smile"], "ok": ["wave", "smile", "grin", "heart", "good", "cheer"] },
+    { "say": ["gift", "smile"], "ok": ["cheer", "grin", "love", "good", "heart"] },
+    { "say": ["sad", "rain"], "ok": ["heart", "deal", "good", "cheer"] }
+  ],
+  "villagers": {
+    "coco":    { "id": "TK-01", "likes": ["wave", "grin", "run", "sun"], "dislikes": ["wait"], "wants": ["run", "sun", "fish"], "reply": ["grin", "run", "sun", "bang", "sweat"], "rule": { "more": true }, "gesture": { "happy": "jump", "puzzled": "tilt" } },
+    "bori":    { "id": "TK-02", "likes": ["sleep", "moon", "smile"], "dislikes": ["shout", "party"], "wants": ["sleep", "moon", "fruit"], "reply": ["zz", "smile", "moon", "dots"], "rule": { "fewer": true }, "gesture": { "happy": "sway", "puzzled": "yawn" } },
+    "mochi":   { "id": "TK-03", "likes": ["flower", "rainbow", "love", "heart"], "dislikes": ["bug"], "wants": ["flower", "rainbow", "heart"], "reply": ["flower", "love", "sparkle", "heart"], "rule": { "greetFirst": ["wave", "heart"] }, "gesture": { "happy": "hop", "puzzled": "droop" } },
+    "dubu":    { "id": "TK-04", "likes": ["wait", "fish", "good"], "dislikes": ["shout"], "wants": ["fish", "good", "moon"], "reply": ["dots", "fish", "good", "smile"], "rule": { "waitFirst": true, "maxCalm": 2 }, "gesture": { "happy": "nod", "puzzled": "turn" } },
+    "pong":    { "id": "TK-05", "likes": ["yum", "fruit", "fish"], "dislikes": ["sleep"], "wants": ["fruit", "yum", "fish"], "reply": ["yum", "fruit", "bang", "grin"], "rule": { "food": true }, "gesture": { "happy": "flap", "puzzled": "rub" } },
+    "chorong": { "id": "TK-06", "likes": ["ask", "rain", "music"], "dislikes": ["sun"], "wants": ["rain", "music", "bug"], "reply": ["rain", "music", "ask", "sparkle"], "rule": { "askAnswers": true, "rainBonus": 1 }, "gesture": { "happy": "hop", "puzzled": "puff" } },
+    "danpung": { "id": "TK-07", "likes": ["maple", "look", "think"], "dislikes": ["shout"], "wants": ["maple", "look", "flower"], "reply": ["maple", "look", "think", "sparkle"], "rule": { "echo": true }, "gesture": { "happy": "wag", "puzzled": "curl" } }
+  }
+}

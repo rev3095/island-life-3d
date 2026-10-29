@@ -1,0 +1,34 @@
+{
+  "id": "FP-01",
+  "slug": "festival-part-lantern",
+  "name": "반딧불 등불",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "triangles": 454,
+  "parts": 1,
+  "materials": [
+    "glow",
+    "jar",
+    "lid"
+  ],
+  "animations": {},
+  "size": [
+    0.28,
+    0.28,
+    0.5
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11112,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-part-lantern_front.png",
+    "festival-part-lantern_hero.jpg",
+    "festival-part-lantern_main.png",
+    "festival-part-lantern_thumb.png",
+    "festival-part-lantern_top.png"
+  ]
+}

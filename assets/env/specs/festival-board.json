@@ -1,0 +1,60 @@
+{
+  "id": "PR-15",
+  "slug": "festival-board",
+  "name": "부품 진행판",
+  "category": "prop",
+  "kind": "festival-board",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "서쪽 입구 옆 판. 부품 다섯 자리가 검은 실루엣이고, 모은 부품은 앞 선반에 놓인다.",
+    "keywords": [
+      "2×1칸",
+      "실루엣 다섯",
+      "선반"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "board": "#F3E0BC",
+    "roof": "#A8642E",
+    "slot": "#4A3B32"
+  },
+  "paletteLabels": {
+    "wood": "기둥·선반",
+    "board": "판",
+    "roof": "지붕",
+    "slot": "부품 자리"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.9,
+        0.3
+      ]
+    },
+    "extent": [
+      1,
+      0.3
+    ]
+  }
+}

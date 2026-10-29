@@ -1,0 +1,47 @@
+{
+  "id": "BD-06",
+  "slug": "festival-stage",
+  "name": "축제 무대",
+  "category": "building",
+  "kind": "festival-stage",
+  "version": "0.1",
+  "triangles": 5160,
+  "parts": 1,
+  "materials": [
+    "backdrop",
+    "banner",
+    "bell",
+    "cloth",
+    "clothB",
+    "deck",
+    "flagA",
+    "flagB",
+    "flagC",
+    "glow",
+    "metal",
+    "skirt",
+    "step",
+    "string",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    5.72,
+    3.48,
+    3.66
+  ],
+  "footprint": [
+    6,
+    4
+  ],
+  "glbBytes": 105464,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-stage_front.png",
+    "festival-stage_hero.jpg",
+    "festival-stage_main.png",
+    "festival-stage_thumb.png",
+    "festival-stage_top.png"
+  ]
+}

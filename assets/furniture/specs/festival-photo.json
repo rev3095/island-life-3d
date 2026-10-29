@@ -1,0 +1,91 @@
+{
+  "id": "FU-34",
+  "slug": "festival-photo",
+  "item": "furn.festival-photo",
+  "name": "축제 단체 사진",
+  "category": "furniture",
+  "kind": "festival-photo",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "축제 날 무대 앞에서 다 같이 찍은 사진. 협탁 위 가로 사진틀에 주민 여덟이 웃고 있다.",
+    "keywords": [
+      "가로 사진틀",
+      "얼굴 여덟",
+      "깃발 줄"
+    ],
+    "references": [
+      "단체 사진 액자"
+    ],
+    "avoid": [
+      "실제 사람 사진"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "photoBg",
+      "stage",
+      "ink",
+      "faceA",
+      "faceB",
+      "faceC",
+      "faceD",
+      "faceE",
+      "faceF",
+      "faceG",
+      "faceH"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#F7F1E4",
+    "photoBg": "#2E3A66",
+    "stage": "#B98957",
+    "ink": "#4A3B32",
+    "wood": "#C99B68",
+    "woodDark": "#8C6440",
+    "faceA": "#F2B36B",
+    "faceB": "#6CA0DC",
+    "faceC": "#B9A6E0",
+    "faceD": "#F7A6A0",
+    "faceE": "#7FA36B",
+    "faceF": "#FFD866",
+    "faceG": "#8CCB6E",
+    "faceH": "#D9583B"
+  },
+  "paletteLabels": {
+    "frame": "사진틀",
+    "photoBg": "밤하늘",
+    "stage": "무대",
+    "ink": "입",
+    "wood": "협탁 상판",
+    "woodDark": "협탁 다리",
+    "faceA": "코코",
+    "faceB": "보리",
+    "faceC": "모찌",
+    "faceD": "나",
+    "faceE": "두부",
+    "faceF": "퐁",
+    "faceG": "초롱",
+    "faceH": "단풍"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

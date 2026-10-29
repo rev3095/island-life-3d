@@ -1,0 +1,62 @@
+{
+  "id": "FU-34",
+  "slug": "festival-photo",
+  "item": "furn.festival-photo",
+  "name": "축제 단체 사진",
+  "category": "furniture",
+  "kind": "festival-photo",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3490,
+  "parts": 2,
+  "materials": [
+    "faceA",
+    "faceB",
+    "faceC",
+    "faceD",
+    "faceE",
+    "faceF",
+    "faceG",
+    "faceH",
+    "frame",
+    "ink",
+    "photoBg",
+    "stage",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "photo",
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.8,
+    0.44,
+    0.88
+  ],
+  "bounds": [
+    [
+      -0.4,
+      -0.22,
+      0.0
+    ],
+    [
+      0.4,
+      0.22,
+      0.879
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 73224,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-photo_front.png",
+    "festival-photo_main.png",
+    "festival-photo_thumb.png",
+    "festival-photo_top.png"
+  ]
+}

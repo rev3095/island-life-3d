@@ -110,7 +110,9 @@ export function createObjects(ctx, island, kit, models, collision) {
       out.push({ type: 'box', x0: o.x + Math.min(pts[0][0], pts[1][0]) * s, x1: o.x + Math.max(pts[0][0], pts[1][0]) * s,
         z0: o.z + Math.min(pts[0][1], pts[1][1]) * s, z1: o.z + Math.max(pts[0][1], pts[1][1]) * s, y: o.y, id: o.id });
     }
-    for (const [cx, cz, r] of c.circles ?? []) out.push({ type: 'circle', x: o.x + cx * cos + cz * sin, z: o.z - cx * sin + cz * cos, r: r * s, y: o.y, id: o.id });
+    // 원은 아무 각도로나 돌 수 있다 (5차 Z5: 축제 광장 둘레 부스)
+    const fc = Math.cos(o.rot), fs = Math.sin(o.rot);
+    for (const [cx, cz, r] of c.circles ?? []) out.push({ type: 'circle', x: o.x + (cx * fc + cz * fs) * s, z: o.z + (-cx * fs + cz * fc) * s, r: r * s, y: o.y, id: o.id });
     return out;
   }
 
@@ -183,17 +185,17 @@ export function createObjects(ctx, island, kit, models, collision) {
       events.emit('world:object', { type: 'remove', id, kind: o.kind });
       return true;
     },
-    /** 칸 가운데에 물체를 놓는다. data: { rot, scale, variant, persist=true, ... } → id */
+    /** 칸 가운데에 물체를 놓는다. data: { rot, scale, variant, persist=true, at: {x, z, y}?, ... } → id (at = 칸 가운데 대신 그 자리, 5차 Z5 축제 부스) */
     add(kind, tx, tz, data = {}) {
       if (!models[kind]) { console.warn(`[world] 모르는 배경 종류: ${kind}`); return null; }
-      const { rot = 0, scale = 1, variant = null, persist = true, id: wantId, ...rest } = data;
+      const { rot = 0, scale = 1, variant = null, persist = true, id: wantId, at = null, ...rest } = data;
       let id = wantId ?? `${kind}@${tx},${tz}`;
       for (let n = 2; byId.has(id); n++) id = `${kind}@${tx},${tz}~${n}`;
-      const c = island.toWorld(tx, tz);
+      const c = at ?? island.toWorld(tx, tz);
       const lvl = island.levelAt(tx, tz);
-      const o = { id, kind, tx, tz, x: c.x, z: c.z, y: lvl * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false };
+      const o = { id, kind, tx, tz, x: c.x, z: c.z, y: at?.y ?? lvl * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false };
       insert(o);
-      if (persist) state.island.added.push({ id, kind, tx, tz, data: { rot, scale, variant, ...rest } });
+      if (persist) state.island.added.push({ id, kind, tx, tz, data: { rot, scale, variant, ...(at ? { at } : {}), ...rest } });
       events.emit('world:object', { type: 'add', id, kind });
       return id;
     },
@@ -244,9 +246,9 @@ export function createObjects(ctx, island, kit, models, collision) {
       }
       for (const a of isl.added ?? []) {
         if (byId.has(a.id)) continue;
-        const { rot = 0, scale = 1, variant = null, ...rest } = a.data ?? {};
-        const c = island.toWorld(a.tx, a.tz);
-        insert({ id: a.id, kind: a.kind, tx: a.tx, tz: a.tz, x: c.x, z: c.z, y: island.levelAt(a.tx, a.tz) * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false });
+        const { rot = 0, scale = 1, variant = null, at = null, ...rest } = a.data ?? {};
+        const c = at ?? island.toWorld(a.tx, a.tz);
+        insert({ id: a.id, kind: a.kind, tx: a.tx, tz: a.tz, x: c.x, z: c.z, y: at?.y ?? island.levelAt(a.tx, a.tz) * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false });
       }
     },
     setSeason(s) {

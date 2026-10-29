@@ -1,0 +1,59 @@
+{
+  "id": "PR-13",
+  "slug": "festival-garland",
+  "name": "깃발 줄",
+  "category": "prop",
+  "kind": "festival-garland",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "등불 기둥 사이에 거는 세모 깃발 줄. 바람에 흔들린다.",
+    "keywords": [
+      "길이 4.6",
+      "깃발 열하나",
+      "주민 색"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이",
+      "value": 4.6,
+      "min": 3,
+      "max": 6,
+      "step": 0.1
+    }
+  },
+  "palette": {
+    "string": "#4A3B32",
+    "flagA": "#F2B36B",
+    "flagB": "#6CA0DC",
+    "flagC": "#B9A6E0",
+    "flagD": "#8CCB6E",
+    "flagE": "#FFD866"
+  },
+  "paletteLabels": {
+    "string": "줄",
+    "flagA": "코코 색",
+    "flagB": "보리 색",
+    "flagC": "모찌 색",
+    "flagD": "초롱 색",
+    "flagE": "퐁 색"
+  },
+  "animations": []
+}

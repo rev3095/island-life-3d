@@ -202,6 +202,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
       h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, toggle('outline', '외곽선'), fullscreenRow(),
       !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
+      h('h3', { class: 'pk-set-head' }, '대화'), toggle('textLines', '주민 글 대사 보기', false),   // 5차 Z5: 끄면 이모티콘으로만 (검수 보드 z5 D14-A)
     ].filter(Boolean));
   }
 

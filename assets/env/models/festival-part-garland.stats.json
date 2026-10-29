@@ -1,0 +1,35 @@
+{
+  "id": "FP-03",
+  "slug": "festival-part-garland",
+  "name": "꽃 가랜드",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "triangles": 434,
+  "parts": 1,
+  "materials": [
+    "flagA",
+    "flagB",
+    "flagC",
+    "string"
+  ],
+  "animations": {},
+  "size": [
+    0.45,
+    0.2,
+    0.37
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11612,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-part-garland_front.png",
+    "festival-part-garland_hero.jpg",
+    "festival-part-garland_main.png",
+    "festival-part-garland_thumb.png",
+    "festival-part-garland_top.png"
+  ]
+}

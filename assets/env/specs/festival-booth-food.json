@@ -1,0 +1,102 @@
+{
+  "id": "FB-04",
+  "slug": "festival-booth-food",
+  "name": "먹거리 부스",
+  "category": "building",
+  "kind": "festival-booth",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "퐁의 부스. 과일 두 개로 파이나 주스를 만든다.",
+    "keywords": [
+      "과일 솥",
+      "파이",
+      "주스 컵 둘",
+      "노랑 차양"
+    ],
+    "references": [
+      "동네 축제 장터 천막"
+    ],
+    "avoid": [
+      "실제 상표·글자 간판"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodDark": "#8C6440",
+    "wall": "#F3E0BC",
+    "awningA": "#FFD866",
+    "awningB": "#FFF4D0",
+    "counter": "#C99A63",
+    "band": "#FFD866",
+    "sign": "#FBF7F2",
+    "metal": "#4E5A57",
+    "fruitA": "#E8504F",
+    "fruitB": "#F39A3B",
+    "fruitC": "#F7A6A0",
+    "pie": "#C99A63"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "woodDark": "판매대 옆",
+    "wall": "뒤 벽",
+    "awningA": "차양 진한 줄",
+    "awningB": "차양 밝은 줄",
+    "counter": "판매대",
+    "band": "띠",
+    "sign": "팻말",
+    "metal": "과일 솥",
+    "fruitA": "과일 빨강",
+    "fruitB": "과일 주황",
+    "fruitC": "과일 분홍",
+    "pie": "파이"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -0.95,
+          0.05,
+          0.6
+        ],
+        [
+          0,
+          0.05,
+          0.62
+        ],
+        [
+          0.95,
+          0.05,
+          0.6
+        ]
+      ]
+    },
+    "extent": [
+      1.5,
+      1
+    ]
+  },
+  "festival": {
+    "booth": "food"
+  }
+}

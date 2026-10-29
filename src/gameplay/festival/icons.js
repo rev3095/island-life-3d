@@ -1,0 +1,12 @@
+// 축제 부품 그림 (FP-01–05, 검수 보드 z5 카드와 같은 그림). 진행판 화면(UI-05)·알림이 쓴다. viewBox 0 0 120 100, 선은 #4A3B32 3px.
+const C = { w: '#FBF7F2', r: '#E8504F', o: '#F39A3B', p: '#F7A6A0', gold: '#F6C84C', v: '#B9A6E0', dk: '#8C6440', br: '#C99A63', pink: '#E86AA0' };
+export const PART_ICONS = {
+  'FP-01': `<path d="M44 26 h32 l6 10 v44 q0 12 -12 12 h-20 q-12 0 -12 -12 v-44z" fill="#FFF4D0"/><rect x="42" y="16" width="36" height="12" rx="3" fill="${C.dk}"/><path d="M50 16 q10 -16 20 0" fill="none"/>${[[52, 50], [66, 44], [60, 66], [72, 72], [54, 80]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="#C9F08A" stroke-width="1.5"/>`).join('')}`,
+  'FP-02': `<ellipse cx="60" cy="34" rx="34" ry="11" fill="${C.w}"/><path d="M26 34 V74 q34 18 68 0 V34" fill="${C.r}"/><path d="M26 44 l17 28 17 -26 17 26 17 -28" fill="none" stroke="${C.gold}"/><path d="M30 6 l20 26 M92 4 l-22 26" stroke="${C.dk}" stroke-width="5"/><circle cx="30" cy="6" r="5" fill="${C.w}"/><circle cx="92" cy="4" r="5" fill="${C.w}"/>`,
+  'FP-03': `<path d="M6 22 q54 40 108 0" fill="none"/>${[[18, 32, C.pink], [36, 41, C.gold], [54, 44, C.v], [72, 44, C.pink], [90, 40, C.gold], [104, 31, C.v]].map(([x, y, c]) => `<path d="M${x - 7} ${y - 2} l7 16 7 -16z" fill="${c}"/><circle cx="${x}" cy="${y - 3}" r="4" fill="${C.w}"/>`).join('')}<circle cx="60" cy="72" r="10" fill="${C.pink}"/><circle cx="60" cy="72" r="4" fill="${C.gold}"/>`,
+  'FP-04': `<path d="M22 44 h76 v22 q0 24 -38 24 q-38 0 -38 -24z" fill="#4E5A57"/><rect x="16" y="38" width="88" height="10" rx="5" fill="#6B7774"/><circle cx="46" cy="34" r="9" fill="${C.r}"/><circle cx="62" cy="30" r="9" fill="${C.o}"/><circle cx="76" cy="36" r="8" fill="${C.p}"/><path d="M40 20 q-4 -8 2 -14 M60 16 q-4 -8 2 -14 M80 20 q-4 -8 2 -14" fill="none" stroke="#9DB2A6" stroke-width="2.5"/>`,
+  'FP-05': `<path d="M26 8 V94" stroke="${C.dk}" stroke-width="6"/><path d="M29 12 h66 l-12 20 12 20 h-66z" fill="#7FA36B"/><path d="M44 32 q10 -10 20 0 q-10 10 -20 0z M64 32 l9 -6 v12z" fill="${C.w}" stroke-width="2"/><ellipse cx="26" cy="94" rx="14" ry="4" fill="${C.br}"/>`,
+};
+/** 부품 그림 SVG (got = 모았나 — 아직이면 검은 실루엣) */
+export const partSvg = (id, got = true, label = '') =>
+  `<svg viewBox="0 0 120 100" class="fe-part${got ? '' : ' is-empty'}" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${PART_ICONS[id] ?? ''}</g></svg>`;

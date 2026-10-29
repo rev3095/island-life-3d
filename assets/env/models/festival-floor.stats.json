@@ -1,0 +1,38 @@
+{
+  "id": "TI-08",
+  "slug": "festival-floor",
+  "name": "축제 돌바닥",
+  "category": "tile",
+  "kind": "festival-floor",
+  "version": "0.1",
+  "triangles": 5360,
+  "parts": 1,
+  "materials": [
+    "center",
+    "edge",
+    "line",
+    "stone",
+    "stoneA",
+    "stoneB",
+    "stoneC"
+  ],
+  "animations": {},
+  "size": [
+    12.0,
+    12.0,
+    0.04
+  ],
+  "footprint": [
+    12,
+    12
+  ],
+  "glbBytes": 109684,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-floor_front.png",
+    "festival-floor_hero.jpg",
+    "festival-floor_main.png",
+    "festival-floor_thumb.png",
+    "festival-floor_top.png"
+  ]
+}

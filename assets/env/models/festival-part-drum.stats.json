@@ -1,0 +1,35 @@
+{
+  "id": "FP-02",
+  "slug": "festival-part-drum",
+  "name": "응원 북",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "triangles": 408,
+  "parts": 1,
+  "materials": [
+    "drumBody",
+    "drumHead",
+    "stick",
+    "trim"
+  ],
+  "animations": {},
+  "size": [
+    0.43,
+    0.41,
+    0.48
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 10344,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-part-drum_front.png",
+    "festival-part-drum_hero.jpg",
+    "festival-part-drum_main.png",
+    "festival-part-drum_thumb.png",
+    "festival-part-drum_top.png"
+  ]
+}

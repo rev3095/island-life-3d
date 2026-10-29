@@ -1,0 +1,53 @@
+{
+  "id": "FP-03",
+  "slug": "festival-part-garland",
+  "name": "꽃 가랜드",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "모찌가 주는 축제 부품. 꽃 깃발 줄 한 묶음.",
+    "keywords": [
+      "손에 들 만한 크기",
+      "진행판 선반에 놓인다"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "string": "#4A3B32",
+    "flagA": "#E86AA0",
+    "flagB": "#F6C84C",
+    "flagC": "#B9A6E0"
+  },
+  "paletteLabels": {
+    "string": "줄",
+    "flagA": "분홍",
+    "flagB": "노랑",
+    "flagC": "보라"
+  },
+  "animations": [],
+  "festival": {
+    "part": "garland"
+  }
+}

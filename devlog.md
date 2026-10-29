@@ -19,7 +19,7 @@
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 6: 요소 68 (배경 35 · 가구 33, 새 16개 + 단풍 지붕이 생긴 주민 집은 검수 대기). 스펙·통계는 묶음 목록 `editor-index.json` (`node tools/build-editor-index.mjs`) — 파일 511개 제한 때문, 지금 약 400개. db `env-refs` / `env-requests` |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
-| **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 2 (SF-1–6 로 ID 바꿈). **반영 v1 (임시, 바뀔 수 있음)** = D14–D25 추천안 그대로(D20 만 B), 의견 없음 → Z5 구현 시작. |
+| **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 3 (SF-1–6 로 ID 바꿈, TK-07 좋아함 ✨→🤔). **반영 v1 (임시, 바뀔 수 있음)** = D14–D25 추천안 그대로(D20 만 B), 의견 없음 → **구현 끝 (`p8-festival`, M5-P2~P7, 합치기 대기)**: 이모티콘 대화·축제 광장 3D 17종·부품·부스 놀이 5·축제 날·단체 사진 엔딩·해마다 축제. 결정 갈래는 `assets/festival/config.json`, 약속 `docs/notes/z5-festival.md` |
 | **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1 (보드 id `wave6`). **반영 v1 (임시)** = D26–D35 모두 추천안 A, 의견 없음 → M6 시작. M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중

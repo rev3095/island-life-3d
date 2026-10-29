@@ -7,6 +7,7 @@ const PARTS = [
   ['house', './house/index.js'],
   ['intro', './intro/index.js'],   // 3차 X3 첫날 흐름 (이름 정하기·첫날 할 일)
   ['story', './story/index.js'],   // 5차 스토리 장면 재생기 (assets/story/)
+  ['festival', './festival/index.js'],   // 5차 Z5 축제·이모티콘 대화·엔딩
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

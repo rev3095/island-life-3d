@@ -20,8 +20,8 @@ const gltfOf = p => {
 
 const SETS = [
   { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 10 },
-  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 35 },
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 33 },
+  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 52 },
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 34 },
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;
@@ -79,7 +79,10 @@ test('리소스: 배경 — 코드가 이름으로 찾는 종류·재질이 있�
   const USED = ['tree', 'fruit-tree', 'palm', 'cedar', 'rock', 'tulip', 'cosmos', 'pansy', 'weed', 'shell', 'bush', 'lamp', 'bench', 'mailbox',
     'signboard', 'bridge', 'fence', 'fossil-spot', 'workbench', 'campfire', 'house-player', 'house-villager', 'shop', 'museum', 'dock',
     'tile-grass', 'tile-sand', 'tile-path', 'tile-water', 'tile-cliff', 'tile-ramp', 'tile-plaza',
-    'moving-boxes', 'party-balloons', 'lot-sign'];   // 5차: 이사·생일 소품 (town 이 slug 로 놓는다)
+    'moving-boxes', 'party-balloons', 'lot-sign',   // 5차: 이사·생일 소품 (town 이 slug 로 놓는다)
+    'festival-stage', 'festival-arch', 'festival-floor', 'festival-cover', 'festival-lantern', 'festival-garland', 'festival-board',   // 5차 Z5 축제 광장 (world/festival.js)
+    'festival-booth-lantern', 'festival-booth-music', 'festival-booth-flower', 'festival-booth-food', 'festival-booth-fish',
+    'festival-part-lantern', 'festival-part-drum', 'festival-part-garland', 'festival-part-pot', 'festival-part-flag'];
   for (const slug of USED) assert.ok(ENV.spec[slug], `배경 ${slug} 없음`);
   // 열매 딴 나무는 이 재질 메시를 뺀다 (world/objects.js PICKED)
   const mats = slug => new Set(ENV.gltf[slug].materials.map(x => x.name));

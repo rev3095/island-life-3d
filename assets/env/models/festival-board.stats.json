@@ -1,0 +1,35 @@
+{
+  "id": "PR-15",
+  "slug": "festival-board",
+  "name": "부품 진행판",
+  "category": "prop",
+  "kind": "festival-board",
+  "version": "0.1",
+  "triangles": 1412,
+  "parts": 1,
+  "materials": [
+    "board",
+    "roof",
+    "slot",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    2.08,
+    0.44,
+    1.52
+  ],
+  "footprint": [
+    3,
+    1
+  ],
+  "glbBytes": 29468,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-board_front.png",
+    "festival-board_hero.jpg",
+    "festival-board_main.png",
+    "festival-board_thumb.png",
+    "festival-board_top.png"
+  ]
+}

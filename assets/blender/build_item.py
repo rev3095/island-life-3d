@@ -1339,7 +1339,53 @@ def b_pansy(M):
     f.add(ellipsoid(c + tilt @ V((0, 0.0, 0.012)), (0.011, 0.011, 0.008), rot=tilt, seg=10, rings=6), 'center', outline=False)
 
 
+# ================================================================ 5차 Z5 축제 부스에서 만드는 것 (IC-FE-01–04, 검수 보드 z5)
+def b_pie(M):
+    m = M.part('pie')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.03), 0.2, 0.21, seg=28), 'plate')
+    m.add(cylinder((0, 0, 0.03), (0, 0, 0.1), 0.16, 0.18, seg=28), 'crust')
+    m.add(cylinder((0, 0, 0.1), (0, 0, 0.112), 0.155, seg=28), 'filling', outline=False)
+    for k in range(4):   # 격자 반죽
+        x = -0.09 + 0.06 * k
+        m.add(box((x, 0, 0.118), (0.025, 0.3 - abs(x) * 1.2, 0.014), bevel=0.006), 'crust')
+        m.add(box((0, x, 0.122), (0.3 - abs(x) * 1.2, 0.025, 0.014), bevel=0.006), 'crust')
+    m.add(tube([V((0.17 * math.cos(TAU * i / 28), 0.17 * math.sin(TAU * i / 28), 0.105)) for i in range(28)], [0.018] * 28, seg=6, closed=True), 'crust')
+
+
+def b_juice(M):
+    m = M.part('cup')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.28), 0.075, 0.09, seg=20), 'glass')
+    m.add(cylinder((0, 0, 0.01), (0, 0, 0.23), 0.07, 0.083, seg=20), 'juice', outline=False)
+    m.add(cylinder((0.03, 0.0, 0.16), (0.08, 0.02, 0.4), 0.009, seg=8), 'straw')
+    m.add(ellipsoid((0.085, -0.02, 0.27), (0.045, 0.012, 0.045), rot=rot_xyz(y=0.6), seg=12, rings=6), 'slice')
+
+
+def b_wreath(M):
+    m = M.part('wreath')
+    R = 0.17
+    m.add(tube([V((R * math.cos(TAU * i / 32), R * math.sin(TAU * i / 32), 0.03)) for i in range(32)], [0.03] * 32, seg=8, closed=True), 'leaf')
+    cols = ('petalA', 'petalB', 'petalC')
+    for k in range(9):
+        a = TAU * k / 9
+        c = V((R * math.cos(a), R * math.sin(a), 0.06))
+        for j in range(5):
+            b = TAU * j / 5
+            m.add(ellipsoid(c + V((0.022 * math.cos(b), 0.022 * math.sin(b), 0.0)), (0.02, 0.02, 0.012), seg=8, rings=5), cols[k % 3])
+        m.add(ellipsoid(c + V((0, 0, 0.008)), (0.012, 0.012, 0.01), seg=8, rings=5), 'center', outline=False)
+
+
+def b_medal(M):
+    m = M.part('medal')
+    for sx in (1, -1):
+        m.add(box((sx * 0.04, 0.0, 0.2), (0.05, 0.012, 0.22), bevel=0.006, rot=rot_xyz(y=sx * 0.35)), 'ribbon')
+    m.add(cylinder((0, 0.0, 0.0), (0, -0.03, 0.0), 0.1, seg=28), 'gold')
+    m.add(cylinder((0, -0.03, 0.0), (0, -0.034, 0.0), 0.075, seg=28), 'goldLight', outline=False)
+    m.add(ellipsoid((-0.01, -0.038, 0.0), (0.04, 0.006, 0.022), seg=12, rings=6), 'fish')
+    m.add(cone((0.03, -0.038, 0.0), (0.06, -0.038, 0.0), 0.02, 0.0, squash=0.3, seg=6), 'fish')
+
+
 BUILDERS = {
+    'pie': b_pie, 'juice': b_juice, 'wreath': b_wreath, 'medal': b_medal,
     'fish': b_fish, 'flatfish': b_flatfish, 'squid': b_squid, 'octopus': b_octopus, 'seahorse': b_seahorse,
     'butterfly': b_butterfly, 'dragonfly': b_dragonfly, 'bee': b_bee, 'firefly': b_firefly, 'beetle': b_beetle, 'cicada': b_cicada,
     'hopper': b_hopper, 'ant': b_ant, 'snail': b_snail, 'pillbug': b_pillbug, 'skater': b_skater, 'caterpillar': b_caterpillar, 'earwig': b_earwig,
@@ -1355,7 +1401,7 @@ BUILDERS = {
 
 # 렌더 방향 (스펙 render 칸이 없을 때): 물고기는 옆모습(머리 왼쪽), 곤충은 위에서 비스듬히
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
-          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14)}
+          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32)}
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
 
 
