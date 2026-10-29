@@ -138,7 +138,7 @@ export function createSave({ state, storage = defaultStorage(), key = SAVE_KEY, 
     }
   }
 
-  /** 저장을 지우고 새 게임 상태로 되돌린다 */
+  /** 저장을 지우고 새 게임 상태로 되돌린다. createState 에 없는 칸(state.mail 같은 모듈 칸)도 지운다 */
   function reset() {
     let ok = true;
     if (storage) {
@@ -146,7 +146,9 @@ export function createSave({ state, storage = defaultStorage(), key = SAVE_KEY, 
     }
     blocked = false;
     lastSavedAt = null;
-    applyTo(state, createState());
+    const fresh = createState();
+    for (const k of Object.keys(state)) if (!(k in fresh)) delete state[k];
+    applyTo(state, fresh);
     onReset();
     return ok;
   }
