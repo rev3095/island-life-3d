@@ -1,0 +1,75 @@
+{
+  "id": "PR-14",
+  "slug": "festival-lantern",
+  "name": "등불 기둥",
+  "category": "prop",
+  "kind": "festival-lantern",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "축제 광장 둘레의 나무 기둥. 유리병 등불이 달려 있고 등불 길을 열면 밤에 켜진다.",
+    "keywords": [
+      "높이 2.6",
+      "유리병 등불",
+      "받침돌"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이",
+      "value": 2.6,
+      "min": 2,
+      "max": 3.2,
+      "step": 0.1
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "stone": "#A9B8A0",
+    "jar": "#FFF4D0",
+    "lid": "#8C6440",
+    "glow": "#FFE7A0"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "stone": "받침돌",
+    "jar": "유리병",
+    "lid": "뚜껑",
+    "glow": "불빛"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          0,
+          0,
+          0.14
+        ]
+      ]
+    },
+    "extent": [
+      0.2,
+      0.2
+    ]
+  }
+}

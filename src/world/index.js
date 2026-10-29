@@ -6,6 +6,7 @@ import { createObjects } from './objects.js';
 import { createCollision } from './collision.js';
 import { createDaily } from './daily.js';
 import { createOcclusion } from './occlusion.js';
+import { carveFestival } from './festival.js';
 
 let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
 
@@ -25,6 +26,8 @@ export default {
       [m.slug, { gltf: await assets.loadEnv(m.slug), spec: await assets.loadEnvSpec(m.slug) }])));
     const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit,
       lots: lotsOf(Object.fromEntries(Object.entries(models).map(([k, v]) => [k, v.spec]))) });
+    // 5차 Z5 축제 광장: 지금 광장을 넓혀 무대·부스 자리·등불을 깐다 (열린 부스 = state.festival.booths 의 열쇠)
+    carveFestival(gen, { opened: new Set(Object.keys(state.festival?.booths ?? {})), specs: Object.fromEntries(Object.entries(models).map(([k, v]) => [k, v.spec])) });
     const base = createIslandApi(gen);
 
     kit = createKit(ctx);

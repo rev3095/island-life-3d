@@ -1,0 +1,55 @@
+{
+  "id": "FP-04",
+  "slug": "festival-part-pot",
+  "name": "과일 솥",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "퐁이 주는 축제 부품. 과일이 담긴 작은 솥.",
+    "keywords": [
+      "손에 들 만한 크기",
+      "진행판 선반에 놓인다"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#4E5A57",
+    "trim": "#6B7774",
+    "fruitA": "#E8504F",
+    "fruitB": "#F39A3B",
+    "fruitC": "#F7A6A0"
+  },
+  "paletteLabels": {
+    "metal": "솥",
+    "trim": "테두리",
+    "fruitA": "과일 빨강",
+    "fruitB": "과일 주황",
+    "fruitC": "과일 분홍"
+  },
+  "animations": [],
+  "festival": {
+    "part": "pot"
+  }
+}

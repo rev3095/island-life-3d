@@ -1,0 +1,36 @@
+{
+  "id": "FP-04",
+  "slug": "festival-part-pot",
+  "name": "과일 솥",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "triangles": 656,
+  "parts": 1,
+  "materials": [
+    "fruitA",
+    "fruitB",
+    "fruitC",
+    "metal",
+    "trim"
+  ],
+  "animations": {},
+  "size": [
+    0.44,
+    0.44,
+    0.35
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 15632,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-part-pot_front.png",
+    "festival-part-pot_hero.jpg",
+    "festival-part-pot_main.png",
+    "festival-part-pot_thumb.png",
+    "festival-part-pot_top.png"
+  ]
+}

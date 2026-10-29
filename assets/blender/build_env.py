@@ -563,7 +563,338 @@ def b_tile(M):
             t.add(box((x, y, 0.02 + 0.006 * (i % 3)), (0.44, 0.44, 0.06), bevel=0.02), 'stone' if i in (0, 3) else 'stoneLight')
 
 
+# ================================================================ 5차 Z5 축제 (검수 보드 z5: BD-06·07, TI-08, FB-01–05, PR-13–16, FP-01–05)
+# 부스·부품 종류는 스펙의 festival 칸 ({"booth": "lantern"} / {"part": "drum"}) 이 정한다.
+def turned(bm, angle, at):
+    """bmesh 를 Z 축으로 돌리고 옮긴다"""
+    bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=Matrix.Rotation(angle, 3, 'Z'))
+    bmesh.ops.translate(bm, vec=V(at), verts=bm.verts)
+    return bm
+
+
+def annulus(r0, r1, a0, a1, z0, z1, seg=6):
+    """두께 있는 고리 조각 (바닥 무늬)"""
+    bm = bmesh.new()
+    pts = [a0 + (a1 - a0) * k / seg for k in range(seg + 1)]
+    lo = [[bm.verts.new((r * math.cos(a), r * math.sin(a), z0)) for a in pts] for r in (r0, r1)]
+    hi = [[bm.verts.new((r * math.cos(a), r * math.sin(a), z1)) for a in pts] for r in (r0, r1)]
+    for k in range(seg):
+        bm.faces.new([hi[0][k], hi[1][k], hi[1][k + 1], hi[0][k + 1]])
+        bm.faces.new([lo[0][k + 1], lo[1][k + 1], lo[1][k], lo[0][k]])
+        bm.faces.new([lo[1][k], lo[1][k + 1], hi[1][k + 1], hi[1][k]])
+        bm.faces.new([lo[0][k + 1], lo[0][k], hi[0][k], hi[0][k + 1]])
+    bm.faces.new([lo[0][0], lo[1][0], hi[1][0], hi[0][0]])
+    bm.faces.new([hi[0][seg], hi[1][seg], lo[1][seg], lo[0][seg]])
+    return bm
+
+
+def string_lights(m, a, b, sag, n, z_drop=0.04):
+    """두 점 사이에 처진 전구 줄 (전구는 glow — 밤에 켜진다)"""
+    a, b = V(a), V(b)
+    pt = lambda t: a.lerp(b, t) - V((0, 0, sag * math.sin(math.pi * t)))
+    m.add(tube([pt(i / 16) for i in range(17)], [0.012] * 17, seg=6), 'string', outline=False)
+    for i in range(1, n + 1):
+        m.add(ellipsoid(pt(i / (n + 1)) - V((0, 0, z_drop)), (0.035, 0.035, 0.045), seg=10, rings=6), 'glow', outline=False)
+
+
+def b_festival_stage(M):
+    W, D, H = P.get('width', 5.0), P.get('depth', 3.0), 0.36
+    m = M.part('stage')
+    # 둘레 두 단 계단 + 무대 바닥 (pads 의 steps 와 같은 높이: 0.12 · 0.24 · 0.36)
+    for i, h in enumerate((0.12, 0.24)):
+        g = 0.36 - i * 0.18
+        m.add(box((0, -g / 2, h / 2), (W + g * 2, D + g, h), bevel=0.02), top_side('step', 'wood', h))
+    m.add(box((0, 0, H / 2), (W, D, H), bevel=0.03), top_side('deck', 'wood', H))
+    for k in range(1, 6):   # 널빤지 줄
+        y = -D / 2 + D * k / 6
+        m.add(box((0, y, H + 0.004), (W - 0.1, 0.025, 0.01), bevel=0.0), 'woodDark', outline=False)
+    m.add(box((0, -D / 2 - 0.005, H * 0.55), (W - 0.04, 0.02, 0.12), bevel=0.005), 'skirt', outline=False)
+    # 뒤 판 (색종이 동그라미)
+    m.add(box((0, D / 2 - 0.1, H + 1.05), (W - 0.3, 0.1, 2.1), bevel=0.03), 'backdrop')
+    rnd = random.Random(6)
+    for k in range(14):
+        x, z = rnd.uniform(-W / 2 + 0.45, W / 2 - 0.45), rnd.uniform(H + 0.35, H + 1.9)
+        m.add(cylinder((x, D / 2 - 0.16, z), (x, D / 2 - 0.15, z), rnd.uniform(0.07, 0.13), seg=14), ('flagA', 'flagB', 'flagC')[k % 3], outline=False)
+    # 기둥 넷 + 천막 지붕 + 앞 주름 천
+    top = H + 2.55
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(cylinder((sx * (W / 2 - 0.15), sy * (D / 2 - 0.15), H), (sx * (W / 2 - 0.15), sy * (D / 2 - 0.15), top), 0.07, seg=12), 'wood')
+    m.add(prism((0, 0, top), W, D, 0.75, overhang=0.12), 'cloth', smooth=False)
+    for k in range(10):
+        x = -W / 2 - 0.06 + (W + 0.12) * (k + 0.5) / 10
+        m.add(ellipsoid((x, -D / 2 - 0.13, top - 0.02), ((W + 0.12) / 20, 0.03, 0.17), seg=14, rings=8), 'cloth' if k % 2 else 'clothB')
+    # 현수막 (🎉 동그라미 무늬) · 전구 줄 · 개막 종
+    m.add(box((0, -D / 2 + 0.1, top - 0.42), (W * 0.62, 0.05, 0.46), bevel=0.02), 'banner')
+    for k, x in enumerate((-0.9, -0.45, 0, 0.45, 0.9)):
+        m.add(cylinder((x * W / 5, -D / 2 + 0.07, top - 0.42), (x * W / 5, -D / 2 + 0.06, top - 0.42), 0.11, seg=16), ('flagA', 'flagB', 'flagC')[k % 3], outline=False)
+    string_lights(m, (-W / 2 + 0.15, -D / 2 + 0.15, top - 0.08), (W / 2 - 0.15, -D / 2 + 0.15, top - 0.08), 0.25, 9)
+    m.add(cylinder((-W / 2 + 0.45, -D / 2 + 0.15, top - 0.15), (-W / 2 + 0.45, -D / 2 + 0.15, top - 0.45), 0.012, seg=6), 'string', outline=False)
+    m.add(cone((-W / 2 + 0.45, -D / 2 + 0.15, top - 0.75), (-W / 2 + 0.45, -D / 2 + 0.15, top - 0.45), 0.16, 0.07, seg=16), 'bell')
+    m.add(ellipsoid((-W / 2 + 0.45, -D / 2 + 0.15, top - 0.78), (0.04, 0.04, 0.04), seg=10, rings=6), 'metal')
+
+
+def b_festival_arch(M):
+    W, Ht = P.get('width', 2.6), 2.7
+    m = M.part('arch')
+    for sx in (1, -1):
+        m.add(cylinder((sx * W / 2, 0, 0), (sx * W / 2, 0, 0.12), 0.18, 0.15, seg=14), 'stone')
+        m.add(cylinder((sx * W / 2, 0, 0.1), (sx * W / 2, 0, Ht - 0.2), 0.09, seg=12), 'wood')
+    arc = [V((-W / 2 + W * t, 0, Ht - 0.25 + 0.35 * math.sin(math.pi * t))) for t in (i / 18 for i in range(19))]
+    m.add(tube(arc, [0.1] * 19, seg=10), 'wood')
+    rnd = random.Random(8)
+    for k in range(13):   # 꽃 덩굴
+        t = k / 12
+        p = arc[round(t * 18)] if k % 3 else V((rnd.choice((-1, 1)) * W / 2, 0, rnd.uniform(0.6, Ht - 0.4)))
+        m.add(ellipsoid(p + V((rnd.uniform(-0.05, 0.05), -0.08, 0.05)), (0.13, 0.08, 0.12), seg=12, rings=8), 'leaf')
+        m.add(ellipsoid(p + V((rnd.uniform(-0.06, 0.06), -0.16, 0.08)), (0.08, 0.05, 0.08), seg=10, rings=6), ('flowerA', 'flowerB', 'flowerC')[k % 3])
+    for k in range(5):   # 깃발
+        t = (k + 0.5) / 5
+        p = arc[round(t * 18)]
+        m.add(pennant(p - V((0, 0.02, 0.1)), 0.2, 0.26), ('flagA', 'flagB', 'flagC')[k % 3])
+
+
+def b_festival_floor(M):
+    R = P.get('radius', 6.0)
+    m = M.part('floor')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.02), R, seg=72), 'stone', outline=False)
+    rings = [(0.0, 0.9, 'center', 1), (0.9, 1.15, 'line', 24), (1.15, 2.2, None, 12), (2.2, 2.4, 'line', 36), (3.9, 4.1, 'line', 48), (5.6, 5.95, 'edge', 60)]
+    cols = ('stoneA', 'stoneB', 'stoneC')
+    for r0, r1, mat, n in rings:
+        for k in range(n):
+            a0, a1 = TAU * k / n, TAU * (k + 1) / n - (0.02 if n > 1 else 0)
+            m.add(annulus(max(r0, 0.001), r1, a0, a1, 0.02, 0.035, seg=max(2, 72 // max(n, 1))), mat or cols[k % 3], outline=False)
+    for k in range(16):   # 해 모양 빛살
+        a = TAU * k / 16
+        m.add(annulus(2.5, 3.8, a - 0.06, a + 0.06, 0.02, 0.03, seg=2), cols[k % 3], outline=False)
+
+
+BOOTH_GOODS = {}
+
+
+def goods(name):
+    def deco(fn):
+        BOOTH_GOODS[name] = fn
+        return fn
+    return deco
+
+
+def jar_lantern(m, c, s=1.0, glow='glow'):
+    c = V(c)
+    m.add(cylinder(c, c + V((0, 0, 0.26 * s)), 0.1 * s, 0.11 * s, seg=16), 'jar')
+    m.add(cylinder(c + V((0, 0, 0.25 * s)), c + V((0, 0, 0.3 * s)), 0.08 * s, seg=14), 'lid')
+    m.add(tube(bezier(c + V((-0.07 * s, 0, 0.3 * s)), c + V((-0.07 * s, 0, 0.42 * s)), c + V((0.07 * s, 0, 0.42 * s)), c + V((0.07 * s, 0, 0.3 * s)), 8), [0.008 * s] * 9, seg=5), 'lid', outline=False)
+    for k, (dx, dz) in enumerate(((-0.03, 0.07), (0.035, 0.12), (0.0, 0.18), (-0.02, 0.21))):
+        m.add(ellipsoid(c + V((dx * s, -0.04 * s, dz * s)), (0.022 * s, 0.022 * s, 0.022 * s), seg=8, rings=5), glow, outline=False)
+
+
+@goods('lantern')
+def g_lantern(m, z):
+    for x in (-0.6, 0, 0.6):
+        jar_lantern(m, (x, -0.05, z), 1.0)
+
+
+@goods('music')
+def g_music(m, z):
+    m.add(cylinder((0, -0.05, z), (0, -0.05, z + 0.32), 0.3, seg=24), 'drumBody')
+    m.add(cylinder((0, -0.05, z + 0.32), (0, -0.05, z + 0.35), 0.31, seg=24), 'drumHead')
+    for sx in (1, -1):
+        m.add(capsule((sx * 0.12, -0.15, z + 0.38), (sx * 0.42, -0.35, z + 0.62), 0.022, seg=8, rings=4), 'stick')
+    for x in (-0.75, 0.75):
+        m.add(cylinder((x, 0.0, z), (x, 0.0, z + 0.22), 0.14, seg=16), 'drumBody')
+        m.add(cylinder((x, 0.0, z + 0.22), (x, 0.0, z + 0.24), 0.15, seg=16), 'drumHead')
+
+
+@goods('flower')
+def g_flower(m, z):
+    for k, x in enumerate((-0.6, 0.0, 0.6)):
+        m.add(cylinder((x, 0, z), (x, 0, z + 0.18), 0.12, 0.15, seg=14), 'pot')
+        for j in range(5):
+            a = TAU * j / 5
+            m.add(ellipsoid((x + 0.08 * math.cos(a), 0.08 * math.sin(a), z + 0.3), (0.07, 0.07, 0.06), seg=10, rings=6), ('petalA', 'petalB', 'petalC')[(k + j) % 3])
+        m.add(ellipsoid((x, 0, z + 0.25), (0.13, 0.13, 0.06), seg=12, rings=6), 'leaf')
+    ring = [V((0.35 * math.cos(TAU * i / 20), -0.32, z + 0.55 + 0.35 * math.sin(TAU * i / 20))) for i in range(20)]
+    m.add(tube(ring, [0.035] * 20, seg=8, closed=True), 'leaf')
+
+
+@goods('food')
+def g_food(m, z):
+    m.add(cylinder((-0.45, 0, z), (-0.45, 0, z + 0.3), 0.3, 0.26, seg=20), 'metal')
+    for k, (dx, dy) in enumerate(((-0.1, -0.05), (0.08, 0.06), (0.02, -0.12))):
+        m.add(ellipsoid((-0.45 + dx, dy, z + 0.34), (0.1, 0.1, 0.1), seg=12, rings=8), ('fruitA', 'fruitB', 'fruitC')[k])
+    m.add(cylinder((0.35, -0.05, z), (0.35, -0.05, z + 0.1), 0.24, 0.2, seg=20), 'pie')
+    m.add(cylinder((0.35, -0.05, z + 0.1), (0.35, -0.05, z + 0.12), 0.2, seg=20), 'fruitA', outline=False)
+    for k, x in enumerate((0.75, 0.95)):
+        m.add(cylinder((x, -0.2, z), (x, -0.2, z + 0.22), 0.06, 0.075, seg=12), ('fruitB', 'fruitC')[k])
+
+
+@goods('fish')
+def g_fish(m, z):
+    m.add(box((-0.3, 0, z + 0.22), (0.9, 0.45, 0.44), bevel=0.03), 'glass')
+    m.add(box((-0.3, 0, z + 0.17), (0.84, 0.4, 0.32), bevel=0.02), 'water', outline=False)
+    for k, (x, h) in enumerate(((-0.5, 0.18), (-0.15, 0.28))):
+        m.add(ellipsoid((x, -0.05, z + h), (0.11, 0.04, 0.06), seg=12, rings=6), 'fish')
+        m.add(cone((x + 0.1, -0.05, z + h), (x + 0.18, -0.05, z + h), 0.05, 0.0, squash=0.4, seg=6), 'fish')
+    m.add(box((0.6, 0.05, z + 0.32), (0.42, 0.05, 0.64), bevel=0.02), 'boardW')
+    for k, hh in enumerate((0.3, 0.45, 0.22)):
+        m.add(box((0.48 + k * 0.12, 0.02, z + 0.08 + hh / 2), (0.07, 0.02, hh), bevel=0.005), 'band', outline=False)
+
+
+def booth_frame(M, label=True):
+    """3×2칸 부스 몸: 뒤 벽 · 기둥 · 줄무늬 차양 · 앞 판매대 · 위 팻말. 판매대 윗면 높이를 돌려준다"""
+    W, D = 2.8, 1.7
+    m = M.part('booth')
+    m.add(box((0, D / 2 - 0.08, 1.05), (W - 0.2, 0.1, 2.0), bevel=0.02), 'wall')
+    for sx in (1, -1):
+        for y, top_z in ((-D / 2 + 0.12, 1.93), (D / 2 - 0.12, 2.28)):   # 앞기둥은 차양 아래까지
+            m.add(cylinder((sx * (W / 2 - 0.1), y, 0), (sx * (W / 2 - 0.1), y, top_z), 0.06, seg=10), 'wood')
+    n = 7
+    for k in range(n):   # 줄무늬 차양: 뒤가 높고 앞으로 기운다
+        x0, x1 = -W / 2 - 0.08 + (W + 0.16) * k / n, -W / 2 - 0.08 + (W + 0.16) * (k + 1) / n
+        bm = bmesh.new()
+        pts = [(x0, D / 2, 2.3), (x1, D / 2, 2.3), (x1, -D / 2 - 0.2, 1.9), (x0, -D / 2 - 0.2, 1.9)]
+        lo = [bm.verts.new(V(p)) for p in pts]
+        hi = [bm.verts.new(V(p) + V((0, 0, 0.04))) for p in pts]
+        bm.faces.new(list(reversed(lo)))
+        bm.faces.new(hi)
+        for i in range(4):
+            j = (i + 1) % 4
+            bm.faces.new([lo[i], lo[j], hi[j], hi[i]])
+        mat = 'awningA' if k % 2 == 0 else 'awningB'
+        m.add(bm, mat, smooth=False)
+        m.add(ellipsoid(((x0 + x1) / 2, -D / 2 - 0.2, 1.9), ((x1 - x0) / 2, 0.03, 0.13), seg=12, rings=6), mat)
+    top = 0.95
+    m.add(box((0, -D / 2 + 0.35, top / 2), (W, 0.6, top), bevel=0.03), top_side('counter', 'woodDark', top))
+    m.add(box((0, -D / 2 + 0.04, top * 0.55), (W - 0.04, 0.02, 0.2), bevel=0.005), 'band', outline=False)
+    if label:
+        m.add(box((0, -D / 2 - 0.1, 2.45), (0.8, 0.06, 0.38), bevel=0.05), 'sign')
+        m.add(cylinder((0, -D / 2 - 0.14, 2.45), (0, -D / 2 - 0.13, 2.45), 0.12, seg=16), 'awningA', outline=False)
+    return m, top, D
+
+
+def b_festival_booth(M):
+    m, top, D = booth_frame(M)
+    g = M.part('goods')
+    BOOTH_GOODS[spec['festival']['booth']](g, top)
+    # 판매대 위 물건은 판매대 앞쪽으로
+    bmesh.ops.translate(g.bm, vec=V((0, -D / 2 + 0.35, 0)), verts=g.bm.verts)
+
+
+def b_festival_cover(M):
+    W, D = 2.8, 1.7
+    m = M.part('cover')
+    m.add(box((0, 0, 1.0), (W, D, 2.0), bevel=0.55, segments=5), 'cloth')   # 천을 덮은 둥근 덩어리
+    for z in (0.6, 1.5):
+        ring = [V(((W / 2 + 0.02) * math.cos(TAU * i / 32), (D / 2 + 0.02) * math.sin(TAU * i / 32), z)) for i in range(32)]
+        m.add(tube(ring, [0.025] * 32, seg=6, closed=True), 'rope')
+    m.add(box((0, -D / 2 - 0.08, 0.45), (0.04, 0.04, 0.9), bevel=0.01), 'wood')
+    m.add(box((0, -D / 2 - 0.1, 0.95), (0.6, 0.05, 0.42), bevel=0.04), 'sign')
+    for k, (x, z, r) in enumerate(((-0.12, 0.92, 0.09), (0.06, 1.0, 0.11), (0.16, 0.9, 0.06))):   # 💭 생각 풍선
+        m.add(ellipsoid((x, -D / 2 - 0.14, z), (r, 0.015, r * 0.8), seg=12, rings=6), 'mark', outline=False)
+
+
+def b_festival_lantern(M):
+    Ht = P.get('height', 2.6)
+    m = M.part('post')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.1), 0.14, 0.12, seg=14), 'stone')
+    m.add(cylinder((0, 0, 0.08), (0, 0, Ht), 0.05, seg=10), 'wood')
+    m.add(ellipsoid((0, 0, Ht + 0.03), (0.07, 0.07, 0.06), seg=12, rings=6), 'wood')
+    m.add(box((0, -0.16, Ht - 0.12), (0.04, 0.34, 0.04), bevel=0.01), 'wood')
+    jar_lantern(m, (0, -0.3, Ht - 0.62), 1.15)
+
+
+def b_festival_garland(M):
+    L, sag = P.get('length', 4.6), 0.45
+    m = M.part('garland')
+    pt = lambda t: V((-L / 2 + L * t, 0, -sag * math.sin(math.pi * t)))
+    m.add(tube([pt(i / 24) for i in range(25)], [0.012] * 25, seg=6), 'string', outline=False)
+    n = 11
+    for i in range(n):
+        t = (i + 0.5) / n
+        m.add(pennant(pt(t) + V((0, 0, 0.005)), 0.22, 0.26), ('flagA', 'flagB', 'flagC', 'flagD', 'flagE')[i % 5])
+
+
+def b_festival_board(M):
+    W = 1.9
+    m = M.part('board')
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - 0.08), 0.02, 0.7), (0.09, 0.09, 1.4), bevel=0.015), 'wood')
+    m.add(box((0, 0.05, 1.0), (W, 0.08, 0.72), bevel=0.04), 'board')
+    m.add(prism((0, 0.05, 1.36), W + 0.12, 0.26, 0.16, overhang=0.03), 'roof')
+    for k in range(5):   # 부품 다섯 자리 (검은 실루엣) + 앞 선반
+        x = -W / 2 + 0.25 + (W - 0.5) * k / 4
+        m.add(box((x, 0.0, 1.0), (0.3, 0.02, 0.5), bevel=0.04), 'slot', outline=False)
+        m.add(box((x, -0.12, 0.6), (0.34, 0.22, 0.04), bevel=0.01), 'wood')
+
+
+PART_SHAPES = {}
+
+
+def part_shape(name):
+    def deco(fn):
+        PART_SHAPES[name] = fn
+        return fn
+    return deco
+
+
+@part_shape('lantern')
+def p_lantern(m):
+    jar_lantern(m, (0, 0, 0), 1.25)
+
+
+@part_shape('drum')
+def p_drum(m):
+    m.add(cylinder((0, 0, 0), (0, 0, 0.26), 0.19, seg=20), 'drumBody')
+    m.add(cylinder((0, 0, 0.26), (0, 0, 0.28), 0.2, seg=20), 'drumHead')
+    zig = [V((0.195 * math.cos(TAU * i / 16), 0.195 * math.sin(TAU * i / 16), 0.05 + 0.16 * (i % 2))) for i in range(16)]
+    m.add(tube(zig, [0.012] * 16, seg=5, closed=True), 'trim', outline=False)
+    for sx in (1, -1):
+        m.add(capsule((sx * 0.06, -0.05, 0.3), (sx * 0.2, -0.15, 0.46), 0.016, seg=8, rings=4), 'stick')
+
+
+@part_shape('garland')
+def p_garland(m):
+    pt = lambda t: V((-0.22 + 0.44 * t, 0, 0.36 - 0.12 * math.sin(math.pi * t)))
+    m.add(tube([pt(i / 12) for i in range(13)], [0.01] * 13, seg=5), 'string', outline=False)
+    for i in range(5):
+        m.add(pennant(pt((i + 0.5) / 5), 0.08, 0.11), ('flagA', 'flagB', 'flagC')[i % 3])
+    m.add(ellipsoid((0, -0.02, 0.1), (0.1, 0.1, 0.1), seg=12, rings=8), 'flagA')
+    m.add(ellipsoid((0, -0.09, 0.12), (0.045, 0.03, 0.045), seg=10, rings=6), 'flagC')
+
+
+@part_shape('pot')
+def p_pot(m):
+    m.add(cylinder((0, 0, 0), (0, 0, 0.2), 0.16, 0.2, seg=20), 'metal')
+    m.add(cylinder((0, 0, 0.2), (0, 0, 0.23), 0.22, seg=20), 'trim')
+    for k, (dx, dy) in enumerate(((-0.06, -0.03), (0.07, 0.04), (0.0, -0.08))):
+        m.add(ellipsoid((dx, dy, 0.28), (0.07, 0.07, 0.07), seg=12, rings=8), ('fruitA', 'fruitB', 'fruitC')[k])
+
+
+@part_shape('flag')
+def p_flag(m):
+    m.add(cylinder((-0.12, 0, 0), (-0.12, 0, 0.5), 0.015, seg=8), 'stick')
+    bm = bmesh.new()
+    pts = [(-0.11, 0, 0.48), (0.18, 0, 0.48), (0.12, 0, 0.39), (0.18, 0, 0.3), (-0.11, 0, 0.3)]
+    lo = [bm.verts.new(V(p) - V((0, 0.006, 0))) for p in pts]
+    hi = [bm.verts.new(V(p) + V((0, 0.006, 0))) for p in pts]
+    bm.faces.new(lo)
+    bm.faces.new(list(reversed(hi)))
+    for i in range(5):
+        j = (i + 1) % 5
+        bm.faces.new([lo[i], hi[i], hi[j], lo[j]])
+    m.add(bm, 'flagA', smooth=False)
+    m.add(ellipsoid((0.02, -0.01, 0.39), (0.045, 0.01, 0.022), seg=10, rings=5), 'trim', outline=False)
+    m.add(ellipsoid((-0.12, 0, 0.0), (0.06, 0.06, 0.02), seg=12, rings=5), 'stick')
+
+
+def b_festival_part(M):
+    PART_SHAPES[spec['festival']['part']](M.part('part'))
+
+
 BUILDERS = {
+    'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
+    'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
+    'festival-garland': b_festival_garland, 'festival-board': b_festival_board, 'festival-part': b_festival_part,
     'tree': b_tree, 'fruit-tree': lambda M: b_tree(M, fruit=True), 'palm': b_palm, 'cedar': b_cedar, 'rock': b_rock,
     'flower-tulip': b_tulip, 'flower-cosmos': b_cosmos, 'flower-pansy': b_pansy, 'weed': b_weed, 'shell': b_shell, 'bush': b_bush,
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,

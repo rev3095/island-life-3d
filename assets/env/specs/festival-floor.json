@@ -1,0 +1,66 @@
+{
+  "id": "TI-08",
+  "slug": "festival-floor",
+  "name": "축제 돌바닥",
+  "category": "tile",
+  "kind": "festival-floor",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "축제 광장 바닥 무늬. 지름 12칸 원에 둥근 색 돌 고리와 해 모양 빛살.",
+    "keywords": [
+      "지름 12칸",
+      "색 돌 고리",
+      "가운데 원",
+      "빛살 16"
+    ],
+    "references": [
+      "광장 모자이크"
+    ],
+    "avoid": [
+      "미끄러운 대리석"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "radius": {
+      "label": "반지름",
+      "value": 6,
+      "min": 5,
+      "max": 7,
+      "step": 0.1
+    }
+  },
+  "palette": {
+    "stone": "#E6DCC6",
+    "stoneA": "#F2B36B",
+    "stoneB": "#F3EAD6",
+    "stoneC": "#9CC3EA",
+    "line": "#B9A88A",
+    "center": "#F6C84C",
+    "edge": "#C9A77A"
+  },
+  "paletteLabels": {
+    "stone": "바닥",
+    "stoneA": "돌 주황",
+    "stoneB": "돌 흰색",
+    "stoneC": "돌 하늘",
+    "line": "줄눈 고리",
+    "center": "가운데",
+    "edge": "가장자리"
+  },
+  "animations": []
+}

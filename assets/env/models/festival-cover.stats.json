@@ -1,0 +1,36 @@
+{
+  "id": "PR-16",
+  "slug": "festival-cover",
+  "name": "덮개 친 부스 자리",
+  "category": "prop",
+  "kind": "festival-cover",
+  "version": "0.1",
+  "triangles": 1772,
+  "parts": 1,
+  "materials": [
+    "cloth",
+    "mark",
+    "rope",
+    "sign",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    2.89,
+    1.9,
+    2.0
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 35548,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-cover_front.png",
+    "festival-cover_hero.jpg",
+    "festival-cover_main.png",
+    "festival-cover_thumb.png",
+    "festival-cover_top.png"
+  ]
+}

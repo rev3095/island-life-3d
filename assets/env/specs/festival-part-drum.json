@@ -1,0 +1,53 @@
+{
+  "id": "FP-02",
+  "slug": "festival-part-drum",
+  "name": "응원 북",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "코코가 주는 축제 부품. 빨간 응원 북과 북채.",
+    "keywords": [
+      "손에 들 만한 크기",
+      "진행판 선반에 놓인다"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "drumBody": "#E8504F",
+    "drumHead": "#FBF7F2",
+    "trim": "#F6C84C",
+    "stick": "#8C6440"
+  },
+  "paletteLabels": {
+    "drumBody": "북통",
+    "drumHead": "가죽",
+    "trim": "줄무늬",
+    "stick": "북채"
+  },
+  "animations": [],
+  "festival": {
+    "part": "drum"
+  }
+}

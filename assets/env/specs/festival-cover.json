@@ -1,0 +1,77 @@
+{
+  "id": "PR-16",
+  "slug": "festival-cover",
+  "name": "덮개 친 부스 자리",
+  "category": "prop",
+  "kind": "festival-cover",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "아직 열지 않은 부스 자리. 천을 덮고 끈으로 묶었다. 앞 팻말에 생각 풍선.",
+    "keywords": [
+      "천 덮개",
+      "끈 두 줄",
+      "생각 풍선 팻말"
+    ],
+    "references": [],
+    "avoid": [
+      "공사장 느낌"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "cloth": "#E6DCC6",
+    "rope": "#C99A63",
+    "wood": "#B98957",
+    "sign": "#FBF7F2",
+    "mark": "#9DB2A6"
+  },
+  "paletteLabels": {
+    "cloth": "덮개 천",
+    "rope": "끈",
+    "wood": "팻말 기둥",
+    "sign": "팻말",
+    "mark": "생각 풍선"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -0.95,
+          0.05,
+          0.6
+        ],
+        [
+          0,
+          0.05,
+          0.62
+        ],
+        [
+          0.95,
+          0.05,
+          0.6
+        ]
+      ]
+    },
+    "extent": [
+      1.5,
+      1
+    ]
+  }
+}

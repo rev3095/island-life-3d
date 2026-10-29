@@ -101,3 +101,62 @@ test('빈 보내기 = 기다리기, 인사·연습·하루 횟수', () => {
   assert.deepEqual(got, [3, 2, 2, 0]);
   assert.equal(countPoints(RULES, v, 'd2', 2), 2, '다음 날 다시 센다');
 });
+
+// ---------- 축제 광장 (src/world/festival.js, 검수 보드 z5 D19-A) ----------
+import { generateIsland, lotsOf, BUILDING_KINDS, KIND } from '../src/world/island.js';
+import { festivalLayout, carveFestival, rectCorners, overlaps, BOOTH_SIZE, BOOTH_SCALE, FESTIVAL_RADIUS, BOOTHS } from '../src/world/festival.js';
+
+const envSpec = slug => read(`assets/env/specs/${slug}.json`);
+const island = () => generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, envSpec(k)]))) });
+
+test('축제 광장: 무대·부스 다섯·진행판·아치·등불이 서로·건물과 겹치지 않고, 들어오는 길을 막지 않는다', () => {
+  const gen = island();
+  const F = festivalLayout(gen);
+  const { w, h } = gen;
+  const rects = [
+    ['stage-wall', rectCorners({ x: F.stage.x, z: F.stage.z - 1.4 }, [5.72, 0.2], 0)],
+    ...F.booths.map(b => [b.id, rectCorners(b, BOOTH_SIZE.map(v => v * BOOTH_SCALE), b.rot)]),
+    ['board', rectCorners(F.board, [2.08, 0.5], F.board.rot)],
+    ...F.arches.map((a, i) => [`arch${i}`, rectCorners(a, [2.95, 0.4], a.rot)]),
+    ...F.lanterns.map((l, i) => [`lantern${i}`, rectCorners(l, [0.3, 0.6], l.rot)]),
+    ...gen.buildings.map(b => [`building:${b.data?.owner ?? b.kind}`, [[b.tx0, b.tz0], [b.tx0 + b.fw, b.tz0], [b.tx0 + b.fw, b.tz0 + b.fd], [b.tx0, b.tz0 + b.fd]].map(([x, z]) => ({ x: x - w / 2, z: z - h / 2 }))]),
+  ];
+  const bad = [];
+  for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) if (overlaps(rects[i][1], rects[j][1], 0.15)) bad.push(`${rects[i][0]} × ${rects[j][0]}`);
+  const C = F.center;
+  for (let tz = 0; tz < h; tz++) for (let tx = 0; tx < w; tx++) {
+    if (gen.kind[tz * w + tx] !== KIND.PATH) continue;
+    const p = { x: tx + 0.5 - w / 2, z: tz + 0.5 - h / 2 }, d = Math.hypot(p.x - C.x, p.z - C.z);
+    if (d < FESTIVAL_RADIUS - 0.7 || d > 8.5) continue;
+    const cell = [[-0.3, -0.3], [0.3, -0.3], [0.3, 0.3], [-0.3, 0.3]].map(([a, b]) => ({ x: p.x + a, z: p.z + b }));
+    for (const [n, r] of rects) if (!n.startsWith('building') && !n.startsWith('arch') && overlaps(cell, r)) bad.push(`길 (${tx},${tz}) 를 ${n} 이 막음`);
+  }
+  for (const [n, r] of rects) if (!n.startsWith('building')) for (const c of r) {
+    const i = Math.floor(c.z + h / 2) * w + Math.floor(c.x + w / 2);
+    if (gen.kind[i] === KIND.WATER || gen.kind[i] === KIND.SEA || gen.level[i]) bad.push(`${n} 이 물·언덕에 걸침`);
+  }
+  assert.deepEqual(bad, []);
+});
+
+test('축제 광장: 원 안은 광장 칸, 안에 있던 물체는 치우고 축제 물체를 놓는다 (열린 부스만 부스, 나머지는 덮개)', () => {
+  const gen = island();
+  const before = gen.objects.filter(o => !o.kind.startsWith('festival')).length;
+  const P = carveFestival(gen, { opened: new Set(['FB-02']), specs: { 'festival-stage': envSpec('festival-stage') } });
+  const { w, h } = gen;
+  assert.ok(Number.isFinite(P.x) && Number.isFinite(P.z), 'places.festival 에 x·z (story 기준 자리)');
+  assert.equal(P.booths.length, 5);
+  for (let tz = 0; tz < h; tz++) for (let tx = 0; tx < w; tx++) {
+    const d = Math.hypot(tx + 0.5 - w / 2 - P.x, tz + 0.5 - h / 2 - P.z);
+    if (d <= FESTIVAL_RADIUS - 0.5 && !gen.level[tz * w + tx]) assert.equal(gen.kind[tz * w + tx], KIND.PLAZA, `(${tx},${tz})`);
+  }
+  const kinds = gen.objects.map(o => o.kind);
+  assert.equal(kinds.filter(k => k === 'festival-cover').length, 4);
+  assert.equal(kinds.filter(k => k === 'festival-booth-music').length, 1);
+  for (const k of ['festival-stage', 'festival-floor', 'festival-board']) assert.equal(kinds.filter(x => x === k).length, 1, k);
+  assert.equal(kinds.filter(k => k === 'campfire').length, 1, '모닥불은 새 가운데 하나');
+  const inside = gen.objects.filter(o => !o.kind.startsWith('festival') && o.kind !== 'campfire' && Math.hypot(o.x - P.x, o.z - P.z) < FESTIVAL_RADIUS);
+  assert.deepEqual(inside.map(o => o.id), [], '원 안에 다른 물체가 남으면 안 된다');
+  assert.ok(gen.objects.filter(o => !o.kind.startsWith('festival')).length < before);
+  assert.ok(gen.pads.some(p => p.festival && p.steps[0] === 0.36), '무대 위는 걸을 수 있는 높은 바닥');
+  assert.deepEqual(BOOTHS.map(b => b.id).sort(), ['FB-01', 'FB-02', 'FB-03', 'FB-04', 'FB-05']);
+});

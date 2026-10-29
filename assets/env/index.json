@@ -106,6 +106,51 @@
       "status": "approved"
     },
     {
+      "id": "FP-01",
+      "slug": "festival-part-lantern",
+      "name": "반딧불 등불",
+      "category": "prop",
+      "kind": "festival-part",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FP-02",
+      "slug": "festival-part-drum",
+      "name": "응원 북",
+      "category": "prop",
+      "kind": "festival-part",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FP-03",
+      "slug": "festival-part-garland",
+      "name": "꽃 가랜드",
+      "category": "prop",
+      "kind": "festival-part",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FP-04",
+      "slug": "festival-part-pot",
+      "name": "과일 솥",
+      "category": "prop",
+      "kind": "festival-part",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FP-05",
+      "slug": "festival-part-flag",
+      "name": "낚시 대회 깃발",
+      "category": "prop",
+      "kind": "festival-part",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "PR-01",
       "slug": "lamp",
       "name": "가로등",
@@ -214,6 +259,42 @@
       "status": "review"
     },
     {
+      "id": "PR-13",
+      "slug": "festival-garland",
+      "name": "깃발 줄",
+      "category": "prop",
+      "kind": "festival-garland",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-14",
+      "slug": "festival-lantern",
+      "name": "등불 기둥",
+      "category": "prop",
+      "kind": "festival-lantern",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-15",
+      "slug": "festival-board",
+      "name": "부품 진행판",
+      "category": "prop",
+      "kind": "festival-board",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-16",
+      "slug": "festival-cover",
+      "name": "덮개 친 부스 자리",
+      "category": "prop",
+      "kind": "festival-cover",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -257,6 +338,69 @@
       "kind": "dock",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-06",
+      "slug": "festival-stage",
+      "name": "축제 무대",
+      "category": "building",
+      "kind": "festival-stage",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-07",
+      "slug": "festival-arch",
+      "name": "축제 아치",
+      "category": "building",
+      "kind": "festival-arch",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FB-01",
+      "slug": "festival-booth-lantern",
+      "name": "등불 길 부스",
+      "category": "building",
+      "kind": "festival-booth",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FB-02",
+      "slug": "festival-booth-music",
+      "name": "음악 무대 부스",
+      "category": "building",
+      "kind": "festival-booth",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FB-03",
+      "slug": "festival-booth-flower",
+      "name": "꽃 공방 부스",
+      "category": "building",
+      "kind": "festival-booth",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FB-04",
+      "slug": "festival-booth-food",
+      "name": "먹거리 부스",
+      "category": "building",
+      "kind": "festival-booth",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FB-05",
+      "slug": "festival-booth-fish",
+      "name": "낚시 대회 부스",
+      "category": "building",
+      "kind": "festival-booth",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "TI-01",
@@ -320,6 +464,15 @@
       "kind": "tile-plaza",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "TI-08",
+      "slug": "festival-floor",
+      "name": "축제 돌바닥",
+      "category": "tile",
+      "kind": "festival-floor",
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

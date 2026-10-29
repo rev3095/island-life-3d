@@ -1,0 +1,51 @@
+{
+  "id": "FP-01",
+  "slug": "festival-part-lantern",
+  "name": "반딧불 등불",
+  "category": "prop",
+  "kind": "festival-part",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "초롱이 주는 축제 부품. 반딧불이가 든 유리병 등불.",
+    "keywords": [
+      "손에 들 만한 크기",
+      "진행판 선반에 놓인다"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "jar": "#FFF4D0",
+    "lid": "#8C6440",
+    "glow": "#C9F08A"
+  },
+  "paletteLabels": {
+    "jar": "유리병",
+    "lid": "뚜껑",
+    "glow": "반딧불"
+  },
+  "animations": [],
+  "festival": {
+    "part": "lantern"
+  }
+}

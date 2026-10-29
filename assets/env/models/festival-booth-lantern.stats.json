@@ -1,0 +1,42 @@
+{
+  "id": "FB-01",
+  "slug": "festival-booth-lantern",
+  "name": "등불 길 부스",
+  "category": "building",
+  "kind": "festival-booth",
+  "version": "0.1",
+  "triangles": 2922,
+  "parts": 2,
+  "materials": [
+    "awningA",
+    "awningB",
+    "band",
+    "counter",
+    "glow",
+    "jar",
+    "lid",
+    "sign",
+    "wall",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    2.96,
+    1.93,
+    2.64
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 64952,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-booth-lantern_front.png",
+    "festival-booth-lantern_hero.jpg",
+    "festival-booth-lantern_main.png",
+    "festival-booth-lantern_thumb.png",
+    "festival-booth-lantern_top.png"
+  ]
+}

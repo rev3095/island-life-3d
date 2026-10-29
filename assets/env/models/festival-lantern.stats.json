@@ -1,0 +1,36 @@
+{
+  "id": "PR-14",
+  "slug": "festival-lantern",
+  "name": "등불 기둥",
+  "category": "prop",
+  "kind": "festival-lantern",
+  "version": "0.1",
+  "triangles": 770,
+  "parts": 1,
+  "materials": [
+    "glow",
+    "jar",
+    "lid",
+    "stone",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    0.27,
+    0.57,
+    2.69
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 18524,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-lantern_front.png",
+    "festival-lantern_hero.jpg",
+    "festival-lantern_main.png",
+    "festival-lantern_thumb.png",
+    "festival-lantern_top.png"
+  ]
+}

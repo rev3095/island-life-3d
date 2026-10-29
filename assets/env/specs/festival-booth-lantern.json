@@ -1,0 +1,96 @@
+{
+  "id": "FB-01",
+  "slug": "festival-booth-lantern",
+  "name": "등불 길 부스",
+  "category": "building",
+  "kind": "festival-booth",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "초롱의 부스. 곤충을 등불 병에 넣어 밤하늘로 띄운다.",
+    "keywords": [
+      "유리병 등불 셋",
+      "초록 차양"
+    ],
+    "references": [
+      "동네 축제 장터 천막"
+    ],
+    "avoid": [
+      "실제 상표·글자 간판"
+    ],
+    "notes": "검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodDark": "#8C6440",
+    "wall": "#F3E0BC",
+    "awningA": "#8CCB6E",
+    "awningB": "#E8F5D8",
+    "counter": "#C99A63",
+    "band": "#8CCB6E",
+    "sign": "#FBF7F2",
+    "jar": "#FFF4D0",
+    "lid": "#8C6440",
+    "glow": "#C9F08A"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "woodDark": "판매대 옆",
+    "wall": "뒤 벽",
+    "awningA": "차양 진한 줄",
+    "awningB": "차양 밝은 줄",
+    "counter": "판매대",
+    "band": "띠",
+    "sign": "팻말",
+    "jar": "유리병",
+    "lid": "뚜껑",
+    "glow": "반딧불"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -0.95,
+          0.05,
+          0.6
+        ],
+        [
+          0,
+          0.05,
+          0.62
+        ],
+        [
+          0.95,
+          0.05,
+          0.6
+        ]
+      ]
+    },
+    "extent": [
+      1.5,
+      1
+    ]
+  },
+  "festival": {
+    "booth": "lantern"
+  }
+}

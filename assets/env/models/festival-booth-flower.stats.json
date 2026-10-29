@@ -1,0 +1,44 @@
+{
+  "id": "FB-03",
+  "slug": "festival-booth-flower",
+  "name": "꽃 공방 부스",
+  "category": "building",
+  "kind": "festival-booth",
+  "version": "0.1",
+  "triangles": 3896,
+  "parts": 2,
+  "materials": [
+    "awningA",
+    "awningB",
+    "band",
+    "counter",
+    "leaf",
+    "petalA",
+    "petalB",
+    "petalC",
+    "pot",
+    "sign",
+    "wall",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    2.96,
+    1.93,
+    2.64
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 84052,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-booth-flower_front.png",
+    "festival-booth-flower_hero.jpg",
+    "festival-booth-flower_main.png",
+    "festival-booth-flower_thumb.png",
+    "festival-booth-flower_top.png"
+  ]
+}

@@ -110,7 +110,9 @@ export function createObjects(ctx, island, kit, models, collision) {
       out.push({ type: 'box', x0: o.x + Math.min(pts[0][0], pts[1][0]) * s, x1: o.x + Math.max(pts[0][0], pts[1][0]) * s,
         z0: o.z + Math.min(pts[0][1], pts[1][1]) * s, z1: o.z + Math.max(pts[0][1], pts[1][1]) * s, y: o.y, id: o.id });
     }
-    for (const [cx, cz, r] of c.circles ?? []) out.push({ type: 'circle', x: o.x + cx * cos + cz * sin, z: o.z - cx * sin + cz * cos, r: r * s, y: o.y, id: o.id });
+    // 원은 아무 각도로나 돌 수 있다 (5차 Z5: 축제 광장 둘레 부스)
+    const fc = Math.cos(o.rot), fs = Math.sin(o.rot);
+    for (const [cx, cz, r] of c.circles ?? []) out.push({ type: 'circle', x: o.x + (cx * fc + cz * fs) * s, z: o.z + (-cx * fs + cz * fc) * s, r: r * s, y: o.y, id: o.id });
     return out;
   }
 

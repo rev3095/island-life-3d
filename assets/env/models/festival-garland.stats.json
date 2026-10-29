@@ -1,0 +1,37 @@
+{
+  "id": "PR-13",
+  "slug": "festival-garland",
+  "name": "깃발 줄",
+  "category": "prop",
+  "kind": "festival-garland",
+  "version": "0.1",
+  "triangles": 384,
+  "parts": 1,
+  "materials": [
+    "flagA",
+    "flagB",
+    "flagC",
+    "flagD",
+    "flagE",
+    "string"
+  ],
+  "animations": {},
+  "size": [
+    4.61,
+    0.02,
+    0.01
+  ],
+  "footprint": [
+    5,
+    1
+  ],
+  "glbBytes": 11768,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-garland_front.png",
+    "festival-garland_hero.jpg",
+    "festival-garland_main.png",
+    "festival-garland_thumb.png",
+    "festival-garland_top.png"
+  ]
+}
