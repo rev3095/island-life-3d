@@ -203,7 +203,7 @@ header { display: grid; gap: 6px; }
 <script type="module">
 import { generateIsland, resolveLayout, DEFAULT_LAYOUT, lotsOf, BUILDING_KINDS, KIND, KIND_NAMES } from './src/world/island.js';
 import { ISLAND, VILLAGERS } from './src/core/constants.js';
-import { applyChanges, diffTables, getAt, same } from './tools/edits.mjs';
+import { applyChanges, canon, diffTables, getAt, same } from './tools/edits.mjs';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -310,7 +310,7 @@ async function saveNow() {
   clearTimeout(saveTimer);
   saveTimer = null;
   const body = draftBody();
-  const sig = JSON.stringify(body);
+  const sig = canon(body);
   if (sig === lastSaved) { saveMsg = lastSaved ? `저장됨` : saveMsg; renderStatus(); return; }
   if (!store) { saveMsg = '이 화면에서는 저장소를 쓸 수 없어요. 고친 자리는 창을 닫으면 사라져요.'; renderStatus(); return; }
   if (!writable) { saveMsg = '이 링크에서는 볼 수만 있어요. 옮겨 볼 수는 있지만 저장되지 않아요.'; renderStatus(); return; }
@@ -788,7 +788,7 @@ async function start() {
   let first = true;
   store.watchDoc('drafts/map', d => {
     const incoming = { changes: prune(d?.changes), note: d?.note ?? '', status: d?.status ?? 'editing', basedOn: base.version ?? 0 };
-    const sig = JSON.stringify(incoming);
+    const sig = canon(incoming);
     if (!first && (drag || saveTimer || sig === lastSaved || document.activeElement === $('note'))) return;
     first = false;
     ({ changes, note, status: draftStatus } = incoming);

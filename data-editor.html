@@ -160,7 +160,7 @@ tr.removed td { opacity: .5; text-decoration: line-through; }
 </div>
 
 <script type="module">
-import { applyChanges, diffTables, getAt, same, isDelete, DELETE } from './tools/edits.mjs';
+import { applyChanges, canon, diffTables, getAt, same, isDelete, DELETE } from './tools/edits.mjs';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -425,7 +425,7 @@ async function saveNow() {
   clearTimeout(saveTimer);
   saveTimer = null;
   const body = draftBody();
-  const sig = JSON.stringify(body);
+  const sig = canon(body);
   if (sig === lastSaved) { saveMsg = '저장됨'; renderStatus(); return; }
   if (!store) { saveMsg = '이 화면에서는 저장소를 쓸 수 없어요. 고친 칸은 창을 닫으면 사라져요.'; renderStatus(); return; }
   if (!writable) { saveMsg = '이 링크에서는 볼 수만 있어요. 고쳐 볼 수는 있지만 저장되지 않아요.'; renderStatus(); return; }
@@ -793,7 +793,7 @@ async function start() {
   let first = true;
   store.watchDoc('drafts/data', d => {
     const incoming = { changes: prune(d?.changes), note: d?.note ?? '', status: d?.status ?? 'editing', basedOn: draftBody().basedOn };
-    const sig = JSON.stringify(incoming);
+    const sig = canon(incoming);
     if (!first && (saveTimer || sig === lastSaved || document.activeElement?.closest?.('#sheet, #note'))) return;
     first = false;
     ({ changes, note, status: draftStatus } = incoming);

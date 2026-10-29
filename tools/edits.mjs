@@ -37,8 +37,11 @@ function locate(root, segs) {
 /** 경로의 값 (없으면 undefined) */
 export const getAt = (root, path) => locate(root, splitPath(path)).value;
 
-/** 값 비교 (JSON 으로 같은가) */
-export const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+/** 칸 순서와 상관없는 JSON 글자 (편집기 저장소는 객체 칸을 이름 순으로 돌려준다) */
+export const canon = v => (v === undefined ? 'undefined' : v === null || typeof v !== 'object' ? JSON.stringify(v)
+  : Array.isArray(v) ? `[${v.map(canon).join(',')}]` : `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${canon(v[k])}`).join(',')}}`);
+/** 값 비교 (칸 순서는 보지 않는다) */
+export const same = (a, b) => canon(a) === canon(b);
 
 /**
  * root 에 changes 를 얹는다 (root 는 그대로, 새 객체를 돌려준다).
