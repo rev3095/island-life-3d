@@ -6,6 +6,7 @@ const PARTS = [
   ['town', './town/index.js'],
   ['house', './house/index.js'],
   ['intro', './intro/index.js'],   // 3차 X3 첫날 흐름 (이름 정하기·첫날 할 일)
+  ['story', './story/index.js'],   // 5차 스토리 장면 재생기 (assets/story/)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

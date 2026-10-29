@@ -1,0 +1,53 @@
+/* 스토리 장면 층: 위아래 띠, 이모티콘 말풍선, 고르기, 사진 틀. 색은 게임 ui 의 갈색 잉크·크림과 맞춘다 */
+.st-root { position: absolute; inset: 0; z-index: 40; pointer-events: none; font-family: "Jua", "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #3B2F28; }
+.st-root.is-on { pointer-events: auto; }
+.st-fade { position: absolute; inset: 0; background: #2E2420; opacity: 0; pointer-events: none; }
+
+.st-bar { position: absolute; left: 0; right: 0; height: 11vh; background: #1E1814; transform: scaleY(0); transition: transform .45s ease; }
+.st-top { top: 0; transform-origin: top; }
+.st-bottom { bottom: 0; transform-origin: bottom; display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(16px, env(safe-area-inset-left, 0px)); }
+.st-root.is-on .st-bar { transform: scaleY(1); }
+.st-caption { margin: 0; color: #FFF6E6; font-size: clamp(17px, 2.6vw, 26px); letter-spacing: .02em; text-align: center; text-wrap: balance; }
+.st-skip { position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%);
+  border: 1px solid #6D6259; background: transparent; color: #E9DDCC; border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; cursor: pointer; opacity: .75; }
+.st-skip:hover, .st-skip:focus-visible { opacity: 1; outline: 2px solid #F0A55A; outline-offset: 2px; }
+.st-skip kbd { font: 11px ui-monospace, Consolas, monospace; opacity: .7; margin-left: 4px; }
+.st-tap { position: absolute; left: 50%; bottom: 18%; color: #FFF6E6; font-size: 16px; opacity: 0; transform: translateX(-50%); }
+.st-tap.is-on { animation: st-blink 1.1s ease-in-out infinite; }
+@keyframes st-blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+/* 말풍선: 머리 위, 꼬리 달린 흰 풍선 */
+.st-bubbles { position: absolute; inset: 0; pointer-events: none; }
+.st-bubble { position: absolute; left: 0; top: 0; display: grid; justify-items: center; gap: 2px; will-change: transform; }
+.st-bubble .st-emo { display: block; background: #FFFDF7; border: 2.5px solid #3B2F28; border-radius: 22px; padding: 4px 12px 6px; font-size: clamp(24px, 3.4vw, 36px); line-height: 1.15;
+  box-shadow: 0 3px 0 rgba(59, 47, 40, .25); position: relative; white-space: nowrap;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.st-bubble .st-emo::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 12px; height: 12px; background: #FFFDF7; border-right: 2.5px solid #3B2F28; border-bottom: 2.5px solid #3B2F28; transform: translateX(-50%) rotate(45deg); }
+.st-bubble .st-txt { order: -1; background: #3B2F28; color: #FFF6E6; border-radius: 10px; padding: 2px 10px; font-size: 14px; max-width: 220px; text-align: center; margin-bottom: 4px; }
+.st-bubble[hidden], .st-txt[hidden], .st-caption[hidden] { display: none; }
+.st-bubble.is-pop .st-emo { animation: st-pop .32s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes st-pop { from { scale: .4; } to { scale: 1; } }
+
+/* 고르기 */
+.st-choice { position: absolute; left: 50%; bottom: calc(11vh + 24px); transform: translateX(-50%); display: flex; gap: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.st-choice.is-on { opacity: 1; pointer-events: auto; }
+.st-opt { width: 74px; height: 74px; border-radius: 50%; border: 3px solid #3B2F28; background: #FFFDF7; font-size: 38px; cursor: pointer; box-shadow: 0 4px 0 rgba(59, 47, 40, .3);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; transition: transform .12s; }
+.st-opt.is-sel, .st-opt:hover { transform: translateY(-5px) scale(1.06); background: #FFE7B8; }
+.st-opt:focus-visible { outline: 3px solid #C9701F; outline-offset: 3px; }
+
+/* 사진 틀 (엔딩 단체 사진) */
+.st-photo { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.st-photo.is-on { opacity: 1; }
+.st-photo-frame { position: absolute; inset: 13vh 9vw 20vh; border: clamp(10px, 1.6vw, 18px) solid #FFFDF7; border-bottom-width: clamp(44px, 9vh, 90px); box-shadow: 0 0 0 100vmax rgba(30, 24, 20, .55), 0 10px 30px rgba(0, 0, 0, .35); border-radius: 4px; }
+.st-photo-cap { position: absolute; bottom: calc(20vh + 6px); margin: 0; color: #3B2F28; font-size: clamp(18px, 2.4vw, 26px); }
+.st-root.is-photo .st-bar { transform: scaleY(0); }
+
+/* 장면 동안 숨기는 것: 첫날 목록, 주민 이름표 */
+body.story-on .fd-root:not(.fd-top), body.story-on .town-labels { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .st-bar, .st-choice, .st-photo { transition: none; }
+  .st-bubble.is-pop .st-emo, .st-tap.is-on { animation: none; }
+}
