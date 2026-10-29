@@ -1,4 +1,5 @@
 // DOM 만들기 도우미와 화면 곳곳에서 같이 쓰는 표시 함수 (아이템·도구·시계·조사).
+import { url as assetUrl, urlNow } from '../core/packs.js';
 
 /** h('button', { class, text, onclick, ... }, ...자식) → 요소 */
 export function h(tag, props, ...kids) {
@@ -62,9 +63,14 @@ export function recipeNeeds(ctx, r) {
   });
 }
 
-/** 아이콘 값(이모지 글자 또는 그림 경로) → 요소 */
+/** 아이콘 값(이모지 글자 또는 그림 경로) → 요소. 그림은 게시본에서 묶음 파일 안에 있어 blob URL 을 받아 건다 (assets.url, 개발 서버는 경로 그대로) */
 export function iconEl(icon, cls = 'pk-icon') {
-  if (typeof icon === 'string' && /\.(svg|png|webp|jpe?g)$/i.test(icon)) return h('img', { class: cls, src: icon, alt: '' });
+  if (typeof icon === 'string' && /\.(svg|png|webp|jpe?g)$/i.test(icon)) {
+    const now = urlNow(icon);
+    const img = h('img', { class: cls, src: now, alt: '' });
+    if (now == null) assetUrl(icon).then(u => { img.src = u; }, () => {});
+    return img;
+  }
   return h('span', { class: cls, 'aria-hidden': 'true', text: icon ?? '' });
 }
 
