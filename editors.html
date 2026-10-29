@@ -1,0 +1,336 @@
+<title>포근섬 편집기 홈</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 검수 보드와 같은 섬 안내 책자 — 맨 위 "전체 요청 확인" 띠 → 편집기 · 검수 보드 · 게임 · 6차에 생길 편집기 카드 → 반영 순서와 명령 표 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 (반영 요청 표시) */
+  --acorn: #A8642E;     /* ID 라벨 · 새 요청 */
+  --chip: #E3EEDD;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+code { font-family: var(--mono); font-size: 13px; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.lede { max-width: 70ch; font-size: 16px; }
+
+/* 전체 요청 확인 띠 */
+.check { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--leaf); border-radius: 14px; padding: 16px; }
+.check .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.say { font-family: var(--display); font-size: 22px; color: var(--leaf); }
+.sum { font-variant-numeric: tabular-nums; }
+.sum a { color: var(--leaf); }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 40px; display: grid; gap: 16px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+
+/* 편집기 카드 */
+.ed { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; scroll-margin-top: 64px; }
+.ed.soon { background: transparent; border-style: dashed; }
+.ed .head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ed .head .pill { margin-left: auto; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); white-space: nowrap; }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.pill { font-size: 13px; padding: 2px 11px; border-radius: 999px; background: var(--chip); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pill.open { background: var(--acorn); color: var(--panel); }
+.pill.req { background: var(--sea); color: var(--panel); }
+.pill.ok { color: var(--leaf); }
+.pill.quiet { color: var(--muted); }
+.todo { margin: 0; padding-left: 18px; font-size: 13px; }
+.later { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+.foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
+details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+
+/* 단추·링크 */
+button, a.btn { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+button.ghost { background: transparent; color: var(--leaf); }
+button.tiny { font-size: 12px; padding: 2px 9px; border-radius: 8px; }
+a.btn.off { background: transparent; color: var(--muted); border-color: var(--line); border-style: dashed; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+
+/* 반영 순서 · 명령 표 */
+.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); counter-reset: step; }
+.flow li { counter-increment: step; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 2px; font-size: 14px; }
+.flow li::before { content: counter(step); font-family: var(--display); font-size: 20px; color: var(--acorn); line-height: 1; }
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td:first-child { white-space: nowrap; }
+.archive { font-size: 14px; }
+.archive a { color: var(--leaf); }
+@media (prefers-reduced-motion: no-preference) { .ed { transition: border-color .15s; } .ed:target { border-color: var(--leaf); } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 6차 · ET-01 편집기 홈 · M6-P1</p>
+    <h1>포근섬 편집기 홈</h1>
+    <p class="lede">캐릭터·배경·시나리오 편집기와 검수 보드, 게임 링크를 여기서 모두 열어요. 편집기에서 고르거나 요청을 남긴 뒤 채팅에 명령을 보내면 Claude 가 게임에 반영하고, 이 홈의 숫자를 고쳐요.</p>
+    <div class="check" aria-live="polite">
+      <div class="row"><span class="small muted">모든 편집기를 한 번에</span><span class="say">"전체 요청 확인"</span><button type="button" data-copy="전체 요청 확인">복사</button><span id="copyMsg" role="status"></span></div>
+      <p class="sum" id="sumLine">현황을 불러오는 중…</p>
+      <p class="small muted" id="checkLine"></p>
+      <p class="small" id="whoLine">채팅에 보내면 Claude 가 편집기마다 쓰던 명령 순서대로 처리하고 이 홈 숫자를 고쳐요. 홈이 Claude 를 직접 부르지는 못해요.</p>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#editors">편집기</a><a href="#boards">검수 보드</a><a href="#play">게임</a><a href="#soon">6차에 생길 편집기</a><a href="#how">반영 순서 · 명령</a>
+  </nav>
+
+  <section id="editors">
+    <div class="sec-head"><p class="id">EDITORS</p><h2>편집기</h2>
+      <p class="muted">요소마다 골라 색·모양·연출을 고치고 요청을 남겨요. 숫자는 Claude 가 마지막으로 확인한 때 기준이에요. 그 뒤에 남긴 요청은 다음 확인 때 잡혀요.</p></div>
+    <div class="cards" data-group="editor"></div>
+  </section>
+
+  <section id="boards">
+    <div class="sec-head"><p class="id">BOARDS</p><h2>검수 보드</h2>
+      <p class="muted">새 리소스나 큰 결정은 보드에서 골라요. 고른 내용은 보드에 바로 저장되고, "검수 보드 반영"으로 게임에 들어가요.</p></div>
+    <div class="cards" data-group="board"></div>
+    <p class="archive muted" id="archive"></p>
+  </section>
+
+  <section id="play">
+    <div class="sec-head"><p class="id">GAME</p><h2>게임</h2>
+      <p class="muted">반영이 끝날 때마다 바뀐 파일만 같은 링크에 다시 올려요 (D35-A).</p></div>
+    <div class="cards" data-group="game"></div>
+  </section>
+
+  <section id="soon">
+    <div class="sec-head"><p class="id">ET-06 – ET-10 · M6-P4 – P6</p><h2>6차에 생길 편집기</h2>
+      <p class="muted">트랙마다 만들고 있어요. 링크가 생기면 이 자리에 채워져요.</p></div>
+    <div class="cards" data-group="soon"></div>
+  </section>
+
+  <section id="how">
+    <div class="sec-head"><p class="id">ET-11 · 반영 기록 공용</p><h2>반영 순서와 명령</h2>
+      <p class="muted">모든 편집기와 보드가 같은 순서로 움직이고, 같은 모양의 반영 기록(버전 · 요약 · 되돌리기)을 남겨요. 어느 편집기든 "v2 로 되돌리기"가 같게 동작해요.</p></div>
+    <ol class="flow">
+      <li><b>고르기 · 요청</b><span class="small muted">편집기나 보드에서 고르고, 고치고, 의견이나 레퍼런스를 남겨요. 바로 저장돼요.</span></li>
+      <li><b>채팅 명령</b><span class="small muted">"전체 요청 확인" 하나, 또는 편집기마다의 명령을 보내요.</span></li>
+      <li><b>반영</b><span class="small muted">Claude 가 스펙·데이터를 고쳐 다시 만들고 테스트해요.</span></li>
+      <li><b>다시 게시</b><span class="small muted">편집기와 게임 링크에 바뀐 파일만 올려요.</span></li>
+      <li><b>기록</b><span class="small muted">반영 기록에 새 버전을 남기고, 요청을 끝냄으로 바꾸고, 이 홈 숫자를 고쳐요.</span></li>
+    </ol>
+    <div class="tblwrap"><table class="tbl" id="cmdTable"><thead><tr><th>채팅 명령</th><th>무엇을</th><th>어디</th></tr></thead><tbody></tbody></table></div>
+  </section>
+</div>
+
+<!-- 편집기 홈 목록: "전체 요청 확인" 때 Claude 가 이 목록대로 각 저장소를 읽는다 (reads). 순서·모양은 concept/README.md 「편집기 홈」.
+     url 이 null 인 자리는 홈 저장소 status/<id>.url 로 채우거나, 합친 뒤 여기에 적고 다시 게시한다. -->
+<script type="application/json" id="editors-list">
+[
+  { "id": "character", "group": "editor", "name": "캐릭터 편집기", "url": "https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2", "file": "editor.html",
+    "edits": "캐릭터 10명의 모델·색·생김새·동작. 그림·영상 레퍼런스로 고치기, 새 캐릭터 요청.",
+    "command": "요청 확인", "openLabel": "새 요청", "reads": ["requests: status == 'new'"],
+    "later": "6차에 더해질 것: 성격·대화 탭 (ET-05, M5 이모티콘 대화 뒤)" },
+  { "id": "env", "group": "editor", "name": "배경 편집기", "url": "https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh", "file": "bg-editor.html",
+    "edits": "배경 35 · 가구 33 (자연·소품·건물·타일·가구) 의 모델과 색. 레퍼런스로 고치기, 새 요소 요청.",
+    "command": "배경 요청 확인", "openLabel": "새 요청", "reads": ["env-requests: status == 'new'"],
+    "later": "6차에 더해질 것: 아이템 탭 · 실내 무늬 탭 · 방 배치 격자 (ET-02 – ET-04, M6-P2)" },
+  { "id": "story", "group": "editor", "name": "시나리오 편집기", "url": "https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF", "file": "story-editor.html",
+    "edits": "장면 12. 연출안 고르기, 컷·카메라·배우·말풍선 고치기, 장면 순서, 의견.",
+    "command": "시나리오 반영", "openLabel": "바뀐 것", "reads": ["drafts/*", "timeline/main", "applied/story"] },
+  { "id": "wave6", "group": "board", "name": "6차 검수 보드 v0.6", "url": "https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU", "file": "concept/wave6-board.html",
+    "edits": "M6 편집기 완성. 결정 D26–D35, 새 편집기·탭 ET-01–11.",
+    "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave6", "applied/wave6"] },
+  { "id": "z5", "group": "board", "name": "Z5 축제 검수 보드 v0.1", "url": "https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS", "file": "concept/z5-festival-board.html",
+    "edits": "이모티콘 대화·축제 광장·부품·부스·엔딩. 결정 D14–D25, 리소스 EM · TK · FP · FB · ED …",
+    "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/z5", "applied/z5"] },
+  { "id": "wave5", "group": "board", "name": "5차 검수 보드 v0.5", "url": "https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT", "file": "concept/wave5-board.html",
+    "edits": "아이템 아이콘·주민 방·새 주민·생일·벽지와 바닥. 결정 D8–D13.",
+    "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave5", "applied/wave5"] },
+  { "id": "concept", "group": "archive", "name": "컨셉 보드 v0.1", "url": "https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM", "file": "concept/concept-board.html",
+    "edits": "1차 계획 (저장 없음)", "command": null, "reads": [] },
+  { "id": "game", "group": "game", "name": "게임 「포근섬 이야기」", "url": "https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ", "file": "dist/web/index.html",
+    "edits": "편집기에서 반영한 것이 모두 들어가는 게임. 휴대폰에서도 열려요.",
+    "command": null, "reads": [] },
+  { "id": "sound", "group": "soon", "name": "곡 편집기 · 효과음 표", "url": null, "file": "sound-editor.html", "et": "ET-06 · ET-07", "track": "M6-P4",
+    "edits": "장소·시간대·날씨별 곡 9 (박자·악기·음), 효과음 16 · 목소리 9 의 높이·길이·크기. 미리 듣기.",
+    "command": "소리 반영", "openLabel": "새 요청", "reads": [] },
+  { "id": "map", "group": "soon", "name": "섬 지도 편집기", "url": null, "file": "map-editor.html", "et": "ET-08", "track": "M6-P5",
+    "edits": "시드, 건물·광장·다리·선착장·축제 광장 자리 끌어 고정, 나무·꽃 밀도. 바로 미리 보기.",
+    "command": "지도 반영", "openLabel": "새 요청", "reads": [] },
+  { "id": "data", "group": "soon", "name": "게임 숫자 표", "url": null, "file": "data-editor.html", "et": "ET-09", "track": "M6-P5",
+    "edits": "아이템 값·출현(계절·시간·장소·확률)·레시피·친밀도·부탁 보상. 반영할 때 테스트로 검사.",
+    "command": "숫자 반영", "openLabel": "새 요청", "reads": [] },
+  { "id": "style", "group": "soon", "name": "스타일 편집기", "url": null, "file": "demos/style.html", "et": "ET-10", "track": "M6-P6",
+    "edits": "셰이더 명암·그늘·외곽선·화면 효과 슬라이더. 값을 저장소에 남기고 프리셋으로.",
+    "command": "스타일 반영", "openLabel": "새 요청", "reads": [] }
+]
+</script>
+<script src="concept/board-kit.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const { esc, when, list: histList } = window.ApplyLog;       // 반영 기록 공용 (concept/board-kit.js)
+const LIST = JSON.parse($('editors-list').textContent);
+const ARTIFACT = /^https:\/\/claude\.ai\/(code\/)?artifact\/[\w-]+$/;
+const num = v => (Number.isFinite(+v) && +v > 0 ? Math.floor(+v) : 0);
+
+let status = {}, meta = null, store = 'loading', owner = null;   // store: loading | ok | local | none
+
+/* ---------- 카드 ---------- */
+function pill(e, s) {
+  if (e.group === 'game') return s?.published ? `<span class="pill">게시 v${num(s.published)}</span>` : '';
+  if (!e.url && !okUrl(s?.url)) return '<span class="pill quiet">준비 중</span>';
+  if (store === 'loading') return '<span class="pill quiet">불러오는 중</span>';
+  if (store === 'none') return '<span class="pill quiet">현황 없음</span>';
+  if (!s) return '<span class="pill quiet">확인 전</span>';
+  if (num(s.open)) return `<span class="pill open">${esc(e.openLabel ?? '새 요청')} ${num(s.open)}</span>`;
+  if (s.requested) return '<span class="pill req">반영 요청 표시됨</span>';
+  return '<span class="pill ok">새 것 없음</span>';
+}
+const okUrl = u => typeof u === 'string' && ARTIFACT.test(u);
+function card(e) {
+  const s = status[e.id];
+  const url = e.url ?? (okUrl(s?.url) ? s.url : null);
+  const ap = s?.applied;
+  const items = Array.isArray(s?.openItems) ? s.openItems.slice(0, 5) : [];
+  const facts = [
+    ['고치는 것', esc(e.edits)],
+    e.command ? ['채팅 명령', `<code>"${esc(e.command)}"</code> ${e.group === 'soon' && !url ? '<span class="muted small">(만든 뒤부터)</span>' : `<button type="button" class="ghost tiny" data-copy="${esc(e.command)}">복사</button>`}`] : null,
+    e.group !== 'soon' || s ? ['마지막 반영', ap ? `<b>v${num(ap.version)}</b> · ${esc(when(ap.appliedAt))}${ap.summary ? ` · ${esc(ap.summary)}` : ''}` : '<span class="muted">반영 기록 없음</span>'] : null,
+    s?.published && e.group !== 'game' ? ['게시', `v${num(s.published)}`] : null,
+    s?.checkedAt ? ['확인한 때', esc(when(s.checkedAt))] : null,
+    e.et ? ['ID · 트랙', `<span class="id">${esc(e.et)}</span> · ${esc(e.track ?? '')}`] : null,
+  ].filter(Boolean);
+  const recent = Array.isArray(s?.recent) ? histList(s.recent.slice(0, 3), { title: n => `최근 반영 기록 ${n}개 (되돌리기는 편집기에서)` }) : '';
+  const link = url
+    ? `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">열기 ↗</a>`
+    : `<a class="btn off" aria-disabled="true">링크 준비 중</a>`;
+  return `<article class="ed${e.group === 'soon' ? ' soon' : ''}" id="${esc(e.id)}">
+    <div class="head"><span class="id">${esc(e.id)}</span><h3>${esc(e.name)}</h3>${pill(e, s)}</div>
+    <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+    ${items.length ? `<ul class="todo">${items.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+    ${s?.note ? `<p class="small muted">${esc(s.note)}</p>` : ''}
+    ${recent}
+    ${e.later ? `<p class="later">${esc(e.later)}</p>` : ''}
+    <div class="foot">${link}<code class="small muted">${esc(e.file)}</code></div>
+  </article>`;
+}
+
+/* ---------- 머리 띠 ---------- */
+function renderTop() {
+  const live = LIST.filter(e => e.command);
+  if (store === 'loading') { $('sumLine').textContent = '현황을 불러오는 중…'; return; }
+  if (store === 'none') {
+    $('sumLine').textContent = '이 창에서는 홈 저장소를 읽을 수 없어서 숫자를 못 보여 줘요. 링크는 그대로 열려요.';
+    $('checkLine').textContent = '';
+    return;
+  }
+  const open = live.reduce((n, e) => n + num(status[e.id]?.open), 0);
+  const where = live.filter(e => num(status[e.id]?.open) || status[e.id]?.requested);
+  $('sumLine').innerHTML = open || where.length
+    ? `처리할 것 <b>${open}개</b> · ${where.map(e => `<a href="#${esc(e.id)}">${esc(e.name)}</a>`).join(' · ')}`
+    : '처리할 것 없음 — 마지막 확인 때 모든 편집기가 반영돼 있었어요.';
+  $('checkLine').textContent = meta?.at
+    ? `마지막 전체 요청 확인 · ${when(meta.at)}${meta.summary ? ` · ${meta.summary}` : ''}`
+    : '아직 "전체 요청 확인" 기록이 없어요.';
+  if (owner === false) $('whoLine').textContent = '이 홈은 보기 전용이에요. 요청은 각 편집기에 남기고, 반영은 홈 주인에게 "전체 요청 확인"을 부탁해 주세요.';
+}
+
+function render() {
+  for (const box of document.querySelectorAll('.cards[data-group]')) box.innerHTML = LIST.filter(e => e.group === box.dataset.group).map(card).join('');
+  $('archive').innerHTML = LIST.filter(e => e.group === 'archive').map(e => `지난 보드: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.name)} ↗</a> · ${esc(e.edits)}`).join('<br>');
+  renderTop();
+}
+
+/* ---------- 명령 표 ---------- */
+const CMDS = [
+  ['전체 요청 확인', '모든 편집기·보드의 새 요청과 바뀐 선택을 모아, 아래 명령 순서대로 한 번에 처리', '이 홈'],
+  ['요청 확인', '캐릭터 요청을 처리하고 모델을 다시 만들기', '캐릭터 편집기'],
+  ['배경 요청 확인', '배경·가구 요청 처리 (6차: 아이템·실내·방 배치)', '배경 편집기'],
+  ['시나리오 반영', '고친 장면·순서·의견을 장면 파일에 넣기, 되돌리기', '시나리오 편집기'],
+  ['검수 보드 반영', '바뀐 결정·의견을 계획과 게임에 넣기, 되돌리기', '검수 보드'],
+  ['<이름> 확정', '그 리소스를 확정(approved)으로', '캐릭터 · 배경 편집기'],
+  ['소리 반영 · 지도 반영 · 숫자 반영 · 스타일 반영', '6차 새 편집기 (만든 뒤부터)', '곡 · 지도 · 숫자 표 · 스타일 편집기'],
+];
+$('cmdTable').tBodies[0].innerHTML = CMDS.map(([c, what, where]) => `<tr><td><code>"${esc(c)}"</code></td><td>${esc(what)}</td><td class="small">${esc(where)}</td></tr>`).join('');
+
+/* ---------- 복사 ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  const text = b.dataset.copy;
+  navigator.clipboard.writeText(text)
+    .then(() => { $('copyMsg').textContent = `"${text}" 복사했어요. 채팅에 붙여 넣어 주세요.`; })
+    .catch(() => { $('copyMsg').textContent = `자동 복사가 막혀 있어요. 채팅에 "${text}" 라고 적어 주세요.`; });
+});
+
+/* ---------- 홈 저장소: 웹 링크(아티팩트 db) 또는 로컬 dev-server ---------- */
+// status/<편집기 id> · meta/check 는 Claude 가 "전체 요청 확인"·각 반영 때 ArtifactData 로 써 넣는다 (쓰기 admin). 이 페이지는 읽기만.
+function watchLocal() {
+  // dev-server 의 /api/db/hub-status · hub-meta (assets/review/hub-*.json, 행마다 docId) 를 읽어 흉내 낸다
+  const pull = async () => {
+    const rows = c => fetch(`api/db/${c}`).then(r => r.json()).catch(() => []);
+    const [st, mt] = await Promise.all([rows('hub-status'), rows('hub-meta')]);
+    status = Object.fromEntries(st.filter(r => r.docId).map(r => [r.docId, r]));
+    meta = mt.find(r => r.docId === 'check') ?? null;
+    render();
+  };
+  pull(); setInterval(pull, 5000);
+}
+render();
+if (/^#[\w-]+$/.test(location.hash)) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+(async () => {
+  const [db, user] = window.claude?.use ? await Promise.all(['db', 'user'].map(n => window.claude.use(n).catch(() => null))) : [null, null];
+  if (db) {
+    store = 'ok';
+    db.collection('status').onSnapshot(qs => { status = Object.fromEntries(qs.docs.map(d => [d.id, d.data()])); render(); },
+      () => { store = 'none'; render(); });
+    db.doc('meta/check').onSnapshot(snap => { meta = snap.exists ? snap.data() : null; render(); }, () => {});
+  } else {
+    let local = false;
+    try { local = (await fetch('api/ping')).ok; } catch {}
+    store = local ? 'local' : 'none';
+    if (local) watchLocal(); else render();
+  }
+  if (user) { owner = await user.isOwner().catch(() => null); render(); }
+})();
+</script>
