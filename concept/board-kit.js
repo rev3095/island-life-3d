@@ -12,6 +12,40 @@
 //   applied/<보드 id>  마지막 반영 { board, version, picks, notes, appliedAt, summary }        ← Claude 가 씀
 //   history/<보드 id>-v<n>  반영 기록 (applied 와 같은 모양)                                  ← Claude 가 씀
 // 채팅에 "검수 보드 반영" → Claude 가 boards 를 읽고 applied 와 다른 것만 게임에 반영(되돌리기 포함) → applied·history 기록.
+//
+// window.BOARD 가 없는 페이지(편집기·편집기 홈)도 이 파일을 실으면 반영 기록 공용 도구 window.ApplyLog 를 쓸 수 있다 (ET-11).
+
+/* ---------- 반영 기록 공용 (ET-11) ---------- */
+// 검수 보드·편집기가 모두 같은 모양으로 남긴다 (모양·되돌리기 순서는 concept/README.md 「반영 기록 공용 모양」):
+//   applied/<id>       마지막 반영 { board: <id>, version, appliedAt, summary, commit, … }   ← Claude 가 씀
+//   history/<id>-v<n>  반영 기록 (applied 와 같은 모양)                                     ← Claude 가 씀
+//   보드는 picks·notes, 편집기는 changed (바뀐 요소 목록) 를 더 둔다.
+window.ApplyLog = (function () {
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const when = t => t ? new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+  const sort = rows => [...rows].sort((a, b) => b.version - a.version);
+  // 머리 줄: 마지막 반영 v<n> · 때 · 요약
+  function head(applied, { label = '마지막 반영', empty = '아직 반영 기록이 없어요.' } = {}) {
+    return applied
+      ? `<p><b>${esc(label)} v${applied.version}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}</p>`
+      : `<p><b>${esc(empty)}</b></p>`;
+  }
+  // 반영 기록 목록 (새 것부터). action(h) = 줄 끝에 붙일 단추·링크 HTML
+  function list(history, { action = () => '', title = n => `반영 기록 ${n}개 · 되돌리기` } = {}) {
+    if (!history?.length) return '';
+    return `<details><summary>${esc(title(history.length))}</summary><ol class="hist">${history.map(h => `
+        <li><span><b>v${h.version}</b> · ${esc(when(h.appliedAt))} · ${esc(h.summary ?? '')}</span>
+          ${action(h)}</li>`).join('')}</ol></details>`;
+  }
+  // 저장소 구독: applied/<id> 와 history (board == id)
+  function watch(db, id, { onApplied, onHistory } = {}) {
+    if (onApplied) db.doc(`applied/${id}`).onSnapshot(snap => onApplied(snap.exists ? snap.data() : null), () => {});
+    if (onHistory) db.collection('history').where('board', '==', id).onSnapshot(qs => onHistory(sort(qs.docs.map(d => d.data()))), () => {});
+  }
+  return { esc, when, sort, head, list, watch };
+})();
+
+/* ---------- 검수 보드 ---------- */
 (function () {
   const B = window.BOARD;
   const panel = document.getElementById('boardPanel');
@@ -19,8 +53,7 @@
   const LOCAL = `board-${B.id}-local`;
   const OLD_LOCAL = { wave5: 'wave5-board-notes' }[B.id];       // 저장소를 쓰기 전 v0.5 가 쓰던 자리
   const notes = () => [...document.querySelectorAll('.note[data-id]')];
-  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const optOf = (d, key) => d.opts.find(o => o[0] === key);
+  const { esc, head: headHtml, list: listHtml, watch } = window.ApplyLog;
 
   let db = null, current = null, applied = null, history = [], status = 'editing';
   let saveTimer = null, lastSaved = '', saveMsg = '저장소에 연결하는 중…', note = '';
@@ -77,12 +110,9 @@
   document.addEventListener('change', e => { if (e.target.matches?.('input[type=radio]')) { status = 'editing'; scheduleSave(); } });
 
   /* ---------- 상태 칸 ---------- */
-  const when = t => t ? new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
   function render() {
     const ch = changed();
-    const head = applied
-      ? `<p><b>마지막 반영 v${applied.version}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}</p>`
-      : '<p><b>아직 반영 기록이 없어요.</b></p>';
+    const head = headHtml(applied);
     const diff = applied
       ? (ch.length ? `<p>반영 뒤 바뀐 것 <b>${ch.length}개</b>: ${ch.map(id => `<span class="tag changedTag">${esc(id)}</span>`).join(' ')}</p>`
                    : '<p class="muted small">반영한 뒤로 바뀐 선택·의견이 없어요.</p>')
@@ -90,9 +120,8 @@
     const req = status === 'requested'
       ? '<p class="small"><b>반영 요청을 표시했어요.</b> 채팅에 <b>"검수 보드 반영"</b>이라고 보내 주세요 (보드가 Claude 를 직접 부르지는 못해요).</p>'
       : '';
-    const hist = history.length ? `<details><summary>반영 기록 ${history.length}개 · 되돌리기</summary><ol class="hist">${history.map(h => `
-        <li><span><b>v${h.version}</b> · ${esc(when(h.appliedAt))} · ${esc(h.summary ?? '')}</span>
-          <button type="button" class="ghost" data-rollback="${h.version}" ${applied && h.version === applied.version && !ch.length ? 'disabled' : ''}>이 선택으로 되돌리기</button></li>`).join('')}</ol></details>` : '';
+    const hist = listHtml(history, { action: h =>
+      `<button type="button" class="ghost" data-rollback="${h.version}" ${applied && h.version === applied.version && !ch.length ? 'disabled' : ''}>이 선택으로 되돌리기</button>` });
     panel.innerHTML = `${head}${diff}${req}
       <div class="btns"><button type="button" id="markRequest" ${ch.length || !applied ? '' : 'class="ghost"'}>반영 요청 표시</button><span class="small muted">${esc(saveMsg)}</span></div>
       ${note ? `<p class="small" role="status">${esc(note)}</p>` : ''}${hist}`;
@@ -147,10 +176,10 @@
       if (document.activeElement?.matches?.('.note')) return;
       status = d.status ?? 'editing'; writeDom(d); lastSaved = sig(readDom()); markChanged(); render();
     }, () => {});
-    db.doc(`applied/${B.id}`).onSnapshot(snap => { applied = snap.exists ? snap.data() : null; markChanged(); render(); }, () => {});
-    db.collection('history').where('board', '==', B.id).onSnapshot(qs => {
-      history = qs.docs.map(d => d.data()).sort((a, b) => b.version - a.version); render();
-    }, () => {});
+    watch(db, B.id, {
+      onApplied: d => { applied = d; markChanged(); render(); },
+      onHistory: rows => { history = rows; render(); },
+    });
   })();
 
   window.boardKit = { changed, saveNow: save, applied: () => applied };
