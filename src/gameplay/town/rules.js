@@ -1,14 +1,17 @@
 // 주민 규칙 (DOM·three 없음, node 로 확인): 친밀도·하루 한 번 말 걸기·부탁·선물 반응·일과·대사 고르기.
 // 상태는 state.villagers[slug] 에 둔다 (docs/CONTRACTS.md '상태' 표: villagers 는 2차 gameplay 몫).
+// 숫자(친밀도·선물 점수·부탁 보상)는 assets/data/rules.json 의 town 칸 (게임 숫자 표 → "숫자 반영"), 주민마다의 값은 assets/villagers/<slug>.json.
+import { RULES } from '../../data/tables.js';
 
-export const FRIEND_MAX = 100;
+const T = RULES.town;
+export const FRIEND_MAX = T.friendMax;
 /** 친밀도 단계: [id, 최소값] — 대사 묶음 이름과 같다 */
-export const TIERS = [['new', 0], ['known', 10], ['friend', 30], ['close', 60], ['best', 90]];
-export const TALK_BONUS = 2;                                  // 그날 처음 말 걸면
-export const GIFT_POINTS = { love: 6, like: 3, normal: 2, dislike: 0 };
-export const GIFTS_COUNTED_PER_DAY = 2;                       // 하루에 친밀도가 오르는 선물 수
-export const REQUEST_POINTS = 6;                              // 부탁 들어주기
-export const REQUEST_DAYS = 3;                                // 부탁은 3일 지나면 잊는다
+export const TIERS = T.tiers;
+export const TALK_BONUS = T.talkBonus;                        // 그날 처음 말 걸면
+export const GIFT_POINTS = T.giftPoints;                      // 선물 반응 → 친밀도
+export const GIFTS_COUNTED_PER_DAY = T.giftsCountedPerDay;    // 하루에 친밀도가 오르는 선물 수
+export const REQUEST_POINTS = T.requestPoints;                // 부탁 들어주기
+export const REQUEST_DAYS = T.requestDays;                    // 부탁은 며칠 지나면 잊는다
 export const CAT_LABEL = { fish: '물고기', bug: '곤충', fruit: '과일', flower: '꽃', shell: '조개', fossil: '화석', mat: '재료', furn: '가구', seed: '씨앗' };
 
 // ---------- 난수 ----------
@@ -198,9 +201,10 @@ export function currentRequest(v, dayKey) {
 
 /** 부탁 보상: 가구(주민마다 고른 것) 또는 도토리 주머니 → { id, n } */
 export function requestReward(person, item, r) {
-  if (person.rewards?.length && r() < 0.4) return { id: person.rewards[Math.floor(r() * person.rewards.length)], n: 1 };
-  const value = item?.price ?? 200;
-  return { id: 'mat.acorn-bag', n: Math.max(2, Math.min(12, Math.round((value * 1.2 + 250) / 100))) };
+  const q = T.requestReward;
+  if (person.rewards?.length && r() < q.furnitureChance) return { id: person.rewards[Math.floor(r() * person.rewards.length)], n: 1 };
+  const value = item?.price ?? q.valueDefault;
+  return { id: 'mat.acorn-bag', n: Math.max(q.bagMin, Math.min(q.bagMax, Math.round((value * q.valueMult + q.valuePlus) / 100))) };
 }
 
 // ---------- 선물 ----------

@@ -18,6 +18,8 @@
   --warn: #B4532A;
   --sky-top: #BFE6F7;
   --sky-bot: #EEF8FC;
+  --bubble: #FFFDF8;     /* 이모티콘 말풍선 — 게임 말풍선처럼 늘 밝은 종이색 (그림 선이 갈색이라) */
+  --bubble-line: #D8CDBF;
   --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
@@ -26,13 +28,13 @@
   :root:not([data-theme="light"]) {
     --bg: #161B18; --panel: #1F2620; --ink: #EEE6DC; --muted: #A99F95; --line: #323B33;
     --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #29312A; --live: #7CCB93; --warn: #F08A60;
-    --sky-top: #5E88A8; --sky-bot: #A9C9DA; color-scheme: dark;
+    --sky-top: #5E88A8; --sky-bot: #A9C9DA; --bubble: #F1EBE0; --bubble-line: #8C8174; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #161B18; --panel: #1F2620; --ink: #EEE6DC; --muted: #A99F95; --line: #323B33;
   --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #29312A; --live: #7CCB93; --warn: #F08A60;
-  --sky-top: #5E88A8; --sky-bot: #A9C9DA; color-scheme: dark;
+  --sky-top: #5E88A8; --sky-bot: #A9C9DA; --bubble: #F1EBE0; --bubble-line: #8C8174; color-scheme: dark;
 }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
 [hidden] { display: none !important; }
@@ -164,6 +166,86 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
 .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 6px; align-content: start; }
 .step code { font-family: var(--mono); font-size: 12px; background: var(--chip); padding: 1px 6px; border-radius: 6px; word-break: break-all; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 탭: 모양 · 레퍼런스 | 성격 · 대화 (6차 M6-P3) */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { font: inherit; font-family: var(--display); font-size: 17px; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px;
+  padding: 6px 14px 7px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button:disabled { opacity: .45; cursor: default; }
+@media (min-width: 901px) { .sticky.talkmode { max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px)); overflow-y: auto; } }
+.talkmode .viewer { aspect-ratio: 4 / 3; }
+.subtabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.subtabs button { font: inherit; font-size: 13.5px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+.subtabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); background: var(--chip); }
+.subtabs button .n { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-left: 4px; }
+.tsec { display: grid; gap: 14px; }
+.tsec h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tsec h3 .small { font-family: var(--body); }
+.fe-emo { width: 30px; height: 30px; display: block; }
+.emo-chip { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--bubble); border: 1px solid var(--bubble-line); }
+.emo-btn { font: inherit; display: grid; justify-items: center; gap: 1px; padding: 4px 2px 3px; border-radius: 12px; background: var(--bubble); border: 1px solid var(--bubble-line); cursor: pointer; color: #4A3B32; }
+.emo-btn span { font-size: 10.5px; line-height: 1.15; max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emo-btn[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.emo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 5px; }
+.chiprow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tchip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 2px 4px 2px 10px; border-radius: 999px; background: var(--chip); border: 1px solid var(--line); }
+.tchip.emo { padding: 2px 4px 2px 2px; background: var(--bubble); border-color: var(--bubble-line); color: #4A3B32; }
+.tchip.emo .fe-emo { width: 26px; height: 26px; }
+.tchip button { font: inherit; font-size: 12px; line-height: 1; border: 0; background: none; color: inherit; opacity: .7; cursor: pointer; padding: 4px 5px; border-radius: 999px; }
+.tchip button:hover { opacity: 1; background: rgba(0,0,0,.06); }
+.addrow { display: flex; gap: 6px; flex-wrap: wrap; }
+.addrow select { width: auto; flex: 1 1 200px; min-width: 0; }
+.rows { display: grid; gap: 6px; }
+.rowline { display: grid; grid-template-columns: minmax(0, 1fr) 74px auto; gap: 6px; align-items: center; }
+.pts { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.react-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.react { width: 100%; border-collapse: collapse; font-size: 13px; }
+.react th { text-align: left; font-weight: 400; color: var(--muted); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.react td { padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.react tr:last-child td { border-bottom: 0; }
+.react td.em { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.react select { padding: 3px 6px; font-size: 13px; width: auto; }
+.react .res { display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+.react .res .fe-emo { width: 24px; height: 24px; }
+.react .kind { font-size: 12px; color: var(--muted); margin-left: 6px; }
+.react tr.like td:first-child { box-shadow: inset 3px 0 var(--live); }
+.react tr.dislike td:first-child { box-shadow: inset 3px 0 var(--warn); }
+.flagrow { display: grid; gap: 6px; }
+.flag { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: start; font-size: 14px; }
+.flag .small { grid-column: 2; }
+.flag .extra { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lines { display: grid; gap: 8px; }
+.lcard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; align-items: start; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.lcard.off { opacity: .62; border-style: dashed; }
+.lcard textarea { min-height: 40px; font-size: 14px; background: var(--panel); }
+.lcard .pv { grid-column: 2; font-size: 12.5px; color: var(--muted); }
+.lcard .pv b { font-weight: 400; color: var(--live); }
+.timebar { position: relative; height: 34px; border-radius: 10px; background: var(--chip); overflow: hidden; }
+.timebar .band { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 55%, transparent); }
+.timebar .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+.timebar .lbl { position: absolute; bottom: 2px; font-family: var(--mono); font-size: 10px; color: var(--muted); transform: translateX(-50%); }
+.problems { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 13px; color: var(--warn); }
+.changes { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 13px; }
+.changes code, .problems code { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+/* 대답 시험 */
+.try { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.try-ctx { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; }
+.try-ctx label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+.try-ctx select, .try-ctx input { padding: 4px 6px; font-size: 13px; }
+.want { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+.tlog { display: grid; gap: 8px; max-height: 300px; overflow-y: auto; padding: 2px; }
+.say { display: grid; gap: 3px; justify-items: start; }
+.say.me { justify-items: end; }
+.say .bub { display: flex; gap: 2px; padding: 5px 8px; border-radius: 16px 16px 16px 4px; background: var(--bubble); border: 1px solid var(--bubble-line); }
+.say.me .bub { border-radius: 16px 16px 4px 16px; background: var(--chip); border-color: var(--line); }
+.say .meta { font-size: 12px; color: var(--muted); }
+.say .meta b { color: var(--ink); font-weight: 400; }
+.say .text { font-size: 13.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; max-width: 100%; }
+.tray { display: flex; gap: 6px; align-items: center; min-height: 44px; }
+.tray .slot { width: 42px; height: 42px; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-items: center; background: none; padding: 0; cursor: pointer; }
+.tray .slot.full { border-style: solid; border-color: var(--bubble-line); background: var(--bubble); }
+@media (prefers-reduced-motion: reduce) { .tlog { scroll-behavior: auto; } }
 </style>
 
 <div class="wrap">
@@ -177,8 +259,12 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
 
   <section style="display:grid;gap:14px" aria-live="polite">
     <div class="sel-head"><span class="id" id="selId"></span><h2 id="selName">불러오는 중…</h2><span class="small muted" id="selRole"></span><span id="selStatus"></span></div>
+    <div class="tabs" role="tablist" aria-label="고칠 것" id="tabs">
+      <button type="button" role="tab" id="tab-look" data-tab="look" aria-selected="true" aria-controls="lookCard">모양 · 레퍼런스</button>
+      <button type="button" role="tab" id="tab-talk" data-tab="talk" aria-selected="false" aria-controls="talkCard" disabled>성격 · 대화</button>
+    </div>
     <div class="main">
-      <section class="card sticky" aria-label="3D 모델">
+      <section class="card sticky" aria-label="3D 모델" id="leftCard">
         <div id="viewArea">
           <div class="viewer" id="viewer"><div class="msg" id="viewerMsg">3D 모델 불러오는 중…</div><span class="hint">드래그: 회전 · 휠/핀치: 확대</span></div>
         </div>
@@ -193,9 +279,46 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
           <label class="toggle"><input type="checkbox" id="outlineOn" checked> 외곽선</label>
         </div>
         <div class="spec-row" id="stats"></div>
+        <div class="try" id="tryBox" hidden aria-label="대답 시험">
+          <div style="display:grid;gap:2px"><h3>대답 시험</h3><p class="small muted">고치는 값으로 바로 판정해요. 게임과 같은 판정 코드(<code>festival/judge.js</code>)를 그대로 써요.</p></div>
+          <div class="try-ctx">
+            <label>날짜<input type="date" id="tryDay"></label>
+            <label>날씨<select id="tryWeather"><option value="clear">맑음</option><option value="cloudy">흐림</option><option value="rain">비</option><option value="snow">눈</option><option value="rainbow">무지개</option></select></label>
+            <label>때<select id="trySlot"><option value="dawn">새벽</option><option value="morning">아침</option><option value="afternoon" selected>낮</option><option value="evening">저녁</option><option value="night">밤</option></select></label>
+            <label>친한 정도<select id="tryTier"></select></label>
+          </div>
+          <div id="tryEmote">
+            <div class="want" id="tryWant"></div>
+            <div class="tlog" id="tryLog" aria-live="polite"></div>
+            <div class="tray" id="tray" aria-label="보낼 이모티콘 (세 개까지)"></div>
+            <div class="actions"><button type="button" class="btn primary" id="trySend">보내기</button><button type="button" class="btn" id="tryWait">⏳ 기다리기</button><button type="button" class="btn" id="tryReset">처음부터</button></div>
+            <div class="emo-grid" id="emoGrid" aria-label="플레이어가 보낼 수 있는 이모티콘"></div>
+            <div class="field"><label for="tryGift">선물 시험</label><select id="tryGift"></select><div id="tryGiftOut" class="small"></div></div>
+          </div>
+          <div class="actions"><button type="button" class="btn" id="tryGreet">글 대사로 말 걸어 보기</button><span class="small muted">섬폰 '주민 글 대사 보기'를 켰을 때의 대사</span></div>
+          <div id="tryText"></div>
+        </div>
       </section>
 
-      <section class="card editor" aria-label="프롬프트 편집">
+      <section class="card" aria-label="성격 · 대화 편집" id="talkCard" role="tabpanel" aria-labelledby="tab-talk" hidden>
+        <div style="display:grid;gap:2px"><h2>성격 · 대화</h2><p class="small muted"><span id="talkBase"></span> · <span id="talkStore">저장소 연결 중…</span></p></div>
+        <div class="subtabs" id="subtabs" role="group" aria-label="고칠 갈래"></div>
+        <div class="tsec" id="talkSec"><p class="small muted">주민 데이터를 불러오는 중…</p></div>
+        <div class="tsec" style="border-top:1px solid var(--line);padding-top:14px">
+          <div class="field"><span class="group-title">바뀐 것 <span id="chgN"></span></span><ul class="changes" id="chgList"></ul></div>
+          <div class="field" id="probBox" hidden><span class="group-title" style="color:var(--warn)">고칠 것 (이대로는 게임에 넣을 수 없어요)</span><ul class="problems" id="probList"></ul></div>
+          <div class="field"><label for="talkNote">의견 · 자유 요청</label><textarea id="talkNote" placeholder="예: 코코가 비 오는 날엔 좀 더 시무룩했으면 좋겠어. 잡담에 바다 이야기를 두 줄 더 넣어 줘"></textarea></div>
+          <div class="actions">
+            <button class="btn primary" id="talkSend">요청 보내기</button>
+            <button class="btn" id="talkCopy">글로 복사하기</button>
+            <button class="btn" id="talkReset">처음 값으로</button>
+          </div>
+          <p class="status" id="talkStatus" role="status"></p>
+          <div class="out" id="talkOutWrap" hidden><textarea id="talkOut" readonly aria-label="성격·대화 요청 글"></textarea></div>
+        </div>
+      </section>
+
+      <section class="card editor" aria-label="프롬프트 편집" id="lookCard" role="tabpanel" aria-labelledby="tab-look">
         <div style="display:grid;gap:2px"><h2>프롬프트 · 레퍼런스</h2><p class="small muted"><span id="baseVer"></span> · <span id="storeState">저장소 연결 중…</span></p></div>
         <div class="two" id="newFields" hidden>
           <div class="field"><label for="newName">새 모델 이름</label><input type="text" id="newName" placeholder="예: 부엉이 주민 '호두'"></div>
@@ -249,6 +372,11 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
     <div class="reqs" id="reqList"><p class="small muted">아직 보낸 요청이 없어요.</p></div>
   </section>
 
+  <section style="display:grid;gap:8px" id="logSec">
+    <div><span class="id">APPLIED</span><h2>반영 기록</h2><p class="small muted">"요청 확인"으로 반영될 때마다 버전이 하나씩 올라가요. 예전 버전으로 되돌리고 싶으면 그 줄의 단추를 눌러 요청을 남기세요.</p></div>
+    <div id="logBox"><p class="small muted">저장소에 연결하는 중…</p></div>
+  </section>
+
   <section style="display:grid;gap:12px" id="renderSec">
     <div><span class="id">RENDER</span><h2>Blender 렌더</h2><p class="small muted">정사영 카메라, 툰 셰이딩 + 외곽선. 게임 안에서는 같은 모델이 실시간으로 그려져요.</p></div>
     <div class="sheet" id="turn"></div>
@@ -264,9 +392,13 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
       <div class="step"><h3>2. 채팅에서 확인 부탁</h3><p class="small">채팅에 "요청 확인"이라고 보내주세요. Claude가 새 요청을 모두 읽고 레퍼런스를 내려받아 직접 봅니다.</p></div>
       <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/specs/&lt;모델&gt;.json</code>에, 모양 변화는 모델링 스크립트에 반영하고 <code>node tools/build-character.mjs &lt;모델&gt;</code>로 다시 만들어요.</p></div>
       <div class="step"><h3>4. 같은 링크 갱신</h3><p class="small">새 모델·렌더로 편집기가 업데이트되고, 요청 기록에 "반영 완료"와 무엇을 바꿨는지가 적혀요. 새 모델은 버튼이 하나 늘어나요.</p></div>
+      <div class="step"><h3>성격 · 대화는</h3><p class="small">탭에서 고친 칸만 요청으로 남아요. "요청 확인" 때 Claude가 <code>assets/villagers/&lt;주민&gt;.json</code>(생일은 <code>assets/data/rules.json</code>)에 얹고, 테스트로 게임 대화가 깨지지 않는지 본 뒤 이 편집기와 게임에 반영해요.</p></div>
     </div>
   </section>
 </div>
+
+<!-- 반영 기록 공용 (ET-11): window.ApplyLog -->
+<script src="concept/board-kit.js"></script>
 
 <script type="importmap">
 { "imports": {
@@ -296,6 +428,7 @@ const FOCUS = ['전체 느낌', '얼굴', '비율·실루엣', '색', '의상', 
 const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기' };
 const RENDER_LABEL = { front: '정면', three_quarter: '3/4', side: '옆', back: '뒤', walk: '걷기', run: '달리기', happy: '기뻐하기' };
 const STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'] };
+const KIND_LABEL = { edit: '모양', add: '새 모델', traits: '성격·대화', rollback: '되돌리기' };
 const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
 const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -330,14 +463,14 @@ async function select(next) {
   const model = models.find(m => m.slug === next);
   if (next !== NEW && !model) next = models[0]?.slug;
   slug = next;
-  try { history.replaceState(null, '', '#' + slug.replace(/^_/, '')); } catch {}
+  writeHash();
   document.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.slug === slug)));
   document.querySelector(`.pick[data-slug="${slug}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   $('outWrap').hidden = true; setStatus('');
   document.querySelectorAll('#refList .pending').forEach(n => n.remove());
   const isNew = slug === NEW;
   $('newFields').hidden = !isNew; $('newCard').hidden = !isNew;
-  $('viewArea').hidden = isNew; $('viewControls').hidden = isNew; $('renderSec').hidden = isNew;
+  $('viewArea').hidden = isNew; $('viewControls').hidden = isNew; $('renderSec').hidden = isNew || tab === 'talk';
   $('modelOnly').style.display = isNew ? 'none' : 'grid';
   clearModel();
   if (isNew) {
@@ -345,13 +478,14 @@ async function select(next) {
     $('selId').textContent = 'NEW'; $('selName').textContent = '새 모델 추가'; $('selRole').textContent = '';
     $('selStatus').innerHTML = ''; $('stats').innerHTML = ''; $('baseVer').textContent = '새 모델 요청';
     draft = restore(blankNew());
-    fillForm(); renderRefs(); renderRequests();
+    fillForm(); renderRefs(); renderRequests(); updateTabs();
     return;
   }
   $('selId').textContent = model.id; $('selName').textContent = model.name; $('selRole').textContent = model.role;
   const [cls, label] = MODEL_STATUS[model.status] ?? MODEL_STATUS.review;
   $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
   $('viewerMsg').hidden = false; $('viewerMsg').textContent = '3D 모델 불러오는 중…';
+  updateTabs();
   const want = slug;
   try {
     cache[want] ??= await Promise.all([loadJSON(`assets/specs/${want}.json`), loadJSON(`assets/models/${want}.stats.json`)]);
@@ -421,6 +555,8 @@ function artifactStore(db, assets, user) {
     add: (col, data) => db.collection(col).add(data).then(ref => ref.id),
     update: (col, id, data) => db.doc(`${col}/${id}`).update(data),
     upload: async (blob, type) => { const r = await assets.upload(blob, { type }); return { id: r.id, url: r.url }; },
+    watchDoc: (path, cb) => db.doc(path).onSnapshot(d => cb(d.exists ? d.data() : null), () => {}),
+    watchCol: (col, cb) => db.collection(col).onSnapshot(qs => cb(qs.docs.map(d => d.data())), () => {}),
     url: id => '/_blob/' + id,
     who: async () => (await user?.id?.()) ?? null,
   };
@@ -437,6 +573,9 @@ function localStore() {
     watch(col, cb) { (listeners[col] ??= []).push(cb); refresh(col); return () => {}; },
     async add(col, data) { const r = await send(`api/db/${col}`, 'POST', data); refresh(col); return r.id; },
     async update(col, id, data) { await send(`api/db/${col}/${id}`, 'PATCH', data); refresh(col); },
+    // 반영 기록: 로컬에서는 assets/review/char-applied.json · char-history.json (행마다 docId)
+    watchDoc(path, cb) { const [col, id] = path.split('/'); this.watch(`char-${col}`, rows => cb(rows.find(r => r.docId === id) ?? null)); },
+    watchCol(col, cb) { this.watch(`char-${col}`, cb); },
     async upload(blob, type, name) {
       const r = await fetch(`api/assets?name=${encodeURIComponent(name ?? 'file')}`, { method: 'POST', headers: { 'content-type': type }, body: blob });
       if (!r.ok) throw Object.assign(new Error('upload'), { code: (await r.json()).code });
@@ -462,13 +601,19 @@ connectStore().then(s => {
     $('storeState').textContent = '저장소를 쓸 수 없는 화면이라 "글로 복사하기"로 채팅에 붙여 주세요.';
     $('dropHint').textContent = '이 화면에서는 파일을 올릴 수 없어요. claude.ai 링크에서 열거나, 그림은 채팅에 직접 첨부해 주세요.';
     $('sendReq').disabled = true;
+    $('talkStore').textContent = '저장소를 쓸 수 없는 화면이라 "글로 복사하기"로 채팅에 붙여 주세요.';
+    $('logBox').innerHTML = '<p class="small muted">이 화면에서는 반영 기록을 볼 수 없어요.</p>';
     return;
   }
   $('storeState').textContent = s.label;
+  $('talkStore').textContent = s.label;
+  if (tdraft) refreshMeta();
+  s.watchDoc('applied/character', d => { applied = d; renderLog(); });
+  s.watchCol('history', rows => { records = (rows ?? []).filter(r => r.board === 'character').sort((a, b) => b.version - a.version); renderLog(); });
   if (s.canUpload) { $('drop').setAttribute('aria-disabled', 'false'); $('pickFile').disabled = false; }
   else $('dropHint').textContent = '파일은 이 페이지를 편집할 수 있는 사람만 올릴 수 있어요.';
   s.watch('refs', rows => { if (rows) { allRefs = rows; renderRefs(); } });
-  s.watch('requests', rows => { if (rows) { allReqs = rows; renderRequests(); renderPickerBadges(); } });
+  s.watch('requests', rows => { if (rows) { allReqs = rows; renderRequests(); renderPickerBadges(); renderLog(); } });
 });
 const refRows = () => allRefs.filter(r => r.slug === slug);
 function renderPickerBadges() {
@@ -679,13 +824,615 @@ function renderRequests() {
     const [cls, label] = STATUS[r.status] ?? STATUS.new;
     const thumbs = (r.refs ?? []).map(x => x.kind === 'video' ? (x.frames?.[0] ?? null) : x.asset).filter(Boolean);
     return `<article class="req">
-      <div class="req-head"><span class="pill ${cls}">${label}</span><span class="small muted">${when(r.createdAt)}${r.base ? ` · 기준 v${esc(r.base)}` : ''}${r.doneVersion ? ` → v${esc(r.doneVersion)}` : ''} · 레퍼런스 ${(r.refs ?? []).length}개</span></div>
+      <div class="req-head"><span class="pill ${cls}">${label}</span><span class="pill">${KIND_LABEL[r.kind] ?? '모양'}</span><span class="small muted">${when(r.createdAt)}${r.base ? ` · 기준 v${esc(r.base)}` : ''}${r.doneVersion ? ` → v${esc(r.doneVersion)}` : ''} · 레퍼런스 ${(r.refs ?? []).length}개</span></div>
       ${thumbs.length ? `<div class="req-refs">${thumbs.map(a => `<img src="${esc(mediaURL(a))}" alt="" loading="lazy">`).join('')}</div>` : ''}
       ${r.reply ? `<p class="reply">${esc(r.reply)}</p>` : ''}
       <details><summary>요청 내용</summary><pre>${esc(r.text)}</pre></details>
     </article>`;
   }).join('');
 }
+
+/* ---------- 성격 · 대화 탭 (6차 M6-P3, ET-05 — 검수 보드 wave6 D30-A) ---------- */
+// 주민 파일 assets/villagers/<slug>.json 을 고쳐 보고 바로 시험한다 (이모티콘 판정 = 게임의 festival/judge.js, 선물 반응·대사 고르기 = town/rules.js 그대로).
+// 고친 칸만 요청(requests, kind: 'traits', changes = 파일 안 경로 → 값)으로 남기고, 채팅 "요청 확인" 때 Claude 가
+// tools/apply-traits.mjs 로 파일에 얹는다 (docs/notes/m6-p3-traits.md). 모듈은 따로 불러와서, 못 불러와도 모양 탭은 그대로 돈다.
+const TALK_GROUPS = {
+  villager: [['traits', '성격·말버릇'], ['gifts', '좋아하는 것·부탁'], ['emote', '이모티콘 반응'], ['lines', '글 대사'], ['home', '생일·시간표']],
+  keeper: [['traits', '성격·말버릇'], ['lines', '글 대사']],
+};
+const GROUP_OF = { name: 'traits', traits: 'traits', color: 'traits', pace: 'traits', gifts: 'gifts', requests: 'gifts', emote: 'emote', lines: 'lines', linesOff: 'lines', schedule: 'home', roam: 'home' };
+const TOP_LABEL = { name: '이름', traits: '성격', color: '이름표 색', pace: '움직임', schedule: '시간표', roam: '자주 가는 곳', gifts: '선물', requests: '부탁', emote: '이모티콘', lines: '글 대사', linesOff: '꺼 둔 대사' };
+const SUB_LABEL = { species: '종족', personality: '성격', speech: '말투', ending: '말끝', walk: '걷기', run: '달리기', runChance: '뛰는 정도', idle: '가만히 있는 시간',
+  wake: '나오는 시각', sleep: '들어가는 시각', rainStay: '비 오면 집에', snowStay: '눈 오면 집에', range: '멀리 가는 한계', haunts: '자주 가는 곳',
+  loves: '아주 좋아함', likes: '좋아함', dislikes: '싫어함', wants: '원하는 것', rewards: '보상 가구', reply: '대답 팔레트', rule: '읽는 법', gesture: '몸짓' };
+const CAT_EMO = { fish: '🐟', bug: '🦋', fossil: '🦴', fruit: '🍎', shell: '🐚', flower: '🌷', mat: '🪵', tool: '🧰', furn: '🪑', seed: '🌱', festival: '🎪' };
+const REACT_LABEL = { love: '아주 좋아함', like: '좋아함', normal: '보통', dislike: '싫어함' };
+const FLAG_TEXT = { more: '이어 말해서 신났어요', 'want-more': '하나만 보내서 더 듣고 싶어 해요', 'too-many': '한꺼번에 너무 많았어요', 'greet-first': '인사를 먼저 기다려요',
+  waited: '기다려 줘서 말문을 열었어요', 'wait-first': '먼저 기다려 주길 바라요', food: '먹을 것이라 기뻐요', answer: '물어봐서 원하는 것을 알려 줘요', rain: '비가 와서 더 기뻐요',
+  echo: '따라 해 줘서 아주 기뻐요', hint: '원하는 것을 다시 보여 줘요' };
+const SAMPLE = { player: '윤슬', island: '몽글섬', want: '물고기', item: '사과', reward: '라디오', other: '보리', furn: '소파·책장', n: 3, cat: '물고기' };
+const SLOT_HOUR = { dawn: 6, morning: 9, afternoon: 14, evening: 18, night: 22 };
+const PACE = [['walk', '걷기 빠르기', 0.4, 2.5, 0.05], ['run', '달리기 빠르기', 1, 4.5, 0.05], ['runChance', '뛰어다니는 정도', 0, 1, 0.05], ['happy', '기뻐하는 정도', 0, 0.5, 0.01],
+  ['idle/0', '가만히 (짧게·초)', 0.5, 15, 0.5], ['idle/1', '가만히 (길게·초)', 0.5, 20, 0.5]];
+const seasonOf = day => ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'][Number(day.slice(5, 7)) - 1] ?? 'spring';
+const clockOf = h => `${h >= 24 ? '다음 날 ' : ''}${Math.floor(h % 24)}:${h % 1 ? '30' : '00'}`;
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+
+// 경로 'a/b/0' 로 읽고 쓰기 (tools/edits.mjs 의 경로와 같은 모양)
+const segs = p => String(p).split('/').filter(Boolean);
+const getIn = (o, p) => segs(p).reduce((v, k) => (v == null ? undefined : v[k]), o);
+function setIn(o, p, val) {
+  const s = segs(p);
+  let cur = o;
+  for (const [i, k] of s.slice(0, -1).entries()) cur = (cur[k] ??= /^\d+$/.test(s[i + 1]) ? [] : {});
+  cur[s.at(-1)] = val;
+}
+/** 빈 칸 지우기 (꺼 둔 대사 묶음이 비면 칸째) */
+function pruneIn(o, p) {
+  const s = segs(p);
+  for (let n = s.length; n > 0; n--) {
+    const parent = n > 1 ? getIn(o, s.slice(0, n - 1).join('/')) : o, v = parent?.[s[n - 1]];
+    const empty = Array.isArray(v) ? !v.length : v && typeof v === 'object' && !Object.keys(v).length;
+    if (!empty) break;
+    delete parent[s[n - 1]];
+  }
+}
+
+let TK = null, talkJob = null;   // 불러온 모듈·데이터
+let tab = 'look', tsub = 'traits', tlpool = null, lastText = null;
+let tslug = null, tdoc = null, tdraft = null, tbday0 = null, tbday = null, tryS = null;
+
+function loadTalk() {
+  return (talkJob ??= (async () => {
+    const [J, E, R, F, Tr, I, Tb, B, Ed] = await Promise.all([
+      import('./src/gameplay/festival/judge.js'), import('./src/gameplay/festival/emotes.js'), import('./src/gameplay/town/rules.js'),
+      import('./src/gameplay/town/files.js'), import('./src/gameplay/town/traits.js'), import('./src/data/items.js'),
+      import('./src/data/tables.js'), import('./src/data/birthdays.js'), import('./tools/edits.mjs')]);
+    const [set, talk, ...files] = await Promise.all(['assets/emotes/emotes.json', 'assets/emotes/talk.json', ...F.VILLAGER_FILES].map(loadJSON));
+    const docs = new Map(files.map(d => [d.slug, d]));
+    const emo = E.createEmoteSet(set, J.withVillagers(talk, files));
+    const items = I.ITEMS.filter(it => !it.unknown);
+    const env = { itemIds: new Set([...items.map(i => i.id), 'native']), categories: new Set(I.CATEGORIES),
+      emoteKeys: new Set(set.emotes.map(e => e.key)), playerKeys: new Set(emo.player.map(e => e.key)) };
+    TK = { J, R, Tr, I, B, Ed, RULES: Tb.RULES, talk, emo, docs, items, env };
+    return TK;
+  })());
+}
+const svgOf = (k, label = true) => TK.emo.svg(k, label);
+const gestureName = g => (g === 'idle' ? '그대로' : TK.Tr.GESTURES[g] ?? g);
+const emoName = k => TK.emo.name(k);
+
+function ruleLabel(rule) {
+  if (rule === 'rare') return '✨ 희귀한 것';
+  if (rule === 'hybrid') return '🌸 교배로 핀 꽃';
+  if (rule === 'native') return '🍑 섬 특산 과일';
+  const m = /^price>=(\d+)$/.exec(rule);
+  if (m) return `💰 값 ${Number(m[1]).toLocaleString('ko-KR')} 이상`;
+  if (!rule.includes('.')) return `${CAT_EMO[rule] ?? '📦'} ${TK.I.CATEGORY_NAMES[rule] ?? rule} 전부`;
+  const it = TK.I.get(rule);
+  return it ? `${it.emoji ?? ''} ${it.name}` : rule;
+}
+/** 고르기 목록: gift (특별·분류·아이템) · item (아이템) · want (분류·특산·아이템, 값 'cat:x' | 'id:x') · furn (가구) */
+function ruleOptions(kind, selected = '') {
+  const opt = (v, label) => `<option value="${esc(v)}"${v === selected ? ' selected' : ''}>${esc(label)}</option>`;
+  const out = [selected ? '' : '<option value="">— 고르기 —</option>'];
+  const val = id => (kind === 'want' ? `id:${id}` : id);
+  if (kind === 'gift') out.push(`<optgroup label="특별">${['rare', 'hybrid', 'price>=1000', 'price>=3000', 'price>=5000'].map(r => opt(r, ruleLabel(r))).join('')}</optgroup>`);
+  if (kind === 'gift' || kind === 'want') out.push(`<optgroup label="분류 전부">${TK.I.CATEGORIES.map(c => opt(kind === 'want' ? `cat:${c}` : c, ruleLabel(c))).join('')}</optgroup>`);
+  if (kind === 'want') out.push(opt('id:native', ruleLabel('native')));
+  for (const c of TK.I.CATEGORIES) {
+    if (kind === 'furn' && c !== 'furn') continue;
+    const list = TK.items.filter(it => it.category === c);
+    if (list.length) out.push(`<optgroup label="${esc(TK.I.CATEGORY_NAMES[c] ?? c)}">${list.map(it => opt(val(it.id), `${it.emoji ?? ''} ${it.name}`)).join('')}</optgroup>`);
+  }
+  const html = out.join('');
+  return selected && !html.includes(`value="${esc(selected)}"`) ? opt(selected, `${selected} (목록에 없음)`) + html : html;
+}
+
+const talkKey = () => `island-traits-${tslug}-v${tdoc.version}`;
+function saveTalk() { try { localStorage.setItem(talkKey(), JSON.stringify({ doc: tdraft, bday: tbday, note: $('talkNote').value })); } catch {} }
+function restoreTalk() { try { const s = localStorage.getItem(talkKey()); return s ? JSON.parse(s) : null; } catch { return null; } }
+
+function writeHash() { try { history.replaceState(null, '', '#' + slug.replace(/^_/, '') + (tab === 'talk' ? '.talk' : '')); } catch {} }
+function updateTabs() {
+  const ok = !!TK?.docs.has(slug);
+  $('tab-talk').disabled = !ok;
+  $('tab-talk').title = ok ? '' : TK ? '주민·가게 주인만 성격·대화가 있어요' : '';
+  if (tab === 'talk') { if (ok) openTalk(); else setTab('look', false); }
+}
+function setTab(t, remember = true) {
+  tab = t;
+  for (const b of document.querySelectorAll('#tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === t));
+  const talk = t === 'talk';
+  $('lookCard').hidden = talk; $('talkCard').hidden = !talk; $('tryBox').hidden = !talk; $('stats').hidden = talk;
+  $('renderSec').hidden = talk || slug === NEW;
+  $('leftCard').classList.toggle('talkmode', talk);
+  if (remember) try { localStorage.setItem('island-editor-tab', t); } catch {}
+  writeHash();
+  if (talk) openTalk();
+}
+$('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b && !b.disabled) setTab(b.dataset.tab); });
+$('tabs').addEventListener('keydown', e => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+  const next = tab === 'look' ? 'talk' : 'look';
+  if (!$(`tab-${next}`).disabled) { setTab(next); $(`tab-${next}`).focus(); }
+});
+
+async function openTalk() {
+  if (!TK) {
+    $('talkSec').innerHTML = '<p class="small muted">주민 데이터를 불러오는 중…</p>';
+    await loadTalk().catch(() => null);
+    if (!TK) { $('talkSec').innerHTML = '<p class="status err">주민 데이터를 불러오지 못했어요. 새로고침해 보시고, 계속되면 채팅으로 알려 주세요.</p>'; return; }
+  }
+  if (tslug === slug && tdraft) return;
+  tslug = slug; tdoc = TK.docs.get(slug);
+  if (!tdoc) return;
+  tbday0 = tdoc.role === 'villager' ? (TK.RULES.birthdays.dates[slug] ?? null) : null;
+  const saved = restoreTalk();
+  tdraft = saved?.doc ?? structuredClone(tdoc);
+  tbday = saved && 'bday' in saved ? saved.bday : tbday0;
+  $('talkNote').value = saved?.note ?? '';
+  if (!TALK_GROUPS[tdoc.role].some(([k]) => k === tsub)) tsub = 'traits';
+  tlpool = null;
+  $('talkBase').textContent = `기준: 주민 파일 v${tdoc.version} (${tdoc.id})`;
+  $('talkOutWrap').hidden = true; setTalkStatus('');
+  renderSubtabs(); renderSub(); renderTry(true); refreshMeta();
+}
+
+/* ----- 바뀐 것 · 고칠 것 ----- */
+function talkChanges() {
+  const changes = TK.Ed.diffTables(tdoc, tdraft);
+  const rules = tdoc.role === 'villager' && tbday !== tbday0 ? { [`birthdays/dates/${tslug}`]: tbday } : {};
+  return { changes, rules };
+}
+const pathLabel = p => {
+  const s = segs(p);
+  const out = [TOP_LABEL[s[0]] ?? s[0]];
+  for (const [i, k] of s.slice(1).entries()) {
+    const parent = s.slice(0, i + 1).join('/'), inList = Array.isArray(getIn(tdraft, parent) ?? getIn(tdoc, parent));
+    out.push(inList ? `${+k + 1}번째` : s[0].startsWith('lines') ? TK.Tr.lineLabel(k, s[i]) : SUB_LABEL[k] ?? TK.Tr.SPOTS[k] ?? k);
+  }
+  return out.join(' › ');
+};
+function talkProblems() {
+  const out = TK.Tr.checkVillager(tdraft, TK.env).map(b => ({ path: b.path, why: b.why }));
+  if (tdoc.role === 'villager' && tbday != null && !TK.B.validMmdd(tbday)) out.push({ path: 'birthday', why: '맞지 않는 날짜' });
+  return out;
+}
+function refreshMeta() {
+  const { changes, rules } = talkChanges();
+  const keys = Object.keys(changes);
+  const items = keys.map(p => `<li>${esc(pathLabel(p))} <code>${esc(p)}</code></li>`);
+  if (Object.keys(rules).length) items.push(`<li>생일: ${esc(tbday0 ? TK.B.birthdayLabel(tbday0) : '이사 온 날')} → ${esc(tbday ? TK.B.birthdayLabel(tbday) : '이사 온 날')} <code>rules.json</code></li>`);
+  $('chgN').textContent = items.length ? `${items.length}칸` : '';
+  $('chgList').innerHTML = items.join('') || '<li class="muted" style="list-style:none;margin-left:-18px">아직 없어요. 고치면 여기에 칸마다 적혀요.</li>';
+  const probs = talkProblems();
+  $('probBox').hidden = !probs.length;
+  $('probList').innerHTML = probs.map(b => `<li>${esc(pathLabel(b.path))} — ${esc(b.why)} <code>${esc(b.path)}</code></li>`).join('');
+  $('talkSend').disabled = !store || !!probs.length;
+  const per = {};
+  for (const p of keys) { const g = GROUP_OF[segs(p)[0]] ?? 'traits'; per[g] = (per[g] ?? 0) + 1; }
+  if (Object.keys(rules).length) per.home = (per.home ?? 0) + 1;
+  for (const b of document.querySelectorAll('#subtabs [data-sub]')) { const n = b.querySelector('.n'); if (n) n.textContent = per[b.dataset.sub] ? per[b.dataset.sub] : ''; }
+}
+function touch(rerender = false) {
+  saveTalk();
+  if (rerender) renderSub();
+  refreshMeta();
+  if (tdoc.role === 'villager') { drawWant(); if (tsub === 'emote') fillReact(); }
+}
+function setTalkStatus(text, err = false) { const s = $('talkStatus'); s.textContent = text; s.classList.toggle('err', err); }
+
+/* ----- 갈래 그리기 ----- */
+function renderSubtabs() {
+  $('subtabs').innerHTML = TALK_GROUPS[tdoc.role].map(([k, label]) => `<button type="button" data-sub="${k}" aria-pressed="${k === tsub}">${label}<span class="n"></span></button>`).join('');
+}
+$('subtabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-sub]');
+  if (!b) return;
+  tsub = b.dataset.sub;
+  document.querySelectorAll('#subtabs [data-sub]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderSub(); refreshMeta();
+});
+function renderSub() {
+  $('talkSec').innerHTML = { traits: secTraits, gifts: secGifts, emote: secEmote, lines: secLines, home: secHome }[tsub]();
+  if (tsub === 'emote') fillReact();
+}
+const slider = (path, label, min, max, step, val, show = v => v) =>
+  `<label class="slider"><span>${label}</span><input type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-f="${path}" data-type="num" aria-label="${esc(label)}"><output>${esc(show(val))}</output><span></span></label>`;
+
+function secTraits() {
+  const d = tdraft, t = d.traits;
+  return `<h3>성격 · 말버릇 <span class="small muted">대사를 새로 쓰거나 고칠 때 Claude 가 따르는 기준이에요 (게임 화면에는 바로 나오지 않아요)</span></h3>
+    <div class="two">
+      <div class="field"><label for="t-species">종족</label><input type="text" id="t-species" data-f="traits/species" value="${esc(t.species)}"></div>
+      <div class="field"><label for="t-ending">말끝 (대사 끝에 붙는 말)</label><input type="text" id="t-ending" data-f="traits/ending" value="${esc(t.ending)}" placeholder="없으면 비워 두기"></div>
+    </div>
+    <div class="field"><label for="t-pers">성격</label><input type="text" id="t-pers" data-f="traits/personality" value="${esc(t.personality)}"></div>
+    <div class="field"><label for="t-speech">말투</label><textarea id="t-speech" data-f="traits/speech">${esc(t.speech)}</textarea></div>
+    <div class="field"><span class="group-title">이름표 · 말풍선 색</span>
+      <label class="swatch"><input type="color" id="t-color" data-f="color" data-type="color" value="${esc(d.color.toLowerCase())}"><span>${esc(d.name)} 이름표<code>${esc(d.color)}</code></span></label></div>
+    <div class="field"><span class="group-title">움직임 (섬에서 걸어 다닐 때)</span><div class="sliders">
+      ${PACE.filter(([k]) => getIn(d.pace, k) != null).map(([k, label, min, max, step]) => slider(`pace/${k}`, label, min, max, step, getIn(d.pace, k))).join('')}</div></div>`;
+}
+
+function secGifts() {
+  const g = tdraft.gifts, q = tdraft.requests, P = TK.R.GIFT_POINTS;
+  const chips = (list, path, label) => list.map((r, i) => `<span class="tchip">${esc(label(r))}<button type="button" data-rm="${path}" data-i="${i}" aria-label="${esc(label(r))} 빼기">✕</button></span>`).join('') || '<span class="small muted">없음</span>';
+  const ruleList = (key, label, pts) => `<div class="field"><span class="group-title">${label} <span class="pts">친밀도 +${pts}</span></span>
+      <div class="chiprow">${chips(g[key], `gifts/${key}`, ruleLabel)}</div>
+      <div class="addrow"><select id="add-${key}" aria-label="${label}에 더할 것">${ruleOptions('gift')}</select><button type="button" class="btn" data-add="gifts/${key}" data-from="add-${key}">더하기</button></div></div>`;
+  const row = (path, i, value, w, kind) => `<div class="rowline"><select data-row="${path}" data-i="${i}" data-k="what" aria-label="${i + 1}번째 줄">${ruleOptions(kind, value)}</select>
+      <input type="number" min="1" max="20" step="1" value="${w}" data-row="${path}" data-i="${i}" data-k="w" aria-label="${i + 1}번째 줄 무게">
+      <button type="button" class="btn" data-rm="${path}" data-i="${i}" aria-label="${i + 1}번째 줄 빼기">✕</button></div>`;
+  return `<h3>선물 반응 <span class="small muted">위에서부터 먼저 맞는 것으로 정해요 · 그 밖은 보통 +${P.normal} · 축제 부스에서 만든 것은 누구나 아주 좋아함</span></h3>
+    ${ruleList('loves', '아주 좋아함', P.love)}${ruleList('dislikes', '싫어함', P.dislike)}${ruleList('likes', '좋아함', P.like)}
+    <div class="field"><span class="group-title">답례로 주는 것 (무게가 클수록 자주)</span><div class="rows">${g.back.map((b, i) => row('gifts/back', i, b.id, b.w, 'item')).join('')}</div>
+      <div><button type="button" class="btn" data-addrow="gifts/back">줄 더하기</button></div></div>
+    <h3>부탁 <span class="small muted">하루에 하나, 무게가 클수록 자주 · 3일 지나면 잊어요</span></h3>
+    <div class="field"><span class="group-title">부탁할 것</span><div class="rows">${q.wants.map((w, i) => row('requests/wants', i, w.cat ? `cat:${w.cat}` : `id:${w.id}`, w.w, 'want')).join('')}</div>
+      <div><button type="button" class="btn" data-addrow="requests/wants">줄 더하기</button></div></div>
+    <div class="field"><span class="group-title">부탁을 들어주면 주는 가구 (가끔 — 아니면 도토리 주머니)</span>
+      <div class="chiprow">${chips(q.rewards, 'requests/rewards', ruleLabel)}</div>
+      <div class="addrow"><select id="add-rewards" aria-label="보상 가구 더하기">${ruleOptions('furn')}</select><button type="button" class="btn" data-add="requests/rewards" data-from="add-rewards">더하기</button></div></div>`;
+}
+
+function secEmote() {
+  const E = tdraft.emote, r = E.rule ?? {};
+  const pal = E.reply.map((k, i) => `<span class="tchip emo">${svgOf(k, false)}<span>${esc(emoName(k))}</span>
+      <button type="button" data-mv="emote/reply" data-i="${i}" data-d="-1" aria-label="${esc(emoName(k))} 앞으로">←</button><button type="button" data-mv="emote/reply" data-i="${i}" data-d="1" aria-label="${esc(emoName(k))} 뒤로">→</button>
+      <button type="button" data-rm="emote/reply" data-i="${i}" aria-label="${esc(emoName(k))} 빼기">✕</button></span>`).join('');
+  const addable = TK.emo.set.emotes.filter(e => !E.reply.includes(e.key));
+  const greetKeys = [...new Set([...TK.emo.player.filter(e => e.cat === 'greet').map(e => e.key), ...TK.talk.friendly])];
+  const flags = TK.Tr.RULE_FLAGS.map(f => {
+    const on = f.key in r && r[f.key] !== false;
+    let extra = '';
+    if (on && f.keys) extra = `<div class="extra">${greetKeys.map(k => `<button type="button" class="emo-btn" data-greet="${k}" aria-pressed="${(r.greetFirst ?? []).includes(k)}">${svgOf(k, false)}<span>${esc(emoName(k))}</span></button>`).join('')}</div>`;
+    if (on && f.num) extra = `<div class="extra"><label class="small">${f.num === 'maxCalm' ? '한 번에 괜찮은 수' : '올라가는 단계'} <input type="number" min="1" max="3" step="1" value="${r[f.num] ?? (f.num === 'maxCalm' ? 2 : 1)}" data-rulenum="${f.num}" style="width:64px"></label></div>`;
+    return `<div class="flag"><input type="checkbox" id="rf-${f.key}" data-rule="${f.key}"${on ? ' checked' : ''}><label for="rf-${f.key}">${esc(f.label)}</label><span class="small muted">${esc(f.hint)}</span>${extra}</div>`;
+  }).join('');
+  const gsel = k => `<select id="g-${k}" data-f="emote/gesture/${k}">${Object.entries(TK.Tr.GESTURES).map(([g, n]) => `<option value="${g}"${E.gesture?.[k] === g ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>`;
+  const rows = TK.emo.player.map(({ key: k }) => {
+    const v = E.likes.includes(k) ? 'like' : E.dislikes.includes(k) ? 'dislike' : 'none';
+    return `<tr class="${v}" data-row-emo="${k}"><td class="em">${svgOf(k, false)}<span>${esc(emoName(k))}</span></td>
+      <td><select data-react="${k}" aria-label="${esc(emoName(k))} 반응">${[['like', '좋아함 +2'], ['none', '보통'], ['dislike', '싫어함 −2']].map(([o, l]) => `<option value="${o}"${o === v ? ' selected' : ''}>${l}</option>`).join('')}</select></td>
+      <td style="text-align:center"><input type="checkbox" data-want="${k}"${E.wants.includes(k) ? ' checked' : ''} aria-label="${esc(emoName(k))}: 원하는 것 후보"></td>
+      <td><span class="res" id="rr-${k}"></span></td></tr>`;
+  }).join('');
+  return `<h3>대답 팔레트 <span class="small muted">주민이 대답에 쓰는 이모티콘 · 앞의 둘을 가장 많이 써요 (기쁠 때 첫째, 그냥일 때 둘째)</span></h3>
+    <div class="chiprow">${pal}</div>
+    <div class="addrow"><select id="add-reply" aria-label="대답 팔레트에 더할 이모티콘"><option value="">— 이모티콘 고르기 —</option>${addable.map(e => `<option value="${e.key}">${esc(e.glyph)} ${esc(e.name)}</option>`).join('')}</select><button type="button" class="btn" data-add="emote/reply" data-from="add-reply">더하기</button></div>
+    <h3>읽는 법 <span class="small muted">같은 이모티콘도 주민마다 다르게 읽어요 (${esc(E.id)})</span></h3>
+    <div class="flagrow">${flags}</div>
+    <div class="two"><div class="field"><label for="g-happy">기쁠 때 몸짓</label>${gsel('happy')}</div><div class="field"><label for="g-puzzled">갸웃할 때 몸짓</label>${gsel('puzzled')}</div></div>
+    <h3>반응표 <span class="small muted">받은 이모티콘 → 대답 · 표정 · 친밀도 (${r.more ? '같은 것을 셋 이어 보냈을 때 — 이어 말하기를 좋아해서' : '하나만 보냈을 때'}, 인사·기다리기는 한 뒤, 오늘 원하는 것은 빼고, 시험 날씨 그대로)</span></h3>
+    <p class="small muted">원하는 것 후보 중 하루에 하나를 골라요. 그걸 보내면 +3 더 (하루 세 번까지 친밀도가 올라요).</p>
+    <div class="react-wrap"><table class="react"><thead><tr><th>받은 이모티콘</th><th>반응</th><th>원하는 것 후보</th><th>대답 · 판정 · 친밀도</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+/** 반응표의 결과 칸: 게임 판정 그대로 — 하나만 보냈을 때 (이어 말하기를 좋아하는 주민은 같은 것 셋) */
+const sendOf = k => (tdraft.emote.rule?.more ? [k, k, k] : [k]);
+function fillReact() {
+  const rules = draftRules(), c = tryCtx();
+  for (const { key: k } of TK.emo.player) {
+    const cell = $(`rr-${k}`);
+    if (!cell) continue;
+    try {
+      const x = TK.J.judge(rules, tslug, sendOf(k), { dayKey: c.dayKey, weather: c.weather, want: null, greeted: true, waited: true, lastSaid: [] });
+      cell.innerHTML = `${x.reply.map(t => svgOf(t, false)).join('')}<span class="kind">${esc(TK.J.KIND_NAME[x.kind])} · ${esc(gestureName(x.gesture))} · +${x.points}</span>`;
+      cell.title = x.flags.map(f => FLAG_TEXT[f] ?? f).join(' · ');
+    } catch { cell.textContent = '—'; }
+    const row = cell.closest('tr');
+    row.className = tdraft.emote.likes.includes(k) ? 'like' : tdraft.emote.dislikes.includes(k) ? 'dislike' : 'none';
+  }
+}
+
+function secLines() {
+  const pools = TK.Tr.linePools(tdraft.lines);
+  const off = new Map(TK.Tr.linePools(tdraft.linesOff).map(p => [p.path, p.list]));
+  if (!pools.some(p => p.path === tlpool)) tlpool = pools[0]?.path ?? null;
+  const label = p => segs(p).map((k, i, a) => TK.Tr.lineLabel(k, a[i - 1])).join(' · ');
+  const groups = [];
+  for (const p of pools) {
+    const top = segs(p.path)[0];
+    let g = groups.find(x => x.top === top);
+    if (!g) groups.push(g = { top, list: [] });
+    g.list.push(p);
+  }
+  const sel = groups.map(g => `<optgroup label="${esc(TK.Tr.lineLabel(g.top))}">${g.list.map(p => `<option value="${esc(p.path)}"${p.path === tlpool ? ' selected' : ''}>${esc(label(p.path))} (${p.list.length}${off.get(p.path)?.length ? ` · 꺼 둠 ${off.get(p.path).length}` : ''})</option>`).join('')}</optgroup>`).join('');
+  const cur = getIn(tdraft.lines, tlpool) ?? [], offList = off.get(tlpool) ?? [];
+  const card = (e, i, on) => {
+    const text = Array.isArray(e) ? e.join('\n') : e;
+    return `<div class="lcard${on ? '' : ' off'}"><input type="checkbox" data-lon="${on ? 1 : 0}" data-i="${i}"${on ? ' checked' : ''} aria-label="${on ? '이 대사 끄기' : '이 대사 다시 켜기'}">
+      <textarea rows="${Math.min(5, Math.max(1, text.split('\n').length))}" data-lt="${on ? 'on' : 'off'}" data-i="${i}" aria-label="대사 ${i + 1}">${esc(text)}</textarea>
+      <div class="pv">${linePreview(e)}</div></div>`;
+  };
+  const ends = tdraft.traits.ending ? ` · 말끝 '${esc(tdraft.traits.ending)}'` : '';
+  return `<h3>글 대사 <span class="small muted">섬폰 '주민 글 대사 보기'를 켰을 때 나오는 말 · 지우지 않고 끄면 게임에서만 빠져요${ends}</span></h3>
+    <div class="field"><label for="linePool">대사 묶음</label><select id="linePool">${sel}</select></div>
+    <p class="small muted">한 칸 = 한 번에 하는 말이에요. 칸 안에서 줄을 바꾸면 이어서 차례로 나와요. 자리: ${Object.entries(TK.Tr.PLACEHOLDERS).map(([k, v]) => `<button type="button" class="btn link" data-ph="${k}" title="${esc(v)}">{${k}}</button>`).join(' ')} — <code>{item:을}</code> 처럼 쓰면 받침에 맞는 조사가 붙어요.</p>
+    <div class="lines">${cur.map((e, i) => card(e, i, true)).join('')}${offList.length ? `<p class="small muted">꺼 둔 대사 ${offList.length}개 (체크하면 다시 켜져요)</p>` : ''}${offList.map((e, i) => card(e, i, false)).join('')}</div>
+    <div><button type="button" class="btn" data-addline>줄 더하기</button></div>`;
+}
+const linePreview = e => `↳ <b>${[e].flat().map(s => esc(TK.R.fill(s, SAMPLE))).join(' / ')}</b>`;
+
+function secHome() {
+  const s = tdraft.schedule, ro = tdraft.roam, B = TK.B;
+  const [m, d] = tbday ? tbday.split('-').map(Number) : [0, 0];
+  const newcomer = tbday0 === null;
+  const days = m ? [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1] : 31;
+  const pct = h => ((h - 5) / 24 * 100).toFixed(2);
+  const ticks = [6, 9, 12, 15, 18, 21, 24, 27].map(h => `<span class="tick" style="left:${pct(h)}%"></span><span class="lbl" style="left:${pct(h)}%">${h % 24}</span>`).join('');
+  const sleepMin = Math.min(29, s.wake + 4);
+  return `<h3>생일 <span class="small muted">게임 숫자 표(<code>assets/data/rules.json</code>)와 같은 칸 — 어느 편집기에서 고쳐도 같은 곳에 들어가요</span></h3>
+    <div class="two">
+      <div class="field"><label for="bdM">달</label><select id="bdM">${newcomer ? `<option value="0"${m ? '' : ' selected'}>이사 온 날 (정하지 않음)</option>` : ''}${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}"${i + 1 === m ? ' selected' : ''}>${i + 1}월</option>`).join('')}</select></div>
+      <div class="field"><label for="bdD">날</label><select id="bdD"${m ? '' : ' disabled'}>${Array.from({ length: days }, (_, i) => `<option value="${i + 1}"${i + 1 === d ? ' selected' : ''}>${i + 1}일</option>`).join('')}</select></div>
+    </div>
+    <p class="small muted">${tbday ? `${esc(B.birthdayLabel(tbday))} — 그날은 하루 종일 집에서 파티, 선물 친밀도 ×${B.BIRTHDAY_GIFT_MULT}` : '섬에 이사 온 날이 생일이 돼요.'}</p>
+    <h3>집에 있는 시간표 <span class="small muted">날마다 ±30분 흔들려요</span></h3>
+    <div class="timebar" aria-hidden="true"><span class="band" style="left:${pct(s.wake)}%;width:${(pct(s.sleep) - pct(s.wake)).toFixed(2)}%"></span>${ticks}</div>
+    <div class="sliders">
+      ${slider('schedule/wake', '나오는 시각', 5, 12, 0.5, s.wake, clockOf)}
+      ${slider('schedule/sleep', '들어가는 시각', sleepMin, 29, 0.5, Math.max(sleepMin, s.sleep), clockOf)}
+    </div>
+    <div class="chiprow"><label class="toggle"><input type="checkbox" data-f="schedule/rainStay" data-type="bool"${s.rainStay ? ' checked' : ''}> 비 오면 집에</label>
+      <label class="toggle"><input type="checkbox" data-f="schedule/snowStay" data-type="bool"${s.snowStay ? ' checked' : ''}> 눈 오면 집에</label></div>
+    <h3>자주 가는 곳 <span class="small muted">숫자가 클수록 자주 · 0 = 안 가요</span></h3>
+    <div class="sliders">${slider('roam/range', '멀리 가는 한계', 4, 64, 1, ro.range, v => `${v}칸`)}</div>
+    <div class="spec-row">${Object.entries(TK.Tr.SPOTS).map(([k, n]) => `<label class="stat"><span>${esc(n)}</span><input type="number" min="0" max="9" step="1" value="${ro.haunts[k] ?? 0}" data-haunt="${k}" aria-label="${esc(n)} 가는 정도"></label>`).join('')}</div>`;
+}
+
+/* ----- 고치기 (한 곳에서 받는다) ----- */
+const talkCard = $('talkCard');
+talkCard.addEventListener('input', e => {
+  const t = e.target;
+  if (!tdraft || t.id === 'talkNote') { if (t.id === 'talkNote') saveTalk(); return; }
+  if (t.dataset.f && t.type !== 'checkbox' && t.tagName !== 'SELECT') {
+    const v = t.dataset.type === 'num' ? +t.value : t.dataset.type === 'color' ? t.value.toUpperCase() : t.value;
+    setIn(tdraft, t.dataset.f, v);
+    const out = t.closest('.slider')?.querySelector('output');
+    if (out) out.textContent = t.dataset.f.startsWith('schedule/') ? clockOf(v) : t.dataset.f === 'roam/range' ? `${v}칸` : v;
+    if (t.dataset.type === 'color') t.parentElement.querySelector('code').textContent = v;
+    if (t.dataset.f.startsWith('schedule/')) {
+      const bar = talkCard.querySelector('.timebar .band'), s = tdraft.schedule, pct = h => (h - 5) / 24 * 100;
+      if (bar) { bar.style.left = `${pct(s.wake)}%`; bar.style.width = `${pct(s.sleep) - pct(s.wake)}%`; }
+    }
+    touch(false);
+  } else if (t.dataset.lt) {
+    const parts = t.value.split('\n').map(s => s.trim()).filter(Boolean);
+    const entry = parts.length > 1 ? parts : parts[0] ?? '';
+    const base = t.dataset.lt === 'on' ? tdraft.lines : tdraft.linesOff;
+    getIn(base, tlpool)[+t.dataset.i] = entry;
+    t.parentElement.querySelector('.pv').innerHTML = linePreview(entry);
+    touch(false);
+  } else if (t.dataset.row && t.dataset.k === 'w') {
+    getIn(tdraft, t.dataset.row)[+t.dataset.i].w = Math.max(1, Math.min(20, Math.round(+t.value || 1)));
+    touch(false);
+  } else if (t.dataset.haunt) {
+    const n = Math.max(0, Math.min(9, Math.round(+t.value || 0)));
+    if (n) tdraft.roam.haunts[t.dataset.haunt] = n; else delete tdraft.roam.haunts[t.dataset.haunt];
+    touch(false);
+  } else if (t.dataset.rulenum) {
+    tdraft.emote.rule[t.dataset.rulenum] = Math.max(1, Math.min(3, Math.round(+t.value || 1)));
+    touch(false);
+  }
+});
+talkCard.addEventListener('change', e => {
+  const t = e.target;
+  if (!tdraft) return;
+  if (t.dataset.f && (t.type === 'checkbox' || t.tagName === 'SELECT')) { setIn(tdraft, t.dataset.f, t.type === 'checkbox' ? t.checked : t.value); touch(false); }
+  else if (t.dataset.f === 'schedule/wake') renderSub();
+  else if (t.id === 'linePool') { tlpool = t.value; renderSub(); }
+  else if (t.dataset.row && t.dataset.k === 'what') {
+    const row = getIn(tdraft, t.dataset.row)[+t.dataset.i];
+    if (t.dataset.row === 'requests/wants') { const [k, v] = t.value.split(/:(.*)/); delete row.cat; delete row.id; row[k === 'cat' ? 'cat' : 'id'] = v; const w = row.w; delete row.w; row.w = w; }
+    else row.id = t.value;
+    touch(false);
+  } else if (t.dataset.react) {
+    const k = t.dataset.react, E = tdraft.emote;
+    E.likes = E.likes.filter(x => x !== k); E.dislikes = E.dislikes.filter(x => x !== k);
+    if (t.value === 'like') E.likes.push(k); else if (t.value === 'dislike') E.dislikes.push(k);
+    touch(false);
+  } else if (t.dataset.want) {
+    const k = t.dataset.want, E = tdraft.emote;
+    E.wants = t.checked ? [...E.wants, k] : E.wants.filter(x => x !== k);
+    touch(false);
+  } else if (t.dataset.rule) {
+    const f = TK.Tr.RULE_FLAGS.find(x => x.key === t.dataset.rule), r = (tdraft.emote.rule ??= {});
+    if (t.checked) r[f.key] = f.keys ? ['wave'] : f.num === f.key ? 1 : true;
+    else delete r[f.key];
+    if (f.num && f.num !== f.key) { if (t.checked) r[f.num] ??= 2; else delete r[f.num]; }
+    touch(true);
+  } else if (t.dataset.lon) {
+    const i = +t.dataset.i, from = t.dataset.lon === '1' ? 'lines' : 'linesOff', to = from === 'lines' ? 'linesOff' : 'lines';
+    const list = getIn(tdraft[from], tlpool), [entry] = list.splice(i, 1);
+    if (!getIn(tdraft[to], tlpool)) setIn(tdraft[to], tlpool, []);
+    getIn(tdraft[to], tlpool).push(entry);
+    if (from === 'linesOff') pruneIn(tdraft.linesOff, tlpool);
+    touch(true);
+  } else if (t.id === 'bdM' || t.id === 'bdD') {
+    const m = +$('bdM').value, d = +$('bdD').value || 1;
+    tbday = m ? TK.B.mmdd(m, Math.min(d, [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1])) : null;
+    touch(true);
+  }
+});
+talkCard.addEventListener('focusin', e => { if (e.target.dataset?.lt) lastText = e.target; });
+talkCard.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b || !tdraft) return;
+  if (b.dataset.rm) { getIn(tdraft, b.dataset.rm).splice(+b.dataset.i, 1); touch(true); }
+  else if (b.dataset.mv) {
+    const list = getIn(tdraft, b.dataset.mv), i = +b.dataset.i, j = i + +b.dataset.d;
+    if (j >= 0 && j < list.length) { [list[i], list[j]] = [list[j], list[i]]; touch(true); }
+  } else if (b.dataset.add) {
+    const v = $(b.dataset.from).value, list = getIn(tdraft, b.dataset.add);
+    if (v && !list.includes(v)) { list.push(v); touch(true); }
+  } else if (b.dataset.addrow) {
+    const list = getIn(tdraft, b.dataset.addrow);
+    list.push(b.dataset.addrow === 'requests/wants' ? { cat: 'fish', w: 1 } : { id: 'mat.acorn-bag', w: 1 });
+    touch(true);
+  } else if (b.dataset.greet) {
+    const r = tdraft.emote.rule, k = b.dataset.greet;
+    r.greetFirst = r.greetFirst.includes(k) ? r.greetFirst.filter(x => x !== k) : [...r.greetFirst, k];
+    touch(true);
+  } else if (b.hasAttribute('data-addline')) {
+    getIn(tdraft.lines, tlpool).push('');
+    touch(true);
+    const all = talkCard.querySelectorAll('textarea[data-lt="on"]');
+    all[all.length - 1]?.focus();
+  } else if (b.dataset.ph && lastText) {
+    const ta = lastText, at = ta.selectionStart ?? ta.value.length, ins = `{${b.dataset.ph}}`;
+    ta.value = ta.value.slice(0, at) + ins + ta.value.slice(ta.selectionEnd ?? at);
+    ta.focus(); ta.selectionStart = ta.selectionEnd = at + ins.length;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+});
+$('talkReset').addEventListener('click', () => {
+  if (!tdoc) return;
+  tdraft = structuredClone(tdoc); tbday = tbday0; $('talkNote').value = '';
+  saveTalk(); renderSub(); renderTry(true); refreshMeta(); setTalkStatus('처음 값으로 돌렸어요.');
+});
+
+/* ----- 요청 ----- */
+const short = v => { const s = v === undefined ? '(없음)' : typeof v === 'string' ? v : JSON.stringify(v); return s.length > 140 ? `${s.slice(0, 137)}…` : s; };
+function buildTalkRequest({ changes, rules }, note) {
+  const out = [`[${tdoc.id} ${tdoc.name} 성격·대화 요청 · 기준 주민 파일 v${tdoc.version}]`];
+  if (note) out.push('', '■ 자유 요청 · 의견', note);
+  const keys = Object.keys(changes);
+  if (keys.length) out.push('', `■ 바뀐 칸 ${keys.length}`, ...keys.map(p => `- ${pathLabel(p)} (${p}): ${short(getIn(tdoc, p))} → ${short(changes[p])}`));
+  if (Object.keys(rules).length) out.push('', '■ 생일 (assets/data/rules.json)', `- ${tbday0 ?? '이사 온 날'} → ${tbday ?? '이사 온 날'}`);
+  if (out.length === 1) out.push('', '(바뀐 내용이 없어요.)');
+  return out.join('\n');
+}
+$('talkSend').addEventListener('click', async () => {
+  if (!store || !tdraft) return;
+  const ch = talkChanges(), note = $('talkNote').value.trim();
+  if (!Object.keys(ch.changes).length && !Object.keys(ch.rules).length && !note) { setTalkStatus('바뀐 칸도 의견도 없어요. 값을 고치거나 의견을 적어 주세요.', true); return; }
+  if (talkProblems().length) { setTalkStatus('「고칠 것」을 먼저 고쳐 주세요.', true); return; }
+  const btn = $('talkSend');
+  btn.disabled = true; setTalkStatus('보내는 중…');
+  try {
+    await store.add('requests', { slug: tslug, kind: 'traits', base: tdoc.version, status: 'new', createdAt: Date.now(), by: await store.who(),
+      text: buildTalkRequest(ch, note), changes: ch.changes, rules: ch.rules, request: note });
+    setTalkStatus('요청을 저장했어요. 채팅에 "요청 확인"이라고 보내주시면 반영할게요. 고친 값은 반영될 때까지 이 화면에 그대로 남아요.');
+    $('talkNote').value = ''; saveTalk();
+  } catch (err) {
+    setTalkStatus(err?.code === 'quota_exceeded' ? '저장 공간이 가득 차서 보내지 못했어요.' : '보내지 못했어요. "글로 복사하기"로 채팅에 붙여 주세요.', true);
+  } finally { refreshMeta(); }
+});
+$('talkCopy').addEventListener('click', () => {
+  if (!tdraft) return;
+  const ta = $('talkOut');
+  ta.value = buildTalkRequest(talkChanges(), $('talkNote').value.trim());
+  $('talkOutWrap').hidden = false;
+  try { navigator.clipboard.writeText(ta.value).then(() => setTalkStatus('복사했어요. 채팅에 붙여넣어 주세요.'), () => { ta.select(); setTalkStatus('선택해 두었어요. Ctrl+C로 복사해 주세요.'); }); }
+  catch { ta.select(); }
+});
+
+/* ----- 대답 시험 ----- */
+const draftRules = () => ({ ...TK.talk, villagers: { [tslug]: tdraft.emote } });
+const tryCtx = () => ({ dayKey: $('tryDay').value || todayKey(), weather: $('tryWeather').value, slot: $('trySlot').value, tier: $('tryTier').value || 'new' });
+function renderTry(reset) {
+  const villager = tdoc.role === 'villager';
+  $('tryEmote').hidden = !villager;
+  if (!$('tryTier').options.length) $('tryTier').innerHTML = TK.R.TIERS.map(([id, min]) => `<option value="${id}">${esc(TK.Tr.lineLabel(id))} (${min}~)</option>`).join('');
+  if (!$('tryDay').value) $('tryDay').value = todayKey();
+  if (!$('emoGrid').children.length) {
+    $('emoGrid').innerHTML = TK.emo.player.map(e => `<button type="button" class="emo-btn" data-k="${e.key}" title="${esc(e.name)}">${svgOf(e.key, false)}<span>${esc(e.name)}</span></button>`).join('');
+    $('tryGift').innerHTML = ruleOptions('item');
+  }
+  $('tryText').innerHTML = '';
+  $('tryGiftOut').textContent = '';
+  if (reset || !tryS) {
+    tryS = { log: [], tray: [], greeted: false, waited: false, lastSaid: [], v: {}, wantDone: false };
+    if (villager) {
+      const c = tryCtx(), g = TK.J.greetOf(draftRules(), tslug, { slot: c.slot, weather: c.weather, tier: c.tier });
+      tryS.log.push({ who: 'them', keys: g, note: '인사' });
+      tryS.lastSaid = g;
+    }
+  }
+  drawTry();
+}
+function drawWant() {
+  if (!tdraft?.emote) return;
+  const c = tryCtx(), w = TK.J.wantOf(tdraft.emote, tslug, c.dayKey);
+  $('tryWant').innerHTML = w ? `<span class="emo-chip">${svgOf(w)}</span><span>${esc(c.dayKey)} 에 원하는 것: <b>${esc(emoName(w))}</b>${tryS?.wantDone ? ' (오늘은 들어줬어요)' : ''}</span>` : '<span class="muted">원하는 것 후보가 없어요</span>';
+}
+function drawTry() {
+  if (tdoc.role !== 'villager') return;
+  drawWant();
+  $('tryLog').innerHTML = tryS.log.map(m => {
+    if (m.who === 'err') return `<p class="status err">${esc(m.text)}</p>`;
+    const bub = `<div class="bub">${m.keys.map(k => svgOf(k)).join('')}</div>`;
+    if (m.who === 'me') return `<div class="say me">${bub}<span class="meta">나</span></div>`;
+    const r = m.res;
+    const meta = r ? `<b>${esc(TK.J.KIND_NAME[r.kind])}</b> · 친밀도 +${m.pts}${m.pts < r.points ? ' (오늘은 세 번 다 올랐어요)' : ''} · 몸짓 ${esc(gestureName(r.gesture))}${r.flags.length ? ` · ${r.flags.map(f => esc(FLAG_TEXT[f] ?? f)).join(', ')}` : ''}` : esc(m.note ?? '');
+    return `<div class="say">${bub}<span class="meta">${esc(tdraft.name)} — ${meta}</span></div>`;
+  }).join('');
+  $('tryLog').scrollTop = $('tryLog').scrollHeight;
+  $('tray').innerHTML = [0, 1, 2].map(i => { const k = tryS.tray[i]; return `<button type="button" class="slot${k ? ' full' : ''}" data-slot="${i}" aria-label="${k ? `${esc(emoName(k))} 빼기` : '빈 칸'}">${k ? svgOf(k, false) : ''}</button>`; }).join('')
+    + `<span class="small muted">${tryS.tray.length ? `${tryS.tray.length}/3` : '아래에서 골라 담아요 (세 개까지)'}</span>`;
+}
+function trySend(keys) {
+  const c = tryCtx(), rules = draftRules();
+  const want = TK.J.wantOf(tdraft.emote, tslug, c.dayKey);
+  tryS.log.push({ who: 'me', keys: TK.J.normalize(keys) });
+  let res;
+  try { res = TK.J.judge(rules, tslug, keys, { dayKey: c.dayKey, weather: c.weather, want: tryS.wantDone ? null : want, greeted: tryS.greeted, waited: tryS.waited, lastSaid: tryS.lastSaid }); }
+  catch { tryS.log.push({ who: 'err', text: '판정할 수 없어요. 「고칠 것」을 먼저 봐 주세요.' }); tryS.tray = []; drawTry(); return; }
+  tryS.greeted = res.greeted; tryS.waited = res.waited;
+  const pts = TK.J.countPoints(rules, tryS.v, c.dayKey, res.points);
+  if (res.matchedWant && (res.kind === 'delight' || res.kind === 'happy')) tryS.wantDone = true;
+  tryS.lastSaid = res.reply;
+  tryS.log.push({ who: 'them', keys: res.reply, res, pts });
+  tryS.tray = [];
+  gesture(MOTION[res.gesture] || res.gesture === 'happy' ? res.gesture : res.gestureBase);
+  drawTry();
+}
+$('emoGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b && tryS && tryS.tray.length < 3) { tryS.tray.push(b.dataset.k); drawTry(); } });
+$('tray').addEventListener('click', e => { const b = e.target.closest('[data-slot]'); if (b && tryS) { tryS.tray.splice(+b.dataset.slot, 1); drawTry(); } });
+$('trySend').addEventListener('click', () => { if (tryS?.tray.length) trySend(tryS.tray); });
+$('tryWait').addEventListener('click', () => { if (tryS) trySend([]); });
+$('tryReset').addEventListener('click', () => { if (tdraft) renderTry(true); });
+for (const id of ['tryDay', 'tryWeather', 'trySlot', 'tryTier']) $(id).addEventListener('change', () => { if (!tdraft) return; if (tdoc.role === 'villager') { renderTry(true); if (tsub === 'emote') fillReact(); } });
+$('tryGift').addEventListener('change', () => {
+  const it = TK.I.get($('tryGift').value);
+  if (!it) { $('tryGiftOut').textContent = ''; return; }
+  try {
+    const reaction = TK.R.giftReaction(TK.Tr.toPerson(tdraft), it), pool = tdraft.lines.gift?.[reaction] ?? [];
+    const line = pool.length ? [pool[Math.floor(Math.random() * pool.length)]].flat().map(s => TK.R.fill(s, { ...SAMPLE, item: it.name })).join(' ') : '';
+    $('tryGiftOut').innerHTML = `<b>${esc(REACT_LABEL[reaction])}</b> · 친밀도 +${TK.R.GIFT_POINTS[reaction]} (생일이면 ×${TK.B.BIRTHDAY_GIFT_MULT})${line ? ` — “${esc(line)}”` : ''}`;
+    gesture(reaction === 'love' ? 'happy' : reaction === 'dislike' ? 'shake' : 'nod');
+  } catch { $('tryGiftOut').textContent = '지금 값으로는 선물 반응을 알 수 없어요.'; }
+});
+$('tryGreet').addEventListener('click', () => {
+  if (!tdraft) return;
+  const c = tryCtx();
+  const lines = TK.R.greetingLines(tdraft.lines, { now: { hourF: SLOT_HOUR[c.slot], dayKey: c.dayKey }, weather: c.weather, season: seasonOf(c.dayKey), tier: c.tier, r: TK.R.rngOf(String(Date.now())), recent: [] });
+  $('tryText').innerHTML = lines.length
+    ? `<div class="say"><div class="text">${lines.map(l => esc(TK.R.fill(l, SAMPLE))).join('<br>')}</div><span class="meta">${esc(tdraft.name)} · 예시 이름 ${SAMPLE.player} · ${SAMPLE.island}</span></div>`
+    : '<p class="small muted">이 때에 맞는 인사 대사가 없어요.</p>';
+});
+
+/* ----- 반영 기록 (applied/character · history/character-v<n>, concept/README.md 「반영 기록 공용 모양」) ----- */
+let applied = null, records = [];
+function renderLog() {
+  const L = window.ApplyLog;
+  if (!L) { $('logBox').innerHTML = '<p class="small muted">반영 기록 도구(board-kit.js)를 불러오지 못했어요.</p>'; return; }
+  const asked = new Set(allReqs.filter(r => r.kind === 'rollback' && r.status !== 'done').map(r => r.to));
+  $('logBox').innerHTML = L.head(applied, { label: '마지막 반영' })
+    + L.list(records, { action: h => (applied && h.version === applied.version ? '<span class="small muted">지금 버전</span>'
+      : asked.has(h.version) ? '<span class="pill st-new">되돌리기 요청함</span>'
+      : `<button type="button" class="btn link" data-rollback="${h.version}">v${h.version} 로 되돌리기 요청</button>`) });
+}
+$('logBox').addEventListener('click', async e => {
+  const b = e.target.closest('[data-rollback]');
+  if (!b || !store) return;
+  const to = +b.dataset.rollback;
+  b.disabled = true;
+  try { await store.add('requests', { slug: '_log', kind: 'rollback', to, status: 'new', createdAt: Date.now(), by: await store.who(), text: `[캐릭터 편집기 되돌리기 요청] v${to} 로` }); }
+  catch { b.disabled = false; b.textContent = '보내지 못했어요. 다시 눌러 주세요.'; }
+});
 
 /* ---------- 3D 뷰어 ---------- */
 const host = $('viewer');
@@ -833,6 +1580,29 @@ function loadModel(want) {
 
 $('outlineOn').addEventListener('change', e => outlines.forEach(o => { o.visible = e.target.checked; }));
 
+// 대답 시험 몸짓: 게임(festival/talk.js MOTION)과 같은 모양 — 모델 동작 AN-01–05 가 생기기 전엔 모델을 기울이고 흔든다. happy = 모델의 기뻐하기 동작
+const MOTION = {
+  nod: { t: 0.7, f: (k, m) => { m.rotation.x = Math.sin(k * Math.PI * 4) * 0.16 * (1 - k); } },
+  tilt: { t: 0.9, f: (k, m) => { m.rotation.z = Math.sin(Math.min(1, k * 2.2) * Math.PI / 2) * 0.28 * (k < 0.75 ? 1 : (1 - k) * 4); } },
+  shake: { t: 0.8, f: (k, m) => { m.rotation.y = Math.sin(k * Math.PI * 4) * 0.35 * (1 - k); } },
+  back: { t: 0.9, f: (k, m) => { m.position.z = -Math.sin(Math.min(1, k * 2) * Math.PI / 2) * 0.18 * (k < 0.7 ? 1 : (1 - k) / 0.3); m.rotation.x = -0.12 * Math.sin(k * Math.PI); } },
+  jump: { t: 0.6, f: (k, m) => { m.position.y = Math.sin(k * Math.PI) * 0.25; } },
+};
+MOTION.hop = MOTION.jump; MOTION.flap = MOTION.jump; MOTION.wag = MOTION.nod; MOTION.sway = MOTION.tilt;
+MOTION.yawn = MOTION.tilt; MOTION.droop = MOTION.back; MOTION.turn = MOTION.shake; MOTION.rub = MOTION.nod; MOTION.puff = MOTION.tilt; MOTION.curl = MOTION.tilt;
+let motion = null, happyTimer = 0;
+function gesture(name) {
+  if (!model) return;
+  if (name === 'happy') {
+    if (!actions.happy) return;
+    play('happy');
+    clearTimeout(happyTimer);
+    happyTimer = setTimeout(() => play('idle'), Math.max(1.2, actions.happy.getClip().duration * 2) * 1000);
+    return;
+  }
+  if (MOTION[name]) { model.rotation.set(0, 0, 0); model.position.set(0, 0, 0); motion = { M: MOTION[name], t: 0 }; }
+}
+
 const clock = new THREE.Clock();
 function resize() {
   const w = host.clientWidth, h = host.clientHeight;
@@ -846,14 +1616,25 @@ resize();
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
   if (mixer) { mixer.update(dt); applyProportions(); }
+  if (motion && model) {
+    motion.t += dt;
+    const k = Math.min(1, motion.t / motion.M.t);
+    motion.M.f(k, model);
+    if (k >= 1) { model.rotation.set(0, 0, 0); model.position.set(0, 0, 0); motion = null; }
+  }
   controls.update();
   renderer.render(scene, camera);
 });
 
 const slugFromHash = () => {
-  const h = location.hash.slice(1);
+  const h = location.hash.slice(1).replace(/\.talk$/, '');
   return h === 'new' ? NEW : (models.some(m => m.slug === h) ? h : null);
 };
-addEventListener('hashchange', () => { const s = slugFromHash(); if (s) select(s); });
+const tabFromHash = () => (location.hash.endsWith('.talk') ? 'talk' : null);
+addEventListener('hashchange', () => { const s = slugFromHash(); if (s) select(s); const t = tabFromHash() ?? 'look'; if (t !== tab && !$(`tab-${t}`).disabled) setTab(t); });
+let startTab = tabFromHash();
+if (!startTab && !location.hash) try { startTab = localStorage.getItem('island-editor-tab'); } catch {}
 select(slugFromHash() ?? (models.find(m => m.slug === 'coco') ?? models[0]).slug);
+if (startTab === 'talk') setTab('talk', false);
+loadTalk().then(updateTabs, err => { console.warn('[editor] 성격·대화 탭을 불러오지 못했어요', err); $('tab-talk').title = '성격·대화 탭을 불러오지 못했어요'; });
 </script>

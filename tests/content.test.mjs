@@ -9,7 +9,8 @@ import { createHarvest } from '../src/data/harvest.js';
 import { createState } from '../src/core/state.js';
 import { rngFor } from '../src/data/rng.js';
 import { TUG, needsTug, pullsFor, createTug, tugStep, tugPress } from '../src/gameplay/gather/tug.js';
-import neuru from '../src/gameplay/town/lines/neuru.js';
+import LINES from '../src/gameplay/town/lines/index.js';
+const neuru = LINES.neuru;   // 대사는 assets/villagers/neuru.json (6차 M6-P3)
 
 const ids = pool => pool.map(e => e.item.id);
 

@@ -2,11 +2,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { judge, normalize, wantOf, greetOf, tutorialOk, countPoints, KINDS, MAX_SEND } from '../src/gameplay/festival/judge.js';
+import { judge, normalize, wantOf, greetOf, tutorialOk, countPoints, withVillagers, KINDS, MAX_SEND } from '../src/gameplay/festival/judge.js';
+import { VILLAGERS } from '../src/gameplay/town/people.js';
 
 const read = p => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
 const EM = read('assets/emotes/emotes.json');
-const RULES = read('assets/emotes/talk.json');
+const RULES = withVillagers(read('assets/emotes/talk.json'), VILLAGERS);   // 주민 규칙(TK)은 6차 M6-P3 부터 주민 파일 emote 칸
 const KEYS = new Set(EM.emotes.map(e => e.key));
 const PLAYER = EM.emotes.filter(e => e.cat !== 'reply').map(e => e.key);
 const SLUGS = Object.keys(RULES.villagers);
