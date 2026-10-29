@@ -1,0 +1,62 @@
+{
+  "id": "s05-part1",
+  "version": 1,
+  "status": "draft",
+  "chapter": "축제 준비",
+  "title": "첫 번째 부품",
+  "summary": "첫 부품을 찾아 축제 자리에 놓으면 부스 하나에 불이 들어온다. 밤톨이 달려와 기뻐한다.",
+  "trigger": {"on":"festival-part","n":1},
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "부스에 불이 켜진다",
+      "recommended": true,
+      "desc": "부품을 들어 보임 → 밤톨이 달려옴 → 부스가 보이게 카메라가 올라감.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공이 부품을 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        },
+        {
+          "id": "c2",
+          "note": "밤톨이 달려와 기뻐한다",
+          "dur": 3,
+          "cam": {"size":"full","target":"group","angle":15,"move":"static"},
+          "actors": [
+            {"who":"bamtol","at":[4,4],"to":[1.1,1.8],"do":"run","face":"player","emote":"🎉","text":""},
+            {"who":"player","face":"bamtol"}
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "부스 자리가 보이게 카메라가 올라간다",
+          "dur": 3,
+          "cam": {"size":"wide","target":"place","angle":0,"move":"crane"},
+          "caption": "🧩 1/5",
+          "actors": [{"who":"bamtol","face":0,"emote":"✨","text":""}]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "짧게 한 컷",
+      "desc": "주인공이 부품을 들어 보이는 한 컷 (2.5초). 자주 보는 장면이라 짧게.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "부품 1을(를) 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "caption": "🧩 1/5",
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        }
+      ]
+    }
+  ]
+}

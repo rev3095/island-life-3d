@@ -1,0 +1,62 @@
+{
+  "id": "s06-part2",
+  "version": 1,
+  "status": "draft",
+  "chapter": "축제 준비",
+  "title": "두 번째 부품",
+  "summary": "두 번째 부품. 두부와 보리가 도우러 와서 망치질을 시작한다 — 주민들도 축제 준비에 나선다.",
+  "trigger": {"on":"festival-part","n":2},
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "주민이 도우러 온다",
+      "recommended": true,
+      "desc": "부품 → 두부·보리가 걸어와 힘자랑·망치질.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공이 부품을 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        },
+        {
+          "id": "c2",
+          "note": "두부와 보리가 걸어와 돕겠다고 한다",
+          "dur": 3.5,
+          "cam": {"size":"group","target":"group","angle":0,"move":"pull"},
+          "actors": [
+            {"who":"dubu","at":[-4,4],"to":[-1.2,1.9],"do":"walk","face":"player","emote":"💪","text":""},
+            {"who":"bori","at":[4,4],"to":[1.2,1.9],"do":"walk","face":"player","emote":"🔨","text":""}
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "다 같이 기뻐한다",
+          "dur": 2.5,
+          "cam": {"size":"group","target":"group","angle":10,"move":"static"},
+          "caption": "🧩 2/5",
+          "actors": [{"who":"dubu","do":"happy"},{"who":"bori","do":"happy"},{"who":"player","do":"happy","emote":"😄","text":""}]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "짧게 한 컷",
+      "desc": "주인공이 부품을 들어 보이는 한 컷 (2.5초). 자주 보는 장면이라 짧게.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "부품 2을(를) 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "caption": "🧩 2/5",
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        }
+      ]
+    }
+  ]
+}

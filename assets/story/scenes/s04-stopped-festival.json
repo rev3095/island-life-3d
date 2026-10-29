@@ -1,0 +1,169 @@
+{
+  "id": "s04-stopped-festival",
+  "version": 1,
+  "status": "draft",
+  "chapter": "축제 준비",
+  "title": "멈춘 축제",
+  "summary": "다음 날 아침 광장. 주민들이 텅 빈 축제 자리 앞에 모여 있다. 느루가 옛 축제 사진을 보여 주고, 밤톨이 축제 부품 다섯 개가 사라졌다고 알린다. 주인공이 찾아보겠다고 나선다.",
+  "trigger": {"on":"newday","scene":"s03-firstday-done"},
+  "place": "plaza",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "아침 광장 모임",
+      "recommended": true,
+      "desc": "주민 여섯이 광장에 모여 있고 주인공이 다가간다. 사진 → 슬픔 → 부품 다섯 → 다짐.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "광장 가운데 빈 축제 자리에 주민들이 둘러서 있다",
+          "dur": 3.5,
+          "cam": {"size":"wide","target":"place","angle":0,"move":"push"},
+          "music": "morning",
+          "actors": [
+            {"who":"coco","at":[-2,-1],"face":[0,-2.5]},
+            {"who":"bori","at":[2,-1],"face":[0,-2.5]},
+            {"who":"mochi","at":[-1.2,0.6],"face":[0,-2.5]},
+            {"who":"dubu","at":[1.4,0.6],"face":[0,-2.5]},
+            {"who":"neuru","at":[-0.6,-1.6],"face":180},
+            {"who":"bamtol","at":[0.8,-1.6],"face":180}
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "주인공이 걸어와 무슨 일인지 묻는다",
+          "dur": 3,
+          "cam": {"size":"full","target":"player","angle":0,"move":"static"},
+          "actors": [{"who":"player","at":[0,6],"to":[0,2.2],"do":"walk","emote":"❓","text":""}]
+        },
+        {
+          "id": "c3",
+          "note": "느루가 옛 축제 사진을 보여 준다",
+          "dur": 3,
+          "cam": {"size":"medium","target":"neuru","angle":15,"move":"push"},
+          "actors": [{"who":"neuru","face":"player","emote":"📷","text":""},{"who":"player","face":"neuru"}]
+        },
+        {
+          "id": "c4",
+          "note": "느루가 꺼진 등불을 떠올리며 슬퍼한다",
+          "dur": 2.5,
+          "cam": {"size":"close","target":"neuru","angle":15,"move":"static"},
+          "actors": [{"who":"neuru","emote":"🏮","text":""},{"who":"coco","emote":"😢","text":""}]
+        },
+        {
+          "id": "c5",
+          "note": "밤톨이 부품 다섯 개가 사라졌다고 알린다",
+          "dur": 3.5,
+          "cam": {"size":"medium","target":"bamtol","angle":-15,"move":"static"},
+          "actors": [
+            {"who":"bamtol","face":"player","emote":"🧩🧩🧩🧩🧩","text":""},
+            {"who":"player","face":"bamtol","emote":"😮","text":""}
+          ]
+        },
+        {
+          "id": "c6",
+          "note": "주인공이 찾아보겠다고 한다. 주민들 만세",
+          "dur": 3.5,
+          "cam": {"size":"group","target":"group","angle":0,"move":"pull"},
+          "actors": [
+            {"who":"player","face":"camera","do":"happy","emote":"💪","text":""},
+            {"who":"coco","face":"player","do":"happy","emote":"🙌","text":""},
+            {"who":"bori","face":"player","do":"happy"},
+            {"who":"mochi","face":"player","do":"happy"},
+            {"who":"dubu","face":"player","do":"happy"},
+            {"who":"neuru","face":"player"},
+            {"who":"bamtol","face":"player","do":"happy","emote":"🎉","text":""}
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "박물관 옛 사진",
+      "desc": "느루와 둘이 박물관 앞에서. 밤톨이 뛰어와 부품 이야기를 한다. 조용하고 짧다.",
+      "place": "museum",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "느루가 박물관 앞에서 옛 축제 사진을 꺼낸다",
+          "dur": 3,
+          "cam": {"size":"medium","target":"neuru","angle":15,"move":"static"},
+          "music": "museum",
+          "actors": [
+            {"who":"neuru","at":[0.6,1.4],"face":"player","emote":"📷","text":""},
+            {"who":"player","at":[-0.6,2.2],"face":"neuru","emote":"❓","text":""}
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "느루가 슬퍼한다",
+          "dur": 2.5,
+          "cam": {"size":"close","target":"neuru","angle":15,"move":"push"},
+          "actors": [{"who":"neuru","emote":"😢","text":""}]
+        },
+        {
+          "id": "c3",
+          "note": "밤톨이 뛰어와 부품 다섯 개 이야기를 한다",
+          "dur": 3.5,
+          "cam": {"size":"group","target":"group","angle":0,"move":"static"},
+          "actors": [{"who":"bamtol","at":[4.5,3.5],"to":[1.6,2.4],"do":"run","face":"player","emote":"🧩🧩🧩🧩🧩","text":""}]
+        },
+        {
+          "id": "c4",
+          "note": "주인공의 다짐",
+          "dur": 2.5,
+          "cam": {"size":"close","target":"player","angle":0,"move":"static"},
+          "music": "auto",
+          "actors": [{"who":"player","face":"camera","do":"happy","emote":"💪","text":""}]
+        }
+      ]
+    },
+    {
+      "key": "C",
+      "title": "주민 한 명씩 걱정",
+      "desc": "코코·보리·밤톨이 차례로 한 컷씩. 주민 얼굴이 잘 보인다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "코코가 시무룩하다",
+          "dur": 2.2,
+          "cam": {"size":"close","target":"coco","angle":10,"move":"static"},
+          "music": "morning",
+          "actors": [
+            {"who":"coco","at":[-1.5,-0.5],"face":180,"emote":"😢","text":""},
+            {"who":"bori","at":[1.5,-0.5],"face":180},
+            {"who":"bamtol","at":[0,-1.4],"face":180},
+            {"who":"player","at":[0,2],"face":0}
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "보리가 고개를 갸웃한다",
+          "dur": 2.2,
+          "cam": {"size":"close","target":"bori","angle":-10,"move":"static"},
+          "actors": [{"who":"bori","emote":"❓","text":""}]
+        },
+        {
+          "id": "c3",
+          "note": "밤톨이 부품 다섯 개를 알린다",
+          "dur": 3,
+          "cam": {"size":"medium","target":"bamtol","angle":0,"move":"push"},
+          "actors": [{"who":"bamtol","face":"player","emote":"🧩🧩🧩🧩🧩","text":""}]
+        },
+        {
+          "id": "c4",
+          "note": "주인공의 다짐",
+          "dur": 2.5,
+          "cam": {"size":"group","target":"group","angle":0,"move":"pull"},
+          "actors": [
+            {"who":"player","do":"happy","emote":"💪","text":""},
+            {"who":"coco","face":"player","do":"happy"},
+            {"who":"bori","face":"player","do":"happy"}
+          ]
+        }
+      ]
+    }
+  ]
+}

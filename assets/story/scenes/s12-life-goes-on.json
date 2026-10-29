@@ -1,0 +1,103 @@
+{
+  "id": "s12-life-goes-on",
+  "version": 1,
+  "status": "draft",
+  "chapter": "그 뒤",
+  "title": "섬 생활은 계속",
+  "summary": "사진 뒤, 카메라가 섬 곳곳(연못·박물관·과수원)을 짧게 훑고 광장의 주인공에게 돌아온다. 엔딩 뒤에도 채집·탐험·수집은 그대로 이어진다.",
+  "trigger": {"on":"after","scene":"s11-ending-photo"},
+  "place": "plaza",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "섬 곳곳 훑기",
+      "recommended": true,
+      "desc": "연못 → 박물관 → 과수원을 한 컷씩, 마지막에 광장에서 손 흔드는 주인공. 끝나면 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "연못 — 물고기는 오늘도 기다린다",
+          "dur": 3,
+          "cam": {"size":"wide","target":"place","place":"pond","angle":20,"move":"orbit"},
+          "music": "auto",
+          "transition": "fade",
+          "actors": [{"who":"player","at":[0,1.4],"face":180}]
+        },
+        {
+          "id": "c2",
+          "note": "박물관 — 아직 빈 칸이 많다",
+          "dur": 3,
+          "cam": {"size":"wide","target":"place","place":"museum","angle":-15,"move":"push"},
+          "transition": "fade",
+          "actors": []
+        },
+        {
+          "id": "c3",
+          "note": "과수원 — 열매가 익어 간다",
+          "dur": 3,
+          "cam": {"size":"wide","target":"place","place":"orchard","angle":10,"move":"crane"},
+          "transition": "fade",
+          "actors": []
+        },
+        {
+          "id": "c4",
+          "note": "광장의 주인공이 손을 흔든다",
+          "dur": 3.5,
+          "cam": {"size":"full","target":"player","angle":0,"move":"pull"},
+          "transition": "fade",
+          "caption": "섬 생활은 계속돼요",
+          "wait": true,
+          "actors": [{"who":"player","face":180,"do":"happy","emote":"👋","text":""}]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "다음 날 아침 집에서",
+      "desc": "화면이 어두워졌다 밝아지면 다음 날 아침, 주인공이 집에서 나오고 밤톨이 멀리서 인사한다.",
+      "place": "playerHouse",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "아침, 주인공이 집에서 나온다",
+          "dur": 3.5,
+          "cam": {"size":"full","target":"player","angle":0,"move":"static"},
+          "transition": "fade",
+          "music": "morning",
+          "actors": [{"who":"player","at":[0,0.4],"to":[0,2.2],"do":"walk","face":180,"emote":"🌅","text":""}]
+        },
+        {
+          "id": "c2",
+          "note": "밤톨이 멀리서 손을 흔든다",
+          "dur": 3,
+          "cam": {"size":"group","target":"group","angle":0,"move":"pull"},
+          "caption": "섬 생활은 계속돼요",
+          "wait": true,
+          "actors": [
+            {"who":"bamtol","at":[3,5],"face":"player","do":"happy","emote":"👋","text":""},
+            {"who":"player","face":"bamtol","emote":"😊","text":""}
+          ]
+        }
+      ]
+    },
+    {
+      "key": "C",
+      "title": "바로 돌아오기 + 편지",
+      "desc": "한 컷 뒤 바로 조작. 주민들이 보낸 축하 편지가 우편함에 온다 (town 갈고리 제안).",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공이 기지개, 우편함에 편지",
+          "dur": 3,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"static"},
+          "transition": "fade",
+          "music": "auto",
+          "actors": [{"who":"player","at":[0,1.4],"face":180,"do":"happy","emote":"✉️","text":""}]
+        }
+      ]
+    }
+  ]
+}
