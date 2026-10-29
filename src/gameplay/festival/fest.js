@@ -1,17 +1,29 @@
 // 축제 흐름 (검수 보드 z5 D20-B · D22-A · D23-A · D24-A · D25-A): 🎉 묻기 → 필요한 것 → 부품 → 부스가 선다 →
 // 다섯 다 모은 다음 날 저녁 6시 광장 가운데서 축제 → 단체 사진(스토리 s10·s11) → 사진 액자 → 엔딩 뒤에도 섬은 그대로, 해마다 축제.
 // 장면 연출은 스토리 세션 재생기가 이벤트를 듣고 튼다 (docs/notes/z5-festival.md). 재생기가 없으면 짧게 알림으로 넘긴다.
-import { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen, festState, partCount, allParts, festivalDueOn } from './parts.js';
+import { makeParts, festState, partCount, allParts, festivalDueOn } from './parts.js';
 import { partSvg } from './icons.js';
 import { villagerState, dayHour, josa } from '../town/rules.js';
 import { giveItem } from '../town/talk.js';
 
-export const FESTIVAL_HOUR = 18;
-export const PHOTO_ITEM = 'furn.festival-photo';
 const STORY_PART = n => `s0${4 + n}-part${n}`;
 const nextDay = key => new Date(Date.parse(`${key}T00:00:00Z`) + 86400000).toISOString().slice(0, 10);
 
-export function createFestival(ctx, emo) {
+/** 설정(assets/festival/config.json) 중 아직 만들지 않은 안 → 알림만 하고 추천안대로 */
+const BUILT = { 'parts.method': ['heart+gather'], 'booths.appear': ['immediate'], 'festival.start': ['nextDayEvening'], 'photo.mode': ['stageGroup'], 'after.mode': ['yearly', 'boothsOnly'] };
+export function checkConfig(cfg, warn = console.warn) {
+  for (const [path, ok] of Object.entries(BUILT)) {
+    const v = path.split('.').reduce((o, k) => o?.[k], cfg);
+    if (v != null && !ok.includes(v)) warn(`[festival] 설정 ${path} = ${v} 은 아직 없어서 ${ok[0]} 로 해요 (docs/notes/z5-festival.md 바꿀 자리)`);
+  }
+}
+
+export function createFestival(ctx, emo, cfg) {
+  checkConfig(cfg);
+  const { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen } = makeParts(cfg);
+  const FESTIVAL_HOUR = cfg.festival?.hour ?? 18;
+  const PHOTO_ITEM = cfg.photo?.item ?? 'furn.festival-photo';
+  const YEARLY = (cfg.after?.mode ?? 'yearly') === 'yearly';
   const { events } = ctx;
   const S = () => ctx.services;
   const f = festState(ctx.state);
@@ -110,7 +122,7 @@ export function createFestival(ctx, emo) {
     });
     events.emit('festival:part', { n, total: PARTS.length, id: P.id, name: P.name, emoji: P.emoji, from: V?.slug, booth: b ? { x: b.x, z: b.z } : null, x: b?.x, z: b?.z });
     reveal.then(() => { waitingReveal.delete(n); openBooth(P.booth); });
-    if (allParts(f)) { f.readyDay ??= today(); events.emit('festival:ready', { day: f.readyDay }); hud.draw(); }
+    if (allParts(f, PARTS)) { f.readyDay ??= today(); events.emit('festival:ready', { day: f.readyDay }); hud.draw(); }
   }
 
   function openBooth(id) {
@@ -127,11 +139,10 @@ export function createFestival(ctx, emo) {
     toast(`${boothName(id)} 부스가 열렸어요`, '🎪');
     events.emit('festival:booth', { id });
   }
-  const BOOTH_NAMES = { 'FB-01': '등불 길', 'FB-02': '음악 무대', 'FB-03': '꽃 공방', 'FB-04': '먹거리', 'FB-05': '낚시 대회' };
-  const boothName = id => BOOTH_NAMES[id] ?? id;
+  const boothName = id => cfg.booths.list.find(b => b.id === id)?.name ?? id;
 
   // ---- 축제 날 (다 모은 다음 날 저녁 6시 · 해마다 같은 날) ----
-  const festivalDue = (key = today()) => festivalDueOn(f, key);
+  const festivalDue = (key = today()) => festivalDueOn(f, key, { yearly: YEARLY });
   const evening = () => dayHour(now()) >= FESTIVAL_HOUR;
   function announce() {
     hud.draw();
@@ -213,7 +224,7 @@ export function createFestival(ctx, emo) {
 
   hud.draw();
   return {
-    state: f, ask, register, hud, openBooth, givePart, festivalDue, startFestival, ending,
+    state: f, parts: PARTS, ask, register, hud, openBooth, givePart, festivalDue, startFestival, ending,
     /** 개발용: 부품 하나 바로 받기 / 다 모으기 / 축제 날로 */
     debug: {
       part: id => givePart(PART_BY_ID[id] ?? PARTS.find(p => !f.parts[p.id]), null),

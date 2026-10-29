@@ -104,18 +104,21 @@ test('빈 보내기 = 기다리기, 인사·연습·하루 횟수', () => {
 
 // ---------- 축제 광장 (src/world/festival.js, 검수 보드 z5 D19-A) ----------
 import { generateIsland, lotsOf, BUILDING_KINDS, KIND } from '../src/world/island.js';
-import { festivalLayout, carveFestival, rectCorners, overlaps, BOOTH_SIZE, BOOTH_SCALE, FESTIVAL_RADIUS, BOOTHS } from '../src/world/festival.js';
+import { festivalLayout, carveFestival, rectCorners, overlaps, BOOTH_SIZE } from '../src/world/festival.js';
+
+const CONFIG = read('assets/festival/config.json');   // 보드 결정 (D14–D25) 설정 하나
+const FESTIVAL_RADIUS = CONFIG.plaza.radius;
 
 const envSpec = slug => read(`assets/env/specs/${slug}.json`);
 const island = () => generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, envSpec(k)]))) });
 
 test('축제 광장: 무대·부스 다섯·진행판·아치·등불이 서로·건물과 겹치지 않고, 들어오는 길을 막지 않는다', () => {
   const gen = island();
-  const F = festivalLayout(gen);
+  const F = festivalLayout(gen, CONFIG);
   const { w, h } = gen;
   const rects = [
     ['stage-wall', rectCorners({ x: F.stage.x, z: F.stage.z - 1.4 }, [5.72, 0.2], 0)],
-    ...F.booths.map(b => [b.id, rectCorners(b, BOOTH_SIZE.map(v => v * BOOTH_SCALE), b.rot)]),
+    ...F.booths.map(b => [b.id, rectCorners(b, BOOTH_SIZE.map(v => v * b.scale), b.rot)]),
     ['board', rectCorners(F.board, [2.08, 0.5], F.board.rot)],
     ...F.arches.map((a, i) => [`arch${i}`, rectCorners(a, [2.95, 0.4], a.rot)]),
     ...F.lanterns.map((l, i) => [`lantern${i}`, rectCorners(l, [0.3, 0.6], l.rot)]),
@@ -141,7 +144,7 @@ test('축제 광장: 무대·부스 다섯·진행판·아치·등불이 서로�
 test('축제 광장: 원 안은 광장 칸, 안에 있던 물체는 치우고 축제 물체를 놓는다 (열린 부스만 부스, 나머지는 덮개)', () => {
   const gen = island();
   const before = gen.objects.filter(o => !o.kind.startsWith('festival')).length;
-  const P = carveFestival(gen, { opened: new Set(['FB-02']), specs: { 'festival-stage': envSpec('festival-stage') } });
+  const P = carveFestival(gen, { opened: new Set(['FB-02']), config: CONFIG, specs: { 'festival-stage': envSpec('festival-stage') } });
   const { w, h } = gen;
   assert.ok(Number.isFinite(P.x) && Number.isFinite(P.z), 'places.festival 에 x·z (story 기준 자리)');
   assert.equal(P.booths.length, 5);
@@ -158,16 +161,18 @@ test('축제 광장: 원 안은 광장 칸, 안에 있던 물체는 치우고 �
   assert.deepEqual(inside.map(o => o.id), [], '원 안에 다른 물체가 남으면 안 된다');
   assert.ok(gen.objects.filter(o => !o.kind.startsWith('festival')).length < before);
   assert.ok(gen.pads.some(p => p.festival && p.steps[0] === 0.36), '무대 위는 걸을 수 있는 높은 바닥');
-  assert.deepEqual(BOOTHS.map(b => b.id).sort(), ['FB-01', 'FB-02', 'FB-03', 'FB-04', 'FB-05']);
+  assert.deepEqual(P.booths.map(b => b.id).sort(), ['FB-01', 'FB-02', 'FB-03', 'FB-04', 'FB-05']);
 });
 
 // ---------- 축제 부품·부스 놀이 규칙 (src/gameplay/festival/parts.js · booths.js) ----------
-import { PARTS, heartOpen, takeAny, takeVaried, takeWithOne, festState, allParts } from '../src/gameplay/festival/parts.js';
+import { makeParts, takeAny, takeVaried, takeWithOne, festState, allParts } from '../src/gameplay/festival/parts.js';
+import { checkConfig } from '../src/gameplay/festival/fest.js';
 import { fishLength, dubuRecord, weekOf, lanternColorOf, LANTERN_COLORS, RHYTHM } from '../src/gameplay/festival/booths.js';
 import * as itemsDb from '../src/data/items.js';
 
 const bag = list => list.map(x => (x ? { id: x[0], count: x[1] } : null));
 const total = plan => plan.reduce((s, x) => s + x.n, 0);
+const { PARTS, heartOpen } = makeParts(CONFIG);
 
 test('축제 부품 다섯: 주민 다섯이 하나씩, 부스 하나씩, 말풍선 낱말은 세트(또는 아이템)에 있다', () => {
   assert.equal(PARTS.length, 5);
@@ -207,9 +212,9 @@ test('마음 열기·상태: 친구 단계 + 기쁨 두 번, 다섯 다 모으�
   const st = {};
   const f = festState(st);
   assert.deepEqual([f.parts, f.booths, f.asked], [{}, {}, {}]);
-  assert.ok(!allParts(f));
+  assert.ok(!allParts(f, PARTS));
   for (const p of PARTS) f.parts[p.id] = '2026-11-01';
-  assert.ok(allParts(f));
+  assert.ok(allParts(f, PARTS));
 });
 
 test('부스 놀이 규칙: 물고기 길이·두부 기록은 날마다 같고, 등불 색은 정해진 넷, 리듬은 8박', () => {
@@ -242,4 +247,18 @@ test('축제 날: 다 모은 날은 아니고 다음 날부터, 연 뒤엔 해�
   assert.equal(F.festivalDue('2027-11-02'), true, '해마다 같은 날 (D25-A)');
   f.lastYear = '2027';
   assert.equal(F.festivalDue('2027-11-02'), false, '그해에 열었으면 끝');
+});
+
+test('축제 설정 (assets/festival/config.json): 결정 D14–D25 가 다 있고, 부품·부스·광장 칸이 서로 맞고, 지금 설정은 만든 안만 쓴다', () => {
+  assert.deepEqual(Object.keys(CONFIG.decisions), ['D14', 'D15', 'D16', 'D17', 'D18', 'D19', 'D20', 'D21', 'D22', 'D23', 'D24', 'D25']);
+  const booths = CONFIG.booths.list.map(b => b.id);
+  assert.deepEqual(Object.keys(CONFIG.plaza.boothAngles).sort(), [...booths].sort(), '부스마다 광장 각도');
+  for (const p of CONFIG.parts.list) assert.ok(booths.includes(p.booth), `${p.id} 부스`);
+  for (const b of CONFIG.booths.list) assert.ok(envSpec(b.slug), `${b.id} 모델 스펙`);
+  assert.ok(itemsDb.get(CONFIG.photo.item), '사진 아이템');
+  const warns = [];
+  checkConfig(CONFIG, w => warns.push(w));
+  assert.deepEqual(warns, []);
+  checkConfig({ ...CONFIG, booths: { ...CONFIG.booths, appear: 'nextMorning' } }, w => warns.push(w));
+  assert.equal(warns.length, 1, '아직 없는 안은 알려 준다');
 });

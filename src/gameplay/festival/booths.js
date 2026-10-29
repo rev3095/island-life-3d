@@ -6,8 +6,6 @@ import { rngOf, villagerState, addFriendship, hashStr, josa } from '../town/rule
 import { giveItem } from '../town/talk.js';
 
 export const PRODUCTS = { wreath: 'festival.wreath', pie: 'festival.pie', juice: 'festival.juice', medal: 'festival.medal' };
-export const LABEL = { 'FB-01': '등불 띄우기', 'FB-02': '북 치기', 'FB-03': '화관 만들기', 'FB-04': '요리하기', 'FB-05': '물고기 재기' };
-const OWNER = { 'FB-01': 'chorong', 'FB-02': 'coco', 'FB-03': 'mochi', 'FB-04': 'pong', 'FB-05': 'dubu' };
 /** 등불 색 (festival-lantern 변형) — 곤충마다 정해진다 */
 export const LANTERN_COLORS = ['green', 'gold', 'blue', 'pink'];
 export const lanternColorOf = bugId => (bugId === 'bug.firefly' ? 'green' : LANTERN_COLORS[hashStr(bugId) % LANTERN_COLORS.length]);
@@ -21,14 +19,19 @@ export const weekOf = dayKey => Math.floor((Date.parse(`${dayKey}T00:00:00Z`) / 
 export const dubuRecord = week => 38 + Math.floor(rngOf(String(week), 'dubu-record')() * 22);
 export const RHYTHM = { beats: [0, 1, 2, 2.5, 3.5, 4, 5, 6], beat: 0.62, lead: 1.8, ok: 0.2, great: 0.09 };
 
-export function createBooths(ctx, emo, fest) {
+export function createBooths(ctx, emo, fest, cfg) {
+  // 부스 목록·놀이·주인·개수 규칙은 assets/festival/config.json 의 booths 칸 (D21)
+  const LIST = cfg.booths.list, RULE = cfg.booths.rules ?? {};
+  const byId = Object.fromEntries(LIST.map(b => [b.id, b]));
+  const idOf = play => LIST.find(b => b.play === play)?.id;
+  const PTS = RULE.friendPoints ?? 2;
   const S = () => ctx.services;
   const f = fest.state;
   const today = () => S().time?.now?.().dayKey ?? S().data?.day?.key?.();
   const toast = (t, icon) => S().ui?.toast?.(t, icon);
   const rec = id => (f.booths[id] ??= {});
   const friend = (id, n) => {
-    const slug = OWNER[id];
+    const slug = byId[id]?.owner;
     const v = villagerState(ctx.state, slug);
     const r = rec(id);
     if (r.friendDay === today()) return;
@@ -37,7 +40,7 @@ export function createBooths(ctx, emo, fest) {
   };
 
   async function lantern() {
-    const r = rec('FB-01');
+    const r = rec(idOf('lantern'));
     if (r.day === today()) { toast('오늘 밤 등불은 벌써 띄웠어요. 내일 또 와요', '🌙'); return; }
     const d = S().data;
     const slot = await S().ui.bag.open({ mode: 'pick', title: '등불 길', hint: '등불 병에 넣어 띄울 곤충을 골라 주세요', filter: s => d.items.get(s.id)?.category === 'bug' });
@@ -46,7 +49,7 @@ export function createBooths(ctx, emo, fest) {
     d.inventory.remove(slot, 1);
     r.day = today(); r.color = lanternColorOf(it.id); r.count = (r.count ?? 0) + 1;
     paintLanterns(r.color);
-    friend('FB-01', 2);
+    friend(idOf('lantern'), PTS);
     ctx.events.emit('sfx', { name: 'bug-catch' });
     toast(`${josa(it.name, '이')} 등불이 되어 날아올랐어요`, '✨');
   }
@@ -58,11 +61,11 @@ export function createBooths(ctx, emo, fest) {
   async function music() {
     const score = await rhythm();
     if (score == null) return;
-    const r = rec('FB-02');
+    const r = rec(idOf('music'));
     const best = Math.max(r.best ?? 0, score);
     const record = score > (r.best ?? 0);
     r.best = best; r.plays = (r.plays ?? 0) + 1;
-    if (score >= 6) friend('FB-02', 2);
+    if (score >= 6) friend(idOf('music'), PTS);
     for (const V of S().town?.villagers ?? []) {
       const p = V.actor.position, q = S().player.position;
       if (score >= 5 && Math.hypot(p.x - q.x, p.z - q.z) < 9) V.happy();
@@ -120,29 +123,31 @@ export function createBooths(ctx, emo, fest) {
 
   async function flower() {
     const d = S().data;
-    const plan = takeAny(d.inventory.slots, d.items, it => it.category === 'flower', 3);
-    if (!plan) { toast('화관에는 꽃 3송이가 필요해요', '🌷'); return; }
-    const ok = await S().ui.confirm({ title: '꽃 공방', text: '꽃 3송이로 화관을 만들까요?', icon: '🌸' });
+    const need = RULE.flowers ?? 3;
+    const plan = takeAny(d.inventory.slots, d.items, it => it.category === 'flower', need);
+    if (!plan) { toast(`화관에는 꽃 ${need}송이가 필요해요`, '🌷'); return; }
+    const ok = await S().ui.confirm({ title: '꽃 공방', text: `꽃 ${need}송이로 화관을 만들까요?`, icon: '🌸' });
     if (!ok) return;
     for (const { slot, n } of [...plan].sort((a, b) => b.slot - a.slot)) d.inventory.remove(slot, n);
-    rec('FB-03').made = (rec('FB-03').made ?? 0) + 1;
-    friend('FB-03', 2);
+    rec(idOf('flower')).made = (rec(idOf('flower')).made ?? 0) + 1;
+    friend(idOf('flower'), PTS);
     giveItem(ctx, PRODUCTS.wreath);
   }
 
   async function food() {
-    const r = rec('FB-04');
+    const r = rec(idOf('food'));
     if (r.day !== today()) { r.day = today(); r.today = 0; }
-    if (r.today >= 3) { toast('오늘 요리는 다 했어요. 퐁이 내일 또 오래요', '😋'); return; }
+    if (r.today >= (RULE.foodPerDay ?? 3)) { toast('오늘 요리는 다 했어요. 퐁이 내일 또 오래요', '😋'); return; }
     const d = S().data;
-    const plan = takeAny(d.inventory.slots, d.items, it => it.category === 'fruit', 2);
-    if (!plan) { toast('요리에는 과일 2개가 필요해요', '🍎'); return; }
-    const pick = await S().ui.confirm({ title: '먹거리 부스', text: '과일 2개로 무엇을 만들까요?', icon: '🍲',
+    const need = RULE.fruits ?? 2;
+    const plan = takeAny(d.inventory.slots, d.items, it => it.category === 'fruit', need);
+    if (!plan) { toast(`요리에는 과일 ${need}개가 필요해요`, '🍎'); return; }
+    const pick = await S().ui.confirm({ title: '먹거리 부스', text: `과일 ${need}개로 무엇을 만들까요?`, icon: '🍲',
       buttons: [{ label: '과일 파이', value: 'pie', primary: true }, { label: '과일 주스', value: 'juice' }, { label: '그만', value: null }] });
     if (!pick) return;
     for (const { slot, n } of [...plan].sort((a, b) => b.slot - a.slot)) d.inventory.remove(slot, n);
     r.today++;
-    friend('FB-04', 2);
+    friend(idOf('food'), PTS);
     giveItem(ctx, PRODUCTS[pick]);
   }
 
@@ -152,7 +157,7 @@ export function createBooths(ctx, emo, fest) {
     if (slot == null) return;
     const it = d.items.get(d.inventory.slots[slot].id);
     d.inventory.remove(slot, 1);
-    const r = rec('FB-05'), key = today(), week = weekOf(key);
+    const r = rec(idOf('fish')), key = today(), week = weekOf(key);
     if (r.week !== week) { r.week = week; r.best = null; r.medal = false; }
     r.n = (r.n ?? 0) + 1;
     const cm = fishLength(it, key, r.n);
@@ -160,12 +165,13 @@ export function createBooths(ctx, emo, fest) {
     if (record) r.best = { cm, id: it.id, name: it.name, day: key };
     const dubu = dubuRecord(week);
     ctx.events.emit('sfx', { name: 'splash' });
-    friend('FB-05', 2);
+    friend(idOf('fish'), PTS);
     toast(`${it.name} ${cm}cm${record ? ' · 이번 주 최고!' : ` · 이번 주 최고 ${r.best.cm}cm`} (두부 ${dubu}cm)`, '🐟');
     if (cm >= dubu && !r.medal) { r.medal = true; giveItem(ctx, PRODUCTS.medal); }
   }
 
-  const PLAY = { 'FB-01': lantern, 'FB-02': music, 'FB-03': flower, 'FB-04': food, 'FB-05': fish };
+  const GAMES = { lantern, music, flower, food, fish };
+  const PLAY = Object.fromEntries(LIST.map(b => [b.id, GAMES[b.play]]));
 
   /** 부스 앞에 서서 부스를 보고 있으면 그 부스 */
   function boothInFront() {
@@ -185,7 +191,7 @@ export function createBooths(ctx, emo, fest) {
   function register(gp) {
     gp.add({
       name: 'festival:booth', intent: 'action', priority: 85,
-      label: b => LABEL[b?.id] ?? '부스',
+      label: b => byId[b?.id]?.label ?? '부스',
       test: boothInFront,
       async run(b) {
         const pl = S().player;
@@ -196,6 +202,6 @@ export function createBooths(ctx, emo, fest) {
   }
 
   // 불러온 저장: 마지막으로 띄운 등불 색
-  const restore = () => { const c = f.booths['FB-01']?.color; if (c) paintLanterns(c); };
+  const restore = () => { const c = f.booths[idOf('lantern')]?.color; if (c) paintLanterns(c); };
   return { register, restore, rhythm, PLAY };
 }

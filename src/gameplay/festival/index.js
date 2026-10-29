@@ -7,6 +7,7 @@ import { createEmoteTalk } from './talk.js';
 import { createFestival } from './fest.js';
 import { createBooths } from './booths.js';
 import { ensureCss } from './talkui.js';
+import { CONFIG_FILE } from './parts.js';
 
 let F = null;
 
@@ -15,10 +16,11 @@ export default {
 
   async init(ctx) {
     ensureCss();
-    const emo = await loadEmotes();
-    const talk = createEmoteTalk(ctx, emo);
-    const fest = createFestival(ctx, emo);
-    const booths = createBooths(ctx, emo, fest);
+    // 보드 결정(D14–D25)은 설정 파일 하나 — 결정이 바뀌면 그 파일과 스펙만 고친다 (docs/notes/z5-festival.md 바꿀 자리)
+    const [emo, cfg] = await Promise.all([loadEmotes(), fetch(CONFIG_FILE).then(r => r.json())]);
+    const talk = createEmoteTalk(ctx, emo, cfg);
+    const fest = createFestival(ctx, emo, cfg);
+    const booths = createBooths(ctx, emo, fest, cfg);
     const gp = ctx.services.gameplay?.interactions;
     if (gp) { fest.register(gp); booths.register(gp); }
     booths.restore();
@@ -27,7 +29,7 @@ export default {
     ctx.events.on('story:end', () => fest.hud.hide(false));
     F = { ctx, emo, talk, fest, booths };
     ctx.services.festival = {
-      emotes: emo,
+      emotes: emo, config: cfg,
       emote: { on: () => talk.on(), session: V => talk.session(V) },
       ask: (V, E) => fest.ask(V, E),
       state: fest.state,

@@ -4,27 +4,26 @@
 //          깃발 줄 PR-13 ×8 · 진행판 PR-15 · 모닥불. 자리는 gen.places.festival (story·gameplay 가 쓴다).
 import { KIND } from './island.js';
 
-export const FESTIVAL_RADIUS = 6;
-/** 광장 가운데 = 지금 광장에서 동쪽으로 몇 칸 */
-export const SHIFT_X = 3;
-/** 부스 다섯 (각도: 북쪽 0° 에서 시계 방향) — 무대·입구 네 갈래를 피한 자리 */
-export const BOOTHS = [
-  { id: 'FB-01', slug: 'festival-booth-lantern', part: 'FP-01', angle: 112 },
-  { id: 'FB-02', slug: 'festival-booth-music', part: 'FP-02', angle: 304 },
-  { id: 'FB-03', slug: 'festival-booth-flower', part: 'FP-03', angle: 234 },
-  { id: 'FB-04', slug: 'festival-booth-food', part: 'FP-04', angle: 170 },
-  { id: 'FB-05', slug: 'festival-booth-fish', part: 'FP-05', angle: 202 },
-];
-export const BOOTH_R = 5.15;
-export const BOOTH_SIZE = [2.96, 1.93];            // 모델 크기 (가로, 깊이)
-export const BOOTH_SCALE = 0.78;                   // 둘레에 다섯이 들어가게 조금 작게
-export const STAGE = { r: 5.0, dx: 0.9, size: [5.72, 3.48] };   // dx: 북쪽 길을 비키려고 조금 동쪽으로
-/** 등불 기둥: 부스·입구·무대 사이 빈자리 (원 바깥쪽 가장자리) */
-export const LANTERNS = [52, 91, 136, 185, 217, 249, 288, 320];
-const LANTERN_R = 6.3;
+// 자리 숫자(가운데를 옮길 칸·반지름·부스 각도·등불·아치·진행판)는 assets/festival/config.json 의 plaza 칸 (D19), 부스 목록은 booths 칸 (D21).
+// 6차 M6-P5 가 섬 배치를 assets/island/layout.json 으로 옮기면 plaza 칸을 그쪽으로 옮긴다. 아래는 모델 크기에서 온 값.
+export const BOOTH_SIZE = [2.96, 1.93];            // 부스 모델 크기 (가로, 깊이)
+export const STAGE_SIZE = [5.72, 3.48];             // 무대 모델 크기
+const LANTERN_R_OUT = 0.3;                          // 등불 기둥은 원 가장자리보다 이만큼 바깥
 const GARLAND_LEN = 4.6;                            // 깃발 줄 모델 길이 (PR-13 params.length)
 const GARLAND_Y = 2.42;                             // 등불 기둥 꼭대기 갈고리 높이
-const BOARD_ANGLE = 284;                            // 진행판: 서쪽 입구 바로 북쪽
+
+/** 설정 → 광장 자리 값 (빠진 칸은 반영 v1 값) */
+export function layoutOf(cfg = {}) {
+  const P = cfg.plaza ?? {};
+  const list = cfg.booths?.list ?? [];
+  const partOf = id => cfg.parts?.list?.find(p => p.booth === id)?.id ?? null;
+  return {
+    mode: P.mode ?? 'widen', shiftX: P.shiftX ?? 3, radius: P.radius ?? 6, stage: { r: 5.0, dx: 0.9, ...(P.stage ?? {}) },
+    boothR: P.boothR ?? 5.15, boothScale: P.boothScale ?? 0.78,
+    booths: list.map(b => ({ id: b.id, slug: b.slug, part: partOf(b.id), angle: P.boothAngles?.[b.id] ?? 0 })),
+    lanterns: P.lanterns ?? [], arches: P.arches ?? [270, 72], boardAngle: P.boardAngle ?? 284,
+  };
+}
 
 const { GRASS, PATH, PLAZA } = KIND;
 const rad = d => (d * Math.PI) / 180;
@@ -50,36 +49,37 @@ export function overlaps(A, B, gap = 0) {
   return true;
 }
 
-/** 축제 광장 자리 계산 (gen 을 고치지 않는다) */
-export function festivalLayout(gen) {
+/** 축제 광장 자리 계산 (gen 을 고치지 않는다). cfg = assets/festival/config.json */
+export function festivalLayout(gen, cfg) {
   const { w, h } = gen;
+  const Lo = layoutOf(cfg), R = Lo.radius;
   const p = gen.places.plaza;
-  const tile = { tx: Math.floor(p.x + w / 2) + SHIFT_X, tz: Math.floor(p.z + h / 2) };
+  const tile = { tx: Math.floor(p.x + w / 2) + Lo.shiftX, tz: Math.floor(p.z + h / 2) };
   const center = { x: tile.tx + 0.5 - w / 2, z: tile.tz + 0.5 - h / 2 };
-  const stage = { slug: 'festival-stage', x: center.x + STAGE.dx, z: center.z - STAGE.r, rot: 0 };
-  const booths = BOOTHS.map(b => ({ ...b, ...around(center, b.angle, BOOTH_R), rot: faceCenter(b.angle) }));
-  const lanterns = LANTERNS.map(a => ({ angle: a, ...around(center, a, LANTERN_R), rot: faceCenter(a) }));
+  const stage = { slug: 'festival-stage', x: center.x + Lo.stage.dx, z: center.z - Lo.stage.r, rot: 0 };
+  const booths = Lo.booths.map(b => ({ ...b, ...around(center, b.angle, Lo.boothR), rot: faceCenter(b.angle), scale: Lo.boothScale }));
+  const lanterns = Lo.lanterns.map(a => ({ angle: a, ...around(center, a, R + LANTERN_R_OUT), rot: faceCenter(a) }));
   // 깃발 줄: 이웃한 등불 기둥 사이 (무대를 건너는 마지막→첫 기둥은 빼고). 길이는 크기로 맞춘다
   const garlands = lanterns.slice(0, -1).map((L, i) => {
     const M = lanterns[i + 1];
     const len = Math.hypot(M.x - L.x, M.z - L.z);
     return { x: (L.x + M.x) / 2, z: (L.z + M.z) / 2, rot: -Math.atan2(M.z - L.z, M.x - L.x), y: GARLAND_Y, scale: len / GARLAND_LEN };
   });
-  const arches = [270, 72].map(a => ({ angle: a, ...around(center, a, FESTIVAL_RADIUS + 0.2), rot: faceCenter(a) }));
-  const board = { slug: 'festival-board', ...around(center, BOARD_ANGLE, FESTIVAL_RADIUS + 1.0), rot: faceCenter(BOARD_ANGLE) };
-  return { tile, center, radius: FESTIVAL_RADIUS, stage, booths, lanterns, garlands, arches, board };
+  const arches = Lo.arches.map(a => ({ angle: a, ...around(center, a, R + 0.2), rot: faceCenter(a) }));
+  const board = { slug: 'festival-board', angle: Lo.boardAngle, ...around(center, Lo.boardAngle, R + 1.0), rot: faceCenter(Lo.boardAngle) };
+  return { tile, center, radius: R, boothR: Lo.boothR, boothScale: Lo.boothScale, stage, booths, lanterns, garlands, arches, board };
 }
 
 /**
  * gen 에 축제 광장을 깐다. opened = 열린 부스 id 집합 (state.festival.booths 의 열쇠).
- * specs = 배경 스펙 (무대 pad 높이). 돌려주는 값 = gen.places.festival.
+ * specs = 배경 스펙 (무대 pad 높이), config = assets/festival/config.json. 돌려주는 값 = gen.places.festival.
  */
-export function carveFestival(gen, { opened = new Set(), specs = {} } = {}) {
+export function carveFestival(gen, { opened = new Set(), specs = {}, config = {} } = {}) {
   const { w, h, kind: K, level: L } = gen;
   const idx = (tx, tz) => tz * w + tx;
-  const F = festivalLayout(gen);
+  const F = festivalLayout(gen, config);
   const { center: C, tile: T } = F;
-  const R = FESTIVAL_RADIUS;
+  const R = F.radius;
   // 1. 바닥: 원 안의 평지 풀·흙길·광장 칸을 광장으로
   for (let tz = T.tz - R - 1; tz <= T.tz + R + 1; tz++) for (let tx = T.tx - R - 1; tx <= T.tx + R + 1; tx++) {
     if (tx < 0 || tz < 0 || tx >= w || tz >= h) continue;
@@ -98,20 +98,20 @@ export function carveFestival(gen, { opened = new Set(), specs = {} } = {}) {
   put('festival-floor', { x: C.x, z: C.z, y: 0.05 }, 'floor');   // 광장 돌 칸(윗면 ≈ 0.06) 위로 무늬가 보이게
   put('campfire', C, 'campfire');
   put('festival-stage', F.stage, 'BD-06');
-  for (const b of F.booths) put(opened.has(b.id) ? b.slug : 'festival-cover', { ...b, scale: BOOTH_SCALE }, b.id, { booth: b.id });
+  for (const b of F.booths) put(opened.has(b.id) ? b.slug : 'festival-cover', b, b.id, { booth: b.id });
   for (const [i, l] of F.lanterns.entries()) put('festival-lantern', l, `PR-14-${i + 1}`);
   for (const [i, g] of F.garlands.entries()) put('festival-garland', g, `PR-13-${i + 1}`);
   for (const [i, a] of F.arches.entries()) put('festival-arch', a, `BD-07-${i + 1}`);
   put('festival-board', F.board, 'PR-15');
   // 4. 무대 위는 걸을 수 있는 높은 바닥 (둘레 두 단 계단). 뒤 판·기둥은 충돌체 (스펙 world.collider)
   const pad = specs['festival-stage']?.world?.pad ?? { steps: [0.36, 0.24, 0.12], stepW: 0.18 };
-  const [sw, sd] = STAGE.size;
+  const [sw, sd] = STAGE_SIZE;
   gen.pads.push({ x0: F.stage.x - sw / 2, x1: F.stage.x + sw / 2, z0: F.stage.z - 1.5, z1: F.stage.z + 1.86, y: 0, steps: pad.steps, stepW: pad.stepW, festival: true });
   gen.places.festival = {
     x: C.x, z: C.z, center: C, radius: R, tile: T,
     stage: { x: F.stage.x, z: F.stage.z, front: { x: F.stage.x, z: F.stage.z + sd / 2 - 0.3 }, y: pad.steps[0] },
-    booths: F.booths.map(b => ({ id: b.id, slug: b.slug, part: b.part, x: b.x, z: b.z, rot: b.rot, angle: b.angle, scale: BOOTH_SCALE, front: around(C, b.angle, BOOTH_R - 1.35) })),
-    board: { x: F.board.x, z: F.board.z, rot: F.board.rot, front: around(C, BOARD_ANGLE, FESTIVAL_RADIUS - 0.1) },
+    booths: F.booths.map(b => ({ id: b.id, slug: b.slug, part: b.part, x: b.x, z: b.z, rot: b.rot, angle: b.angle, scale: b.scale, front: around(C, b.angle, F.boothR - 1.35) })),
+    board: { x: F.board.x, z: F.board.z, rot: F.board.rot, front: around(C, F.board.angle, R - 0.1) },
     arches: F.arches.map(a => ({ x: a.x, z: a.z })),
     lanterns: F.lanterns.map(l => ({ x: l.x, z: l.z })),
   };

@@ -1,41 +1,40 @@
 // 축제 부품 5개와 부스 (DOM·three 없음, node 로 확인). 검수 보드 z5 D20-B: 주민과 이모티콘으로 마음을 열고 🎉로 물으면
 // 그 주민이 필요한 것을 이모티콘으로 알려 주고, 섬에서 채집해 가져다주면 부품을 준다. 부품 하나 = 부스 하나 (D22-A 건네면 바로 선다).
+// 부품 목록·필요한 것·마음 여는 기준은 assets/festival/config.json 의 parts 칸 (결정이 바뀌면 그 파일만 고친다).
 import { tierOf } from '../town/rules.js';
-
-/** 마음을 열었나: 친구 단계(친밀도 30) + 이모티콘 대화로 기쁨 이상 두 번 */
-export const OPEN_TIER = 'friend';
-export const OPEN_WINS = 2;
+export const CONFIG_FILE = 'assets/festival/config.json';
 const TIER_ORDER = ['new', 'known', 'friend', 'close', 'best'];
 
-/**
- * need: 가방에서 무엇을 몇 개. pick(slots, items, c) → [{ slot, n }] | null (모자라면 null).
- * hint = 💭 말풍선 낱말, label = 알림 글 (화면 글자는 알림·메뉴에만)
- */
-export const PARTS = [
-  { id: 'FP-01', slug: 'festival-part-lantern', name: '반딧불 등불', emoji: '✨', who: 'chorong', booth: 'FB-01',
-    hint: ['bubble', 'bug', 'moon'], label: '곤충 3마리 (반딧불이면 1마리)',
-    pick: (slots, items) => takeAny(slots, items, it => it.id === 'bug.firefly', 1) ?? takeAny(slots, items, it => it.category === 'bug', 3) },
-  { id: 'FP-02', slug: 'festival-part-drum', name: '응원 북', emoji: '🥁', who: 'coco', booth: 'FB-02',
-    hint: ['bubble', 'item:mat.wood', 'music'], label: '나무 5개',
-    pick: (slots, items) => takeAny(slots, items, it => it.id === 'mat.wood', 5) },
-  { id: 'FP-03', slug: 'festival-part-garland', name: '꽃 가랜드', emoji: '🌸', who: 'mochi', booth: 'FB-03',
-    hint: ['bubble', 'flower', 'rainbow'], label: '꽃 6송이 (색 3가지 이상)',
-    pick: (slots, items) => takeVaried(slots, items, it => it.category === 'flower', 6, 3) },
-  { id: 'FP-04', slug: 'festival-part-pot', name: '과일 솥', emoji: '🍲', who: 'pong', booth: 'FB-04',
-    hint: ['bubble', 'fruit', 'yum'], label: '과일 5개 (섬 특산 아닌 과일 1개 포함)',
-    pick: (slots, items, c) => takeWithOne(slots, items, it => it.category === 'fruit', 5, it => it.id !== c?.nativeFruit) },
-  { id: 'FP-05', slug: 'festival-part-flag', name: '낚시 대회 깃발', emoji: '🚩', who: 'dubu', booth: 'FB-05',
-    hint: ['bubble', 'fish', 'bang'], label: '큰 물고기 1마리 (그림자가 큰 것)',
-    pick: (slots, items) => takeAny(slots, items, it => it.category === 'fish' && (it.shadow ?? 0) >= 5, 1) },
-];
-export const PART_BY_ID = Object.fromEntries(PARTS.map(p => [p.id, p]));
-export const PART_OF = Object.fromEntries(PARTS.map(p => [p.who, p]));
-/** 부품이 없는 주민의 축제 몫 (보리 = 개막 종, 단풍 = 사진사) */
-export const ROLES = { bori: 'bell', danpung: 'photo' };
+/** 아이템이 match 에 맞나: { id } · { category } · { shadowMin } */
+const matches = (m, it) => (!m.id || it.id === m.id) && (!m.category || it.category === m.category) && (m.shadowMin == null || (it.shadow ?? 0) >= m.shadowMin);
 
-/** 이 주민이 마음을 열었나 (v = state.villagers[slug]) */
-export function heartOpen(v) {
-  return TIER_ORDER.indexOf(tierOf(v?.friendship ?? 0)) >= TIER_ORDER.indexOf(OPEN_TIER) && (v?.emote?.wins ?? 0) >= OPEN_WINS;
+/**
+ * 설정의 need 칸 → pick(slots, items, c) → [{ slot, n }] | null (모자라면 null).
+ * need = { match, n } · { match, n, kinds } (서로 다른 것 kinds 가지 이상) · { match, n, oneNot: 'native' } (섬 특산 아닌 것 하나 이상) ·
+ *        { any: [need, …] } (앞에서부터 처음 맞는 것)
+ */
+export function needPicker(need) {
+  if (need.any) { const ps = need.any.map(needPicker); return (slots, items, c) => { for (const p of ps) { const r = p(slots, items, c); if (r) return r; } return null; }; }
+  const test = it => matches(need.match ?? {}, it);
+  if (need.kinds) return (slots, items) => takeVaried(slots, items, test, need.n, need.kinds);
+  if (need.oneNot === 'native') return (slots, items, c) => takeWithOne(slots, items, test, need.n, it => it.id !== c?.nativeFruit);
+  return (slots, items) => takeAny(slots, items, test, need.n);
+}
+
+/** 설정 → 부품 도구 { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen(v) } */
+export function makeParts(cfg) {
+  const P = cfg.parts;
+  const PARTS = P.list.map(p => ({ ...p, pick: needPicker(p.need) }));
+  const open = P.open ?? { tier: 'friend', wins: 2 };
+  return {
+    PARTS,
+    PART_BY_ID: Object.fromEntries(PARTS.map(p => [p.id, p])),
+    PART_OF: Object.fromEntries(PARTS.map(p => [p.who, p])),
+    /** 부품이 없는 주민의 축제 몫 (보리 = 개막 종, 단풍 = 사진사) */
+    ROLES: P.roles ?? {},
+    /** 이 주민이 마음을 열었나 (v = state.villagers[slug]). D20-A(마음 열기만)·C(탐험)는 method 로 */
+    heartOpen: v => TIER_ORDER.indexOf(tierOf(v?.friendship ?? 0)) >= TIER_ORDER.indexOf(open.tier) && (v?.emote?.wins ?? 0) >= open.wins,
+  };
 }
 
 const slotItems = (slots, items) => slots.map((s, slot) => (s ? { slot, n: s.count ?? 1, item: items.get(s.id) } : null)).filter(x => x?.item);
@@ -94,15 +93,15 @@ export function festState(state) {
   return f;
 }
 export const partCount = f => Object.keys(f.parts ?? {}).length;
-export const allParts = f => PARTS.every(p => f.parts?.[p.id]);
+export const allParts = (f, PARTS) => PARTS.every(p => f.parts?.[p.id]);
 
 /**
  * 축제 날인가 (D23-A 다 모은 다음 날부터 — 놓쳐도 다음 날 다시 · D25-A 연 뒤엔 해마다 같은 날).
- * f = state.festival, key = 오늘 dayKey
+ * f = state.festival, key = 오늘 dayKey, yearly = 설정 after.mode 가 'yearly' 인가
  */
-export function festivalDueOn(f, key) {
+export function festivalDueOn(f, key, { yearly = true } = {}) {
   if (!key) return false;
   if (f.readyDay && !f.heldDay) return key > f.readyDay;
-  if (f.heldDay && key.slice(5) === f.heldDay.slice(5) && key.slice(0, 4) > (f.lastYear ?? f.heldDay.slice(0, 4))) return true;
+  if (yearly && f.heldDay && key.slice(5) === f.heldDay.slice(5) && key.slice(0, 4) > (f.lastYear ?? f.heldDay.slice(0, 4))) return true;
   return false;
 }

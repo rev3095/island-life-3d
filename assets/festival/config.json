@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "board": "z5",
+  "applied": 1,
+  "note": "Z5 축제 설정 — 검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS) 반영 v1 (임시, 바뀔 수 있음). 결정이 바뀌면 되도록 이 파일과 스펙만 고친다. 칸마다 어떤 결정(D)인지, 다른 안으로 바꿀 때 무엇을 더 해야 하는지는 docs/notes/z5-festival.md '바꿀 자리' 표.",
+  "decisions": { "D14": "A", "D15": "A", "D16": "A", "D17": "A", "D18": "A", "D19": "A", "D20": "B", "D21": "A", "D22": "A", "D23": "A", "D24": "A", "D25": "A" },
+
+  "talk": {
+    "mode": "emote",
+    "scope": "villagers",
+    "art": "svg",
+    "palette": { "size": 30, "slots": 3 },
+    "judge": "personality+want",
+    "tutorial": true
+  },
+
+  "plaza": {
+    "mode": "widen",
+    "shiftX": 3,
+    "radius": 6,
+    "stage": { "r": 5.0, "dx": 0.9 },
+    "boothR": 5.15,
+    "boothScale": 0.78,
+    "boothAngles": { "FB-01": 112, "FB-02": 304, "FB-03": 234, "FB-04": 170, "FB-05": 202 },
+    "lanterns": [52, 91, 136, 185, 217, 249, 288, 320],
+    "arches": [270, 72],
+    "boardAngle": 284
+  },
+
+  "parts": {
+    "method": "heart+gather",
+    "open": { "tier": "friend", "wins": 2 },
+    "list": [
+      { "id": "FP-01", "slug": "festival-part-lantern", "name": "반딧불 등불", "emoji": "✨", "who": "chorong", "booth": "FB-01",
+        "hint": ["bubble", "bug", "moon"], "label": "곤충 3마리 (반딧불이면 1마리)",
+        "need": { "any": [{ "match": { "id": "bug.firefly" }, "n": 1 }, { "match": { "category": "bug" }, "n": 3 }] } },
+      { "id": "FP-02", "slug": "festival-part-drum", "name": "응원 북", "emoji": "🥁", "who": "coco", "booth": "FB-02",
+        "hint": ["bubble", "item:mat.wood", "music"], "label": "나무 5개",
+        "need": { "match": { "id": "mat.wood" }, "n": 5 } },
+      { "id": "FP-03", "slug": "festival-part-garland", "name": "꽃 가랜드", "emoji": "🌸", "who": "mochi", "booth": "FB-03",
+        "hint": ["bubble", "flower", "rainbow"], "label": "꽃 6송이 (색 3가지 이상)",
+        "need": { "match": { "category": "flower" }, "n": 6, "kinds": 3 } },
+      { "id": "FP-04", "slug": "festival-part-pot", "name": "과일 솥", "emoji": "🍲", "who": "pong", "booth": "FB-04",
+        "hint": ["bubble", "fruit", "yum"], "label": "과일 5개 (섬 특산 아닌 과일 1개 포함)",
+        "need": { "match": { "category": "fruit" }, "n": 5, "oneNot": "native" } },
+      { "id": "FP-05", "slug": "festival-part-flag", "name": "낚시 대회 깃발", "emoji": "🚩", "who": "dubu", "booth": "FB-05",
+        "hint": ["bubble", "fish", "bang"], "label": "큰 물고기 1마리 (그림자가 큰 것)",
+        "need": { "match": { "category": "fish", "shadowMin": 5 }, "n": 1 } }
+    ],
+    "roles": { "bori": "bell", "danpung": "photo" }
+  },
+
+  "booths": {
+    "set": "play",
+    "appear": "immediate",
+    "list": [
+      { "id": "FB-01", "slug": "festival-booth-lantern", "name": "등불 길", "play": "lantern", "label": "등불 띄우기", "owner": "chorong" },
+      { "id": "FB-02", "slug": "festival-booth-music", "name": "음악 무대", "play": "music", "label": "북 치기", "owner": "coco" },
+      { "id": "FB-03", "slug": "festival-booth-flower", "name": "꽃 공방", "play": "flower", "label": "화관 만들기", "owner": "mochi" },
+      { "id": "FB-04", "slug": "festival-booth-food", "name": "먹거리", "play": "food", "label": "요리하기", "owner": "pong" },
+      { "id": "FB-05", "slug": "festival-booth-fish", "name": "낚시 대회", "play": "fish", "label": "물고기 재기", "owner": "dubu" }
+    ],
+    "rules": { "flowers": 3, "fruits": 2, "foodPerDay": 3, "friendPoints": 2 }
+  },
+
+  "festival": { "start": "nextDayEvening", "hour": 18 },
+  "photo": { "mode": "stageGroup", "item": "furn.festival-photo", "save": true },
+  "after": { "mode": "yearly" }
+}

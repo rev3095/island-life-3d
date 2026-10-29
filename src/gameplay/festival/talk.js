@@ -17,7 +17,10 @@ const MOTION = {
 MOTION.hop = MOTION.jump; MOTION.flap = MOTION.jump; MOTION.wag = MOTION.nod; MOTION.sway = MOTION.tilt;
 MOTION.yawn = MOTION.tilt; MOTION.droop = MOTION.back; MOTION.turn = MOTION.shake; MOTION.rub = MOTION.nod; MOTION.puff = MOTION.tilt; MOTION.curl = MOTION.tilt;
 
-export function createEmoteTalk(ctx, emo) {
+export function createEmoteTalk(ctx, emo, cfg = {}) {
+  // D14 대화 방식: emote(이모티콘으로만, 반영 v1) · emote+text(이모티콘 + 짧은 글 — 아직 없어서 emote 로) · text(글 대사 그대로)
+  const MODE = cfg.talk?.mode ?? 'emote';
+  if (!['emote', 'text'].includes(MODE)) console.warn(`[festival] 설정 talk.mode = ${MODE} 은 아직 없어서 emote 로 해요`);
   const rules = emo.rules;
   const motions = [];
   let active = null;
@@ -124,7 +127,7 @@ export function createEmoteTalk(ctx, emo) {
 
   return {
     /** 이모티콘 대화를 쓰나 (섬폰 '주민 글 대사 보기' 가 꺼져 있으면) */
-    on: () => ctx.state.settings?.textLines !== true,
+    on: () => MODE !== 'text' && ctx.state.settings?.textLines !== true,
     session,
     update(dt) {
       for (let i = motions.length - 1; i >= 0; i--) {
