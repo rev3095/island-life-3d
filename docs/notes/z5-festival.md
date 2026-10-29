@@ -22,7 +22,7 @@ main 453379a 를 합친 뒤(a014b36) 구현. 커밋: P2 4d5908e · P3 c396f5b ·
 | D16 그림 | `talk.art` = `svg` | `glyph` = `festival/emotes.js` `svg()` 대신 `glyph` 칸 글자. 3D(C) = 이모티콘 모델 파이프라인 새로 |
 | D17 팔레트 | `talk.palette` = 30개 · 3칸 | 수·묶음은 `assets/emotes/emotes.json` (`cat` 칸). 12개 한 판(B) = 묶음 하나로, 늘어남(C) = 주민 단계별 잠금 칸 추가 |
 | D18 판정 | `talk.judge` = `personality+want` · 규칙 `assets/emotes/talk.json` | 원하는 것만(B) = `talk.json` 의 `rule` 을 비움. 판정 없음(C) = `judge.js` 가 늘 `okay`(points 0) |
-| D19 광장 | `plaza` (mode `widen` · shiftX 3 · radius 6 · 부스 각도 · 등불 · 아치 · 진행판) | 숫자만 바꾸면 `world/festival.js` 가 따른다 (겹침·길 막힘은 테스트가 잡는다). 강 양쪽(B)·언덕(C) = `festivalLayout` 에 모양 추가. **6차 M6-P5 가 섬 배치를 `assets/island/layout.json` 으로 옮기면 이 칸을 그쪽으로** |
+| D19 광장 | 가운데·반지름 = **섬 지도 `assets/island/layout.json` 의 `festival` 칸** (`at` [0.422, 0.54] = 칸 (27,30), `r` 6 — 섬 지도 편집기에서 고친다). 둘레 = 설정 `plaza` (무대 · 부스 각도 · 등불 · 아치 · 진행판) | 숫자만 바꾸면 `world/festival.js` 가 따른다 (겹침·길 막힘·물 걸침은 테스트가 잡는다 — 가운데를 옮기면 각도를 다시 맞출 것). 강 양쪽(B)·언덕(C) = `festivalLayout` 에 모양 추가 |
 | D20 부품 얻기 | `parts.method` = `heart+gather` · `parts.open` · `parts.list[].need` | 필요한 것·마음 여는 기준은 이 칸만. 마음 열기만(A) = need 없이 `fest.js ask` 에서 바로 부품, 탐험(C) = 섬에 숨기는 쪽(world·gather) 추가 |
 | D21 부스 | `booths.list` (id·slug·play·label·owner) · `booths.rules` | 장터(B)·전시(C) = `festival/booths.js` 에 놀이 함수 추가하고 `play` 이름만 바꿈. 부스 모델은 배경 스펙 |
 | D22 서는 때 | `booths.appear` = `immediate` | 다음 날 아침(B) = `fest.js openBooth` 를 `data:newday` 로 미룸. 정해진 순서(C) = `parts.list` 순서대로만 🎉 받기 |
@@ -31,6 +31,8 @@ main 453379a 를 합친 뒤(a014b36) 구현. 커밋: P2 4d5908e · P3 c396f5b ·
 | D25 엔딩 뒤 | `after.mode` = `yearly` | `boothsOnly`(C) = 이미 됨 (해마다 축제 끔). 앨범 도전(B) = 섬폰 앨범 화면 추가 |
 
 아이템: 축제 분류·음식 넷·FU-34 는 `src/data/festival-items.js`, items.js 에는 붙이는 줄 6줄 (6차 M6-P5 가 표를 JSON 으로 옮길 때 같이).
+
+축제 곡: `assets/sound/songs/festival.json` (BGM-10 섬 축제, 반주 모양 `shop`) · `index.json` `schedule.places.festival` — 축제 시작부터 사진 엔딩까지 `bgm('festival')`, 끝나면 `auto` (장면이 끝날 때마다 다시 부른다). 곡을 바꾸려면 소리 편집기에서 그 표만.
 
 ## 다른 트랙과의 약속 (합칠 때 CONTRACTS 로)
 - **상태** `ctx.state.festival` (주인: gameplay/festival): `{ talkTutorial, started, parts: {FP-id: dayKey}, booths: {FB-id: {openedDay, …놀이 기록}}, asked: {slug: dayKey}, readyDay, heldDay, lastYear, festivals: [dayKey], endedDay, photos: [{day}], announced, photoPending }`. 주민별 이모티콘 기록은 `state.villagers[slug].emote = { day, today, wins, wantDone }`.

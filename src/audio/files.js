@@ -13,5 +13,6 @@ export const SONG_FILES = [
   'assets/sound/songs/indoor.json',
   'assets/sound/songs/shop.json',
   'assets/sound/songs/museum.json',
+  'assets/sound/songs/festival.json',   // 5차 Z5 축제 (schedule.places.festival)
 ];
 export const songFile = id => `assets/sound/songs/${id}.json`;

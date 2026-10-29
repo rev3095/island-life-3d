@@ -1,0 +1,40 @@
+{
+  "id": "festival",
+  "version": 1,
+  "code": "BGM-10",
+  "title": "섬 축제",
+  "mood": "축제 행진 (5차 Z5)",
+  "bpm": 120,
+  "meter": 4,
+  "bars": 16,
+  "gain": 1.3,
+  "room": "medium",
+  "key": "F",
+  "scale": "major",
+  "arrange": "shop",
+  "channels": {
+    "mel": { "label": "멜로디", "gain": 0.62, "pan": 0.12, "verb": 0.16 },
+    "bell": { "label": "종", "gain": 0.5, "pan": 0.3, "verb": 0.25 },
+    "keys": { "label": "건반", "gain": 0.5, "pan": -0.25, "verb": 0.14 },
+    "bass": { "label": "베이스", "gain": 0.62, "pan": 0, "verb": 0.02 },
+    "drums": { "label": "드럼", "gain": 0.5, "pan": 0, "verb": 0.05 },
+    "perc": { "label": "타악기", "gain": 0.4, "pan": 0.3, "verb": 0.08 }
+  },
+  "parts": {
+    "melody": { "label": "멜로디", "inst": "marimba", "ch": "mel" },
+    "bell": { "label": "종 겹치기 (두 번째 바퀴)", "inst": "bell", "ch": "bell" },
+    "keys": { "label": "뒷박 화음", "inst": "pluck", "ch": "keys" },
+    "bass": { "label": "베이스", "inst": "pluckbass", "ch": "bass" },
+    "kick": { "label": "킥", "inst": "kick", "ch": "drums" },
+    "snap": { "label": "핑거 스냅", "inst": "snap", "ch": "drums" },
+    "shaker": { "label": "셰이커", "inst": "shaker", "ch": "perc" },
+    "wood": { "label": "우드블록", "inst": "wood", "ch": "perc" }
+  },
+  "prog": ["F | Dm | Bb | C | F | Am | Gm C | F | Bb | C | Am | Dm | Bb | C | Gm C | F"],
+  "mel": [
+    "a5:.5 c6 a5 f5 c5:1 f5 | d5:.5 f5 a5 f5 d5:2 | bb4:.5 d5 f5 d5 bb5:1 a5 | g5:.5 a5 g5 e5 c5:2 |",
+    "a5:.5 c6 a5 f5 c5:1 a5 | c6:.5 b5 a5 e5 c5:2 | bb5:.5 a5 g5 d5 e5:1 g5 | f5:3 r:1 |",
+    "d6:1 c6:.5 bb5 a5:1 f5 | e5:.5 f5 g5 a5 g5:2 | c6:1 b5:.5 a5 e5:1 a5 | f5:.5 e5 d5 e5 f5:1 a5 |",
+    "bb5:.5 a5 bb5 d6 f6:1 d6 | c6:.5 bb5 a5 g5 e5:2 | d5:.5 e5 g5 bb5 a5:1 g5 | f5:.5 r c5 f5 r:2"
+  ]
+}

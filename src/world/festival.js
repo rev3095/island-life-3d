@@ -4,8 +4,8 @@
 //          깃발 줄 PR-13 ×8 · 진행판 PR-15 · 모닥불. 자리는 gen.places.festival (story·gameplay 가 쓴다).
 import { KIND } from './island.js';
 
-// 자리 숫자(가운데를 옮길 칸·반지름·부스 각도·등불·아치·진행판)는 assets/festival/config.json 의 plaza 칸 (D19), 부스 목록은 booths 칸 (D21).
-// 6차 M6-P5 가 섬 배치를 assets/island/layout.json 으로 옮기면 plaza 칸을 그쪽으로 옮긴다. 아래는 모델 크기에서 온 값.
+// 광장 가운데·반지름은 섬 지도 assets/island/layout.json 의 festival 칸 (at = 섬 크기 비율, r = 칸, 섬 지도 편집기에서 고친다).
+// 둘레 자리 숫자(무대·부스 각도·등불·아치·진행판)는 assets/festival/config.json 의 plaza 칸 (D19), 부스 목록은 booths 칸 (D21). 아래는 모델 크기에서 온 값.
 export const BOOTH_SIZE = [2.96, 1.93];            // 부스 모델 크기 (가로, 깊이)
 export const STAGE_SIZE = [5.72, 3.48];             // 무대 모델 크기
 const LANTERN_R_OUT = 0.3;                          // 등불 기둥은 원 가장자리보다 이만큼 바깥
@@ -52,9 +52,11 @@ export function overlaps(A, B, gap = 0) {
 /** 축제 광장 자리 계산 (gen 을 고치지 않는다). cfg = assets/festival/config.json */
 export function festivalLayout(gen, cfg) {
   const { w, h } = gen;
-  const Lo = layoutOf(cfg), R = Lo.radius;
+  const Lo = layoutOf(cfg);
+  const lf = gen.layout?.festival;   // 섬 지도의 축제 자리 (없으면 설정의 shiftX — 지금 광장에서 동쪽으로)
+  const R = lf?.r ?? Lo.radius;
   const p = gen.places.plaza;
-  const tile = { tx: Math.floor(p.x + w / 2) + Lo.shiftX, tz: Math.floor(p.z + h / 2) };
+  const tile = lf?.at ? { tx: Math.round(w * lf.at[0]), tz: Math.round(h * lf.at[1]) } : { tx: Math.floor(p.x + w / 2) + Lo.shiftX, tz: Math.floor(p.z + h / 2) };
   const center = { x: tile.tx + 0.5 - w / 2, z: tile.tz + 0.5 - h / 2 };
   const stage = { slug: 'festival-stage', x: center.x + Lo.stage.dx, z: center.z - Lo.stage.r, rot: 0 };
   const booths = Lo.booths.map(b => ({ ...b, ...around(center, b.angle, Lo.boothR), rot: faceCenter(b.angle), scale: Lo.boothScale }));

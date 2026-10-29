@@ -33,7 +33,7 @@ export const DEFAULT_LAYOUT = deepFreeze({
   villagers: { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47], danpung: [0.73, 0.67] },
   orchard: [0.81, 0.76],                   // 과수원 언덕 (고장 과일나무)
   rocks: [[0.18, 0.37], [0.2, 0.4], [0.22, 0.36], [0.62, 0.2], [0.86, 0.62], [0.4, 0.86]],
-  festival: { at: [0.453, 0.54], r: 6 },   // 축제 광장 빈 자리 (M5 Z5 몫 — 지금 섬 만들기는 안 읽는다)
+  festival: { at: [0.422, 0.54], r: 6 },   // 축제 광장 가운데·반지름 (5차 Z5 world/festival.js 가 읽는다 — 섬을 만든 뒤 지금 광장을 넓혀 깐다)
   density: {                               // 나무·꽃 밀도: 최대 개수, forest = 숲 잡음에 곱하는 세기
     trees: 78, cedars: 26, fruitTrees: 5, fruitChance: 0.1, forest: 1, orchardTrees: 7, palms: 12,
     flowerClusters: 14, flowerSize: [4, 8], bushes: 8, weeds: 32, shells: 11, fossils: 4,
