@@ -1,4 +1,6 @@
 // 주민과 대화: 인사 → 잡담 / 부탁 있어? / 선물 주기 / 잘 가. 친밀도·부탁·선물·답례는 rules.js, 대사는 lines/.
+// 5차 생일(party.js): 주민 생일엔 생일 인사·케이크 한 번·선물 친밀도 3배, 플레이어 생일엔 그날 처음 말 걸 때 축하.
+import { BIRTHDAY_GIFT_MULT } from '../../data/birthdays.js';
 import {
   villagerState, tierOf, dailyTalk, addFriendship, greetingLines, chatLines, pickLines, fill, slotOf,
   makeRequest, matchesRequest, currentRequest, requestReward, receiveGift, giftBack, surpriseGift,
@@ -48,7 +50,7 @@ export function giveItem(ctx, id, n = 1, opts = {}) {
   return res.left;
 }
 
-export function createTalk(ctx, { lines }) {
+export function createTalk(ctx, { lines, party = null }) {
   const data = () => ctx.services.data;
   const ui = () => ctx.services.ui;
   const itemName = id => data()?.items?.get?.(id)?.name ?? id;
@@ -77,15 +79,36 @@ export function createTalk(ctx, { lines }) {
     v.met = true;
     const daily = dailyTalk(v, c.dayKey);
     const cc = { ...c, tier: tierOf(v.friendship), r, recent };
+    const B = L.birthday;
+    const bday = !!(B && party?.isBirthday(V.slug, c.dayKey));
 
     // 인사 (처음 만나면 자기소개, 집에 가던 길이면 그 얘기)
     let greet;
-    if (first) greet = L.intro.slice();
+    if (first) greet = bday ? [...L.intro, ...pickLines(B.self, r, recent)] : L.intro.slice();
     else if (V.talkFrom === 'toDoor') greet = [...pickLines(L.greet[c.slot] ?? L.greet.evening, r, recent), ...pickLines(L.goingHome, r, recent)];
     else if (V.chatWith && L.chatting) { vars.other = V.chatWith.person.name; greet = pickLines(L.chatting, r, recent); }
+    else if (bday && daily.first) greet = pickLines(B.self, r, recent);
     else greet = greetingLines(L, cc);
     V.chatWith = null;
+    // 플레이어 생일: 그날 처음 말 걸면 축하 한마디
+    if (B && v.cheerDay !== c.dayKey && party?.isPlayerBirthday(c.dayKey)) {
+      v.cheerDay = c.dayKey;
+      greet.push(...pickLines(B.player, r, recent));
+      V.happy();
+    }
     if (daily.up) greet.push(...tierUp(daily.up));   // 말 걸기 보너스로 단계가 올랐으면 인사에 붙인다
+
+    // 자기 생일: 파티 케이크를 한 번 나눠 준다 (케이크 가구가 아이템 사전에 있을 때)
+    const cake = bday && v.cakeDay !== c.dayKey ? party.cake() : null;
+    if (cake) {
+      v.cakeDay = c.dayKey;
+      vars.item = itemName(cake);
+      await say([...greet, ...pickLines(B.cake, r)]);
+      greet = [];
+      V.happy();
+      const left = giveItem(ctx, cake);
+      if (left > 0) { giveLater(v, cake, left); await say(pickLines(L.gift.full, r)); }
+    }
 
     // 지난번에 가방이 꽉 차서 못 준 물건 (항목은 id 또는 { id, variant })
     if (v.pending.length) {
@@ -200,11 +223,13 @@ export function createTalk(ctx, { lines }) {
       if (req && matchesRequest(req, item)) { vars.want = req.label; await completeRequest(slot, req); return; }
       d.inventory.remove(slot, 1);
       ctx.events.emit('sfx', { name: 'pickup' });
-      const res = receiveGift(v, P, item, c.dayKey);
+      const res = receiveGift(v, P, item, c.dayKey, bday ? BIRTHDAY_GIFT_MULT : 1);
       note(res.up);
       vars.item = item.name;
-      if (res.reaction === 'love' || res.reaction === 'like') V.happy();
-      await say(pickLines(v.giftsToday > 3 ? L.gift.many : L.gift[res.reaction], r, recent));
+      if (res.reaction === 'love' || res.reaction === 'like' || bday) V.happy();
+      const said = pickLines(v.giftsToday > 3 ? L.gift.many : L.gift[res.reaction], r, recent);
+      if (bday && res.reaction !== 'dislike' && v.giftsToday <= 3) said.push(...pickLines(B.gift, r, recent));   // 생일 선물은 더 기뻐한다
+      await say(said);
       const back = giftBack(v, P, res.reaction, c.dayKey, r);
       if (back) {
         vars.item = itemName(back);
@@ -215,11 +240,17 @@ export function createTalk(ctx, { lines }) {
     }
   }
 
-  /** 집에 있는 주민 문 두드리기 */
+  /** 집에 있는 주민 문 두드리기 (생일인 낮엔 문 너머로 불러들이고 생일 대화) */
   async function knock(V) {
     const L = lines[V.slug];
     const c = context(ctx);
     const late = c.slot === 'night' || c.slot === 'dawn';
+    if (!late && L.birthday && party?.isBirthday(V.slug, c.dayKey)) {
+      ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
+      await speaker(ctx, V.person)(pickLines(L.birthday.door, Math.random));
+      await converse(V);
+      return;
+    }
     const pool = late ? L.home.sleep : c.weather === 'snow' ? L.home.snow ?? L.home.rain : c.weather === 'rain' ? L.home.rain : L.home.day;
     ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
     await speaker(ctx, V.person)(pickLines(pool, Math.random));

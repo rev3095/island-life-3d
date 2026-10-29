@@ -17,7 +17,9 @@ export const DAY_PARTS = [
   { id: 'night', from: 19, to: 29 },   // 19시 ~ 다음날 5시
 ];
 
-export const CHARACTERS = ['player', 'coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'bamtol', 'neuru'];
-export const VILLAGERS = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'];
+export const CHARACTERS = ['player', 'coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'bamtol', 'neuru', 'danpung'];
+/** 섬 주민 (집터가 있는 순서). NEWCOMERS 는 처음엔 빈 집터이고 이사 흐름(town/movein.js)이 끝나야 섬에 산다 */
+export const VILLAGERS = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'danpung'];
+export const NEWCOMERS = ['danpung'];
 
 export const TOOLS = ['rod', 'net', 'shovel', 'axe', 'can'];   // 낚싯대, 잠자리채, 삽, 도끼, 물뿌리개

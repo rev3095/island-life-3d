@@ -1,0 +1,77 @@
+{
+  "id": "CH-10",
+  "slug": "danpung",
+  "name": "단풍",
+  "species": "fox",
+  "role": "주민 · 여우 (새로 이사 옴)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬으로 이사 온 꼼꼼한 수집가 여우. 박물관 기증을 제일 좋아하고, 가을이 오면 신이 나서 꼬리를 흔든다.",
+    "keywords": [
+      "동글동글",
+      "소프트비닐 피규어",
+      "2.5등신",
+      "큰 머리",
+      "짧은 팔다리",
+      "단풍잎 주홍",
+      "귀 끝 진한 색",
+      "흰 주둥이",
+      "꼬리 끝 흰색"
+    ],
+    "references": [
+      "매끈한 소프트비닐 토이 피규어의 표면감",
+      "가을 단풍잎 같은 주홍 여우",
+      "검수 보드 CH-10 얼굴 스케치 (concept/wave5-board.html)"
+    ],
+    "avoid": [
+      "사실적인 털 표현",
+      "교활하거나 날카로운 인상",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "고양이 귀 + 다람쥐 꼬리 부품을 다시 쓴다 (새 부품 없음). 테마 색 #D9583B."
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 1,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1.08,
+    "earPointiness": 1.2,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#E8744B",
+    "tail": "#E07040",
+    "tailTip": "#FBF7F2",
+    "earTip": "#4A3B32",
+    "muzzle": "#FBF7F2",
+    "innerEar": "#FBE3D4",
+    "eye": "#3A2A22",
+    "nose": "#3A2A22",
+    "blush": "#F6A8A0",
+    "shirt": "#F4E6C8",
+    "stripe": "#D9583B",
+    "pants": "#6B4A3A",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 1,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

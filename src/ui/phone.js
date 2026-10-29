@@ -1,6 +1,7 @@
 // 섬폰: 도감·지도·레시피·가방·설정·저장 앱. 앱 화면에서 Esc(B) 는 첫 화면으로, 첫 화면에서는 닫기.
 import { h, fmt, itemInfo, iconEl, recipeNeeds, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
 import { panelShell, gridMove, button } from './panels.js';
+import { birthdayLabel, mmdd } from '../data/birthdays.js';
 
 const APPS = [
   { id: 'dex', name: '도감', icon: '📖', color: '#9ED3A8' },
@@ -195,6 +196,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     drawStyle();
     view.append(...[
       nameRows(),
+      birthdayRows(),
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
       h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
@@ -219,6 +221,38 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       h('div', { class: 'pk-set-row' }, h('span', null, '내 이름'), h('b', { class: 'pk-set-val' }, me.player || '아직 없어요')),
       h('div', { class: 'pk-set-row' }, h('span', null, '섬 이름'), h('b', { class: 'pk-set-val' }, me.island || '아직 없어요')),
       h('div', { class: 'pk-set-row pk-set-action' }, go));
+  }
+
+  /** 내 생일 (5차 D11-A): 달·날을 골라 정하면 그날 주민들이 축하해 준다. 칸은 town 몫이라 town.birthday.setPlayer 로 */
+  function birthdayRows() {
+    const bd = ctx.services.town?.birthday;
+    if (!bd?.setPlayer) return null;
+    const box = h('div', { class: 'pk-set-names pk-set-birthday' });
+    const sel = (label, n, value) => h('select', { 'aria-label': label, class: 'pk-select',
+      style: { minHeight: '40px', padding: '0 8px', borderRadius: '12px', border: '2px solid var(--pk-edge, #d9c7a3)', background: 'var(--pk-cream, #fffaf0)', font: '15px var(--pk-display, inherit)' } },
+    Array.from({ length: n }, (_, i) => h('option', { value: String(i + 1), selected: i + 1 === value || undefined }, `${i + 1}${label}`)));
+    function draw() {
+      const cur = bd.player();
+      const today = ctx.services.time?.now?.();
+      const m = sel('월', 12, cur ? Number(cur.slice(0, 2)) : today?.month ?? 1);
+      const d = sel('일', 31, cur ? Number(cur.slice(3)) : today?.day ?? 1);
+      const set = button(cur ? '바꾸기' : '정하기', { onclick: () => {
+        if (!mmdd(m.value, d.value)) { toast('그런 날은 없어요. 날짜를 다시 골라 주세요', '📅'); return; }
+        const s = bd.setPlayer(Number(m.value), Number(d.value));
+        toast(bd.isPlayerToday?.() ? '오늘이 생일이었군요! 생일 축하해요' : `내 생일을 ${birthdayLabel(s)}로 정했어요`, '🎂');
+        draw();
+      } });
+      const clear = cur && button('지우기', { onclick: () => { bd.setPlayer(null); toast('내 생일을 지웠어요', '🎂'); draw(); } });
+      const todays = (bd.today?.() ?? []).map(slug => ctx.services.town?.villagers?.find(V => V.slug === slug)?.person?.name ?? slug);
+      box.replaceChildren(
+        h('h3', { class: 'pk-set-head' }, '생일'),
+        h('div', { class: 'pk-set-row' }, h('span', null, '내 생일'), h('b', { class: 'pk-set-val' }, cur ? `${birthdayLabel(cur)}${bd.isPlayerToday?.() ? ' 🎂' : ''}` : '아직 없어요')),
+        h('div', { class: 'pk-set-row pk-set-action', style: { display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'flex-end' } }, m, d, set, clear),
+        todays.length > 0 && h('p', { class: 'pk-muted pk-small' }, `🎈 오늘은 ${todays.join(', ')}의 생일이에요`),
+      );
+    }
+    draw();
+    return box;
   }
 
   /** 전체 화면 (휴대폰에서 주소창을 숨긴다). 브라우저·아티팩트 틀이 막으면 줄을 안 보인다. 저장하지 않는다 */

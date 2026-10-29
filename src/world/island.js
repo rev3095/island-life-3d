@@ -3,6 +3,7 @@
 // 좌표: 타일 (tx, tz) — tx 0 = 서쪽, tz 0 = 북쪽. 월드 (x, z) 는 섬 가운데가 원점, 타일 1칸 = 1.0, 북쪽 = -Z.
 // 대략적인 배치는 concept/concept-board.html 의 MAP (640×560 그림 = 64×56 타일, 10px = 1칸) 을 따른다.
 import { mulberry32, valueNoise, shuffle, pick } from './rng.js';
+import { NEWCOMERS } from '../core/constants.js';
 
 export const KIND = { SEA: 0, SAND: 1, GRASS: 2, PATH: 3, PLAZA: 4, WATER: 5, CLIFF: 6, RAMP: 7 };
 export const KIND_NAMES = ['sea', 'sand', 'grass', 'path', 'plaza', 'water', 'cliff', 'ramp'];
@@ -28,7 +29,7 @@ export const lotsOf = specs => Object.fromEntries(BUILDING_KINDS.map(k => {
  * 섬 만들기. 돌려주는 값은 순수 데이터 (배열·목록) 이고, createIslandApi 가 조회 함수를 붙인다.
  * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads }}
  */
-export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], nativeFruit: fruitWanted = null, lots } = {}) {
+export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], newcomers = NEWCOMERS, nativeFruit: fruitWanted = null, lots } = {}) {
   if (!lots) throw new Error('[world] generateIsland 에 lots(건물 집터)가 필요하다 — lotsOf(배경 스펙)');
   const rng = mulberry32(seed);
   const N = w * h;
@@ -255,22 +256,25 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     for (let tz = tz0 - 1; tz <= tz0 + fd + 1; tz++) for (let tx = tx0 - 1; tx <= tx0 + fw; tx++) occ[idx(tx, tz)] = -1;
     const b = { kind, tx0, tz0, fw, fd, x, z, door, level: lvl, data };
     buildings.push(b);
-    addObj(kind, tx0 + Math.floor(fw / 2), tz0 + Math.floor(fd / 2), { x, z, rot: 0, data, variant: data?.variant, force: true });
+    // 빈 집터(data.lot): 건물은 놓지 않고 자리만 잡는다. 집이 서면 town 이 objects.add 로 놓고 문 앞 계단(pad.off)을 켠다
+    if (!data?.lot) addObj(kind, tx0 + Math.floor(fw / 2), tz0 + Math.floor(fd / 2), { x, z, rot: 0, data, variant: data?.variant, force: true });
     const y = lvl * LEVEL_HEIGHT;
     if (kind === 'museum') pads.push({ x0: x - 2.95, x1: x + 2.95, z0: z - 2.25, z1: z + 2.85, y, steps: [0.45, 0.3, 0.15], stepW: 0.15 });
     else if (kind === 'shop') pads.push({ x0: x - 2.07, x1: x + 2.07, z0: z + 1.3, z1: z + 1.89, y, h: 0.12 });
-    else pads.push({ x0: x - 1.27, x1: x + 1.27, z0: z + 1.1, z1: z + 1.59, y, h: 0.12 });
+    else pads.push({ x0: x - 1.27, x1: x + 1.27, z0: z + 1.1, z1: z + 1.59, y, h: 0.12, off: !!data?.lot });
+    b.pad = pads[pads.length - 1];
     return b;
   };
 
   const museum = placeBuilding('museum', w * 0.345, h * 0.3, 1, {}) ?? placeBuilding('museum', w * 0.345, h * 0.42, 0, {});   // 언덕에 자리가 없으면 아래에
   const shop = placeBuilding('shop', w * 0.728, h * 0.535, 0, {});
   const playerHouse = placeBuilding('house-player', w * 0.273, h * 0.73, 0, { owner: 'player' });
-  const VILLAGER_SPOTS = { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47] };
+  const VILLAGER_SPOTS = { coco: [0.21, 0.5], bori: [0.26, 0.61], mochi: [0.44, 0.71], dubu: [0.5, 0.8], pong: [0.72, 0.445], chorong: [0.81, 0.47], danpung: [0.73, 0.67] };
   const villagerHouses = [];
   for (const slug of villagers) {
     const [fx, fz] = VILLAGER_SPOTS[slug] ?? [0.5, 0.5];
-    const b = placeBuilding('house-villager', w * fx, h * fz, 0, { owner: slug, variant: slug });
+    const lot = newcomers.includes(slug);   // 이사 올 주민: 처음엔 빈 집터
+    const b = placeBuilding('house-villager', w * fx, h * fz, 0, { owner: slug, variant: slug, ...(lot ? { lot: true } : {}) });
     if (b) villagerHouses.push(b);
   }
 
@@ -370,7 +374,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   const MAIL = { player: 'red', coco: 'red', bori: 'blue', mochi: 'yellow', dubu: 'green', pong: 'blue', chorong: 'yellow' };
   for (const b of buildings) {
     if (b.kind === 'house-player' || b.kind === 'house-villager') {
-      addObj('mailbox', b.door.tx + 1, b.door.tz, { force: true, variant: MAIL[b.data.owner] ?? 'red', data: { owner: b.data.owner } });
+      if (!b.data.lot) addObj('mailbox', b.door.tx + 1, b.door.tz, { force: true, variant: MAIL[b.data.owner] ?? 'red', data: { owner: b.data.owner } });
       for (const tx of [b.tx0 - 1, b.tx0 + b.fw]) addObj('bush', tx, b.tz0 + b.fd - 1, { force: true, variant: pick(['pink', 'white', 'blue', 'red'], rng), rot: rot() });
     }
     if (b.kind === 'shop') {
@@ -506,6 +510,8 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
   // ── 12. 장소 ──
   const tw = (tx, tz) => ({ x: tx + 0.5 - w / 2, z: tz + 0.5 - h / 2 });
   const bPlace = b => b && { x: b.x, z: b.z, door: tw(b.door.tx, b.door.tz), tx: b.door.tx, tz: b.door.tz };
+  // 빈 집터는 lot = { tx, tz, fw, fd, cx, cz (집 가운데 칸), pad (문 앞 계단, off 면 꺼짐) } 를 더 준다 — town 이 집·표지판·이삿짐을 놓는다
+  const lotOf = b => (b.data.lot ? { lot: { tx: b.tx0, tz: b.tz0, fw: b.fw, fd: b.fd, cx: b.tx0 + Math.floor(b.fw / 2), cz: b.tz0 + Math.floor(b.fd / 2), pad: b.pad } } : {});
   const places = {
     spawn: dock ? { x: dock.x, z: dock.z - 1, facing: 0 } : { ...tw(spawnT.tx, spawnT.tz), facing: 0 },
     plaza: tw(plazaC.tx, plazaC.tz),
@@ -513,7 +519,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     museum: bPlace(museum),
     dock: dock ? { x: dock.x, z: dock.z + 2.5 } : null,
     playerHouse: bPlace(playerHouse),
-    villagerHouses: villagerHouses.map(b => ({ slug: b.data.owner, ...bPlace(b) })),
+    villagerHouses: villagerHouses.map(b => ({ slug: b.data.owner, ...bPlace(b), ...lotOf(b) })),
     pond: { x: pond.x - w / 2, z: pond.z - h / 2 },
     waterfall: waterfalls[0] ? tw(waterfalls[0].tx, waterfalls[0].tz + 1) : null,
     bridges: bridges.map(b => ({ x: b.x, z: b.z })),
@@ -635,7 +641,7 @@ export function createIslandApi(gen) {
     }
     if (dock && Math.abs(x - dock.x) <= 1.0 && z >= dock.z - 0.1 && z <= dock.z + 4.1) return 0.385;
     for (const p of pads) {
-      if (x < p.x0 || x > p.x1 || z < p.z0 || z > p.z1) continue;
+      if (p.off || x < p.x0 || x > p.x1 || z < p.z0 || z > p.z1) continue;   // off = 아직 집이 없는 집터의 계단
       if (p.h != null) return p.y + p.h;
       const e = Math.min(x - p.x0, p.x1 - x, z - p.z0, p.z1 - z);
       const step = Math.min(p.steps.length - 1, Math.floor(e / p.stepW));

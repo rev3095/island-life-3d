@@ -33,6 +33,7 @@ FEATURES = {
     'duck': {'muzzle': 'beak', 'tail': 'feather', 'crest': True},
     'frog': {'mouth': 'wide', 'eyes': 'bumps', 'faceBelly': True, 'head': (1.25, 0.95, 0.75), 'blushSpread': 1.1},
     'squirrel': {'ears': 'tuft', 'muzzle': 'small', 'tail': 'bushy'},
+    'fox': {'ears': 'fox', 'muzzle': 'cat', 'tail': 'fox'},   # 고양이 귀(끝 진한 색) + 다람쥐 꼬리(끝 흰색) 다시 쓰기
     'tortoise': {'mouth': 'smile', 'tail': 'stub', 'shell': True, 'head': (1.0, 0.95, 0.9)},
 }
 SPECIES = spec.get('species', 'cat')
@@ -369,7 +370,7 @@ E = P['earSize']
 ear_kind = F.get('ears')
 for side, sx in (('L', 1), ('R', -1)):
     ear = 'ear.' + side
-    if ear_kind in ('cat', 'tuft'):
+    if ear_kind in ('cat', 'tuft', 'fox'):
         p, n = head_point(sx * 0.62, 0.78)
         d = (n + V((0, 0, 0.5))).normalized()
         L = 0.17 * E * hs
@@ -381,6 +382,9 @@ for side, sx in (('L', 1), ('R', -1)):
         if ear_kind == 'tuft':   # 다람쥐 귀 끝 털
             B.add(cone(tip - d * 0.02 * hs, tip + d * 0.05 * hs + V((sx * 0.01, 0, 0)), 0.02 * hs, 0.004, squash=0.6), col('marking'), ear)
             tip = tip + d * 0.05 * hs
+        if ear_kind == 'fox':    # 여우 귀 끝: 위쪽 1/3 을 진한 색 껍질로 덮는다
+            tb = base + d * L * 0.6
+            B.add(cone(tb, tip + d * 0.006 * hs, 0.085 * E * hs * 0.55, 0.016 / P['earPointiness'], squash=0.6), col('earTip', 'marking'), ear)
         EARS[side] = (base, tip)
     elif ear_kind == 'long':     # 토끼
         p, n = head_point(sx * 0.3, 0.98)
@@ -430,14 +434,14 @@ tl = P['tailLength']
 tail_kind = F.get('tail')
 t0 = V((0, BODY_R[1] * 0.8, BODY_C.z - 0.06))
 TAIL = []
-if tail_kind in ('cat', 'curl', 'bushy'):
+if tail_kind in ('cat', 'curl', 'bushy', 'fox'):
     if tail_kind == 'cat':
         TAIL = bezier(t0, t0 + V((0.0, 0.16, -0.02)) * tl, t0 + V((0.09, 0.2, 0.16)) * tl, t0 + V((0.06, 0.13, 0.27)) * tl, 14)
         radii = [0.032 - 0.006 * i / 14 for i in range(15)]
     elif tail_kind == 'curl':
         TAIL = bezier(t0, t0 + V((0, 0.1, 0.02)) * tl, t0 + V((0, 0.16, 0.12)) * tl, t0 + V((0, 0.1, 0.17)) * tl, 10)
         radii = [0.03 - 0.008 * i / 10 for i in range(11)]
-    else:
+    else:   # bushy · fox
         tb = V((0, BODY_R[1] * 0.85, BODY_C.z - 0.08))
         TAIL = bezier(tb, tb + V((0, 0.2, 0.0)) * tl, tb + V((0, 0.26, 0.34)) * tl, tb + V((0, 0.12, 0.44)) * tl, 16)
         radii = [0.04 + 0.07 * math.sin(math.pi * min(1.0, 0.25 + i / 16 * 0.75)) for i in range(17)]
@@ -449,8 +453,15 @@ if tail_kind in ('cat', 'curl', 'bushy'):
         return {'tail.1': 1 - t, 'tail.2': t}
 
     tmat = col('tail')
-    B.add(tube(TAIL, radii, seg=14), tmat, tail_w)
-    B.add(ellipsoid(TAIL[-1], (radii[-1],) * 3, seg=14, rings=8), col('marking') if tail_kind == 'cat' else tmat, 'tail.2')
+    if tail_kind == 'fox':       # 여우 꼬리: 끝 1/4 은 흰색
+        k = 12
+        B.add(tube(TAIL[:k + 1], radii[:k + 1], seg=14), tmat, tail_w)
+        tip_mat = col('tailTip', 'muzzle')
+        B.add(tube(TAIL[k:], [r * 1.01 for r in radii[k:]], seg=14), tip_mat, tail_w)
+        B.add(ellipsoid(TAIL[-1], (radii[-1],) * 3, seg=14, rings=8), tip_mat, 'tail.2')
+    else:
+        B.add(tube(TAIL, radii, seg=14), tmat, tail_w)
+        B.add(ellipsoid(TAIL[-1], (radii[-1],) * 3, seg=14, rings=8), col('marking') if tail_kind == 'cat' else tmat, 'tail.2')
 elif tail_kind == 'puff':
     c = t0 + V((0, 0.03, -0.01))
     B.add(ellipsoid(c, tuple(v * tl for v in (0.05, 0.045, 0.05)), seg=16, rings=10), col('tail'), 'tail.1')
