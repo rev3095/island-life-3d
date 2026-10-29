@@ -1,0 +1,71 @@
+{
+  "id": "FU-29",
+  "slug": "kitchen-counter",
+  "item": "furn.kitchen-counter",
+  "name": "조리대",
+  "category": "furniture",
+  "kind": "kitchen-counter",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "퐁 부엌의 크림색 조리대. 나무 상판 위에 냄비와 도마·사과, 아래에 민트색 문 두 짝.",
+    "keywords": [
+      "나무 상판",
+      "냄비",
+      "도마 위 사과",
+      "민트 문 둘"
+    ],
+    "references": [
+      "시골 부엌 찬장"
+    ],
+    "avoid": [
+      "번쩍이는 스테인리스"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "body": "#F7F1E4",
+    "top": "#B98957",
+    "plinth": "#8C6440",
+    "door": "#BDE3D6",
+    "knob": "#8C6440",
+    "pot": "#4E5A57",
+    "board": "#E2C08D",
+    "apple": "#E8504F",
+    "stem": "#7F5636",
+    "leaf": "#5FAE5A"
+  },
+  "paletteLabels": {
+    "body": "몸통",
+    "top": "상판",
+    "plinth": "아래 받침",
+    "door": "문",
+    "knob": "손잡이",
+    "pot": "냄비",
+    "board": "도마",
+    "apple": "사과",
+    "stem": "꼭지",
+    "leaf": "잎"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

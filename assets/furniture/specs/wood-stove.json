@@ -1,0 +1,74 @@
+{
+  "id": "FU-28",
+  "slug": "wood-stove",
+  "item": "furn.wood-stove",
+  "name": "나무 난로",
+  "category": "furniture",
+  "kind": "wood-stove",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "무쇠 장작 난로. 앞 창으로 불꽃이 일렁이고 밤에는 창이 환하게 빛난다. 굴뚝이 위로 뻗고 위에 주전자.",
+    "keywords": [
+      "무쇠 몸통",
+      "불꽃 창",
+      "굴뚝",
+      "주전자"
+    ],
+    "references": [
+      "산장 장작 난로"
+    ],
+    "avoid": [
+      "무섭게 큰 불"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow",
+      "flame",
+      "flameCore"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "iron": "#4E5A57",
+    "ironLight": "#6B7F86",
+    "glow": "#F39A3B",
+    "flame": "#F39A3B",
+    "flameCore": "#F7E6A8",
+    "bark": "#8C6440",
+    "brass": "#D9B060",
+    "kettle": "#C9844A"
+  },
+  "paletteLabels": {
+    "iron": "무쇠",
+    "ironLight": "테두리",
+    "glow": "불 창 (밤에 빛남)",
+    "flame": "불꽃",
+    "flameCore": "불꽃 속",
+    "bark": "장작",
+    "brass": "손잡이",
+    "kettle": "주전자"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [
+    "flicker"
+  ]
+}

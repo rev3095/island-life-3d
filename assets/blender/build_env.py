@@ -8,6 +8,7 @@ variants(계절·색 변형)는 같은 모양에 색만 바꾼 것이라 렌더�
 좌표계: Blender Z-up, 정면 = -Y. 1.0 = 게임 타일 1칸 (캐릭터 키 ≈ 1.0).
 """
 import bpy, bmesh, json, math, os, random, sys
+from mathutils import Matrix
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from toonkit import (V, Model, add_outlines, aim, bezier, box, capsule, cone, cylinder, ellipsoid, jitter, prism,
@@ -280,6 +281,129 @@ def b_campfire(M):
     flame.add(cone((0, -0.03, 0.08), (0, -0.03, 0.36), 0.08, 0.0, seg=10), 'flameCore', outline=False)
 
 
+# ================================================================ 5차 소품: 이사·생일 (PR-10 ~ PR-12, 검수 보드 wave5)
+def carton(m, c, size, mat, rot=0.0):
+    """테이프 붙인 종이 상자: 윗면 가운데 테이프가 앞뒤 옆면으로 내려온다"""
+    R = rot_xyz(z=rot)
+    c = V(c)
+    w, d, h = size
+    m.add(box(c, size, bevel=0.015, rot=R), mat)
+    m.add(box(c + R @ V((0, 0, h / 2 + 0.003)), (0.09, d + 0.006, 0.008), bevel=0.002, rot=R), 'tape')
+    for sy in (1, -1):
+        m.add(box(c + R @ V((0, sy * (d / 2 + 0.003), h / 2 - 0.06)), (0.09, 0.008, 0.12), bevel=0.002, rot=R), 'tape')
+
+
+def b_moving_boxes(M):
+    m = M.part('boxes')
+    carton(m, (-0.27, 0.02, 0.21), (0.54, 0.5, 0.42), 'box')
+    carton(m, (0.29, -0.03, 0.17), (0.48, 0.44, 0.34), 'boxLight', rot=0.12)
+    carton(m, (-0.2, 0.0, 0.6), (0.48, 0.42, 0.36), 'boxLight', rot=-0.1)
+    m.add(box((-0.43, -0.23, 0.26), (0.14, 0.008, 0.1), bevel=0.003), 'paper', outline=False)   # 이름표
+    # 오른쪽 상자 위 보따리: 천을 묶은 매듭이 위로
+    b = V((0.29, -0.03, 0.34))
+    m.add(ellipsoid(b + V((0, 0, 0.1)), (0.17, 0.15, 0.11), seg=20, rings=10), 'cloth')
+    for sx in (1, -1):
+        m.add(ellipsoid(b + V((sx * 0.05, 0, 0.23)), (0.05, 0.03, 0.06), rot=rot_xyz(y=sx * 0.6), seg=12, rings=6), 'cloth')
+    m.add(ellipsoid(b + V((0, 0, 0.2)), (0.04, 0.04, 0.035), seg=10, rings=6), 'cloth')
+    for k in range(7):   # 보따리 점무늬
+        a = TAU * k / 7 + 0.3
+        dz = 0.04 * math.sin(3 * a)
+        k = math.sqrt(1 - (dz / 0.11) ** 2)   # 보따리 겉면 위
+        m.add(ellipsoid(b + V((math.cos(a) * 0.17 * k, math.sin(a) * 0.15 * k, 0.1 + dz)), (0.02, 0.02, 0.02), seg=8, rings=4), 'clothDot', outline=False)
+
+
+def pennant(c, w, h, thick=0.008):
+    """줄에 매다는 세모 깃발 (앞 -Y 를 본다)"""
+    bm = bmesh.new()
+    c = V(c)
+    pts = [V((-w / 2, 0, 0)), V((w / 2, 0, 0)), V((0, 0, -h))]
+    lo = [bm.verts.new(c + p + V((0, -thick / 2, 0))) for p in pts]
+    hi = [bm.verts.new(c + p + V((0, thick / 2, 0))) for p in pts]
+    bm.faces.new(lo)
+    bm.faces.new(list(reversed(hi)))
+    for k in range(3):
+        j = (k + 1) % 3
+        bm.faces.new([lo[k], hi[k], hi[j], lo[j]])
+    return bm
+
+
+def b_party_balloons(M):
+    m = M.part('stand')
+    hw, top = 0.75, 1.8
+    for sx in (1, -1):
+        m.add(cylinder((sx * hw, 0, 0), (sx * hw, 0, 0.05), 0.1, 0.08, seg=14), 'pole')
+        m.add(cylinder((sx * hw, 0, 0.05), (sx * hw, 0, top), 0.03, seg=10), 'pole')
+        m.add(ellipsoid((sx * hw, 0, top + 0.03), (0.05, 0.05, 0.05), seg=12, rings=8), 'flagA')
+    sag = lambda t: V((-hw + 2 * hw * t, 0, top - 0.02 - 0.26 * math.sin(math.pi * t)))
+    m.add(tube([sag(i / 20) for i in range(21)], [0.008] * 21, seg=6), 'string')
+    for i in range(7):   # 깃발 일곱 + 사이사이 꼬마전구 (밤에 빛난다)
+        t = (i + 0.5) / 7
+        m.add(pennant(sag(t) + V((0, 0, 0.005)), 0.15, 0.17), 'flagA' if i % 2 == 0 else 'flagB')
+        if i:
+            m.add(ellipsoid(sag(i / 7) - V((0, 0, 0.035)), (0.025, 0.025, 0.03), seg=10, rings=6), 'glow', outline=False)
+    g = V((0, -0.02, 0.1))   # 풍선을 묶은 선물 상자
+    m.add(box(g, (0.24, 0.24, 0.2), bevel=0.02), 'gift')
+    m.add(box(g, (0.25, 0.05, 0.205), bevel=0.01), 'ribbon')
+    m.add(box(g, (0.05, 0.25, 0.205), bevel=0.01), 'ribbon')
+    knot = g + V((0, 0, 0.11))
+    for sx in (1, -1):
+        m.add(ellipsoid(knot + V((sx * 0.045, 0, 0.02)), (0.05, 0.022, 0.035), rot=rot_xyz(y=-sx * 0.5), seg=12, rings=6), 'ribbon')
+    b = M.part('balloons')
+    for c, col in ((V((-0.33, -0.12, 1.02)), 'balloonRed'), (V((0.02, -0.16, 1.16)), 'balloonYellow'), (V((0.36, -0.1, 1.04)), 'balloonBlue')):
+        b.add(ellipsoid(c, (0.16, 0.16, 0.2), seg=24, rings=14), col)
+        b.add(cone(c - V((0, 0, 0.19)), c - V((0, 0, 0.24)), 0.012, 0.028, seg=8), col)
+        b.add(ellipsoid(c + V((-0.06, -0.12, 0.08)), (0.03, 0.012, 0.05), rot=rot_xyz(y=0.4, z=0.5), seg=10, rings=6), 'shine', outline=False)
+        s = bezier(c - V((0, 0, 0.24)), c - V((0, 0, 0.5)), knot + V((0, 0, 0.35)), knot, 14)
+        b.add(tube(s, [0.005] * len(s), seg=5), 'string', outline=False)
+
+
+def text_mesh(body, size, depth):
+    """한글 글자를 메시로 (윈도 맑은 고딕). 글꼴이 없으면 None"""
+    for path in ('C:/Windows/Fonts/malgunbd.ttf', 'C:/Windows/Fonts/malgun.ttf', '/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf'):
+        if os.path.exists(path):
+            break
+    else:
+        return None
+    cu = bpy.data.curves.new('label', 'FONT')
+    cu.body, cu.font, cu.size, cu.extrude = body, bpy.data.fonts.load(path), size, depth
+    cu.align_x, cu.align_y = 'CENTER', 'CENTER'
+    ob = bpy.data.objects.new('label', cu)
+    bpy.context.scene.collection.objects.link(ob)
+    ev = ob.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    bm = bmesh.new()
+    bm.from_mesh(ev.to_mesh())
+    ev.to_mesh_clear()
+    bpy.data.objects.remove(ob, do_unlink=True)
+    bpy.data.curves.remove(cu)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    return bm
+
+
+def b_lot_sign(M):
+    """빈 집터(주민 집 3×3) 네 귀퉁이 말뚝 + 줄, 앞 가운데 '집터' 팻말. 원점 = 집터 가운데"""
+    m = M.part('lot')
+    S = 1.32
+    corners = [(-S, -S), (S, -S), (S, S), (-S, S)]
+    for x, y in corners:
+        m.add(box((x, y, 0.2), (0.07, 0.07, 0.4), bevel=0.012), 'stake')
+        m.add(cone((x, y, 0.4), (x, y, 0.47), 0.05, 0.0, seg=4), 'stake', smooth=False)
+    for (x0, y0), (x1, y1) in zip(corners, corners[1:] + corners[:1]):   # 말뚝 사이 늘어진 줄
+        pts = [V((x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, 0.36 - 0.07 * math.sin(math.pi * t))) for t in (i / 16 for i in range(17))]
+        m.add(tube(pts, [0.012] * len(pts), seg=6), 'rope')
+    for x, y, rx, ry in ((-0.5, 0.3, 0.55, 0.4), (0.45, -0.25, 0.5, 0.45), (0.2, 0.6, 0.35, 0.3)):   # 고른 흙
+        m.add(ellipsoid((x, y, 0.0), (rx, ry, 0.02), seg=20, rings=6), 'dirt', outline=False)
+    fy = -S
+    m.add(box((0, fy, 0.45), (0.08, 0.08, 0.9), bevel=0.015), 'stake')
+    m.add(box((0, fy - 0.045, 0.8), (0.64, 0.05, 0.38), bevel=0.03), 'board')
+    label = text_mesh('집터', 0.2, 0.006)
+    if label:
+        bmesh.ops.transform(label, matrix=Matrix.Translation(V((0, fy - 0.075, 0.795))) @ rot_xyz(x=math.pi / 2).to_4x4(), verts=label.verts)
+        m.add(label, 'ink', outline=False, smooth=False)
+    else:   # 글꼴이 없으면 집 그림
+        m.add(box((0, fy - 0.072, 0.75), (0.16, 0.01, 0.13), bevel=0.004), 'ink', outline=False)
+        m.add(prism((0, fy - 0.072, 0.815), 0.01, 0.22, 0.1, ridge='y'), 'ink', outline=False)
+
+
 # ================================================================ 건물
 def house_body(M, W, D, Hh, roofH, door_x=0.0):
     m = M.part('house')
@@ -445,6 +569,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
 
 

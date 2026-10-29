@@ -1,0 +1,72 @@
+{
+  "id": "FU-31",
+  "slug": "umbrella-stand",
+  "item": "furn.umbrella-stand",
+  "name": "우산꽂이",
+  "category": "furniture",
+  "kind": "umbrella-stand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "초롱 방의 초록 우산꽂이. 빨강·노랑 우산은 손잡이가, 파랑 우산은 접힌 끝이 위로 나왔다. 통에 물방울 무늬.",
+    "keywords": [
+      "초록 통",
+      "우산 셋",
+      "물방울 무늬"
+    ],
+    "references": [
+      "현관 우산꽂이"
+    ],
+    "avoid": [
+      "펼친 우산"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "drop",
+      "strap"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stand": "#7FA36B",
+    "standDark": "#5E8A55",
+    "drop": "#CDEBF5",
+    "umbRed": "#E8504F",
+    "umbYellow": "#F6C84C",
+    "umbBlue": "#6CA0DC",
+    "shaft": "#8C6440",
+    "strap": "#FBF7F2",
+    "tip": "#4E5A57"
+  },
+  "paletteLabels": {
+    "stand": "통",
+    "standDark": "통 테·속",
+    "drop": "물방울 무늬",
+    "umbRed": "빨강 우산",
+    "umbYellow": "노랑 우산",
+    "umbBlue": "파랑 우산",
+    "shaft": "우산대",
+    "strap": "끈",
+    "tip": "우산 끝"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

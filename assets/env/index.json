@@ -187,6 +187,33 @@
       "status": "approved"
     },
     {
+      "id": "PR-10",
+      "slug": "moving-boxes",
+      "name": "이삿짐 상자",
+      "category": "prop",
+      "kind": "moving-boxes",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-11",
+      "slug": "party-balloons",
+      "name": "파티 풍선 장식",
+      "category": "prop",
+      "kind": "party-balloons",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-12",
+      "slug": "lot-sign",
+      "name": "집터 표지판",
+      "category": "prop",
+      "kind": "lot-sign",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -201,8 +228,8 @@
       "name": "주민 집",
       "category": "building",
       "kind": "house",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.2",
+      "status": "review"
     },
     {
       "id": "BD-03",

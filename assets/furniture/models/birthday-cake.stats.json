@@ -1,0 +1,63 @@
+{
+  "id": "FU-33",
+  "slug": "birthday-cake",
+  "item": "furn.birthday-cake",
+  "name": "생일 케이크",
+  "category": "furniture",
+  "kind": "birthday-cake",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5828,
+  "parts": 2,
+  "materials": [
+    "berry",
+    "candle",
+    "cream",
+    "flame",
+    "flameCore",
+    "icing",
+    "pink",
+    "plate",
+    "stand",
+    "wick"
+  ],
+  "objects": [
+    "cake",
+    "flame"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    0.88,
+    0.88,
+    0.9
+  ],
+  "bounds": [
+    [
+      -0.44,
+      -0.44,
+      0.0
+    ],
+    [
+      0.44,
+      0.44,
+      0.901
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 116848,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "birthday-cake_front.png",
+    "birthday-cake_main.png",
+    "birthday-cake_thumb.png",
+    "birthday-cake_top.png"
+  ]
+}

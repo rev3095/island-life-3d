@@ -1,0 +1,81 @@
+{
+  "id": "FU-33",
+  "slug": "birthday-cake",
+  "item": "furn.birthday-cake",
+  "name": "생일 케이크",
+  "category": "furniture",
+  "kind": "birthday-cake",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "생일 날 주민이 주는 2단 케이크. 크림 아래 단에 빨간 물결 장식, 분홍 위 단에 파란 초 셋이 타오른다.",
+    "keywords": [
+      "2단 케이크",
+      "물결 장식",
+      "초 셋",
+      "받침 접시"
+    ],
+    "references": [
+      "동네 빵집 생일 케이크"
+    ],
+    "avoid": [
+      "숫자 초",
+      "글씨"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "flame",
+      "flameCore"
+    ],
+    "noOutline": [
+      "wick"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stand": "#E8C77A",
+    "plate": "#FFFDF6",
+    "cream": "#F7F1E4",
+    "pink": "#F7C6E0",
+    "icing": "#E8504F",
+    "berry": "#E8504F",
+    "candle": "#6CA0DC",
+    "wick": "#4A3B32",
+    "flame": "#F39A3B",
+    "flameCore": "#F7E6A8"
+  },
+  "paletteLabels": {
+    "stand": "받침",
+    "plate": "접시",
+    "cream": "아래 단",
+    "pink": "위 단",
+    "icing": "물결 장식",
+    "berry": "딸기",
+    "candle": "초",
+    "wick": "심지",
+    "flame": "불꽃",
+    "flameCore": "불꽃 속"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [
+    "flicker"
+  ]
+}

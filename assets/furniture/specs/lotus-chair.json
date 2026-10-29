@@ -1,0 +1,69 @@
+{
+  "id": "FU-32",
+  "slug": "lotus-chair",
+  "item": "furn.lotus-chair",
+  "name": "연잎 의자",
+  "category": "furniture",
+  "kind": "lotus-chair",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "굵은 줄기 위에 넓은 연잎 방석. 가장자리가 살짝 말려 올라가고, 뒤쪽에 분홍 연꽃이 피었다. 잎 위에 물방울 하나.",
+    "keywords": [
+      "연잎 방석",
+      "잎맥",
+      "분홍 연꽃",
+      "물방울"
+    ],
+    "references": [
+      "연못의 연잎"
+    ],
+    "avoid": [
+      "진짜 개구리 그림"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "leafVein",
+      "dew"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "leaf": "#8CCB6E",
+    "leafVein": "#6FB257",
+    "lotus": "#F4B6C8",
+    "lotusDeep": "#E88FB0",
+    "center": "#F6C84C",
+    "dew": "#CDEBF5"
+  },
+  "paletteLabels": {
+    "stem": "줄기",
+    "leaf": "연잎",
+    "leafVein": "잎맥",
+    "lotus": "연꽃",
+    "lotusDeep": "연꽃 안쪽",
+    "center": "꽃술",
+    "dew": "물방울"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

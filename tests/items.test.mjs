@@ -2,12 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as items from '../src/data/items.js';
 
-test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화석 8 · 도구 5 · 가구 20', () => {
+test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화석 8 · 도구 5 · 가구 20(+5차 13)', () => {
   assert.equal(items.list('fish').length, 20);
   assert.equal(items.list('bug').length, 22);
   assert.equal(items.list('fossil').length, 8);
   assert.equal(items.list('tool').length, 5);
-  assert.equal(items.list('furn').length, 20);
+  assert.equal(items.list('furn').length, 33);
   assert.equal(items.list('fruit').length, 6);
   assert.equal(items.list('shell').length, 6);
 });

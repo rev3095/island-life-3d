@@ -1,0 +1,68 @@
+{
+  "id": "PR-10",
+  "slug": "moving-boxes",
+  "name": "이삿짐 상자",
+  "category": "prop",
+  "kind": "moving-boxes",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "새 주민이 오기 전날 집터에 쌓이는 이삿짐. 테이프 붙인 종이 상자 셋과 보따리 하나.",
+    "keywords": [
+      "종이 상자 셋",
+      "갈색 테이프",
+      "보따리"
+    ],
+    "references": [
+      "이사 날 현관"
+    ],
+    "avoid": [
+      "택배 회사 로고"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "box": "#D9B382",
+    "boxLight": "#E4C594",
+    "tape": "#B5852A",
+    "paper": "#FFFFFF",
+    "cloth": "#7FC8B8",
+    "clothDot": "#FBF7F2"
+  },
+  "paletteLabels": {
+    "box": "상자",
+    "boxLight": "밝은 상자",
+    "tape": "테이프",
+    "paper": "이름표",
+    "cloth": "보따리",
+    "clothDot": "보따리 무늬"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.1,
+        0.56
+      ]
+    },
+    "extent": [
+      0.6,
+      0.32
+    ]
+  }
+}

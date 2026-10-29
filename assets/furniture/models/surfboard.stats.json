@@ -1,0 +1,52 @@
+{
+  "id": "FU-21",
+  "slug": "surfboard",
+  "item": "furn.surfboard",
+  "name": "서핑보드",
+  "category": "furniture",
+  "kind": "surfboard",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2560,
+  "parts": 2,
+  "materials": [
+    "board",
+    "fin",
+    "stripe",
+    "wood"
+  ],
+  "objects": [
+    "board",
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.76,
+    1.61
+  ],
+  "bounds": [
+    [
+      -0.3,
+      -0.335,
+      -0.005
+    ],
+    [
+      0.3,
+      0.421,
+      1.606
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 49968,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "surfboard_front.png",
+    "surfboard_main.png",
+    "surfboard_thumb.png",
+    "surfboard_top.png"
+  ]
+}

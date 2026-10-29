@@ -1,0 +1,62 @@
+{
+  "id": "FU-21",
+  "slug": "surfboard",
+  "item": "furn.surfboard",
+  "name": "서핑보드",
+  "category": "furniture",
+  "kind": "surfboard",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "코코 방의 서핑보드. 나무 받침에 비스듬히 기대 세웠고, 가운데에 주황 줄이 길게 났다.",
+    "keywords": [
+      "기대 세운 보드",
+      "주황 줄",
+      "뒤 지느러미",
+      "나무 받침"
+    ],
+    "references": [
+      "바닷가 서핑 가게"
+    ],
+    "avoid": [
+      "진짜 브랜드 무늬"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "stripe"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "board": "#F7F1E4",
+    "stripe": "#F2B36B",
+    "fin": "#4E5A57",
+    "wood": "#B98957"
+  },
+  "paletteLabels": {
+    "board": "보드",
+    "stripe": "가운데 줄",
+    "fin": "지느러미",
+    "wood": "받침"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

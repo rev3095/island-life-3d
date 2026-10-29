@@ -1,0 +1,52 @@
+{
+  "id": "FU-23",
+  "slug": "cushion-bed",
+  "item": "furn.cushion-bed",
+  "name": "쿠션 침대",
+  "category": "furniture",
+  "kind": "cushion-bed",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2448,
+  "parts": 1,
+  "materials": [
+    "button",
+    "cushion",
+    "cushionTop",
+    "pillow",
+    "piping"
+  ],
+  "objects": [
+    "bed"
+  ],
+  "animations": {},
+  "size": [
+    1.91,
+    1.91,
+    0.58
+  ],
+  "bounds": [
+    [
+      -0.956,
+      -0.956,
+      0.0
+    ],
+    [
+      0.956,
+      0.956,
+      0.58
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 48240,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cushion-bed_front.png",
+    "cushion-bed_main.png",
+    "cushion-bed_thumb.png",
+    "cushion-bed_top.png"
+  ]
+}

@@ -443,6 +443,282 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-21",
+      "slug": "surfboard",
+      "item": "furn.surfboard",
+      "name": "서핑보드",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.6,
+        0.76,
+        1.61
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-22",
+      "slug": "ball-basket",
+      "item": "furn.ball-basket",
+      "name": "공 바구니",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.77,
+        0.77,
+        0.63
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-23",
+      "slug": "cushion-bed",
+      "item": "furn.cushion-bed",
+      "name": "쿠션 침대",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.91,
+        1.91,
+        0.58
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-24",
+      "slug": "bone-cushion",
+      "item": "furn.bone-cushion",
+      "name": "뼈다귀 쿠션",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.28
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-25",
+      "slug": "flower-shelf",
+      "item": "furn.flower-shelf",
+      "name": "꽃 선반",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.87,
+        0.45,
+        1.25
+      ],
+      "variants": [
+        "mix",
+        "pink",
+        "purple",
+        "yellow",
+        "white"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-26",
+      "slug": "terrarium",
+      "item": "furn.terrarium",
+      "name": "유리 온실",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.7,
+        0.7,
+        0.78
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-27",
+      "slug": "rod-rack",
+      "item": "furn.rod-rack",
+      "name": "낚싯대 걸이",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.92,
+        0.24,
+        1.58
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-28",
+      "slug": "wood-stove",
+      "item": "furn.wood-stove",
+      "name": "나무 난로",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.72,
+        0.62,
+        1.65
+      ],
+      "variants": [],
+      "animations": [
+        "flicker"
+      ],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-29",
+      "slug": "kitchen-counter",
+      "item": "furn.kitchen-counter",
+      "name": "조리대",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.96,
+        0.81,
+        1.17
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-30",
+      "slug": "fruit-basket",
+      "item": "furn.fruit-basket",
+      "name": "과일 바구니",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.72,
+        0.72,
+        0.62
+      ],
+      "variants": [
+        "apple",
+        "pear",
+        "peach",
+        "cherry",
+        "orange"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-31",
+      "slug": "umbrella-stand",
+      "item": "furn.umbrella-stand",
+      "name": "우산꽂이",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.5,
+        0.5,
+        1.11
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-32",
+      "slug": "lotus-chair",
+      "item": "furn.lotus-chair",
+      "name": "연잎 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.64
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-33",
+      "slug": "birthday-cake",
+      "item": "furn.birthday-cake",
+      "name": "생일 케이크",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.88,
+        0.88,
+        0.9
+      ],
+      "variants": [],
+      "animations": [
+        "flicker"
+      ],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

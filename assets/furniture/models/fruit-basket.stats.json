@@ -1,0 +1,55 @@
+{
+  "id": "FU-30",
+  "slug": "fruit-basket",
+  "item": "furn.fruit-basket",
+  "name": "과일 바구니",
+  "category": "furniture",
+  "kind": "fruit-basket",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5432,
+  "parts": 2,
+  "materials": [
+    "basket",
+    "basketDark",
+    "cloth",
+    "fruit",
+    "leaf",
+    "stem"
+  ],
+  "objects": [
+    "basket",
+    "fruits"
+  ],
+  "animations": {},
+  "size": [
+    0.72,
+    0.72,
+    0.62
+  ],
+  "bounds": [
+    [
+      -0.36,
+      -0.36,
+      0.0
+    ],
+    [
+      0.36,
+      0.36,
+      0.617
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 104720,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-basket_front.png",
+    "fruit-basket_main.png",
+    "fruit-basket_thumb.png",
+    "fruit-basket_top.png",
+    "fruit-basket_variants.png"
+  ]
+}

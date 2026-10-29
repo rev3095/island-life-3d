@@ -1,0 +1,52 @@
+{
+  "id": "FU-24",
+  "slug": "bone-cushion",
+  "item": "furn.bone-cushion",
+  "name": "뼈다귀 쿠션",
+  "category": "furniture",
+  "kind": "bone-cushion",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3596,
+  "parts": 2,
+  "materials": [
+    "bone",
+    "cushion",
+    "paw",
+    "piping"
+  ],
+  "objects": [
+    "bone",
+    "cushion"
+  ],
+  "animations": {},
+  "size": [
+    0.9,
+    0.9,
+    0.28
+  ],
+  "bounds": [
+    [
+      -0.448,
+      -0.448,
+      0.0
+    ],
+    [
+      0.448,
+      0.448,
+      0.285
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 68744,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bone-cushion_front.png",
+    "bone-cushion_main.png",
+    "bone-cushion_thumb.png",
+    "bone-cushion_top.png"
+  ]
+}
