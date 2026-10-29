@@ -1,13 +1,15 @@
 // 사고팔기: 파는 값, 사는 값, 날마다 바뀌는 도토리상점 물건 (dayKey 시드라 같은 날엔 늘 같다).
+// 영업 시각·하루 물건 수는 assets/data/rules.json 의 shop 칸, 값은 items.json (표 편집기 → "숫자 반영").
 import * as items from './items.js';
 import { rngFor, sample } from './rng.js';
+import { RULES } from './tables.js';
 
-export const SHOP_HOURS = { open: 8, close: 22 };   // 도토리상점 영업 8~22시
-export const SHOP_FURNITURE_PER_DAY = 2;
-export const SHOP_FLOWER_SEEDS_PER_DAY = 2;
+export const SHOP_HOURS = { open: RULES.shop.open, close: RULES.shop.close };   // 도토리상점 영업 8~22시
+export const SHOP_FURNITURE_PER_DAY = RULES.shop.furniturePerDay;
+export const SHOP_FLOWER_SEEDS_PER_DAY = RULES.shop.flowerSeedsPerDay;
 
 const FRUIT_TREES = items.list('fruit').filter(f => f.variant).map(f => f.id);
-/** 섬 특산 과일: 섬 시드로 정해진다. 특산 과일은 싸게(100), 나머지는 비싸게(500) 팔린다 */
+/** 섬 특산 과일: 섬 시드로 정해진다. 특산 과일은 싸게(nativePrice 100), 나머지는 비싸게(500) 팔린다 */
 export const nativeFruit = seed => FRUIT_TREES[Math.floor(rngFor(seed, 'native-fruit')() * FRUIT_TREES.length)];
 
 /** 파는 값 (가방 한 개 기준) */

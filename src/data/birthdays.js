@@ -1,22 +1,16 @@
 // 생일표 (5차 D11-A: 주민 생일 + 플레이어 생일). DOM·three 없음 — town·섬폰·테스트가 같이 쓴다.
 // 날짜는 'MM-DD' 문자열. 이사 온 주민(단풍)은 이사 온 날이 생일이 되어 state.town.birthdays 에 적힌다 (town 이 적는다).
 // 플레이어 생일은 섬폰에서 고르면 state.town.playerBirthday 에 'MM-DD' 로 (town 서비스가 적는다).
+// 생일표·배수는 assets/data/rules.json 의 birthdays 칸 (표 편집기 → "숫자 반영").
+import { RULES } from './tables.js';
 
-/** 주민 생일 (검수 보드 생일표). 단풍은 이사 온 날 정한다 */
-export const BIRTHDAYS = {
-  coco: '07-14',      // 해변 달리기 좋은 한여름
-  bori: '03-21',      // 낮잠 자기 좋은 봄볕
-  mochi: '04-08',     // 튤립이 피는 때
-  dubu: '11-03',      // 연어가 올라오는 늦가을
-  pong: '09-27',      // 과일이 잘 익는 가을
-  chorong: '06-18',   // 장마 시작
-  danpung: null,      // 이사 온 날
-};
+/** 주민 생일 (검수 보드 생일표: 코코 한여름 · 보리 봄볕 · 모찌 튤립 · 두부 연어 철 · 퐁 과일 · 초롱 장마). 단풍(null)은 이사 온 날 정한다 */
+export const BIRTHDAYS = { ...RULES.birthdays.dates };
 
 /** 생일에 받은 선물은 친밀도가 평소의 이만큼 */
-export const BIRTHDAY_GIFT_MULT = 3;
+export const BIRTHDAY_GIFT_MULT = RULES.birthdays.giftMult;
 /** 생일 케이크 (FU-33, 가구 — Z3 가 FURN 표에 넣는다). 아이템 사전에 없으면 건너뛴다 */
-export const BIRTHDAY_CAKE = 'furn.birthday-cake';
+export const BIRTHDAY_CAKE = RULES.birthdays.cake;
 
 const DAYS_IN = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const pad = n => String(n).padStart(2, '0');

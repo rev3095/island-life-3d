@@ -1,5 +1,5 @@
 // 트랙 T1: 섬 월드 — 지형 생성·그리기, 배경 물체, 충돌·높이. ctx.services.world 를 올린다 (docs/CONTRACTS.md).
-import { generateIsland, createIslandApi, lotsOf, KIND } from './island.js';
+import { generateIsland, createIslandApi, lotsOf, resolveLayout, KIND } from './island.js';
 import { createKit } from './kit.js';
 import { buildTerrain } from './terrain.js';
 import { createObjects } from './objects.js';
@@ -23,7 +23,9 @@ export default {
     const index = await assets.loadEnvIndex();
     const models = Object.fromEntries(await Promise.all(index.models.map(async m =>
       [m.slug, { gltf: await assets.loadEnv(m.slug), spec: await assets.loadEnvSpec(m.slug) }])));
-    const gen = generateIsland(state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit,
+    // 지도 자리·시드·밀도 (섬 지도 편집기 → "지도 반영"). 없으면 island.js 기본값 = 지금 섬. layout.seed 가 null 이면 저장의 섬 시드
+    const layout = resolveLayout(await assets.loadJSON('assets/island/layout.json').catch(e => (console.warn('[world] layout.json 없음 — 기본 지도', e), null)));
+    const gen = generateIsland(layout.seed ?? state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit, layout,
       lots: lotsOf(Object.fromEntries(Object.entries(models).map(([k, v]) => [k, v.spec]))) });
     const base = createIslandApi(gen);
 

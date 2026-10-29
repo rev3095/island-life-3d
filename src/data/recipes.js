@@ -1,28 +1,11 @@
-// 작업대 제작법 (DIY). 컨셉 보드 TOOLS·FURN 표의 '제작' 항목. 재료 수가 적혀 있지 않은 것은 여기서 정했다.
+// 작업대 제작법 (DIY). 컨셉 보드 TOOLS·FURN 표의 '제작' 항목 + 5차 검수 보드(wave5) FU 카드의 제작 가구.
+// 6차(M6-P5)부터 표는 assets/data/rules.json 의 recipes (표 편집기 → "숫자 반영"), note 칸은 사람이 읽는 메모.
 // 재료 한 줄: { id, n } 정확한 아이템, 또는 { category, n } 그 카테고리 아무거나 (예: 조개 6개).
 import * as items from './items.js';
+import { RULES } from './tables.js';
 
 /** 레시피 id = 만들어지는 아이템 id */
-export const RECIPES = [
-  { result: 'tool.rod', needs: [{ id: 'mat.branch', n: 5 }] },
-  { result: 'tool.net', needs: [{ id: 'mat.branch', n: 5 }] },
-  { result: 'tool.shovel', needs: [{ id: 'mat.wood', n: 5 }] },                                   // 컨셉: 나무 5
-  { result: 'tool.axe', needs: [{ id: 'mat.branch', n: 5 }, { id: 'mat.stone', n: 1 }] },          // 컨셉: 나뭇가지 5 + 돌 1
-  { result: 'tool.can', needs: [{ id: 'mat.wood', n: 5 }] },                                       // 컨셉: 나무 5
-  { result: 'furn.log-chair', needs: [{ id: 'mat.wood', n: 4 }] },
-  { result: 'furn.log-table', needs: [{ id: 'mat.wood', n: 8 }] },
-  { result: 'furn.wood-bed', needs: [{ id: 'mat.wood', n: 6 }, { id: 'mat.hardwood', n: 4 }] },
-  { result: 'furn.campfire', needs: [{ id: 'mat.branch', n: 3 }, { id: 'mat.stone', n: 3 }] },
-  { result: 'furn.woodpile', needs: [{ id: 'mat.wood', n: 6 }] },
-  { result: 'furn.fish-tank', needs: [{ id: 'mat.hardwood', n: 2 }, { id: 'mat.clay', n: 2 }] },
-  { result: 'furn.bug-case', needs: [{ id: 'mat.wood', n: 3 }, { id: 'mat.branch', n: 2 }] },
-  { result: 'furn.shell-curtain', needs: [{ category: 'shell', n: 6 }] },                          // 컨셉: 조개 6
-  { result: 'furn.fruit-chair', needs: [{ category: 'fruit', n: 10 }] },                           // 컨셉: 과일 10
-  // 5차 검수 보드(wave5) FU 카드의 제작 가구
-  { result: 'furn.flower-shelf', needs: [{ id: 'mat.wood', n: 6 }, { category: 'flower', n: 4 }] }, // 보드: 나무 6 · 꽃 4
-  { result: 'furn.wood-stove', needs: [{ id: 'mat.iron', n: 4 }, { id: 'mat.wood', n: 4 }] },      // 보드: 철광석 4 · 나무 4
-  { result: 'furn.fruit-basket', needs: [{ category: 'fruit', n: 5 }] },                           // 보드: 과일 5
-].map(r => Object.freeze({ id: r.result, count: 1, ...r }));
+export const RECIPES = RULES.recipes.map(({ result, needs, count }) => Object.freeze({ id: result, count: count ?? 1, result, needs }));
 
 const BY_ID = new Map(RECIPES.map(r => [r.id, r]));
 
