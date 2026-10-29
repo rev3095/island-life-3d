@@ -1,0 +1,28 @@
+{
+  "id": "WP-05",
+  "slug": "wp-05",
+  "kind": "wallpaper",
+  "name": "통나무 벽",
+  "version": 1,
+  "status": "review",
+  "price": 1600,
+  "pattern": {
+    "tile": [40, 16],
+    "size": [0.8, 0.32],
+    "base": "base",
+    "shapes": [
+      { "rect": [0, 12, 40, 4], "fill": "groove" },
+      { "rect": [0, 2, 40, 3], "fill": "shine" },
+      { "circle": [30, 7, 2], "fill": "knot" }
+    ]
+  },
+  "palette": {
+    "base": "#A8774E",
+    "groove": "#7F5636",
+    "shine": "#BC8B5E",
+    "knot": "#8C6440",
+    "wainscot": "#7F5636",
+    "molding": "#5A4030",
+    "baseboard": "#4A3428"
+  }
+}

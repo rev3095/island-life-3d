@@ -1,0 +1,20 @@
+{
+  "id": "RM-01",
+  "slug": "rm-01",
+  "kind": "room",
+  "owner": "coco",
+  "ownerName": "코코",
+  "name": "해변 운동방",
+  "version": 1,
+  "status": "review",
+  "note": "활발한 고양이. 아침 달리기 뒤 쉬는 방.",
+  "wallpaper": "wp-02",
+  "floor": "fl-02",
+  "host": { "lx": 4, "lz": 3.6, "face": "s" },
+  "furniture": [
+    { "item": "furn.sofa", "variant": "orange", "gx": 0, "gz": 1, "rot": 1 },
+    { "item": "furn.floor-lamp", "variant": "cream", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-21", "name": "서핑보드", "box": [1, 1, 1.5], "color": "#F2B36B", "gx": 7, "gz": 0, "rot": 0 },
+    { "fu": "FU-22", "name": "공 바구니", "box": [1, 1, 0.6], "color": "#C99A63", "gx": 6, "gz": 4, "rot": 0 }
+  ]
+}

@@ -1,8 +1,14 @@
 // 도토리상점: 사기(진열 목록) / 팔기(가방 팔기 모드). 거래는 data 서비스(wallet·inventory)로 한다.
+// 사기 탭 아래 '오늘의 벽지·바닥' 코너 (5차 Z2): house.interior.today() 가 날마다 하나씩 고른 것. 산 것은 가방이 아니라 집 꾸미기 목록(house.interior.add)에 들어간다.
 import { h, fmt, itemInfo, iconEl } from './dom.js';
 import { panelShell, button, confirmBox } from './panels.js';
 import { itemPhrase } from './bag.js';
 import { notice } from './phone.js';
+
+const DECOR_NAME = { wallpaper: '벽지', floor: '바닥' };
+const DECOR_ICON = { wallpaper: '🖼️', floor: '🟫' };
+// 받침 맞춘 조사: 벽지를·벽지로·벽지예요 / 바닥을·바닥으로·바닥이에요
+const DECOR_JOSA = { wallpaper: { obj: '를', to: '로', is: '예요' }, floor: { obj: '을', to: '으로', is: '이에요' } };
 
 export function createShop(ctx, panels, { bag, toast }) {
   let current = null;
@@ -29,6 +35,8 @@ export function createShop(ctx, panels, { bag, toast }) {
       view.replaceChildren();
       if (!data()?.wallet) view.append(notice('🏪', '가게가 아직 문을 열지 않았어요.', '데이터(data) 모듈이 연결되면 사고팔 수 있어요.'));
       else if (tab === 'buy') {
+        const corner = decorCorner();   // 날마다 바뀌는 것이라 맨 위에
+        if (corner) view.append(corner);
         if (!stock.length) view.append(notice('📦', '오늘은 물건이 다 팔렸어요.', '내일 다시 와 주세요.'));
         else view.append(h('ul', { class: 'pk-stock' }, stock.map(id => {
           const it = itemInfo(ctx, id);
@@ -57,6 +65,43 @@ export function createShop(ctx, panels, { bag, toast }) {
       ctx.events.emit('sfx', { name: 'acorn' });
       toast(`${it.name} 샀어요!`, it.icon);
       draw(`[data-id="${CSS.escape(id)}"]`);
+    }
+
+    // ── 오늘의 벽지·바닥 ──
+    const decor = () => ctx.services.house?.interior;
+    function decorCorner() {
+      let today = [];
+      try { today = decor()?.today?.() ?? []; } catch (e) { console.warn('[shop] 오늘의 벽지·바닥', e); }
+      if (!today.length) return null;
+      return h('section', { class: 'pk-shop-decor', 'aria-label': '오늘의 벽지·바닥', style: { marginBottom: '14px' } },
+        h('p', { class: 'pk-keeper', style: { margin: '0 0 8px' } }, h('b', null, '오늘의 벽지·바닥'), ' 날마다 바뀌어요'),
+        h('ul', { class: 'pk-stock' }, today.map(d => {
+          const short = !d.owned && d.price > acorns();
+          const kind = DECOR_NAME[d.kind] ?? '';
+          return h('li', null, h('button', { type: 'button', class: `pk-stock-item${short ? ' is-short' : ''}${d.owned ? ' is-owned' : ''}`, dataset: { decor: d.slug }, onclick: () => buyDecor(d),
+            'aria-label': `${kind} ${d.name}${d.shopOnly ? ', 상점 한정' : ''}, ${d.owned ? '이미 가지고 있어요' : `${fmt(d.price)}도토리${short ? ', 도토리가 모자라요' : ''}`}` },
+          d.swatch ? h('img', { class: 'pk-stock-icon', src: d.swatch, alt: '', style: { borderRadius: '10px', boxShadow: 'inset 0 0 0 2px rgba(74,59,50,.15)' } }) : iconEl(DECOR_ICON[d.kind], 'pk-stock-icon'),
+          h('span', { class: 'pk-stock-name' }, `${d.name} ${kind}`, d.shopOnly ? h('small', { style: { display: 'block', fontSize: '12px', opacity: '.7' } }, '상점 한정') : null),
+          h('span', { class: 'pk-price', style: d.owned ? { opacity: '.6' } : null }, d.owned ? '가지고 있어요' : `🌰 ${fmt(d.price)}`)));
+        })));
+    }
+
+    async function buyDecor(d) {
+      if (p.fresh()) return;
+      const w = data()?.wallet, inter = decor();
+      if (!w || !inter) return;
+      const kind = DECOR_NAME[d.kind] ?? '', j = DECOR_JOSA[d.kind] ?? DECOR_JOSA.wallpaper;
+      if (inter.owns(d.slug)) { toast(`이미 가진 ${kind}${j.is}. 집에서 벽을 보고 꾸밀 수 있어요`, DECOR_ICON[d.kind]); return; }
+      if (d.price > acorns()) { toast('도토리가 모자라요', '🌰'); return; }
+      const now = await confirmBox(panels, { title: '사기', icon: DECOR_ICON[d.kind], text: `${d.name} ${kind}${j.obj} 🌰 ${fmt(d.price)}에 살까요?\n집 안에서 벽을 바라보고 행동 키를 누르면 바꿀 수 있어요.`,
+        buttons: [{ label: '사서 바로 붙일게요', value: 'apply', primary: true }, { label: '사기만 할게요', value: 'buy' }, { label: '그만둘래요', value: false }], cancelValue: false });
+      if (!now || p.closed) return;
+      if (!w.spend(d.price)) { toast('도토리가 모자라요', '🌰'); return; }
+      if (!inter.add(d.slug)) { w.add(d.price); toast(`이미 가진 ${kind}${j.is}`, DECOR_ICON[d.kind]); return; }
+      if (now === 'apply') inter.apply(d.kind, d.slug);
+      ctx.events.emit('sfx', { name: 'acorn' });
+      toast(now === 'apply' ? `${d.name} ${kind}${j.to} 바꿨어요!` : `${d.name} ${kind} 샀어요!`, DECOR_ICON[d.kind]);
+      draw(`[data-decor="${CSS.escape(d.slug)}"]`);
     }
 
     async function sellLoop() {

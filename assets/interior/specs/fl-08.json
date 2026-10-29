@@ -1,0 +1,22 @@
+{
+  "id": "FL-08",
+  "slug": "fl-08",
+  "kind": "floor",
+  "name": "모래 바닥",
+  "version": 1,
+  "status": "review",
+  "price": 2000,
+  "step": "sand",
+  "shopOnly": true,
+  "pattern": {
+    "tile": [14, 14],
+    "size": [0.45, 0.45],
+    "base": "base",
+    "shapes": [
+      { "circle": [3, 4, 1], "fill": "grain" },
+      { "circle": [10, 10, 1.2], "fill": "grain" },
+      { "circle": [11, 3, 0.8], "fill": "shine" }
+    ]
+  },
+  "palette": { "base": "#EBD9A8", "grain": "#D9C38A", "shine": "#F5E8C4", "edge": "#C9B27A" }
+}

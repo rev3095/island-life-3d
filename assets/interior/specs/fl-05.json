@@ -1,0 +1,22 @@
+{
+  "id": "FL-05",
+  "slug": "fl-05",
+  "kind": "floor",
+  "name": "짙은 판자",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "step": "wood",
+  "pattern": {
+    "tile": [40, 12],
+    "size": [3.333, 1],
+    "base": "base",
+    "shapes": [
+      { "rect": [0, 6, 40, 6], "fill": "light" },
+      { "rect": [0, 5, 40, 1.4], "fill": "gap" },
+      { "rect": [0, 11, 40, 1.4], "fill": "gap" },
+      { "rect": [15, 0, 1.4, 6], "fill": "gap" }
+    ]
+  },
+  "palette": { "base": "#8C6440", "light": "#7A5636", "gap": "#5A4030", "edge": "#5A4030" }
+}

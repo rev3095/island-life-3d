@@ -1,0 +1,19 @@
+{
+  "id": "RM-02",
+  "slug": "rm-02",
+  "kind": "room",
+  "owner": "bori",
+  "ownerName": "보리",
+  "name": "햇살 낮잠방",
+  "version": 1,
+  "status": "review",
+  "note": "느긋한 강아지. 햇볕 드는 창 아래 큰 쿠션.",
+  "wallpaper": "wp-03",
+  "floor": "fl-03",
+  "host": { "lx": 3.5, "lz": 3.6, "face": "s" },
+  "furniture": [
+    { "fu": "FU-23", "name": "쿠션 침대", "box": [2, 2, 0.45], "color": "#9CC3EA", "gx": 5, "gz": 0, "rot": 0 },
+    { "fu": "FU-24", "name": "뼈다귀 쿠션", "box": [1, 1, 0.35], "color": "#F7F1E4", "gx": 1, "gz": 5, "rot": 0 },
+    { "item": "furn.radio", "variant": "mint", "gx": 0, "gz": 1, "rot": 1 }
+  ]
+}

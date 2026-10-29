@@ -1,0 +1,20 @@
+{
+  "id": "RM-05",
+  "slug": "rm-05",
+  "kind": "room",
+  "owner": "pong",
+  "ownerName": "퐁",
+  "name": "과일 부엌",
+  "version": 1,
+  "status": "review",
+  "note": "먹보 오리. 조리대와 과일이 있는 부엌.",
+  "wallpaper": "wp-06",
+  "floor": "fl-06",
+  "host": { "lx": 2.5, "lz": 3.6, "face": "s" },
+  "furniture": [
+    { "fu": "FU-29", "name": "조리대", "box": [2, 1, 0.95], "color": "#7FCDB6", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-30", "name": "과일 바구니", "box": [1, 1, 0.5], "color": "#C99A63", "gx": 2, "gz": 0, "rot": 0 },
+    { "item": "furn.log-table", "gx": 4, "gz": 3, "rot": 0 },
+    { "item": "furn.fruit-chair", "variant": "orange", "gx": 6, "gz": 3, "rot": 3 }
+  ]
+}

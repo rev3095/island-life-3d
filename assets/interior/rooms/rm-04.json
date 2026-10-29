@@ -1,0 +1,20 @@
+{
+  "id": "RM-04",
+  "slug": "rm-04",
+  "kind": "room",
+  "owner": "dubu",
+  "ownerName": "두부",
+  "name": "낚시 오두막",
+  "version": 1,
+  "status": "review",
+  "note": "말수 적은 곰. 통나무 벽에 낚싯대와 난로.",
+  "wallpaper": "wp-05",
+  "floor": "fl-05",
+  "host": { "lx": 3.5, "lz": 3.6, "face": "s" },
+  "furniture": [
+    { "fu": "FU-27", "name": "낚싯대 걸이", "box": [0.9, 0.12, 0.6], "color": "#8C6440", "wall": "n", "slot": 3 },
+    { "fu": "FU-28", "name": "나무 난로", "box": [1, 1, 1.1], "color": "#4E5A57", "gx": 6, "gz": 1, "rot": 0 },
+    { "item": "furn.fish-tank", "gx": 0, "gz": 3, "rot": 1 },
+    { "item": "furn.woodpile", "gx": 7, "gz": 4, "rot": 0 }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "FL-04",
+  "slug": "fl-04",
+  "kind": "floor",
+  "name": "흰 타일",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "step": "wood",
+  "pattern": { "tile": [18, 18], "size": [0.5, 0.5], "base": "base", "shapes": [{ "rect": [1, 1, 16, 16], "fill": "tile" }] },
+  "palette": { "base": "#DDD6C8", "tile": "#F7F4EE", "edge": "#BDB4A2" }
+}

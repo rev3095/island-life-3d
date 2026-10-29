@@ -1,0 +1,17 @@
+{
+  "id": "FL-03",
+  "slug": "fl-03",
+  "kind": "floor",
+  "name": "폭신 카펫",
+  "version": 1,
+  "status": "review",
+  "price": 1600,
+  "step": "grass",
+  "pattern": {
+    "tile": [12, 12],
+    "size": [0.4, 0.4],
+    "base": "base",
+    "shapes": [{ "circle": [3, 3, 1.6], "fill": "dot" }, { "circle": [9, 9, 1.6], "fill": "dot" }]
+  },
+  "palette": { "base": "#9CC3EA", "dot": "#B7D4F0", "edge": "#6CA0DC" }
+}
