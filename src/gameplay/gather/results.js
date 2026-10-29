@@ -1,5 +1,6 @@
 // 잡은 것·주운 것 챙기기: data.collect (도감 기록·도토리 주머니는 지갑으로) → 알림 → 가방이 차면 안내.
-// 물고기·곤충·화석은 머리 위로 들어 보이며 기뻐한다 (player 'happy').
+// 물고기·곤충·화석은 머리 위로 들어 보이며 기뻐한다 (player 'happy'). 들어 보이는 모델은 아이콘과 같은 3D 모델(assets/items, 5차 Z1),
+// 처음 받는 동안만 코드 모델(meshes.js · bugmodels.js)로 잠깐 보였다가 바꿔 든다.
 import { eul } from './util.js';
 
 const SHOW = 1.5;   // 들어 보이는 시간 (초)
@@ -9,15 +10,19 @@ export function createResults(ctx, kit, mk, fx, { lock }) {
   const shown = [];
   const v = new T.Vector3();
 
-  /** 머리 위로 들어 보이기 (mesh 를 주면 그걸, 없으면 아이템 모양) */
+  const lift = m => { m.scale.multiplyScalar(1.25); m.rotation.set(0, 0, 0); scene.add(m); return m; };
+
+  /** 머리 위로 들어 보이기: 아이템 모델이 있으면 그걸, 받는 동안은 mesh(주면) 또는 코드 모양 */
   function show(id, mesh = null) {
-    const m = mesh ?? mk.item(id);
-    m.scale.multiplyScalar(1.25);
-    m.rotation.set(0, 0, 0);
-    scene.add(m);
-    shown.push({ m, t: 0 });
+    const s = { m: lift(mesh ?? mk.item(id)), t: 0 };
+    shown.push(s);
     kit.player?.headTop(v);
     fx.sparkle(v, 7);
+    mk.heldModel?.(id).then(model => {
+      if (!model || !shown.includes(s)) return;
+      scene.remove(s.m);
+      s.m = lift(model);
+    });
   }
 
   return {

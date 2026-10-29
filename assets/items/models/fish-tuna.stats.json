@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-19",
+  "slug": "fish-tuna",
+  "name": "참치",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.tuna"
+  ],
+  "hold": true,
+  "triangles": 1492,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.165,
+    0.701,
+    0.262
+  ],
+  "bounds": [
+    [
+      -0.082,
+      -0.351,
+      -0.131
+    ],
+    [
+      0.082,
+      0.351,
+      0.131
+    ]
+  ],
+  "glbBytes": 41568,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-tuna_main.png",
+    "fish-tuna_thumb.png"
+  ]
+}

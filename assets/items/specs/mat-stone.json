@@ -1,0 +1,50 @@
+{
+  "id": "IC-MA-04",
+  "slug": "mat-stone",
+  "name": "돌",
+  "group": "mat",
+  "category": "item",
+  "kind": "stone",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.stone",
+      "code": "IC-MA-04"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "울퉁불퉁한 회색 돌과 작은 돌",
+    "keywords": [
+      "회색",
+      "각진 면"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "stone": "#A8A49B",
+    "stoneLight": "#C8C4BA"
+  },
+  "paletteLabels": {
+    "stone": "돌",
+    "stoneLight": "밝은 돌"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "id": "FU-25",
+  "slug": "flower-shelf",
+  "item": "furn.flower-shelf",
+  "name": "꽃 선반",
+  "category": "furniture",
+  "kind": "flower-shelf",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "모찌 방의 2단 나무 선반. 화분 네 개에 꽃이 피었고, 위 칸 끝에 작은 물뿌리개.",
+    "keywords": [
+      "2단 선반",
+      "토분 넷",
+      "꽃 색 변형",
+      "물뿌리개"
+    ],
+    "references": [
+      "꽃집 진열대"
+    ],
+    "avoid": [
+      "철제 선반"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "bloomCenter"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodDark": "#8C6440",
+    "pot": "#C96F4A",
+    "potRim": "#B35E3D",
+    "soil": "#6B4A33",
+    "leaf": "#5FAE5A",
+    "bloomA": "#F4B6C8",
+    "bloomB": "#B9A6E0",
+    "bloomC": "#FBF7F2",
+    "bloomD": "#F6C84C",
+    "bloomCenter": "#F39A3B",
+    "can": "#7FC8B8"
+  },
+  "paletteLabels": {
+    "wood": "선반판",
+    "woodDark": "기둥",
+    "pot": "화분",
+    "potRim": "화분 테",
+    "soil": "흙",
+    "leaf": "잎",
+    "bloomA": "꽃 1",
+    "bloomB": "꽃 2",
+    "bloomC": "꽃 3",
+    "bloomD": "꽃 4",
+    "bloomCenter": "꽃술",
+    "can": "물뿌리개"
+  },
+  "variants": {
+    "mix": {
+      "label": "알록달록 (기본)",
+      "palette": {}
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "bloomA": "#F4B6C8",
+        "bloomB": "#F4B6C8",
+        "bloomC": "#F4B6C8",
+        "bloomD": "#F4B6C8"
+      }
+    },
+    "purple": {
+      "label": "보라",
+      "palette": {
+        "bloomA": "#B9A6E0",
+        "bloomB": "#B9A6E0",
+        "bloomC": "#B9A6E0",
+        "bloomD": "#B9A6E0"
+      }
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "bloomA": "#F6C84C",
+        "bloomB": "#F6C84C",
+        "bloomC": "#F6C84C",
+        "bloomD": "#F6C84C"
+      }
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "bloomA": "#FBF7F2",
+        "bloomB": "#FBF7F2",
+        "bloomC": "#FBF7F2",
+        "bloomD": "#FBF7F2"
+      }
+    }
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,44 @@
+{
+  "id": "IC-SH-03",
+  "slug": "shell-scallop",
+  "name": "가리비",
+  "group": "shell",
+  "kind": "scallop",
+  "version": "0.1",
+  "items": [
+    "shell.scallop"
+  ],
+  "hold": false,
+  "triangles": 1856,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellRib"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.32,
+    0.293,
+    0.082
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.146,
+      0.0
+    ],
+    [
+      0.16,
+      0.146,
+      0.082
+    ]
+  ],
+  "glbBytes": 35944,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-scallop_main.png",
+    "shell-scallop_thumb.png"
+  ]
+}

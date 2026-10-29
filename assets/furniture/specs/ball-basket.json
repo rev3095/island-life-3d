@@ -1,0 +1,65 @@
+{
+  "id": "FU-22",
+  "slug": "ball-basket",
+  "item": "furn.ball-basket",
+  "name": "공 바구니",
+  "category": "furniture",
+  "kind": "ball-basket",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "등나무로 엮은 바구니에 빨강·파랑·노랑 공 세 개가 담겼다.",
+    "keywords": [
+      "등나무 바구니",
+      "공 셋",
+      "흰 줄 비치볼"
+    ],
+    "references": [
+      "체육관 공 바구니"
+    ],
+    "avoid": [
+      "진짜 구기 종목 로고"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "ballWhite"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "basket": "#C99A63",
+    "basketDark": "#A8774E",
+    "ballRed": "#E8504F",
+    "ballBlue": "#6CA0DC",
+    "ballYellow": "#F6C84C",
+    "ballWhite": "#FBF7F2"
+  },
+  "paletteLabels": {
+    "basket": "바구니",
+    "basketDark": "엮은 줄·속",
+    "ballRed": "빨강 공",
+    "ballBlue": "파랑 공",
+    "ballYellow": "노랑 공",
+    "ballWhite": "공 줄무늬"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,26 @@
+{
+  "id": "WP-07",
+  "slug": "wp-07",
+  "kind": "wallpaper",
+  "name": "빗방울",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "pattern": {
+    "tile": [22, 26],
+    "size": [0.7, 0.83],
+    "base": "base",
+    "shapes": [
+      { "path": "M6 4 q3 5 0 7 q-3 -2 0 -7z", "fill": "drop" },
+      { "path": "M17 15 q3 5 0 7 q-3 -2 0 -7z", "fill": "dropGreen" }
+    ]
+  },
+  "palette": {
+    "base": "#DCEFD3",
+    "drop": "#7FB8D6",
+    "dropGreen": "#8CCB6E",
+    "wainscot": "#A9C99B",
+    "molding": "#6E9A5E",
+    "baseboard": "#557A48"
+  }
+}

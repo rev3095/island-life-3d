@@ -1,0 +1,46 @@
+{
+  "id": "IC-MA-02",
+  "slug": "mat-hardwood",
+  "name": "단단한 나무",
+  "group": "mat",
+  "kind": "hardwood",
+  "version": "0.1",
+  "items": [
+    "mat.hardwood"
+  ],
+  "hold": false,
+  "triangles": 536,
+  "parts": 1,
+  "materials": [
+    "bark",
+    "cut",
+    "knot",
+    "ring"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.218,
+    0.393,
+    0.229
+  ],
+  "bounds": [
+    [
+      -0.109,
+      -0.196,
+      0.0
+    ],
+    [
+      0.109,
+      0.196,
+      0.229
+    ]
+  ],
+  "glbBytes": 14772,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-hardwood_main.png",
+    "mat-hardwood_thumb.png"
+  ]
+}

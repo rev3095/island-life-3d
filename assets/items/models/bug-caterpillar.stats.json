@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-21",
+  "slug": "bug-caterpillar",
+  "name": "송충이",
+  "group": "bug",
+  "kind": "caterpillar",
+  "version": "0.1",
+  "items": [
+    "bug.caterpillar"
+  ],
+  "hold": true,
+  "triangles": 3184,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "hair",
+    "head",
+    "stripe"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.049,
+    0.192,
+    0.062
+  ],
+  "bounds": [
+    [
+      -0.024,
+      -0.096,
+      -0.031
+    ],
+    [
+      0.024,
+      0.096,
+      0.031
+    ]
+  ],
+  "glbBytes": 66904,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-caterpillar_main.png",
+    "bug-caterpillar_thumb.png"
+  ]
+}

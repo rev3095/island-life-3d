@@ -1,0 +1,45 @@
+{
+  "id": "IC-BG-17",
+  "slug": "bug-snail",
+  "name": "달팽이",
+  "group": "bug",
+  "kind": "snail",
+  "version": "0.1",
+  "items": [
+    "bug.snail"
+  ],
+  "hold": true,
+  "triangles": 1580,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "shell"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.071,
+    0.175,
+    0.112
+  ],
+  "bounds": [
+    [
+      -0.035,
+      -0.087,
+      -0.056
+    ],
+    [
+      0.035,
+      0.087,
+      0.056
+    ]
+  ],
+  "glbBytes": 31448,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-snail_main.png",
+    "bug-snail_thumb.png"
+  ]
+}

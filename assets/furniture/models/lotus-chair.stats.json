@@ -1,0 +1,55 @@
+{
+  "id": "FU-32",
+  "slug": "lotus-chair",
+  "item": "furn.lotus-chair",
+  "name": "연잎 의자",
+  "category": "furniture",
+  "kind": "lotus-chair",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4272,
+  "parts": 2,
+  "materials": [
+    "center",
+    "dew",
+    "leaf",
+    "leafVein",
+    "lotus",
+    "lotusDeep",
+    "stem"
+  ],
+  "objects": [
+    "chair",
+    "lotus"
+  ],
+  "animations": {},
+  "size": [
+    0.9,
+    0.9,
+    0.64
+  ],
+  "bounds": [
+    [
+      -0.45,
+      -0.45,
+      0.0
+    ],
+    [
+      0.45,
+      0.45,
+      0.638
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 83844,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lotus-chair_front.png",
+    "lotus-chair_main.png",
+    "lotus-chair_thumb.png",
+    "lotus-chair_top.png"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "IC-MA-04",
+  "slug": "mat-stone",
+  "name": "돌",
+  "group": "mat",
+  "kind": "stone",
+  "version": "0.1",
+  "items": [
+    "mat.stone"
+  ],
+  "hold": false,
+  "triangles": 284,
+  "parts": 1,
+  "materials": [
+    "stone",
+    "stoneLight"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.398,
+    0.304,
+    0.215
+  ],
+  "bounds": [
+    [
+      -0.199,
+      -0.152,
+      0.0
+    ],
+    [
+      0.199,
+      0.152,
+      0.215
+    ]
+  ],
+  "glbBytes": 14480,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-stone_main.png",
+    "mat-stone_thumb.png"
+  ]
+}

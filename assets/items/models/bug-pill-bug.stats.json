@@ -1,0 +1,46 @@
+{
+  "id": "IC-BG-18",
+  "slug": "bug-pill-bug",
+  "name": "쥐며느리",
+  "group": "bug",
+  "kind": "pillbug",
+  "version": "0.1",
+  "items": [
+    "bug.pill-bug"
+  ],
+  "hold": true,
+  "triangles": 2844,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "shell"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.08,
+    0.171,
+    0.042
+  ],
+  "bounds": [
+    [
+      -0.04,
+      -0.086,
+      -0.021
+    ],
+    [
+      0.04,
+      0.086,
+      0.021
+    ]
+  ],
+  "glbBytes": 55588,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-pill-bug_main.png",
+    "bug-pill-bug_thumb.png"
+  ]
+}

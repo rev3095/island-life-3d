@@ -1,0 +1,70 @@
+{
+  "id": "IC-FR-03",
+  "slug": "fruit-peach",
+  "name": "복숭아",
+  "group": "fruit",
+  "category": "item",
+  "kind": "fruit",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fruit.peach",
+      "code": "IC-FR-03"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "잘 익은 복숭아, 꼭지에 잎 하나",
+    "keywords": [
+      "둥근 열매",
+      "잎 한 장"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": [
+      "shine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "shape": {
+      "label": "모양",
+      "value": "peach",
+      "options": [
+        "apple",
+        "pear",
+        "peach",
+        "cherry",
+        "orange"
+      ]
+    }
+  },
+  "palette": {
+    "fruit": "#F7A6A0",
+    "fruitDark": "#E8847E",
+    "shine": "#FFFFFF",
+    "stem": "#7F5636",
+    "leaf": "#5FAE5A"
+  },
+  "paletteLabels": {
+    "fruit": "열매",
+    "fruitDark": "열매 무늬",
+    "shine": "빛",
+    "stem": "꼭지",
+    "leaf": "잎"
+  }
+}

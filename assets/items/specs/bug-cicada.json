@@ -1,0 +1,72 @@
+{
+  "id": "IC-BG-08",
+  "slug": "bug-cicada",
+  "name": "매미",
+  "group": "bug",
+  "category": "item",
+  "kind": "cicada",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.cicada",
+      "code": "IC-BG-08"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "여름 내내 나무에 붙어 맴맴 노래한다. 땅속에서 몇 해를 기다렸다 나온 가수.",
+    "keywords": [
+      "나무 줄기",
+      "낮"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.26,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#3B3530",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#6E5A3E",
+    "mark": "#8C7A52",
+    "wing": "#DDEBE6",
+    "wingMark": "#9AB0A8",
+    "leg": "#5A4A32"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "mark": "무늬",
+    "wing": "날개",
+    "wingMark": "날개 무늬",
+    "leg": "다리"
+  },
+  "render": {
+    "yaw": -55,
+    "pitch": 38
+  }
+}

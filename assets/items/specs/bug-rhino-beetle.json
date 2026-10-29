@@ -1,0 +1,94 @@
+{
+  "id": "IC-BG-10",
+  "slug": "bug-rhino-beetle",
+  "name": "장수풍뎅이",
+  "group": "bug",
+  "category": "item",
+  "kind": "beetle",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.rhino-beetle",
+      "code": "IC-BG-10"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "이마의 큰 뿔이 자랑인 힘센 곤충. 밤마다 나무즙을 먹으러 온다.",
+    "keywords": [
+      "나무 줄기",
+      "밤"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.3,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (크기 비)",
+      "value": 0.55,
+      "min": 0.2,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 너비 (크기 비)",
+      "value": 0.4,
+      "min": 0.05,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "몸 높이 (크기 비)",
+      "value": 0.28,
+      "min": 0.1,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "horn": {
+      "label": "뿔",
+      "value": true
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "shell": "#5A3A24",
+    "body": "#3E281A",
+    "head": "#3E281A",
+    "leg": "#3E281A"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "shell": "껍데기",
+    "body": "몸",
+    "head": "머리",
+    "leg": "다리"
+  }
+}

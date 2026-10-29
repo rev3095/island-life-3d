@@ -1,0 +1,20 @@
+{
+  "id": "RM-06",
+  "slug": "rm-06",
+  "kind": "room",
+  "owner": "chorong",
+  "ownerName": "초롱",
+  "name": "비 오는 날 방",
+  "version": 1,
+  "status": "review",
+  "note": "수다쟁이 개구리. 빗방울 벽지와 연못 바닥.",
+  "wallpaper": "wp-07",
+  "floor": "fl-07",
+  "host": { "lx": 5.5, "lz": 3.6, "face": "s" },
+  "furniture": [
+    { "fu": "FU-31", "name": "우산꽂이", "box": [1, 1, 0.9], "color": "#8CCB6E", "gx": 7, "gz": 5, "rot": 0 },
+    { "fu": "FU-32", "name": "연잎 의자", "box": [1, 1, 0.5], "color": "#5FAE5A", "gx": 4, "gz": 2, "rot": 0 },
+    { "item": "furn.round-rug", "variant": "blue", "gx": 0, "gz": 4, "rot": 0 },
+    { "item": "furn.plant-pot", "variant": "terracotta", "gx": 0, "gz": 1, "rot": 0 }
+  ]
+}

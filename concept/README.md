@@ -7,6 +7,21 @@
 | 컨셉 보드 v0.1 (1차 계획, 저장 없음) | `concept-board.html` | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | — |
 | 5차 검수 보드 v0.5 | `wave5-board.html` + `board-kit.js` | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `wave5` |
 | Z5 축제 검수 보드 v0.1 (이모티콘 대화·축제 광장·부품·부스·엔딩, D14–D25) | `z5-festival-board.html` + `board-kit.js` | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `z5` |
+| 6차 검수 보드 v0.6 (M6 편집기 완성) | `wave6-board.html` + `board-kit.js` | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `wave6` |
+
+## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
+
+| 접두사 | 무엇 | 쓴 번호 |
+|---|---|---|
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26– (wave6) |
+| CH | 캐릭터 | CH-01–10 (CH-11·12 는 후보만) |
+| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 · PR-01–12 (+z5 PR-13–16) · BD-01–05 (+z5 BD-06–07) · TI-01–07 (+z5 TI-08) |
+| FU | 가구 | FU-01–33 (+z5 FU-34) |
+| IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 |
+| WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 |
+| EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 · ED-01–06 · SF-1–6 · UI-04–05 |
+| s01– | 장면 (시나리오 편집기) | s01–s12 |
+| ET | 편집기 (wave6) | ET-01– |
 
 ## 새 보드 만드는 법 (6차부터)
 

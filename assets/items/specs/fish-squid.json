@@ -1,0 +1,68 @@
+{
+  "id": "IC-FS-15",
+  "slug": "fish-squid",
+  "name": "오징어",
+  "group": "fish",
+  "category": "item",
+  "kind": "squid",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fish.squid",
+      "code": "IC-FS-15"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "다리가 열 개인 바다의 재주꾼. 놀라면 먹물을 뿜고 사라진다.",
+    "keywords": [
+      "바다",
+      "그림자 3"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.4,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#F2E4D6",
+    "back": "#E2B8A0",
+    "belly": "#FAF4EC",
+    "fin": "#ECCDB8",
+    "mark": "#AA8A78",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

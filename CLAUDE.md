@@ -41,13 +41,18 @@ node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배�
 
 ### 편집기와 "요청 확인" 흐름
 - `editor.html`(캐릭터 편집기, https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2) · `bg-editor.html`(배경 편집기, https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh) 은 아티팩트로 공개되며 capabilities `db`·`assets`·`user` 를 쓴다. 사용자가 레퍼런스(이미지·영상→장면 6장)와 프롬프트로 요청을 저장한다: 캐릭터 `refs`/`requests`, 배경 `env-refs`/`env-requests` 컬렉션.
-- 채팅에 "요청 확인"(캐릭터) / "배경 요청 확인"(배경)이 오면: ArtifactData 로 `status:'new'` 요청 읽기 → `working` → 레퍼런스는 Artifact read `path=<asset id>` 로 내려받아 직접 본다 → 스펙·빌더 수정 (`version` 올리고, 확정이던 요소는 status `review` 로) → 재빌드 → 크기가 바뀌었으면 같은 스펙의 `world` 칸(충돌·집터) 맞추기 → `node --test tests/` (`assets.test.mjs` 가 교체 약속 검사) → 같은 아티팩트에 다시 publish (바뀐 파일만 `files` 로; bg-editor 는 파일 270개라 255개 제한) → 게임 링크도 다시 게시 (웹 배포 절) → 요청을 `done` + `reply` + `doneVersion` 으로 갱신.
+- 채팅에 "요청 확인"(캐릭터) / "배경 요청 확인"(배경)이 오면: ArtifactData 로 `status:'new'` 요청 읽기 → `working` → 레퍼런스는 Artifact read `path=<asset id>` 로 내려받아 직접 본다 → 스펙·빌더 수정 (`version` 올리고, 확정이던 요소는 status `review` 로) → 재빌드 → 크기가 바뀌었으면 같은 스펙의 `world` 칸(충돌·집터) 맞추기 → `node --test tests/` (`assets.test.mjs` 가 교체 약속 검사) → 같은 아티팩트에 다시 publish (바뀐 파일만 `files` 로, 한 번에 255개. bg-editor 는 아티팩트 한 버전에 파일 511개까지라 요소별 스펙·통계 대신 `node tools/build-editor-index.mjs` 로 만든 묶음 목록 `editor-index.json` 두 개를 올리고 `specs/`·`.stats.json` 은 올리지 않는다) → 게임 링크도 다시 게시 (웹 배포 절) → 요청을 `done` + `reply` + `doneVersion` 으로 갱신.
 - "<이름> 확정": 스펙 `status: "approved"` → `node tools/build-*.mjs --index` (Blender 없이 목록만) → 편집기 다시 publish. 2026-10-29 에 61종(캐릭터 9 · 배경 32 · 가구 20) 모두 임시 확정. 교체 약속은 `docs/CONTRACTS.md` 끝 "리소스 교체 약속".
 - 로컬 dev-server 는 `/api/db/<col>`·`/api/assets` 로 같은 흐름을 파일(`assets/review/`, `assets/references/`, gitignore)로 흉내 낸다.
 
 ### 검수 보드와 "검수 보드 반영" 흐름
 - 새 리소스·큰 결정이 필요한 차수는 **선택지가 있는 검수 보드부터** 만들어 사용자가 고르게 한다 (`concept/README.md` — 만드는 법, 보드 목록). 보드는 공용 `concept/board-kit.js` 로 선택·의견을 아티팩트 저장소에 두고, 반영 기록·되돌리기를 보여 준다.
 - 채팅에 "검수 보드 반영"이 오면: `boards/<id>` 와 `applied/<id>` 를 비교해 바뀐 결정·의견만 반영(되돌리기는 `history` 의 `commit` 기준 `git revert`) → 승인 뒤 합치기 → `applied` 버전 올리고 `history` 기록. 자세한 순서는 `concept/README.md`.
+
+### 스토리와 "시나리오 반영" 흐름
+- 컷신은 데이터다: 장면 하나 = `assets/story/scenes/<id>.json` (트리거 · 연출안 2~3개(`takes`, 추천 하나, `pick` = 게임에 들어갈 것) · 컷(카메라·배우 자리/동작·이모티콘 말풍선 + 비워 둔 글 칸·전환·음악·고르기 갈래)), 순서는 `assets/story/index.json`, 파일 목록은 `src/gameplay/story/files.js` (웹 빌드가 이 글자로 묶는다). 재생기 `src/gameplay/story/` (`ctx.services.story.play(id)`, 이벤트 `story:start`·`story:end`), 규칙·카메라 계산 `rules.js` 는 편집기와 같이 쓴다. 모양·트리거·갈고리 제안은 `docs/notes/story.md`.
+- 시나리오 편집기 `story-editor.html` (아티팩트, 링크는 `docs/notes/story.md` 첫 줄, capabilities `db`·`user`, `applied`·`history` 쓰기 admin): 사용자가 연출안을 고르고 컷·순서·글을 고치고 의견을 남기면 `drafts/<장면 id>`·`timeline/main` 에 저장된다.
+- 채팅에 "시나리오 반영"이 오면: `drafts`·`timeline` 을 읽어 장면 파일과 다른 것만 반영(고침 = `version` +1, 새 장면 = 파일 + index.json + files.js, 의견 = 컷을 고치거나 새 연출안으로, 되돌리기 = `history/story-v<n>.commit` 의 `assets/story/`) → `node --test tests/` → dev-server `/index.html?story=<id>&take=<key>` 로 재생 확인 → 커밋 → 편집기 다시 publish (바뀐 파일만) → `applied/story` 버전 +1 · `history/story-v<n>` 기록. 자세한 순서는 `docs/notes/story.md` "시나리오 반영".
 
 ### 웹 배포 (게임 링크)
 - 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면) · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.

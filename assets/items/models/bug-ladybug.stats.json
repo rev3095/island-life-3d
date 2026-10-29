@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-04",
+  "slug": "bug-ladybug",
+  "name": "무당벌레",
+  "group": "bug",
+  "kind": "beetle",
+  "version": "0.1",
+  "items": [
+    "bug.ladybug"
+  ],
+  "hold": true,
+  "triangles": 2704,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "mark",
+    "shell"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.128,
+    0.182,
+    0.071
+  ],
+  "bounds": [
+    [
+      -0.064,
+      -0.091,
+      -0.036
+    ],
+    [
+      0.064,
+      0.091,
+      0.036
+    ]
+  ],
+  "glbBytes": 56204,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-ladybug_main.png",
+    "bug-ladybug_thumb.png"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "id": "s03-firstday-done",
+  "version": 1,
+  "status": "approved",
+  "chapter": "첫날",
+  "title": "첫날을 마치고",
+  "summary": "첫날 할 일을 다 하고 밤톨에게 선물을 받은 뒤, 근처 주민들이 와서 박수를 친다. 노을 지는 섬으로 마무리.",
+  "trigger": {"on":"firstday-done"},
+  "place": "shop",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "주민들의 박수",
+      "recommended": true,
+      "desc": "주민 셋이 달려와 박수 → 주인공 감동 → 노을 풍경.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "밤톨이 축하한다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"bamtol","angle":10,"move":"static"},
+          "actors": [
+            {"who":"bamtol","at":[0.8,1.6],"face":"player","do":"happy","emote":"🎉","text":""},
+            {"who":"player","at":[-0.6,2.4],"face":"bamtol","emote":"😄","text":""}
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "코코·보리·모찌가 달려와 박수를 친다",
+          "dur": 4,
+          "cam": {"size":"group","target":"player","angle":0,"move":"pull"},
+          "actors": [
+            {"who":"coco","at":[-5,6],"to":[-2.2,3.6],"do":"run","face":"player","emote":"👏","text":""},
+            {"who":"bori","at":[5,6],"to":[2,3.4],"do":"run","emote":"👏","text":""},
+            {"who":"mochi","at":[0,8],"to":[-0.8,4.4],"do":"run","emote":"🎉","text":""}
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "주인공이 뭉클해한다",
+          "dur": 2.2,
+          "cam": {"size":"close","target":"player","angle":0,"move":"push"},
+          "actors": [
+            {"who":"player","face":"camera","emote":"🥹","text":""},
+            {"who":"coco","face":"player"},
+            {"who":"bori","face":"player"},
+            {"who":"mochi","face":"player"}
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "다 같이 기뻐하고, 카메라가 멀어지며 섬을 비춘다",
+          "dur": 4,
+          "cam": {"size":"wide","target":"group","angle":0,"move":"crane"},
+          "music": "evening",
+          "actors": [{"who":"player","do":"happy"},{"who":"coco","do":"happy"},{"who":"bori","do":"happy"},{"who":"mochi","do":"happy"}]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "밤톨과 둘이서",
+      "desc": "선물 상자와 하트로 조용하게. 주민은 나오지 않는다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "밤톨이 선물을 건넨다",
+          "dur": 2.8,
+          "cam": {"size":"medium","target":"group","angle":0,"move":"static"},
+          "actors": [
+            {"who":"bamtol","at":[0.8,1.6],"face":"player","emote":"🎁","text":""},
+            {"who":"player","at":[-0.6,2.4],"face":"bamtol","emote":"😮","text":""}
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "밤톨이 하트, 주인공이 기뻐한다",
+          "dur": 3,
+          "cam": {"size":"close","target":"bamtol","angle":20,"move":"push"},
+          "actors": [{"who":"bamtol","do":"happy","emote":"❤️","text":""},{"who":"player","do":"happy","emote":"😊","text":""}]
+        }
+      ]
+    },
+    {
+      "key": "C",
+      "title": "한 컷 축하",
+      "desc": "둘이 함께 만세 한 컷 (3초).",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "둘이 함께 만세",
+          "dur": 3,
+          "cam": {"size":"group","target":"group","angle":0,"move":"orbit"},
+          "actors": [
+            {"who":"bamtol","at":[0.8,1.6],"face":"player","do":"happy","emote":"🎉","text":""},
+            {"who":"player","at":[-0.6,2.4],"face":"bamtol","do":"happy","emote":"🙌","text":""}
+          ]
+        }
+      ]
+    }
+  ]
+}

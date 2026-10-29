@@ -1,0 +1,44 @@
+{
+  "id": "IC-MA-05",
+  "slug": "mat-iron",
+  "name": "철광석",
+  "group": "mat",
+  "kind": "iron",
+  "version": "0.1",
+  "items": [
+    "mat.iron"
+  ],
+  "hold": false,
+  "triangles": 306,
+  "parts": 1,
+  "materials": [
+    "metal",
+    "stone"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.358,
+    0.261,
+    0.234
+  ],
+  "bounds": [
+    [
+      -0.179,
+      -0.131,
+      0.0
+    ],
+    [
+      0.179,
+      0.131,
+      0.234
+    ]
+  ],
+  "glbBytes": 20608,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-iron_main.png",
+    "mat-iron_thumb.png"
+  ]
+}

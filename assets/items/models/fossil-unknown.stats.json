@@ -1,0 +1,45 @@
+{
+  "id": "IC-FO-09",
+  "slug": "fossil-unknown",
+  "name": "알 수 없는 화석",
+  "group": "fossil",
+  "kind": "unknown-fossil",
+  "version": "0.1",
+  "items": [
+    "fossil.unknown"
+  ],
+  "hold": true,
+  "triangles": 824,
+  "parts": 1,
+  "materials": [
+    "bone",
+    "dirt",
+    "dirtDark"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.26,
+    0.224,
+    0.165
+  ],
+  "bounds": [
+    [
+      -0.13,
+      -0.112,
+      -0.082
+    ],
+    [
+      0.13,
+      0.112,
+      0.082
+    ]
+  ],
+  "glbBytes": 28136,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-unknown_main.png",
+    "fossil-unknown_thumb.png"
+  ]
+}

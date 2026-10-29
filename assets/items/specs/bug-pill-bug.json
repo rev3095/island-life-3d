@@ -1,0 +1,68 @@
+{
+  "id": "IC-BG-18",
+  "slug": "bug-pill-bug",
+  "name": "쥐며느리",
+  "group": "bug",
+  "category": "item",
+  "kind": "pillbug",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.pill-bug",
+      "code": "IC-BG-18"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "바위를 들추면 동그랗게 몸을 마는 작은 친구. 축축한 곳을 좋아한다.",
+    "keywords": [
+      "바위 밑",
+      "종일"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.18,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#6E7275",
+    "shell": "#82888A",
+    "leg": "#555A5C"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "shell": "껍데기",
+    "leg": "다리"
+  },
+  "render": {
+    "yaw": -60,
+    "pitch": 30
+  }
+}

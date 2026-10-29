@@ -1,0 +1,50 @@
+{
+  "id": "IC-FR-06",
+  "slug": "fruit-coconut",
+  "name": "야자열매",
+  "group": "fruit",
+  "category": "item",
+  "kind": "coconut",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fruit.coconut",
+      "code": "IC-FR-06"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "털 결이 보이는 갈색 야자열매, 눈 세 개",
+    "keywords": [
+      "갈색",
+      "세 점"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "coconut": "#7A5232",
+    "coconutDark": "#4E3422"
+  },
+  "paletteLabels": {
+    "coconut": "야자 껍질",
+    "coconutDark": "야자 줄"
+  }
+}

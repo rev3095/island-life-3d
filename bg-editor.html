@@ -313,12 +313,14 @@ const MAX_BYTES = 20 * 1024 * 1024;
 function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); }); }
 
 let models = [], categories = ['nature', 'prop', 'building', 'tile'];
-try { ({ models, categories = categories } = await loadJSON(BASE + 'index.json')); }
+// 게시본은 요소마다 스펙·통계를 넣은 묶음 목록(editor-index.json, tools/build-editor-index.mjs)을 읽는다 — 아티팩트 파일 수 제한 때문. 없으면 index.json
+const loadIndex = b => loadJSON(b + 'editor-index.json').catch(() => loadJSON(b + 'index.json'));
+try { ({ models, categories = categories } = await loadIndex(BASE)); }
 catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어요.'; $('viewerMsg').textContent = '로컬에서는 node dev-server.mjs 로 연 주소에서 확인해 주세요.'; throw e; }
 // 배경 요소와 가구는 폴더가 달라서 요소마다 폴더(base)를 기억한다. 모닥불처럼 slug 가 겹치는 가구는 key 앞에 furn- 을 붙여 나눈다.
 models.forEach(m => Object.assign(m, { key: m.slug, base: BASE }));
 try {
-  const furn = (await loadJSON(FURN + 'index.json')).models ?? [];
+  const furn = (await loadIndex(FURN)).models ?? [];
   models.push(...furn.map(m => ({ ...m, category: 'furniture', key: 'furn-' + m.slug, base: FURN })));
   if (furn.length) categories = [...categories, 'furniture'];
 } catch {}
@@ -386,7 +388,7 @@ async function select(next) {
   $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
   $('viewerMsg').hidden = false; $('viewerMsg').textContent = '3D 모델 불러오는 중…';
   const want = slug, B = model.base, file = model.slug;
-  try { cache[want] ??= await Promise.all([loadJSON(`${B}specs/${file}.json`), loadJSON(`${B}models/${file}.stats.json`)]); }
+  try { cache[want] ??= model.spec && model.stats ? [model.spec, model.stats] : await Promise.all([loadJSON(`${B}specs/${file}.json`), loadJSON(`${B}models/${file}.stats.json`)]); }
   catch { if (slug === want) $('viewerMsg').textContent = '요소 정보를 불러오지 못했어요.'; return; }
   if (slug !== want) return;
   [spec, stats] = cache[want];

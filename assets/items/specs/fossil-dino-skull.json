@@ -1,0 +1,65 @@
+{
+  "id": "IC-FO-08",
+  "slug": "fossil-dino-skull",
+  "name": "공룡 두개골",
+  "group": "fossil",
+  "category": "item",
+  "kind": "dino-skull",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fossil.dino-skull",
+      "code": "IC-FO-08"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "거대한 공룡의 머리뼈. 박물관 한가운데에 놓일 섬의 보물이다.",
+    "keywords": [
+      "박물관 화석"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기",
+      "value": 0.44,
+      "min": 0.15,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bone": "#E8DCC0",
+    "socket": "#5A4632",
+    "tooth": "#F7F1E4",
+    "stone": "#A8A49B"
+  },
+  "paletteLabels": {
+    "bone": "뼈",
+    "socket": "눈구멍",
+    "tooth": "이빨",
+    "stone": "돌"
+  },
+  "render": {
+    "yaw": -60,
+    "pitch": 20
+  }
+}

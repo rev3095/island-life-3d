@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-15",
+  "slug": "bug-bell-cricket",
+  "name": "방울벌레",
+  "group": "bug",
+  "kind": "hopper",
+  "version": "0.1",
+  "items": [
+    "bug.bell-cricket"
+  ],
+  "hold": true,
+  "triangles": 1988,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "leg2",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.238,
+    0.321,
+    0.185
+  ],
+  "bounds": [
+    [
+      -0.119,
+      -0.16,
+      -0.092
+    ],
+    [
+      0.119,
+      0.16,
+      0.092
+    ]
+  ],
+  "glbBytes": 42624,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-bell-cricket_main.png",
+    "bug-bell-cricket_thumb.png"
+  ]
+}

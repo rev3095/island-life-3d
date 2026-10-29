@@ -1,0 +1,17 @@
+{
+  "id": "FL-06",
+  "slug": "fl-06",
+  "kind": "floor",
+  "name": "노랑 체크 타일",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "step": "wood",
+  "pattern": {
+    "tile": [20, 20],
+    "size": [1, 1],
+    "base": "base",
+    "shapes": [{ "rect": [0, 0, 10, 10], "fill": "check" }, { "rect": [10, 10, 10, 10], "fill": "check" }]
+  },
+  "palette": { "base": "#FFF4D0", "check": "#FFD866", "edge": "#D9B03A" }
+}

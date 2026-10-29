@@ -1,0 +1,94 @@
+{
+  "id": "IC-FL-09",
+  "slug": "flower-pansy",
+  "name": "팬지",
+  "group": "flower",
+  "category": "item",
+  "kind": "pansy",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "flower.pansy-purple",
+      "code": "IC-FL-09",
+      "variant": "purple"
+    },
+    {
+      "item": "flower.pansy-yellow",
+      "code": "IC-FL-10",
+      "variant": "yellow"
+    },
+    {
+      "item": "flower.pansy-blue",
+      "code": "IC-FL-11",
+      "variant": "blue"
+    },
+    {
+      "item": "flower.pansy-orange",
+      "code": "IC-FL-12",
+      "variant": "orange"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "얼굴 무늬가 있는 다섯 잎 팬지",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "petal": "#9C7BD6",
+    "petalDark": "#5B3F94",
+    "center": "#F6C84C"
+  },
+  "paletteLabels": {
+    "stem": "꼭지",
+    "petal": "꽃잎",
+    "petalDark": "꽃잎 무늬",
+    "center": "꽃술"
+  },
+  "variants": {
+    "purple": {
+      "label": "보라 (기본)",
+      "palette": {}
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "petal": "#F6D35C",
+        "petalDark": "#B5852A"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "petal": "#7FA8E6",
+        "petalDark": "#3F5FA8"
+      }
+    },
+    "orange": {
+      "label": "주황",
+      "palette": {
+        "petal": "#F2A65A",
+        "petalDark": "#B4532A"
+      }
+    }
+  }
+}

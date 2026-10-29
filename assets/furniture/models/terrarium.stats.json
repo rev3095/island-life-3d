@@ -1,0 +1,58 @@
+{
+  "id": "FU-26",
+  "slug": "terrarium",
+  "item": "furn.terrarium",
+  "name": "유리 온실",
+  "category": "furniture",
+  "kind": "terrarium",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3626,
+  "parts": 3,
+  "materials": [
+    "bloom",
+    "bloomCenter",
+    "frame",
+    "glass",
+    "leaf",
+    "soil",
+    "stem",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "base",
+    "dome",
+    "plant"
+  ],
+  "animations": {},
+  "size": [
+    0.7,
+    0.7,
+    0.78
+  ],
+  "bounds": [
+    [
+      -0.35,
+      -0.35,
+      0.0
+    ],
+    [
+      0.35,
+      0.35,
+      0.78
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 73636,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "terrarium_front.png",
+    "terrarium_main.png",
+    "terrarium_thumb.png",
+    "terrarium_top.png"
+  ]
+}

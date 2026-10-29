@@ -1,0 +1,94 @@
+{
+  "id": "IC-BG-11",
+  "slug": "bug-stag-beetle",
+  "name": "사슴벌레",
+  "group": "bug",
+  "category": "item",
+  "kind": "beetle",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.stag-beetle",
+      "code": "IC-BG-11"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "사슴뿔 같은 큰 턱을 가진 귀한 곤충. 야자수에 몰래 붙어 있다.",
+    "keywords": [
+      "야자수",
+      "밤"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.32,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (크기 비)",
+      "value": 0.5,
+      "min": 0.2,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 너비 (크기 비)",
+      "value": 0.36,
+      "min": 0.05,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "몸 높이 (크기 비)",
+      "value": 0.22,
+      "min": 0.1,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "jaws": {
+      "label": "큰 턱",
+      "value": true
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "shell": "#3A2A20",
+    "body": "#2A1E16",
+    "head": "#2A1E16",
+    "leg": "#2A1E16"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "shell": "껍데기",
+    "body": "몸",
+    "head": "머리",
+    "leg": "다리"
+  }
+}

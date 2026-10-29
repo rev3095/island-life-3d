@@ -1,0 +1,63 @@
+{
+  "id": "s08-part4",
+  "version": 1,
+  "status": "approved",
+  "chapter": "축제 준비",
+  "title": "네 번째 부품",
+  "summary": "네 번째 부품. 코코와 모찌가 광장에 등불을 걸어 시험해 본다. 축제가 코앞이다.",
+  "trigger": {"on":"festival-part","n":4},
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "등불 시험",
+      "recommended": true,
+      "desc": "부품 → 코코·모찌가 등불을 들고 → 카메라가 올라가며 광장이 반짝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공이 부품을 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        },
+        {
+          "id": "c2",
+          "note": "코코와 모찌가 등불을 들어 보인다",
+          "dur": 3,
+          "cam": {"size":"group","target":"group","angle":15,"move":"static"},
+          "actors": [
+            {"who":"coco","at":[-1.5,-0.2],"face":"player","emote":"🏮","text":""},
+            {"who":"mochi","at":[1.5,-0.2],"face":"player","emote":"🏮","text":""}
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "광장이 반짝인다",
+          "dur": 3.5,
+          "cam": {"size":"wide","target":"place","angle":0,"move":"crane"},
+          "caption": "🧩 4/5",
+          "music": "evening",
+          "actors": [{"who":"coco","do":"happy","emote":"✨","text":""},{"who":"mochi","do":"happy"},{"who":"player","do":"happy"}]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "짧게 한 컷",
+      "desc": "주인공이 부품을 들어 보이는 한 컷 (2.5초). 자주 보는 장면이라 짧게.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "부품 4을(를) 들어 보인다",
+          "dur": 2.5,
+          "cam": {"size":"medium","target":"player","angle":0,"move":"push"},
+          "caption": "🧩 4/5",
+          "actors": [{"who":"player","at":[0,1.6],"face":180,"do":"happy","emote":"{part.emoji}","text":""}]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,430 @@
+<title>포근섬 6차 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 5차 보드와 같은 섬 안내 책자 — 마일스톤 → 지금 편집할 수 있는 것(빈칸 찾기) → 결정 → 새 편집기 스케치 → 계획. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정 */
+.dec { display: grid; gap: 10px; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+
+/* 아이콘 */
+.iconrow { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ico { display: grid; justify-items: center; gap: 2px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; }
+.ico svg { width: 100%; max-width: 64px; height: auto; }
+.ico .was { font-size: 20px; line-height: 1; }
+.compare { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.thumbB { width: 96px; height: 96px; border-radius: 10px; background: var(--stage); }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+
+/* 벽지·바닥 견본 */
+.swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.sw { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.sw svg { width: 100%; height: 72px; border-radius: 8px; display: block; }
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+.miles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.mile { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.mile .small { grid-column: 1 / -1; }
+.mile.here { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.mile.done { opacity: .78; }
+td.st { font-size: 16px; text-align: center; }
+@media (prefers-reduced-motion: no-preference) { .card, .ico { transition: border-color .15s; } }
+</style>
+
+<!-- 공용 그림 조각: 벽지·바닥 무늬, 가구·소품 그림. 방 그림과 카드가 같은 조각을 쓴다 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="wp-01" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#F7EBD3"/><rect width="9" height="24" fill="#F0DDBA"/></pattern>
+    <pattern id="wp-02" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#FCE3C4"/><rect x="2" width="7" height="24" fill="#F2B36B"/><rect x="13" width="2" height="24" fill="#F7C98F"/></pattern>
+    <pattern id="wp-03" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#E4EFFA"/><rect width="20" height="6" fill="#BFD6F0" opacity=".7"/><rect width="6" height="20" fill="#BFD6F0" opacity=".7"/></pattern>
+    <pattern id="wp-04" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#EFE8FA"/><g fill="#B9A6E0"><circle cx="7" cy="5" r="2.6"/><circle cx="10" cy="8" r="2.6"/><circle cx="7" cy="11" r="2.6"/><circle cx="4" cy="8" r="2.6"/></g><circle cx="7" cy="8" r="1.6" fill="#F6C84C"/><g fill="#D7CCF0"><circle cx="20" cy="18" r="2"/><circle cx="22" cy="20" r="2"/><circle cx="20" cy="22" r="2"/><circle cx="18" cy="20" r="2"/></g></pattern>
+    <pattern id="wp-05" width="40" height="16" patternUnits="userSpaceOnUse"><rect width="40" height="16" fill="#A8774E"/><rect y="12" width="40" height="4" fill="#7F5636"/><rect y="2" width="40" height="3" fill="#BC8B5E"/><circle cx="30" cy="7" r="2" fill="#8C6440"/></pattern>
+    <pattern id="wp-06" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#B5DCCB"/><rect x="1" y="1" width="14" height="14" rx="2" fill="#DDF2EA"/></pattern>
+    <pattern id="wp-07" width="22" height="26" patternUnits="userSpaceOnUse"><rect width="22" height="26" fill="#DCEFD3"/><path d="M6 4 q3 5 0 7 q-3 -2 0 -7z" fill="#7FB8D6"/><path d="M17 15 q3 5 0 7 q-3 -2 0 -7z" fill="#8CCB6E"/></pattern>
+    <pattern id="wp-08" width="34" height="30" patternUnits="userSpaceOnUse"><rect width="34" height="30" fill="#2E3A66"/><path d="M8 6 l1.4 3 3 .4 -2.2 2 .6 3 -2.8-1.5 -2.8 1.5 .6-3 -2.2-2 3-.4z" fill="#F7E6A8"/><circle cx="25" cy="21" r="1.4" fill="#F7E6A8"/><circle cx="28" cy="6" r="1" fill="#CDEBF5"/></pattern>
+    <pattern id="fl-01" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#D9B382"/><rect y="6" width="40" height="6" fill="#E4C594"/><rect y="5" width="40" height="1.4" fill="#8C6440"/><rect y="11" width="40" height="1.4" fill="#8C6440"/><rect x="22" width="1.4" height="6" fill="#8C6440"/><rect x="6" y="6" width="1.4" height="6" fill="#8C6440"/></pattern>
+    <pattern id="fl-02" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#EBD2A6"/><rect y="6" width="40" height="6" fill="#F3E0BC"/><rect y="5" width="40" height="1.2" fill="#B98957"/><rect y="11" width="40" height="1.2" fill="#B98957"/><rect x="28" width="1.2" height="6" fill="#B98957"/></pattern>
+    <pattern id="fl-03" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#9CC3EA"/><circle cx="3" cy="3" r="1.6" fill="#B7D4F0"/><circle cx="9" cy="9" r="1.6" fill="#B7D4F0"/></pattern>
+    <pattern id="fl-04" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#DDD6C8"/><rect x="1" y="1" width="16" height="16" fill="#F7F4EE"/></pattern>
+    <pattern id="fl-05" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#8C6440"/><rect y="6" width="40" height="6" fill="#7A5636"/><rect y="5" width="40" height="1.4" fill="#5A4030"/><rect y="11" width="40" height="1.4" fill="#5A4030"/><rect x="15" width="1.4" height="6" fill="#5A4030"/></pattern>
+    <pattern id="fl-06" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#FFF4D0"/><rect width="10" height="10" fill="#FFD866"/><rect x="10" y="10" width="10" height="10" fill="#FFD866"/></pattern>
+    <pattern id="fl-07" width="30" height="22" patternUnits="userSpaceOnUse"><rect width="30" height="22" fill="#A9B8A0"/><ellipse cx="8" cy="6" rx="7" ry="4.5" fill="#C4D0BB" stroke="#7F8F78" stroke-width="1"/><ellipse cx="22" cy="16" rx="8" ry="5" fill="#C4D0BB" stroke="#7F8F78" stroke-width="1"/></pattern>
+    <pattern id="fl-08" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#EBD9A8"/><circle cx="3" cy="4" r="1" fill="#D9C38A"/><circle cx="10" cy="10" r="1.2" fill="#D9C38A"/><circle cx="11" cy="3" r=".8" fill="#F5E8C4"/></pattern>
+
+    <!-- 가구·소품 그림 (앞에서 본 모습, 0 0 120 100) -->
+    <g id="g-ink" />
+    <symbol id="f-21" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M64 4 C84 18 82 78 60 96 C40 80 42 20 64 4z" fill="#F7F1E4"/><path d="M62 14 C70 34 70 64 60 86" fill="none" stroke="#F2B36B" stroke-width="7"/></g></symbol>
+    <symbol id="f-22" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="46" cy="40" r="14" fill="#E8504F"/><circle cx="72" cy="36" r="13" fill="#6CA0DC"/><circle cx="60" cy="30" r="10" fill="#F6C84C"/><path d="M26 46 H94 L86 94 H34z" fill="#C99A63"/><path d="M30 62 H90 M32 78 H88" fill="none" stroke-width="2"/></g></symbol>
+    <symbol id="f-23" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="8" y="44" width="104" height="44" rx="20" fill="#6CA0DC"/><rect x="18" y="34" width="84" height="40" rx="18" fill="#9CC3EA"/><ellipse cx="38" cy="50" rx="16" ry="9" fill="#F7F1E4"/></g></symbol>
+    <symbol id="f-24" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><ellipse cx="60" cy="72" rx="46" ry="20" fill="#6CA0DC"/><path d="M34 50 a9 9 0 1 1 10 -12 h32 a9 9 0 1 1 10 12 a9 9 0 1 1 -10 12 h-32 a9 9 0 1 1 -10 -12z" fill="#F7F1E4"/></g></symbol>
+    <symbol id="f-25" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M14 20 V96 M106 20 V96" fill="none" stroke="#8C6440" stroke-width="6"/><rect x="10" y="52" width="100" height="8" fill="#B98957"/><rect x="10" y="88" width="100" height="8" fill="#B98957"/><rect x="24" y="36" width="16" height="16" fill="#C96F4A"/><circle cx="32" cy="28" r="9" fill="#F4B6C8"/><rect x="54" y="38" width="14" height="14" fill="#C96F4A"/><circle cx="61" cy="30" r="8" fill="#B9A6E0"/><rect x="80" y="72" width="16" height="16" fill="#C96F4A"/><circle cx="88" cy="64" r="9" fill="#F6C84C"/><rect x="34" y="74" width="14" height="14" fill="#C96F4A"/><circle cx="41" cy="66" r="8" fill="#FBF7F2"/></g></symbol>
+    <symbol id="f-26" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="26" y="80" width="68" height="14" rx="3" fill="#B98957"/><path d="M30 80 V44 a30 30 0 0 1 60 0 V80z" fill="#CDEBF5" fill-opacity=".75"/><path d="M60 80 V56" stroke="#5E9F4F" fill="none"/><ellipse cx="52" cy="60" rx="8" ry="4" fill="#5FAE5A"/><ellipse cx="68" cy="54" rx="8" ry="4" fill="#5FAE5A"/><circle cx="60" cy="48" r="6" fill="#F7A6A0"/><path d="M42 40 q6 -10 14 -12" fill="none" stroke="#FBFDF8" stroke-width="3"/></g></symbol>
+    <symbol id="f-27" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="16" y="18" width="88" height="22" rx="4" fill="#A8774E"/><path d="M28 30 L44 94 M58 30 L74 94" fill="none" stroke="#7F5636" stroke-width="5"/><path d="M44 94 q20 -30 40 -50 M74 94 q14 -20 22 -36" fill="none" stroke="#9DB2A6" stroke-width="1.5"/><circle cx="86" cy="44" r="5" fill="#E8504F"/><circle cx="35" cy="60" r="5" fill="#4E5A57"/></g></symbol>
+    <symbol id="f-28" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="74" y="4" width="12" height="34" fill="#4E5A57"/><rect x="28" y="34" width="66" height="54" rx="10" fill="#4E5A57"/><rect x="42" y="48" width="38" height="24" rx="5" fill="#F39A3B"/><path d="M52 70 q6 -14 10 -4 q4 -12 8 4z" fill="#F7E6A8" stroke-width="2"/><path d="M34 88 v8 M88 88 v8" fill="none" stroke-width="5"/></g></symbol>
+    <symbol id="f-29" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="8" y="44" width="104" height="52" rx="4" fill="#F7F1E4"/><rect x="4" y="38" width="112" height="10" rx="3" fill="#B98957"/><rect x="18" y="56" width="38" height="32" rx="3" fill="#BDE3D6"/><rect x="64" y="56" width="38" height="32" rx="3" fill="#BDE3D6"/><path d="M30 38 V24 h30 V38" fill="#4E5A57"/><path d="M26 24 h38" fill="none" stroke-width="4"/><circle cx="90" cy="30" r="8" fill="#E8504F"/></g></symbol>
+    <symbol id="f-30" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="44" cy="48" r="13" fill="#E8504F"/><circle cx="68" cy="44" r="13" fill="#F39A3B"/><circle cx="56" cy="34" r="11" fill="#D9D36A"/><circle cx="80" cy="54" r="10" fill="#F7A6A0"/><path d="M22 56 H98 L90 92 H30z" fill="#C99A63"/><path d="M38 56 C40 24 80 24 82 56" fill="none" stroke-width="4"/></g></symbol>
+    <symbol id="f-31" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M50 50 C40 20 70 4 76 30" fill="none" stroke="#E8504F" stroke-width="5"/><path d="M66 50 C62 22 86 14 88 34" fill="none" stroke="#F6C84C" stroke-width="5"/><path d="M38 20 q12 -16 24 0z" fill="#6CA0DC"/><path d="M44 20 V54" fill="none"/><rect x="34" y="50" width="52" height="46" rx="6" fill="#7FA36B"/><path d="M34 64 h52" fill="none"/></g></symbol>
+    <symbol id="f-32" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M56 62 L50 94 h20 l-6 -32" fill="#5E9F4F"/><path d="M14 54 a46 18 0 1 0 92 0 a46 18 0 1 0 -92 0z M60 54 L96 46" fill="#8CCB6E"/><path d="M82 36 q6 -12 12 0 q6 -8 8 2 q-10 8 -20 -2z" fill="#F4B6C8"/></g></symbol>
+    <symbol id="f-33" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="20" y="62" width="80" height="30" rx="6" fill="#F7F1E4"/><rect x="34" y="38" width="52" height="26" rx="6" fill="#F7C6E0"/><path d="M20 70 q10 8 20 0 q10 8 20 0 q10 8 20 0 q10 8 20 0" fill="none" stroke="#E8504F"/><path d="M48 38 V24 M60 38 V20 M72 38 V24" fill="none" stroke="#6CA0DC" stroke-width="4"/><path d="M48 18 q3 -6 0 -10 q-3 4 0 10z M60 14 q3 -6 0 -10 q-3 4 0 10z M72 18 q3 -6 0 -10 q-3 4 0 10z" fill="#F39A3B" stroke-width="1.5"/></g></symbol>
+    <symbol id="p-10" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="10" y="54" width="54" height="40" fill="#D9B382"/><rect x="60" y="60" width="50" height="34" fill="#E4C594"/><rect x="26" y="20" width="50" height="36" fill="#E4C594"/><path d="M37 54 V94 M85 60 V94 M51 20 V56" fill="none" stroke="#B5852A" stroke-width="5"/></g></symbol>
+    <symbol id="p-11" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M40 52 L56 96 M64 44 L58 96 M86 50 L62 96" fill="none" stroke-width="1.5"/><ellipse cx="38" cy="36" rx="15" ry="18" fill="#E8504F"/><ellipse cx="64" cy="26" rx="15" ry="18" fill="#F6C84C"/><ellipse cx="88" cy="36" rx="15" ry="18" fill="#6CA0DC"/><path d="M4 8 q56 26 112 0" fill="none" stroke-width="2"/><path d="M18 14 l6 12 6 -10z M52 21 l6 12 6 -12z M88 18 l6 12 6 -14z" fill="#8CCB6E" stroke-width="2"/></g></symbol>
+    <symbol id="p-12" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M14 92 V50 M106 92 V50 M60 92 V64" fill="none" stroke="#8C6440" stroke-width="5"/><path d="M14 56 q23 10 46 0 q23 10 46 0" fill="none" stroke="#E8D5A8" stroke-width="3"/><rect x="36" y="22" width="48" height="30" rx="4" fill="#F7F1E4"/><path d="M60 52 V64" fill="none" stroke="#8C6440" stroke-width="5"/><text x="60" y="43" text-anchor="middle" font-family="Jua, sans-serif" font-size="15" fill="#4A3B32" stroke="none">집터</text></g></symbol>
+    <!-- 지금 있는 가구 (방 그림용, 간단히) -->
+    <symbol id="e-sofa" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="10" y="30" width="100" height="40" rx="12" fill="#F2A65A"/><rect x="4" y="50" width="112" height="36" rx="10" fill="#F39A3B"/><path d="M14 86 v8 M106 86 v8" fill="none" stroke-width="5"/></g></symbol>
+    <symbol id="e-lamp" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M44 10 H76 L86 38 H34z" fill="#F7E6A8"/><path d="M60 38 V90" fill="none" stroke-width="4"/><ellipse cx="60" cy="92" rx="18" ry="5" fill="#4E5A57"/></g></symbol>
+    <symbol id="e-rug" viewBox="0 0 120 100"><ellipse cx="60" cy="60" rx="56" ry="26" fill="#9CC3EA" stroke="#4A3B32" stroke-width="3"/><ellipse cx="60" cy="60" rx="38" ry="16" fill="none" stroke="#FBFDF8" stroke-width="3"/></symbol>
+    <symbol id="e-radio" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="24" y="36" width="72" height="50" rx="10" fill="#7FCDB6"/><circle cx="48" cy="61" r="13" fill="#F7F1E4"/><rect x="68" y="50" width="18" height="8" fill="#F6C84C"/><path d="M80 36 L94 12" fill="none"/></g></symbol>
+    <symbol id="e-pot" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M60 62 C40 40 40 20 54 12 M60 62 C80 40 86 26 72 14" fill="none" stroke="#5E9F4F" stroke-width="4"/><ellipse cx="50" cy="30" rx="12" ry="7" fill="#5FAE5A"/><ellipse cx="74" cy="34" rx="12" ry="7" fill="#5FAE5A"/><path d="M38 60 H82 L76 94 H44z" fill="#C96F4A"/></g></symbol>
+    <symbol id="e-tank" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="22" y="30" width="76" height="52" rx="6" fill="#9CD3E8"/><path d="M46 56 q10 -10 20 0 q-10 10 -20 0z M66 56 l8 -6 v12z" fill="#F39A3B"/><rect x="30" y="82" width="60" height="12" fill="#8C6440"/></g></symbol>
+    <symbol id="e-wood" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3"><circle cx="36" cy="78" r="14" fill="#C99A63"/><circle cx="64" cy="78" r="14" fill="#C99A63"/><circle cx="92" cy="78" r="14" fill="#C99A63"/><circle cx="50" cy="54" r="14" fill="#B98957"/><circle cx="78" cy="54" r="14" fill="#B98957"/></g></symbol>
+    <symbol id="e-table" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><ellipse cx="60" cy="44" rx="50" ry="14" fill="#C99A63"/><rect x="48" y="50" width="24" height="44" fill="#8C6440"/></g></symbol>
+    <symbol id="e-fchair" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="60" cy="58" r="34" fill="#F39A3B"/><path d="M60 24 q4 -12 14 -14" fill="none" stroke="#7F5636" stroke-width="4"/><ellipse cx="60" cy="54" rx="22" ry="8" fill="#F7C98F"/></g></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 6차 · 검수 보드 v0.6 · 2026-10-29</p>
+    <h1>포근섬 6차 검수 보드</h1>
+    <p class="lede">목표는 <b>M6 편집기 완성</b>이에요. 모델·스토리·연출뿐 아니라 아이템, 벽지·방 배치, 주민 성격과 대화, 소리, 섬 지도, 게임 숫자까지 모두 편집기에서 고르고 고치고 적용할 수 있게 해요. 아래 「지금 편집할 수 있는 것」에서 빈칸을 확인하고, 결정 D26–D35 와 새 편집기 ET-01–11 을 골라 주세요. 고른 내용은 바로 저장되고, 채팅에 <b>"검수 보드 반영"</b>이라고 하면 진행해요.</p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#miles">마일스톤 M0–M7</a><a href="#now">지금 편집할 수 있는 것</a><a href="#decide">결정 D26–D35</a><a href="#editors">새 편집기 ET</a><a href="#plan">진행 계획 E1–E6</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="miles">
+    <div class="sec-head"><p class="id">MILESTONES</p><h2>마일스톤과 지금 위치</h2>
+      <p class="muted">M = 큰 목표, P = 그 안의 단계예요. 부를 때는 <code>M4-P2</code> 처럼 불러요. 자세한 표는 <code>docs/PLAN.md</code> 맨 위에 있어요.</p></div>
+    <div class="miles" id="milesList"></div>
+  </section>
+
+  <section id="now">
+    <div class="sec-head"><p class="id">AUDIT · 2026-10-29</p><h2>지금 편집할 수 있는 것</h2>
+      <p class="muted">✅ 편집기로 고치고 채팅 명령으로 적용 · △ 일부만 · ❌ 아직 코드나 스펙 파일을 직접 고쳐야 함 · ⏳ 만들기 전</p></div>
+    <div class="tblwrap"><table class="tbl" id="auditTable"><thead><tr><th>대상</th><th>편집기</th><th>적용 방법</th><th>상태</th><th>6차에서</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS</p><h2>먼저 정할 것 열 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요.</p></div>
+    <div id="decisions" class="grid wide" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="editors">
+    <div class="sec-head"><p class="id">ET-01 – ET-11 · 새 편집기와 탭</p><h2>새로 만들 편집기</h2>
+      <p class="muted">그림은 화면 배치 스케치예요. 모든 편집기가 지금 편집기와 같은 순서로 움직여요: 편집기에서 요청이나 값을 남기고 → 채팅 명령 → Claude 가 스펙·데이터를 고쳐 다시 만들고 → 같은 링크에 다시 게시 → 반영 기록(버전·되돌리기)을 남겨요.</p></div>
+    <div class="grid wide" id="etCards"></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN · M6</p><h2>승인 뒤 진행 계획</h2>
+      <p class="muted">지금처럼 트랙마다 세션과 브랜치를 나눠 동시에 만들고, 합치기 전에 다시 승인을 받아요. 결정에서 "빼기"를 고른 편집기의 트랙은 만들지 않아요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>트랙</th><th>만드는 것</th><th>맡는 파일</th><th>먼저 필요한 것</th></tr></thead><tbody>
+      <tr><td class="id">M6-P1 (E1)</td><td>편집기 홈 · 전체 요청 확인 · 반영 기록 공용 (ET-01 · ET-11)</td><td><code>editors.html</code> (새) · <code>concept/board-kit.js</code></td><td>D26 · D27</td></tr>
+      <tr><td class="id">M6-P2 (E2)</td><td>배경 편집기 아이템·실내 탭, 방 배치 격자 (ET-02 – ET-04)</td><td><code>bg-editor.html</code></td><td>M4 합치기 · D28 · D29</td></tr>
+      <tr><td class="id">M6-P3 (E3)</td><td>캐릭터 편집기 성격·대화 탭 (ET-05)</td><td><code>editor.html</code> · 주민 데이터를 <code>assets/villagers/</code> JSON 으로</td><td>M5-P2 이모티콘 대화 · D30</td></tr>
+      <tr><td class="id">M6-P4 (E4)</td><td>곡 편집기 · 효과음 표 (ET-06 · ET-07)</td><td><code>sound-editor.html</code> (새) · 곡·효과음 값을 <code>assets/sound/</code> JSON 으로</td><td>D31</td></tr>
+      <tr><td class="id">M6-P5 (E5)</td><td>섬 지도 편집기 · 게임 숫자 표 (ET-08 · ET-09)</td><td><code>map-editor.html</code> · <code>data-editor.html</code> (새) · 자리·표 값을 <code>assets/island/</code> · <code>assets/data/</code> JSON 으로</td><td>M5-P3 축제 광장 자리 · D32 · D33</td></tr>
+      <tr><td class="id">M6-P6 (E6)</td><td>스타일 편집기 게시 (ET-10)</td><td><code>demos/style.html</code> · <code>docs/SHADERS.md</code></td><td>D34</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+
+/* ---------- 마일스톤 ---------- */
+const MILES = [
+  ['M0', '리소스 기초', 'done', '캐릭터·배경 파이프라인, 캐릭터·배경 편집기, 컨셉 보드'],
+  ['M1', '기본 게임', 'done', '섬·이동, 채집, 주민·상점·박물관, 집·가구·제작, 시간·날씨, 소리, 셰이더'],
+  ['M2', '휴대폰·웹 배포', 'done', '터치 조작, 성능·카메라, 첫날 흐름, 게임 링크'],
+  ['M3', '다듬기', 'done', '버튼 안내, 화석 감정·줄 당김, 그리기 다듬기, 리소스 61종 확정'],
+  ['M4', '섬 생활 확장', 'wait', '아이템 3D 아이콘, 벽지·바닥·주민 방, 새 가구, 이사·생일·단풍, 시나리오 편집기 — 브랜치 끝, 합치기 승인 대기'],
+  ['M5', '축제와 엔딩', 'next', '이모티콘 대화, 축제 광장·부스·부품 5, 단체 사진 엔딩, 엔딩 뒤 계속 — Z5 보드 선택 대기'],
+  ['M6', '편집기 완성', 'here', '이 보드 — 모든 리소스·과정을 편집기로'],
+  ['M7', '출시 준비', 'later', '처음부터 끝까지 플레이, 밸런스, 실제 휴대폰, 성능, 접근성, 공유'],
+];
+const MS = { done: ['✅', '끝'], wait: ['🔶', '합치기 대기'], next: ['⏳', '다음'], here: ['📝', '지금 이 보드'], later: ['·', '예정'] };
+$('milesList').innerHTML = MILES.map(([id, name, st, what]) => `
+  <div class="mile ${st}"><span class="id">${id}</span><b>${name}</b><span class="tag">${MS[st][0]} ${MS[st][1]}</span><span class="small muted">${what}</span></div>`).join('');
+
+/* ---------- 지금 편집할 수 있는 것 ---------- */
+const AUDIT = [
+  ['캐릭터 10 (단풍 포함)', '캐릭터 편집기', '요청 → "요청 확인"', '✅', '단풍은 M4 합친 뒤 다시 게시'],
+  ['배경 35 · 가구 33', '배경 편집기', '요청 → "배경 요청 확인"', '✅', '새 16개는 M4 합친 뒤 다시 게시'],
+  ['장면 12 (스토리보드·연출·카메라)', '시나리오 편집기', '편집 → "시나리오 반영"', '✅', '—'],
+  ['결정 (5차 · Z5 · 6차)', '검수 보드', '선택 → "검수 보드 반영"', '✅', '—'],
+  ['아이템 모델 82 · 아이콘 93', '없음', '스펙 파일 직접', '❌', 'ET-02'],
+  ['벽지 8 · 바닥 8', '없음', '스펙 파일 직접', '❌', 'ET-03'],
+  ['주민 방 배치 RM-01–07', '없음', '배치 JSON 직접', '❌', 'ET-04'],
+  ['주민 성격·좋아하는 것·글 대사', '없음', '코드 (town/lines · people.js)', '❌', 'ET-05'],
+  ['이모티콘 대화 (Z5)', '만들기 전', '—', '⏳', 'ET-05'],
+  ['축제 광장·부스·부품 (Z5)', '만들기 전', '스펙 방식이라 만들면 배경 편집기에 저절로', '⏳', '—'],
+  ['곡 9 · 효과음 16 · 목소리 9', '없음 (사운드 데모는 듣기만)', '코드', '❌', 'ET-06 · ET-07'],
+  ['섬 지도 · 건물·광장 자리', '없음', '시드·코드', '❌', 'ET-08'],
+  ['가격·출현·레시피·친밀도', '없음 (데이터 데모는 보기만)', '코드', '❌', 'ET-09'],
+  ['셰이더·화면 느낌', '스타일 편집기 (내 컴퓨터에서만)', '값 복사 → 채팅에 붙여 넣기', '△', 'ET-10'],
+  ['편집기·보드 링크 모음, 요청 현황', '없음 (devlog 표)', '—', '❌', 'ET-01 · ET-11'],
+];
+$('auditTable').tBodies[0].innerHTML = AUDIT.map(([what, ed, how, st, next]) => `<tr><td>${what}</td><td class="small">${ed}</td><td class="small">${how}</td><td class="st">${st}</td><td class="id">${next}</td></tr>`).join('');
+
+/* ---------- 결정 ---------- */
+const DECISIONS = [
+  { id: 'D26', q: '편집기를 어떻게 모을까요?', opts: [
+    ['A', '편집기 홈 + 편집기는 따로', '한 링크에서 모든 편집기·보드를 열고, 편집기마다 새 요청 수와 마지막 반영 버전을 봐요 (ET-01).', true],
+    ['B', '큰 편집기 하나로 합치기', '모든 편집기를 탭으로 묶은 앱 하나. 파일이 커져서 휴대폰에서 느려질 수 있어요.'],
+    ['C', '지금처럼 따로', '링크 모음 없이 devlog 표만.'] ] },
+  { id: 'D27', q: '요청·반영 명령은?', opts: [
+    ['A', '지금 명령 그대로 + "전체 요청 확인"', '"요청 확인" · "배경 요청 확인" · "시나리오 반영" · "검수 보드 반영"은 그대로, 모든 편집기의 새 요청을 한 번에 처리하는 명령을 더해요.', true],
+    ['B', '"편집 반영" 하나로 통일', '명령은 하나, 어느 편집기 요청이든 한 번에.'] ] },
+  { id: 'D28', q: '아이템 모델(82)은 어디서 고칠까요?', opts: [
+    ['A', '배경 편집기에 "아이템" 탭', '물고기·곤충·화석·도구 … 분류 탭, 3D 보기, 색·크기 조절, 요청 (ET-02).', true],
+    ['B', '아이템 편집기 따로', '같은 기능을 새 링크로.'] ] },
+  { id: 'D29', q: '벽지·바닥·방 배치는?', opts: [
+    ['A', '배경 편집기 "실내" 탭 + 방 배치 격자', '무늬 색·간격을 바로 보고, 주민 방은 8×8 칸에 가구를 끌어 놓아요 (ET-03 · ET-04).', true],
+    ['B', '무늬만 편집기, 배치는 게임 안에서', '게임에서 가구를 놓고 "배치 내보내기"로 저장.'] ] },
+  { id: 'D30', q: '주민 성격과 대화는? (M5 이모티콘 대화 뒤)', opts: [
+    ['A', '캐릭터 편집기에 "성격·대화" 탭', '좋아하는 것·싫어하는 것, 이모티콘 반응표, 글 대사(D14 결과에 따라), 생일, 집에 있는 시간 (ET-05).', true],
+    ['B', '대화 편집기 따로', '주민 모델과 떨어진 새 링크.'] ] },
+  { id: 'D31', q: '소리·음악은?', opts: [
+    ['A', '곡 편집기 + 효과음 표', '장소·시간대·날씨별 곡을 고르고 박자·악기·음을 고쳐요. 효과음·목소리는 미리 듣고 높이·길이를 바꿔요 (ET-06 · ET-07).', true],
+    ['B', '곡 바꿔 끼우기만', '지금 곡 9개 중 어느 곡을 어디에 쓸지만 골라요.'],
+    ['C', '이번엔 빼기', 'M7 이후로.'] ] },
+  { id: 'D32', q: '섬 지도는?', opts: [
+    ['A', '자리 고정 + 시드', '건물·광장·다리·선착장 자리를 지도에서 끌어 고정하고, 나머지(나무·꽃)는 시드로. 결과를 바로 미리 봐요 (ET-08).', true],
+    ['B', '시드만 바꾸기', '섬 모양을 숫자 하나로 바꿔 보는 것만.'],
+    ['C', '이번엔 빼기', '지금 섬 그대로.'] ] },
+  { id: 'D33', q: '게임 숫자(가격·출현·레시피·친밀도)는?', opts: [
+    ['A', '표 편집기', '스프레드시트처럼 고치고, 반영할 때 테스트로 검사해요 (ET-09).', true],
+    ['B', '이번엔 빼기', '필요할 때 채팅으로 요청.'] ] },
+  { id: 'D34', q: '셰이더 스타일 편집기는?', opts: [
+    ['A', '링크로 게시 + 값 저장 + "스타일 반영"', '지금 내 컴퓨터에서만 열리는 스타일 편집기를 게시하고, 값 복사 대신 저장소에 남겨요 (ET-10).', true],
+    ['B', '지금처럼', '로컬에서 열고 값 복사 → 채팅.'] ] },
+  { id: 'D35', q: '편집 결과를 게임 링크에 언제 올릴까요?', opts: [
+    ['A', '반영할 때마다 바로', '편집기 반영이 끝나면 게임 링크도 바뀐 파일만 다시 게시해요.', true],
+    ['B', '"게시"라고 할 때만', '여러 번 반영한 뒤 한 번에 올려요.'] ] },
+];
+$('decisions').innerHTML = DECISIONS.map(d => `
+  <div class="card dec"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+      <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+        <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div>
+    ${noteBox(d.id, d.q)}</div>`).join('');
+
+/* ---------- 편집기 화면 스케치 ---------- */
+const P = { frame: '#FBF7F2', bar: '#3F8F5C', pane: '#E3EEDD', line: '#C9D3C5', acc: '#A8642E', sea: '#9CC3EA', soft: '#F3E7D3' };
+function mock(kind) {
+  const box = (x, y, w, h, f = P.pane, r = 6) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}"/>`;
+  const lines = (x, y, n, w, gap = 12) => Array.from({ length: n }, (_, i) => `<rect x="${x}" y="${y + i * gap}" width="${w - (i % 3) * 14}" height="5" rx="2.5" fill="${P.line}"/>`).join('');
+  const slider = (x, y, w, t) => `<rect x="${x}" y="${y}" width="${w}" height="4" rx="2" fill="${P.line}"/><circle cx="${x + w * t}" cy="${y + 2}" r="5" fill="${P.acc}"/>`;
+  let body = '';
+  if (kind === 'home') {
+    const names = ['캐릭터', '배경', '시나리오', '검수 보드', '소리', '지도'];
+    body = names.map((n, i) => { const x = 16 + (i % 3) * 98, y = 40 + Math.floor(i / 3) * 74;
+      return box(x, y, 88, 64, P.soft) + `<text x="${x + 10}" y="${y + 24}" font-size="12" fill="${INK}">${n}</text>` + (i < 3 ? `<circle cx="${x + 74}" cy="${y + 14}" r="8" fill="${P.acc}"/><text x="${x + 74}" y="${y + 18}" font-size="10" text-anchor="middle" fill="#FBFDF8">${i + 1}</text>` : '') + lines(x + 10, y + 36, 2, 60); }).join('');
+  } else if (kind === 'items') {
+    body = ['물고기', '곤충', '화석', '도구'].map((n, i) => box(14, 40 + i * 26, 58, 20, i ? P.pane : P.sea, 10) + `<text x="24" y="54" transform="translate(0 ${i * 26})" font-size="10" fill="${INK}">${n}</text>`).join('')
+      + box(82, 40, 140, 140, P.soft) + `<path d="M110 110 C125 82 170 82 182 110 C170 138 125 138 110 110z" fill="#C9A15A" stroke="${INK}" stroke-width="2"/><path d="M182 110 l18 -16 v32z" fill="#B5852A" stroke="${INK}" stroke-width="2"/><circle cx="126" cy="105" r="3" fill="${INK}"/>`
+      + [0.3, 0.6, 0.45, 0.8].map((t, i) => slider(236, 52 + i * 30, 70, t)).join('');
+  } else if (kind === 'pattern') {
+    const sw = ['wp-02', 'wp-03', 'wp-04', 'wp-05', 'fl-02', 'fl-06'];
+    body = sw.map((s, i) => `<rect x="${16 + i * 50}" y="42" width="42" height="42" rx="6" fill="url(#${s})" stroke="${P.line}"/>`).join('')
+      + box(16, 96, 196, 86, P.soft) + `<rect x="24" y="104" width="180" height="70" rx="4" fill="url(#wp-04)"/>` + [0.4, 0.7, 0.2].map((t, i) => slider(228, 108 + i * 26, 76, t)).join('');
+  } else if (kind === 'room') {
+    let g = ''; for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) g += `<rect x="${60 + i * 18}" y="${40 + j * 18}" width="17" height="17" fill="url(#fl-01)" stroke="#FBF7F2" stroke-width="1"/>`;
+    body = g + `<rect x="60" y="40" width="36" height="17" fill="#6CA0DC" stroke="${INK}" stroke-width="2"/><rect x="132" y="94" width="36" height="36" fill="#F39A3B" stroke="${INK}" stroke-width="2"/><rect x="186" y="148" width="17" height="17" fill="#8CCB6E" stroke="${INK}" stroke-width="2"/>`
+      + `<path d="M222 70 h70 M222 90 h56 M222 110 h64" stroke="${P.line}" stroke-width="5" stroke-linecap="round"/><path d="M168 130 l26 18" stroke="${P.acc}" stroke-width="2.5" stroke-dasharray="4 3"/>`;
+  } else if (kind === 'talk') {
+    const em = ['👋', '😄', '🎁', '😢', '💛', '🎉', '🍎', '🐟', '🌷', '❓', '⏳', '🙌'];
+    body = em.map((e, i) => box(16 + (i % 4) * 34, 40 + Math.floor(i / 4) * 34, 28, 28, P.soft) + `<text x="${30 + (i % 4) * 34}" y="${60 + Math.floor(i / 4) * 34}" font-size="15" text-anchor="middle">${e}</text>`).join('')
+      + box(160, 40, 146, 140, P.soft) + ['👋 → 👋😄', '🎁 → 🙌😄', '😢 → 💛🤝', '🍎 → 😋 ♥+2'].map((t, i) => `<text x="170" y="${64 + i * 30}" font-size="12" fill="${INK}">${t}</text>`).join('');
+  } else if (kind === 'music') {
+    body = ['아침', '낮', '밤', '비'].map((n, i) => `<text x="16" y="${58 + i * 32}" font-size="11" fill="${INK}">${n}</text>` + Array.from({ length: 7 }, (_, k) => `<rect x="${52 + k * 36 + (i % 2) * 8}" y="${48 + i * 32 + ((k * 7 + i * 3) % 5) * 3}" width="${18 + (k % 3) * 8}" height="8" rx="4" fill="${[P.bar, P.sea, P.acc, '#B9A6E0'][i]}"/>`).join('')).join('')
+      + `<path d="M150 36 V182" stroke="${P.acc}" stroke-width="2"/>`;
+  } else if (kind === 'sfx') {
+    body = ['나무 흔들기', '낚시 입질', '줍기', '가방 열기', '코코 목소리'].map((n, i) => `<circle cx="28" cy="${54 + i * 28}" r="9" fill="${P.bar}"/><path d="M25 ${49 + i * 28} l8 5 -8 5z" fill="#FBFDF8"/><text x="44" y="${58 + i * 28}" font-size="11" fill="${INK}">${n}</text>` + slider(150, 52 + i * 28, 70, 0.3 + i * 0.12) + slider(236, 52 + i * 28, 70, 0.7 - i * 0.1)).join('');
+  } else if (kind === 'map') {
+    body = `<path d="M40 110 C40 60 90 40 160 44 C240 48 290 80 284 120 C278 162 220 184 150 180 C80 176 40 150 40 110z" fill="#8CCB6E" stroke="#EBD9A8" stroke-width="8"/><path d="M150 46 C140 90 170 120 160 178" stroke="${P.sea}" stroke-width="7" fill="none"/>`
+      + [['🏠', 90, 140], ['🏪', 210, 120], ['🏛', 110, 80], ['🎪', 180, 100]].map(([e, x, y]) => `<circle cx="${x}" cy="${y}" r="13" fill="#FBF7F2" stroke="${INK}" stroke-width="2"/><text x="${x}" y="${y + 5}" font-size="13" text-anchor="middle">${e}</text>`).join('')
+      + box(226, 160, 80, 22, P.soft) + `<text x="234" y="175" font-size="10" fill="${INK}">시드 20261028</text>`;
+  } else if (kind === 'table') {
+    body = Array.from({ length: 7 }, (_, r) => Array.from({ length: 4 }, (_, c) => `<rect x="${16 + c * 74}" y="${38 + r * 20}" width="72" height="18" fill="${r ? (r % 2 ? P.soft : '#FBF7F2') : P.pane}"/>`).join('')).join('')
+      + ['아이템', '값', '계절', '확률'].map((t, c) => `<text x="${22 + c * 74}" y="${51}" font-size="10" fill="${INK}">${t}</text>`).join('')
+      + ['붕어', '피라미', '연어', '상어', '사과', '나무 의자'].map((t, r) => `<text x="22" y="${71 + r * 20}" font-size="10" fill="${INK}">${t}</text><text x="96" y="${71 + r * 20}" font-size="10" fill="${INK}">${[160, 200, 700, 15000, 100, 240][r]}</text>`).join('');
+  } else if (kind === 'style') {
+    body = box(16, 40, 186, 140, P.sea) + `<circle cx="110" cy="120" r="34" fill="#F2B36B" stroke="${INK}" stroke-width="3"/><path d="M78 118 a32 32 0 0 0 64 0" fill="#000" opacity=".12"/>` + [0.5, 0.3, 0.8, 0.6, 0.4].map((t, i) => slider(216, 50 + i * 26, 88, t)).join('');
+  } else if (kind === 'log') {
+    body = ['v3 · 10-30 · 벤치 색', 'v2 · 10-29 · D8 바꿈', 'v1 · 10-29 · 첫 반영'].map((t, i) => box(16, 42 + i * 44, 210, 36, i ? P.soft : P.pane) + `<text x="28" y="${64 + i * 44}" font-size="11" fill="${INK}">${t}</text>` + (i ? `<rect x="236" y="${48 + i * 44}" width="70" height="24" rx="12" fill="none" stroke="${P.bar}" stroke-width="2"/><text x="271" y="${64 + i * 44}" font-size="10" text-anchor="middle" fill="${P.bar}">되돌리기</text>` : '')).join('');
+  }
+  return `<svg viewBox="0 0 320 196" role="img" aria-label="편집기 화면 스케치">
+    <rect width="320" height="196" rx="10" fill="${P.frame}" stroke="${P.line}"/><rect width="320" height="26" rx="10" fill="${P.bar}"/><rect y="16" width="320" height="10" fill="${P.bar}"/>
+    <circle cx="14" cy="13" r="4" fill="#FBFDF8" opacity=".8"/><circle cx="26" cy="13" r="4" fill="#FBFDF8" opacity=".6"/>${body}</svg>`;
+}
+
+/* ---------- 새 편집기 ---------- */
+const ET = [
+  ['ET-01', '편집기 홈', 'home', 'D26', '모든 편집기·보드를 한 링크에서. 편집기마다 새 요청 수, 마지막 반영 버전, 쓰는 채팅 명령.', '새 링크 (editors.html)', '"전체 요청 확인"'],
+  ['ET-02', '아이템 탭', 'items', 'D28', '아이템 모델 82개 (물고기 20 · 곤충 22 · 화석 9 · 도구 · 재료 · 씨앗 · 과일 · 조개 · 꽃). 3D 보기, 색·크기, 아이콘 미리 보기, 요청.', '배경 편집기', '"배경 요청 확인"'],
+  ['ET-03', '실내 무늬 탭', 'pattern', 'D29', '벽지 8 · 바닥 8 색과 무늬 간격을 바로 보기. 새 무늬 요청 (레퍼런스 첨부).', '배경 편집기', '"배경 요청 확인"'],
+  ['ET-04', '방 배치 격자', 'room', 'D29', '주민 방 RM-01–07 을 8×8 칸에 가구 끌어 놓기·돌리기. 방마다 벽지·바닥 고르기.', '배경 편집기', '"배경 요청 확인"'],
+  ['ET-05', '성격·대화 탭', 'talk', 'D30', '주민마다 좋아하는 것·싫어하는 것, 이모티콘 응답 팔레트와 반응표(Z5 TK), 글 대사 켜고 끄기·고치기, 생일, 집에 있는 시간.', '캐릭터 편집기', '"요청 확인"'],
+  ['ET-06', '곡 편집기', 'music', 'D31', '장소·시간대·날씨별 배경음 9곡. 곡 고르기, 박자·악기·음표 고치기, 미리 듣기.', '새 링크 (sound-editor.html)', '"소리 반영"'],
+  ['ET-07', '효과음 표', 'sfx', 'D31', '효과음 16 · 주민 목소리 9 미리 듣기, 높이·길이·크기 조절.', '곡 편집기 안', '"소리 반영"'],
+  ['ET-08', '섬 지도 편집기', 'map', 'D32', '시드, 건물·광장·다리·선착장·축제 광장 자리를 끌어 고정. 나무·꽃 밀도. 결과를 바로 미리 보기.', '새 링크 (map-editor.html)', '"지도 반영"'],
+  ['ET-09', '게임 숫자 표', 'table', 'D33', '아이템 값·출현(계절·시간·장소·확률)·레시피·친밀도 오르는 양·부탁 보상. 반영할 때 테스트로 검사.', '새 링크 (data-editor.html)', '"숫자 반영"'],
+  ['ET-10', '스타일 편집기 게시', 'style', 'D34', '셰이더 명암·그늘·외곽선·화면 효과 슬라이더. 값을 저장소에 남기고 프리셋으로.', '지금 스타일 편집기를 게시', '"스타일 반영"'],
+  ['ET-11', '반영 기록 공용', 'log', 'D27', '모든 편집기가 검수 보드와 같은 반영 기록(버전·요약·되돌리기)을 써요. 어느 편집기든 "v2 로 되돌리기" 가 같게 동작.', '모든 편집기', '각 편집기 명령'],
+];
+$('etCards').innerHTML = ET.map(([id, name, kind, dec, what, where, cmd]) => `
+  <div class="card"><div class="stage">${mock(kind)}</div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로</span><span class="tag">${dec}</span></div>
+    <dl class="facts"><dt>고치는 것</dt><dd>${what}</dd><dt>어디에</dt><dd>${where}</dd><dt>적용 명령</dt><dd>${cmd}</dd></dl>${noteBox(id, name)}</div>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+$('pills').innerHTML = ['<span class="pill wait">검수 대기</span>', '결정 10', '새 편집기·탭 11', '트랙 6 (M6-P1–P6)', '지금 ❌ 9 · △ 1']
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'wave6', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 6차 검수 보드 v0.6 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>

@@ -1,0 +1,46 @@
+{
+  "id": "IC-FR-01",
+  "slug": "fruit-apple",
+  "name": "사과",
+  "group": "fruit",
+  "kind": "fruit",
+  "version": "0.1",
+  "items": [
+    "fruit.apple"
+  ],
+  "hold": false,
+  "triangles": 784,
+  "parts": 1,
+  "materials": [
+    "fruit",
+    "leaf",
+    "shine",
+    "stem"
+  ],
+  "objects": [
+    "fruit"
+  ],
+  "size": [
+    0.28,
+    0.28,
+    0.323
+  ],
+  "bounds": [
+    [
+      -0.14,
+      -0.14,
+      0.0
+    ],
+    [
+      0.14,
+      0.14,
+      0.323
+    ]
+  ],
+  "glbBytes": 18980,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fruit-apple_main.png",
+    "fruit-apple_thumb.png"
+  ]
+}

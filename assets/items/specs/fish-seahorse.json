@@ -1,0 +1,72 @@
+{
+  "id": "IC-FS-17",
+  "slug": "fish-seahorse",
+  "name": "해마",
+  "group": "fish",
+  "category": "item",
+  "kind": "seahorse",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "fish.seahorse",
+      "code": "IC-FS-17"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "말을 닮은 얼굴로 꼿꼿이 서서 헤엄친다. 알은 아빠가 배 주머니에 품는다.",
+    "keywords": [
+      "바다",
+      "그림자 1"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.26,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#F2B262",
+    "back": "#D88E3E",
+    "belly": "#F8D69C",
+    "fin": "#E8A050",
+    "mark": "#A26B2F",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -80,
+    "pitch": 8
+  }
+}

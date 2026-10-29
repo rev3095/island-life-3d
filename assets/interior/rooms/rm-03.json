@@ -1,0 +1,21 @@
+{
+  "id": "RM-03",
+  "slug": "rm-03",
+  "kind": "room",
+  "owner": "mochi",
+  "ownerName": "모찌",
+  "name": "꽃 온실방",
+  "version": 1,
+  "status": "review",
+  "note": "상냥한 토끼. 화분이 가득한 연보라 방.",
+  "wallpaper": "wp-04",
+  "floor": "fl-04",
+  "host": { "lx": 4, "lz": 4, "face": "s" },
+  "furniture": [
+    { "fu": "FU-25", "name": "꽃 선반", "box": [2, 1, 1.2], "color": "#B98957", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-26", "name": "유리 온실", "box": [1, 1, 0.9], "color": "#CDEBF5", "gx": 5, "gz": 2, "rot": 0 },
+    { "item": "furn.plant-pot", "variant": "white", "gx": 7, "gz": 4, "rot": 0 },
+    { "item": "furn.plant-pot", "variant": "terracotta", "gx": 1, "gz": 5, "rot": 0 },
+    { "item": "furn.plant-pot", "variant": "blue", "gx": 7, "gz": 0, "rot": 0 }
+  ]
+}

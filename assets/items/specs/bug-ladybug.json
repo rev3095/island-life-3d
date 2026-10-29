@@ -1,0 +1,121 @@
+{
+  "id": "IC-BG-04",
+  "slug": "bug-ladybug",
+  "name": "무당벌레",
+  "group": "bug",
+  "category": "item",
+  "kind": "beetle",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.ladybug",
+      "code": "IC-BG-04"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "빨간 등에 까만 점박이. 진딧물을 먹어 주는 꽃밭의 친구다.",
+    "keywords": [
+      "꽃 위",
+      "낮"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.17,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (크기 비)",
+      "value": 0.5,
+      "min": 0.2,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 너비 (크기 비)",
+      "value": 0.5,
+      "min": 0.05,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "몸 높이 (크기 비)",
+      "value": 0.3,
+      "min": 0.1,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "dots": {
+      "label": "점 자리 [가로, 세로]",
+      "value": [
+        [
+          0.18,
+          -0.12
+        ],
+        [
+          -0.18,
+          -0.12
+        ],
+        [
+          0.22,
+          0.16
+        ],
+        [
+          -0.22,
+          0.16
+        ],
+        [
+          0.09,
+          0.36
+        ],
+        [
+          -0.09,
+          0.36
+        ]
+      ]
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "shell": "#E0413A",
+    "body": "#2F2A26",
+    "head": "#2F2A26",
+    "mark": "#2F2A26",
+    "leg": "#2F2A26"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "shell": "껍데기",
+    "body": "몸",
+    "head": "머리",
+    "mark": "무늬",
+    "leg": "다리"
+  }
+}

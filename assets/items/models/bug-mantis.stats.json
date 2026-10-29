@@ -1,0 +1,47 @@
+{
+  "id": "IC-BG-12",
+  "slug": "bug-mantis",
+  "name": "사마귀",
+  "group": "bug",
+  "kind": "hopper",
+  "version": "0.1",
+  "items": [
+    "bug.mantis"
+  ],
+  "hold": true,
+  "triangles": 1608,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "leg",
+    "leg2",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.131,
+    0.36,
+    0.186
+  ],
+  "bounds": [
+    [
+      -0.066,
+      -0.18,
+      -0.093
+    ],
+    [
+      0.066,
+      0.18,
+      0.093
+    ]
+  ],
+  "glbBytes": 34160,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-mantis_main.png",
+    "bug-mantis_thumb.png"
+  ]
+}

@@ -14,14 +14,27 @@
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 4 (빌드 c9464ea, 268파일)** — 리소스 61종 확정 + 배치값(world 칸) 스펙으로, 바뀐 67파일만 게시. 버전 3 = 빌드 62d53b7, 버전 2 = 빌드 ff74575. 한 번 255파일 제한이라 두 번에 나눠 게시(254 + 10). 다시 게시: 빌드 → 같은 `file_path` 로 바뀐 파일만(`git diff --name-only c9464ea HEAD` ∩ `files.json`), 다른 대화에서는 `url` 로 먼저 read. 순서는 `docs/notes/deploy.md` '게시 순서' |
-| 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 5: **9종 모두 확정(임시, 2026-10-29)**. db `refs` / `requests` — 요청 0건 |
-| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 5: **요소 52개(배경 32 · 가구 20) 모두 확정(임시, 2026-10-29)**. db `env-refs` / `env-requests` — 요청 0건 |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files-1.json`·`files-2.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 6 (빌드 bed3fc9, 510파일 — 아티팩트 한 버전 한계 511 에 닿음)** — M4 합침: 아이템 3D 아이콘·벽지/바닥·주민 방·새 가구 13·소품 3·단풍·이사·생일·장면 12. 바뀐 266파일을 255 + 11 로 두 번 게시. 다음엔 `git diff --name-only bed3fc9 HEAD` ∩ files.json. **새 파일을 더하려면 묶음 파일 방식 먼저 (M6-P0)** |
+| 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 6: 캐릭터 10 (단풍 CH-10 은 검수 대기, 나머지 9 확정). db `refs` / `requests` |
+| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 6: 요소 68 (배경 35 · 가구 33, 새 16개 + 단풍 지붕이 생긴 주민 집은 검수 대기). 스펙·통계는 묶음 목록 `editor-index.json` (`node tools/build-editor-index.mjs`) — 파일 511개 제한 때문, 지금 약 400개. db `env-refs` / `env-requests` |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
 | **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 1 (2026-10-29, `p8-festival`): 보드 id `z5`, 결정 D14–D25 (이모티콘 대화 방식·범위·그림·팔레트·판정, 축제 광장 위치, 부품 얻기, 부스 구성·서는 때, 축제 시작, 엔딩 사진, 엔딩 뒤). 리소스 EM-01–36 · TK-01–07 · BD-06·07 · TI-08 · FP-01–05 · FB-01–05 · PR-13–16 · FU-34 · IC-FE-01–04 · AN-01–05 · ED-01–06. **사용자 선택 대기**. 약속 제안 `docs/notes/z5-festival.md` |
+| **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1 (보드 id `wave6`). **반영 v1 (임시)** = D26–D35 모두 추천안 A, 의견 없음 → M6 시작. M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중
+**6차 = M6 편집기 완성 진행 중 (main c289d39 에서 갈라짐, 보드 wave6 반영 v1)**:
+| P | 세션 id | 브랜치 · 포트 | 할 일 |
+|---|---|---|---|
+| M6-P0 묶음 파일 | `local_1621341c-345a-4189-abcc-edce4c473823` | `p9-pack` · 4221 | 게임 게시본 에셋을 묶음 파일로 (510 → 150 아래), 로더·아이콘 blob URL |
+| M6-P1 편집기 홈 | `local_41283c0d-df65-4768-8d2b-22270ba71982` | `p9-hub` · 4222 | `editors.html` 홈, "전체 요청 확인", 반영 기록 공용 모양 |
+| M6-P2 배경 편집기 탭 | `local_77a32949-c78d-439c-90f9-25d39fcb308e` | `p9-bgtabs` · 4223 | 아이템 탭(편집기 묶음 파일), 실내 무늬 탭, 방 배치 격자 |
+| M6-P3 성격·대화 탭 | — | — | 대기 (M5-P2 이모티콘 대화 뒤) |
+| M6-P4 곡·효과음 | `local_39dc4cc6-d0a4-4da7-9548-f7402fc80c41` | `p9-sound` · 4224 | 소리 값을 `assets/sound/` 로, `sound-editor.html`, "소리 반영" |
+| M6-P5 지도·숫자 | `local_0c0f69c4-b37a-401d-87eb-0f625cf2ae73` | `p9-mapdata` · 4225 | `assets/island/layout.json`·`assets/data/`, `map-editor.html`·`data-editor.html`, "지도 반영"·"숫자 반영" |
+| M6-P6 스타일 | `local_cc18b756-21bf-405f-9ed0-8bcca8b82aed` | `p9-style` · 4226 | 프리셋을 `assets/style/` 로, 스타일 편집기 게시, "스타일 반영" |
+M5(Z5) 는 보드 선택 대기, 스토리는 고정 세션 대기. Z1~Z4 세션·폴더(`p8-items`·`p8-interior`·`p8-furniture`·`p8-town`)는 합쳤으니 정리 가능(사용자 확인 뒤).
+
 없음. **리소스 61종 임시 확정 + 교체 준비 (2026-10-29)**: 캐릭터 9 · 배경 32 · 가구 20 을 status `approved` 로(편집기 두 개 버전 5). 나중에 고칠 때 코드를 안 건드리게, 코드에 박혀 있던 배경 충돌 모양·query 범위·건물 집터를 각 배경 스펙의 `world` 칸으로 옮김(`world/objects.js`·`island.js` 가 스펙에서 읽음). `tests/assets.test.mjs`(6개) 가 교체 약속(파일·재질=팔레트·캐릭터 동작/뼈·배경 이름·충돌/집터 ↔ 모델 크기·가구 칸 ↔ items.js)을 검사 — 테스트 165. 빌드 도구에 `--index`(Blender 없이 목록만). 교체 시험: 로컬 배경 편집기에서 벤치에 "하늘색 · 1.6칸" 요청 → 스펙·빌더 수정 → 빌드 11초 → 충돌을 안 고치면 테스트가 잡음 → world 칸 고침 → 편집기·게임에 그대로 반영(충돌 1.61 확인) → 원래대로 되돌림. 약속 정리는 CONTRACTS 끝 "리소스 교체 약속". **게임 링크 버전 4 로 다시 게시**(빌드 c9464ea, 바뀐 67파일, 전체 268 · 로컬 `/artifact/` 에서 12개 모듈·콘솔 오류 0·목록 밖 요청 0 확인, 게시본 objects.js·shop.json 이 로컬과 같은 바이트).
 
 4차까지: **4차 합치고 게시 끝 (2026-10-29)**: Y1 `p7-ux` · Y2 `p7-content` · Y3 `p7-render` 를 main 에 합침(마지막 62d53b7), 테스트 159/159. 게임 링크 버전 3 — 바뀐 파일 35개만 다시 게시해 전체 268파일(빌드 62d53b7, 다음엔 `git diff --name-only 62d53b7 HEAD` ∩ files.json).
@@ -39,6 +52,8 @@
 | Z2 벽지·바닥·주민 방 | `local_6540e4d8-f48b-4859-94cc-725e456585af` | `p8-interior` · 4212 | WP·FL 16 스펙, 집 벽지 바꾸기·상점 코너, 주민 방 RM-01–06 들어가기 |
 | Z3 새 가구·소품 | `local_ec3270d4-3c0d-4a3d-bed4-b3a6330c4c27` | `p8-furniture` · 4213 | FU-21–33 · PR-10–12 · 단풍 집 변형 · 레시피 |
 | Z4 이사·생일·새 주민 | `local_9ff78bdc-581f-4fed-8d3a-fa6e107e126f` | `p8-town` · 4214 | 단풍(CH-10) 모델·대사, 집터→이삿짐→입주, 생일·플레이어 생일, 방 안 주민 |
+| Z5 축제·이모티콘 대화·엔딩 | `local_a4293983-fb69-490e-811d-32a97ceb52f4` | `p8-festival` · 4215 | ① Z5 검수 보드(D14~, everyones_festival 방식 이모티콘 대화·축제 광장·부스 5·부품 5·단체 사진 엔딩·엔딩 뒤 계속) → 사용자 선택 → ② Z4 합친 뒤 구현 |
+| 스토리 (고정) | `local_cf7cb178-7119-44d1-9caa-02326243c37b` | `story` · 4216 | 시나리오 편집기(`story-editor.html`)·장면 데이터(`assets/story/`)·장면 재생기(`src/gameplay/story/`), 처음부터 엔딩까지 초안. 사용자가 편집 → 그 세션에 "시나리오 반영" |
 폴더는 `../island-worktrees/p8-*`. 합친 뒤 할 일: 배경 편집기에 아이템·벽지 탭, 게임 재게시.
 
 **3차 결과 (main 에 합침: f3f7970 · a24ebbf · a69656f · 75901f9, 후속 ff74575)**
@@ -166,6 +181,10 @@
 | 15 | Republish game | 빌드 c9464ea → 바뀐 67파일 게시(버전 4, 268파일), 로컬 `/artifact/` 확인 | 끝 |
 | 16 | 5차 검수 보드 만들어줘 + 앞으로 모든 개발사항은 한국어로 | 한국어 보고 메모리 저장, 5차 리소스 계획(ID) 정리, `concept/wave5-board.html` 작성·로컬 확인(콘솔 오류 0·가로 넘침 없음·요청 글 동작)·게시 | 사용자 검수 대기 |
 | 17 | 보드 선택대로, 앞으로 선택지 방식 + 보드 고쳐 반영·되돌리기, 일단 진행 | 보드 저장형(board-kit.js·db), 사용자 선택 D8-B 를 저장소에서 확인, 반영 v1 기록, `concept/README.md`·CLAUDE.md·메모리에 흐름, 5차 표·작업 폴더 4개·Z1~Z4 세션 시작 | 진행 중 |
+| 18 | (작업 중 새 요청) 이모티콘 대화, 섬 가운데 축제 공간·부품 5개·부스 해금·단체 사진 엔딩·엔딩 뒤 계속 → Z5, 시나리오·스토리보드·연출 편집 고정 세션 | everyones_festival 문서 확인(이모지 전용 소통·재료 5·단체 사진), 지금 게임은 글 대사가 이미 있어 대화 방식을 Z5 보드 결정으로, PLAN 5차 추가 표, 작업 폴더 `p8-festival`·`story`, 세션 2개 시작 | 진행 중 |
+| 19 | 지시한 작업 다 끝났나, 모든 과정이 편집기로 고칠 수 있게 나뉘었나 점검, M·P 마일스톤 표기·진행·향후, 필요하면 6차 보드 | 점검: M4 브랜치 6개 임시 합치기(충돌 1곳 해결, 테스트 197, 모듈 13 로드)·합치기 승인 대기, 편집기 없는 것 9가지(아이템·실내·방 배치·주민 성격/대사·소리·지도·숫자·편집기 홈, 스타일은 로컬만). Z5 보드 ID FL-1–6 겹침 → SF 로 바꾸라고 Z5 에 알림. PLAN 맨 위 M0–M7 · P 표, `concept/README.md` ID 표, 6차 보드 게시 | 사용자 선택 대기 |
+| 20 | 합치고 게시 | M4 브랜치 6개를 main 에 `--no-ff` (충돌: `tests/assets.test.mjs` 개수 — 임시 합치기 때와 같게, `concept/README.md`·`devlog.md` 보드 줄 — 둘 다 살림), 테스트 197, main 에서 모듈 13·오류 0. 캐릭터 편집기 v6(단풍), 배경 편집기 v6 — 파일 512 한계에 걸려 스펙·통계를 묶음 목록으로 바꿈(bed3fc9), 게임 v6(266파일 두 번). Z5·스토리에 main 합쳐짐 알림, 임시 폴더 지움 | 끝 → 6차 보드대로 진행 |
+| 21 | (작업 중) 6차 보드 검수 완료, 임시 선택, 6차 보드대로 진행 | 보드 저장소 비어 있음 → 추천안 그대로 반영 v1 기록(boards·applied·history), D28-A 를 하려면 파일 수 한계를 먼저 풀어야 해서 M6-P0 묶음 파일 추가, PLAN 6차 표, 작업 폴더 6개, 세션 6개 시작(P3 는 M5-P2 뒤) | 진행 중 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |

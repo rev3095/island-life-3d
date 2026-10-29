@@ -1,0 +1,45 @@
+{
+  "id": "IC-FO-03",
+  "slug": "fossil-amber",
+  "name": "호박",
+  "group": "fossil",
+  "kind": "amber",
+  "version": "0.1",
+  "items": [
+    "fossil.amber"
+  ],
+  "hold": true,
+  "triangles": 310,
+  "parts": 1,
+  "materials": [
+    "amber",
+    "glint",
+    "inclusion"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.209,
+    0.177,
+    0.156
+  ],
+  "bounds": [
+    [
+      -0.104,
+      -0.088,
+      -0.078
+    ],
+    [
+      0.104,
+      0.088,
+      0.078
+    ]
+  ],
+  "glbBytes": 12168,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-amber_main.png",
+    "fossil-amber_thumb.png"
+  ]
+}

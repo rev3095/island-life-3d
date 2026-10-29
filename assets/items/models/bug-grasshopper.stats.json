@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-13",
+  "slug": "bug-grasshopper",
+  "name": "메뚜기",
+  "group": "bug",
+  "kind": "hopper",
+  "version": "0.1",
+  "items": [
+    "bug.grasshopper"
+  ],
+  "hold": true,
+  "triangles": 1956,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "leg2",
+    "wing"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.131,
+    0.27,
+    0.102
+  ],
+  "bounds": [
+    [
+      -0.065,
+      -0.135,
+      -0.051
+    ],
+    [
+      0.065,
+      0.135,
+      0.051
+    ]
+  ],
+  "glbBytes": 41940,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-grasshopper_main.png",
+    "bug-grasshopper_thumb.png"
+  ]
+}

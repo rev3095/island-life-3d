@@ -1,0 +1,12 @@
+{
+  "id": "WP-01",
+  "slug": "wp-01",
+  "kind": "wallpaper",
+  "name": "크림 줄무늬",
+  "version": 1,
+  "status": "review",
+  "price": 1200,
+  "starter": true,
+  "pattern": { "tile": [24, 24], "size": [0.5, 0.5], "base": "base", "shapes": [{ "rect": [0, 0, 9, 24], "fill": "stripe" }] },
+  "palette": { "base": "#F7EBD3", "stripe": "#F0DDBA", "wainscot": "#B98957", "molding": "#8C6440", "baseboard": "#6E4E33" }
+}

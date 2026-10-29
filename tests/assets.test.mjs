@@ -1,5 +1,5 @@
 // 리소스 약속 검사: 편집기로 고친 모델·스펙을 바꿔 끼워도 게임이 그대로 도는지.
-// 캐릭터 9 · 배경 32 · 가구 20 이 각자 스펙(json) · 모델(.glb.json) · 통계(stats) · 썸네일로 따로 있고,
+// 캐릭터 10 · 배경 35 · 가구 33 이 각자 스펙(json) · 모델(.glb.json) · 통계(stats) · 썸네일로 따로 있고,
 // 게임 코드가 이름으로 찾는 것(뼈·동작·재질·노드)과 스펙의 world 칸(충돌·집터)이 모델 크기와 맞는지 본다.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -19,9 +19,9 @@ const gltfOf = p => {
 };
 
 const SETS = [
-  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 9 },
-  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 32 },
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 20 },
+  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 10 },
+  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 35 },
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 33 },
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;
@@ -72,13 +72,14 @@ test('리소스: 캐릭터는 게임이 쓰는 동작·뼈 이름을 모두 가�
     assert.equal(g.skins?.length, 1, `캐릭터 ${m.slug}: 뼈대(skin) 하나`);
   }
   // 이야기·주민 코드가 slug 로 부르는 캐릭터
-  for (const slug of ['player', 'coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'bamtol', 'neuru']) assert.ok(CH.spec[slug], `캐릭터 ${slug} 없음`);
+  for (const slug of ['player', 'coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'bamtol', 'neuru', 'danpung']) assert.ok(CH.spec[slug], `캐릭터 ${slug} 없음`);
 });
 
 test('리소스: 배경 — 코드가 이름으로 찾는 종류·재질이 있다', () => {
   const USED = ['tree', 'fruit-tree', 'palm', 'cedar', 'rock', 'tulip', 'cosmos', 'pansy', 'weed', 'shell', 'bush', 'lamp', 'bench', 'mailbox',
     'signboard', 'bridge', 'fence', 'fossil-spot', 'workbench', 'campfire', 'house-player', 'house-villager', 'shop', 'museum', 'dock',
-    'tile-grass', 'tile-sand', 'tile-path', 'tile-water', 'tile-cliff', 'tile-ramp', 'tile-plaza'];
+    'tile-grass', 'tile-sand', 'tile-path', 'tile-water', 'tile-cliff', 'tile-ramp', 'tile-plaza',
+    'moving-boxes', 'party-balloons', 'lot-sign'];   // 5차: 이사·생일 소품 (town 이 slug 로 놓는다)
   for (const slug of USED) assert.ok(ENV.spec[slug], `배경 ${slug} 없음`);
   // 열매 딴 나무는 이 재질 메시를 뺀다 (world/objects.js PICKED)
   const mats = slug => new Set(ENV.gltf[slug].materials.map(x => x.name));

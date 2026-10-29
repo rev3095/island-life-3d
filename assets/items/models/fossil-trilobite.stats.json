@@ -1,0 +1,45 @@
+{
+  "id": "IC-FO-02",
+  "slug": "fossil-trilobite",
+  "name": "삼엽충",
+  "group": "fossil",
+  "kind": "trilobite",
+  "version": "0.1",
+  "items": [
+    "fossil.trilobite"
+  ],
+  "hold": true,
+  "triangles": 2964,
+  "parts": 1,
+  "materials": [
+    "fossil",
+    "fossilDark",
+    "stone"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.28,
+    0.341,
+    0.044
+  ],
+  "bounds": [
+    [
+      -0.14,
+      -0.17,
+      -0.022
+    ],
+    [
+      0.14,
+      0.17,
+      0.022
+    ]
+  ],
+  "glbBytes": 64100,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-trilobite_main.png",
+    "fossil-trilobite_thumb.png"
+  ]
+}

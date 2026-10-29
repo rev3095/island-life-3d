@@ -1,0 +1,89 @@
+{
+  "id": "IC-FL-05",
+  "slug": "flower-cosmos",
+  "name": "코스모스",
+  "group": "flower",
+  "category": "item",
+  "kind": "cosmos",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "flower.cosmos-pink",
+      "code": "IC-FL-05",
+      "variant": "pink"
+    },
+    {
+      "item": "flower.cosmos-white",
+      "code": "IC-FL-06",
+      "variant": "white"
+    },
+    {
+      "item": "flower.cosmos-orange",
+      "code": "IC-FL-07",
+      "variant": "orange"
+    },
+    {
+      "item": "flower.cosmos-red",
+      "code": "IC-FL-08",
+      "variant": "red"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "꽃잎 여덟 장이 활짝 핀 코스모스",
+    "keywords": [],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "stem": "#5E9F4F",
+    "petal": "#F7C6E0",
+    "center": "#F6C84C"
+  },
+  "paletteLabels": {
+    "stem": "꼭지",
+    "petal": "꽃잎",
+    "center": "꽃술"
+  },
+  "variants": {
+    "pink": {
+      "label": "분홍 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "petal": "#FBF7F2"
+      }
+    },
+    "orange": {
+      "label": "주황",
+      "palette": {
+        "petal": "#F2A65A"
+      }
+    },
+    "red": {
+      "label": "빨강",
+      "palette": {
+        "petal": "#D9583B"
+      }
+    }
+  }
+}

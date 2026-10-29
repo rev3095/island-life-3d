@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-10",
+  "slug": "bug-rhino-beetle",
+  "name": "장수풍뎅이",
+  "group": "bug",
+  "kind": "beetle",
+  "version": "0.1",
+  "items": [
+    "bug.rhino-beetle"
+  ],
+  "hold": true,
+  "triangles": 2268,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "shell"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.209,
+    0.328,
+    0.166
+  ],
+  "bounds": [
+    [
+      -0.104,
+      -0.164,
+      -0.083
+    ],
+    [
+      0.104,
+      0.164,
+      0.083
+    ]
+  ],
+  "glbBytes": 47404,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-rhino-beetle_main.png",
+    "bug-rhino-beetle_thumb.png"
+  ]
+}

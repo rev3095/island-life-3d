@@ -1,0 +1,46 @@
+{
+  "id": "IC-SD-05",
+  "slug": "seed-cedar-sapling",
+  "name": "삼나무 묘목",
+  "group": "seed",
+  "kind": "cedar-sapling",
+  "version": "0.1",
+  "items": [
+    "seed.cedar-sapling"
+  ],
+  "hold": false,
+  "triangles": 804,
+  "parts": 1,
+  "materials": [
+    "burlap",
+    "leaf",
+    "tie",
+    "trunk"
+  ],
+  "objects": [
+    "seed"
+  ],
+  "size": [
+    0.335,
+    0.34,
+    0.64
+  ],
+  "bounds": [
+    [
+      -0.167,
+      -0.17,
+      0.0
+    ],
+    [
+      0.167,
+      0.17,
+      0.64
+    ]
+  ],
+  "glbBytes": 18192,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "seed-cedar-sapling_main.png",
+    "seed-cedar-sapling_thumb.png"
+  ]
+}

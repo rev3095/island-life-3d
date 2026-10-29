@@ -1,0 +1,116 @@
+{
+  "id": "IC-BG-15",
+  "slug": "bug-bell-cricket",
+  "name": "방울벌레",
+  "group": "bug",
+  "category": "item",
+  "kind": "hopper",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.bell-cricket",
+      "code": "IC-BG-15"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "작은 방울을 흔드는 듯 맑게 우는 곤충. 소리는 들려도 모습은 잘 안 보인다.",
+    "keywords": [
+      "풀밭",
+      "밤"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.24,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (크기 비)",
+      "value": 0.45,
+      "min": 0.2,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 너비 (크기 비)",
+      "value": 0.2,
+      "min": 0.05,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "antenna": {
+      "label": "더듬이 길이",
+      "value": 1,
+      "min": 0.1,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "kneeUp": {
+      "label": "뒷다리 무릎 높이",
+      "value": 0.6,
+      "min": 0.3,
+      "max": 1.5,
+      "step": 0.01,
+      "live": false
+    },
+    "wingLength": {
+      "label": "접은 날개 길이",
+      "value": 0.9,
+      "min": 0.5,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "cerci": {
+      "label": "꽁무니 털",
+      "value": true
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#3E3428",
+    "head": "#2E261C",
+    "wing": "#7A6A4E",
+    "leg": "#3E3428",
+    "leg2": "#4E4434"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "head": "머리",
+    "wing": "날개",
+    "leg": "다리",
+    "leg2": "뒷다리"
+  },
+  "render": {
+    "yaw": -55,
+    "pitch": 38
+  }
+}

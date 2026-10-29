@@ -1,5 +1,6 @@
 // 주민 한 명의 하루: 집에서 나오기 → 자주 가는 곳을 오가며 쉬기 → 밤(또는 비)엔 문까지 걸어가 들어가기.
 // 길은 path.js 의 칸 A*, 실제 걸음은 world.collide. 플레이어·다른 주민은 비켜 가고, 가까이 오면 쳐다본다.
+// 5차: 생일엔 하루 종일 집에 있고(town.staysIn), 플레이어가 그 집 방에 들어오면(house:enter) 방 안에 서 있다 (mode 'room').
 import { createActor } from './actor.js';
 import { shouldBeOut } from './rules.js';
 
@@ -21,12 +22,13 @@ export async function createVillager(ctx, person, town) {
     partner: null, bubble: null, chatAt: -99,   // 주민끼리 수다: 상대, 지금 말풍선 글자
 
     get out() { return V.mode !== 'home'; },
+    get inRoom() { return V.mode === 'room' || (V.mode === 'talk' && V.talkFrom === 'room'); },
     /** 말 걸 수 있는 상태인가 (문을 드나드는 중엔 안 됨) */
     get talkable() { return actor.visible && actor.opacity > 0.9 && V.mode !== 'home' && V.mode !== 'enter' && V.mode !== 'emerge'; },
 
     /** 처음 놓기: 밖에 있을 시각이면 자주 가는 곳 아무 데나, 아니면 집 안 */
     spawn(now, weather) {
-      if (shouldBeOut(person, now, weather)) {
+      if (outNow(now, weather)) {
         const s = town.pickSpot(person, V) ?? step;
         actor.place(s.x, s.z, r() * Math.PI * 2);
         actor.setOpacity(1); actor.fadeTo = 1;
@@ -47,11 +49,24 @@ export async function createVillager(ctx, person, town) {
     endTalk() {
       if (V.mode !== 'talk') return;
       const back = V.talkFrom;
-      V.mode = back === 'walk' || back === 'toDoor' ? back : 'idle';
+      // 집 안(문 너머·방)에서 말했으면 그대로 집 안에
+      V.mode = back === 'walk' || back === 'toDoor' || back === 'home' || back === 'room' ? back : 'idle';
       if (V.mode === 'idle') V.timer = 1.5 + r() * 2;
       V.think = 0;
     },
     happy() { actor.playOnce('happy'); },
+    /** 플레이어가 이 주민 방에 들어왔다: 방 안 spot 에 세운다 (집에 있을 때만) → 세웠으면 true */
+    enterRoom(spot, facing = Math.PI) {
+      if (V.mode !== 'home' && V.mode !== 'room') return false;
+      V.mode = 'room';
+      V.partner = null; V.bubble = null;
+      actor.path = [];
+      actor.place(spot.x, spot.z, facing);
+      actor.setOpacity(1); actor.fadeTo = 1;
+      return true;
+    },
+    /** 플레이어가 방에서 나갔다: 다시 보이지 않는 집 안으로 */
+    leaveRoom() { if (V.inRoom) toHome(); },
     /** 다른 주민과 수다 시작 (index.js 가 짝을 지어 준다) */
     startChat(other, seconds) {
       V.mode = 'chat';
@@ -78,6 +93,10 @@ export async function createVillager(ctx, person, town) {
 
       switch (V.mode) {
         case 'home': break;
+        case 'room':
+          if (pl && pd < LOOK_DIST * 1.5) actor.lookAt(pl.x, pl.z);
+          actor.animateMove(0);
+          break;
         case 'talk':
           if (pl) actor.lookAt(pl.x, pl.z);
           break;
@@ -102,7 +121,7 @@ export async function createVillager(ctx, person, town) {
           actor.animateMove(0);
           break;
         case 'walk': case 'toDoor': case 'emerge': case 'enter': {
-          const speed = V.run ? pace.run * (town.rainJoy(V) ? 1.1 : 1) : pace.walk;
+          const speed = V.run ? pace.run * (town.joy(V) ? 1.1 : 1) : pace.walk;
           const res = actor.walk(dt, speed, (x, z, dx, dz) => town.avoid(V, x, z, dx, dz));
           actor.animateMove(actor.speed, V.run);
           if (res === 'arrived') arrived();
@@ -121,7 +140,7 @@ export async function createVillager(ctx, person, town) {
     const [a, b] = person.pace.idle;
     V.timer = t ?? a + r() * (b - a);
     actor.path = [];
-    if (r() < person.pace.happy * (town.rainJoy(V) ? 2.5 : 0.5)) V.happy();
+    if (r() < person.pace.happy * (town.joy(V) ? 2.5 : 0.5)) V.happy();
   }
 
   function walkTo(spot, mode = 'walk') {
@@ -130,7 +149,7 @@ export async function createVillager(ctx, person, town) {
     actor.setPath(pts);
     V.mode = mode;
     const far = pts.length > 4 || Math.hypot(spot.x - actor.position.x, spot.z - actor.position.z) > 9;
-    V.run = mode === 'walk' && far && r() < person.pace.runChance * (town.rainJoy(V) ? 2 : 1);
+    V.run = mode === 'walk' && far && r() < person.pace.runChance * (town.joy(V) ? 2 : 1);
     return true;
   }
 
@@ -189,9 +208,12 @@ export async function createVillager(ctx, person, town) {
     idle(1 + r() * 2);
   }
 
+  /** 지금 밖에 있어야 하나 (일과·날씨 + 생일엔 집에) */
+  function outNow(now, weather) { return shouldBeOut(person, now, weather) && !town.staysIn?.(V); }
+
   function think(now, weather) {
-    if (!now || V.mode === 'talk') return;
-    const want = shouldBeOut(person, now, weather);
+    if (!now || V.mode === 'talk' || V.mode === 'room') return;
+    const want = outNow(now, weather);
     if (want && V.mode === 'home') {
       if ((V.emergeDelay -= THINK) <= 0) emerge();
     } else if (want && V.mode === 'toDoor') {

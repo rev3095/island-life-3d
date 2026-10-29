@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-13",
+  "slug": "fish-mackerel",
+  "name": "고등어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.mackerel"
+  ],
+  "hold": true,
+  "triangles": 1780,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.079,
+    0.41,
+    0.104
+  ],
+  "bounds": [
+    [
+      -0.04,
+      -0.205,
+      -0.052
+    ],
+    [
+      0.04,
+      0.205,
+      0.052
+    ]
+  ],
+  "glbBytes": 46472,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-mackerel_main.png",
+    "fish-mackerel_thumb.png"
+  ]
+}

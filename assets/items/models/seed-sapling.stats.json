@@ -1,0 +1,47 @@
+{
+  "id": "IC-SD-04",
+  "slug": "seed-sapling",
+  "name": "어린 나무",
+  "group": "seed",
+  "kind": "sapling",
+  "version": "0.1",
+  "items": [
+    "seed.sapling"
+  ],
+  "hold": false,
+  "triangles": 1924,
+  "parts": 1,
+  "materials": [
+    "burlap",
+    "leaf",
+    "soil",
+    "tie",
+    "trunk"
+  ],
+  "objects": [
+    "seed"
+  ],
+  "size": [
+    0.315,
+    0.25,
+    0.633
+  ],
+  "bounds": [
+    [
+      -0.157,
+      -0.125,
+      0.0
+    ],
+    [
+      0.157,
+      0.125,
+      0.633
+    ]
+  ],
+  "glbBytes": 39312,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "seed-sapling_main.png",
+    "seed-sapling_thumb.png"
+  ]
+}

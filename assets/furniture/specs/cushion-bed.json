@@ -1,0 +1,64 @@
+{
+  "id": "FU-23",
+  "slug": "cushion-bed",
+  "item": "furn.cushion-bed",
+  "name": "쿠션 침대",
+  "category": "furniture",
+  "kind": "cushion-bed",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "보리 방의 낮고 폭신한 하늘색 큰 쿠션. 뒤와 옆을 두른 둥근 테두리, 가운데 매트, 흰 베개.",
+    "keywords": [
+      "낮은 쿠션",
+      "U자 테두리",
+      "단추 누빔",
+      "흰 베개"
+    ],
+    "references": [
+      "강아지 방석 침대"
+    ],
+    "avoid": [
+      "높은 침대 다리"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "button"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "cushion": "#6CA0DC",
+    "cushionTop": "#9CC3EA",
+    "piping": "#F7F1E4",
+    "button": "#4F86C6",
+    "pillow": "#F7F1E4"
+  },
+  "paletteLabels": {
+    "cushion": "쿠션",
+    "cushionTop": "가운데 매트",
+    "piping": "둘레 줄",
+    "button": "누빔 단추",
+    "pillow": "베개"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

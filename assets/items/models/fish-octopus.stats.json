@@ -1,0 +1,47 @@
+{
+  "id": "IC-FS-16",
+  "slug": "fish-octopus",
+  "name": "문어",
+  "group": "fish",
+  "kind": "octopus",
+  "version": "0.1",
+  "items": [
+    "fish.octopus"
+  ],
+  "hold": true,
+  "triangles": 5240,
+  "parts": 1,
+  "materials": [
+    "back",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "mark"
+  ],
+  "objects": [
+    "octopus"
+  ],
+  "size": [
+    0.432,
+    0.429,
+    0.196
+  ],
+  "bounds": [
+    [
+      -0.216,
+      -0.214,
+      -0.098
+    ],
+    [
+      0.216,
+      0.214,
+      0.098
+    ]
+  ],
+  "glbBytes": 100940,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-octopus_main.png",
+    "fish-octopus_thumb.png"
+  ]
+}

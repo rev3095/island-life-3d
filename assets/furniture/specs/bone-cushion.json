@@ -1,0 +1,61 @@
+{
+  "id": "FU-24",
+  "slug": "bone-cushion",
+  "item": "furn.bone-cushion",
+  "name": "뼈다귀 쿠션",
+  "category": "furniture",
+  "kind": "bone-cushion",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "둥근 파랑 방석 위에 하얀 뼈다귀 베개. 앞에는 발자국 무늬.",
+    "keywords": [
+      "둥근 방석",
+      "뼈다귀 베개",
+      "발자국 무늬"
+    ],
+    "references": [
+      "반려견 방석"
+    ],
+    "avoid": [
+      "진짜 뼈"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "paw"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "cushion": "#6CA0DC",
+    "piping": "#9CC3EA",
+    "bone": "#F7F1E4",
+    "paw": "#F7F1E4"
+  },
+  "paletteLabels": {
+    "cushion": "방석",
+    "piping": "둘레 줄",
+    "bone": "뼈다귀",
+    "paw": "발자국"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,70 @@
+{
+  "id": "FU-27",
+  "slug": "rod-rack",
+  "item": "furn.rod-rack",
+  "name": "낚싯대 걸이",
+  "category": "furniture",
+  "kind": "rod-rack",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "두부 방 벽 판자에 낚싯대 두 개를 걸었다. 낚싯줄 끝 빨간 찌가 판자 고리에 걸려 있다.",
+    "keywords": [
+      "벽 판자",
+      "낚싯대 둘",
+      "릴",
+      "빨간 찌"
+    ],
+    "references": [
+      "낚시 오두막 벽"
+    ],
+    "avoid": [
+      "날카로운 바늘"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "line"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "plank": "#A8774E",
+    "peg": "#7F5636",
+    "rod": "#7F5636",
+    "grip": "#E2C08D",
+    "reel": "#4E5A57",
+    "line": "#9DB2A6",
+    "bobber": "#E8504F",
+    "bobberTop": "#FBF7F2"
+  },
+  "paletteLabels": {
+    "plank": "판자",
+    "peg": "걸이 못",
+    "rod": "낚싯대",
+    "grip": "손잡이",
+    "reel": "릴",
+    "line": "낚싯줄",
+    "bobber": "찌",
+    "bobberTop": "찌 윗부분"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

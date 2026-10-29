@@ -1,0 +1,44 @@
+{
+  "id": "IC-FO-06",
+  "slug": "fossil-dino-track",
+  "name": "공룡 발자국",
+  "group": "fossil",
+  "kind": "dino-track",
+  "version": "0.1",
+  "items": [
+    "fossil.dino-track"
+  ],
+  "hold": true,
+  "triangles": 534,
+  "parts": 1,
+  "materials": [
+    "stone",
+    "track"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.418,
+    0.387,
+    0.078
+  ],
+  "bounds": [
+    [
+      -0.209,
+      -0.193,
+      -0.039
+    ],
+    [
+      0.209,
+      0.193,
+      0.039
+    ]
+  ],
+  "glbBytes": 17980,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-dino-track_main.png",
+    "fossil-dino-track_thumb.png"
+  ]
+}

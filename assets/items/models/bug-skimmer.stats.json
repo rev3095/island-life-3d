@@ -1,0 +1,49 @@
+{
+  "id": "IC-BG-07",
+  "slug": "bug-skimmer",
+  "name": "밀잠자리",
+  "group": "bug",
+  "kind": "dragonfly",
+  "version": "0.1",
+  "items": [
+    "bug.skimmer"
+  ],
+  "hold": true,
+  "triangles": 1940,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "leg",
+    "stripe",
+    "wing",
+    "wingMark"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.376,
+    0.394,
+    0.056
+  ],
+  "bounds": [
+    [
+      -0.188,
+      -0.197,
+      -0.028
+    ],
+    [
+      0.188,
+      0.197,
+      0.028
+    ]
+  ],
+  "glbBytes": 55740,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-skimmer_main.png",
+    "bug-skimmer_thumb.png"
+  ]
+}

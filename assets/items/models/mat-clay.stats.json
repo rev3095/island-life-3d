@@ -1,0 +1,44 @@
+{
+  "id": "IC-MA-06",
+  "slug": "mat-clay",
+  "name": "점토",
+  "group": "mat",
+  "kind": "clay",
+  "version": "0.1",
+  "items": [
+    "mat.clay"
+  ],
+  "hold": false,
+  "triangles": 748,
+  "parts": 1,
+  "materials": [
+    "clay",
+    "clayLight"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.38,
+    0.3,
+    0.21
+  ],
+  "bounds": [
+    [
+      -0.19,
+      -0.15,
+      0.0
+    ],
+    [
+      0.19,
+      0.15,
+      0.21
+    ]
+  ],
+  "glbBytes": 15604,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-clay_main.png",
+    "mat-clay_thumb.png"
+  ]
+}

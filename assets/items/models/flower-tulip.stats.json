@@ -1,0 +1,55 @@
+{
+  "id": "IC-FL-01",
+  "slug": "flower-tulip",
+  "name": "튤립",
+  "group": "flower",
+  "kind": "tulip",
+  "version": "0.1",
+  "items": [
+    "flower.tulip-red",
+    "flower.tulip-yellow",
+    "flower.tulip-white",
+    "flower.tulip-pink"
+  ],
+  "hold": false,
+  "triangles": 1112,
+  "parts": 1,
+  "materials": [
+    "petal",
+    "stem"
+  ],
+  "objects": [
+    "flower"
+  ],
+  "size": [
+    0.166,
+    0.162,
+    0.499
+  ],
+  "bounds": [
+    [
+      -0.083,
+      -0.081,
+      0.0
+    ],
+    [
+      0.083,
+      0.081,
+      0.499
+    ]
+  ],
+  "glbBytes": 25404,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-tulip_main.png",
+    "flower-tulip_pink_main.png",
+    "flower-tulip_pink_thumb.png",
+    "flower-tulip_red_main.png",
+    "flower-tulip_red_thumb.png",
+    "flower-tulip_thumb.png",
+    "flower-tulip_white_main.png",
+    "flower-tulip_white_thumb.png",
+    "flower-tulip_yellow_main.png",
+    "flower-tulip_yellow_thumb.png"
+  ]
+}

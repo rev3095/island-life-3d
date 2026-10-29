@@ -1,0 +1,54 @@
+{
+  "id": "IC-MA-02",
+  "slug": "mat-hardwood",
+  "name": "단단한 나무",
+  "group": "mat",
+  "category": "item",
+  "kind": "hardwood",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.hardwood",
+      "code": "IC-MA-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "굵고 진한 통나무 하나, 옹이가 있다",
+    "keywords": [
+      "진한 나무",
+      "옹이"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bark": "#7F5636",
+    "cut": "#C49A6C",
+    "ring": "#9A6B45",
+    "knot": "#5E3D26"
+  },
+  "paletteLabels": {
+    "bark": "껍질",
+    "cut": "자른 면",
+    "ring": "나이테",
+    "knot": "옹이"
+  }
+}

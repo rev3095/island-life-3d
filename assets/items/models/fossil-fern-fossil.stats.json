@@ -1,0 +1,44 @@
+{
+  "id": "IC-FO-04",
+  "slug": "fossil-fern-fossil",
+  "name": "고사리 화석",
+  "group": "fossil",
+  "kind": "fern-fossil",
+  "version": "0.1",
+  "items": [
+    "fossil.fern-fossil"
+  ],
+  "hold": true,
+  "triangles": 862,
+  "parts": 1,
+  "materials": [
+    "fern",
+    "stone"
+  ],
+  "objects": [
+    "fossil"
+  ],
+  "size": [
+    0.348,
+    0.243,
+    0.05
+  ],
+  "bounds": [
+    [
+      -0.174,
+      -0.122,
+      -0.025
+    ],
+    [
+      0.174,
+      0.122,
+      0.025
+    ]
+  ],
+  "glbBytes": 39568,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fossil-fern-fossil_main.png",
+    "fossil-fern-fossil_thumb.png"
+  ]
+}
