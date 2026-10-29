@@ -462,7 +462,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-22",
@@ -482,7 +482,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-23",
@@ -502,7 +502,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-24",
@@ -522,7 +522,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-25",
@@ -548,7 +548,7 @@
       ],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-26",
@@ -568,7 +568,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-27",
@@ -588,7 +588,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-28",
@@ -610,7 +610,7 @@
         "flicker"
       ],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-29",
@@ -630,7 +630,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-30",
@@ -656,7 +656,7 @@
       ],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-31",
@@ -676,7 +676,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-32",
@@ -696,7 +696,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-33",
@@ -718,7 +718,7 @@
         "flicker"
       ],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-34",
@@ -738,7 +738,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

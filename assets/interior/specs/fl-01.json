@@ -4,7 +4,7 @@
   "kind": "floor",
   "name": "나무 판자",
   "version": 1,
-  "status": "review",
+  "status": "approved",
   "price": 1200,
   "step": "wood",
   "starter": true,

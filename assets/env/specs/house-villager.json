@@ -5,7 +5,7 @@
   "category": "building",
   "kind": "house",
   "version": "0.2",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "주민 일곱 명의 집. 모양은 같고 지붕 색이 주민 테마색이다. 문 위에 작은 차양이 있다.",
     "keywords": [

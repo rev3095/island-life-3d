@@ -112,7 +112,7 @@
       "category": "prop",
       "kind": "festival-part",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-02",
@@ -121,7 +121,7 @@
       "category": "prop",
       "kind": "festival-part",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-03",
@@ -130,7 +130,7 @@
       "category": "prop",
       "kind": "festival-part",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-04",
@@ -139,7 +139,7 @@
       "category": "prop",
       "kind": "festival-part",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-05",
@@ -148,7 +148,7 @@
       "category": "prop",
       "kind": "festival-part",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-01",
@@ -238,7 +238,7 @@
       "category": "prop",
       "kind": "moving-boxes",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-11",
@@ -247,7 +247,7 @@
       "category": "prop",
       "kind": "party-balloons",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-12",
@@ -256,7 +256,7 @@
       "category": "prop",
       "kind": "lot-sign",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-13",
@@ -265,7 +265,7 @@
       "category": "prop",
       "kind": "festival-garland",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-14",
@@ -274,7 +274,7 @@
       "category": "prop",
       "kind": "festival-lantern",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-15",
@@ -283,7 +283,7 @@
       "category": "prop",
       "kind": "festival-board",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-16",
@@ -292,7 +292,7 @@
       "category": "prop",
       "kind": "festival-cover",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -310,7 +310,7 @@
       "category": "building",
       "kind": "house",
       "version": "0.2",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-03",
@@ -346,7 +346,7 @@
       "category": "building",
       "kind": "festival-stage",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-07",
@@ -355,7 +355,7 @@
       "category": "building",
       "kind": "festival-arch",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-01",
@@ -364,7 +364,7 @@
       "category": "building",
       "kind": "festival-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-02",
@@ -373,7 +373,7 @@
       "category": "building",
       "kind": "festival-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-03",
@@ -382,7 +382,7 @@
       "category": "building",
       "kind": "festival-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-04",
@@ -391,7 +391,7 @@
       "category": "building",
       "kind": "festival-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-05",
@@ -400,7 +400,7 @@
       "category": "building",
       "kind": "festival-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-01",
@@ -472,7 +472,7 @@
       "category": "tile",
       "kind": "festival-floor",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

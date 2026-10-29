@@ -4,7 +4,7 @@
   "kind": "floor",
   "name": "모래 바닥",
   "version": 1,
-  "status": "review",
+  "status": "approved",
   "price": 2000,
   "step": "sand",
   "shopOnly": true,

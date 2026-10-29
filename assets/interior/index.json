@@ -6,7 +6,7 @@
       "kind": "wallpaper",
       "name": "크림 줄무늬",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1200,
       "starter": true
     },
@@ -16,7 +16,7 @@
       "kind": "wallpaper",
       "name": "오렌지 줄무늬",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1400
     },
     {
@@ -25,7 +25,7 @@
       "kind": "wallpaper",
       "name": "하늘 체크",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1400
     },
     {
@@ -34,7 +34,7 @@
       "kind": "wallpaper",
       "name": "연보라 꽃무늬",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1600
     },
     {
@@ -43,7 +43,7 @@
       "kind": "wallpaper",
       "name": "통나무 벽",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1600
     },
     {
@@ -52,17 +52,17 @@
       "kind": "wallpaper",
       "name": "민트 타일",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1400
     },
-    { "id": "WP-07", "slug": "wp-07", "kind": "wallpaper", "name": "빗방울", "version": 1, "status": "review", "price": 1400 },
+    { "id": "WP-07", "slug": "wp-07", "kind": "wallpaper", "name": "빗방울", "version": 1, "status": "approved", "price": 1400 },
     {
       "id": "WP-08",
       "slug": "wp-08",
       "kind": "wallpaper",
       "name": "밤하늘 별",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 2000,
       "shopOnly": true
     },
@@ -72,27 +72,27 @@
       "kind": "floor",
       "name": "나무 판자",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 1200,
       "starter": true
     },
-    { "id": "FL-02", "slug": "fl-02", "kind": "floor", "name": "밝은 판자", "version": 1, "status": "review", "price": 1400 },
-    { "id": "FL-03", "slug": "fl-03", "kind": "floor", "name": "폭신 카펫", "version": 1, "status": "review", "price": 1600 },
-    { "id": "FL-04", "slug": "fl-04", "kind": "floor", "name": "흰 타일", "version": 1, "status": "review", "price": 1400 },
-    { "id": "FL-05", "slug": "fl-05", "kind": "floor", "name": "짙은 판자", "version": 1, "status": "review", "price": 1400 },
-    { "id": "FL-06", "slug": "fl-06", "kind": "floor", "name": "노랑 체크 타일", "version": 1, "status": "review", "price": 1400 },
-    { "id": "FL-07", "slug": "fl-07", "kind": "floor", "name": "연못 돌바닥", "version": 1, "status": "review", "price": 1600 },
+    { "id": "FL-02", "slug": "fl-02", "kind": "floor", "name": "밝은 판자", "version": 1, "status": "approved", "price": 1400 },
+    { "id": "FL-03", "slug": "fl-03", "kind": "floor", "name": "폭신 카펫", "version": 1, "status": "approved", "price": 1600 },
+    { "id": "FL-04", "slug": "fl-04", "kind": "floor", "name": "흰 타일", "version": 1, "status": "approved", "price": 1400 },
+    { "id": "FL-05", "slug": "fl-05", "kind": "floor", "name": "짙은 판자", "version": 1, "status": "approved", "price": 1400 },
+    { "id": "FL-06", "slug": "fl-06", "kind": "floor", "name": "노랑 체크 타일", "version": 1, "status": "approved", "price": 1400 },
+    { "id": "FL-07", "slug": "fl-07", "kind": "floor", "name": "연못 돌바닥", "version": 1, "status": "approved", "price": 1600 },
     {
       "id": "FL-08",
       "slug": "fl-08",
       "kind": "floor",
       "name": "모래 바닥",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 2000,
       "shopOnly": true
     },
-    { "id": "RF-01", "slug": "frame", "kind": "frame", "name": "방 틀 (창·문 매트)", "version": 1, "status": "review" }
+    { "id": "RF-01", "slug": "frame", "kind": "frame", "name": "방 틀 (창·문 매트)", "version": 1, "status": "approved" }
   ],
   "rooms": [
     {
@@ -101,7 +101,7 @@
       "owner": "coco",
       "name": "해변 운동방",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-02",
       "floor": "fl-02"
     },
@@ -111,7 +111,7 @@
       "owner": "bori",
       "name": "햇살 낮잠방",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-03",
       "floor": "fl-03"
     },
@@ -121,7 +121,7 @@
       "owner": "mochi",
       "name": "꽃 온실방",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-04",
       "floor": "fl-04"
     },
@@ -131,7 +131,7 @@
       "owner": "dubu",
       "name": "낚시 오두막",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-05",
       "floor": "fl-05"
     },
@@ -141,7 +141,7 @@
       "owner": "pong",
       "name": "과일 부엌",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-06",
       "floor": "fl-06"
     },
@@ -151,7 +151,7 @@
       "owner": "chorong",
       "name": "비 오는 날 방",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "wallpaper": "wp-07",
       "floor": "fl-07"
     }
