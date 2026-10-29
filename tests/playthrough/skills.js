@@ -223,6 +223,13 @@ export function createSkills(bot) {
     if (!d) { bot.issue('major', 'world', `${label ?? key} 문 자리가 없어요`); return false; }
     await bot.walkTo({ x: d.x, z: d.z + 0.15 }, { near: 0.25, label: `${label ?? key} 문` });
     await bot.faceDir(0);
+    // 문 앞에 주민이 서 있으면 행동 키가 '말 걸기'로 간다 → 비켜 줄 때까지 기다린다 (사람도 A 글자를 보고 기다린다)
+    const want = { shop: /town:(shop|firstday)/, museum: /town:museum/ }[key];
+    if (want && !want.test(bot.peek() ?? '')) {
+      const ok = await bot.until(() => want.test(bot.peek() ?? ''), { timeout: 20, ui: false });
+      bot.issue('polish', 'town', `${label ?? key} 문 앞에 주민이 서 있으면 행동 키가 말 걸기로 가요 (비킬 때까지 ${ok ? '기다림' : '20초 넘게 안 비킴'})`);
+      if (!ok) { await bot.walkTo({ x: d.x + 0.6, z: d.z + 0.15 }, { near: 0.2 }); await bot.faceDir(0); }
+    }
     return true;
   };
   /** 상점: mode 'sell' | 'buy'. sellTest(item, slot) → 팔 개수(0 = 안 팜). buy = [id...] */
