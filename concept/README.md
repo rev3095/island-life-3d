@@ -51,38 +51,80 @@
 
 ## 편집기 홈 (ET-01)
 
-https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저장소 루트). 모든 편집기·검수 보드·게임 링크를 한곳에서 열고, 편집기마다 무엇을 고치는지 · 채팅 명령 · 마지막 반영 버전 · 처리할 것 수를 보여 준다. 6차에 생길 편집기(곡·지도·숫자·스타일)는 링크 없는 자리로 둔다.
+https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저장소 루트). 모든 편집기·검수 보드·게임 링크를 한곳에서 열고, 편집기마다 무엇을 고치는지 · 채팅 명령 · 마지막 반영 버전 · 처리할 것 수를 보여 주고, **「전체 관리」 표에서 모든 리소스를 골라 다시 열기 · 고쳐 주세요 · 확정을 남긴다** (아래 「전체 관리」).
 
-- **목록 = `editors.html` 의 `<script type="application/json" id="editors-list">`.** 항목 `{ id, group: editor|board|game|soon|archive, name, url, file, edits, command, openLabel, reads, et?, track?, later? }`. `reads` 는 "전체 요청 확인" 때 Claude 가 그 아티팩트 저장소에서 읽을 곳. `tests/hub.test.mjs` 가 목록 ↔ CLAUDE.md·이 표·시나리오 노트의 링크, 보드 id ↔ `window.BOARD.id` 를 검사한다.
-- 아티팩트는 다른 아티팩트의 저장소를 읽을 수 없다 → 홈은 **자기 저장소의 문서만** 보여 주고, 그 문서는 Claude 가 ArtifactData 로 써 넣는다 (홈 페이지는 읽기만). 숫자는 Claude 가 마지막으로 확인한 때 기준이다.
+- **목록 = `editors.html` 의 `<script type="application/json" id="editors-list">`.** 항목 `{ id, group: editor|board|game|soon|archive, name, url, file, edits, command, openLabel, reads, et?, track?, later? }`. `reads` 는 "전체 요청 확인" 때 Claude 가 그 아티팩트 저장소에서 읽을 곳. 머리의 **바로 가기** (`nav.quick`) 는 같은 링크를 스크립트 없이 적어 둔 것 — 목록을 바꾸면 같이 고친다. `tests/hub.test.mjs` 가 목록 ↔ 바로 가기 · CLAUDE.md·이 표·시나리오 노트의 링크, 보드 id ↔ `window.BOARD.id` 를 검사한다.
+- 아티팩트는 다른 아티팩트의 저장소를 읽을 수 없다 → 홈은 **자기 저장소의 문서만** 보여 주고, 그 문서는 Claude 가 ArtifactData 로 써 넣는다. 숫자·목록은 Claude 가 마지막으로 확인한 때 기준이다. 홈 페이지가 쓰는 곳은 `manage/*` (전체 관리 요청) 하나.
+- **열리게 하는 약속** (게시본에서 무엇이 실패해도 화면이 비지 않게, `tests/hub.test.mjs` 가 본다): ① 맨 앞 작은 스크립트가 오류·`unhandledrejection`·스크립트 파일 못 받음을 잡아 맨 위 상자(`#bootErr`)에 "무엇이 안 됐는지" 적는다 (오류 글 복사 단추 — 채팅에 붙이면 Claude 가 고친다) ② 글꼴은 `<link>` 대신 그 스크립트가 나중에 붙인다 (글꼴 서버가 늦어도 화면을 막지 않음, 없으면 기본 글꼴) ③ 바로 가기 링크·명령 표는 HTML 그대로 ④ `board-kit.js` 를 못 받아도 같은 모양의 대신 도구로 그린다 ⑤ `claude.use()` 는 12초 제한·`null`·던짐·Promise 아님을 모두 견디고, `user.isOwner()`·`can()`·`id()` 도 각각 8초 제한으로 감싼다 ⑥ 현황(`status`) 구독이 실패해야만 "저장소 못 읽음", 다른 구독은 그 칸에만 이유 ⑦ 15초 동안 답이 없으면 그렇게 적는다.
 
 | 문서 (홈 저장소) | 모양 | 쓰는 쪽 |
 |---|---|---|
 | `status/<목록 id>` | `{ id, open, openItems, requested, applied, recent, published, note, url, checkedAt, updatedAt, updatedBy: 'claude' }` | Claude (쓰기 admin) |
 | `meta/check` | 마지막 "전체 요청 확인" `{ at, summary, open, by: 'claude' }` | Claude (쓰기 admin) |
+| `meta/catalog` | 목록을 만든 때 `{ at, commit, total, review, groups: [{id, label, count, review, new}], by: 'claude' }` | Claude (쓰기 admin, `tools/hub-catalog.mjs`) |
+| `catalog/<분류>` | 그 분류의 모든 리소스 (아래 「전체 관리」) | Claude (쓰기 admin, `tools/hub-catalog.mjs`) |
+| `marks/<분류>` | 값 데이터(소리·지도·숫자·스타일·보드 결정)의 홈 쪽 상태 `{ group, items: { <id>: { state: 'review'|'approved', at, from: '<manage 문서 id>', note } } }` | Claude (쓰기 admin) |
+| `manage/<자동 id>` | 전체 관리에서 남긴 요청 (아래) | 홈 페이지 (쓰기 interact) · 처리 결과는 Claude |
 
 `status` 칸: `open` = 아직 처리 안 한 것 수 (캐릭터·배경: `status:'new'` 요청 · 보드: `applied` 뒤 바뀐 결정·의견 · 시나리오: 바뀐 장면·순서·의견 · 새 편집기: 그 편집기 노트가 정한 것), `openItems` = 짧은 이름 최대 5개, `requested` = 편집기·보드에서 "반영 요청 표시"를 눌렀는지, `applied` = 그 편집기 `applied/<id>` 요약 `{version, appliedAt, summary, commit}` (없으면 `null`), `recent` = `history` 최근 3개 `{version, appliedAt, summary}` (새 것부터), `published` = 그 편집기 아티팩트 게시 버전, `note` = 한 줄 상황, `url` = 목록에 링크가 없는 새 편집기의 링크 (`https://claude.ai/artifact/…` 만 받아 줌 — 홈을 다시 게시하지 않고 자리를 채울 때). 목록에 없는 칸은 비워 둬도 된다.
 
-게시: `file_path: editors.html`, `files: {"concept/board-kit.js": "concept/board-kit.js"}` (홈은 루트에 있어서 로컬과 같은 경로), `capabilities: {"db": {"rules": [{"path":"status","read":"view","write":"admin"},{"path":"meta","read":"view","write":"admin"}]}, "user": {}}`, 첫 게시 `icon: "home"`. 로컬 확인은 dev-server `/editors.html` — `/api/db/hub-status`·`hub-meta` (`assets/review/hub-*.json`, 행마다 `docId`) 를 읽는다.
+게시: `file_path: editors.html`, `files: {"concept/board-kit.js": "concept/board-kit.js"}` (홈은 루트에 있어서 로컬과 같은 경로), `capabilities: {"db": {"rules": [{"path":"status","read":"view","write":"admin"},{"path":"meta","read":"view","write":"admin"},{"path":"catalog","read":"view","write":"admin"},{"path":"marks","read":"view","write":"admin"},{"path":"manage","read":"view","write":"interact"}]}, "user": {}}` (capabilities 를 넘기면 전체를 다시 선언 — 생략하면 그대로), 첫 게시 `icon: "home"`. 로컬 확인은 dev-server `/editors.html` — `/api/db/hub-status`·`hub-meta`·`hub-catalog`·`hub-marks`·`hub-manage` (`assets/review/hub-*.json`, 행마다 `docId`; `node tools/hub-catalog.mjs --local` 이 catalog·meta 행을 채운다) 를 읽고 쓴다.
+
+## 전체 관리 (홈의 표)
+
+**원칙: 확정(approved)해도 편집기·요소·기록을 지우지 않는다.** 확정은 "지금 게임에 들어간 것이 이것"이라는 표시일 뿐이고, 언제든 홈에서 골라 다시 열거나(검수 대기 `review`), 편집기에서 바로 고쳐 요청할 수 있다. 게임은 status 로 거르지 않으니 다시 열어도 게임에서 빠지지 않는다. 기록(`applied`·`history`)도 앞으로만 쌓는다.
+
+**목록 만들기** — `node tools/hub-catalog.mjs --boards <보드 반영.json> [--local]`. 저장소 파일을 읽어 `assets/review/hub/catalog/<분류>.json` 13개 + `meta-catalog.json` 을 만든다 (`--local` 은 dev-server 흉내 파일도). `--boards` 는 보드마다 `applied/<보드 id>` 문서의 data 를 `{wave5: {…}, z5: {…}, wave6: {…}}` 로 모은 파일 (결정 줄의 고른 안·상태). 링크는 `editors.html` 목록의 url 에 그 요소로 가는 주소 끝 `#…` 을 붙인다.
+
+| 분류 (`catalog/<id>`) | 읽는 곳 | 상태 | 고치는 곳 (주소 끝) |
+|---|---|---|---|
+| `character` 캐릭터 | `assets/specs/*.json` | 스펙 `status` | 캐릭터 편집기 `#<slug>` |
+| `villager` 주민 성격·대화 | `assets/villagers/*.json` | 파일 `status` | 캐릭터 편집기 `#<slug>.talk` |
+| `env` 배경 (축제 포함) | `assets/env/specs` | 스펙 `status` | 배경 편집기 `#<slug>` |
+| `furniture` 가구 | `assets/furniture/specs` | 스펙 `status` | 배경 편집기 `#furn-<slug>` |
+| `item` 아이템 (`icons` = 아이콘 수) | `assets/items/specs` | 스펙 `status` | 배경 편집기 `#item-<slug>` |
+| `interior` 벽지·바닥 | `assets/interior/specs` (wallpaper·floor) | 스펙 `status` | 배경 편집기 `#wp-0N`·`#fl-0N` |
+| `room` 방 배치 (+ 파일 없는 RM-07 = `new`) | `assets/interior/rooms` | 파일 `status` | 배경 편집기 `#rm-0N` |
+| `scene` 장면 | `assets/story/scenes` (순서 `index.json`) | 파일 `status` | 시나리오 편집기 |
+| `sound` 곡·선곡 표·효과음·목소리 | `assets/sound/` | 값 데이터 → `marks` | 곡 편집기 `#songs`·`#schedule`·`#sfx`·`#voices` |
+| `map` 섬 지도 자리·시드·밀도 | `assets/island/layout.json` 칸마다 | 값 데이터 → `marks` | 섬 지도 편집기 |
+| `data` 숫자 표 묶음 | 숫자 표 편집기 `SHEETS` + `assets/data/*.json` | 값 데이터 → `marks` | 숫자 표 `#<표 id>` |
+| `style` 스타일 프리셋 | `assets/style/presets.json` | 값 데이터 → `marks` | 스타일 편집기 |
+| `decision` 보드 결정 D8– | 보드 html `DECISIONS` + `--boards` | 고른 안이 있으면 확정 → `marks` | 그 보드 |
+
+`catalog/<분류>` 모양: `{ group, label, editor, editorName, how: 'spec'|'value'|'board', count, approved, review, new, icons?, builtAt, commit, by: 'claude', items: [{ id, ref, name, sub, state: 'approved'|'review'|'new', version, link, file, board?, pick?, rec?, icons? }] }` (문서 하나 256 KiB 안 — 지금 가장 큰 아이템이 21 KB).
+
+**요청 문서** `manage/<자동 id>` (홈 페이지가 씀): `{ kind: 'reopen'|'fix'|'approve', items: [{ group, id, ref, name, state, version }], note, status: 'new', from: 'hub', createdAt, by: <user id|null> }` — 한 문서에 400줄까지, 「고쳐 주세요」(`'fix'`)는 `note` 필수. 처리 전(`new`)이면 홈에서 취소(`status: 'cancelled'`). Claude 가 처리하면 `status: 'done'`, `reply`(한 줄 답), `doneAt`, `doneVersion` (그 편집기 `applied` 새 버전, 없으면 생략). 처리 중에는 `'working'`. 저장소를 못 쓰는 창에서는 같은 세 단추가 채팅에 붙일 글("전체 요청 확인 — 다시 열기 2개: 벤치(PR-02), …")을 복사한다 → 채팅으로 오면 아래와 같게 처리.
+
+**Claude 가 처리하는 법** (분류의 `how` 마다):
+
+| `kind` | `spec` (스펙·파일에 status 가 있는 것) | `value` (소리·지도·숫자·스타일) | `board` (보드 결정) |
+|---|---|---|---|
+| `'reopen'` 다시 열기 | 파일 `status: "review"` (version 은 그대로) → `node tools/build-*.mjs --index` (배경 편집기는 `build-editor-index.mjs` 도) → 그 편집기 다시 게시 (목록 파일만) | `marks/<분류>.items.<id> = {state:'review', at, from}` (파일은 그대로 — 편집기에서 바로 고치면 된다) | `marks/decision` 에 `review` → 사용자가 보드에서 다시 고르면 "검수 보드 반영" |
+| `'fix'` 고쳐 주세요 | 그 편집기 요청 하나처럼 처리 (CLAUDE.md 「"요청 확인"」 흐름: 스펙·빌더 수정 → 재빌드 → 테스트 → 다시 게시 → 그 편집기 `applied`·`history` 새 버전, `changed` 에 `request: 'manage/<id>'`) → 고친 것은 `review` 로 | 의견대로 값 데이터를 고친다 (그 편집기 반영 흐름 — `apply-edits`·`apply-sound` 등과 같은 검사·버전 +1) | 의견을 보드 카드·계획에 반영 ("검수 보드 반영" 흐름) |
+| `'approve'` 확정 | 파일 `status: "approved"` → `--index` → 다시 게시 | `marks` 에서 그 줄을 지운다 (= 확정) | `marks` 에서 지운다 |
+
+끝나면 `manage` 문서를 `done` + `reply` 로, `node tools/hub-catalog.mjs` 로 목록을 다시 만들어 `catalog/*`·`meta/catalog` 를 쓴다 (아래 7번).
 
 ## "전체 요청 확인" (Claude 가 하는 일, D27-A)
 
 지금 명령("요청 확인" · "배경 요청 확인" · "시나리오 반영" · "검수 보드 반영" · 6차 새 명령)은 그대로 두고, 모든 편집기를 한 번에 도는 명령을 더한 것.
 
-1. **목록 읽기**: `editors.html` 의 `editors-list` + 홈 저장소 `status/*` (`ArtifactData list`, 홈 링크는 위). `url` 이 없는 자리는 `status/<id>.url` 을 쓴다. `command` 가 없는 것(게임·지난 보드)은 건너뛴다.
+1. **목록 읽기**: `editors.html` 의 `editors-list` + 홈 저장소 `status/*` · **`manage` (`query where status == 'new'`)** · `marks/*` (`ArtifactData list`, 홈 링크는 위). `url` 이 없는 자리는 `status/<id>.url` 을 쓴다. `command` 가 없는 것(게임·지난 보드)은 건너뛴다.
 2. **모으기** (읽기만): 항목마다 `reads` 대로 그 아티팩트 저장소를 읽는다.
    - 캐릭터 `requests` · 배경 `env-requests`: `query where status == 'new'` (되돌리기 요청 `kind: 'rollback'` 포함).
    - 시나리오: `drafts` 목록 · `timeline/main` · `applied/story` → `docs/notes/story.md` 의 "바뀐 것".
-   - 보드: `boards/<id>` 와 `applied/<id>` 의 `picks`·`notes` 비교, `status == 'requested'`.
+   - 보드: `boards/<id>` 와 `applied/<id>` 의 `picks`·`notes` 비교, `status == 'requested'`. `applied/<id>` 의 data 는 7번 목록 만들기의 `--boards` 파일로도 쓴다.
    - 새 편집기: 그 트랙 노트(`docs/notes/<트랙>.md`)가 정한 곳 — 정하지 않았으면 아래 공용 모양(`applied/<id>` + `requests` `status:'new'`).
-3. **먼저 보여 주기**: 편집기마다 새 것 수와 짧은 목록을 표로 보여 준다. 아무것도 없으면 `status/*`·`meta/check` 의 `checkedAt`·`at` 만 고치고 끝.
-4. **처리 순서**: 검수 보드(결정이 다른 일의 방향을 바꾼다) → 캐릭터 → 배경 → 시나리오 → 새 편집기. 각각 **그 편집기의 기존 흐름** 그대로 (CLAUDE.md 「편집기와 "요청 확인" 흐름」, 이 문서 「"검수 보드 반영"」, `docs/notes/story.md` 「시나리오 반영」, 새 편집기 노트). 트랙 하나만큼 큰 일(새 편집기·새 리소스 묶음, 보드 결정 변경)은 세션·브랜치로 나눠 제안하고, 나머지를 먼저 끝낸다. 되돌리기는 무엇을 되돌리는지 먼저 보여 준다.
+   - **홈 전체 관리**: `manage` 의 `new` 문서마다 `kind` · 줄(`items` 의 `group`·`id`) · `note`. 채팅에 붙여 온 "전체 요청 확인 — 다시 열기 …" 글도 같은 것으로 본다.
+3. **먼저 보여 주기**: 편집기마다 새 것 수와 짧은 목록, 홈에서 남긴 요청(다시 열기·고쳐 주세요·확정 몇 개, 어느 편집기)을 표로 보여 준다. 아무것도 없으면 `status/*`·`meta/check` 의 `checkedAt`·`at` 만 고치고 7번 목록만 다시 만든 뒤 끝.
+4. **처리 순서**: 검수 보드(결정이 다른 일의 방향을 바꾼다) → 홈 「다시 열기」·「확정」 (status·marks 만 바꾸는 가벼운 일) → 캐릭터 → 배경 → 시나리오 → 새 편집기 (각 편집기 요청과 홈 「고쳐 주세요」를 같이). 각각 **그 편집기의 기존 흐름** 그대로 (CLAUDE.md 「편집기와 "요청 확인" 흐름」, 이 문서 「"검수 보드 반영"」·「전체 관리」, `docs/notes/story.md` 「시나리오 반영」, 새 편집기 노트). 처리를 시작한 `manage` 문서는 `status: 'working'`. 트랙 하나만큼 큰 일(새 편집기·새 리소스 묶음, 보드 결정 변경)은 세션·브랜치로 나눠 제안하고, 나머지를 먼저 끝낸다. 되돌리기는 무엇을 되돌리는지 먼저 보여 준다. **확정이든 다시 열기든 편집기·요소·기록은 지우지 않는다.**
 5. **테스트**: `node --test tests/` 한 번 (편집기마다 따로 돌리지 않아도 된다 — 마지막에 한 번은 꼭).
-6. **다시 게시**: 바뀐 편집기마다 바뀐 파일만, 게임 링크는 맨 끝에 한 번 (D35-A).
-7. **기록**: 편집기마다 `applied/<id>`·`history/<id>-v<n>` (아래 공용 모양), 요청은 `done` + `reply` + `doneVersion`. 그다음 홈 `status/<id>` 전부 (`open`·`openItems`·`requested`·`applied`·`recent`·`published`·`checkedAt`) 와 `meta/check` (`at`, `summary` = "새 요청 3 처리 · 보드 1 반영" 처럼, 남은 것 수 `open`) 를 한 번의 `batch` 로.
+6. **다시 게시**: 바뀐 편집기마다 바뀐 파일만, 게임 링크는 맨 끝에 한 번 (D35-A). status 만 바뀐 편집기는 목록 파일(`--index` 결과)만.
+7. **기록**: 편집기마다 `applied/<id>`·`history/<id>-v<n>` (아래 공용 모양), 요청은 `done` + `reply` + `doneVersion` (홈 `manage` 문서도). 그다음 **`node tools/hub-catalog.mjs --boards <보드 반영.json>`** 으로 목록을 다시 만들고, 홈 저장소에 `catalog/<분류>` 13개 + `meta/catalog` + 바뀐 `marks/<분류>` + `status/<id>` 전부 (`open`·`openItems`·`requested`·`applied`·`recent`·`published`·`checkedAt`) + `meta/check` (`at`, `summary` = "새 요청 3 처리 · 보드 1 반영 · 홈 요청 2" 처럼, 남은 것 수 `open`) 를 `batch` 로 (한 번에 50개까지 — 먼저 `list` 로 각 문서 `version` 을 읽어 `if_version` 에, 처음 만드는 문서는 생략. 파일은 `file_path` 로).
 8. 사용자에게 편집기별로 한 것·남은 것·확인 못 한 것을 나눠 보고.
 
-편집기 하나의 명령("요청 확인" 등)만 왔을 때도 끝에 홈 `status/<그 id>` 를 고친다 (`meta/check` 는 그대로).
+편집기 하나의 명령("요청 확인" 등)만 왔을 때도 끝에 홈 `status/<그 id>` 를 고치고, 그 편집기 분류의 `catalog/<분류>` 를 다시 쓴다 (`meta/check` 는 그대로). "<이름> 확정" · "<이름> 다시 열기" 가 채팅으로 오면 홈 「확정」·「다시 열기」와 같게 처리한다.
 
 ## 반영 기록 공용 모양 (ET-11)
 
