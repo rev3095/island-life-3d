@@ -26,7 +26,12 @@
 | Y1 조작 안내·편의 | `local_678353c3-ca85-405a-8e1b-71e193c08ae8` | `p7-ux` · `../island-worktrees/p7-ux` | 4201 | `gameplay/index.js`, `core/input.js`, `ui/`, `data/save.js`, `gameplay/intro/` | `interactions.peek` + A·B·키 힌트 글자, 섬폰 이름 보기·다시 정하기, `save.reset()` 전체 지우기, 저장 실패 알림 |
 | Y2 채집 콘텐츠 | `local_da502eac-6abd-47f5-b015-a56e725bfe9f` | `p7-content` · `../island-worktrees/p7-content` | 4202 | `gameplay/gather/`, `data/items·museum·spawns·harvest`, `town/keepers.js`·`lines/neuru.js` | 화석 감정, 큰 물고기 줄 당김, 곤충 들추기, 물고기 종별 색 |
 | Y3 그리기 다듬기 | `local_c56ae154-0fbc-4491-ba5a-03e232c9740f` | `p7-render` · `../island-worktrees/p7-render` | 4203 | `core/materials.js`, `render/`, `world/`, `player/index.js`, `town/actor.js`, `house/furniture.js` | 캐릭터 부품 합치기(호출 줄이기), 디더 가림 공용(주민·가구), 강 둑·땅 경계, 그림자에 바람 |
-끝나면: 브랜치 검증 → 임시로 합쳐 테스트·브라우저 → 사용자 승인 → 합치기 → `build-web` → 게임 아티팩트 같은 링크에 바뀐 파일만 다시 게시.
+**세 트랙 작업 끝 — 합치기 승인 대기.** Y1 `p7-ux` e5a867e (4커밋) · Y2 `p7-content` 18f5ed1 (4커밋) · Y3 `p7-render` 5811f1d (4커밋). 모두 담당 파일 안, 겹치는 파일 0. 임시 작업 폴더 `../island-worktrees/wave4-trial`(포트 4209, launch `island-wave4-trial`)에서 셋을 합쳐: 충돌 0, 테스트 159/159, `build-web --check` 통과(265 → 268파일, 255 + 13), 콘솔 오류 0, 모듈 12개, `peek('action')` 주민 옆 "말 걸기"·HUD 안내 "Space 말 걸기", 주민 메시 3개(합치기), `fossil.unknown` 있음, 낮 화면에 하늘 띠·주민 이름표.
+- Y1: `interactions.peek` + 버튼 글자 표, A·B·Space·F 글자, 섬폰 이름 보기·다시 정하기, `save.reset()` 전체 칸 지우기, 저장 실패 알림.
+- Y2: 화석 감정(느루), 큰 물고기 줄 당김(`gather/tug.js`), 바위·나무 곤충 들추기, 물고기 종별 색.
+- Y3: 캐릭터 부품 합치기(광장 그리기 호출 363 → 167), 디더 가림 공용(주민·가게 주인·가구), 강 둑 부드럽게·거품·풀/모래 경계, 그림자에 바람.
+- 확인 못 한 것: 실제 휴대폰·다른 GPU, 저장소 막힌 창 알림(직접 못 만듦), 사람 손으로 줄 당김.
+승인 뒤: `--no-ff` 셋 합치기 → 테스트 → `build-web` → 게임 링크에 바뀐 파일만 다시 게시(`git diff --name-only ff74575 HEAD` ∩ files.json, 묶음 나눔) → `wave4-trial`·p7 작업 폴더 정리.
 5차 후보(새 리소스라 검수 보드 먼저): 주민 집 안·이사·생일, 도구 아이콘(D2), 새 가구.
 
 **3차 결과 (main 에 합침: f3f7970 · a24ebbf · a69656f · 75901f9, 후속 ff74575)**
@@ -147,6 +152,7 @@
 | 8 | 네, 정리 | 작업 폴더 13개 검사(미커밋 0·main 에 없는 커밋 0) → 남길 파일 옮기기 → 등록 해제·브랜치 삭제 | 저장소엔 main 만, 빈 폴더 10개는 세션이 잡고 있음 |
 | 9 | 네, 보관 | 세션 13개 보관 시도 → 11개 보관, 빈 폴더 8개 지움 | T1·X3 은 살아 있는 작업이 있어 남음 |
 | 10 | 이후 작업 진행 | T1·X3 보관 다시 시도(아직 살아 있는 작업 → 안 됨), 편집기 요청 0건 확인, 4차 계획(새 리소스 없는 것만, 파일 겹침 없게) → 작업 폴더 3개 → Y1~Y3 세션 시작 | 진행 중 |
+| 11 | (세션 보고들) | Y1~Y3 브랜치 검증, wave4-trial 에 임시로 합쳐 테스트 159·빌드 검사·브라우저 | 합치기 승인 요청 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
