@@ -19,6 +19,7 @@
 | 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | 버전 5: **요소 52개(배경 32 · 가구 20) 모두 확정(임시, 2026-10-29)**. db `env-refs` / `env-requests` — 요청 0건 |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
+| **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1, **검수 대기** (보드 id `wave6`). M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중
 없음. **리소스 61종 임시 확정 + 교체 준비 (2026-10-29)**: 캐릭터 9 · 배경 32 · 가구 20 을 status `approved` 로(편집기 두 개 버전 5). 나중에 고칠 때 코드를 안 건드리게, 코드에 박혀 있던 배경 충돌 모양·query 범위·건물 집터를 각 배경 스펙의 `world` 칸으로 옮김(`world/objects.js`·`island.js` 가 스펙에서 읽음). `tests/assets.test.mjs`(6개) 가 교체 약속(파일·재질=팔레트·캐릭터 동작/뼈·배경 이름·충돌/집터 ↔ 모델 크기·가구 칸 ↔ items.js)을 검사 — 테스트 165. 빌드 도구에 `--index`(Blender 없이 목록만). 교체 시험: 로컬 배경 편집기에서 벤치에 "하늘색 · 1.6칸" 요청 → 스펙·빌더 수정 → 빌드 11초 → 충돌을 안 고치면 테스트가 잡음 → world 칸 고침 → 편집기·게임에 그대로 반영(충돌 1.61 확인) → 원래대로 되돌림. 약속 정리는 CONTRACTS 끝 "리소스 교체 약속". **게임 링크 버전 4 로 다시 게시**(빌드 c9464ea, 바뀐 67파일, 전체 268 · 로컬 `/artifact/` 에서 12개 모듈·콘솔 오류 0·목록 밖 요청 0 확인, 게시본 objects.js·shop.json 이 로컬과 같은 바이트).
@@ -168,6 +169,7 @@
 | 16 | 5차 검수 보드 만들어줘 + 앞으로 모든 개발사항은 한국어로 | 한국어 보고 메모리 저장, 5차 리소스 계획(ID) 정리, `concept/wave5-board.html` 작성·로컬 확인(콘솔 오류 0·가로 넘침 없음·요청 글 동작)·게시 | 사용자 검수 대기 |
 | 17 | 보드 선택대로, 앞으로 선택지 방식 + 보드 고쳐 반영·되돌리기, 일단 진행 | 보드 저장형(board-kit.js·db), 사용자 선택 D8-B 를 저장소에서 확인, 반영 v1 기록, `concept/README.md`·CLAUDE.md·메모리에 흐름, 5차 표·작업 폴더 4개·Z1~Z4 세션 시작 | 진행 중 |
 | 18 | (작업 중 새 요청) 이모티콘 대화, 섬 가운데 축제 공간·부품 5개·부스 해금·단체 사진 엔딩·엔딩 뒤 계속 → Z5, 시나리오·스토리보드·연출 편집 고정 세션 | everyones_festival 문서 확인(이모지 전용 소통·재료 5·단체 사진), 지금 게임은 글 대사가 이미 있어 대화 방식을 Z5 보드 결정으로, PLAN 5차 추가 표, 작업 폴더 `p8-festival`·`story`, 세션 2개 시작 | 진행 중 |
+| 19 | 지시한 작업 다 끝났나, 모든 과정이 편집기로 고칠 수 있게 나뉘었나 점검, M·P 마일스톤 표기·진행·향후, 필요하면 6차 보드 | 점검: M4 브랜치 6개 임시 합치기(충돌 1곳 해결, 테스트 197, 모듈 13 로드)·합치기 승인 대기, 편집기 없는 것 9가지(아이템·실내·방 배치·주민 성격/대사·소리·지도·숫자·편집기 홈, 스타일은 로컬만). Z5 보드 ID FL-1–6 겹침 → SF 로 바꾸라고 Z5 에 알림. PLAN 맨 위 M0–M7 · P 표, `concept/README.md` ID 표, 6차 보드 게시 | 사용자 선택 대기 |
 
 #### 2. 2차 결과 (합친 것)
 | 트랙 | 커밋 | 내용 |
