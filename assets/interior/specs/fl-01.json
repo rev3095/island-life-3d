@@ -1,0 +1,24 @@
+{
+  "id": "FL-01",
+  "slug": "fl-01",
+  "kind": "floor",
+  "name": "나무 판자",
+  "version": 1,
+  "status": "review",
+  "price": 1200,
+  "step": "wood",
+  "starter": true,
+  "pattern": {
+    "tile": [40, 12],
+    "size": [3.333, 1],
+    "base": "base",
+    "shapes": [
+      { "rect": [0, 6, 40, 6], "fill": "light" },
+      { "rect": [0, 5, 40, 1.4], "fill": "gap" },
+      { "rect": [0, 11, 40, 1.4], "fill": "gap" },
+      { "rect": [22, 0, 1.4, 6], "fill": "gap" },
+      { "rect": [6, 6, 1.4, 6], "fill": "gap" }
+    ]
+  },
+  "palette": { "base": "#D9B382", "light": "#E4C594", "gap": "#8C6440", "edge": "#7A5636" }
+}

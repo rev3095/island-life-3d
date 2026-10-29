@@ -1,0 +1,16 @@
+{
+  "id": "WP-06",
+  "slug": "wp-06",
+  "kind": "wallpaper",
+  "name": "민트 타일",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "pattern": {
+    "tile": [16, 16],
+    "size": [0.3, 0.3],
+    "base": "base",
+    "shapes": [{ "rect": [1, 1, 14, 14], "fill": "tile", "rx": 2 }]
+  },
+  "palette": { "base": "#B5DCCB", "tile": "#DDF2EA", "wainscot": "#FBFDF8", "molding": "#7FB8A6", "baseboard": "#5E9483" }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "FL-07",
+  "slug": "fl-07",
+  "kind": "floor",
+  "name": "연못 돌바닥",
+  "version": 1,
+  "status": "review",
+  "price": 1600,
+  "step": "wood",
+  "pattern": {
+    "tile": [30, 22],
+    "size": [1.2, 0.88],
+    "base": "base",
+    "shapes": [
+      { "ellipse": [8, 6, 7, 4.5], "fill": "stone", "stroke": "line", "strokeWidth": 1 },
+      { "ellipse": [22, 16, 8, 5], "fill": "stone", "stroke": "line", "strokeWidth": 1 }
+    ]
+  },
+  "palette": { "base": "#A9B8A0", "stone": "#C4D0BB", "line": "#7F8F78", "edge": "#7F8F78" }
+}

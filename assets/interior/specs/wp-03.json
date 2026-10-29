@@ -1,0 +1,16 @@
+{
+  "id": "WP-03",
+  "slug": "wp-03",
+  "kind": "wallpaper",
+  "name": "하늘 체크",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "pattern": {
+    "tile": [20, 20],
+    "size": [0.5, 0.5],
+    "base": "base",
+    "shapes": [{ "rect": [0, 0, 20, 6], "fill": "check", "opacity": 0.7 }, { "rect": [0, 0, 6, 20], "fill": "check", "opacity": 0.7 }]
+  },
+  "palette": { "base": "#E4EFFA", "check": "#BFD6F0", "wainscot": "#FBFDF8", "molding": "#8FB3D9", "baseboard": "#5E7FA8" }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "WP-02",
+  "slug": "wp-02",
+  "kind": "wallpaper",
+  "name": "오렌지 줄무늬",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "pattern": {
+    "tile": [24, 24],
+    "size": [0.5, 0.5],
+    "base": "base",
+    "shapes": [{ "rect": [2, 0, 7, 24], "fill": "stripe" }, { "rect": [13, 0, 2, 24], "fill": "thin" }]
+  },
+  "palette": {
+    "base": "#FCE3C4",
+    "stripe": "#F2B36B",
+    "thin": "#F7C98F",
+    "wainscot": "#F3E0BC",
+    "molding": "#C98A4B",
+    "baseboard": "#9C6A3C"
+  }
+}

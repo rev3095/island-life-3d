@@ -1,0 +1,34 @@
+{
+  "id": "WP-04",
+  "slug": "wp-04",
+  "kind": "wallpaper",
+  "name": "연보라 꽃무늬",
+  "version": 1,
+  "status": "review",
+  "price": 1600,
+  "pattern": {
+    "tile": [26, 26],
+    "size": [0.55, 0.55],
+    "base": "base",
+    "shapes": [
+      { "circle": [7, 5, 2.6], "fill": "petal" },
+      { "circle": [10, 8, 2.6], "fill": "petal" },
+      { "circle": [7, 11, 2.6], "fill": "petal" },
+      { "circle": [4, 8, 2.6], "fill": "petal" },
+      { "circle": [7, 8, 1.6], "fill": "heart" },
+      { "circle": [20, 18, 2], "fill": "petalLight" },
+      { "circle": [22, 20, 2], "fill": "petalLight" },
+      { "circle": [20, 22, 2], "fill": "petalLight" },
+      { "circle": [18, 20, 2], "fill": "petalLight" }
+    ]
+  },
+  "palette": {
+    "base": "#EFE8FA",
+    "petal": "#B9A6E0",
+    "heart": "#F6C84C",
+    "petalLight": "#D7CCF0",
+    "wainscot": "#D7CCF0",
+    "molding": "#9C88C9",
+    "baseboard": "#7A68A6"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "WP-08",
+  "slug": "wp-08",
+  "kind": "wallpaper",
+  "name": "밤하늘 별",
+  "version": 1,
+  "status": "review",
+  "price": 2000,
+  "shopOnly": true,
+  "pattern": {
+    "tile": [34, 30],
+    "size": [0.7, 0.62],
+    "base": "base",
+    "shapes": [
+      { "path": "M8 6 l1.4 3 3 .4 -2.2 2 .6 3 -2.8-1.5 -2.8 1.5 .6-3 -2.2-2 3-.4z", "fill": "star" },
+      { "circle": [25, 21, 1.4], "fill": "star" },
+      { "circle": [28, 6, 1], "fill": "twinkle" }
+    ]
+  },
+  "palette": {
+    "base": "#2E3A66",
+    "star": "#F7E6A8",
+    "twinkle": "#CDEBF5",
+    "wainscot": "#3A4A78",
+    "molding": "#C9A84C",
+    "baseboard": "#22294A"
+  }
+}

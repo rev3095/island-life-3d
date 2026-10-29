@@ -1,0 +1,9 @@
+{
+  "id": "RF-01",
+  "slug": "frame",
+  "kind": "frame",
+  "name": "방 틀 (창·문 매트)",
+  "version": 1,
+  "status": "review",
+  "palette": { "frameTrim": "#FFF8E6", "pane": "#CDEBF5", "paneNight": "#3A4A78", "doormat": "#C96F4A", "doormatEdge": "#8C4A33" }
+}

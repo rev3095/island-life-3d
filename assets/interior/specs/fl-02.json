@@ -1,0 +1,22 @@
+{
+  "id": "FL-02",
+  "slug": "fl-02",
+  "kind": "floor",
+  "name": "밝은 판자",
+  "version": 1,
+  "status": "review",
+  "price": 1400,
+  "step": "wood",
+  "pattern": {
+    "tile": [40, 12],
+    "size": [3.333, 1],
+    "base": "base",
+    "shapes": [
+      { "rect": [0, 6, 40, 6], "fill": "light" },
+      { "rect": [0, 5, 40, 1.2], "fill": "gap" },
+      { "rect": [0, 11, 40, 1.2], "fill": "gap" },
+      { "rect": [28, 0, 1.2, 6], "fill": "gap" }
+    ]
+  },
+  "palette": { "base": "#EBD2A6", "light": "#F3E0BC", "gap": "#B98957", "edge": "#B98957" }
+}
