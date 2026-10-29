@@ -102,6 +102,8 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 
 ## "시나리오 반영" (Claude 가 하는 일)
 
+0. 먼저 `git merge main` 으로 story 브랜치를 맞춘다 (다른 트랙 결과가 main 에 들어와 있다. v1 은 main bed3fc9 에 합쳐짐, 게임 링크 버전 6).
+   - **파일 수 한계**: 게임 웹 빌드가 510파일로 아티팩트 한계(511)에 닿았다. 6차(M6) 묶음 파일 방식 전까지 **장면 파일을 새로 더하지 않는다** — 새 장면이 필요하면 사용자에게 알리고 기존 장면 고치기·연출안 더하기로 대신한다 (고치기는 괜찮다).
 1. ArtifactData `list` 로 편집기의 `drafts`·`timeline` 을 읽고, `get applied/story` (없으면 v0).
 2. drafts 의 `scene` 마다 `assets/story/scenes/<id>.json` 과 비교해 바뀐 장면만 고른다. 바뀐 게 없고 의견도 그대로면 그렇게 알리고 끝.
    - **고침**: 장면 파일을 drafts 내용으로 바꾸고 `version` +1, 확정(`approved`)이던 장면은 `review` 로.
