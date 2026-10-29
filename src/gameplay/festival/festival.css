@@ -1,0 +1,64 @@
+/* Z5 이모티콘 대화 (UI-04) · 축제 진행판 (UI-05). 색·글꼴은 ui.css 의 섬 톤을 따른다 */
+.fe-talk { position: absolute; inset: 0; pointer-events: none; font-family: inherit; }
+.fe-catch { position: absolute; inset: 0; pointer-events: auto; }
+.fe-emo { width: 34px; height: 34px; display: inline-block; vertical-align: middle; flex: none; }
+.fe-item { object-fit: contain; }
+.fe-glyph { font-size: 28px; line-height: 34px; text-align: center; }
+.fe-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.fe-bubble { position: fixed; left: 0; top: 0; pointer-events: auto; display: flex; align-items: center; gap: 6px;
+  padding: 12px 14px 10px; min-height: 40px; background: #FBF7F2; border: 3px solid #4A3B32; border-radius: 20px;
+  box-shadow: 0 4px 0 rgba(74, 59, 50, .25); transform: translate(50vw, 30vh) translate(-50%, -100%); cursor: pointer; outline: none; }
+.fe-bubble::after { content: ''; position: absolute; left: 50%; bottom: -13px; width: 18px; height: 18px; background: #FBF7F2;
+  border-right: 3px solid #4A3B32; border-bottom: 3px solid #4A3B32; transform: translateX(-50%) rotate(45deg); }
+.fe-bubble.is-free { transform: translate(50vw, 26vh) translate(-50%, -100%) !important; }
+.fe-bubble:focus-visible { box-shadow: 0 0 0 3px #2F86A6; }
+.fe-bubble-emos { display: flex; gap: 6px; position: relative; z-index: 1; }
+.fe-bubble-emos .fe-emo { width: 44px; height: 44px; }
+.fe-bubble-emos .fe-glyph { font-size: 36px; line-height: 44px; }
+.fe-name { position: absolute; left: 12px; top: -14px; font-size: 13px; font-weight: 700; color: #4A3B32; padding: 1px 10px; border-radius: 999px; border: 2px solid #4A3B32; }
+.fe-next { position: absolute; right: 8px; bottom: 2px; font-size: 11px; color: #A8642E; opacity: 0; }
+.fe-bubble.is-wait .fe-next { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .fe-bubble.is-pop .fe-bubble-emos { animation: fe-pop .28s ease-out; }
+  .fe-bubble.is-wait .fe-next { animation: fe-bob 1s ease-in-out infinite; }
+  .fe-slots.is-full { animation: fe-shake .3s; }
+}
+@keyframes fe-pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fe-bob { 50% { transform: translateY(3px); } }
+@keyframes fe-shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.fe-slots.is-full .fe-slot { border-color: #C9583B; }
+
+.fe-dock { position: absolute; left: 50%; bottom: max(14px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  width: min(560px, calc(100vw - 24px)); pointer-events: auto; display: grid; gap: 8px; }
+.fe-picker, .fe-choices { background: rgba(251, 247, 242, .96); border: 3px solid #4A3B32; border-radius: 18px; padding: 10px; display: grid; gap: 8px; }
+.fe-choices { grid-auto-flow: column; justify-content: center; gap: 12px; }
+.fe-picker[hidden], .fe-choices[hidden] { display: none; }
+.fe-dock button { font: inherit; color: #4A3B32; background: #FFFDF8; border: 2px solid #4A3B32; border-radius: 12px; cursor: pointer; display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: 2px; }
+.fe-dock button:focus-visible { outline: 3px solid #2F86A6; outline-offset: 2px; }
+.fe-dock button:disabled { cursor: default; }
+.fe-choice { display: flex !important; gap: 4px; padding: 6px 14px !important; }
+.fe-choice .fe-emo { width: 40px; height: 40px; }
+.fe-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.fe-tab .fe-emo { width: 26px; height: 26px; }
+.fe-tab[aria-selected="true"] { background: #F6C84C !important; }
+.fe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
+.fe-cell .fe-emo { width: 36px; height: 36px; }
+@media (hover: hover) { .fe-cell:hover, .fe-tab:hover { background: #F3E0BC; } }
+.fe-bar { display: flex; gap: 8px; align-items: center; }
+.fe-slots { display: flex; gap: 6px; flex: 1; }
+.fe-slot { width: 48px; }
+.fe-slot.is-empty { border-style: dashed !important; background: transparent !important; }
+.fe-slot .fe-emo { width: 32px; height: 32px; }
+.fe-send { background: #5FAE5A !important; color: #FBF7F2 !important; min-width: 84px !important; }
+.fe-send svg { width: 26px; height: 26px; }
+.fe-send.is-wait { background: #9CC3EA !important; }
+.fe-bye .fe-emo { width: 28px; height: 28px; }
+@media (max-width: 520px) {
+  .fe-grid { grid-template-columns: repeat(5, 1fr); }
+  .fe-bubble-emos .fe-emo { width: 36px; height: 36px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .fe-dock { left: auto; right: max(12px, env(safe-area-inset-right, 0px)); transform: none; width: min(420px, 52vw); bottom: 8px; }
+  .fe-grid { grid-template-columns: repeat(5, 1fr); }
+}

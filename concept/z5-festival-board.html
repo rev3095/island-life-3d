@@ -443,7 +443,7 @@ const TK = [
   ['TK-04', 'dubu', '두부 · 곰', '기다려 주는 걸 좋아해요. ⏳ 뒤에야 말문을 열고, 3개를 한꺼번에 받으면 물러나요', ['wait', 'fish', 'good'], ['shout'], ['dots', 'fish', 'good', 'smile'], '천천히 끄덕 / 고개 돌림', 'FP-05 낚시 대회 깃발'],
   ['TK-05', 'pong', '퐁 · 오리', '먹을 것이 하나라도 들어가면 무엇이든 좋아요. 배고프면 😋 를 먼저 보여 줘요', ['yum', 'fruit', 'fish'], ['sleep'], ['yum', 'fruit', 'bang', 'grin'], '날개 퍼덕 / 배 문지르기', 'FP-04 과일 솥'],
   ['TK-06', 'chorong', '초롱 · 개구리', '❓로 물으면 꼭 대답(힌트)해요. 비 오는 날엔 모든 판정이 한 단계 더 좋아요', ['ask', 'rain', 'music'], ['sun'], ['rain', 'music', 'ask', 'sparkle'], '폴짝 / 볼 부풀리기', 'FP-01 반딧불 등불'],
-  ['TK-07', 'danpung', '단풍 · 여우 (이사 온 뒤)', '자기가 보낸 이모티콘을 같은 순서로 따라 하면 기뻐요 (꼼꼼한 수집가)', ['maple', 'look', 'sparkle'], ['shout'], ['maple', 'look', 'think', 'sparkle'], '꼬리 흔들기 / 꼬리 감기', '사진사 (엔딩 사진기)'],
+  ['TK-07', 'danpung', '단풍 · 여우 (이사 온 뒤)', '자기가 보낸 이모티콘을 같은 순서로 따라 하면 기뻐요 (꼼꼼한 수집가)', ['maple', 'look', 'think'], ['shout'], ['maple', 'look', 'think', 'sparkle'], '꼬리 흔들기 / 꼬리 감기', '사진사 (엔딩 사진기)'],
 ];
 $('tkTable').tBodies[0].innerHTML = TK.map(([id, slug, name, rule, like, dis, reply, ges, role]) => `
   <tr><td class="id">${id}</td><td><span class="tag" style="background:${VCOL[slug]};color:${INK}">${name}</span></td><td class="small">${rule}</td><td>${minis(like)}</td><td>${minis(dis)}</td><td>${minis(reply)}</td><td class="small">${ges}</td><td class="small">${role}</td><td style="min-width:170px">${noteBox(id, name.split(' ·')[0] + ' 대화 규칙')}</td></tr>`).join('');

@@ -150,6 +150,7 @@ export default {
       fade,                                        // fade(on, 초, 색?) → Promise (화면 전환 막)
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
+      panel: (name, root, opts) => panels.open(name, root, opts),   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)
     };
   },
 
