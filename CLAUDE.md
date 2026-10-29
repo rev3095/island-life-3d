@@ -44,6 +44,9 @@ node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배�
 - 채팅에 "요청 확인"(캐릭터) / "배경 요청 확인"(배경)이 오면: ArtifactData 로 `status:'new'` 요청 읽기 → `working` → 레퍼런스는 Artifact read `path=<asset id>` 로 내려받아 직접 본다 → 스펙·빌더 수정 → 재빌드 → 같은 아티팩트에 다시 publish (bg-editor 는 파일 270개라 255개 제한 때문에 두 번에 나눠 올림) → 요청을 `done` + `reply` + `doneVersion` 으로 갱신.
 - 로컬 dev-server 는 `/api/db/<col>`·`/api/assets` 로 같은 흐름을 파일(`assets/review/`, `assets/references/`, gitignore)로 흉내 낸다.
 
+### 웹 배포 (게임 링크)
+- 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면) · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.
+
 ### 병렬 개발 방식
 - 단계 P1~P6 과 트랙 표는 `docs/PLAN.md`. 트랙마다 브랜치 + git worktree(`../island-worktrees/<브랜치>`)에서 **자기 폴더만** 고치고, 계약 변경은 `docs/notes/<트랙>.md` 에 제안한다. `main` 합치기는 사용자 승인 뒤 조정 세션이 한다 (합치기 전 `git merge-tree --write-tree main <branch>` 로 충돌 확인).
 - 미리보기 브라우저 창이 숨겨져 있으면 `requestAnimationFrame` 이 느려져 fps 값이 의미 없다 — 성능은 `renderer.render` + `gl.finish()` 시간으로 잰다.
