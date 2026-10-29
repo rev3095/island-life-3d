@@ -1,0 +1,469 @@
+<title>포근섬 5차 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 컨셉 보드 v0.1 과 같은 섬 안내 책자 — 결정 사항이 맨 위, 아래로 리소스 시트가 ID 순서로. 카드마다 의견 칸 → 맨 끝에서 요청 글로 모은다 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정 */
+.dec { display: grid; gap: 10px; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+
+/* 아이콘 */
+.iconrow { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ico { display: grid; justify-items: center; gap: 2px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; }
+.ico svg { width: 100%; max-width: 64px; height: auto; }
+.ico .was { font-size: 20px; line-height: 1; }
+.compare { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.thumbB { width: 96px; height: 96px; border-radius: 10px; background: var(--stage); }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+
+/* 벽지·바닥 견본 */
+.swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.sw { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.sw svg { width: 100%; height: 72px; border-radius: 8px; display: block; }
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+@media (prefers-reduced-motion: no-preference) { .card, .ico { transition: border-color .15s; } }
+</style>
+
+<!-- 공용 그림 조각: 벽지·바닥 무늬, 가구·소품 그림. 방 그림과 카드가 같은 조각을 쓴다 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="wp-01" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#F7EBD3"/><rect width="9" height="24" fill="#F0DDBA"/></pattern>
+    <pattern id="wp-02" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#FCE3C4"/><rect x="2" width="7" height="24" fill="#F2B36B"/><rect x="13" width="2" height="24" fill="#F7C98F"/></pattern>
+    <pattern id="wp-03" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#E4EFFA"/><rect width="20" height="6" fill="#BFD6F0" opacity=".7"/><rect width="6" height="20" fill="#BFD6F0" opacity=".7"/></pattern>
+    <pattern id="wp-04" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#EFE8FA"/><g fill="#B9A6E0"><circle cx="7" cy="5" r="2.6"/><circle cx="10" cy="8" r="2.6"/><circle cx="7" cy="11" r="2.6"/><circle cx="4" cy="8" r="2.6"/></g><circle cx="7" cy="8" r="1.6" fill="#F6C84C"/><g fill="#D7CCF0"><circle cx="20" cy="18" r="2"/><circle cx="22" cy="20" r="2"/><circle cx="20" cy="22" r="2"/><circle cx="18" cy="20" r="2"/></g></pattern>
+    <pattern id="wp-05" width="40" height="16" patternUnits="userSpaceOnUse"><rect width="40" height="16" fill="#A8774E"/><rect y="12" width="40" height="4" fill="#7F5636"/><rect y="2" width="40" height="3" fill="#BC8B5E"/><circle cx="30" cy="7" r="2" fill="#8C6440"/></pattern>
+    <pattern id="wp-06" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#B5DCCB"/><rect x="1" y="1" width="14" height="14" rx="2" fill="#DDF2EA"/></pattern>
+    <pattern id="wp-07" width="22" height="26" patternUnits="userSpaceOnUse"><rect width="22" height="26" fill="#DCEFD3"/><path d="M6 4 q3 5 0 7 q-3 -2 0 -7z" fill="#7FB8D6"/><path d="M17 15 q3 5 0 7 q-3 -2 0 -7z" fill="#8CCB6E"/></pattern>
+    <pattern id="wp-08" width="34" height="30" patternUnits="userSpaceOnUse"><rect width="34" height="30" fill="#2E3A66"/><path d="M8 6 l1.4 3 3 .4 -2.2 2 .6 3 -2.8-1.5 -2.8 1.5 .6-3 -2.2-2 3-.4z" fill="#F7E6A8"/><circle cx="25" cy="21" r="1.4" fill="#F7E6A8"/><circle cx="28" cy="6" r="1" fill="#CDEBF5"/></pattern>
+    <pattern id="fl-01" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#D9B382"/><rect y="6" width="40" height="6" fill="#E4C594"/><rect y="5" width="40" height="1.4" fill="#8C6440"/><rect y="11" width="40" height="1.4" fill="#8C6440"/><rect x="22" width="1.4" height="6" fill="#8C6440"/><rect x="6" y="6" width="1.4" height="6" fill="#8C6440"/></pattern>
+    <pattern id="fl-02" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#EBD2A6"/><rect y="6" width="40" height="6" fill="#F3E0BC"/><rect y="5" width="40" height="1.2" fill="#B98957"/><rect y="11" width="40" height="1.2" fill="#B98957"/><rect x="28" width="1.2" height="6" fill="#B98957"/></pattern>
+    <pattern id="fl-03" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#9CC3EA"/><circle cx="3" cy="3" r="1.6" fill="#B7D4F0"/><circle cx="9" cy="9" r="1.6" fill="#B7D4F0"/></pattern>
+    <pattern id="fl-04" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#DDD6C8"/><rect x="1" y="1" width="16" height="16" fill="#F7F4EE"/></pattern>
+    <pattern id="fl-05" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#8C6440"/><rect y="6" width="40" height="6" fill="#7A5636"/><rect y="5" width="40" height="1.4" fill="#5A4030"/><rect y="11" width="40" height="1.4" fill="#5A4030"/><rect x="15" width="1.4" height="6" fill="#5A4030"/></pattern>
+    <pattern id="fl-06" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#FFF4D0"/><rect width="10" height="10" fill="#FFD866"/><rect x="10" y="10" width="10" height="10" fill="#FFD866"/></pattern>
+    <pattern id="fl-07" width="30" height="22" patternUnits="userSpaceOnUse"><rect width="30" height="22" fill="#A9B8A0"/><ellipse cx="8" cy="6" rx="7" ry="4.5" fill="#C4D0BB" stroke="#7F8F78" stroke-width="1"/><ellipse cx="22" cy="16" rx="8" ry="5" fill="#C4D0BB" stroke="#7F8F78" stroke-width="1"/></pattern>
+    <pattern id="fl-08" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#EBD9A8"/><circle cx="3" cy="4" r="1" fill="#D9C38A"/><circle cx="10" cy="10" r="1.2" fill="#D9C38A"/><circle cx="11" cy="3" r=".8" fill="#F5E8C4"/></pattern>
+
+    <!-- 가구·소품 그림 (앞에서 본 모습, 0 0 120 100) -->
+    <g id="g-ink" />
+    <symbol id="f-21" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M64 4 C84 18 82 78 60 96 C40 80 42 20 64 4z" fill="#F7F1E4"/><path d="M62 14 C70 34 70 64 60 86" fill="none" stroke="#F2B36B" stroke-width="7"/></g></symbol>
+    <symbol id="f-22" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="46" cy="40" r="14" fill="#E8504F"/><circle cx="72" cy="36" r="13" fill="#6CA0DC"/><circle cx="60" cy="30" r="10" fill="#F6C84C"/><path d="M26 46 H94 L86 94 H34z" fill="#C99A63"/><path d="M30 62 H90 M32 78 H88" fill="none" stroke-width="2"/></g></symbol>
+    <symbol id="f-23" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="8" y="44" width="104" height="44" rx="20" fill="#6CA0DC"/><rect x="18" y="34" width="84" height="40" rx="18" fill="#9CC3EA"/><ellipse cx="38" cy="50" rx="16" ry="9" fill="#F7F1E4"/></g></symbol>
+    <symbol id="f-24" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><ellipse cx="60" cy="72" rx="46" ry="20" fill="#6CA0DC"/><path d="M34 50 a9 9 0 1 1 10 -12 h32 a9 9 0 1 1 10 12 a9 9 0 1 1 -10 12 h-32 a9 9 0 1 1 -10 -12z" fill="#F7F1E4"/></g></symbol>
+    <symbol id="f-25" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M14 20 V96 M106 20 V96" fill="none" stroke="#8C6440" stroke-width="6"/><rect x="10" y="52" width="100" height="8" fill="#B98957"/><rect x="10" y="88" width="100" height="8" fill="#B98957"/><rect x="24" y="36" width="16" height="16" fill="#C96F4A"/><circle cx="32" cy="28" r="9" fill="#F4B6C8"/><rect x="54" y="38" width="14" height="14" fill="#C96F4A"/><circle cx="61" cy="30" r="8" fill="#B9A6E0"/><rect x="80" y="72" width="16" height="16" fill="#C96F4A"/><circle cx="88" cy="64" r="9" fill="#F6C84C"/><rect x="34" y="74" width="14" height="14" fill="#C96F4A"/><circle cx="41" cy="66" r="8" fill="#FBF7F2"/></g></symbol>
+    <symbol id="f-26" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="26" y="80" width="68" height="14" rx="3" fill="#B98957"/><path d="M30 80 V44 a30 30 0 0 1 60 0 V80z" fill="#CDEBF5" fill-opacity=".75"/><path d="M60 80 V56" stroke="#5E9F4F" fill="none"/><ellipse cx="52" cy="60" rx="8" ry="4" fill="#5FAE5A"/><ellipse cx="68" cy="54" rx="8" ry="4" fill="#5FAE5A"/><circle cx="60" cy="48" r="6" fill="#F7A6A0"/><path d="M42 40 q6 -10 14 -12" fill="none" stroke="#FBFDF8" stroke-width="3"/></g></symbol>
+    <symbol id="f-27" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="16" y="18" width="88" height="22" rx="4" fill="#A8774E"/><path d="M28 30 L44 94 M58 30 L74 94" fill="none" stroke="#7F5636" stroke-width="5"/><path d="M44 94 q20 -30 40 -50 M74 94 q14 -20 22 -36" fill="none" stroke="#9DB2A6" stroke-width="1.5"/><circle cx="86" cy="44" r="5" fill="#E8504F"/><circle cx="35" cy="60" r="5" fill="#4E5A57"/></g></symbol>
+    <symbol id="f-28" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="74" y="4" width="12" height="34" fill="#4E5A57"/><rect x="28" y="34" width="66" height="54" rx="10" fill="#4E5A57"/><rect x="42" y="48" width="38" height="24" rx="5" fill="#F39A3B"/><path d="M52 70 q6 -14 10 -4 q4 -12 8 4z" fill="#F7E6A8" stroke-width="2"/><path d="M34 88 v8 M88 88 v8" fill="none" stroke-width="5"/></g></symbol>
+    <symbol id="f-29" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="8" y="44" width="104" height="52" rx="4" fill="#F7F1E4"/><rect x="4" y="38" width="112" height="10" rx="3" fill="#B98957"/><rect x="18" y="56" width="38" height="32" rx="3" fill="#BDE3D6"/><rect x="64" y="56" width="38" height="32" rx="3" fill="#BDE3D6"/><path d="M30 38 V24 h30 V38" fill="#4E5A57"/><path d="M26 24 h38" fill="none" stroke-width="4"/><circle cx="90" cy="30" r="8" fill="#E8504F"/></g></symbol>
+    <symbol id="f-30" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="44" cy="48" r="13" fill="#E8504F"/><circle cx="68" cy="44" r="13" fill="#F39A3B"/><circle cx="56" cy="34" r="11" fill="#D9D36A"/><circle cx="80" cy="54" r="10" fill="#F7A6A0"/><path d="M22 56 H98 L90 92 H30z" fill="#C99A63"/><path d="M38 56 C40 24 80 24 82 56" fill="none" stroke-width="4"/></g></symbol>
+    <symbol id="f-31" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M50 50 C40 20 70 4 76 30" fill="none" stroke="#E8504F" stroke-width="5"/><path d="M66 50 C62 22 86 14 88 34" fill="none" stroke="#F6C84C" stroke-width="5"/><path d="M38 20 q12 -16 24 0z" fill="#6CA0DC"/><path d="M44 20 V54" fill="none"/><rect x="34" y="50" width="52" height="46" rx="6" fill="#7FA36B"/><path d="M34 64 h52" fill="none"/></g></symbol>
+    <symbol id="f-32" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M56 62 L50 94 h20 l-6 -32" fill="#5E9F4F"/><path d="M14 54 a46 18 0 1 0 92 0 a46 18 0 1 0 -92 0z M60 54 L96 46" fill="#8CCB6E"/><path d="M82 36 q6 -12 12 0 q6 -8 8 2 q-10 8 -20 -2z" fill="#F4B6C8"/></g></symbol>
+    <symbol id="f-33" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="20" y="62" width="80" height="30" rx="6" fill="#F7F1E4"/><rect x="34" y="38" width="52" height="26" rx="6" fill="#F7C6E0"/><path d="M20 70 q10 8 20 0 q10 8 20 0 q10 8 20 0 q10 8 20 0" fill="none" stroke="#E8504F"/><path d="M48 38 V24 M60 38 V20 M72 38 V24" fill="none" stroke="#6CA0DC" stroke-width="4"/><path d="M48 18 q3 -6 0 -10 q-3 4 0 10z M60 14 q3 -6 0 -10 q-3 4 0 10z M72 18 q3 -6 0 -10 q-3 4 0 10z" fill="#F39A3B" stroke-width="1.5"/></g></symbol>
+    <symbol id="p-10" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="10" y="54" width="54" height="40" fill="#D9B382"/><rect x="60" y="60" width="50" height="34" fill="#E4C594"/><rect x="26" y="20" width="50" height="36" fill="#E4C594"/><path d="M37 54 V94 M85 60 V94 M51 20 V56" fill="none" stroke="#B5852A" stroke-width="5"/></g></symbol>
+    <symbol id="p-11" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M40 52 L56 96 M64 44 L58 96 M86 50 L62 96" fill="none" stroke-width="1.5"/><ellipse cx="38" cy="36" rx="15" ry="18" fill="#E8504F"/><ellipse cx="64" cy="26" rx="15" ry="18" fill="#F6C84C"/><ellipse cx="88" cy="36" rx="15" ry="18" fill="#6CA0DC"/><path d="M4 8 q56 26 112 0" fill="none" stroke-width="2"/><path d="M18 14 l6 12 6 -10z M52 21 l6 12 6 -12z M88 18 l6 12 6 -14z" fill="#8CCB6E" stroke-width="2"/></g></symbol>
+    <symbol id="p-12" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M14 92 V50 M106 92 V50 M60 92 V64" fill="none" stroke="#8C6440" stroke-width="5"/><path d="M14 56 q23 10 46 0 q23 10 46 0" fill="none" stroke="#E8D5A8" stroke-width="3"/><rect x="36" y="22" width="48" height="30" rx="4" fill="#F7F1E4"/><path d="M60 52 V64" fill="none" stroke="#8C6440" stroke-width="5"/><text x="60" y="43" text-anchor="middle" font-family="Jua, sans-serif" font-size="15" fill="#4A3B32" stroke="none">집터</text></g></symbol>
+    <!-- 지금 있는 가구 (방 그림용, 간단히) -->
+    <symbol id="e-sofa" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="10" y="30" width="100" height="40" rx="12" fill="#F2A65A"/><rect x="4" y="50" width="112" height="36" rx="10" fill="#F39A3B"/><path d="M14 86 v8 M106 86 v8" fill="none" stroke-width="5"/></g></symbol>
+    <symbol id="e-lamp" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M44 10 H76 L86 38 H34z" fill="#F7E6A8"/><path d="M60 38 V90" fill="none" stroke-width="4"/><ellipse cx="60" cy="92" rx="18" ry="5" fill="#4E5A57"/></g></symbol>
+    <symbol id="e-rug" viewBox="0 0 120 100"><ellipse cx="60" cy="60" rx="56" ry="26" fill="#9CC3EA" stroke="#4A3B32" stroke-width="3"/><ellipse cx="60" cy="60" rx="38" ry="16" fill="none" stroke="#FBFDF8" stroke-width="3"/></symbol>
+    <symbol id="e-radio" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="24" y="36" width="72" height="50" rx="10" fill="#7FCDB6"/><circle cx="48" cy="61" r="13" fill="#F7F1E4"/><rect x="68" y="50" width="18" height="8" fill="#F6C84C"/><path d="M80 36 L94 12" fill="none"/></g></symbol>
+    <symbol id="e-pot" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><path d="M60 62 C40 40 40 20 54 12 M60 62 C80 40 86 26 72 14" fill="none" stroke="#5E9F4F" stroke-width="4"/><ellipse cx="50" cy="30" rx="12" ry="7" fill="#5FAE5A"/><ellipse cx="74" cy="34" rx="12" ry="7" fill="#5FAE5A"/><path d="M38 60 H82 L76 94 H44z" fill="#C96F4A"/></g></symbol>
+    <symbol id="e-tank" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><rect x="22" y="30" width="76" height="52" rx="6" fill="#9CD3E8"/><path d="M46 56 q10 -10 20 0 q-10 10 -20 0z M66 56 l8 -6 v12z" fill="#F39A3B"/><rect x="30" y="82" width="60" height="12" fill="#8C6440"/></g></symbol>
+    <symbol id="e-wood" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3"><circle cx="36" cy="78" r="14" fill="#C99A63"/><circle cx="64" cy="78" r="14" fill="#C99A63"/><circle cx="92" cy="78" r="14" fill="#C99A63"/><circle cx="50" cy="54" r="14" fill="#B98957"/><circle cx="78" cy="54" r="14" fill="#B98957"/></g></symbol>
+    <symbol id="e-table" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><ellipse cx="60" cy="44" rx="50" ry="14" fill="#C99A63"/><rect x="48" y="50" width="24" height="44" fill="#8C6440"/></g></symbol>
+    <symbol id="e-fchair" viewBox="0 0 120 100"><g stroke="#4A3B32" stroke-width="3" stroke-linejoin="round"><circle cx="60" cy="58" r="34" fill="#F39A3B"/><path d="M60 24 q4 -12 14 -14" fill="none" stroke="#7F5636" stroke-width="4"/><ellipse cx="60" cy="54" rx="22" ry="8" fill="#F7C98F"/></g></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 5차 · 검수 보드 v0.5 · 2026-10-29</p>
+    <h1>포근섬 5차 검수 보드</h1>
+    <p class="lede">5차에 새로 만들 그림·모델을 ID와 함께 모았어요. 주민 집 안과 벽지·바닥, 테마 가구, 아이템 아이콘, 이사와 생일에 필요한 것들이에요. 그림은 모두 <b>컨셉 스케치</b>이고, 승인을 받은 뒤에 Blender 모델과 실제 아이콘을 만들어요. 카드마다 의견 칸에 적고 맨 아래 <b>요청 글 만들기</b>를 누른 다음, 복사해서 채팅에 붙여 넣어 주세요.</p>
+    <div class="status" id="pills"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#decide">결정 D8–D12</a><a href="#icons">아이콘 IC</a><a href="#rooms">주민 집 안 RM</a><a href="#walls">벽지 WP · 바닥 FL</a>
+    <a href="#furn">새 가구 FU</a><a href="#props">이사·생일 FU-33 · PR</a><a href="#villagers">새 주민 CH</a><a href="#birthday">생일표</a><a href="#plan">진행 계획</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS</p><h2>먼저 정할 것 다섯 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요. (D1–D7 은 컨셉 보드 v0.1 에서 정했어요.)</p></div>
+    <div id="decisions" class="grid wide" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="icons">
+    <div class="sec-head"><p class="id">IC · 아이템 아이콘 93개</p><h2>이모지 대신 섬 전용 아이콘</h2>
+      <p class="muted">지금 가방·상점·박물관에는 가구를 뺀 아이템 93개가 이모지로 나와요. 기기마다 모양이 다르고 물고기 20종이 모두 🐟 하나예요. 아래는 D8-A(손그림 2D) 견본 10개이고, 위에 작게 붙은 것이 지금 이모지예요.</p></div>
+    <div class="iconrow" id="iconSamples"></div>
+    <div class="compare">
+      <div class="card"><div class="head"><span class="id">D8-A</span><h3>손그림 2D 아이콘</h3></div>
+        <p class="small">진한 밤색 테두리 3px, 칠 한 겹과 밝은 빛 한 줄, 64칸 격자. 색은 아이템 데이터에서 받아 같은 모양에 칠해요(꽃 4색 · 씨앗 봉투 3색). 파일 하나에 1–2KB라 휴대폰에서도 바로 떠요.</p></div>
+      <div class="card"><div class="head"><span class="id">D8-B</span><h3>3D 렌더 썸네일 (지금 가구 방식)</h3></div>
+        <div style="display:flex;gap:12px;align-items:center"><img class="thumbB" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAAAXNSR0IDN8dNUwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAADZlWElmTU0AKgAAABgAAABIAAAAAQAAAEgAAAABAAIBGgAFAAAAAQAAAAgBGwAFAAAAAQAAABAAAAAAkHjvvAAAAAlvRkZzAAAAAAAAAAAA2iq2zgAAAAlwSFlzAAALEgAACxIB0t1+/AAAAA90RVh0RmlsZQA8dW50aXRsZWQ+lbPXlgAAABh0RVh0RGF0ZQAyMDI2LzEwLzI5IDAxOjQzOjI0k+MYhAAAABB0RVh0VGltZQAwMDowMDowMDowMezDJsIAAAAJdEVYdEZyYW1lADAwMcFRFSIAAAAKdEVYdENhbWVyYQBjYW29b1WDAAAAC3RFWHRTY2VuZQBTY2VuZeUhXZYAAAATdEVYdFJlbmRlclRpbWUAMDA6MTUuNjD80yBFAAAgAElEQVR4Ae29eZhsV3Ufuk7N89DzePve23ceNAuELIFASAxiFBLBhsROeJ/Ji+33kRcn+cf+yOc8EjskJol5fklsx4nBNgKEAGEhQAjMjCSQLpKu7jz0PHcNXVVd43m/36mue+v27dtdVV2nqrp7b6lvV1edOmfvtffaa+01/JaIaooCigKKAooCigKKAooCigKKAooCigI7jwKapu28QasRKwooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAqspoBKwF9Nkdb+W81Xa8+P6p2igKKAooCigKKAooCigKKAokArU0CdJ1p5dlTfFAUUBRQFFAUUBRQFFAUUBRQFFAUUBRQFFAUUBXYSBZSdZifNthqrooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAokBdKKCManUho7qJooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCigKKAooCiQO0UUKbq2mmnvqkooCigKLDjKaCESHVLQKvucnX1dqIAmUXX9YYOyed2SWc4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" alt="소파 3D 썸네일 예시"><p class="small">가구처럼 Blender 모델을 찍어요. 물고기·곤충·화석 51종은 3D 모델을 새로 만들어야 해서 작업이 4배쯤 커져요. 대신 들어 보일 때 같은 모델을 써요.</p></div></div>
+    </div>
+    <div class="tblwrap"><table class="tbl" id="iconTable"><thead><tr><th>ID 범위</th><th>분류</th><th>개수</th><th>고유 그림</th><th>들어가는 것</th><th>의견</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="rooms">
+    <div class="sec-head"><p class="id">RM · 주민 집 안 6곳</p><h2>문 두드리고 들어가는 주민 방</h2>
+      <p class="muted">지금은 플레이어 집만 들어갈 수 있어요. 주민 집 문 앞에서 행동 키를 누르면 방으로 들어가고, 주민은 방 안을 돌아다녀요. 방 크기는 플레이어 첫 방과 같은 8×8칸이에요. <span class="tag new">새로</span> 표시는 이번에 만드는 가구예요.</p></div>
+    <div class="grid wide" id="roomCards"></div>
+  </section>
+
+  <section id="walls">
+    <div class="sec-head"><p class="id">WP · FL · 벽지 8 · 바닥 8</p><h2>바꿔 끼우는 벽지와 바닥</h2>
+      <p class="muted">지금 방 색은 코드에 박혀 있어요(<code>house/room.js</code>). 이번에 벽지·바닥을 하나씩 스펙 JSON으로 빼서, 플레이어 집에서도 고르고 주민 방에도 쓰고, 배경 편집기에서 색을 고칠 수 있게 해요. 모델 없이 무늬만 그려요.</p></div>
+    <h3>벽지</h3><div class="swatches" id="wpList"></div>
+    <h3>바닥</h3><div class="swatches" id="flList"></div>
+  </section>
+
+  <section id="furn">
+    <div class="sec-head"><p class="id">FU-21 – FU-32 · 주민 테마 가구 12개</p><h2>주민 방에 놓이는 새 가구</h2>
+      <p class="muted">지금 가구 20개(FU-01–20)에 더해요. 주민 방에 놓이고, 그 주민과 친해지면 선물로 받거나 상점·제작으로 얻어요. 가구 파이프라인(스펙 → Blender)으로 만들고 배경 편집기 가구 탭에 들어가요.</p></div>
+    <div class="grid" id="furnCards"></div>
+  </section>
+
+  <section id="props">
+    <div class="sec-head"><p class="id">FU-33 · PR-10 – PR-12 · 이사·생일에 쓰는 것 4개</p><h2>이사와 생일 날 섬 풍경</h2>
+      <p class="muted">케이크(FU-33)는 가구, 나머지 셋은 배경 요소(소품 분류)로 만들어 배경 편집기에 들어가요. 새 주민 집은 지금 주민 집(BD-02)에 지붕 색 변형만 하나 더해요. 새 모델은 없어요.</p></div>
+    <div class="grid" id="propCards"></div>
+  </section>
+
+  <section id="villagers">
+    <div class="sec-head"><p class="id">CH-10 – CH-12 · 새 주민 후보 3명</p><h2>빈 집터로 이사 올 주민</h2>
+      <p class="muted">D8–D12 중 이사(D10)를 A로 하면 셋 중 한 명만 Blender로 만들어요. 지금 캐릭터 빌더 부품을 최대한 다시 써요. 얼굴 그림은 분위기만 보는 스케치예요.</p></div>
+    <div class="grid" id="vilCards"></div>
+  </section>
+
+  <section id="birthday">
+    <div class="sec-head"><p class="id">BIRTHDAYS</p><h2>주민 생일표 (바꿀 수 있어요)</h2>
+      <p class="muted">생일 날에는 주민 집 앞에 풍선 장식(PR-11)이 서고, 하루 종일 집 안에 있어요. 선물을 주면 친밀도가 평소의 3배 올라요. 다음 생일인 두부(11월 3일)로 바로 확인해 볼 수 있어요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="bdTable"><thead><tr><th>주민</th><th>생일</th><th>왜 이 날</th><th>좋아하는 선물</th><th>의견</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN</p><h2>승인 뒤 진행 계획</h2>
+      <p class="muted">지금까지처럼 트랙을 세션과 브랜치로 나눠 동시에 만들고, 합치기 전에 다시 승인을 받아요. 새 리소스는 모두 편집기에 들어가서 나중에 바로 고칠 수 있어요(리소스 교체 약속).</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>트랙</th><th>만드는 것</th><th>맡는 폴더</th><th>먼저 필요한 것</th></tr></thead><tbody>
+      <tr><td class="id">Z1</td><td>아이콘 93개 (IC)</td><td><code>assets/icons/</code> · <code>src/ui/</code> 아이콘 표시 · <code>items.js</code> icon 경로</td><td>D8</td></tr>
+      <tr><td class="id">Z2</td><td>벽지·바닥 16개, 주민 방 6곳, 들어가기 (WP · FL · RM)</td><td><code>assets/interior/</code> · <code>src/gameplay/house/</code></td><td>D9 · D12</td></tr>
+      <tr><td class="id">Z3</td><td>새 가구 13개 · 소품 3개 (FU · PR)</td><td><code>assets/furniture/</code> · <code>assets/env/</code> · Blender 빌더</td><td>가구 의견</td></tr>
+      <tr><td class="id">Z4</td><td>이사·생일 흐름, 새 주민 (CH)</td><td><code>src/gameplay/town/</code> · <code>src/data/</code> · <code>assets/specs/</code></td><td>D10 · D11</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">고른 결정과 적은 의견을 한 글로 모아요. 복사해서 채팅에 붙여 넣으면 반영해서 이 보드를 다시 올릴게요. 적은 내용은 이 브라우저에만 임시 저장돼요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+
+/* ---------- 결정 ---------- */
+const DECISIONS = [
+  { id: 'D8', q: '아이콘을 어떻게 그릴까요?', opts: [
+    ['A', '손그림 2D 아이콘', '93개를 같은 선·같은 빛으로. 가볍고 빨리 만들 수 있어요. 가구는 지금처럼 3D 썸네일.', true],
+    ['B', '3D 렌더 썸네일', '물고기·곤충·화석 3D 모델 51개를 새로 만들어 찍어요. 들어 보일 때도 그 모델을 써요. 작업이 큼.'] ] },
+  { id: 'D9', q: '주민 집 안은 얼마나 다르게?', opts: [
+    ['A', '주민마다 테마 방', '벽지·바닥·가구가 주민 성격대로 다른 방 6곳 (RM-01–06).', true],
+    ['B', '같은 방 + 벽지 색만', '가구는 공통, 벽지·바닥 색만 주민 색. 새 가구가 거의 필요 없어요.'] ] },
+  { id: 'D10', q: '이사는 어떻게?', opts: [
+    ['A', '새 주민 1명이 이사 옴', '빈 집터(PR-12)에 이삿짐(PR-10)이 오고 며칠 뒤 입주. 아무도 떠나지 않아요. 후보 CH-10–12 중 하나.', true],
+    ['B', '후보 3명 모두 차례로', '일주일 간격으로 한 명씩 이사 와서 주민이 9명이 돼요. 모델 3개.'],
+    ['C', '이번엔 빼기', '집 안·생일만 하고 이사는 6차로.'] ] },
+  { id: 'D11', q: '생일은 어디까지?', opts: [
+    ['A', '주민 생일 + 플레이어 생일', '주민 생일 파티에, 플레이어 생일은 섬폰에서 고르면 그날 주민들이 축하해요.', true],
+    ['B', '주민 생일만', '플레이어 생일은 고르지 않아요.'] ] },
+  { id: 'D12', q: '벽지·바닥은 어떻게 얻을까요?', opts: [
+    ['A', '상점에서 매일 하나씩', '상점 진열에 벽지·바닥 칸을 하나씩 더하고, 주민 방 벽지는 친해지면 선물로 받아요.', true],
+    ['B', '처음부터 모두', '섬폰 집 꾸미기에서 16가지를 바로 골라요.'] ] },
+];
+$('decisions').innerHTML = DECISIONS.map(d => `
+  <div class="card dec"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+      <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+        <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div>
+    ${noteBox(d.id, d.q)}</div>`).join('');
+
+/* ---------- 아이콘 견본 ---------- */
+const ICONS = [
+  ['IC-TL-01', '낚싯대', '🎣', `<path d="M10 56 L50 10" stroke="#8C6440" stroke-width="5"/><circle cx="20" cy="45" r="6" fill="#B8C2C8"/><path d="M50 10 Q56 28 50 42" fill="none" stroke="#9DB2A6" stroke-width="1.5"/><circle cx="50" cy="46" r="5" fill="#E8504F"/><path d="M45 46 h10" stroke="#FBF7F2" stroke-width="3"/>`],
+  ['IC-TL-02', '잠자리채', '🥅', `<path d="M12 58 L36 30" stroke="#8C6440" stroke-width="5"/><circle cx="44" cy="20" r="14" fill="#FBF7F2"/><path d="M34 12 L54 28 M32 22 L50 34 M40 8 L56 20" stroke="#C9D3D0" stroke-width="1.5"/>`],
+  ['IC-TL-03', '삽', '⛏️', `<path d="M14 54 L38 28" stroke="#8C6440" stroke-width="5"/><path d="M10 50 l8 8" stroke="#8C6440" stroke-width="7"/><path d="M36 22 l12 -12 c6 2 8 4 8 10 l-12 12z" fill="#B8C2C8"/>`],
+  ['IC-TL-04', '도끼', '🪓', `<path d="M16 58 L42 14" stroke="#8C6440" stroke-width="5"/><path d="M36 12 c10 -4 18 2 20 12 l-14 4z" fill="#B8C2C8"/>`],
+  ['IC-TL-05', '물뿌리개', '🚿', `<rect x="14" y="26" width="28" height="26" rx="6" fill="#6CA0DC"/><path d="M42 34 L58 22" stroke="#6CA0DC" stroke-width="5"/><path d="M20 26 c0 -12 18 -12 18 0" fill="none" stroke="#4E5A57" stroke-width="4"/><path d="M18 32 h4" stroke="#CDEBF5" stroke-width="3"/>`],
+  ['IC-FR-01', '사과', '🍎', `<circle cx="32" cy="38" r="18" fill="#E8504F"/><path d="M32 20 q2 -8 8 -10" fill="none" stroke="#7F5636" stroke-width="3"/><path d="M34 16 q10 -6 14 2 q-8 6 -14 -2z" fill="#5FAE5A"/><path d="M22 32 q2 -6 8 -6" fill="none" stroke="#F7A6A0" stroke-width="3"/>`],
+  ['IC-FS-01', '붕어', '🐟', `<path d="M10 32 C18 16 42 16 48 32 C42 48 18 48 10 32z" fill="#C9A15A"/><path d="M48 32 L60 20 V44z" fill="#B5852A"/><circle cx="20" cy="29" r="3" fill="${INK}"/><path d="M28 24 q6 8 0 16" fill="none" stroke="#E4C594" stroke-width="2"/>`],
+  ['IC-BG-01', '배추흰나비', '🦋', `<ellipse cx="22" cy="24" rx="12" ry="14" fill="#FBF7F2"/><ellipse cx="42" cy="24" rx="12" ry="14" fill="#FBF7F2"/><ellipse cx="24" cy="44" rx="9" ry="9" fill="#FBF7F2"/><ellipse cx="40" cy="44" rx="9" ry="9" fill="#FBF7F2"/><path d="M32 16 V52" stroke="${INK}" stroke-width="4"/><circle cx="20" cy="20" r="3" fill="${INK}"/><circle cx="44" cy="20" r="3" fill="${INK}"/>`],
+  ['IC-FO-01', '암모나이트', '🐚', `<circle cx="32" cy="32" r="22" fill="#C9A77A"/><path d="M32 32 m-4 0 a4 4 0 1 1 8 0 a9 9 0 1 1 -18 0 a14 14 0 1 1 28 0 a19 19 0 0 1 -19 19" fill="none" stroke="#8C6440" stroke-width="2.5"/>`],
+  ['IC-FL-01', '빨강 튤립', '🌷', `<path d="M32 36 V58" stroke="#5E9F4F" stroke-width="4"/><path d="M32 52 q-14 -2 -16 -12 q12 0 16 10z" fill="#5FAE5A"/><path d="M18 14 l7 8 7 -10 7 10 7 -8 v14 c0 10 -28 10 -28 0z" fill="#E8504F"/>`],
+];
+$('iconSamples').innerHTML = ICONS.map(([id, name, was, body]) => `
+  <div class="ico"><span class="was" title="지금 이모지">${was}</span>
+    <svg viewBox="0 0 64 64" role="img" aria-label="${name} 아이콘 견본"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>
+    <span class="small">${name}</span><span class="id">${id}</span></div>`).join('');
+
+const ICON_GROUPS = [
+  ['IC-TL-01–05', '도구', 5, 5, '낚싯대, 잠자리채, 삽, 도끼, 물뿌리개'],
+  ['IC-MA-01–08', '재료', 8, 8, '나무, 단단한 나무, 나뭇가지, 돌, 철광석, 점토, 잡초, 도토리 주머니'],
+  ['IC-SD-01–05', '씨앗·묘목', 5, 3, '씨앗 봉투 3색(튤립·코스모스·팬지), 어린 나무, 삼나무 묘목'],
+  ['IC-FR-01–06', '과일', 6, 6, '사과, 배, 복숭아, 체리, 오렌지, 야자열매'],
+  ['IC-SH-01–06', '조개', 6, 6, '바지락, 개오지, 가리비, 고둥, 소라, 분홍 산호'],
+  ['IC-FL-01–12', '꽃', 12, 3, '튤립·코스모스·팬지 모양 3개 × 꽃 색 4가지'],
+  ['IC-FS-01–20', '물고기', 20, 20, '붕어, 피라미, 송사리, 잉어, 미꾸라지, 은어, 메기, 쏘가리, 연어, 금붕어, 가물치, 전갱이, 고등어, 광어, 오징어, 문어, 해마, 도미, 참치, 상어'],
+  ['IC-BG-01–22', '곤충', 22, 22, '배추흰나비, 호랑나비, 노랑나비, 무당벌레, 꿀벌, 고추잠자리, 밀잠자리, 매미, 반딧불이, 장수풍뎅이, 사슴벌레, 사마귀, 메뚜기, 귀뚜라미, 방울벌레, 개미, 달팽이, 쥐며느리, 소금쟁이, 나방, 송충이, 집게벌레'],
+  ['IC-FO-01–09', '화석', 9, 9, '암모나이트, 삼엽충, 호박, 고사리 화석, 상어 이빨, 공룡 발자국, 매머드 엄니, 공룡 두개골, 알 수 없는 화석'],
+];
+$('iconTable').tBodies[0].innerHTML = ICON_GROUPS.map(([id, cat, n, u, list]) => `
+  <tr><td class="id">${id}</td><td>${cat}</td><td>${n}</td><td>${u}</td><td class="small">${list}</td><td style="min-width:180px">${noteBox(id.split('–')[0].replace(/-01$/, ''), cat + ' 아이콘')}</td></tr>`).join('')
+  + `<tr><td></td><td><b>합계</b></td><td><b>93</b></td><td><b>82</b></td><td class="small muted">가구 20개는 지금 3D 썸네일 그대로</td><td></td></tr>`;
+
+/* ---------- 벽지·바닥 ---------- */
+const WP = [
+  ['WP-01', '크림 줄무늬', '지금 플레이어 방 (기본)'], ['WP-02', '오렌지 줄무늬', '코코 방'], ['WP-03', '하늘 체크', '보리 방'], ['WP-04', '연보라 꽃무늬', '모찌 방'],
+  ['WP-05', '통나무 벽', '두부 방'], ['WP-06', '민트 타일', '퐁 방'], ['WP-07', '빗방울', '초롱 방'], ['WP-08', '밤하늘 별', '상점 한정'],
+];
+const FL = [
+  ['FL-01', '나무 판자', '지금 플레이어 방 (기본)'], ['FL-02', '밝은 판자', '코코 방'], ['FL-03', '폭신 카펫', '보리 방'], ['FL-04', '흰 타일', '모찌 방'],
+  ['FL-05', '짙은 판자', '두부 방'], ['FL-06', '노랑 체크 타일', '퐁 방'], ['FL-07', '연못 돌바닥', '초롱 방'], ['FL-08', '모래 바닥', '상점 한정'],
+];
+const swatch = ([id, name, use]) => `<div class="sw"><svg viewBox="0 0 132 72" role="img" aria-label="${name} 견본"><rect width="132" height="72" fill="url(#${id.toLowerCase()})"/></svg>
+  <span class="small"><b>${name}</b></span><span class="small muted">${use}</span><span class="id">${id}</span>${noteBox(id, name)}</div>`;
+$('wpList').innerHTML = WP.map(swatch).join('');
+$('flList').innerHTML = FL.map(swatch).join('');
+
+/* ---------- 가구 ---------- */
+const FURN = [
+  ['FU-21', '서핑보드', '1×1', '코코', '벽에 기대 세운 보드. 주황·흰 줄', '코코 친밀도 선물'],
+  ['FU-22', '공 바구니', '1×1', '코코', '공 세 개가 담긴 등나무 바구니', '상점'],
+  ['FU-23', '쿠션 침대', '2×2', '보리', '낮고 폭신한 하늘색 큰 쿠션', '보리 친밀도 선물'],
+  ['FU-24', '뼈다귀 쿠션', '1×1', '보리', '둥근 방석 위 뼈다귀 베개', '상점'],
+  ['FU-25', '꽃 선반', '2×1', '모찌', '2단 나무 선반, 화분 넷 (꽃 색 변형)', '제작: 나무 6 · 꽃 4'],
+  ['FU-26', '유리 온실', '1×1', '모찌', '유리 돔 안의 작은 화초', '모찌 친밀도 선물'],
+  ['FU-27', '낚싯대 걸이', '벽', '두부', '벽 판자에 낚싯대 두 개', '두부 친밀도 선물'],
+  ['FU-28', '나무 난로', '1×1', '두부', '무쇠 난로, 불꽃 일렁임(flicker), 밤에 빛남', '제작: 철광석 4 · 나무 4'],
+  ['FU-29', '조리대', '2×1', '퐁', '위에 냄비·사과, 아래 민트 문 둘', '퐁 친밀도 선물'],
+  ['FU-30', '과일 바구니', '1×1', '퐁', '손잡이 바구니 (특산 과일 5종 변형)', '제작: 과일 5'],
+  ['FU-31', '우산꽂이', '1×1', '초롱', '초록 통에 우산 세 개', '상점'],
+  ['FU-32', '연잎 의자', '1×1', '초롱', '연잎 방석과 분홍 연꽃', '초롱 친밀도 선물'],
+  ['FU-33', '생일 케이크', '1×1', '모두', '2단 케이크, 초 셋. 생일 날 받는 장식', '생일 선물'],
+];
+const card = (id, name, sym, facts, ratio = '120 100') => `
+  <div class="card"><div class="stage"><svg viewBox="0 0 ${ratio}" role="img" aria-label="${name} 스케치"><use href="#${sym}"/></svg></div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로</span></div>
+    <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>${noteBox(id, name)}</div>`;
+$('furnCards').innerHTML = FURN.filter(f => f[0] !== 'FU-33').map(([id, name, size, who, look, get]) =>
+  card(id, name, 'f-' + id.slice(3), [['칸', size], ['테마', who], ['모양', look], ['얻는 법', get]])).join('');
+
+const PROPS = [
+  ['PR-10', '이삿짐 상자', 'p-10', '새 주민이 오기 전날 집터에 쌓여요. 이사 온 날 사라져요.'],
+  ['PR-11', '파티 풍선 장식', 'p-11', '생일인 주민 집 앞에 하루 동안 서요. 밤에 살짝 빛나요.'],
+  ['PR-12', '집터 표지판', 'p-12', '빈 집터를 말뚝과 줄로 표시해요. 새 주민 집이 서면 없어져요.'],
+];
+const cake = FURN.find(f => f[0] === 'FU-33');
+$('propCards').innerHTML = card(cake[0], cake[1], 'f-33', [['분류', '가구 1×1'], ['쓰임', '생일 날 주민이 주는 선물. 집에 장식해요.']])
+  + PROPS.map(([id, name, sym, what]) => card(id, name, sym, [['분류', '소품 (배경 편집기)'], ['쓰임', what]])).join('');
+
+/* ---------- 주민 방 ---------- */
+const ROOMS = [
+  ['RM-01', '코코', '해변 운동방', 'wp-02', 'fl-02', '#F2B36B', [['e-sofa', 18, 58, 70], ['f-21', 226, 28, 92, true], ['f-22', 150, 108, 52, true], ['e-lamp', 108, 72, 44]], '활발한 고양이. 아침 달리기 뒤 쉬는 방.'],
+  ['RM-02', '보리', '햇살 낮잠방', 'wp-03', 'fl-03', '#6CA0DC', [['f-23', 150, 54, 108, true], ['f-24', 40, 120, 56, true], ['e-radio', 44, 72, 48]], '느긋한 강아지. 햇볕 드는 창 아래 큰 쿠션.'],
+  ['RM-03', '모찌', '꽃 온실방', 'wp-04', 'fl-04', '#B9A6E0', [['f-25', 40, 48, 86, true], ['f-26', 200, 70, 50, true], ['e-pot', 250, 112, 44], ['e-pot', 60, 130, 40]], '상냥한 토끼. 화분이 가득한 연보라 방.'],
+  ['RM-04', '두부', '낚시 오두막', 'wp-05', 'fl-05', '#7FA36B', [['f-27', 110, 18, 76, true], ['f-28', 220, 62, 60, true], ['e-tank', 40, 86, 56], ['e-wood', 200, 132, 48]], '말수 적은 곰. 통나무 벽에 낚싯대와 난로.'],
+  ['RM-05', '퐁', '과일 부엌', 'wp-06', 'fl-06', '#FFD866', [['f-29', 30, 48, 92, true], ['e-table', 160, 110, 70], ['f-30', 176, 92, 38, true], ['e-fchair', 240, 120, 44]], '먹보 오리. 조리대와 과일이 있는 부엌.'],
+  ['RM-06', '초롱', '비 오는 날 방', 'wp-07', 'fl-07', '#8CCB6E', [['f-31', 238, 76, 52, true], ['f-32', 120, 112, 64, true], ['e-rug', 30, 128, 84], ['e-pot', 50, 72, 46]], '수다쟁이 개구리. 빗방울 벽지와 연못 바닥.'],
+];
+const roomSvg = (wp, fl, items) => `<svg viewBox="0 0 320 210" role="img" aria-label="방 스케치">
+  <polygon points="0,0 34,14 34,104 0,210" fill="url(#${wp})"/><polygon points="0,0 34,14 34,104 0,210" fill="#000" opacity=".1"/>
+  <polygon points="320,0 286,14 286,104 320,210" fill="url(#${wp})"/><polygon points="320,0 286,14 286,104 320,210" fill="#000" opacity=".1"/>
+  <rect x="34" y="14" width="252" height="90" fill="url(#${wp})"/><rect x="34" y="92" width="252" height="12" fill="#B98957"/>
+  <rect x="70" y="28" width="40" height="34" rx="3" fill="#CDEBF5" stroke="${INK}" stroke-width="2.5"/><rect x="210" y="28" width="40" height="34" rx="3" fill="#CDEBF5" stroke="${INK}" stroke-width="2.5"/>
+  <polygon points="34,104 286,104 320,210 0,210" fill="url(#${fl})"/>
+  <rect x="134" y="196" width="52" height="14" fill="#C96F4A"/>
+  ${items.map(([s, x, y, w]) => `<use href="#${s}" x="${x}" y="${y}" width="${w}" height="${w * 100 / 120}"/>`).join('')}
+</svg>`;
+const symName = Object.fromEntries([...FURN.map(f => ['f-' + f[0].slice(3), f[1]]),
+  ['e-sofa', '소파 FU-11'], ['e-lamp', '스탠드 FU-06'], ['e-rug', '러그 FU-08'], ['e-radio', '라디오 FU-10'], ['e-pot', '화분 FU-07'], ['e-tank', '어항 FU-14'], ['e-wood', '장작더미 FU-05'], ['e-table', '통나무 테이블 FU-02'], ['e-fchair', '과일 의자 FU-19']]);
+$('roomCards').innerHTML = ROOMS.map(([id, who, title, wp, fl, color, items, about]) => {
+  const uniq = [...new Map(items.map(i => [i[0], i])).values()];
+  return `<div class="card"><div class="stage">${roomSvg(wp, fl, items)}</div>
+    <div class="head"><span class="id">${id}</span><h3>${who} · ${title}</h3><span class="tag" style="background:${color};color:${INK}">${who} 색</span></div>
+    <p class="small muted">${about}</p>
+    <dl class="facts"><dt>벽지 · 바닥</dt><dd>${wp.toUpperCase()} · ${fl.toUpperCase()}</dd>
+      <dt>가구</dt><dd>${uniq.map(([s, , , , isNew]) => isNew ? `<span class="tag new">${symName[s]} ${'FU-' + s.slice(2)}</span>` : `<span class="tag">${symName[s]}</span>`).join(' ')}</dd></dl>
+    ${noteBox(id, who + ' 방')}</div>`;
+}).join('') + `<div class="card"><div class="head"><span class="id">RM-07</span><h3>새 주민 방</h3></div>
+  <p class="small muted">이사 올 주민(D10)이 정해지면 그 성격대로 꾸며요. 벽지·바닥은 WP-08 · FL-08 처럼 새로 하나씩 더할 수 있어요.</p>${noteBox('RM-07', '새 주민 방')}</div>`;
+
+/* ---------- 새 주민 후보 ---------- */
+const VIL = [
+  ['CH-10', '단풍', '여우', '꼼꼼한 수집가. 박물관 기증을 제일 좋아하고, 가을이 오면 신나요.', '#D9583B', '고양이 귀 + 다람쥐 꼬리 다시 쓰기 (새 부품 0)',
+    `<path d="M30 50 L22 12 L50 34z M90 50 L98 12 L70 34z" fill="#D9583B"/><path d="M26 22 l4 -10 6 12z M94 22 l-4 -10 -6 12z" fill="${INK}" stroke-width="1"/><ellipse cx="60" cy="64" rx="40" ry="36" fill="#E8744B"/><path d="M34 74 q26 34 52 0 q-26 -10 -52 0z" fill="#FBF7F2"/><circle cx="46" cy="60" r="4" fill="${INK}"/><circle cx="74" cy="60" r="4" fill="${INK}"/><ellipse cx="60" cy="76" rx="5" ry="3.5" fill="${INK}"/>`],
+  ['CH-11', '구름', '양', '수줍은 그림쟁이. 바닷가에서 하루 종일 그림을 그려요.', '#B9A6E0', '곰 둥근 귀 + 털 뭉치 부품 1개 새로',
+    `<g fill="#FBF7F2"><circle cx="34" cy="38" r="16"/><circle cx="60" cy="28" r="18"/><circle cx="86" cy="38" r="16"/><circle cx="26" cy="62" r="14"/><circle cx="94" cy="62" r="14"/></g><ellipse cx="20" cy="66" rx="12" ry="7" fill="#D8C9B8"/><ellipse cx="100" cy="66" rx="12" ry="7" fill="#D8C9B8"/><ellipse cx="60" cy="70" rx="30" ry="30" fill="#D8C9B8"/><circle cx="48" cy="66" r="4" fill="${INK}"/><circle cx="72" cy="66" r="4" fill="${INK}"/><path d="M54 82 q6 5 12 0" fill="none"/><circle cx="40" cy="78" r="4" fill="#F7A6A0" stroke="none"/><circle cx="80" cy="78" r="4" fill="#F7A6A0" stroke="none"/>`],
+  ['CH-12', '파도', '펭귄', '씩씩한 바다 탐험가. 선착장에서 수영하고 물고기 이야기를 해요.', '#5B8FC9', '오리 부리 다시 쓰기 + 날개 부품 1개 새로',
+    `<ellipse cx="60" cy="62" rx="42" ry="40" fill="#2E3A66"/><path d="M30 64 C30 38 54 40 60 52 C66 40 90 38 90 64 C90 92 30 92 30 64z" fill="#FBF7F2"/><circle cx="48" cy="60" r="4" fill="${INK}"/><circle cx="72" cy="60" r="4" fill="${INK}"/><path d="M50 72 h20 l-10 10z" fill="#F39A3B"/><circle cx="38" cy="74" r="4" fill="#F7A6A0" stroke="none"/><circle cx="82" cy="74" r="4" fill="#F7A6A0" stroke="none"/>`],
+];
+$('vilCards').innerHTML = VIL.map(([id, name, sp, about, color, build, face]) => `
+  <div class="card"><div class="stage"><svg viewBox="0 0 120 110" role="img" aria-label="${name} 얼굴 스케치" style="max-width:180px"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round">${face}</g></svg></div>
+    <div class="head"><span class="id">${id}</span><h3>${name} · ${sp}</h3><span class="tag" style="background:${color};color:#FBFDF8">테마 색</span></div>
+    <p class="small">${about}</p>
+    <dl class="facts"><dt>빌더</dt><dd>${build}</dd><dt>집</dt><dd>BD-02 주민 집 + 지붕 ${color} 변형</dd></dl>${noteBox(id, name)}</div>`).join('');
+
+/* ---------- 생일표 ---------- */
+const BD = [
+  ['코코', '7월 14일', '해변 달리기 좋은 한여름', '과일, 섬 특산 과일'], ['보리', '3월 21일', '낮잠 자기 좋은 봄볕', '조개, 쿠션 가구'],
+  ['모찌', '4월 8일', '튤립이 피는 때', '꽃, 교배한 꽃'], ['두부', '11월 3일', '연어가 올라오는 늦가을', '물고기 (큰 것)'],
+  ['퐁', '9월 27일', '과일이 잘 익는 가을', '과일, 요리 가구'], ['초롱', '6월 18일', '장마 시작', '곤충, 비 오는 날 꽃'],
+  ['새 주민', '이사 온 날부터 정함', 'D10 에 따라', '—'],
+];
+$('bdTable').tBodies[0].innerHTML = BD.map(([who, day, why, gift]) => `<tr><td>${who}</td><td>${day}</td><td class="small">${why}</td><td class="small">${gift}</td><td style="min-width:180px">${noteBox('BD-' + who, who + ' 생일')}</td></tr>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+$('pills').innerHTML = ['<span class="pill wait">검수 대기</span>', '결정 5', '아이콘 93 (고유 82)', '주민 방 6 (+1)', '벽지 8 · 바닥 8', '새 가구 13', '소품 3', '새 주민 후보 3']
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 의견 저장 · 요청 글 ---------- */
+const KEY = 'wave5-board-notes';
+const notes = [...document.querySelectorAll('.note')];
+try { const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+  for (const n of notes) if (saved[n.dataset.id]) { n.value = saved[n.dataset.id]; n.classList.add('filled'); }
+  for (const d of DECISIONS) if (saved['pick-' + d.id]) { const r = document.getElementById(d.id + saved['pick-' + d.id]); if (r) r.checked = true; }
+} catch {}
+function save() {
+  const o = {};
+  for (const n of notes) if (n.value.trim()) o[n.dataset.id] = n.value.trim();
+  for (const d of DECISIONS) { const r = document.querySelector(`input[name="${d.id}"]:checked`); if (r) o['pick-' + d.id] = r.value; }
+  try { localStorage.setItem(KEY, JSON.stringify(o)); } catch {}
+}
+document.addEventListener('input', e => { if (e.target.classList?.contains('note')) e.target.classList.toggle('filled', !!e.target.value.trim()); save(); });
+document.addEventListener('change', save);
+
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 5차 검수 보드 v0.5 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  try { localStorage.removeItem(KEY); } catch {}
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
