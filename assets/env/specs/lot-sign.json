@@ -1,0 +1,90 @@
+{
+  "id": "PR-12",
+  "slug": "lot-sign",
+  "name": "집터 표지판",
+  "category": "prop",
+  "kind": "lot-sign",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "빈 집터(3×3) 네 귀퉁이에 말뚝을 박고 줄을 둘렀다. 앞 가운데에 '집터' 팻말. 새 주민 집이 서면 없어진다.",
+    "keywords": [
+      "말뚝 넷",
+      "줄",
+      "'집터' 팻말",
+      "고른 흙"
+    ],
+    "references": [
+      "공사 전 빈터"
+    ],
+    "avoid": [
+      "공사장 경고 표지"
+    ],
+    "notes": "5차 검수 보드 wave5 카드대로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stake": "#8C6440",
+    "rope": "#E8D5A8",
+    "board": "#F7F1E4",
+    "ink": "#4A3B32",
+    "dirt": "#C9A877"
+  },
+  "paletteLabels": {
+    "stake": "말뚝",
+    "rope": "줄",
+    "board": "팻말",
+    "ink": "글씨",
+    "dirt": "고른 흙"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -1.32,
+          -1.32,
+          0.06
+        ],
+        [
+          1.32,
+          -1.32,
+          0.06
+        ],
+        [
+          -1.32,
+          1.32,
+          0.06
+        ],
+        [
+          1.32,
+          1.32,
+          0.06
+        ],
+        [
+          0,
+          1.32,
+          0.07
+        ]
+      ]
+    },
+    "extent": [
+      1.4,
+      1.4
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "FU-25",
+  "slug": "flower-shelf",
+  "item": "furn.flower-shelf",
+  "name": "꽃 선반",
+  "category": "furniture",
+  "kind": "flower-shelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 7684,
+  "parts": 2,
+  "materials": [
+    "bloomA",
+    "bloomB",
+    "bloomC",
+    "bloomCenter",
+    "bloomD",
+    "can",
+    "leaf",
+    "pot",
+    "potRim",
+    "soil",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "flowers",
+    "shelf"
+  ],
+  "animations": {},
+  "size": [
+    1.87,
+    0.45,
+    1.25
+  ],
+  "bounds": [
+    [
+      -0.933,
+      -0.225,
+      0.0
+    ],
+    [
+      0.933,
+      0.225,
+      1.255
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 151844,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-shelf_front.png",
+    "flower-shelf_main.png",
+    "flower-shelf_thumb.png",
+    "flower-shelf_top.png",
+    "flower-shelf_variants.png"
+  ]
+}

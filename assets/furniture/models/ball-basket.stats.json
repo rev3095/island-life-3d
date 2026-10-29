@@ -1,0 +1,54 @@
+{
+  "id": "FU-22",
+  "slug": "ball-basket",
+  "item": "furn.ball-basket",
+  "name": "공 바구니",
+  "category": "furniture",
+  "kind": "ball-basket",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5492,
+  "parts": 2,
+  "materials": [
+    "ballBlue",
+    "ballRed",
+    "ballWhite",
+    "ballYellow",
+    "basket",
+    "basketDark"
+  ],
+  "objects": [
+    "balls",
+    "basket"
+  ],
+  "animations": {},
+  "size": [
+    0.77,
+    0.77,
+    0.63
+  ],
+  "bounds": [
+    [
+      -0.384,
+      -0.384,
+      0.0
+    ],
+    [
+      0.384,
+      0.384,
+      0.63
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 105604,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "ball-basket_front.png",
+    "ball-basket_main.png",
+    "ball-basket_thumb.png",
+    "ball-basket_top.png"
+  ]
+}

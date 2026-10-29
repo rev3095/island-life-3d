@@ -1,0 +1,61 @@
+{
+  "id": "FU-28",
+  "slug": "wood-stove",
+  "item": "furn.wood-stove",
+  "name": "나무 난로",
+  "category": "furniture",
+  "kind": "wood-stove",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2100,
+  "parts": 2,
+  "materials": [
+    "bark",
+    "brass",
+    "flame",
+    "flameCore",
+    "glow",
+    "iron",
+    "ironLight",
+    "kettle"
+  ],
+  "objects": [
+    "flame",
+    "stove"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    0.72,
+    0.62,
+    1.65
+  ],
+  "bounds": [
+    [
+      -0.36,
+      -0.327,
+      0.0
+    ],
+    [
+      0.36,
+      0.29,
+      1.65
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 47100,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wood-stove_front.png",
+    "wood-stove_main.png",
+    "wood-stove_thumb.png",
+    "wood-stove_top.png"
+  ]
+}

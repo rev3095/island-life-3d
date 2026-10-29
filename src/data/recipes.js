@@ -18,6 +18,10 @@ export const RECIPES = [
   { result: 'furn.bug-case', needs: [{ id: 'mat.wood', n: 3 }, { id: 'mat.branch', n: 2 }] },
   { result: 'furn.shell-curtain', needs: [{ category: 'shell', n: 6 }] },                          // 컨셉: 조개 6
   { result: 'furn.fruit-chair', needs: [{ category: 'fruit', n: 10 }] },                           // 컨셉: 과일 10
+  // 5차 검수 보드(wave5) FU 카드의 제작 가구
+  { result: 'furn.flower-shelf', needs: [{ id: 'mat.wood', n: 6 }, { category: 'flower', n: 4 }] }, // 보드: 나무 6 · 꽃 4
+  { result: 'furn.wood-stove', needs: [{ id: 'mat.iron', n: 4 }, { id: 'mat.wood', n: 4 }] },      // 보드: 철광석 4 · 나무 4
+  { result: 'furn.fruit-basket', needs: [{ category: 'fruit', n: 5 }] },                           // 보드: 과일 5
 ].map(r => Object.freeze({ id: r.result, count: 1, ...r }));
 
 const BY_ID = new Map(RECIPES.map(r => [r.id, r]));

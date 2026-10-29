@@ -1,0 +1,58 @@
+{
+  "id": "FU-29",
+  "slug": "kitchen-counter",
+  "item": "furn.kitchen-counter",
+  "name": "조리대",
+  "category": "furniture",
+  "kind": "kitchen-counter",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3208,
+  "parts": 2,
+  "materials": [
+    "apple",
+    "board",
+    "body",
+    "door",
+    "knob",
+    "leaf",
+    "plinth",
+    "pot",
+    "stem",
+    "top"
+  ],
+  "objects": [
+    "counter",
+    "things"
+  ],
+  "animations": {},
+  "size": [
+    1.96,
+    0.81,
+    1.17
+  ],
+  "bounds": [
+    [
+      -0.98,
+      -0.415,
+      0.0
+    ],
+    [
+      0.98,
+      0.39,
+      1.172
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 65960,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "kitchen-counter_front.png",
+    "kitchen-counter_main.png",
+    "kitchen-counter_thumb.png",
+    "kitchen-counter_top.png"
+  ]
+}

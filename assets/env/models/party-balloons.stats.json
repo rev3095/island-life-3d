@@ -1,0 +1,42 @@
+{
+  "id": "PR-11",
+  "slug": "party-balloons",
+  "name": "파티 풍선 장식",
+  "category": "prop",
+  "kind": "party-balloons",
+  "version": "0.1",
+  "triangles": 4674,
+  "parts": 2,
+  "materials": [
+    "balloonBlue",
+    "balloonRed",
+    "balloonYellow",
+    "flagA",
+    "flagB",
+    "gift",
+    "glow",
+    "pole",
+    "ribbon",
+    "shine",
+    "string"
+  ],
+  "animations": {},
+  "size": [
+    1.69,
+    0.42,
+    1.88
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 95288,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "party-balloons_front.png",
+    "party-balloons_hero.jpg",
+    "party-balloons_main.png",
+    "party-balloons_thumb.png",
+    "party-balloons_top.png"
+  ]
+}

@@ -579,12 +579,390 @@ def b_shell_curtain(M):
                 m.add(ellipsoid((x, y, z), (0.017, 0.017, 0.017), seg=10, rings=6), 'bead')
 
 
+# ================================================================ 5차: 주민 테마 가구 (FU-21 ~ FU-33, 검수 보드 wave5)
+def placed(bm, center, R):
+    """원점 기준으로 만든 조각을 R 로 돌려 center 에 놓는다"""
+    from mathutils import Matrix
+    bmesh.ops.transform(bm, matrix=Matrix.Translation(V(center)) @ R.to_4x4(), verts=bm.verts)
+    return bm
+
+
+def ring(center, r, tube_r, seg=32, z_wave=None):
+    """수평 고리 관 (둘레 줄·테). z_wave(각도) 를 주면 높이가 물결친다"""
+    c = V(center)
+    pts = [c + V((math.cos(TAU * k / seg) * r, math.sin(TAU * k / seg) * r, z_wave(TAU * k / seg) if z_wave else 0)) for k in range(seg)]
+    return toonkit.tube(pts, [tube_r] * seg, seg=8, closed=True)
+
+
+def wicker(m, r0, r1, H, ribs=12):
+    """위가 넓은 등나무 바구니: 몸통 + 엮은 줄 + 세로 살 + 윗테 (윗면 = 속)"""
+    m.add(cylinder((0, 0, 0), (0, 0, H), r0, r1, seg=32), lambda c, n: 'basketDark' if n.z > 0.9 else 'basket')
+    rad = lambda z: r0 + (r1 - r0) * z / H
+    for z in (H * 0.25, H * 0.5, H * 0.75):
+        m.add(ring((0, 0, z), rad(z) + 0.004, 0.012), 'basketDark')
+    for k in range(ribs):
+        a = TAU * k / ribs + 0.13
+        d = V((math.cos(a), math.sin(a), 0))
+        m.add(cylinder(d * (r0 + 0.004) + V((0, 0, 0.02)), d * (r1 + 0.004) + V((0, 0, H - 0.03)), 0.01, seg=6), 'basketDark')
+    m.add(ring((0, 0, H - 0.005), r1, 0.024), 'basketDark')
+
+
+def petal_flower(m, c, r, petal, center, normal=(0, -0.45, 0.9), n=5, phase=0.0):
+    """납작한 꽃 한 송이: 꽃잎 n 장이 normal 쪽을 본다"""
+    R = align_z(normal)
+    c = V(c)
+    for k in range(n):
+        a = TAU * k / n + phase
+        p = c + R @ V((math.cos(a) * r * 0.75, math.sin(a) * r * 0.75, 0))
+        m.add(ellipsoid(p, (r * 0.62, r * 0.42, r * 0.22), rot=R @ rot_xyz(z=a), seg=6, rings=4), petal)
+    m.add(ellipsoid(c + R @ V((0, 0, r * 0.12)), (r * 0.4, r * 0.4, r * 0.25), rot=R, seg=6, rings=4), center)
+
+
+def b_surfboard(M):
+    """나무 받침에 비스듬히 기대 세운 보드 (뒤 +Y 쪽으로 기운다)"""
+    L, hw = 1.62, 0.25
+    R = rot_xyz(x=-0.26)
+    base = V((0, -0.2, 0.04))
+    at = lambda x, y, z: base + R @ V((x, y, z))
+    b = M.part('board')
+    bm = ellipsoid((0, 0, 0), (hw, 0.035, L / 2), seg=32, rings=24)
+    for v in bm.verts:   # 앞코(위)는 뾰족하게, 꼬리(아래)는 뭉툭하게
+        t = v.co.z / (L / 2)
+        v.co.x *= (1 - 0.3 * t) if t > 0 else math.sqrt(1 + t * t)
+    b.add(placed(bm, at(0, 0, L / 2), R), 'board')
+    b.add(placed(ellipsoid((0, 0, 0), (0.055, 0.03, L / 2 * 0.9), seg=16, rings=20), at(0, -0.012, L / 2 - 0.02), R), 'stripe')
+    b.add(placed(ellipsoid((0, 0, 0), (0.01, 0.07, 0.09), seg=10, rings=6), at(0, 0.07, 0.3), R), 'fin')
+    m = M.part('stand')
+    m.add(box((0, -0.18, 0.03), (0.6, 0.3, 0.06), bevel=0.02), 'wood')
+    m.add(box((0, -0.31, 0.08), (0.6, 0.05, 0.1), bevel=0.015), 'wood')
+    top = at(0, 0.04, 1.15)
+    for sx in (1, -1):   # 이젤처럼 뒤로 뻗은 다리 둘 + 가로대
+        m.add(cylinder((sx * 0.13, 0.4, 0), (sx * 0.1, top.y, top.z), 0.022, seg=8), 'wood')
+    m.add(box((0, 0.33, 0.25), (0.3, 0.035, 0.04), bevel=0.01), 'wood')
+
+
+def b_ball_basket(M):
+    m = M.part('basket')
+    H = 0.4
+    wicker(m, 0.27, 0.36, H)
+    b = M.part('balls')
+    red, blue, yellow = V((-0.11, -0.06, H + 0.06)), V((0.13, 0.03, H + 0.05)), V((0.0, 0.15, H + 0.12))
+    b.add(ellipsoid(red, (0.15, 0.15, 0.15), seg=24, rings=14), 'ballRed')
+    for a in (0.55, -0.55):   # 비치볼 흰 줄 둘
+        b.add(ellipsoid(red, (0.153, 0.03, 0.153), rot=rot_xyz(z=a), seg=24, rings=12), 'ballWhite')
+    b.add(ellipsoid(blue, (0.14, 0.14, 0.14), seg=24, rings=14), 'ballBlue')
+    b.add(ellipsoid(blue, (0.143, 0.143, 0.025), rot=rot_xyz(x=0.5), seg=24, rings=8), 'ballWhite')
+    b.add(ellipsoid(yellow, (0.11, 0.11, 0.11), seg=20, rings=12), 'ballYellow')
+
+
+def b_cushion_bed(M):
+    m = M.part('bed')
+    S, r = 1.9, 0.2
+    m.add(box((0, 0, 0.12), (S, S, 0.24), bevel=0.1), 'cushion')
+    m.add(box((0, 0, 0.12), (S + 0.012, S + 0.012, 0.035), bevel=0.012), 'piping')
+    m.add(box((0, -0.06, 0.3), (S - 0.36, S - 0.42, 0.16), bevel=0.08), 'cushionTop')
+    hy = S / 2 - r
+    m.add(capsule((-(S / 2 - r), hy, 0.38), (S / 2 - r, hy, 0.38), r), 'cushion')   # 뒤·옆을 두른 둥근 테
+    for sx in (1, -1):
+        m.add(capsule((sx * (S / 2 - r), hy, 0.38), (sx * (S / 2 - r), -S / 2 + r + 0.08, 0.32), r * 0.9), 'cushion')
+    for ix in (-1, 0, 1):   # 누빔 단추
+        for iy in (-1, 0, 1):
+            m.add(ellipsoid((ix * 0.4, -0.06 + iy * 0.38, 0.38), (0.035, 0.035, 0.012), seg=10, rings=6), 'button')
+    m.add(ellipsoid((-0.36, 0.34, 0.45), (0.3, 0.17, 0.09), rot=rot_xyz(z=0.25), seg=20, rings=10), 'pillow')
+
+
+def b_bone_cushion(M):
+    m = M.part('cushion')
+    R0 = 0.42
+    m.add(cylinder((0, 0, 0), (0, 0, 0.1), R0, seg=40), 'cushion')
+    m.add(ellipsoid((0, 0, 0.1), (R0, R0, 0.07), seg=40, rings=12), 'cushion')
+    m.add(ring((0, 0, 0.1), R0 + 0.004, 0.024, seg=40), 'piping')
+    dome = lambda x, y: 0.1 + 0.07 * math.sqrt(max(0.0, 1 - (x * x + y * y) / R0 ** 2))
+    for x, y, rx in ((0, -0.24, 0.05), (-0.07, -0.31, 0.022), (0, -0.33, 0.022), (0.07, -0.31, 0.022)):   # 앞 발자국
+        m.add(ellipsoid((x, y, dome(x, y) - 0.002), (rx, rx * 0.85, 0.01), seg=12, rings=6), 'paw')
+    b = M.part('bone')
+    T = rot_xyz(z=0.18)
+    c = V((0, 0.08, 0.215))
+    b.add(capsule(c + T @ V((-0.17, 0, 0)), c + T @ V((0.17, 0, 0)), 0.07, seg=16, rings=10), 'bone')
+    for sx in (1, -1):
+        for sy in (1, -1):
+            b.add(ellipsoid(c + T @ V((sx * 0.21, sy * 0.055, 0)), (0.075, 0.075, 0.07), seg=16, rings=10), 'bone')
+
+
+def b_flower_shelf(M):
+    m = M.part('shelf')
+    W, D, H = 1.86, 0.44, 1.2
+    for sx in (1, -1):
+        for sy in (1, -1):
+            x, y = sx * (W / 2 - 0.04), sy * (D / 2 - 0.04)
+            m.add(box((x, y, H / 2), (0.07, 0.07, H), bevel=0.015), 'woodDark')
+            m.add(ellipsoid((x, y, H + 0.02), (0.045, 0.045, 0.035), seg=10, rings=6), 'woodDark')
+    for z in (0.1, 0.64):
+        m.add(box((0, 0, z), (W, D, 0.06), bevel=0.015), 'wood')
+    for z in (0.42, 1.0):   # 뒤 가로대
+        m.add(box((0, D / 2 - 0.04, z), (W - 0.08, 0.04, 0.07), bevel=0.01), 'woodDark')
+    f = M.part('flowers')
+    for x, z0, bloom in ((-0.43, 0.67, 'bloomA'), (0.02, 0.67, 'bloomB'), (-0.29, 0.13, 'bloomC'), (0.43, 0.13, 'bloomD')):
+        f.add(cylinder((x, 0, z0), (x, 0, z0 + 0.2), 0.1, 0.13, seg=20), 'pot')
+        f.add(ring((x, 0, z0 + 0.19), 0.135, 0.022, seg=20), 'potRim')
+        f.add(cylinder((x, 0, z0 + 0.17), (x, 0, z0 + 0.205), 0.12, seg=20), 'soil')
+        for a in (0.6, 2.6, 4.4):
+            f.add(ellipsoid((x + math.cos(a) * 0.08, math.sin(a) * 0.06, z0 + 0.26), (0.07, 0.03, 0.014), rot=rot_xyz(y=-0.4, z=a), seg=12, rings=6), 'leaf')
+        for k, (dx, dz) in enumerate(((-0.06, 0.3), (0.06, 0.31), (0.0, 0.38))):   # 꽃 세 송이
+            f.add(cylinder((x + dx * 0.4, 0, z0 + 0.2), (x + dx, -0.03, z0 + dz), 0.008, seg=6), 'leaf')
+            petal_flower(f, (x + dx, -0.04, z0 + dz), 0.055, bloom, 'bloomCenter', phase=k * 0.6)
+    # 위 칸 오른쪽 끝의 작은 물뿌리개
+    cx, cz = 0.55, 0.67
+    f.add(cylinder((cx, 0, cz), (cx, 0, cz + 0.16), 0.085, 0.075, seg=18), 'can')
+    f.add(cylinder((cx - 0.06, -0.02, cz + 0.05), (cx - 0.2, -0.04, cz + 0.17), 0.016, 0.012, seg=8), 'can')
+    f.add(cylinder((cx - 0.2, -0.04, cz + 0.17), (cx - 0.22, -0.042, cz + 0.185), 0.025, 0.03, seg=10), 'can')
+    handle = bezier((cx + 0.06, 0, cz + 0.15), (cx + 0.08, 0, cz + 0.26), (cx - 0.04, 0, cz + 0.26), (cx - 0.04, 0, cz + 0.16), 10)
+    f.add(rail(handle, [0.012] * len(handle), seg=6), 'can')
+
+
+def b_terrarium(M):
+    m = M.part('base')
+    m.add(box((0, 0, 0.07), (0.7, 0.7, 0.14), bevel=0.03), 'wood')
+    m.add(box((0, 0, 0.15), (0.62, 0.62, 0.03), bevel=0.01), 'woodDark')
+    R, z0, z1 = 0.29, 0.165, 0.44   # 둥근 벽 아래·위 (위는 반구)
+    g = M.part('dome')
+    # 유리는 뒤쪽 반만 (앞은 살만 두어 안의 화초가 보이게 — 곤충 상자와 같은 방식)
+    wall = cylinder((0, 0, z0), (0, 0, z1), R - 0.008, seg=32)
+    bmesh.ops.delete(wall, geom=[f for f in wall.faces if f.calc_center_median().y < 0.01 or abs(f.normal.z) > 0.9], context='FACES')
+    g.add(wall, 'glass')
+    cap = ellipsoid((0, 0, z1), (R - 0.008,) * 3, seg=32, rings=16)
+    bmesh.ops.delete(cap, geom=[f for f in cap.faces if f.calc_center_median().y < 0.01 or f.calc_center_median().z < z1], context='FACES')
+    g.add(cap, 'glass')
+    for z in (z0 + 0.01, z1):
+        g.add(ring((0, 0, z), R, 0.014), 'frame')
+    for k in range(3):   # 머리 위로 넘어가는 살 셋
+        a = math.pi * k / 3 + 0.3
+        d = V((math.cos(a), math.sin(a), 0))
+        pts = [d * R + V((0, 0, z0))] + [d * (R * math.cos(t)) + V((0, 0, z1 + R * math.sin(t))) for t in (math.pi * i / 16 for i in range(17))] + [-d * R + V((0, 0, z0))]
+        g.add(rail(pts, [0.012] * len(pts), seg=8), 'frame')
+    g.add(ellipsoid((0, 0, z1 + R + 0.02), (0.03, 0.03, 0.03), seg=12, rings=8), 'frame')
+    p = M.part('plant')
+    p.add(ellipsoid((0, 0, 0.165), (0.2, 0.2, 0.04), seg=24, rings=8), 'soil')
+    stem = bezier((0, 0, 0.18), (0.02, 0, 0.27), (-0.02, -0.02, 0.34), (0, -0.03, 0.42), 8)
+    p.add(rail(stem, [0.013] * len(stem), seg=6), 'stem')
+    for sx, z in ((1, 0.25), (-1, 0.31), (1, 0.36)):
+        p.add(ellipsoid((sx * 0.07, -0.01, z), (0.075, 0.03, 0.014), rot=rot_xyz(y=-sx * 0.45), seg=12, rings=6), 'leaf')
+    petal_flower(p, (0, -0.035, 0.43), 0.07, 'bloom', 'bloomCenter', n=6)
+
+
+def b_rod_rack(M):
+    m = M.part('rack')
+    cz = 1.45
+    m.add(box((0, -0.035, cz), (0.92, 0.07, 0.24), bevel=0.025), 'plank')
+    for x in (-0.38, 0.38):
+        m.add(ellipsoid((x, -0.072, cz + 0.06), (0.016, 0.01, 0.016), seg=8, rings=6), 'peg')
+    rods = []
+    for x, tip_x, reel in ((-0.24, -0.08, True), (0.02, 0.16, False)):   # 손잡이가 위, 낚싯대 끝이 아래로
+        m.add(cylinder((x, -0.07, cz + 0.02), (x, -0.15, cz + 0.03), 0.016, seg=8), 'peg')
+        top, tip = V((x, -0.16, cz + 0.1)), V((tip_x, -0.12, 0.36))
+        d = (tip - top).normalized()
+        m.add(ellipsoid(top, (0.03, 0.03, 0.03), seg=10, rings=6), 'reel')
+        m.add(cylinder(top, top + d * 0.24, 0.027, 0.024, seg=12), 'grip')
+        m.add(cylinder(top + d * 0.24, tip, 0.014, 0.006, seg=8), 'rod')
+        for t in (0.45, 0.65, 0.85):   # 줄 고리
+            m.add(ring(top + (tip - top) * t + V((0, -0.012, 0)), 0.014, 0.004, seg=10), 'reel')
+        if reel:
+            c = top + d * 0.32 + V((0, -0.045, 0))
+            m.add(cylinder(c - V((0.028, 0, 0)), c + V((0.028, 0, 0)), 0.045, seg=16), 'reel')
+            m.add(capsule(c + V((0.03, 0, 0)), c + V((0.04, -0.02, -0.04)), 0.008, seg=6, rings=4), 'grip')
+        rods.append(tip)
+    # 낚싯줄은 끝에서 늘어졌다가 판자 오른쪽 못에 걸린 찌로 올라간다
+    for tip, x, s in ((rods[0], 0.34, 1.0), (rods[1], 0.42, 0.8)):
+        peg = V((x, -0.12, cz - 0.08))
+        m.add(cylinder((x, -0.07, cz - 0.08), peg, 0.012, seg=6), 'peg')
+        bob = peg + V((0, 0, -0.1 - 0.12 * (1 - s) / 0.2))
+        line = bezier(tip, tip + V((0.04, -0.01, -0.12)), bob + V((0, 0, -0.42)), bob, 16)
+        m.add(rail(line, [0.0035] * len(line), seg=5), 'line')
+        m.add(cylinder(bob, peg, 0.0035, seg=5), 'line')
+        r = 0.045 * s
+        m.add(ellipsoid(bob - V((0, 0, r)), (r, r, r * 1.1), seg=14, rings=10), lambda c, n, z=bob.z - r: 'bobberTop' if c.z > z + 0.01 else 'bobber')
+
+
+def b_wood_stove(M):
+    m = M.part('stove')
+    W, D, z0, H = 0.66, 0.52, 0.14, 0.56
+    fy, wz = -D / 2, z0 + H * 0.48
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(cylinder((sx * 0.25, sy * 0.18, 0), (sx * 0.25, sy * 0.18, z0 + 0.03), 0.035, 0.045, seg=10), 'iron')
+    m.add(box((0, 0, z0 + H / 2), (W, D, H), bevel=0.08), 'iron')
+    m.add(box((0, 0, z0 + 0.03), (W + 0.04, D + 0.04, 0.05), bevel=0.02), 'ironLight')
+    m.add(box((0, 0, z0 + H + 0.02), (W + 0.06, D + 0.06, 0.05), bevel=0.02), 'ironLight')
+    m.add(box((0, fy - 0.01, wz), (0.42, 0.04, 0.3), bevel=0.04), 'ironLight')
+    m.add(box((0, fy - 0.022, wz), (0.34, 0.03, 0.22), bevel=0.03), 'glow')   # 불 창: 밤에 빛난다
+    m.add(box((0, fy - 0.008, z0 + 0.09), (0.3, 0.02, 0.05), bevel=0.01), 'ironLight')   # 재 서랍
+    m.add(capsule((0.25, fy - 0.05, wz + 0.08), (0.25, fy - 0.05, wz - 0.08), 0.016, seg=8, rings=4), 'brass')
+    for z in (wz + 0.08, wz - 0.08):
+        m.add(cylinder((0.25, fy - 0.01, z), (0.25, fy - 0.05, z), 0.01, seg=6), 'brass')
+    for sx in (1, -1):   # 장작 둘 (불꽃 아래)
+        m.add(capsule((-0.12, fy - 0.045, wz - 0.085 + 0.01 * sx), (0.12, fy - 0.045, wz - 0.085 - 0.01 * sx), 0.022, seg=8, rings=4), 'bark')
+    cx, cy = 0.17, 0.1   # 굴뚝
+    m.add(cylinder((cx, cy, z0 + H + 0.04), (cx, cy, 1.6), 0.075, seg=16), 'iron')
+    m.add(ring((cx, cy, z0 + H + 0.08), 0.08, 0.016, seg=16), 'ironLight')
+    m.add(cylinder((cx, cy, 1.6), (cx, cy, 1.65), 0.1, seg=16), 'ironLight')
+    k = V((-0.14, -0.04, z0 + H + 0.045))   # 주전자
+    m.add(ellipsoid(k + V((0, 0, 0.08)), (0.11, 0.11, 0.085), seg=20, rings=10), 'kettle')
+    m.add(cylinder(k, k + V((0, 0, 0.03)), 0.085, seg=16), 'kettle')
+    m.add(cylinder(k + V((-0.08, 0, 0.08)), k + V((-0.17, 0, 0.15)), 0.02, 0.012, seg=8), 'kettle')
+    m.add(ellipsoid(k + V((0, 0, 0.17)), (0.022, 0.022, 0.018), seg=10, rings=6), 'brass')
+    handle = bezier(k + V((0.06, 0, 0.14)), k + V((0.06, 0, 0.26)), k + V((-0.06, 0, 0.26)), k + V((-0.06, 0, 0.14)), 10)
+    m.add(rail(handle, [0.011] * len(handle), seg=6), 'brass')
+    flame = M.part('flame', pivot=(0, fy - 0.04, wz - 0.1))
+    for x, h, r in ((0, 0.17, 0.07), (-0.085, 0.11, 0.05), (0.085, 0.12, 0.05)):
+        flame.add(cone((x, fy - 0.04, wz - 0.1), (x, fy - 0.04, wz - 0.1 + h), r, 0.0, squash=0.35, seg=10), 'flame')
+    flame.add(cone((0, fy - 0.05, wz - 0.1), (0, fy - 0.05, wz - 0.01), 0.04, 0.0, squash=0.35, seg=10), 'flameCore')
+
+
+def b_kitchen_counter(M):
+    m = M.part('counter')
+    W, D, H = 1.9, 0.72, 0.84
+    m.add(box((0, 0.01, 0.06), (W - 0.1, D - 0.1, 0.12), bevel=0.02), 'plinth')
+    m.add(box((0, 0, H / 2 + 0.03), (W - 0.04, D - 0.04, H - 0.1), bevel=0.04), 'body')
+    m.add(box((0, 0, H), (W + 0.06, D + 0.06, 0.07), bevel=0.02), 'top')
+    for sx in (1, -1):
+        m.add(box((sx * 0.46, -D / 2 + 0.005, H * 0.47), (0.8, 0.03, 0.56), bevel=0.03), 'door')
+        m.add(box((sx * 0.46, -D / 2 - 0.006, H * 0.47), (0.64, 0.012, 0.4), bevel=0.012), 'body')
+        m.add(box((sx * 0.46, -D / 2 - 0.012, H * 0.47), (0.58, 0.012, 0.34), bevel=0.01), 'door')
+        m.add(ellipsoid((sx * 0.12, -D / 2 - 0.035, H * 0.62), (0.025, 0.02, 0.025), seg=10, rings=6), 'knob')
+    t = M.part('things')
+    zt = H + 0.035
+    px = -0.38
+    t.add(cylinder((px, 0.04, zt), (px, 0.04, zt + 0.22), 0.2, seg=28), 'pot')
+    t.add(ellipsoid((px, 0.04, zt + 0.22), (0.205, 0.205, 0.045), seg=28, rings=10), 'pot')
+    t.add(ellipsoid((px, 0.04, zt + 0.275), (0.03, 0.03, 0.022), seg=10, rings=6), 'knob')
+    for sx in (1, -1):
+        t.add(capsule((px + sx * 0.19, 0.04, zt + 0.17), (px + sx * 0.25, 0.04, zt + 0.17), 0.022, seg=8, rings=4), 'pot')
+    t.add(box((0.45, -0.04, zt + 0.012), (0.44, 0.3, 0.025), bevel=0.01), 'board')
+    for x, y, r in ((0.4, -0.06, 0.1), (0.56, 0.02, 0.085)):
+        c = V((x, y, zt + 0.025 + r * 0.9))
+        t.add(ellipsoid(c, (r, r, r * 0.92), seg=20, rings=12), 'apple')
+        t.add(cylinder(c + V((0, 0, r * 0.8)), c + V((0.012, 0, r * 1.25)), 0.01, seg=6), 'stem')
+        t.add(ellipsoid(c + V((0.04, 0, r * 1.05)), (0.04, 0.018, 0.008), rot=rot_xyz(y=-0.4), seg=10, rings=6), 'leaf')
+
+
+def b_fruit_basket(M):
+    m = M.part('basket')
+    r1, H = 0.33, 0.28
+    wicker(m, 0.24, r1, H, ribs=10)
+    handle = bezier((-r1 + 0.02, 0, H), (-r1 + 0.02, 0, H + 0.42), (r1 - 0.02, 0, H + 0.42), (r1 - 0.02, 0, H), 16)
+    m.add(rail(handle, [0.022] * len(handle), seg=8), 'basketDark')
+    m.add(ellipsoid((0, 0, H + 0.005), (r1 + 0.03, r1 + 0.03, 0.03), seg=28, rings=8), 'cloth')
+    f = M.part('fruits')
+    r = 0.11
+    for i, (x, y, z) in enumerate(((-0.14, -0.09, 0.06), (0.13, -0.11, 0.06), (0.14, 0.12, 0.06), (-0.12, 0.13, 0.06), (0.0, -0.05, 0.16))):
+        c = V((x, y, H + z))
+        f.add(ellipsoid(c, (r, r, r * 0.92), seg=20, rings=12), 'fruit')
+        f.add(cylinder(c + V((0, 0, r * 0.8)), c + V((0.012, 0, r * 1.2)), 0.009, seg=6), 'stem')
+        if i == 4:
+            f.add(ellipsoid(c + V((0.045, 0, r * 1.02)), (0.045, 0.02, 0.008), rot=rot_xyz(y=-0.4), seg=10, rings=6), 'leaf')
+
+
+def b_umbrella_stand(M):
+    m = M.part('stand')
+    r, H = 0.22, 0.52
+    m.add(cylinder((0, 0, 0), (0, 0, H), r, seg=28), lambda c, n: 'standDark' if n.z > 0.9 else 'stand')
+    m.add(ring((0, 0, H - 0.005), r + 0.004, 0.02, seg=28), 'standDark')
+    m.add(ring((0, 0, H * 0.7), r + 0.004, 0.01, seg=28), 'standDark')
+    m.add(ring((0, 0, 0.02), r + 0.006, 0.022, seg=28), 'standDark')
+    for a, z in ((-0.35, 0.22), (0.25, 0.14), (0.05, 0.27), (0.5, 0.25)):   # 앞면 물방울 무늬
+        d = V((math.sin(a), -math.cos(a), 0))
+        p = d * (r + 0.003) + V((0, 0, z))
+        m.add(ellipsoid(p, (0.022, 0.006, 0.03), rot=rot_xyz(z=a), seg=12, rings=6), 'drop')
+        m.add(cone(p + V((0, 0, 0.018)), p + V((0, 0, 0.055)) + d * 0.002, 0.016, 0.0, squash=0.3, seg=8), 'drop')
+    u = M.part('umbrellas')
+    # 손잡이가 위로 나온 빨강·노랑: 접힌 우산 몸이 통 안쪽으로 뾰족하다
+    for (bx, by), lean, col, hook in (((-0.07, 0.03), V((-0.05, 0.0, 0)), 'umbRed', 1), ((0.08, -0.04), V((0.05, -0.02, 0)), 'umbYellow', -1)):
+        b0 = V((bx, by, 0.06))
+        top = b0 + lean + V((0, 0, 0.94))
+        d = (top - b0).normalized()
+        u.add(cone(b0 + d * 0.5, b0, 0.075, 0.0, seg=12), col)   # 가운데가 불룩한 접힌 몸
+        u.add(cone(b0 + d * 0.5, b0 + d * 0.72, 0.075, 0.016, seg=12), col)
+        u.add(cylinder(b0 + d * 0.58, b0 + d * 0.61, 0.06, seg=12), 'strap')
+        u.add(cylinder(b0 + d * 0.66, top, 0.012, seg=8), 'shaft')
+        j = bezier(top, top + V((0, 0, 0.09)), top + V((hook * 0.13, 0, 0.11)), top + V((hook * 0.13, 0, 0.02)), 10)
+        u.add(rail(j, [0.02] * len(j), seg=8), col)
+    # 접힌 끝이 위로 나온 파랑
+    b0, top = V((0.0, 0.1, 0.1)), V((0.03, 0.12, 1.06))
+    d = (top - b0).normalized()
+    u.add(cylinder(b0, b0 + d * 0.5, 0.012, seg=8), 'shaft')
+    u.add(cone(b0 + d * 0.62, b0 + d * 0.42, 0.075, 0.016, seg=12), 'umbBlue')
+    u.add(cone(b0 + d * 0.62, top, 0.075, 0.0, seg=12), 'umbBlue')
+    u.add(cylinder(b0 + d * 0.7, b0 + d * 0.73, 0.06, seg=12), 'strap')
+    u.add(cylinder(top - d * 0.01, top + d * 0.05, 0.008, seg=6), 'tip')
+
+
+def b_lotus_chair(M):
+    m = M.part('chair')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.06), 0.26, 0.24, seg=24), 'stem')
+    m.add(cylinder((0, 0, 0.05), (0, 0, 0.38), 0.12, 0.09, seg=16), 'stem')
+    R0, cz = 0.45, 0.4
+    leaf = ellipsoid((0, 0, cz), (R0, R0, 0.07), seg=40, rings=14)
+    for v in leaf.verts:   # 가장자리가 살짝 말려 올라가고 물결친다
+        d = math.hypot(v.co.x, v.co.y) / R0
+        v.co.z += 0.06 * d * d + 0.012 * math.sin(6 * math.atan2(v.co.y, v.co.x)) * d ** 4
+    m.add(leaf, 'leaf')
+    top = lambda d: cz + 0.07 * math.sqrt(max(0.0, 1 - d * d)) + 0.06 * d * d + 0.004
+    for k in range(7):   # 잎맥 (첫 줄은 연잎 홈)
+        a = TAU * k / 7 - 0.2
+        pts = [V((math.cos(a) * R0 * t, math.sin(a) * R0 * t, top(t))) for t in (0.04 + 0.86 * i / 8 for i in range(9))]
+        m.add(rail(pts, [0.012 if k == 0 else 0.007] * len(pts), seg=6, flat=0.35, side=(-math.sin(a), math.cos(a), 0)), 'leafVein')
+    m.add(ellipsoid((-0.16, -0.12, top(0.44) + 0.012), (0.035, 0.035, 0.022), seg=12, rings=8), 'dew')
+    f = M.part('lotus')
+    c = V((0.2, 0.22, top(0.66) + 0.01))
+    for layer, (n, tilt, L, mat, ph) in enumerate(((7, 1.05, 0.11, 'lotus', 0.0), (5, 0.55, 0.09, 'lotusDeep', 0.4))):
+        for k in range(n):
+            a = TAU * k / n + ph
+            Rp = rot_xyz(z=a) @ rot_xyz(y=tilt)
+            f.add(ellipsoid(c + Rp @ V((0, 0, L * 0.85)), (0.055 - layer * 0.01, 0.028, L), rot=Rp, seg=12, rings=8), mat)
+    f.add(ellipsoid(c + V((0, 0, 0.04)), (0.045, 0.045, 0.03), seg=12, rings=8), 'center')
+
+
+def b_birthday_cake(M):
+    m = M.part('cake')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.04), 0.2, 0.17, seg=24), 'stand')
+    m.add(cylinder((0, 0, 0.04), (0, 0, 0.12), 0.07, 0.06, seg=16), 'stand')
+    m.add(cylinder((0, 0, 0.12), (0, 0, 0.16), 0.43, 0.44, seg=40), 'plate')
+    m.add(cylinder((0, 0, 0.16), (0, 0, 0.42), 0.36, seg=40), 'cream')
+    m.add(ring((0, 0, 0.36), 0.364, 0.016, seg=48, z_wave=lambda a: 0.025 * math.sin(8 * a)), 'icing')
+    m.add(cylinder((0, 0, 0.42), (0, 0, 0.62), 0.24, seg=36), 'pink')
+    for k in range(16):   # 아래 단 윗가장자리 크림 방울
+        a = TAU * k / 16
+        m.add(ellipsoid((math.cos(a) * 0.33, math.sin(a) * 0.33, 0.425), (0.03, 0.03, 0.025), seg=10, rings=6), 'pink')
+    for k in range(12):
+        a = TAU * k / 12 + 0.2
+        m.add(ellipsoid((math.cos(a) * 0.22, math.sin(a) * 0.22, 0.625), (0.026, 0.026, 0.022), seg=10, rings=6), 'cream')
+    for a in (0.4, 2.0, 3.6, 5.1):   # 두 단 사이 딸기
+        m.add(ellipsoid((math.cos(a) * 0.29, math.sin(a) * 0.29, 0.46), (0.035, 0.035, 0.04), seg=12, rings=8), 'berry')
+    flame = M.part('flame', pivot=(0, 0, 0.8))
+    for x, h in ((-0.1, 0.15), (0.0, 0.19), (0.1, 0.15)):
+        top = 0.62 + h
+        m.add(cylinder((x, 0, 0.6), (x, 0, top), 0.018, seg=10), 'candle')
+        m.add(cylinder((x, 0, top), (x, 0, top + 0.02), 0.003, seg=4), 'wick')
+        for mat, r, dz in (('flame', 0.024, 0.045), ('flameCore', 0.012, 0.035)):
+            bm = ellipsoid((x, -0.004 if mat == 'flameCore' else 0, top + dz), (r, r, r * 1.9), seg=10, rings=8)
+            for v in bm.verts:   # 물방울 모양: 위로 갈수록 가늘게
+                t = (v.co.z - (top + dz)) / (r * 1.9)
+                if t > 0:
+                    v.co.x = x + (v.co.x - x) * (1 - 0.75 * t)
+                    v.co.y *= 1 - 0.75 * t
+            flame.add(bm, mat)
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,
     'sofa': b_sofa, 'wardrobe': b_wardrobe, 'wall-clock': b_wall_clock, 'fish-tank': b_fish_tank, 'bug-case': b_bug_case,
     'picture-frame': b_picture_frame, 'villager-photo': b_villager_photo, 'shell-curtain': b_shell_curtain,
     'fruit-chair': b_fruit_chair, 'dino-model': b_dino_model,
+    'surfboard': b_surfboard, 'ball-basket': b_ball_basket, 'cushion-bed': b_cushion_bed, 'bone-cushion': b_bone_cushion,
+    'flower-shelf': b_flower_shelf, 'terrarium': b_terrarium, 'rod-rack': b_rod_rack, 'wood-stove': b_wood_stove,
+    'kitchen-counter': b_kitchen_counter, 'fruit-basket': b_fruit_basket, 'umbrella-stand': b_umbrella_stand,
+    'lotus-chair': b_lotus_chair, 'birthday-cake': b_birthday_cake,
 }
 
 

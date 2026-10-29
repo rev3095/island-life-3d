@@ -1,0 +1,37 @@
+{
+  "id": "PR-10",
+  "slug": "moving-boxes",
+  "name": "이삿짐 상자",
+  "category": "prop",
+  "kind": "moving-boxes",
+  "version": "0.1",
+  "triangles": 2440,
+  "parts": 1,
+  "materials": [
+    "box",
+    "boxLight",
+    "cloth",
+    "clothDot",
+    "paper",
+    "tape"
+  ],
+  "animations": {},
+  "size": [
+    1.09,
+    0.55,
+    0.79
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 49132,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "moving-boxes_front.png",
+    "moving-boxes_hero.jpg",
+    "moving-boxes_main.png",
+    "moving-boxes_thumb.png",
+    "moving-boxes_top.png"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "FU-31",
+  "slug": "umbrella-stand",
+  "item": "furn.umbrella-stand",
+  "name": "우산꽂이",
+  "category": "furniture",
+  "kind": "umbrella-stand",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2766,
+  "parts": 2,
+  "materials": [
+    "drop",
+    "shaft",
+    "stand",
+    "standDark",
+    "strap",
+    "tip",
+    "umbBlue",
+    "umbRed",
+    "umbYellow"
+  ],
+  "objects": [
+    "stand",
+    "umbrellas"
+  ],
+  "animations": {},
+  "size": [
+    0.5,
+    0.5,
+    1.11
+  ],
+  "bounds": [
+    [
+      -0.248,
+      -0.248,
+      -0.002
+    ],
+    [
+      0.248,
+      0.248,
+      1.11
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 57428,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "umbrella-stand_front.png",
+    "umbrella-stand_main.png",
+    "umbrella-stand_thumb.png",
+    "umbrella-stand_top.png"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "PR-12",
+  "slug": "lot-sign",
+  "name": "집터 표지판",
+  "category": "prop",
+  "kind": "lot-sign",
+  "version": "0.1",
+  "triangles": 2712,
+  "parts": 1,
+  "materials": [
+    "board",
+    "dirt",
+    "ink",
+    "rope",
+    "stake"
+  ],
+  "animations": {},
+  "size": [
+    2.74,
+    2.77,
+    0.99
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 72292,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lot-sign_front.png",
+    "lot-sign_hero.jpg",
+    "lot-sign_main.png",
+    "lot-sign_thumb.png",
+    "lot-sign_top.png"
+  ]
+}
