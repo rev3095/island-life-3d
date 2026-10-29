@@ -4,7 +4,7 @@
   "timeline": [
     {"fixed":"naming","title":"이름·섬 이름 정하기","owner":"intro","note":"지금 있는 창 (src/gameplay/intro/naming.js)"},
     {"scene":"s01-arrival"},
-    {"fixed":"bamtol-guide","title":"밤톨의 첫날 안내 대화","owner":"town","note":"지금 있는 대화 (town keepers · lines/bamtol.js)"},
+    {"fixed":"bamtol-guide","title":"밤톨의 첫날 안내 대화","owner":"town","note":"지금 있는 대화 (town keepers · assets/villagers/bamtol.json)"},
     {"scene":"s02-guide-after"},
     {"fixed":"firstday-list","title":"첫날 할 일 7단계","owner":"intro","note":"도구 → 채집 → 잡기 → 팔기 → 기증 → 집 (지금 있는 목록)"},
     {"scene":"s03-firstday-done"},
