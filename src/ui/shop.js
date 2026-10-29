@@ -68,16 +68,17 @@ export function createShop(ctx, panels, { bag, toast }) {
         const slot = d.inventory.slots[i];
         if (!slot) continue;
         const it = itemInfo(ctx, slot.id);
+        const name = bag.variants?.name(slot, it.name) ?? it.name;   // '파랑 소파'
         const buttons = slot.count > 1
           ? [{ label: `모두 팔기 (🌰 ${fmt(it.sell * slot.count)})`, value: slot.count, primary: true }, { label: `1개만 (🌰 ${fmt(it.sell)})`, value: 1 }, { label: '그만둘래요', value: 0 }]
           : [{ label: '팔게요', value: 1, primary: true }, { label: '그만둘래요', value: 0 }];
         const n = await confirmBox(panels, { title: '팔기', icon: it.icon, cancelValue: 0, buttons,
-          text: slot.count > 1 ? `${it.name} ${slot.count}개, 하나에 🌰 ${fmt(it.sell)}이에요. 몇 개 팔까요?` : `${itemPhrase(it.name)} 🌰 ${fmt(it.sell)}에 팔까요?` });
+          text: slot.count > 1 ? `${name} ${slot.count}개, 하나에 🌰 ${fmt(it.sell)}이에요. 몇 개 팔까요?` : `${itemPhrase(name)} 🌰 ${fmt(it.sell)}에 팔까요?` });
         if (!n || p.closed) continue;
         d.inventory.remove(i, n);
         d.wallet.add(it.sell * n);
         ctx.events.emit('sfx', { name: 'sell' });
-        toast(`${it.name}${n > 1 ? ` ${n}개` : ''} 팔고 🌰 ${fmt(it.sell * n)} 받았어요`, '🌰');
+        toast(`${name}${n > 1 ? ` ${n}개` : ''} 팔고 🌰 ${fmt(it.sell * n)} 받았어요`, '🌰');
       }
       if (!p.closed) draw('.pk-sell-go');
     }

@@ -3,7 +3,7 @@ import { h, fmt, clockText, nowFromDate, toolSvg, TOOL_NAME, WEATHER_ICON, WEATH
 
 const HINT_KEYS = [['WASD', '이동'], ['Shift', '달리기'], ['Space', '행동'], ['F', '줍기'], ['Q/E', '도구'], ['I', '가방'], ['P', '섬폰'], ['M', '지도'], ['H', '안내 숨기기']];
 
-export function createHud(ctx, { openBag, openPhone, openMap, setHint }) {
+export function createHud(ctx, { openBag, openPhone, openMap, openTools, setHint }) {
   const time = h('b', { class: 'pk-clock-time' });
   const date = h('span', { class: 'pk-clock-date' });
   const wx = h('span', { class: 'pk-clock-wx', role: 'img' });
@@ -17,10 +17,10 @@ export function createHud(ctx, { openBag, openPhone, openMap, setHint }) {
     h('span', { 'aria-hidden': 'true' }, icon), h('kbd', { class: 'pk-quick-key', 'aria-hidden': 'true' }, key));
   const quickRow = h('nav', { class: 'pk-quick', 'aria-label': '메뉴' }, quick('🎒', '가방', 'I', openBag), quick('📱', '섬폰', 'P', openPhone), quick('🗺️', '지도', 'M', openMap));
 
-  // 도구 단추: 누르면 다음 도구 (키보드 E 와 같다)
+  // 도구 단추: 누르면 도구 고르기 고리 (없으면 다음 도구 — 키보드 E 와 같다)
   const toolRing = h('span', { class: 'pk-tool-ring' });
   const toolName = h('span', { class: 'pk-tag pk-tool-name' });
-  const tool = h('button', { type: 'button', class: 'pk-tool', onclick: () => ctx.input.press?.('toolNext') }, toolRing, toolName);
+  const tool = h('button', { type: 'button', class: 'pk-tool', onclick: () => (openTools ? openTools() : ctx.input.press?.('toolNext')) }, toolRing, toolName);
 
   const hint = h('div', { class: 'pk-hint', role: 'note', 'aria-label': '키 안내' },
     h('span', { class: 'pk-hint-keys' }, HINT_KEYS.map(([k, t]) => h('span', { class: 'pk-hint-item' }, h('kbd', null, k), t))),
@@ -54,7 +54,7 @@ export function createHud(ctx, { openBag, openPhone, openMap, setHint }) {
       const key = id && TOOL_NAME[id] ? id : 'none';
       toolRing.innerHTML = toolSvg(key);
       toolName.textContent = TOOL_NAME[key];
-      tool.setAttribute('aria-label', `지금 든 도구: ${TOOL_NAME[key]}. 눌러서 다음 도구`);
+      tool.setAttribute('aria-label', `지금 든 도구: ${TOOL_NAME[key]}. 눌러서 도구 고르기`);
       tool.classList.remove('is-swap'); void tool.offsetWidth; tool.classList.add('is-swap');
     },
     show(on = true) { root.hidden = !on; },

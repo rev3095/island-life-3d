@@ -188,8 +188,24 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
       h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
-      h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, toggle('outline', '외곽선'), toggle('keyHint', '키 안내 보기'),
+      h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, toggle('outline', '외곽선'), fullscreenRow(),
+      !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
     ].filter(Boolean));
+  }
+
+  /** 전체 화면 (휴대폰에서 주소창을 숨긴다). 브라우저·아티팩트 틀이 막으면 줄을 안 보인다. 저장하지 않는다 */
+  function fullscreenRow() {
+    const de = document.documentElement;
+    if (!document.fullscreenEnabled || !de.requestFullscreen) return null;
+    const b = h('button', { type: 'button', role: 'switch', class: 'pk-switch', 'aria-checked': String(!!document.fullscreenElement), 'aria-labelledby': 'pk-set-fullscreen' }, h('span', { class: 'pk-switch-knob' }));
+    b.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await de.requestFullscreen({ navigationUI: 'hide' });
+      } catch { toast('전체 화면으로 바꾸지 못했어요', '📱'); }
+      b.setAttribute('aria-checked', String(!!document.fullscreenElement));
+    });
+    return h('div', { class: 'pk-set-row' }, h('span', { id: 'pk-set-fullscreen' }, '전체 화면'), b);
   }
 
   // ---------- 저장 ----------

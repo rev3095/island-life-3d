@@ -1,6 +1,7 @@
 // 가방: 동그란 20칸. 보기(view)·팔기(sell)·기증(donate)·고르기(pick) 모드. open() 은 고른 칸 번호(또는 null)를 돌려준다.
 import { h, fmt, itemInfo, iconEl, josa, DEX_CATEGORIES } from './dom.js';
 import { panelShell, gridMove } from './panels.js';
+import { createVariants } from './variants.js';
 
 const COLS = 5, SIZE = 20;
 const MODES = {
@@ -13,6 +14,8 @@ const MODES = {
 export function createBag(ctx, panels) {
   const slots = () => ctx.services.data?.inventory?.slots ?? ctx.state.inventory ?? [];
   let current = null;   // 열려 있는 가방 { p, render }
+  // 가구 색·주민 사진 같은 변형 이름 (스펙을 받으면 열린 가방을 다시 그린다)
+  const variants = createVariants(ctx, () => current?.render());
 
   /** 이 모드에서 고를 수 있는 칸인가 */
   function canPick(mode, slot, info) {
@@ -40,7 +43,7 @@ export function createBag(ctx, panels) {
       const b = h('button', { type: 'button', class: 'pk-slot', role: 'gridcell', dataset: { i } });
       b.addEventListener('click', () => choose(i));
       b.addEventListener('focus', () => detail(i));
-      b.addEventListener('pointerenter', () => detail(i));
+      b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') detail(i); });   // 손가락은 누르면 포커스로 보인다
       return b;
     });
     // 5칸씩 줄로 묶어 표 구조를 맞춘다
@@ -61,10 +64,12 @@ export function createBag(ctx, panels) {
         b.classList.toggle('is-off', !!slot && m !== 'view' && !ok);
         b.classList.toggle('is-selected', i === selected);
         if (slot) {
+          const v = variants.of(slot);
           b.append(iconEl(it.icon, 'pk-slot-icon'));
+          if (v?.color) b.append(h('span', { class: 'pk-slot-dot', style: { background: v.color }, 'aria-hidden': 'true' }));
           if (slot.count > 1) b.append(h('span', { class: 'pk-count', 'aria-hidden': 'true' }, slot.count));
-          b.append(h('span', { class: 'pk-tip', 'aria-hidden': 'true' }, h('b', null, it.name), it.sell > 0 && h('span', null, `🌰 ${fmt(it.sell)}`)));
-          b.setAttribute('aria-label', `${i + 1}번 칸: ${it.name}${slot.count > 1 ? ` ${slot.count}개` : ''}${it.sell > 0 ? `, 판매 가격 ${fmt(it.sell)}도토리` : ''}${m !== 'view' && !ok ? ', 고를 수 없음' : ''}`);
+          b.append(h('span', { class: 'pk-tip', 'aria-hidden': 'true' }, h('b', null, it.name), v && variantTag(v), it.sell > 0 && h('span', null, `🌰 ${fmt(it.sell)}`)));
+          b.setAttribute('aria-label', `${i + 1}번 칸: ${it.name}${v ? ` (${v.label})` : ''}${slot.count > 1 ? ` ${slot.count}개` : ''}${it.sell > 0 ? `, 판매 가격 ${fmt(it.sell)}도토리` : ''}${m !== 'view' && !ok ? ', 고를 수 없음' : ''}`);
         } else b.setAttribute('aria-label', `${i + 1}번 칸: 비어 있음`);
         b.setAttribute('aria-disabled', m !== 'view' && !ok ? 'true' : 'false');
       });
@@ -81,8 +86,9 @@ export function createBag(ctx, panels) {
       if (!slot) { info.replaceChildren(h('span', { class: 'pk-muted' }, i >= 0 ? '빈 칸' : '')); return; }
       const it = itemInfo(ctx, slot.id);
       const ok = pickable(slot, it);
+      const v = variants.of(slot);
       info.replaceChildren(...[iconEl(it.icon, 'pk-bag-info-icon'),
-        h('b', null, it.name), slot.count > 1 && h('span', null, `× ${slot.count}`),
+        h('b', null, it.name), v && variantTag(v), slot.count > 1 && h('span', null, `× ${slot.count}`),
         it.sell > 0 && h('span', { class: 'pk-price' }, `🌰 ${fmt(it.sell)}`),
         m !== 'view' && !ok && h('span', { class: 'pk-muted' }, whyNot(m, it))].filter(Boolean));
     }
@@ -91,6 +97,8 @@ export function createBag(ctx, panels) {
       if (p.fresh()) return;
       const slot = slots()[i];
       const it = slot ? itemInfo(ctx, slot.id) : null;
+      // iOS 는 눌러도 단추에 포커스를 주지 않아서 직접 준다 (설명 줄·A 버튼이 이 칸을 본다)
+      if (document.activeElement !== cells[i]) cells[i].focus({ preventScroll: true });
       if (m === 'view') { selected = slot ? i : -1; render(); return; }
       if (!pickable(slot, it)) {
         cells[i].classList.remove('is-nope'); void cells[i].offsetWidth; cells[i].classList.add('is-nope');
@@ -118,8 +126,11 @@ export function createBag(ctx, panels) {
     return p.result;
   }
 
-  return { open, refresh: () => current?.render() };
+  return { open, refresh: () => current?.render(), variants };
 }
+
+/** 변형 이름표: 색 점 + '파랑' */
+const variantTag = v => h('span', { class: 'pk-variant' }, v.color && h('i', { style: { background: v.color }, 'aria-hidden': 'true' }), v.label);
 
 /** 팔기·기증 문구에 쓰는 '사과 3개를' 같은 말 */
 export const itemPhrase = (name, n = 1) => (n > 1 ? `${name} ${n}개를` : josa(name, '을/를'));

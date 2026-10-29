@@ -10,6 +10,7 @@ import { createMap } from './map.js';
 import { createShop } from './shop.js';
 import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
+import { createToolRing } from './toolring.js';
 
 let dialog = null, hud = null;
 
@@ -50,6 +51,7 @@ export default {
     const shop = createShop(ctx, panels, { bag, toast });
     const museum = createMuseum(ctx, panels, { bag, toast });
     const craft = createCraft(ctx, panels, { toast });
+    const tools = createToolRing(ctx, panels);
     // 화면 전환 막 (집·건물 드나들 때): HUD 위, 창·알림 아래
     const fadeEl = h('div', { class: 'pk-fade', 'aria-hidden': 'true' });
     const fade = (on = true, sec = 0.3, color) => new Promise(res => {
@@ -59,11 +61,13 @@ export default {
       setTimeout(res, Math.max(0, sec) * 1000 + 30);
     });
     dialog = createDialog(ctx, panels);
-    hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), setHint: v => setSetting('keyHint', v) });
+    hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), openTools: () => tools.open(), setHint: v => setSetting('keyHint', v) });
     hud.showHint(state.settings.keyHint !== false);
 
     root.append(hud.root, fadeEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
+    // 터치 화면 노트북처럼 나중에 손가락으로 만지면 core/input 이 패드를 만들고 알려 준다
+    events.on('input:touch', () => root.classList.add('pk-touch'));
 
     // 바쁠 때(창·대화) HUD 일부를 접는다
     events.on('ui:open', () => root.classList.add('is-busy'));
@@ -105,6 +109,7 @@ export default {
       shop: { open: opts => shop.open(opts) },
       museum: { open: opts => museum.open(opts) },
       craft: { open: opts => craft.open(opts) },   // 작업대 창 → Promise<만든 레시피 id 들>
+      tools: { open: () => tools.open() },         // 도구 고르기 고리 → Promise<{tool} | null>
       fade,                                        // fade(on, 초, 색?) → Promise (화면 전환 막)
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
