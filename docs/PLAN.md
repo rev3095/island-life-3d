@@ -65,6 +65,19 @@
 
 겹치면 안 되는 곳: data 는 Y1 이 `save.js` 만, Y2 가 나머지. town 은 Y2 가 `keepers.js`·`lines/neuru.js` 만, Y3 가 `actor.js` 만. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안으로 적는다.
 
+### 5차 (2026-10-29 — 검수 보드 반영 v1 대로)
+
+검수 보드 `wave5` 반영 v1: **D8-B 3D 렌더 아이콘** · D9-A 주민마다 테마 방 · D10-A 새 주민 1명 이사 · D11-A 주민+플레이어 생일 · D12-A 벽지·바닥은 상점에서 매일 · D13 새 주민 = 단풍(여우, CH-10). 의견 없음. ID 는 보드 기준 (https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT). `main` 에서 갈라진다.
+
+| 트랙 | 브랜치 · 포트 | 고치는 곳 (여기만) | 결과물 |
+|---|---|---|---|
+| Z1 아이템 모델·아이콘 | `p8-items` · 4211 | `assets/items/` (새), `assets/blender/build_item.py` (새), `tools/build-item.mjs` (새), `src/data/items.js` 의 **`icon` 자리만**, `src/gameplay/gather/results.js`·`bugmodels.js`·`meshes.js`, `tests/items-assets.test.mjs` (새) | IC 93개를 3D 모델 렌더 썸네일로 (물고기 20·곤충 22·화석 9 새 모델 + 도구·재료·씨앗·과일·조개·꽃), 잡은 것 들어 보일 때 같은 모델 |
+| Z2 벽지·바닥·주민 방 | `p8-interior` · 4212 | `assets/interior/` (새: 벽지 WP-01–08·바닥 FL-01–08 스펙, 방 RM-01–06 배치), `src/gameplay/house/`, `src/ui/shop.js` (벽지·바닥 코너) | 방 색을 스펙으로, 플레이어 집 벽지·바닥 바꾸기(상점에서 매일 하나), 주민 집 문으로 들어가기·주민 방 6곳 (새 가구 FU-21–32 는 id 로 두고 없으면 임시 상자) |
+| Z3 새 가구·소품 | `p8-furniture` · 4213 | `assets/furniture/` (FU-21–33), `assets/blender/build_furniture.py`, `assets/env/specs/` 의 PR-10–12 · `house-villager` 변형 하나, `assets/blender/build_env.py`, `src/data/items.js` 의 **`FURN` 표만**, `src/data/recipes.js` | 가구 13개·소품 3개 Blender 모델·렌더(스펙 `world` 칸 포함), 단풍 집 지붕색 변형, 제작 레시피 |
+| Z4 이사·생일·새 주민 | `p8-town` · 4214 | `src/gameplay/town/`, `src/data/birthdays.js` (새), `src/core/constants.js` 의 `VILLAGERS`, `src/world/island.js` (7번째 집터), `src/ui/phone.js` (플레이어 생일), `assets/specs/danpung.json` (새) · `assets/blender/build_character.py` (여우 FEATURES) | 단풍(CH-10) 모델, 빈 집터 → 이삿짐 → 입주 흐름, 주민 생일 파티·선물 3배·편지, 플레이어 생일, 주민이 자기 방 안에 있기 (house 가 주는 `house:enter` 이벤트) |
+
+겹치면 안 되는 곳: `src/data/items.js` 는 Z1 이 `icon` 자리, Z3 가 `FURN` 표만. `src/ui/` 는 Z2 가 `shop.js`, Z4 가 `phone.js` 만. house ↔ town 은 이벤트·서비스로만 (`docs/notes/<트랙>.md` 에 약속 제안). 편집기 화면(`editor.html`·`bg-editor.html`)은 고치지 않는다 — 새 탭(아이템·벽지)은 조정 세션이 합친 뒤에. 새 리소스는 모두 스펙 파일로 두고 리소스 교체 약속(`docs/CONTRACTS.md` 끝)을 지킨다.
+
 ## 합치기
 
 각 트랙은 자기 브랜치에 커밋만 하고, 합치기(merge)는 사용자 확인 후 `main` 에서 한다.
