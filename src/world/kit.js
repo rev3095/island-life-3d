@@ -3,6 +3,8 @@
 // 계절·색 변형은 꼭짓점 색만 다시 칠한다. 잎·꽃 흔들림(sway)과 흔들기(shake)는 셰이더에서 한다.
 // 합치면 재질 이름이 사라지므로 이름의 스타일 효과(바람·물결·하이라이트)는 꼭짓점 속성 aStyle 로 남긴다 (materials.styleClass).
 // 외곽선 판도 꼭짓점 색을 가져서 은은한 외곽선이 물체 색을 따라간다.
+// 묶음은 종류마다 섬 전체에 하나: 그리기 직전 prepareFrame() 이 칸마다 화면 밖(곡면 월드 반영)·그림자 밖을 빼고 가까운 순으로 담는다.
+// 칸마다 aFade(가림 투명, occlusion.js)를 두어 카메라와 플레이어 사이 물체를 디더로 비치게 한다.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -28,6 +30,20 @@ const SWAY_GLSL = /* glsl */ `
   transformed.xz += swD;
 `;
 
+// 가림 투명(디더): aFade = 0(그대로) ~ 1. 화면 점마다 4×4 바이어 문턱을 달리해 그만큼 구멍을 낸다 → 정렬·반투명 없이 뒤가 비친다.
+// 그림자는 three 기본 깊이 재질로 그려서 그대로 남는다. 맨 끝까지 지우지 않고 FADE_MAX 만큼만 (물체가 있다는 건 보이게)
+const FADE_MAX = 0.7;
+const FADE_VERT = /* glsl */ `
+  vKitFade = aFade;
+`;
+const FADE_FRAG = /* glsl */ `
+  if ( vKitFade > 0.004 ) {
+    const float KIT_BAYER[ 16 ] = float[ 16 ]( 0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0 );
+    ivec2 kp = ivec2( mod( floor( gl_FragCoord.xy ), 4.0 ) );
+    if ( ( KIT_BAYER[ kp.y * 4 + kp.x ] + 0.5 ) / 16.0 < vKitFade * ${FADE_MAX.toFixed(2)} ) discard;
+  }
+`;
+
 export function createKit(ctx) {
   const { materials } = ctx;
   const uTime = { value: 0 };
@@ -41,17 +57,23 @@ export function createKit(ctx) {
     if (type === 'outline') m = materials.outlineMaterial(width, { styleAttr: true });
     else m = materials.toonMaterial('#ffffff', { flat: type === 'flat', name, styleAttr: true });
     m.vertexColors = true;
-    if (sway) {
-      const base = m.onBeforeCompile;
-      const baseKey = m.customProgramCacheKey();
-      m.onBeforeCompile = (sh, r) => {
-        base.call(m, sh, r);
+    const base = m.onBeforeCompile;
+    const baseKey = m.customProgramCacheKey();
+    m.onBeforeCompile = (sh, r) => {
+      base.call(m, sh, r);
+      let vs = 'attribute float aFade;\nvarying float vKitFade;\n' + sh.vertexShader;
+      let after = FADE_VERT;
+      if (sway) {
         sh.uniforms.uTime = uTime;
-        sh.vertexShader = 'attribute vec2 aSway;\nattribute float aShake;\nuniform float uTime;\n'
-          + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n' + SWAY_GLSL);
-      };
-      m.customProgramCacheKey = () => baseKey + '-sway';
-    }
+        vs = 'attribute vec2 aSway;\nattribute float aShake;\nuniform float uTime;\n' + vs;
+        after += SWAY_GLSL;
+      }
+      sh.vertexShader = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n' + after);
+      sh.fragmentShader = 'varying float vKitFade;\n'
+        + sh.fragmentShader.replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' + FADE_FRAG);
+    };
+    m.customProgramCacheKey = () => baseKey + (sway ? '-sway' : '') + '-fade';
+    m.defaultAttributeValues = { ...m.defaultAttributeValues, aFade: [0] };   // aFade 가 없는 메시에 써도 0 (그대로)
     matCache.set(key, m);
     return m;
   }
@@ -116,7 +138,12 @@ export function createKit(ctx) {
         castShadow: type !== 'outline' && castShadow, receiveShadow: type !== 'outline',
       });
     }
-    const tpl = { parts, sway, palette: {}, recolor };
+    // 판 전체를 감싸는 구 (칸마다 화면 밖 판정에 쓴다). 흔들림·흔들기 몫만큼 여유
+    const box = new THREE.Box3();
+    for (const p of parts) { p.geometry.computeBoundingBox(); box.union(p.geometry.boundingBox); }
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    sphere.radius += sway ? 0.15 : 0.02;
+    const tpl = { parts, sway, palette: {}, recolor, sphere, shadow: parts.some(p => p.castShadow) };
     recolor(palette);
     return tpl;
 
@@ -136,50 +163,76 @@ export function createKit(ctx) {
     }
   }
 
-  /** 인스턴스 묶음: 판 하나를 여러 위치에 그린다. 툰·평면·외곽선 메시가 instanceMatrix 를 같이 쓴다. */
+  /**
+   * 인스턴스 묶음: 판 하나를 여러 위치에 그린다. 툰·평면·외곽선 메시가 instanceMatrix 를 같이 쓴다.
+   * 칸(slot)마다 원본(위치 행렬·흔들기·가림 투명·감싸는 구)을 따로 들고, 매 프레임 prepare() 가 본 카메라·그림자 카메라에
+   * 걸리는 칸만 앞에서부터 GPU 버퍼에 옮겨 담는다 → 섬 전체를 한 묶음으로 둬도(그리기 호출 적게) 보이는 것만 그린다.
+   * 담는 순서는 카메라에서 가까운 것부터 (앞 물체가 먼저 깊이를 채워 뒤 조각을 덜 칠한다). 외곽선은 가까운 것만
+   * (멀면 굵기가 1화소도 안 된다) — 외곽선 메시의 count 를 가까운 칸 수로 둔다.
+   */
   class Batch {
     constructor(tpl, capacity = 16, parent = ctx.scene) {
       this.tpl = tpl; this.parent = parent;
       this.ids = []; this.count = 0; this.capacity = 0; this.meshes = [];
-      this.dirty = false;
+      this.dirty = false;          // 칸 내용이 바뀜 → 다음 prepare 에서 다시 골라 담는다
+      this.drawn = -1;             // 지금 GPU 에 담긴 칸 수
       this.grow(Math.max(4, capacity));
+      batches.add(this);
     }
     grow(cap) {
-      const old = this.meshes;
-      const oldMatrix = old[0]?.instanceMatrix, oldShake = this.shake;
+      const old = this.meshes, n = this.count;
+      const keep = (src, k, fill = 0) => { const a = new Float32Array(cap * k).fill(fill); if (src) a.set(src.subarray(0, n * k)); return a; };
       this.capacity = cap;
-      this.matrix = new THREE.InstancedBufferAttribute(new Float32Array(cap * 16), 16);
-      this.matrix.setUsage(THREE.DynamicDrawUsage);
-      if (oldMatrix) this.matrix.array.set(oldMatrix.array.subarray(0, this.count * 16));
-      if (this.tpl.sway) {
-        this.shake = new THREE.InstancedBufferAttribute(new Float32Array(cap).fill(-100), 1);
-        if (oldShake) this.shake.array.set(oldShake.array.subarray(0, this.count));
-      }
+      this.mat = keep(this.mat, 16);             // 칸별 원본
+      this.fad = keep(this.fad, 1);
+      this.sph = keep(this.sph, 4);
+      if (this.tpl.sway) this.shk = keep(this.shk, 1, -100);
+      this.drawOf = new Int32Array(cap).fill(-1);  // 칸 → GPU 자리 (-1 = 안 그림)
+      this.slotOf = new Int32Array(cap);           // GPU 자리 → 칸 (지금 담긴 순서)
+      this.visTmp = new Int32Array(cap);           // 이번에 보이는 칸 / 거리 칸 (가까운 순 정렬용)
+      this.binTmp = new Uint8Array(cap);
+      this.orderTmp = new Int32Array(cap);
+      this.near = -1;                              // 외곽선을 그리는 가까운 칸 수
+      // GPU 쪽 (보이는 칸만 앞에서부터)
+      const attr = k => { const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * k), k); a.setUsage(THREE.DynamicDrawUsage); return a; };
+      this.matrix = attr(16);
+      this.fade = attr(1);                       // 가림 투명 정도 (occlusion.js 가 바꾼다)
+      this.shake = this.tpl.sway ? attr(1) : null;
       this.meshes = this.tpl.parts.map(part => {
         const g = new THREE.BufferGeometry();
         for (const [k, v] of Object.entries(part.geometry.attributes)) g.setAttribute(k, v);
         g.setIndex(part.geometry.index);
         g.boundingSphere = part.geometry.boundingSphere;
         if (this.shake) g.setAttribute('aShake', this.shake);
+        g.setAttribute('aFade', this.fade);
         const m = new THREE.InstancedMesh(g, part.material, cap);
         m.instanceMatrix = this.matrix;
-        m.count = this.count;
+        m.count = 0;
+        m.frustumCulled = false;                 // 화면 밖 판정은 칸마다 여기서 한다 (곡면 월드 반영)
+        m.renderOrder = this.tpl.renderOrder ?? 0;
         m.castShadow = part.castShadow;
         m.receiveShadow = part.receiveShadow;
         if (part.type === 'outline') m.userData.outline = true;
         return m;
       });
-      for (const m of old) { this.parent.remove(m); all.delete(m); }
+      for (const m of old) this.parent.remove(m);
       for (const m of this.meshes) this.parent.add(m);
+      this.drawn = -1;
       this.dirty = true;
+      this.refreshVisible();
     }
     /** 위치 추가 → 칸 번호 */
     add(id, matrix) {
       if (this.count >= this.capacity) this.grow(this.capacity * 2);
       const slot = this.count++;
       this.ids[slot] = id;
-      matrix.toArray(this.matrix.array, slot * 16);
-      if (this.shake) this.shake.array[slot] = -100;
+      matrix.toArray(this.mat, slot * 16);
+      tv.copy(this.tpl.sphere.center).applyMatrix4(matrix);
+      this.sph[slot * 4] = tv.x; this.sph[slot * 4 + 1] = tv.y; this.sph[slot * 4 + 2] = tv.z;
+      this.sph[slot * 4 + 3] = this.tpl.sphere.radius * matrix.getMaxScaleOnAxis();
+      if (this.shk) this.shk[slot] = -100;
+      this.fad[slot] = 0;
+      this.drawOf[slot] = -1;
       this.dirty = true;
       return slot;
     }
@@ -188,8 +241,10 @@ export function createKit(ctx) {
       const last = --this.count;
       let moved = null;
       if (slot !== last) {
-        this.matrix.array.copyWithin(slot * 16, last * 16, last * 16 + 16);
-        if (this.shake) this.shake.array[slot] = this.shake.array[last];
+        this.mat.copyWithin(slot * 16, last * 16, last * 16 + 16);
+        this.sph.copyWithin(slot * 4, last * 4, last * 4 + 4);
+        if (this.shk) this.shk[slot] = this.shk[last];
+        this.fad[slot] = this.fad[last];
         moved = this.ids[slot] = this.ids[last];
       }
       this.ids.length = this.count;
@@ -197,53 +252,118 @@ export function createKit(ctx) {
       return moved;
     }
     shakeAt(slot) {
-      if (!this.shake) return;
-      this.shake.array[slot] = uTime.value;
-      this.shake.needsUpdate = true;
+      if (!this.shk) return;
+      this.shk[slot] = uTime.value;
+      const d = this.drawOf[slot];
+      if (d >= 0) { this.shake.array[d] = uTime.value; this.shake.needsUpdate = true; }
     }
-    setOutlineVisible(v) { for (const m of this.meshes) if (m.userData.outline) m.visible = v; }
-    /** 바뀐 내용을 GPU 로 (한 프레임에 한 번) */
-    flush() {
-      if (!this.dirty) return;
-      this.dirty = false;
-      this.matrix.needsUpdate = true;
-      if (this.shake) this.shake.needsUpdate = true;
-      for (const m of this.meshes) {
-        m.count = this.count;
-        m.visible = this.count > 0 && (!m.userData.outline || ctx.state.settings.outline !== false);
-        m.computeBoundingSphere();
-        if (m.boundingSphere) m.userData.s0 = m.boundingSphere.clone();
+    /** 가림 투명 정도 0~1 (칸마다) */
+    setFade(slot, v) {
+      if (slot < 0 || slot >= this.count || this.fad[slot] === v) return;
+      this.fad[slot] = v;
+      const d = this.drawOf[slot];
+      if (d >= 0) { this.fade.array[d] = v; this.fade.needsUpdate = true; }
+    }
+    setOutlineVisible() { this.refreshVisible(); }
+    refreshVisible() {
+      const ol = ctx.state.settings.outline !== false;
+      for (const m of this.meshes) m.visible = m.count > 0 && (!m.userData.outline || ol);
+    }
+    /** 보이는 칸만 가까운 순으로 GPU 버퍼 앞쪽에 담는다. 고른 칸·순서가 그대로면 아무것도 안 올린다 */
+    cull(test, cx, cy, cz, olFar) {
+      const shadow = this.tpl.shadow, vis = this.visTmp, bin = this.binTmp, sph = this.sph;
+      let n = 0, near = 0;
+      for (let s = 0; s < this.count; s++) {
+        if (!test(sph, s * 4, shadow)) continue;
+        const i = s * 4, d = Math.hypot(sph[i] - cx, sph[i + 1] - cy, sph[i + 2] - cz) - sph[i + 3];
+        bin[n] = Math.min(BINS - 1, Math.max(0, Math.floor(d / BIN)));
+        if (d < olFar) near++;
+        vis[n++] = s;
       }
-      bendSpheres(this.meshes);
+      // 거리 칸으로 세어 늘어놓기 (가까운 것부터, 같은 칸 안은 원래 순서)
+      binCount.fill(0);
+      for (let i = 0; i < n; i++) binCount[bin[i] + 1]++;
+      for (let b = 1; b <= BINS; b++) binCount[b] += binCount[b - 1];
+      const order = this.orderTmp;
+      for (let i = 0; i < n; i++) order[binCount[bin[i]]++] = vis[i];
+      let changed = this.dirty || n !== this.drawn || near !== this.near;
+      if (!changed) for (let i = 0; i < n; i++) if (order[i] !== this.slotOf[i]) { changed = true; break; }
+      this.dirty = false;
+      if (!changed) return;
+      for (let i = 0; i < this.drawn; i++) this.drawOf[this.slotOf[i]] = -1;
+      const M = this.matrix.array, F = this.fade.array, S = this.shake?.array;
+      for (let i = 0; i < n; i++) {
+        const s = order[i];
+        this.slotOf[i] = s;
+        this.drawOf[s] = i;
+        M.set(this.mat.subarray(s * 16, s * 16 + 16), i * 16);
+        F[i] = this.fad[s];
+        if (S) S[i] = this.shk[s];
+      }
+      this.matrix.needsUpdate = true;
+      this.fade.needsUpdate = true;
+      if (this.shake) this.shake.needsUpdate = true;
+      this.drawn = n;
+      this.near = near;
+      for (const m of this.meshes) m.count = m.userData.outline ? near : n;
+      this.refreshVisible();
     }
   }
 
-  // 곡면 월드: 화면에는 휘어서(아래로 내려가서) 보이는데 three 는 휘기 전 자리로 화면 밖인지 따진다.
-  // 초점보다 북쪽(먼 쪽) 묶음은 구를 휜 만큼 내리고, 구 안에서 휘는 정도가 다른 만큼 반지름을 늘린다.
-  // 남쪽(카메라 쪽)은 휘면 더 아래로 내려가 화면 밖이 될 뿐이라 그대로 둔다.
-  let lastZ = NaN, lastK = NaN;
-  const all = new Set();
-  function bendSpheres(meshes) {
-    const fz = ctx.focus.z, k = materials.curve.uCurve.value;
-    for (const m of meshes) {
-      all.add(m);
-      const s = m.boundingSphere, s0 = m.userData.s0;
-      if (!s || !s0) continue;
-      s.copy(s0);
-      const dz = fz - s0.center.z, r = s0.radius;     // 북쪽으로 얼마나 먼가
-      if (dz + r <= 0) continue;
-      const a = Math.max(dz, 0);
-      s.center.y -= k * a * a;
-      s.radius += k * (2 * a * r + r * r) + 0.3;
+  // ── 칸마다 화면 밖 판정 (매 프레임 그리기 직전, render 가 world.prepareFrame() 으로 부른다) ──
+  // 곡면 월드: 화면에는 초점에서 떨어진 만큼(dz²·uCurve) 내려가 보이는데 three 는 휘기 전 자리로 판정한다 → 구를 그만큼 내리고 키운다.
+  // 그림자 카메라는 휘기 전 자리 그대로 (그림자는 휘기 전 좌표로 그린다). 둘 중 하나에라도 걸리면 그린다.
+  const batches = new Set();
+  // 섬폰 외곽선 설정: main.js 가 외곽선 메시를 모두 켜고 끈 뒤 빈 묶음(count 0)은 다시 숨긴다 (빈 그리기 호출 방지)
+  ctx.events?.on('settings:changed', ({ key }) => { if (key === 'outline') for (const b of batches) b.refreshVisible(); });
+  const BIN = 2, BINS = 64, binCount = new Int32Array(BINS + 1);     // 가까운 순 정렬: 2칸 단위 거리 칸
+  // 외곽선을 그리는 거리 (카메라에서). 1280×800 에서 30 이면 굵기가 0.3화소쯤 → 그 너머는 안 보인다. low 는 더 가깝게
+  const OUTLINE_FAR = { high: 30, low: 22 };
+  const tv = new THREE.Vector3(), pm = new THREE.Matrix4();
+  const view = new THREE.Frustum();
+  let shadowF = null, curK = 0, curZ = 0;
+  const outside = (planes, x, y, z, r) => {
+    for (let i = 0; i < 6; i++) { const p = planes[i]; if (p.normal.x * x + p.normal.y * y + p.normal.z * z + p.constant < -r) return true; }
+    return false;
+  };
+  const test = (sph, i, shadow) => {
+    const x = sph[i], y = sph[i + 1], z = sph[i + 2], r = sph[i + 3];
+    const dz = Math.abs(z - curZ);
+    if (!outside(view.planes, x, y - curK * dz * dz, z, r + curK * (2 * dz * r + r * r) + 0.05)) return true;
+    return shadow && shadowF !== null && !outside(shadowF.planes, x, y, z, r);
+  };
+  let lastKey = '', lastOl = 0, hooked = false;
+  function prepare() {
+    const cam = ctx.camera;
+    cam.updateMatrixWorld();
+    pm.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
+    view.setFromProjectionMatrix(pm);
+    curK = materials.curve.uCurve.value; curZ = ctx.focus.z;
+    shadowF = null;
+    const sun = ctx.lights?.sun;
+    if (sun?.castShadow && ctx.renderer.shadowMap.enabled) {
+      sun.updateMatrixWorld(); sun.target.updateMatrixWorld();
+      sun.shadow.updateMatrices(sun);
+      shadowF = sun.shadow.getFrustum();
     }
+    // 카메라·곡면·그림자 카메라가 그대로면 바뀐 묶음만 다시 고른다
+    const e = pm.elements, s = shadowF ? sun.shadow.matrix.elements : null;
+    const key = `${e[12].toFixed(3)},${e[13].toFixed(3)},${e[14].toFixed(3)},${e[0].toFixed(4)},${e[5].toFixed(4)},${e[6].toFixed(4)},${curK.toFixed(5)},${curZ.toFixed(2)}`
+      + (s ? `|${s[12].toFixed(3)},${s[13].toFixed(3)},${s[0].toFixed(4)},${s[5].toFixed(4)}` : '');
+    const olFar = OUTLINE_FAR[ctx.quality] ?? OUTLINE_FAR.high;
+    const all = key !== lastKey || olFar !== lastOl;
+    lastKey = key; lastOl = olFar;
+    tv.setFromMatrixPosition(cam.matrixWorld);
+    const t = api.noCull ? keepAll : test;
+    for (const b of batches) if (all || b.dirty) b.cull(t, tv.x, tv.y, tv.z, olFar);
   }
-  /** 매 프레임: 초점이 움직였으면 모든 묶음의 구를 다시 늘린다 */
-  function updateCulling() {
-    const fz = ctx.focus.z, k = materials.curve.uCurve.value;
-    if (Math.abs(fz - lastZ) < 0.5 && Math.abs(k - lastK) < 0.0001) return;
-    lastZ = fz; lastK = k;
-    bendSpheres(all);
-  }
+  const keepAll = () => true;
+  /** world.update 에서: render 가 prepareFrame 을 부르지 않는 경우(다른 그리기)에만 여기서 고른다 (한 프레임 늦음) */
+  function updateCulling() { if (!hooked) prepare(); }
+  /** 그리기 직전 (render 가 부른다) */
+  function prepareFrame() { hooked = true; prepare(); }
 
-  return { uTime, material, buildTemplate, Batch, updateCulling };
+  // noCull: 확인용 — true 면 칸마다 판정 없이 모두 그린다 (가까운 순 정렬·외곽선 거리는 그대로)
+  const api = { uTime, material, buildTemplate, Batch, updateCulling, prepareFrame, batches, noCull: false };
+  return api;
 }

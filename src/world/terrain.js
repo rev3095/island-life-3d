@@ -1,9 +1,13 @@
-// 지형 그리기: 타일 모델을 종류·구역(16×16칸)별 InstancedMesh 로, 섬 밖 바다는 큰 판 하나로, 폭포·물거품은 따로.
+// 지형 그리기: 타일 모델을 종류별 InstancedMesh 로 (칸마다 화면 밖 판정은 kit), 섬 밖 바다는 큰 판 하나로, 폭포는 따로.
+// 바닷가는 coast.js: 부드러운 모래 앞치마 + 바다 셰이더의 얕은 물빛·물가 거품·밀려오는 물결.
 import * as THREE from 'three';
 import { KIND, LEVEL_HEIGHT, WATER_TOP } from './island.js';
 import { mulberry32 } from './rng.js';
+import { buildCoast, patchSea } from './coast.js';
 
-export const CHUNK = 16;                       // 구역 크기 (화면 밖 구역은 그리지 않는다)
+// 구역 크기. 화면 밖 판정은 kit 묶음이 칸마다 하므로 구역을 섬 전체로 크게 둔다 → 종류마다 묶음 하나 (그리기 호출 적게).
+// (예전 16×16 구역: 섬 하나에 묶음 180여 개, 보이는 묶음 통째로 그림)
+export const CHUNK = 64;
 const SEA_Y = WATER_TOP - 0.02;                // 바다 판 높이 (강 물 타일보다 살짝 아래 → 겹침 깜빡임 없음)
 
 // 타일 종류 → 모델 slug, 변형
@@ -30,6 +34,8 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     // 땅 재질 이름 'ground' → 비가 오면 sky 가 젖은 색으로 바꾼다 (물은 빼고)
     templates[k] = kit.buildTemplate(gltf, spec, { palette, castShadow: !flatGround, outline: flatGround ? 0 : undefined,
       materialName: +k === KIND.WATER ? null : 'ground' });
+    // 땅은 물체(나무·집·캐릭터) 다음에 그린다 → 물체에 가린 땅 조각은 깊이 시험에서 먼저 버려진다 (땅 셰이더가 화면 대부분을 칠해서 크다)
+    templates[k].renderOrder = 1;
   }
 
   const batches = new Map();
@@ -58,24 +64,25 @@ export function buildTerrain(ctx, gen, island, kit, models) {
     m4.compose(p.set(x, y, zz), q, LIFT[k] != null ? wide : one);
     batchFor(k, tx, tz).add(i, m4);
   }
-  for (const b of batches.values()) b.flush();
 
-  const sea = buildSea(ctx, gen, island, models['tile-water'].spec);
+  const coast = buildCoast(ctx, gen, models['tile-sand'].spec.palette, SEA_Y);
+  coast.apron.renderOrder = 1;
+  group.add(coast.apron);
+  const sea = buildSea(ctx, gen, island, models['tile-water'].spec, coast);
+  sea.renderOrder = 2;                          // 바다 판은 섬 밑까지 깔려 있다 → 맨 나중에 (땅에 가린 곳은 칠하지 않게)
   group.add(sea);
-  const foam = buildFoam(ctx, gen, island);
-  group.add(foam.mesh);
   const falls = buildWaterfalls(ctx, gen, island);
   group.add(falls.group);
 
   return {
-    group, templates, batches,
-    update(dt, t) { foam.update(t); falls.update(dt, t); },
+    group, templates, batches, coast,
+    update(dt, t) { coast.uniforms.uSeaTime.value = t; falls.update(dt, t); },
     setOutlineVisible(v) { for (const b of batches.values()) b.setOutlineVisible(v); },
   };
 }
 
-/** 섬 둘레 바다: 바닷가는 얕은 색, 멀어질수록 깊은 색 (꼭짓점 색). 곡면 월드가 휘도록 잘게 나눈다. */
-function buildSea(ctx, gen, island, waterSpec) {
+/** 섬 둘레 바다: 꼭짓점 색은 중간 → 깊은 색, 바닷가 얕은 물빛·거품·물결은 해안 셰이더(coast.js). 곡면 월드가 휘도록 잘게 나눈다. */
+function buildSea(ctx, gen, island, waterSpec, coast) {
   const { w, h } = gen;
   // 땅에서의 거리 (타일)
   const N = w * h, d = new Float32Array(N).fill(1e9);
@@ -107,67 +114,23 @@ function buildSea(ctx, gen, island, waterSpec) {
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position;
   const col = new Float32Array(pos.count * 3);
-  const shallow = new THREE.Color('#9ED6E8'), mid = new THREE.Color(waterSpec.variants?.sea?.palette?.water ?? '#5BAFD0'), deep = new THREE.Color('#4C9CC4');
+  const mid = new THREE.Color(waterSpec.variants?.sea?.palette?.water ?? '#5BAFD0'), deep = new THREE.Color('#4C9CC4');
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
-    const dd = distAt(x, z);
-    const a = THREE.MathUtils.smoothstep(dd, 0.6, 3.2), b = THREE.MathUtils.smoothstep(dd, 6, 30);
-    c.copy(shallow).lerp(mid, a).lerp(deep, b);
+    const b = THREE.MathUtils.smoothstep(distAt(x, z), 6, 30);
+    c.copy(mid).lerp(deep, b);
     col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
   }
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const mat = ctx.materials.toonMaterial('#ffffff', { name: 'sea' });
   mat.vertexColors = true;
+  patchSea(mat, coast, { shallow: '#A6DCEA' });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.y = SEA_Y;
   mesh.receiveShadow = true;
   mesh.name = 'sea';
   return mesh;
-}
-
-/** 바닷가 물거품: 바다에 닿은 땅 타일 가장자리를 따라 흰 띠. 천천히 밀려왔다 빠진다. */
-function buildFoam(ctx, gen, island) {
-  const { w, h } = gen;
-  const pos = [], off = [];
-  const isSea = (tx, tz) => tx < 0 || tz < 0 || tx >= w || tz >= h || (gen.kind[tz * w + tx] === KIND.SEA && !(gen.flags[tz * w + tx]));
-  const seaOnly = (tx, tz) => tx < 0 || tz < 0 || tx >= w || tz >= h || gen.kind[tz * w + tx] === KIND.SEA;
-  const W0 = 0.02, W1 = 0.24, Y = SEA_Y + 0.012;
-  for (let tz = 0; tz < h; tz++) for (let tx = 0; tx < w; tx++) {
-    if (seaOnly(tx, tz)) continue;
-    const { x, z } = island.toWorld(tx, tz);
-    // 네 변: [이웃 방향, 변의 두 끝]
-    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      if (!isSea(tx + dx, tz + dz)) continue;
-      const ex = x + dx * 0.5, ez = z + dz * 0.5;      // 변 가운데
-      const tx_ = -dz, tz_ = dx;                       // 변 방향
-      const quad = [[-0.5, W0], [0.5, W0], [0.5 + W1 * 0.6, W1], [-0.5 - W1 * 0.6, W1]];
-      const v = quad.map(([s, n]) => [ex + tx_ * s + dx * n, Y, ez + tz_ * s + dz * n]);
-      for (const k of [0, 2, 1, 0, 3, 2]) { pos.push(...v[k]); off.push(dx, dz); }
-    }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('aOff', new THREE.Float32BufferAttribute(off, 2));
-  geo.computeVertexNormals();
-  const mat = ctx.materials.toonMaterial('#F4FBFF', { flat: true, name: 'foam' });
-  mat.transparent = true;
-  mat.opacity = 0.85;
-  mat.side = THREE.DoubleSide;           // 변 방향마다 감는 순서가 달라서 양면으로
-  mat.depthWrite = false;
-  const uWave = { value: 0 };
-  const base = mat.onBeforeCompile;
-  mat.onBeforeCompile = (sh, r) => {
-    base.call(mat, sh, r);
-    sh.uniforms.uWave = uWave;
-    sh.vertexShader = 'attribute vec2 aOff;\nuniform float uWave;\n' + sh.vertexShader.replace('#include <begin_vertex>',
-      '#include <begin_vertex>\n  transformed.xz += aOff * (uWave * 0.16 + sin(position.x * 0.7 + position.z * 0.5) * 0.03);');
-  };
-  mat.customProgramCacheKey = () => 'curved-foam';
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.name = 'foam';
-  mesh.renderOrder = 1;
-  return { mesh, update(t) { uWave.value = 0.5 + 0.5 * Math.sin(t * 0.9); mat.opacity = 0.65 + 0.25 * (1 - uWave.value); } };
 }
 
 /** 폭포: 언덕 위 물이 아래 물로 떨어지는 곳에 흐르는 물줄기 판 + 아래 물보라 */
