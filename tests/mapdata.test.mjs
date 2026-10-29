@@ -10,6 +10,8 @@ import { ISLAND, VILLAGERS } from '../src/core/constants.js';
 import * as items from '../src/data/items.js';
 import { ITEM_TABLE, RULES } from '../src/data/tables.js';
 import * as townRules from '../src/gameplay/town/rules.js';
+import { applyChanges, diffTables, pretty, DELETE } from '../tools/edits.mjs';
+import { plan } from '../tools/apply-edits.mjs';
 
 const readJSON = p => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
 const lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, readJSON(`assets/env/specs/${k}.json`)])));
@@ -78,6 +80,51 @@ test('지도: layout.json 섬에 건물·다리·선착장·경사로·폭포·�
   const fk = at(Math.round(g.w * fx), Math.round(g.h * fz));
   assert.ok(fk !== KIND.SEA && fk !== KIND.WATER, '축제 광장 빈 자리 가운데가 땅');
   assert.deepEqual(print(make(seed, FILE)), print(g));
+});
+
+/* ---------- 편집기 바뀐 칸 → 파일 (tools/edits.mjs · apply-edits.mjs) ---------- */
+
+test('반영 도구: 바뀐 칸을 이름표로 찾아 얹고, 없는 칸이면 오류', () => {
+  const ch = {
+    'items/fish/crucian/price': 170, 'items/fish/shark/weight': 2, 'items/flowers/tulip/hybridPrice': 300,
+    'rules/gather/shake/bees': 0.05, 'rules/day/shellsPerDay/1': 9, 'rules/birthdays/dates/danpung': '10-30',
+    'rules/recipes/tool.rod/needs': [{ id: 'mat.branch', n: 4 }],
+    'rules/recipes/furn.sofa': { result: 'furn.sofa', needs: [{ id: 'mat.wood', n: 9 }], note: '시험' },
+    'rules/recipes/furn.fruit-basket': null,
+  };
+  const p = plan('data', ch, p => readJSON(p));
+  assert.deepEqual(p.errors, []);
+  const it = p.files.items.after, ru = p.files.rules.after;
+  assert.equal(it.fish.find(r => r.slug === 'crucian').price, 170);
+  assert.equal(it.fish.find(r => r.slug === 'shark').weight, 2);
+  assert.equal(it.flowers.find(r => r.kind === 'tulip').hybridPrice, 300);
+  assert.equal(ru.gather.shake.bees, 0.05);
+  assert.deepEqual(ru.day.shellsPerDay, [RULES.day.shellsPerDay[0], 9]);
+  assert.equal(ru.birthdays.dates.danpung, '10-30');
+  assert.deepEqual(ru.recipes.find(r => r.result === 'tool.rod').needs, [{ id: 'mat.branch', n: 4 }]);
+  assert.ok(ru.recipes.some(r => r.result === 'furn.sofa') && !ru.recipes.some(r => r.result === 'furn.fruit-basket'));
+  assert.equal(it.version, ITEM_TABLE.version + 1);
+  assert.equal(ru.version, RULES.version + 1);
+  assert.equal(ITEM_TABLE.fish[0].price, 160, '원본 표는 그대로');
+  // 지우기 · 없는 칸
+  const d = applyChanges(p.files.items.after, { 'fish/shark/weight': { ...DELETE } });
+  assert.ok(!('weight' in d.out.fish.find(r => r.slug === 'shark')));
+  const bad = plan('data', { 'items/fish/nope/price': 1, 'items/fish/crucian/price/x': 1, 'menu/a': 1 }, p => readJSON(p));
+  assert.equal(bad.errors.length, 3);
+  // 지도
+  const m = plan('map', { shop: [0.7, 0.5], 'villagers/coco': [0.3, 0.45], 'density/trees': 60, 'bridges/1': [0.6, 0.76] }, p => readJSON(p));
+  const L = m.files.layout.after;
+  assert.deepEqual([L.shop, L.villagers.coco, L.density.trees, L.bridges[1], L.version], [[0.7, 0.5], [0.3, 0.45], 60, [0.6, 0.76], FILE.version + 1]);
+});
+
+test('반영 도구: 두 표의 차이(diffTables)를 얹으면 같은 표가 된다 (되돌리기)', () => {
+  const a = readJSON('assets/data/rules.json');
+  const b = applyChanges(a, { 'gather/rock/iron': 0.2, 'recipes/furn.sofa': { result: 'furn.sofa', needs: [{ id: 'mat.wood', n: 9 }], note: '' }, 'recipes/tool.net': null, 'town/talkBonus': 3 }).out;
+  const back = diffTables(b, a);
+  assert.deepEqual(applyChanges(b, back).out, a);
+  assert.deepEqual(diffTables(a, a), {});
+  assert.equal(pretty(readJSON('assets/data/items.json')) + '\n', readFileSync(new URL('../assets/data/items.json', import.meta.url), 'utf8'), 'items.json 이 반영 도구 모양 그대로 (diff 가 작게)');
+  assert.equal(pretty(FILE) + '\n', readFileSync(new URL('../assets/island/layout.json', import.meta.url), 'utf8'));
 });
 
 /* ---------- 숫자 표 ---------- */
