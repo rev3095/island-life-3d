@@ -21,3 +21,6 @@ assets/items/editor-models-*.json
 assets/interior/editor-index.json
 assets/env/editor-models-*.json
 assets/furniture/editor-models-*.json
+
+# 자동 플레이 점검 실행 결과 (node tools/playtest.mjs) — 보고서에 쓸 장면만 docs/qa/shots/ 로 옮겨 커밋
+docs/qa/runs/

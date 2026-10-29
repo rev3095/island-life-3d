@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>자동 플레이 점검</title>
+<style>
+  :root { --bg: #FFF8E6; --ink: #4A3B32; --muted: #7A6656; --ok: #3E8E4F; --warn: #B7791F; --bad: #C0392B; --line: #E8DCC0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 14px/1.45 "Malgun Gothic", system-ui, sans-serif; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #BFE6F7; }
+  #panel { position: fixed; right: 8px; top: 8px; width: min(420px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow: auto; background: rgba(255, 248, 230, .96);
+    border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,.18); padding: 10px 12px; z-index: 10; font-size: 12.5px; }
+  #panel.min { width: auto; max-height: none; }
+  #panel.min .body { display: none; }
+  #panel h1 { font-size: 15px; margin: 0 0 6px; display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  #panel button { border: 0; border-radius: 999px; padding: 2px 10px; background: #F1E4C6; color: var(--ink); cursor: pointer; font: inherit; }
+  table { width: 100%; border-collapse: collapse; }
+  td { border-top: 1px solid var(--line); padding: 3px 4px; vertical-align: top; }
+  .pass { color: var(--ok); } .awkward { color: var(--warn); } .block { color: var(--bad); } .skip { color: var(--muted); }
+  #log { white-space: pre-wrap; font: 11.5px/1.35 ui-monospace, Consolas, monospace; max-height: 220px; overflow: auto; background: #FBF1DA; padding: 6px; border-radius: 8px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<iframe id="game" title="게임"></iframe>
+<aside id="panel"><h1><span>🤖 자동 플레이</span><span><b id="sum">준비</b> <button id="min" type="button">접기</button></span></h1>
+  <div class="body"><div id="opts"></div><table id="steps"></table><div id="log"></div></div></aside>
+<script type="module">
+// 주소: /tests/playthrough/  ?target=dev|artifact  &touch=1  &only=naming,arrival  &from=meet  &days=10  &speed=4  &keep=1 (저장 그대로) &yearly=1  &panel=0
+import { createBot } from './bot.js';
+import { createSkills } from './skills.js';
+import { makeScenario, runSteps } from './scenario.js';
+
+const q = new URLSearchParams(location.search);
+const target = q.get('target') ?? 'dev';
+const SAVE_KEY = 'island-life-save-v1';
+const host = window.__playtest = { status: 'loading', steps: [], log: [], wantShots: q.get('shots') === '1', pendingShot: null, lastShotFile: null };
+const $ = s => document.querySelector(s);
+if (q.get('panel') === '0' || host.wantShots) $('#panel').classList.add('min');
+// 스크린샷 동안엔 실행 판을 숨긴다 (bot.shot 이 부른다)
+host.beforeShot = () => { $('#panel').style.visibility = 'hidden'; };
+host.afterShot = () => { $('#panel').style.visibility = ''; };
+$('#min').onclick = () => $('#panel').classList.toggle('min');
+const logEl = $('#log');
+const log = t => { host.log.push(t); logEl.textContent += `${t}\n`; logEl.scrollTop = logEl.scrollHeight; console.log('[playtest]', t); };
+
+// 새 게임: 저장을 지운다 (같은 출처라 iframe 과 저장소를 같이 쓴다)
+if (q.get('keep') !== '1') { try { localStorage.removeItem(SAVE_KEY); } catch { /* 저장소 막힘 */ } }
+// ?debug 는 넣지 않는다 (하늘 조절 판·fps 줄이 화면을 가린다). 봇은 시계를 time 서비스로 당긴다. &debug=1 로 켜기
+const gameParams = new URLSearchParams(q.get('debug') === '1' ? { debug: '' } : {});
+if (q.get('touch')) gameParams.set('touch', q.get('touch'));
+if (q.get('quality')) gameParams.set('quality', q.get('quality'));
+const url = (target === 'artifact' ? '/artifact/' : '/index.html') + '?' + gameParams.toString().replace(/=(&|$)/g, '$1');
+$('#opts').textContent = `대상 ${url} · ${innerWidth}×${innerHeight}`;
+const frame = $('#game');
+frame.src = url;
+
+const t0 = performance.now();
+await new Promise(r => frame.addEventListener('load', r, { once: true }));
+const win = frame.contentWindow;
+// 게임 준비: 서비스가 다 오르고 game:ready 가 지나갈 때까지
+const ready = await new Promise(res => {
+  const end = performance.now() + 120000;
+  const tick = () => {
+    const c = win.__island;
+    if (c?.services?.festival && c.services.story && win.document.querySelector('.pk-root')) return res(true);
+    if (performance.now() > end) return res(false);
+    setTimeout(tick, 200);
+  };
+  tick();
+});
+host.bootMs = Math.round(performance.now() - t0);
+if (!ready) { host.status = 'error'; log(`게임이 2분 안에 안 떴어요 (__island ${!!win.__island})`); throw new Error('boot'); }
+await new Promise(r => setTimeout(r, 800));
+log(`게임 준비 ${host.bootMs}ms`);
+
+const bot = createBot(win, { log });
+bot.maxSpeed = Number(q.get('speed') ?? 4);
+if (win.__island.input.touch || q.get('touch') === '1') {
+  // 터치: 행동·줍기는 화면 A·B 단추를 누른다
+  const tap = intent => { const b = win.document.querySelector(`.tc-btn[data-intent="${intent}"]`); if (!b) return false; b.dispatchEvent(new win.PointerEvent('pointerdown', { bubbles: true, pointerId: 7, pointerType: 'touch' })); b.dispatchEvent(new win.PointerEvent('pointerup', { bubbles: true, pointerId: 7, pointerType: 'touch' })); return true; };
+  const press = bot.press;
+  bot.press = intent => ((intent === 'action' || intent === 'pickup') && tap(intent) ? undefined : press(intent));
+  log('터치 모드: A·B 단추로 누름');
+}
+if (host.wantShots) bot.uiShots = new Set();   // 창 종류마다 처음 뜰 때 스크린샷
+const sk = createSkills(bot);
+const sc = makeScenario(bot, sk, { maxDays: Number(q.get('days') ?? 10), yearly: q.get('yearly') === '1' });
+host.bot = bot; host.sk = sk; host.T = sc.T;
+host.status = 'running';
+const icon = { pass: '✅', awkward: '🟡', block: '⛔', skip: '⏭' };
+const draw = () => {
+  $('#steps').innerHTML = host.steps.map(s => `<tr><td class="${s.status}">${icon[s.status] ?? ''}</td><td><b>${s.id}</b> ${s.title}<br><small>${s.note ?? ''} · ${s.gameSec}s/${s.realSec}s${s.errors.length ? ` · 오류 ${s.errors.length}` : ''}</small></td></tr>`).join('');
+  const c = k => host.steps.filter(s => s.status === k).length;
+  $('#sum').textContent = `${c('pass')}✅ ${c('awkward')}🟡 ${c('block')}⛔`;
+};
+const only = q.get('only')?.split(',');
+host.steps = await runSteps(bot, sc.steps, { only, from: q.get('from'), onStep: (rec, all) => { host.steps = all; draw(); } });
+draw();
+host.report = {
+  target, url, viewport: `${innerWidth}x${innerHeight}`, touch: !!win.__island.input.touch, bootMs: host.bootMs, realSec: Math.round((performance.now() - t0) / 1000),
+  steps: host.steps, issues: bot.issues, errors: bot.errors, warnings: bot.warnings.slice(0, 80), toasts: bot.toasts, notes: sc.T.notes, days: sc.T.days, metrics: sc.T.metrics,
+  stats: bot.stats, counts: bot.counts, shots: bot.shots.map(s => ({ ...s, canvas: s.canvas ? `(캔버스 ${Math.round(s.canvas.length / 1024)}KB)` : undefined })),
+  transcriptN: bot.transcript.length, final: { day: bot.day(), acorns: bot.acorns(), festival: win.__island.state.festival, seen: win.__island.state.story.seen, museum: win.__island.services.data.museum.progress() },
+};
+host.transcript = bot.transcript;
+host.status = 'done';
+log(`끝 — ${$('#sum').textContent}, 실제 ${host.report.realSec}초`);
+</script>
+</body>
+</html>

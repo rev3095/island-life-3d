@@ -117,9 +117,10 @@ export default {
       else later();
     });
 
-    // 키·버튼 의도로 창 열기 (창이 열려 있을 땐 panels 가 키를 먼저 받으므로 여기 오지 않는다)
+    // 키·버튼 의도로 창 열기 (창이 열려 있을 땐 panels 가 키를 먼저 받으므로 여기 오지 않는다).
+    // 서비스의 isBlocking 을 본다 — 스토리 장면이 감싸서 장면 동안 true (Esc 로 장면을 건너뛸 때 섬폰이 같이 열리던 것, QA)
     events.on('input:press', ({ intent } = {}) => {
-      if (panels.blocking()) return;
+      if (ctx.services.ui?.isBlocking?.() ?? panels.blocking()) return;
       if (intent === 'bag') bag.open({ mode: 'view' });
       else if (intent === 'phone') phone.open();
       else if (intent === 'map') map.open();
