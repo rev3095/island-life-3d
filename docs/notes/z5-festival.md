@@ -3,6 +3,8 @@
 ## 지금 단계
 ① 검수 보드 — `concept/z5-festival-board.html`, 보드 id `z5`, https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS (버전 1, 2026-10-29). 결정 D14–D25 는 사용자가 고르는 중. "검수 보드 반영" 이 오면 ② 구현.
 ② 구현은 Z4(`p8-town`)를 main 에 합친 뒤 이 브랜치를 main 에 맞추고 시작한다 — 그 전에는 `src/gameplay/town/`·`src/world/island.js` 를 건드리지 않는다.
+- 2026-10-29: M4(Z1~Z4·스토리·Z5 보드)가 main bed3fc9 에 합쳐짐. ② 를 시작할 때 먼저 `git merge main`.
+- 파일 수 주의: 게임 웹 빌드가 510파일로 아티팩트 한 버전 한계(511)에 닿았다. 6차에서 조정 세션이 묶음 파일 방식을 만들기 전까지, 새 리소스는 스펙 방식 그대로 두되 파일 수를 아낀다 (렌더는 thumb 하나만, 부스 다섯은 스펙 하나에 변형으로 묶는 것 검토).
 
 ## 보드에 붙인 ID (추천안 기준, 반영 때 바뀔 수 있음)
 | ID | 무엇 |
