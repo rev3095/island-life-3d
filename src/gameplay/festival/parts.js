@@ -95,3 +95,14 @@ export function festState(state) {
 }
 export const partCount = f => Object.keys(f.parts ?? {}).length;
 export const allParts = f => PARTS.every(p => f.parts?.[p.id]);
+
+/**
+ * 축제 날인가 (D23-A 다 모은 다음 날부터 — 놓쳐도 다음 날 다시 · D25-A 연 뒤엔 해마다 같은 날).
+ * f = state.festival, key = 오늘 dayKey
+ */
+export function festivalDueOn(f, key) {
+  if (!key) return false;
+  if (f.readyDay && !f.heldDay) return key > f.readyDay;
+  if (f.heldDay && key.slice(5) === f.heldDay.slice(5) && key.slice(0, 4) > (f.lastYear ?? f.heldDay.slice(0, 4))) return true;
+  return false;
+}

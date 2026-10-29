@@ -226,3 +226,20 @@ test('부스 놀이 규칙: 물고기 길이·두부 기록은 날마다 같고,
   for (const c of LANTERN_COLORS) assert.ok(lantern.variants?.[c]?.palette?.glow, `등불 변형 ${c}`);
   assert.equal(RHYTHM.beats.length, 8);
 });
+
+// ---------- 축제 날 (fest.js festivalDue 와 같은 규칙: 다 모은 다음 날부터 · 해마다 같은 날) ----------
+test('축제 날: 다 모은 날은 아니고 다음 날부터, 연 뒤엔 해마다 같은 날', async () => {
+  const { festivalDueOn } = await import('../src/gameplay/festival/parts.js');
+  const f = {};
+  const F = { festivalDue: k => festivalDueOn(f, k) };
+  assert.equal(F.festivalDue('2026-11-01'), false);
+  f.readyDay = '2026-11-01';
+  assert.equal(F.festivalDue('2026-11-01'), false, '다 모은 그날은 아니다');
+  assert.equal(F.festivalDue('2026-11-02'), true);
+  assert.equal(F.festivalDue('2026-11-05'), true, '놓쳐도 다음 저녁에 다시');
+  f.heldDay = '2026-11-02'; f.lastYear = '2026';
+  assert.equal(F.festivalDue('2026-11-03'), false);
+  assert.equal(F.festivalDue('2027-11-02'), true, '해마다 같은 날 (D25-A)');
+  f.lastYear = '2027';
+  assert.equal(F.festivalDue('2027-11-02'), false, '그해에 열었으면 끝');
+});

@@ -1,7 +1,7 @@
 // 축제 흐름 (검수 보드 z5 D20-B · D22-A · D23-A · D24-A · D25-A): 🎉 묻기 → 필요한 것 → 부품 → 부스가 선다 →
 // 다섯 다 모은 다음 날 저녁 6시 광장 가운데서 축제 → 단체 사진(스토리 s10·s11) → 사진 액자 → 엔딩 뒤에도 섬은 그대로, 해마다 축제.
 // 장면 연출은 스토리 세션 재생기가 이벤트를 듣고 튼다 (docs/notes/z5-festival.md). 재생기가 없으면 짧게 알림으로 넘긴다.
-import { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen, festState, partCount, allParts } from './parts.js';
+import { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen, festState, partCount, allParts, festivalDueOn } from './parts.js';
 import { partSvg } from './icons.js';
 import { villagerState, dayHour, josa } from '../town/rules.js';
 import { giveItem } from '../town/talk.js';
@@ -41,10 +41,10 @@ export function createFestival(ctx, emo) {
     ctx.uiRoot?.append(root);
     return {
       draw() {
-        const on = !!f.started;
+        const due = festivalDue();
+        const on = !!f.started && (!f.endedDay || due);   // 엔딩 뒤엔 해마다 축제 날에만
         root.hidden = !on;
         if (!on) return;
-        const due = festivalDue();
         root.innerHTML = `<span class="fe-hud-head" aria-hidden="true">${emo.svg('party', false)}</span>${PARTS.map(p => partSvg(p.id, !!f.parts[p.id], `${p.name} ${f.parts[p.id] ? '모음' : '아직'}`)).join('')}${due ? `<span class="fe-hud-due">${emo.svg('moon', false)}</span>` : ''}`;
         root.setAttribute('aria-label', `축제 부품 ${partCount(f)}/5${due ? ', 오늘 저녁 축제' : ''}`);
       },
@@ -131,13 +131,7 @@ export function createFestival(ctx, emo) {
   const boothName = id => BOOTH_NAMES[id] ?? id;
 
   // ---- 축제 날 (다 모은 다음 날 저녁 6시 · 해마다 같은 날) ----
-  const mmdd = k => k?.slice(5);
-  function festivalDue(key = today()) {
-    if (!key) return false;
-    if (f.readyDay && !f.heldDay) return key > f.readyDay;
-    if (f.heldDay && mmdd(key) === mmdd(f.heldDay) && key.slice(0, 4) > (f.lastYear ?? f.heldDay.slice(0, 4))) return true;   // D25-A 해마다
-    return false;
-  }
+  const festivalDue = (key = today()) => festivalDueOn(f, key);
   const evening = () => dayHour(now()) >= FESTIVAL_HOUR;
   function announce() {
     hud.draw();
