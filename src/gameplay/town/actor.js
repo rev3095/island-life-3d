@@ -12,7 +12,8 @@ export async function createActor(ctx, slug) {
   const { THREE, assets, materials, scene } = ctx;
   const [gltf, spec] = await Promise.all([assets.loadCharacter(slug), assets.loadCharacterSpec(slug).catch(() => null)]);
   const { scene: model, animations } = assets.instantiate(gltf);
-  const toon = materials.applyToonStyle(model, { spec });
+  // merge: 툰 부품을 [몸 · 눈·볼 · 외곽선] 세 메시로 합친다 (그리기 호출 줄이기). 카메라와 플레이어 사이면 world 가 toon.setFade 로 비치게 한다
+  const toon = materials.applyToonStyle(model, { spec, merge: true });
   const root = new THREE.Group();
   root.name = `town:${slug}`;
   root.add(model);

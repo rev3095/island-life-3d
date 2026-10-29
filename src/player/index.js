@@ -24,7 +24,9 @@ export default {
     const world = ctx.services.world;
     const gltf = await assets.loadCharacter('player');
     const { scene: model, animations } = assets.instantiate(gltf);
-    materials.applyToonStyle(model, { outlineWidth: 0.006 });
+    // merge: 툰 부품을 [몸 · 눈·볼 · 외곽선] 세 메시로 합친다. 플레이어는 가림 투명 대상에서 뺀다 (늘 보여야 하는 쪽)
+    materials.applyToonStyle(model, { outlineWidth: 0.006, merge: true });
+    model.userData.occluder = false;
     const root = new THREE.Group();
     root.name = 'player';
     root.add(model);

@@ -1,4 +1,4 @@
-// 그리기 줄이기 (render 가 매 프레임 그리기 전에 부른다). 모양·재질은 건드리지 않는다.
+// 그리기 줄이기 (render 가 매 프레임 그리기 전에 부른다). 모양·재질은 건드리지 않는다 (3번의 그림자 깊이 재질만 붙인다).
 //
 // 1. 캐릭터 화면 밖 빼기: applyToonStyle 은 뼈대 메시(캐릭터·그 외곽선)를 frustumCulled = false 로 둔다 (움직이는 정점의 구를 모르니까).
 //    그러면 화면 밖 주민·가게 주인까지 본 장면 + 그림자 지도에 매번 그려진다 — 9명 × (몸 · 외곽선 · 그림자) ≈ 220번, Intel UHD GPU 3~4ms.
@@ -24,9 +24,39 @@ export function createCuller(ctx) {
   const view = new THREE.Frustum(), ws = new THREE.Sphere(), eye = new THREE.Vector3();
   const skip = new WeakSet(), seen = new Set();
 
+  // 3. 그림자에 바람: 바람에 흔들리는 재질(materials 가 userData.shadowSway 를 단다)로 그림자를 드리우는 메시에
+  //    같은 모양으로 흔들리는 깊이 재질을 붙인다 (world 배경 묶음은 kit.js 가 흔들림까지 넣어 직접 붙인다)
+  const windyGeo = new WeakMap();
+  const hasWind = g => {
+    if (!windyGeo.has(g)) {
+      const a = g.attributes.aStyle;
+      let w = false;
+      if (a) for (let i = 0; i < a.count && !w; i++) w = Math.abs(a.getX(i) - 1) < 0.5;
+      windyGeo.set(g, w);
+    }
+    return windyGeo.get(g);
+  };
+  let windShadow = true;
+  /** 바람 그림자 켜고 끄기 (비용 비교용): 끄면 붙인 깊이 재질(이름 style-shadow)을 떼어 두었다가 켜면 돌려준다 */
+  function setWindShadow(on) {
+    windShadow = !!on;
+    scene.traverse(o => {
+      if (!o.isMesh) return;
+      if (!on && o.customDepthMaterial?.name === 'style-shadow') { o.userData.windDepth = o.customDepthMaterial; o.customDepthMaterial = undefined; }
+      if (on && o.userData.windDepth) { o.customDepthMaterial = o.userData.windDepth; delete o.userData.windDepth; }
+    });
+  }
+  function attachWindShadow(o) {
+    if (!windShadow || !o.castShadow || o.customDepthMaterial || Array.isArray(o.material) || !ctx.materials?.shadowDepthMaterial) return;
+    const sw = o.material?.userData?.shadowSway;
+    if (!sw || !(sw.wind || (sw.attr && hasWind(o.geometry)))) return;
+    o.customDepthMaterial = ctx.materials.shadowDepthMaterial({ wind: sw.wind, attr: sw.attr });
+  }
+
   function scan() {
     tracked.length = 0;
     scene.traverse(o => {
+      if (o.isMesh) attachWindShadow(o);
       if (!o.isSkinnedMesh) return;
       let info = o.userData.cull;
       if (!info) {
@@ -156,5 +186,8 @@ export function createCuller(ctx) {
     /** 그림자 범위를 보이는 땅에 맞출지 (false = 예전 ±18 고정) */
     get fitShadow() { return fit; },
     set fitShadow(v) { fit = !!v; rectIn = 0; },
+    /** 바람에 흔들리는 그림자 (false = 예전처럼 그림자는 가만히, 비교용) */
+    get windShadow() { return windShadow; },
+    set windShadow(v) { setWindShadow(v); },
   };
 }
