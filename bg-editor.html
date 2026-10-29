@@ -108,7 +108,7 @@ header { display: grid; gap: 8px; }
 .ctl-label { font-size: 12.5px; color: var(--muted); }
 .spec-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
 .stat { background: var(--chip); border-radius: 10px; padding: 8px 10px; display: grid; }
-.stat b { font-family: var(--mono); font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
+.stat b { font-family: var(--mono); font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .stat span { font-size: 12px; color: var(--muted); }
 
 /* 프롬프트 편집 */
@@ -177,6 +177,53 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
 .steps { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 6px; align-content: start; }
 .step code { font-family: var(--mono); font-size: 12px; background: var(--chip); padding: 1px 6px; border-radius: 6px; word-break: break-all; }
+
+/* 영역 탭 (배경·가구·아이템·실내 무늬·방 배치) 아래에 분류 탭 */
+.tabs.areas button { font-family: var(--display); font-size: 16px; padding: 6px 16px; }
+.tabs.sub button { font-size: 14px; padding: 3px 12px; }
+.sheet.icons { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+.slider select { padding: 4px 8px; }
+
+/* 무늬 크게 보기 (2D) */
+.flat { display: block; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; border: 1px solid var(--line); background: var(--chip); }
+
+/* 방 배치 격자: 서·동 벽 띠 + 8칸, 북 벽 띠 + 8칸 (색은 방 스펙 그대로라 어두운 화면에서도 밝게 둔다) */
+.plan { position: relative; width: 100%; aspect-ratio: 9.2 / 8.6; border-radius: 12px; background: #E9DFCF; touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; outline-offset: 3px; }
+.plan > * { position: absolute; box-sizing: border-box; }
+.plan-wall { background-repeat: repeat; border: 2px solid #8C6440; }
+.plan-floor { background-repeat: repeat; }
+.plan-grid { pointer-events: none; border-right: 1px solid rgba(59,47,40,.25); border-bottom: 1px solid rgba(59,47,40,.25);
+  background-image: linear-gradient(rgba(59,47,40,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(59,47,40,.22) 1px, transparent 1px); background-size: 12.5% 12.5%; }
+.plan-win { background: #CDEBF5; border: 2px solid #FFF8E6; box-shadow: 0 0 0 1px rgba(59,47,40,.4); pointer-events: none; }
+.plan-mat { border-radius: 4px; display: grid; place-items: center; color: #FFF8E6; font-size: 12px; pointer-events: none; }
+.piece { border: 2px solid #3B2F28; border-radius: 8px; background: rgba(255,255,255,.75); cursor: grab; padding: 1px; color: #3B2F28; }
+.piece img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; display: block; }
+.piece.rug { background: rgba(255,255,255,.35); border-style: dashed; }
+.piece.wall { border-radius: 4px; }
+.piece.sel { outline: 3px solid #4F8A3C; outline-offset: 1px; z-index: 5; }
+.piece.bad { border-color: #B4532A; background: rgba(240,138,96,.45); }
+.piece .lbl { position: absolute; left: 2px; right: 2px; bottom: 1px; font-size: 10px; line-height: 1.1; text-align: center; text-shadow: 0 0 2px #fff, 0 0 2px #fff; pointer-events: none; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.piece .front { position: absolute; background: #4F8A3C; border-radius: 3px; pointer-events: none; }
+.piece .front.f0 { left: 30%; right: 30%; bottom: -4px; height: 5px; }
+.piece .front.f1 { top: 30%; bottom: 30%; right: -4px; width: 5px; }
+.piece .front.f2 { left: 30%; right: 30%; top: -4px; height: 5px; }
+.piece .front.f3 { top: 30%; bottom: 30%; left: -4px; width: 5px; }
+.piece .vdot { position: absolute; top: 2px; right: 2px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(0,0,0,.3); }
+.host { width: 6.5%; aspect-ratio: 1; border-radius: 50%; background: #F2B36B; border: 2px solid #3B2F28; transform: translate(-50%, -50%); display: grid; place-items: center;
+  font-family: var(--display); font-size: 12px; color: #3B2F28; cursor: grab; z-index: 6; }
+.host.sel { outline: 3px solid #4F8A3C; outline-offset: 1px; }
+.host.bad { background: #F08A60; }
+.host i { position: absolute; width: 0; height: 0; border: 5px solid transparent; }
+.host i.n { top: -11px; border-bottom-color: #3B2F28; } .host i.s { bottom: -11px; border-top-color: #3B2F28; }
+.host i.e { right: -11px; border-left-color: #3B2F28; } .host i.w { left: -11px; border-right-color: #3B2F28; }
+.room-tools { display: grid; gap: 10px; }
+.room-tools .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.room-tools select, .room-tools input[type="text"] { width: auto; max-width: 100%; flex: 1 1 140px; }
+.room-tools .sw { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); flex: none; }
+.sel-piece { background: var(--chip); border-radius: 10px; padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+.sel-piece select { flex: 0 1 auto; }
+.checks { margin: 0; padding-left: 18px; font-size: 13px; color: var(--warn); }
+.checks.ok { color: var(--live); list-style: none; padding-left: 0; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 
@@ -184,11 +231,12 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
   <header>
     <div class="title-row"><h1>배경 편집기</h1><a class="small" href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2" target="_blank" rel="noopener">캐릭터 편집기 열기 ↗</a></div>
     <div class="pills" id="pills"></div>
-    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일과 집 안 가구를 요소 하나하나로 나눠 Blender로 만든 3D 모델입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요.</p>
+    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일, 집 안 가구, 가방에 드는 아이템을 요소 하나하나로 나눠 Blender로 만든 3D 모델과, 집 안 벽지·바닥 무늬, 주민 방 배치입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요. 주민 방은 8×8 칸에 가구를 끌어 놓고 돌려서 배치를 보내 주세요.</p>
   </header>
 
-  <nav style="display:grid;gap:12px" aria-label="요소 고르기">
-    <div class="tabs" id="tabs" role="group" aria-label="분류"></div>
+  <nav style="display:grid;gap:10px" aria-label="요소 고르기">
+    <div class="tabs areas" id="areas" role="group" aria-label="영역"></div>
+    <div class="tabs sub" id="tabs" role="group" aria-label="분류"></div>
     <div class="groups" id="groups"></div>
   </nav>
 
@@ -197,7 +245,9 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
     <div class="main">
       <section class="card sticky" aria-label="3D 모델">
         <div id="viewArea">
-          <div class="viewer" id="viewer"><div class="msg" id="viewerMsg">3D 모델 불러오는 중…</div><span class="hint">드래그: 회전 · 휠/핀치: 확대</span></div>
+          <div class="viewer" id="viewer"><div class="msg" id="viewerMsg">3D 모델 불러오는 중…</div><span class="hint" id="viewerHint">드래그: 회전 · 휠/핀치: 확대</span></div>
+          <canvas class="flat" id="flat" hidden aria-label="무늬 크게 보기"></canvas>
+          <div class="plan" id="plan" hidden tabindex="0" role="application" aria-label="방 배치 격자 — 가구를 눌러 고르고 끌어서 옮겨요. 방향키 옮기기, R 돌리기, Delete 빼기"></div>
         </div>
         <div class="newcard" id="newCard" hidden>
           <div class="plus">+</div>
@@ -205,14 +255,23 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
           <p class="small muted">이름·분류·컨셉과 레퍼런스를 적어 보내주시면, Claude가 Blender로 새 요소를 만들어 이 편집기에 버튼으로 추가해요.</p>
         </div>
         <div id="viewControls" style="display:grid;gap:8px">
+          <div class="controls" id="modeRow" hidden><span class="ctl-label">보기</span><div class="seg" id="modeSeg" role="group" aria-label="보기"></div></div>
           <div class="controls" id="variantRow"><span class="ctl-label">변형</span><div class="seg" id="variantSeg" role="group" aria-label="변형"></div></div>
           <div class="controls" id="animRow"><span class="ctl-label">동작</span><div class="seg" id="animSeg" role="group" aria-label="동작"></div></div>
-          <div class="controls">
-            <label class="toggle"><input type="checkbox" id="autoRot" checked> 자동 회전</label>
-            <label class="toggle"><input type="checkbox" id="outlineOn" checked> 외곽선</label>
+          <div class="controls" id="toggles">
+            <label class="toggle" id="autoRotWrap"><input type="checkbox" id="autoRot" checked> 자동 회전</label>
+            <label class="toggle" id="outlineWrap"><input type="checkbox" id="outlineOn" checked> 외곽선</label>
             <label class="toggle" id="tileToggle"><input type="checkbox" id="tile3"> 3×3으로 깔아 보기</label>
-            <label class="toggle"><input type="checkbox" id="scaleRef"> 캐릭터 키 막대</label>
+            <label class="toggle" id="scaleWrap"><input type="checkbox" id="scaleRef"> 캐릭터 키 막대</label>
           </div>
+        </div>
+        <div class="room-tools" id="roomTools" hidden>
+          <div class="row"><span class="ctl-label">방 이름</span><input type="text" id="roomName" aria-label="방 이름"></div>
+          <div class="row"><span class="ctl-label">벽지</span><img class="sw" id="roomWpSw" alt=""><select id="roomWp" aria-label="벽지"></select></div>
+          <div class="row"><span class="ctl-label">바닥</span><img class="sw" id="roomFlSw" alt=""><select id="roomFl" aria-label="바닥"></select></div>
+          <div class="row"><span class="ctl-label">가구 더하기</span><select id="addFurn" aria-label="더할 가구"></select><button type="button" class="btn" id="addFurnBtn">+ 방에 놓기</button></div>
+          <div class="sel-piece" id="selPiece"></div>
+          <ul class="checks" id="roomChecks"></ul>
         </div>
         <div class="spec-row" id="stats"></div>
       </section>
@@ -222,7 +281,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
         <div class="two" id="newFields" hidden>
           <div class="field"><label for="newName">새 요소 이름</label><input type="text" id="newName" placeholder="예: 대나무, 분수대, 빨간 우체통"></div>
           <div class="field"><label for="newCat">분류</label>
-            <select id="newCat"><option value="nature">자연</option><option value="prop">소품</option><option value="building">건물</option><option value="tile">타일</option><option value="furniture">가구</option></select></div>
+            <select id="newCat"></select></div>
         </div>
         <div class="field"><label for="req">자유 요청 (가장 우선)</label>
           <textarea id="req" placeholder="예: 첨부한 그림처럼 지붕을 더 뾰족하게, 창문은 둥글게. 굴뚝은 빼줘"></textarea></div>
@@ -244,7 +303,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
         <div class="field"><label for="avoid">피할 것 (한 줄에 하나)</label><textarea id="avoid"></textarea></div>
         <div id="modelOnly" style="display:grid;gap:16px">
           <div class="field"><span class="group-title">색 · 바로 미리보기</span><div class="palette" id="palette"></div></div>
-          <div class="field" id="paramField"><span class="group-title">디자인 수치 · <span style="color:var(--live)">실시간</span> 항목은 바로 보이고, 나머지는 다시 만들 때 반영</span><div class="sliders" id="sliders"></div></div>
+          <div class="field" id="paramField"><span class="group-title" id="paramTitle"></span><div class="sliders" id="sliders"></div></div>
           <div class="field" id="variantField"><span class="group-title">변형 (색만 다른 버전 · 고치려면 자유 요청에 적어 주세요)</span><div class="variants" id="variantList"></div></div>
         </div>
         <div class="actions">
@@ -267,7 +326,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
   </section>
 
   <section style="display:grid;gap:12px" id="renderSec">
-    <div><span class="id">RENDER</span><h2>Blender 렌더</h2><p class="small muted">정사영 카메라, 툰 셰이딩 + 외곽선. 게임 안에서는 같은 모델이 실시간으로 그려져요.</p></div>
+    <div><span class="id" id="renderTag">RENDER</span><h2 id="renderTitle">Blender 렌더</h2><p class="small muted" id="renderNote"></p></div>
     <div class="sheet" id="views"></div>
     <figure class="wide" id="variantsImg"></figure>
     <figure class="wide" id="hero"></figure>
@@ -278,7 +337,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
     <div class="steps">
       <div class="step"><h3>1. 요소 고르고 요청 보내기</h3><p class="small">격자에서 요소를 고르고 레퍼런스·프롬프트를 넣어 "요청 보내기". 요청과 파일은 이 페이지의 저장소에 요소별로 남아요.</p></div>
       <div class="step"><h3>2. 채팅에서 확인 부탁</h3><p class="small">채팅에 "배경 요청 확인"이라고 보내주세요. Claude가 새 요청을 모두 읽고 레퍼런스를 내려받아 직접 봅니다.</p></div>
-      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>(가구는 <code>assets/furniture/specs/</code>)에, 모양 변화는 <code>build_env.py</code>(가구는 <code>build_furniture.py</code>)에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>(가구는 <code>build-furniture.mjs</code>)로 다시 만들어요.</p></div>
+      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>(가구 <code>assets/furniture/specs/</code>, 아이템 <code>assets/items/specs/</code>)에, 모양 변화는 <code>build_env.py</code>(가구 <code>build_furniture.py</code>, 아이템 <code>build_item.py</code>)에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>(<code>build-furniture.mjs</code> · <code>build-item.mjs</code>)로 다시 만들어요. 벽지·바닥은 <code>assets/interior/specs/</code> 무늬 스펙만, 주민 방은 보내 준 배치 JSON 그대로 <code>assets/interior/rooms/</code> 에 넣어요.</p></div>
       <div class="step"><h3>4. 같은 링크 갱신</h3><p class="small">새 모델·렌더로 편집기가 업데이트되고, 요청 기록에 "반영 완료"와 바뀐 내용이 적혀요. 확정한 요소는 초록 점으로 바뀌어요.</p></div>
     </div>
   </section>
@@ -296,53 +355,129 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const NEW = '_new';
-const BASE = 'assets/env/', FURN = 'assets/furniture/';
+const BASE = 'assets/env/', FURN = 'assets/furniture/', ITEMS = 'assets/items/', INT = 'assets/interior/';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구' };
-const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각', furniture: '집 안에 놓는 가구 (작업대에서 만들거나 선물로 받음)' };
+const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구',
+  fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃',
+  wallpaper: '벽지', floor: '바닥', room: '주민 방' };
+const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각', furniture: '집 안에 놓는 가구 (작업대에서 만들거나 선물로 받음)',
+  fish: '강·바다·연못에서 낚아 손에 들어 보이는 것', bug: '꽃·나무·바위 둘레에서 잡아 들어 보이는 것', fossil: '땅을 파면 나오고, 느루가 감정해 줘요', tool: '채집에 쓰는 도구', mat: '제작에 쓰는 재료',
+  seed: '심는 것 (꽃 씨앗 봉투는 색마다 변형)', fruit: '과일나무 열매', shell: '바닷가에서 줍는 것', flower: '꽃 아이템 (모델 하나에 색 변형)',
+  wallpaper: '집 안 벽 무늬 — 상점에서 하루 하나', floor: '집 안 바닥 무늬 — 상점에서 하루 하나', room: '주민 집 안 8×8 칸 방. 가구를 끌어 놓고 돌려요' };
+// 영역 → 분류. 아이템 분류는 index.json 의 group, 실내 무늬는 kind
+const AREAS = [
+  { key: 'env', label: '배경', cats: ['nature', 'prop', 'building', 'tile'] },
+  { key: 'furniture', label: '가구', cats: ['furniture'] },
+  { key: 'item', label: '아이템', cats: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower'] },
+  { key: 'interior', label: '실내 무늬', cats: ['wallpaper', 'floor'] },
+  { key: 'room', label: '방 배치', cats: ['room'] },
+];
+const ITEM_CATS = new Set(AREAS[2].cats);
+// 요청·레퍼런스 줄의 분류: 아이템은 category 'item' + group, 나머지는 분류 그대로
+const metaOf = cat => ITEM_CATS.has(cat) ? { category: 'item', group: cat } : { category: cat };
+const catOfRow = r => r.group ?? r.category;
+const addWord = cat => ITEM_CATS.has(cat) ? '아이템' : cat === 'wallpaper' || cat === 'floor' ? '무늬' : '배경 요소';
 const FOCUS = ['전체 느낌', '모양·실루엣', '비율·크기', '색', '재질', '디테일'];
 const ANIM_LABEL = { sway: '바람에 흔들림', shake: '나무 흔들기', flicker: '불꽃 일렁임' };
 const VIEW_LABEL = { main: '3/4 보기', front: '정면', top: '위에서' };
 const STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'] };
-const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
+const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'], new: ['wait', '새로 만들 방'] };
+// 아이템 스펙 params 의 고르기 값 (빌더 build_item.py 의 모양 이름)
+const OPTION_LABEL = { fore: '기본', swept: '뒤로 젖힘', oval: '둥근', hind: '기본', hindTail: '꼬리 달림', fork: '갈래', moon: '초승달', straight: '일자', round: '둥근', fan: '부채', shark: '상어',
+  tri: '세모', long: '긴', spiky: '가시', sickle: '낫', none: '없음', small: '작은', spots: '점', bands: '띠', line: '줄', waves: '물결', patch: '얼룩',
+  apple: '사과', pear: '배', peach: '복숭아', cherry: '체리', orange: '오렌지' };
+// 벽지·바닥 팔레트 키 (스펙에 paletteLabels 가 없어서)
+const PAL_LABEL = { base: '바탕', stripe: '줄무늬', thin: '가는 줄', check: '체크', petal: '꽃잎', heart: '꽃술', petalLight: '연한 꽃잎', groove: '홈', shine: '빛', knot: '옹이',
+  tile: '타일', drop: '빗방울', dropGreen: '초록 빗방울', star: '별', twinkle: '반짝이', light: '밝은 판', gap: '틈', dot: '점', stone: '돌', line: '선', grain: '알갱이',
+  edge: '앞 턱', wainscot: '징두리', molding: '몰딩', baseboard: '걸레받이' };
+const STEP_LABEL = { wood: '나무', sand: '모래', grass: '폭신' };
 const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
 const MAX_BYTES = 20 * 1024 * 1024;
 
 function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); }); }
 
-let models = [], categories = ['nature', 'prop', 'building', 'tile'];
+let models = [], area = 'env', tab = 'all', itemsLoaded = false, frameSpec = null;
 // 게시본은 요소마다 스펙·통계를 넣은 묶음 목록(editor-index.json, tools/build-editor-index.mjs)을 읽는다 — 아티팩트 파일 수 제한 때문. 없으면 index.json
 const loadIndex = b => loadJSON(b + 'editor-index.json').catch(() => loadJSON(b + 'index.json'));
-try { ({ models, categories = categories } = await loadIndex(BASE)); }
-catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어요.'; $('viewerMsg').textContent = '로컬에서는 node dev-server.mjs 로 연 주소에서 확인해 주세요.'; throw e; }
-// 배경 요소와 가구는 폴더가 달라서 요소마다 폴더(base)를 기억한다. 모닥불처럼 slug 가 겹치는 가구는 key 앞에 furn- 을 붙여 나눈다.
-models.forEach(m => Object.assign(m, { key: m.slug, base: BASE }));
-try {
-  const furn = (await loadIndex(FURN)).models ?? [];
-  models.push(...furn.map(m => ({ ...m, category: 'furniture', key: 'furn-' + m.slug, base: FURN })));
-  if (furn.length) categories = [...categories, 'furniture'];
-} catch {}
+// 실내 묶음이 없으면(로컬에서 빌드 전) 목록·스펙·방 파일을 하나씩
+async function loadInterior() {
+  try { return await loadJSON(INT + 'editor-index.json'); } catch {}
+  const index = await loadJSON(INT + 'index.json');
+  const all = await Promise.all(index.models.map(async m => ({ ...m, spec: await loadJSON(`${INT}specs/${m.slug}.json`) })));
+  const rooms = await Promise.all((index.rooms ?? []).map(async r => ({ ...r, room: await loadJSON(`${INT}rooms/${r.slug}.json`) })));
+  return { ...index, models: all, rooms, frame: all.find(m => m.kind === 'frame')?.spec };
+}
+// 단풍(CH-10) 방은 아직 파일이 없다 → 빈 방으로 두고, 배치를 정해 요청을 보내면 "배경 요청 확인" 때 rooms/rm-07.json 을 새로 만든다
+const RM07 = { id: 'RM-07', slug: 'rm-07', kind: 'room', owner: 'danpung', ownerName: '단풍', name: '단풍 방', version: 0, status: 'new',
+  note: '', wallpaper: 'wp-01', floor: 'fl-01', host: { lx: 4, lz: 3.6, face: 's' }, furniture: [] };
 
-/* ---------- 헤더 · 분류 탭 · 요소 격자 ---------- */
-const reviewing = models.filter(m => m.status !== 'approved').length;
-$('pills').innerHTML = [`요소 ${models.length}개`, ...categories.map(c => `${CAT_LABEL[c]} ${models.filter(m => m.category === c).length}`), `검수 대기 ${reviewing}`, `확정 ${models.length - reviewing}`]
-  .map(t => `<span class="pill">${t}</span>`).join('');
-let tab = 'all';
+const itemsFetch = loadIndex(ITEMS);   // 아이템 목록은 아이콘이 들어 있어 크다(2MB 남짓) → 기다리지 않고 나중에 붙인다
+try {
+  const env = await loadIndex(BASE);
+  if (env.categories) AREAS[0].cats = env.categories;
+  models = env.models.map(m => ({ ...m, key: m.slug, base: BASE, area: 'env', cat: m.category, type: 'model' }));
+}
+catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어요.'; $('viewerMsg').textContent = '로컬에서는 node dev-server.mjs 로 연 주소에서 확인해 주세요.'; throw e; }
+// 배경 요소·가구·아이템은 폴더가 달라서 요소마다 폴더(base)를 기억한다. 모닥불처럼 slug 가 겹치면 안 되니 가구 key 앞에 furn-, 아이템은 item- 을 붙인다.
+{
+  const [furn, interior] = await Promise.all([loadIndex(FURN).catch(() => null), loadInterior().catch(() => null)]);
+  models.push(...(furn?.models ?? []).map(m => ({ ...m, category: 'furniture', key: 'furn-' + m.slug, base: FURN, area: 'furniture', cat: 'furniture', type: 'model' })));
+  if (interior) {
+    frameSpec = interior.frame ?? null;
+    models.push(...interior.models.filter(m => m.kind === 'wallpaper' || m.kind === 'floor')
+      .map(m => ({ ...m, category: m.kind, key: m.slug, base: INT, area: 'interior', cat: m.kind, type: 'pattern' })));
+    const rooms = interior.rooms.map(r => ({ ...r, spec: r.room, ownerName: r.room.ownerName, category: 'room', key: r.slug, base: INT, area: 'room', cat: 'room', type: 'room' }));
+    if (!rooms.some(r => r.id === RM07.id)) rooms.push({ ...RM07, spec: RM07, category: 'room', key: RM07.slug, base: INT, area: 'room', cat: 'room', type: 'room' });
+    models.push(...rooms);
+  }
+}
+const specOf = s => models.find(m => m.type === 'pattern' && m.slug === s)?.spec ?? null;
+$('newCat').innerHTML = AREAS.filter(a => a.key !== 'room').flatMap(a => a.cats.map(c => `<option value="${c}">${a.key === 'item' ? '아이템 · ' : ''}${CAT_LABEL[c]}</option>`)).join('');
+
+/* ---------- 헤더 · 영역 탭 · 분류 탭 · 요소 격자 ---------- */
+const inArea = a => models.filter(m => m.area === a);
+const areaCount = a => a === 'item' && !itemsLoaded ? '…' : inArea(a).length;
+function renderHead() {
+  const reviewing = models.filter(m => m.status !== 'approved').length;
+  $('pills').innerHTML = [`요소 ${models.length}개`, ...AREAS.map(a => `${a.label} ${areaCount(a.key)}`), `검수 대기 ${reviewing}`, `확정 ${models.length - reviewing}`]
+    .map(t => `<span class="pill">${t}</span>`).join('');
+}
+function renderAreas() {
+  $('areas').innerHTML = AREAS.map(a => `<button type="button" data-area="${a.key}" aria-pressed="${area === a.key}">${a.label}<span>${areaCount(a.key)}</span></button>`).join('');
+}
 function renderTabs() {
-  $('tabs').innerHTML = [['all', '전체', models.length], ...categories.map(c => [c, CAT_LABEL[c], models.filter(m => m.category === c).length])]
+  const cats = AREAS.find(a => a.key === area).cats;
+  $('tabs').hidden = cats.length < 2;
+  $('tabs').innerHTML = [['all', '전체', inArea(area).length], ...cats.map(c => [c, CAT_LABEL[c], models.filter(m => m.cat === c).length])]
     .map(([k, l, n]) => `<button type="button" data-tab="${k}" aria-pressed="${tab === k}">${l}<span>${n}</span></button>`).join('');
 }
+// 격자 썸네일: 모델은 Blender 썸네일(아이템은 묶음 목록의 data: 아이콘), 무늬는 견본 그림, 방은 바닥·가구 약도
+function thumbOf(m) {
+  if (m.type === 'pattern') return m.thumb ??= swatchURL(m.spec, { px: 152, meters: 1.2 });
+  if (m.type === 'room') return m.thumb ??= roomThumb(m.spec);
+  if (m.category === 'item') return m.items?.[0]?.thumb ?? m.items?.[0]?.icon;
+  return `${m.base}renders/${m.slug}_thumb.png`;
+}
 function renderGroups() {
-  const cats = tab === 'all' ? categories : [tab];
+  const cats = tab === 'all' ? AREAS.find(a => a.key === area).cats : [tab];
+  if (area === 'item' && !inArea('item').length) { $('groups').innerHTML = `<p class="small muted">${itemsLoaded ? '아이템 목록을 불러오지 못했어요. 새로고침해 주세요.' : '아이템 목록 불러오는 중… (모델 82개 · 아이콘 93개)'}</p>`; return; }
   $('groups').innerHTML = cats.map(c => `<div class="group"><h3>${CAT_LABEL[c]} <span class="small muted">${CAT_NOTE[c]}</span></h3><div class="grid">
-    ${models.filter(m => m.category === c).map(m => `<button type="button" class="pick" data-slug="${esc(m.key)}" aria-pressed="${m.key === slug}">
+    ${models.filter(m => m.cat === c).map(m => `<button type="button" class="pick" data-slug="${esc(m.key)}" aria-pressed="${m.key === slug}">
       <span class="dot ${m.status === 'approved' ? 'ok' : ''}" title="${MODEL_STATUS[m.status]?.[1] ?? ''}"></span>
-      <img src="${m.base}renders/${esc(m.slug)}_thumb.png" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.name)}</span></button>`).join('')}
-    <button type="button" class="pick add" data-slug="${NEW}" data-cat="${c}" aria-pressed="${slug === NEW && newCat === c}"><span class="plus">+</span><span class="nm">새 요소</span></button>
+      <img src="${esc(thumbOf(m))}" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.type === 'room' ? `${m.ownerName ?? ''} 방` : m.name)}</span></button>`).join('')}
+    ${c === 'room' ? '' : `<button type="button" class="pick add" data-slug="${NEW}" data-cat="${c}" aria-pressed="${slug === NEW && newCat === c}"><span class="plus">+</span><span class="nm">새 ${addWord(c) === '배경 요소' ? '요소' : addWord(c)}</span></button>`}
   </div></div>`).join('');
 }
+$('areas').addEventListener('click', e => {
+  const b = e.target.closest('[data-area]');
+  if (!b) return;
+  area = b.dataset.area; tab = 'all';
+  renderAreas(); renderTabs(); renderGroups();
+  const first = inArea(area)[0];
+  if (first && cur?.area !== area) select(first.key);
+});
 $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return; tab = b.dataset.tab; renderTabs(); renderGroups(); });
 $('groups').addEventListener('click', e => {
   const b = e.target.closest('[data-slug]');
@@ -352,54 +487,113 @@ $('groups').addEventListener('click', e => {
 });
 
 /* ---------- 고른 요소 상태 ---------- */
-let slug = null, spec = null, stats = null, draft = null, newCat = 'nature', variant = null;
+// cur = 고른 요소(목록 줄), spec = 그 스펙(방은 방 JSON), params = 슬라이더 정의 (무늬는 간격 두 개를 여기서 만든다)
+let slug = null, cur = null, spec = null, stats = null, draft = null, newCat = 'nature', variant = null, params = {}, mode = '3d';
 const cache = {};
 const draftKey = () => slug === NEW ? 'env-draft-_new' : `env-draft-${slug}-v${spec.version}`;
-const paramValues = s => Object.fromEntries(Object.entries(s.params ?? {}).map(([k, v]) => [k, v.value]));
-const pick = s => JSON.parse(JSON.stringify({ request: '', prompt: s.prompt, palette: s.palette, params: paramValues(s) }));
-const blankNew = () => ({ request: '', name: '', category: newCat, prompt: { concept: '', keywords: [], references: [], avoid: [] } });
+const clone = o => JSON.parse(JSON.stringify(o));
+const blankPrompt = () => ({ concept: '', keywords: [], references: [], avoid: [] });
+const paramValues = () => Object.fromEntries(Object.entries(params).map(([k, v]) => [k, v.value]));
+// 방 배치 draft: 가구 줄마다 _id (처음 있던 것 o0…, 더한 것 n…) 를 붙여 요청 글에서 무엇이 옮겨졌는지 맞춘다. 배치 JSON 에는 넣지 않는다.
+const layoutOf = r => ({ name: r.name, wallpaper: r.wallpaper, floor: r.floor, host: { ...r.host }, furniture: (r.furniture ?? []).map((f, i) => ({ ...f, _id: 'o' + i })) });
+const pick = s => cur?.type === 'room'
+  ? clone({ request: '', prompt: { ...blankPrompt(), concept: s.note ?? '' }, layout: layoutOf(s) })
+  : clone({ request: '', prompt: s.prompt ?? blankPrompt(), palette: s.palette ?? {}, params: paramValues() });
+const blankNew = () => ({ request: '', name: '', category: newCat, prompt: blankPrompt() });
 const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify(draft)); } catch {} };
 const restore = base => { try { const s = localStorage.getItem(draftKey()); if (s) return { ...base, ...JSON.parse(s) }; } catch {} return base; };
+function paramsOf(s) {
+  if (cur?.type !== 'pattern') return s.params ?? {};
+  const r = v => Math.round(v * 100) / 100;
+  const def = (label, v) => ({ label, value: v, min: r(Math.max(0.1, v * 0.4)), max: r(v * 2.5), step: 0.01, live: true });
+  return { sizeX: def('가로 간격 (m)', s.pattern.size[0]), sizeY: def('세로 간격 (m)', s.pattern.size[1]) };
+}
 
 async function select(next) {
   if (next === slug) return;
-  let model = models.find(m => m.key === next);
-  if (next !== NEW && !model) { model = models[0]; next = model?.key; }
-  slug = next;
+  let el = models.find(m => m.key === next);
+  if (next !== NEW && !el) { el = models[0]; next = el?.key; }
+  slug = next; cur = next === NEW ? null : el;
+  if (cur && cur.area !== area) { area = cur.area; tab = 'all'; renderAreas(); renderTabs(); }
   try { history.replaceState(null, '', '#' + (slug === NEW ? 'new' : slug)); } catch {}
   renderGroups();
   $('outWrap').hidden = true; setStatus('');
   document.querySelectorAll('#refList .pending').forEach(n => n.remove());
-  const isNew = slug === NEW;
+  const isNew = slug === NEW, type = cur?.type;
   $('newFields').hidden = !isNew; $('newCard').hidden = !isNew;
-  $('viewArea').hidden = isNew; $('viewControls').hidden = isNew; $('renderSec').hidden = isNew;
-  $('modelOnly').style.display = isNew ? 'none' : 'grid';
+  $('viewArea').hidden = isNew; $('viewControls').hidden = isNew; $('renderSec').hidden = isNew || type !== 'model';
+  $('modelOnly').style.display = isNew || type === 'room' ? 'none' : 'grid';
+  $('roomTools').hidden = type !== 'room';
   clearModel();
   if (isNew) {
-    spec = null; stats = null;
-    $('selId').textContent = 'NEW'; $('selName').textContent = `새 요소 추가 · ${CAT_LABEL[newCat]}`; $('selRole').textContent = '';
-    $('selStatus').innerHTML = ''; $('stats').innerHTML = ''; $('baseVer').textContent = '새 요소 요청';
+    spec = null; stats = null; params = {};
+    $('selId').textContent = 'NEW'; $('selName').textContent = `새 ${addWord(newCat)} 추가 · ${CAT_LABEL[newCat]}`; $('selRole').textContent = '';
+    $('selStatus').innerHTML = ''; $('stats').innerHTML = ''; $('baseVer').textContent = `새 ${addWord(newCat)} 요청`;
     draft = restore(blankNew()); draft.category = newCat;
     fillForm(); renderRefs(); renderRequests();
     return;
   }
-  $('selId').textContent = model.id; $('selName').textContent = model.name; $('selRole').textContent = CAT_LABEL[model.category];
-  const [cls, label] = MODEL_STATUS[model.status] ?? MODEL_STATUS.review;
+  $('selId').textContent = cur.id;
+  $('selName').textContent = type === 'room' ? `${cur.ownerName ?? ''} · ${cur.name}` : cur.name;
+  $('selRole').textContent = CAT_LABEL[cur.cat] + (cur.category === 'item' ? ' · 아이템' : '');
+  const [cls, label] = MODEL_STATUS[cur.status] ?? MODEL_STATUS.review;
   $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
   $('viewerMsg').hidden = false; $('viewerMsg').textContent = '3D 모델 불러오는 중…';
-  const want = slug, B = model.base, file = model.slug;
-  try { cache[want] ??= model.spec && model.stats ? [model.spec, model.stats] : await Promise.all([loadJSON(`${B}specs/${file}.json`), loadJSON(`${B}models/${file}.stats.json`)]); }
-  catch { if (slug === want) $('viewerMsg').textContent = '요소 정보를 불러오지 못했어요.'; return; }
-  if (slug !== want) return;
-  [spec, stats] = cache[want];
+  const want = slug, B = cur.base, file = cur.slug;
+  if (type === 'model') {
+    try { cache[want] ??= cur.spec && cur.stats ? [cur.spec, cur.stats] : await Promise.all([loadJSON(`${B}specs/${file}.json`), loadJSON(`${B}models/${file}.stats.json`)]); }
+    catch { if (slug === want) $('viewerMsg').textContent = '요소 정보를 불러오지 못했어요.'; return; }
+    if (slug !== want) return;
+    [spec, stats] = cache[want];
+  } else { spec = cur.spec; stats = null; }
   variant = null;
-  $('baseVer').textContent = `기준: 스펙 v${spec.version}`;
+  params = paramsOf(spec);
+  $('baseVer').textContent = cur.status === 'new' ? `새 방 (rooms/${file}.json 은 아직 없어요)` : `기준: ${type === 'room' ? '방' : '스펙'} v${spec.version}`;
+  draft = restore(pick(spec));
+  if (type === 'model') {
+    renderSheet();
+    $('tileToggle').hidden = spec.category !== 'tile';
+    $('tile3').checked = spec.category === 'tile';
+  }
+  renderStats();
+  fillForm(); renderVariants(); renderRefs(); renderRequests();
+  setMode(type === 'model' ? '3d' : type === 'pattern' ? '3d' : 'plan');
+}
+
+/* ---------- 요소 수치 · 렌더 시트 ---------- */
+function renderStats() {
   const kb = n => `${Math.round(n / 1024)}KB`;
-  const [sx, sy, sz] = stats.size;
-  $('stats').innerHTML = [
-    [stats.triangles.toLocaleString('ko-KR'), '삼각형'], [`${stats.footprint[0]}×${stats.footprint[1]}`, '차지하는 칸'],
-    [`${sx}×${sy}×${sz}`, '크기 (가로×깊이×높이)'], [stats.materials.length, '재질'], [stats.parts, '부품'], [kb(stats.glbBytes), '.glb 용량'],
-  ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  let rows;
+  if (cur.type === 'pattern') {
+    const p = spec.pattern;
+    rows = [[`${p.size[0]}×${p.size[1]}m`, '무늬 한 칸 (가로×세로)'], [p.shapes?.length ?? 0, '모양'], [Object.keys(spec.palette ?? {}).length, '색'],
+      [spec.price ?? '–', '값 (도토리)'], [spec.starter ? '처음부터' : spec.shopOnly ? '상점 한정' : '상점', '얻는 곳'], ...(spec.step ? [[STEP_LABEL[spec.step] ?? spec.step, '발소리']] : [])];
+  } else if (cur.type === 'room') {
+    const L = draft.layout, chk = checkLayout(L), nm = s => { const p = models.find(m => m.slug === s && m.type === 'pattern'); return p ? `${p.id} ${p.name}` : s; };
+    rows = [[cur.ownerName ?? '–', '주인'], [L.furniture.length, '가구'], [nm(L.wallpaper), '벽지'], [nm(L.floor), '바닥'], [chk.problems.length ? `${chk.problems.length}개` : '없음', '배치 문제']];
+  } else {
+    const [sx, sy, sz] = stats.size;
+    rows = [[stats.triangles.toLocaleString('ko-KR'), '삼각형'],
+      stats.footprint ? [`${stats.footprint[0]}×${stats.footprint[1]}`, '차지하는 칸'] : [spec.hold ? '들어 보임' : '바닥에 놓임', '게임에서'],
+      [`${sx}×${sy}×${sz}`, '크기 (가로×깊이×높이)'], [stats.materials.length, '재질'], [stats.parts, '부품'], [kb(stats.glbBytes), '.glb 용량'],
+      ...(cur.category === 'item' ? [[cur.items.length, '쓰는 아이템']] : [])];
+  }
+  $('stats').innerHTML = rows.map(([v, l]) => `<div class="stat"><b>${esc(v)}</b><span>${l}</span></div>`).join('');
+}
+function renderSheet() {
+  const B = cur.base, file = cur.slug;
+  $('views').classList.toggle('icons', cur.category === 'item');
+  if (cur.category === 'item') {
+    // 아이템은 아이콘(200px 툰 렌더)만 묶음 목록에 넣었다 — 큰 렌더는 파일 수 때문에 올리지 않는다
+    $('renderTag').textContent = 'ICON'; $('renderTitle').textContent = '아이콘';
+    $('renderNote').textContent = '가방·도감·상점에 쓰는 그림 (Blender 툰 렌더). 꽃과 꽃 씨앗 봉투는 색마다 한 장씩이에요.';
+    const vl = v => spec.variants?.[v]?.label?.replace(' (기본)', '');
+    $('views').innerHTML = cur.items.map(it => `<figure><div class="ph"><img src="${esc(it.thumb ?? it.icon)}" alt="${esc(spec.name)} ${esc(vl(it.variant) ?? '')} 아이콘" loading="lazy"></div><figcaption><span class="id">${esc(it.code)}</span>${esc(vl(it.variant) ?? spec.name)} <span class="small muted">${esc(it.item)}</span></figcaption></figure>`).join('');
+    $('variantsImg').hidden = true; $('hero').hidden = true;
+    return;
+  }
+  $('renderTag').textContent = 'RENDER'; $('renderTitle').textContent = 'Blender 렌더';
+  $('renderNote').textContent = '정사영 카메라, 툰 셰이딩 + 외곽선. 게임 안에서는 같은 모델이 실시간으로 그려져요.';
   const img = (name, ext = 'png') => `<figure><div class="ph"><img src="${B}renders/${file}_${name}.${ext}" alt="${esc(spec.name)} ${VIEW_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${VIEW_LABEL[name] ?? ''}</figcaption></figure>`;
   $('views').innerHTML = ['main', 'front', 'top'].map(n => img(n)).join('');
   const hasVariants = stats.renders.includes(`${file}_variants.png`);
@@ -408,12 +602,30 @@ async function select(next) {
   const hasHero = stats.renders.includes(`${file}_hero.jpg`) || B === BASE;
   $('hero').hidden = !hasHero;
   $('hero').innerHTML = !hasHero ? '' : `<img src="${B}renders/${file}_hero.jpg" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
-  $('tileToggle').hidden = spec.category !== 'tile';
-  $('tile3').checked = spec.category === 'tile';
-  draft = restore(pick(spec));
-  fillForm(); renderVariants(); renderRefs(); renderRequests();
-  loadModel(want, `${B}models/${file}.glb.json`);
 }
+
+/* ---------- 보기 바꾸기: 3D · 무늬 크게(2D) · 배치 격자 ---------- */
+const MODES = { pattern: [['3d', '방에 붙여 보기'], ['flat', '무늬 크게']], room: [['plan', '배치 격자'], ['3d', '3D로 보기']] };
+function setMode(m) {
+  mode = m;
+  const type = cur?.type, inRoom = type !== 'model';
+  $('viewer').hidden = m !== '3d'; $('flat').hidden = m !== 'flat'; $('plan').hidden = m !== 'plan';
+  $('modeRow').hidden = !MODES[type];
+  $('modeSeg').innerHTML = (MODES[type] ?? []).map(([k, l]) => `<button type="button" data-mode="${k}" aria-pressed="${k === m}">${l}</button>`).join('');
+  $('toggles').hidden = m !== '3d';
+  $('outlineWrap').hidden = inRoom; $('autoRotWrap').hidden = inRoom; $('scaleWrap').hidden = type === 'room';
+  if (inRoom) { $('tileToggle').hidden = true; $('variantRow').hidden = true; $('animRow').hidden = true; }
+  $('viewerHint').textContent = inRoom ? '드래그: 둘러보기 · 휠/핀치: 확대' : '드래그: 회전 · 휠/핀치: 확대';
+  clearModel();
+  if (m === '3d') {
+    if (type === 'model') loadModel(slug, cur);
+    else if (type === 'pattern') showPattern3D();
+    else showRoom3D();
+  }
+  if (m === 'flat') drawFlat();
+  if (m === 'plan') renderPlan();
+}
+$('modeSeg').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b && b.dataset.mode !== mode) setMode(b.dataset.mode); });
 
 /* ---------- 프롬프트 폼 ---------- */
 function fillForm() {
@@ -423,13 +635,23 @@ function fillForm() {
   $('references').value = (draft.prompt.references ?? []).join('\n');
   $('avoid').value = (draft.prompt.avoid ?? []).join('\n');
   if (slug === NEW) { $('newName').value = draft.name ?? ''; $('newCat').value = draft.category ?? 'nature'; return; }
-  const labels = spec.paletteLabels ?? {};
+  if (cur.type === 'room') { renderRoomTools(); return; }
+  const labels = spec.paletteLabels ?? (cur.type === 'pattern' ? PAL_LABEL : {});
   $('palette').innerHTML = Object.entries(draft.palette).map(([k, v]) =>
     `<label class="swatch"><input type="color" data-pal="${k}" value="${v.toLowerCase()}"><span>${esc(labels[k] ?? k)}<code data-hex="${k}">${v.toUpperCase()}</code></span></label>`).join('');
-  const params = Object.entries(spec.params ?? {});
-  $('paramField').hidden = !params.length;
-  $('sliders').innerHTML = params.map(([k, d]) =>
-    `<label class="slider"><span>${esc(d.label)}</span><input type="range" min="${d.min}" max="${d.max}" step="${d.step ?? 0.01}" value="${draft.params[k]}" data-param="${k}"><output data-out="${k}">${(+draft.params[k]).toFixed(d.step >= 1 ? 0 : 2)}</output><span class="tag ${d.live ? 'live' : ''}">${d.live ? '실시간' : '재생성'}</span></label>`).join('');
+  const list = Object.entries(params);
+  $('paramField').hidden = !list.length;
+  $('paramTitle').innerHTML = cur.type === 'pattern' ? '무늬 간격 · 무늬 한 칸의 실제 크기, <span style="color:var(--live)">바로</span> 보여요'
+    : '디자인 수치 · <span style="color:var(--live)">실시간</span> 항목은 바로 보이고, 나머지는 다시 만들 때 반영';
+  // 크기(scale)는 뷰어가 바로 키워 보여 준다 (다시 만들 때 모델에 반영)
+  const live = (k, d) => d.live || k === 'scale';
+  // 고르기(options) · 켜고 끄기(boolean) · 목록 값(무늬 자리 등, JSON 글) 은 다시 만들 때 반영
+  const other = (k, d) => d.options ? `<select data-param="${k}">${d.options.map(o => `<option value="${esc(o)}"${o === draft.params[k] ? ' selected' : ''}>${esc(OPTION_LABEL[o] ?? o)}</option>`).join('')}</select>`
+    : typeof d.value === 'boolean' ? `<input type="checkbox" data-param="${k}"${draft.params[k] ? ' checked' : ''}>`
+    : `<input type="text" data-param="${k}" value="${esc(JSON.stringify(draft.params[k]))}" spellcheck="false">`;
+  $('sliders').innerHTML = list.map(([k, d]) => typeof d.value !== 'number'
+    ? `<label class="slider"><span>${esc(d.label)}</span>${other(k, d)}<output></output><span class="tag">재생성</span></label>`
+    : `<label class="slider"><span>${esc(d.label)}</span><input type="range" min="${d.min}" max="${d.max}" step="${d.step ?? 0.01}" value="${draft.params[k]}" data-param="${k}"><output data-out="${k}">${(+draft.params[k]).toFixed(d.step >= 1 ? 0 : 2)}</output><span class="tag ${live(k, d) ? 'live' : ''}">${live(k, d) ? '실시간' : '재생성'}</span></label>`).join('');
 }
 function renderVariants() {
   const vs = Object.entries(spec.variants ?? {});
@@ -463,12 +685,22 @@ editor.addEventListener('input', e => {
   else if (t.id === 'references') draft.prompt.references = lines(t.value);
   else if (t.id === 'avoid') draft.prompt.avoid = lines(t.value);
   else if (t.dataset.pal) { draft.palette[t.dataset.pal] = t.value.toUpperCase(); document.querySelector(`[data-hex="${t.dataset.pal}"]`).textContent = t.value.toUpperCase(); recolor(); }
-  else if (t.dataset.param) { const d = spec.params[t.dataset.param]; draft.params[t.dataset.param] = +t.value; document.querySelector(`[data-out="${t.dataset.param}"]`).textContent = (+t.value).toFixed(d.step >= 1 ? 0 : 2); }
+  else if (t.dataset.param) {
+    const d = params[t.dataset.param];
+    if (d.options) draft.params[t.dataset.param] = t.value;
+    else if (typeof d.value === 'boolean') draft.params[t.dataset.param] = t.checked;
+    else if (typeof d.value !== 'number') { try { draft.params[t.dataset.param] = JSON.parse(t.value); t.style.borderColor = ''; } catch { t.style.borderColor = 'var(--warn)'; return; } }
+    else { draft.params[t.dataset.param] = +t.value; document.querySelector(`[data-out="${t.dataset.param}"]`).textContent = (+t.value).toFixed(d.step >= 1 ? 0 : 2); }
+    if (cur?.type === 'pattern') refreshPattern();
+  }
   else return;
   save();
 });
 editor.addEventListener('change', e => { if (e.target.tagName === 'SELECT') e.target.dispatchEvent(new Event('input', { bubbles: true })); });
-$('resetDraft').addEventListener('click', () => { draft = slug === NEW ? blankNew() : pick(spec); save(); fillForm(); recolor(); $('outWrap').hidden = true; });
+$('resetDraft').addEventListener('click', () => {
+  draft = slug === NEW ? blankNew() : pick(spec); save(); fillForm(); recolor(); $('outWrap').hidden = true;
+  if (cur?.type === 'room') { selPiece = null; layoutChanged(); }
+});
 
 /* ---------- 저장소: 웹 링크(아티팩트 db·assets) 또는 로컬 dev-server ---------- */
 function artifactStore(db, assets, user) {
@@ -529,7 +761,7 @@ connectStore().then(s => {
   s.watch(COL.refs, rows => { if (rows) { allRefs = rows; renderRefs(); } });
   s.watch(COL.requests, rows => { if (rows) { allReqs = rows; renderRequests(); } });
 });
-const refRows = () => allRefs.filter(r => r.slug === slug && (slug !== NEW || r.category === newCat));
+const refRows = () => allRefs.filter(r => r.slug === slug && (slug !== NEW || catOfRow(r) === newCat));
 
 /* ---------- 레퍼런스 업로드 ---------- */
 const mediaURL = asset => store ? store.url(asset) : '';
@@ -613,7 +845,7 @@ async function extractFrames(src, n = 6) {
 const UPLOAD_ERR = { too_large: '20MB보다 커서 올릴 수 없어요.', unsupported_type: '지원하지 않는 형식이에요.', quota_or_state: '저장 공간이 가득 찼어요.', rate_limited: '잠시 후 다시 올려 주세요.', not_granted: '이 화면에서는 올릴 권한이 없어요.' };
 async function addFiles(files) {
   if (!store?.canUpload || !slug) return;
-  const target = slug, cat = slug === NEW ? newCat : spec.category;
+  const target = slug, meta = metaOf(slug === NEW ? newCat : cur.cat);
   for (const file of files) {
     const type = file.type;
     const pending = document.createElement('article');
@@ -626,7 +858,7 @@ async function addFiles(files) {
     try {
       const kind = type.startsWith('video/') ? 'video' : 'image';
       const a = await store.upload(file, type, file.name);
-      const refId = await store.add(COL.refs, { slug: target, category: cat, kind, asset: a.id, mime: type, name: file.name, note: '', focus: [], status: 'active', createdAt: Date.now() });
+      const refId = await store.add(COL.refs, { slug: target, ...meta, kind, asset: a.id, mime: type, name: file.name, note: '', focus: [], status: 'active', createdAt: Date.now() });
       if (kind === 'video') {
         msg('장면 뽑는 중…');
         let frames;
@@ -636,7 +868,7 @@ async function addFiles(files) {
         for (const [i, f] of frames.entries()) {
           msg(`장면 저장 중 ${i + 1}/${frames.length}`);
           const fa = await store.upload(f.blob, 'image/jpeg', `${file.name}-${i + 1}.jpg`);
-          await store.add(COL.refs, { slug: target, category: cat, kind: 'frame', parent: refId, asset: fa.id, mime: 'image/jpeg', name: `${file.name} #${i + 1}`, t: f.t, status: 'active', createdAt: Date.now() });
+          await store.add(COL.refs, { slug: target, ...meta, kind: 'frame', parent: refId, asset: fa.id, mime: 'image/jpeg', name: `${file.name} #${i + 1}`, t: f.t, status: 'active', createdAt: Date.now() });
         }
         if (!frames.length) await store.update(COL.refs, refId, { note: '(장면을 뽑지 못했어요. 영상 자체는 저장됨)' });
       }
@@ -672,7 +904,7 @@ function refLines(refs) {
 }
 function buildRequest(refs = activeRefs()) {
   if (slug === NEW) {
-    const p = draft.prompt, out = [`[새 배경 요소 추가 요청] ${draft.name || '(이름 미정)'} · ${CAT_LABEL[draft.category] ?? draft.category}`];
+    const c = draft.category, p = draft.prompt, out = [`[새 ${addWord(c)} 추가 요청] ${draft.name || '(이름 미정)'} · ${ITEM_CATS.has(c) ? '아이템 · ' : ''}${CAT_LABEL[c] ?? c}`];
     if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
     out.push(...refLines(refs));
     if (p.concept) out.push('', '■ 컨셉', p.concept);
@@ -681,9 +913,10 @@ function buildRequest(refs = activeRefs()) {
     if (p.avoid.length) out.push('', '■ 피할 것', ...p.avoid.map(s => `- ${s}`));
     return out.join('\n');
   }
-  const base = pick(spec), out = [`[${spec.id} ${spec.name} 수정 요청 · 기준 스펙 v${spec.version}]`];
+  if (cur.type === 'room') return roomRequest(refs);
+  const base = pick(spec), out = [`[${spec.id} ${spec.name}${cur.category === 'item' ? ' (아이템 모델)' : ''} 수정 요청 · 기준 스펙 v${spec.version}]`];
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-  const labels = spec.paletteLabels ?? {};
+  const labels = spec.paletteLabels ?? (cur.type === 'pattern' ? PAL_LABEL : {});
   if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
   out.push(...refLines(refs));
   if (draft.prompt.concept !== base.prompt.concept) out.push('', '■ 컨셉', draft.prompt.concept);
@@ -692,8 +925,10 @@ function buildRequest(refs = activeRefs()) {
   if (!same(draft.prompt.avoid, base.prompt.avoid)) out.push('', '■ 피할 것', ...draft.prompt.avoid.map(s => `- ${s}`));
   const pal = Object.keys(draft.palette).filter(k => draft.palette[k].toUpperCase() !== base.palette[k]?.toUpperCase());
   if (pal.length) out.push('', '■ 색 변경', ...pal.map(k => `- ${k}(${labels[k] ?? k}): ${base.palette[k]} → ${draft.palette[k]}`));
-  const pr = Object.keys(draft.params ?? {}).filter(k => Math.abs(draft.params[k] - base.params[k]) > 0.004);
-  if (pr.length) out.push('', '■ 디자인 수치 변경', ...pr.map(k => `- ${k}(${spec.params[k].label}): ${base.params[k]} → ${draft.params[k]}`));
+  const moved = (a, b) => typeof a === 'number' ? Math.abs(a - b) > 0.004 : JSON.stringify(a) !== JSON.stringify(b);
+  const pr = Object.keys(draft.params ?? {}).filter(k => params[k] && moved(draft.params[k], base.params[k]));
+  const val = (k, v) => params[k].options ? `${v}(${OPTION_LABEL[v] ?? v})` : typeof v === 'object' ? JSON.stringify(v) : v;
+  if (pr.length) out.push('', cur.type === 'pattern' ? '■ 무늬 간격 변경 (pattern.size, m)' : '■ 디자인 수치 변경', ...pr.map(k => `- ${k}(${params[k].label}): ${val(k, base.params[k])} → ${val(k, draft.params[k])}`));
   if (out.length === 1) out.push('', `(바뀐 내용이 없어요. 이대로 확정이면 "${spec.name} 확정"이라고 보내주세요.)`);
   return out.join('\n');
 }
@@ -701,13 +936,16 @@ function setStatus(text, err = false) { const s = $('sendStatus'); s.textContent
 $('sendReq').addEventListener('click', async () => {
   if (!store || !draft) return;
   if (slug === NEW && !draft.name.trim() && !draft.request.trim() && !draft.prompt.concept.trim()) { setStatus('새 요소 이름이나 요청 내용을 적어 주세요.', true); return; }
+  const room = cur?.type === 'room';
   const btn = $('sendReq');
   btn.disabled = true;
   setStatus('보내는 중…');
   try {
     const refs = activeRefs();
-    await store.add(COL.requests, { slug, category: slug === NEW ? draft.category : spec.category, kind: slug === NEW ? 'add' : 'edit', base: spec?.version ?? null,
-      status: 'new', createdAt: Date.now(), by: await store.who(), text: buildRequest(refs), fields: draft, refs });
+    // 방 배치는 배치 JSON(layout)과 검사 결과(problems)를 같이 남긴다 — "배경 요청 확인" 때 rooms/<slug>.json 에 그대로 넣는다
+    await store.add(COL.requests, { slug, ...metaOf(slug === NEW ? draft.category : cur.cat), kind: slug === NEW || cur.status === 'new' ? 'add' : 'edit', base: spec?.version ?? null,
+      status: 'new', createdAt: Date.now(), by: await store.who(), text: buildRequest(refs), fields: draft, refs,
+      ...(room ? { layout: layoutJSON(draft.layout), problems: checkLayout(draft.layout).problems } : {}) });
     setStatus('요청을 저장했어요. 채팅에 "배경 요청 확인"이라고 보내주시면 바로 작업할게요.');
     draft.request = ''; $('req').value = ''; save();
   } catch (err) {
@@ -724,7 +962,7 @@ $('copyOut').addEventListener('click', () => {
 
 const when = ts => new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 function renderRequests() {
-  const rows = allReqs.filter(r => r.slug === slug && (slug !== NEW || r.category === newCat)).sort((a, b) => b.createdAt - a.createdAt);
+  const rows = allReqs.filter(r => r.slug === slug && (slug !== NEW || catOfRow(r) === newCat)).sort((a, b) => b.createdAt - a.createdAt);
   if (!rows.length) { $('reqList').innerHTML = '<p class="small muted">아직 보낸 요청이 없어요.</p>'; return; }
   $('reqList').innerHTML = rows.map(r => {
     const [cls, label] = STATUS[r.status] ?? STATUS.new;
@@ -767,12 +1005,13 @@ ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.002;
 scene.add(ground);
 const GROUND = { grass: 0xa9c46a, sand: 0xf1dfae, water: 0x6bb8d6, floor: 0xd9b48a };
+const ITEM_GROUND = { fish: GROUND.water, shell: GROUND.sand };
 // 캐릭터 키(1.0칸) 비교용 막대
 const refBar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1, 12), new THREE.MeshToonMaterial({ color: 0xf2b36b, gradientMap: grad }));
 refBar.position.y = 0.5;
 refBar.visible = false;
 scene.add(refBar);
-$('scaleRef').addEventListener('change', e => { refBar.visible = e.target.checked; });
+$('scaleRef').addEventListener('change', e => { refBar.visible = e.target.checked && cur?.type !== 'room'; });
 
 const outlineW = { value: 0.01 };
 const outlineMat = new THREE.MeshBasicMaterial({ color: '#4A3B32', side: THREE.BackSide });
@@ -781,15 +1020,21 @@ outlineMat.onBeforeCompile = sh => {
   sh.vertexShader = 'uniform float uW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize( normal ) * uW;');
 };
 const NO_OUTLINE = new Set(['glow', 'flame', 'flameCore', 'crack', 'paper', 'waterLight', 'center', 'petalDark', 'rockDark', 'shellRib', 'flower', 'grassDark', 'pebble', 'window']);
-let model = null, holder = null, mixer = null, actions = {}, current = null, mats = {}, outlines = [], loadSeq = 0, baseScale = 1;
+// holder = 뷰어에 올린 것 (모델 하나, 또는 무늬·방 보기의 방 껍데기 + 가구), shell = 방 껍데기 (벽지·바닥을 바꿔 끼운다)
+let model = null, holder = null, shell = null, mixer = null, actions = {}, current = null, mats = {}, outlines = [], loadSeq = 0, baseScale = 1;
 
+// 방 가구는 같은 모델을 여러 번 복제해 쓰므로 그 지오메트리(keepGeo)는 지우지 않는다
+function disposeTree(root) {
+  root.traverse(o => {
+    if (!o.isMesh) return;
+    if (!o.userData.keepGeo) o.geometry.dispose();
+    if (o.material !== outlineMat) { o.material.map?.dispose(); o.material.dispose(); }
+  });
+}
 function clearModel() {
   loadSeq++;
-  if (holder) {
-    scene.remove(holder);
-    holder.traverse(o => { if (o.isMesh) { o.geometry.dispose(); if (o.material !== outlineMat) o.material.dispose(); } });
-  }
-  model = null; holder = null; mixer = null; actions = {}; current = null; mats = {}; outlines = [];
+  if (holder) { scene.remove(holder); disposeTree(holder); }
+  model = null; holder = null; shell = null; mixer = null; actions = {}; current = null; mats = {}; outlines = [];
   $('animSeg').innerHTML = '';
 }
 
@@ -799,13 +1044,14 @@ function currentPalette() {
   return { ...draft.palette, ...(v ?? {}) };
 }
 function recolor() {
+  if (cur?.type === 'pattern') { refreshPattern(); return; }
   const pal = currentPalette();
   for (const [name, list] of Object.entries(mats)) if (pal[name]) list.forEach(m => m.color.set(pal[name]));
 }
 
 function applyLive() {
-  if (!holder || !draft?.params) return;
-  const s0 = spec.params?.scale?.value ?? 1;
+  if (!holder || cur?.type !== 'model' || !draft?.params) return;
+  const s0 = params.scale?.value ?? 1;
   holder.scale.setScalar((draft.params.scale ?? s0) / s0);
 }
 
@@ -839,18 +1085,29 @@ $('tile3').addEventListener('change', layoutTiles);
 function frame() {
   const box = new THREE.Box3().setFromObject(holder);
   const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
-  const r = Math.max(size.length() / 2, 0.3);
-  const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
+  const inRoom = cur?.type !== 'model', item = cur?.category === 'item';
+  const r = Math.max(size.length() / 2, item ? 0.06 : 0.3);
+  // 방: 벽지는 낮게(북쪽 벽이 보이게), 바닥은 높게, 방 배치는 게임처럼 남쪽 위에서
+  const look = !inRoom ? { dir: [-0.45, 0.5, 1], k: 1.05 } : cur.cat === 'wallpaper' ? { dir: [0, 0.38, 1], k: 0.6, y: 1.2, z: -1 } : cur.cat === 'floor' ? { dir: [0, 1.3, 1], k: 0.7 } : { dir: [0, 0.9, 1], k: 0.78 };
+  if (look.y != null) center.y = look.y;
+  center.z += look.z ?? 0;
+  const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * look.k;
   controls.target.copy(center);
-  camera.position.copy(center).add(new THREE.Vector3(-0.45, 0.5, 1).normalize().multiplyScalar(dist));
-  controls.minDistance = r * 0.8;
-  controls.maxDistance = dist * 3;
+  camera.position.copy(center).add(new THREE.Vector3(...look.dir).normalize().multiplyScalar(dist));
+  controls.minDistance = r * (inRoom ? 0.3 : 0.8);
+  controls.maxDistance = dist * (inRoom ? 1.6 : 3);
+  // 방은 앞(남쪽) 벽이 없어서 앞쪽에서만 둘러본다 (게임 카메라처럼)
+  controls.minAzimuthAngle = inRoom ? -Math.PI * 0.32 : -Infinity;
+  controls.maxAzimuthAngle = inRoom ? Math.PI * 0.32 : Infinity;
+  controls.autoRotate = !inRoom && $('autoRot').checked;
   camera.near = dist / 100; camera.far = dist * 10; camera.updateProjectionMatrix();
+  refBar.visible = $('scaleRef').checked && cur?.type !== 'room';
+  if (inRoom) { ground.visible = false; refBar.position.set(2.2, 0.5, 1.2); return; }
   const isTile = spec.category === 'tile';
   ground.visible = !isTile && spec.heroGround !== 'none';
-  ground.material.color.setHex(GROUND[spec.heroGround] ?? (spec.category === 'furniture' ? GROUND.floor : GROUND.grass));
-  ground.scale.setScalar(Math.max(1.4, Math.hypot(size.x, size.z) * 0.9));
-  refBar.position.x = box.max.x + 0.35;
+  ground.material.color.setHex(GROUND[spec.heroGround] ?? (spec.category === 'furniture' ? GROUND.floor : item ? ITEM_GROUND[cur.cat] ?? GROUND.grass : GROUND.grass));
+  ground.scale.setScalar(Math.max(item ? 0.3 : 1.4, Math.hypot(size.x, size.z) * (item ? 1.4 : 0.9)));
+  refBar.position.set(box.max.x + 0.35, 0.5, 0);
 }
 
 function onModel(gltf) {
@@ -878,6 +1135,8 @@ function onModel(gltf) {
   holder = new THREE.Group();
   holder.add(model);
   scene.add(holder);
+  // 들어 보이는 아이템(물고기·곤충·화석)은 원점이 가운데라 바닥 위로 올려 보여 준다
+  if (cur?.category === 'item') model.position.y -= new THREE.Box3().setFromObject(model).min.y;
   outlineW.value = spec.style?.outlineWidth ?? 0.01;
   mixer = new THREE.AnimationMixer(model);
   for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
@@ -889,19 +1148,635 @@ function onModel(gltf) {
   if (names.includes('sway')) play('sway'); else if (names.length) play(names[0]);
   $('viewerMsg').hidden = true;
 }
-// 웹 링크는 .glb 파일과 data: 주소 fetch 를 막아서, base64로 감싼 JSON을 받아 직접 풀어 읽는다 (tools/glb-to-json.mjs)
-function loadModel(want, url) {
+// 웹 링크는 .glb 파일과 data: 주소 fetch 를 막아서, base64로 감싼 JSON을 받아 직접 풀어 읽는다 (tools/glb-to-json.mjs).
+// 아이템은 파일 수 때문에 모델 여러 개를 묶음(editor-models-<n>.json, { slug: base64 })으로 받는다 — 묶음 하나는 한 번만 받는다.
+const bundles = {};
+function modelData(el) {
+  if (!el.bundle) return loadJSON(`${el.base}models/${el.slug}.glb.json`).then(j => j.data);
+  const k = el.base + el.bundle;
+  bundles[k] ??= loadJSON(`${el.base}editor-models-${el.bundle}.json`).catch(e => { delete bundles[k]; throw e; });
+  return bundles[k].then(b => b[el.slug]);
+}
+const parseGLB = data => new Promise((ok, no) => new GLTFLoader().parse(Uint8Array.from(atob(data), c => c.charCodeAt(0)).buffer, '', ok, no));
+function loadModel(want, el) {
   const seq = loadSeq;
-  loadJSON(url)
-    .then(j => {
-      const bin = Uint8Array.from(atob(j.data), c => c.charCodeAt(0));
-      return new Promise((ok, no) => new GLTFLoader().parse(bin.buffer, '', ok, no));
-    })
+  $('viewerMsg').hidden = false;
+  $('viewerMsg').textContent = el.bundle && !bundles[el.base + el.bundle] ? '아이템 모델 묶음 불러오는 중… (1.5MB 안팎, 처음 한 번만)' : '3D 모델 불러오는 중…';
+  modelData(el)
+    .then(d => { if (!d) throw new Error('model'); return parseGLB(d); })
     .then(gltf => { if (seq === loadSeq && slug === want) onModel(gltf); })
     .catch(() => { if (seq === loadSeq) $('viewerMsg').textContent = '3D 모델을 불러오지 못했어요. 새로고침해 보시고, 계속되면 채팅으로 알려주세요.'; });
 }
 
 $('outlineOn').addEventListener('change', e => holder?.traverse(o => { if (o.userData.outline) o.visible = e.target.checked; }));
+
+/* ---------- 벽지·바닥 무늬 (ET-03) ---------- */
+// 게임 src/gameplay/house/pattern.js 의 paint · patternCanvas · patternTexture · swatchURL 과 interior.js 의 resolveFill 을 그대로 옮겨 왔다.
+// 편집기 게시본에는 src/ 가 없어서 import 하지 않는다 — 그 파일의 그리기가 바뀌면 여기도 같이 고친다 (같은 스펙이면 게임 방·상점 견본과 같은 그림).
+// 무늬 스펙 pattern = { tile: [가로, 세로] (무늬 한 칸, 검수 보드 SVG 좌표), size: [가로, 세로] (한 칸의 실제 크기 m), base: 팔레트 키, shapes: [rect|circle|ellipse|path + fill·stroke·opacity] }
+const HEX = /^#[0-9A-Fa-f]{6}$/;
+function resolveFill(s, key) {
+  if (key == null) return null;
+  if (HEX.test(key)) return key;
+  const c = s?.palette?.[key];
+  return HEX.test(c ?? '') ? c : null;
+}
+/** pattern 한 칸을 ctx2d 에 그린다 (k = 무늬 좌표 1 → 픽셀). 가장자리를 넘는 모양은 옆 칸 자리에도 그려 이음매가 없다 */
+function paint(g, s, k) {
+  const p = s.pattern;
+  const [tw, th] = p.tile;
+  g.save();
+  g.scale(k, k);
+  g.fillStyle = resolveFill(s, p.base) ?? '#FFFFFF';
+  g.fillRect(0, 0, tw, th);
+  for (const sh of p.shapes ?? []) {
+    for (const ox of [-tw, 0, tw]) for (const oy of [-th, 0, th]) {
+      g.save();
+      g.translate(ox, oy);
+      g.globalAlpha = sh.opacity ?? 1;
+      let path;
+      if (sh.rect) {
+        const [x, y, w, h] = sh.rect;
+        path = new Path2D();
+        if (sh.rx && path.roundRect) path.roundRect(x, y, w, h, sh.rx); else path.rect(x, y, w, h);
+      } else if (sh.circle) {
+        const [cx, cy, r] = sh.circle;
+        path = new Path2D();
+        path.arc(cx, cy, r, 0, Math.PI * 2);
+      } else if (sh.ellipse) {
+        const [cx, cy, rx, ry] = sh.ellipse;
+        path = new Path2D();
+        path.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      } else if (sh.path) path = new Path2D(sh.path);
+      if (path) {
+        const fill = resolveFill(s, sh.fill), stroke = resolveFill(s, sh.stroke);
+        if (fill) { g.fillStyle = fill; g.fill(path); }
+        if (stroke) { g.strokeStyle = stroke; g.lineWidth = sh.strokeWidth ?? 1; g.stroke(path); }
+      }
+      g.restore();
+    }
+  }
+  g.restore();
+}
+function patternCanvas(s, minPx = 128) {
+  const [tw, th] = s.pattern.tile;
+  const k = Math.min(512 / Math.max(tw, th), Math.max(1, Math.ceil(minPx / Math.min(tw, th))));
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(tw * k);
+  cv.height = Math.round(th * k);
+  paint(cv.getContext('2d'), s, cv.width / tw);
+  return cv;
+}
+/** UV 를 m 단위로 주면 repeat = 1 / size 로 실제 크기가 맞는다 */
+function patternTexture(s) {
+  const tex = new THREE.CanvasTexture(patternCanvas(s));
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.repeat.set(1 / s.pattern.size[0], 1 / s.pattern.size[1]);
+  tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  return tex;
+}
+/** 상점 견본과 같은 그림: 무늬를 실제 크기 비율대로 meters m 네모에 */
+function swatchURL(s, { px = 96, meters = 1.2 } = {}) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = px;
+  const g = cv.getContext('2d');
+  const tile = patternCanvas(s, 64);
+  const [sw, sh] = s.pattern.size;
+  const pat = g.createPattern(tile, 'repeat');
+  pat.setTransform?.(new DOMMatrix().scale((sw / meters) * px / tile.width, (sh / meters) * px / tile.height));
+  g.fillStyle = pat;
+  g.fillRect(0, 0, px, px);
+  return cv.toDataURL('image/png');
+}
+// 지금 폼 값(색·간격)을 얹은 스펙
+const liveSpec = () => ({ ...spec, palette: { ...spec.palette, ...draft.palette }, pattern: { ...spec.pattern, size: [draft.params.sizeX, draft.params.sizeY] } });
+// 벽지는 기본 바닥(FL-01) 방에, 바닥은 기본 벽지(WP-01) 방에 붙여 본다
+function showPattern3D() {
+  const s = liveSpec(), wp = cur.cat === 'wallpaper';
+  shell = buildShell(wp ? s : specOf('wp-01'), wp ? specOf('fl-01') : s);
+  holder = shell.group;
+  scene.add(holder);
+  frame();
+  $('viewerMsg').hidden = true;
+}
+function refreshPattern() {
+  if (cur?.type !== 'pattern') return;
+  const s = liveSpec();
+  if (mode === '3d' && shell) cur.cat === 'wallpaper' ? shell.setWallpaper(s) : shell.setFloor(s);
+  if (mode === 'flat') drawFlat();
+}
+// 무늬 크게: 실제 크기로 몇 칸 반복 + 1m 눈금
+function drawFlat() {
+  const cv = $('flat'), px = Math.round((cv.clientWidth || 600) * Math.min(devicePixelRatio, 2));
+  cv.width = cv.height = px;
+  const s = liveSpec(), [sw, sh] = s.pattern.size;
+  const meters = Math.min(7, Math.max(1.6, Math.max(sw, sh) * 2.2));
+  const g = cv.getContext('2d'), tile = patternCanvas(s, 128), pat = g.createPattern(tile, 'repeat');
+  pat.setTransform(new DOMMatrix().scale((sw / meters) * px / tile.width, (sh / meters) * px / tile.height));
+  g.fillStyle = pat;
+  g.fillRect(0, 0, px, px);
+  const u = px / 600, m = px / meters, x = 16 * u, y = px - 22 * u;
+  g.fillStyle = 'rgba(255,255,255,.88)';
+  g.fillRect(x - 8 * u, y - 24 * u, m + 16 * u, 36 * u);
+  g.fillStyle = '#3B2F28';
+  g.fillRect(x, y, m, 4 * u);
+  g.fillRect(x, y - 6 * u, 2 * u, 14 * u); g.fillRect(x + m - 2 * u, y - 6 * u, 2 * u, 14 * u);
+  g.font = `${14 * u}px "Gowun Dodum", sans-serif`;
+  g.fillText(`1m · 무늬 한 칸 ${sw}×${sh}m`, x, y - 8 * u);
+}
+
+/* ---------- 방 껍데기 (게임 src/gameplay/house/room.js 의 buildRoom 을 줄여 옮김) ---------- */
+// 8×8 칸, 북·서·동 벽(앞 벽 없음), 징두리·몰딩·걸레받이, 창문 둘, 문 매트. 뷰어에서는 방 가운데가 원점.
+const ROOM_W = 8, ROOM_D = 8, WALL_H = 2.6, WAINSCOT_H = 0.85, WINDOW_Y = 1.35, WINDOW_W = 0.9, WINDOW_H = 0.8;
+const WINDOWS = ['n:1', 'n:6'], DOOR = { gx0: 3, gx1: 4 };
+const RX0 = -ROOM_W / 2, RZ0 = -ROOM_D / 2;   // 방 기준 좌표 (0, 0) = 북서쪽 모서리
+function buildShell(wallpaper, floor) {
+  const group = new THREE.Group(), sm = {};
+  const colorOf = name => frameSpec?.palette?.[name] ?? wallpaper?.palette?.[name] ?? '#FFFFFF';
+  const mat = name => sm[name] ??= new THREE.MeshToonMaterial({ color: colorOf(name), gradientMap: grad });
+  const add = (name, w, h, d, x, y, z, rotY = 0) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(name));
+    m.position.set(x, y, z);
+    m.rotation.y = rotY;
+    group.add(m);
+  };
+  add('floorEdge', ROOM_W + 0.4, 0.3, ROOM_D + 0.2, 0, -0.152, -0.1);
+  add('floorEdge', ROOM_W + 0.4, 0.34, 0.06, 0, -0.15, ROOM_D / 2 + 0.03);
+  const walls = [
+    { len: ROOM_W + 0.48, inner: ROOM_W, cx: 0, cz: RZ0 - 0.12, rot: 0, inX: 0, inZ: 1 },
+    { len: ROOM_D + 0.24, inner: ROOM_D, cx: RX0 - 0.12, cz: 0.12, rot: Math.PI / 2, inX: 1, inZ: 0 },
+    { len: ROOM_D + 0.24, inner: ROOM_D, cx: RX0 + ROOM_W + 0.12, cz: 0.12, rot: Math.PI / 2, inX: -1, inZ: 0 },
+  ];
+  sm.wallpaper = new THREE.MeshToonMaterial({ color: '#FFFFFF', gradientMap: grad });
+  for (const w of walls) {
+    const at = (off, y) => [w.cx + w.inX * off, y, w.cz + w.inZ * off];
+    add('wallEdge', w.len, WALL_H, 0.24, ...at(0, WALL_H / 2), w.rot);
+    add('wainscot', w.len - 0.24, WAINSCOT_H, 0.05, ...at(0.135, WAINSCOT_H / 2), w.rot);
+    add('molding', w.len - 0.24, 0.07, 0.09, ...at(0.165, WAINSCOT_H + 0.01), w.rot);
+    add('baseboard', w.len - 0.24, 0.13, 0.08, ...at(0.17, 0.065), w.rot);
+    add('molding', w.len, 0.1, 0.1, ...at(0.13, WALL_H - 0.05), w.rot);
+    // 벽지 판: UV = (벽을 따라 m, 높이 m)
+    const h = WALL_H - WAINSCOT_H, g = new THREE.PlaneGeometry(w.inner, h), uv = g.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w.inner, WAINSCOT_H + uv.getY(i) * h);
+    if (w.inX) g.rotateY(w.inX > 0 ? Math.PI / 2 : -Math.PI / 2);
+    const [px, , pz] = at(0.122, 0);
+    g.translate(w.inX ? px : 0, WAINSCOT_H + h / 2, w.inX ? 0 : pz);
+    group.add(new THREE.Mesh(g, sm.wallpaper));
+  }
+  for (const sx of [-1, 1]) add('molding', 0.3, WALL_H + 0.04, 0.3, sx * (ROOM_W / 2 + 0.12), WALL_H / 2, RZ0 + ROOM_D + 0.1);
+  for (const key of WINDOWS) {
+    const cx = RX0 + Number(key.split(':')[1]) + 0.5, wz = RZ0 + 0.01;
+    add('pane', WINDOW_W - 0.08, WINDOW_H - 0.08, 0.02, cx, WINDOW_Y, wz + 0.005);
+    add('frameTrim', WINDOW_W + 0.06, 0.07, 0.06, cx, WINDOW_Y + WINDOW_H / 2, wz + 0.02);
+    add('frameTrim', WINDOW_W + 0.06, 0.07, 0.06, cx, WINDOW_Y - WINDOW_H / 2, wz + 0.02);
+    add('frameTrim', 0.07, WINDOW_H, 0.06, cx - WINDOW_W / 2, WINDOW_Y, wz + 0.02);
+    add('frameTrim', 0.07, WINDOW_H, 0.06, cx + WINDOW_W / 2, WINDOW_Y, wz + 0.02);
+    add('frameTrim', 0.04, WINDOW_H - 0.08, 0.03, cx, WINDOW_Y, wz + 0.02);
+    add('frameTrim', WINDOW_W - 0.08, 0.04, 0.03, cx, WINDOW_Y, wz + 0.02);
+    add('frameTrim', WINDOW_W + 0.18, 0.06, 0.14, cx, WINDOW_Y - WINDOW_H / 2 - 0.05, wz + 0.07);
+  }
+  const mx = RX0 + (DOOR.gx0 + DOOR.gx1 + 1) / 2, mz = RZ0 + ROOM_D - 0.42;
+  add('doormatEdge', 1.36, 0.03, 0.66, mx, 0.012, mz);
+  add('doormat', 1.2, 0.034, 0.52, mx, 0.014, mz);
+  const fg = new THREE.PlaneGeometry(ROOM_W, ROOM_D), fuv = fg.attributes.uv;
+  for (let i = 0; i < fuv.count; i++) fuv.setXY(i, fuv.getX(i) * ROOM_W, fuv.getY(i) * ROOM_D);
+  fg.rotateX(-Math.PI / 2);
+  sm.roomFloor = new THREE.MeshToonMaterial({ color: '#FFFFFF', gradientMap: grad });
+  group.add(new THREE.Mesh(fg, sm.roomFloor));
+  const swap = (m, tex) => { m.map?.dispose(); m.map = tex; m.needsUpdate = true; };
+  const out = {
+    group,
+    setWallpaper(s) {
+      if (!s?.pattern) return;
+      swap(sm.wallpaper, patternTexture(s));
+      const pal = s.palette ?? {};
+      for (const k of ['wainscot', 'molding', 'baseboard']) if (pal[k]) sm[k].color.set(pal[k]);
+      sm.wallEdge.color.set(pal[s.pattern.base] ?? pal.base ?? '#F7EBD3');
+    },
+    setFloor(s) {
+      if (!s?.pattern) return;
+      swap(sm.roomFloor, patternTexture(s));
+      if (s.palette?.edge) sm.floorEdge.color.set(s.palette.edge);
+    },
+  };
+  out.setWallpaper(wallpaper);
+  out.setFloor(floor);
+  return out;
+}
+
+/* ---------- 방 배치 규칙 (게임 src/gameplay/house/grid.js · interior.js 의 checkRoom 을 옮김) ---------- */
+// 바닥 가구 { gx, gz, rot } — (gx, gz) 는 돌린 발자국의 북서쪽 칸, rot 0 남 · 1 동 · 2 북 · 3 서 (정면 방향).
+// 벽 가구 { wall: n|w|e, slot } — 북쪽 벽 slot = gx, 서·동쪽 벽 slot = gz. 창문 자리 n:1·n:6 (창문 가구만), 문 매트 (3,7)·(4,7) 은 비워 둔다.
+// 가구는 지금 있는 것 item(아이템 id), 새 가구는 fu(FU 번호) + 모델이 없을 때 그릴 box·color. 주민 자리 host { lx, lz, face }.
+const dims = ([w, d], rot) => (rot % 2 ? [d, w] : [w, d]);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const round1 = v => Math.round(v * 10) / 10;
+function cellsOf(e, fp) {
+  const [w, d] = dims(fp, e.rot ?? 0), out = [];
+  for (let z = 0; z < d; z++) for (let x = 0; x < w; x++) out.push([e.gx + x, e.gz + z]);
+  return out;
+}
+function boxOf(e, fp) { const [w, d] = dims(fp, e.rot ?? 0); return { x0: e.gx, z0: e.gz, x1: e.gx + w, z1: e.gz + d, cx: e.gx + w / 2, cz: e.gz + d / 2 }; }
+const DOOR_CELLS = new Set([`${DOOR.gx0},${ROOM_D - 1}`, `${DOOR.gx1},${ROOM_D - 1}`]);
+const WINDOW_SET = new Set(WINDOWS);
+const WALL_LABEL = { n: '북쪽', w: '서쪽', e: '동쪽' }, ROT_LABEL = ['남쪽 보기', '동쪽 보기', '북쪽 보기', '서쪽 보기'], FACE_LABEL = { n: '북', e: '동', s: '남 (문 쪽)', w: '서' };
+const furnModels = () => models.filter(m => m.area === 'furniture');
+function resolveFurn(e) {
+  const m = furnModels().find(x => (e.item && x.item === e.item) || (e.fu && x.id === e.fu)) ?? null;
+  const box = Array.isArray(e.box) ? e.box : [1, 1, 0.8];
+  return { e, m, place: m?.place ?? (e.wall ? 'wall' : 'floor'), layer: m?.layer ?? null, footprint: m?.footprint ?? (e.wall ? [1, 1] : [box[0], box[1]]), name: m?.name ?? e.name ?? e.fu ?? e.item ?? '가구' };
+}
+const hostHits = (h, r) => { const b = boxOf(r.e, r.footprint); return h.lx > b.x0 - 0.3 && h.lx < b.x1 + 0.3 && h.lz > b.z0 - 0.3 && h.lz < b.z1 + 0.3; };
+/** 배치 검사 → { problems: [글], bad: Set(_id | 'host') } — 게임 checkRoom 과 같은 규칙 (겹치면 양쪽 다 빨갛게) */
+function checkLayout(L) {
+  const problems = [], bad = new Set(), owner = new Map();
+  const list = L.furniture.map(resolveFurn);
+  const flag = (r, text) => { problems.push(`${r.name}: ${text}`); bad.add(r.e._id); };
+  for (const r of list) {
+    const e = r.e;
+    if (e.item && !r.m) flag(r, '가구 목록에 없는 아이템이에요');
+    if (r.place === 'wall' || r.place === 'window') {
+      if (!e.wall) { flag(r, '벽 가구는 벽에 걸어요'); continue; }
+      const key = `${e.wall}:${e.slot}`;
+      if (!(e.slot >= 0 && e.slot < (e.wall === 'n' ? ROOM_W : ROOM_D))) flag(r, `벽 자리 ${key} 가 방 밖이에요`);
+      if (r.place === 'window' ? !WINDOW_SET.has(key) : WINDOW_SET.has(key)) flag(r, r.place === 'window' ? `창문 자리가 아니에요 (${key})` : `창문 자리에는 걸 수 없어요 (${key})`);
+      const o = owner.get('wall|' + key);
+      if (o) { flag(r, `벽 자리 ${key} 에 다른 가구가 있어요`); bad.add(o); } else owner.set('wall|' + key, e._id);
+      continue;
+    }
+    if (e.wall) { flag(r, '바닥 가구인데 벽에 걸었어요'); continue; }
+    const layer = r.layer === 'rug' ? 'rug' : 'solid';
+    for (const [x, z] of cellsOf(e, r.footprint)) {
+      if (x < 0 || z < 0 || x >= ROOM_W || z >= ROOM_D) { flag(r, `(${e.gx}, ${e.gz}) 방 밖으로 나가요`); break; }
+      if (DOOR_CELLS.has(`${x},${z}`)) { flag(r, `(${e.gx}, ${e.gz}) 문 매트 칸을 막아요`); break; }
+      const k = `${layer}|${x},${z}`, o = owner.get(k);
+      if (o && o !== e._id) { flag(r, `(${e.gx}, ${e.gz}) ${list.find(q => q.e._id === o)?.name ?? '다른 가구'}와 겹쳐요`); bad.add(o); break; }
+      owner.set(k, e._id);
+    }
+  }
+  const h = L.host;
+  if (!h || !Number.isFinite(h.lx) || !Number.isFinite(h.lz) || !['n', 'e', 's', 'w'].includes(h.face)) { problems.push('주민 자리 host = { lx, lz, face } 가 필요해요'); bad.add('host'); }
+  else {
+    if (h.lx < 0.5 || h.lx > ROOM_W - 0.5 || h.lz < 0.5 || h.lz > ROOM_D - 1.2) { problems.push('주민 자리가 방 가장자리·문 매트에 너무 가까워요'); bad.add('host'); }
+    for (const r of list) if (!r.e.wall && r.layer !== 'rug' && hostHits(h, r)) { problems.push(`주민 자리가 ${r.name}와 겹쳐요`); bad.add('host'); }
+  }
+  return { problems, bad };
+}
+const furnColor = r => {
+  if (!r.m) return r.e.color ?? '#C99A63';
+  const sp = r.m.spec ?? {}, pal = { ...(sp.palette ?? {}), ...(sp.variants?.[r.e.variant]?.palette ?? {}) };
+  return Object.values(pal)[0] ?? '#C99A63';
+};
+// 격자 썸네일: 위 띠 = 북쪽 벽지, 아래 = 바닥 8×8 + 가구 상자 + 주민 자리
+function roomThumb(r) {
+  const px = 152, band = 18, cell = px / 8, ch = (px - band) / 8;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = px;
+  const g = cv.getContext('2d');
+  const fill = (s, x, y, w, h) => {
+    if (!s?.pattern) { g.fillStyle = '#E9DFCF'; g.fillRect(x, y, w, h); return; }
+    const t = patternCanvas(s, 32), pat = g.createPattern(t, 'repeat');
+    pat.setTransform?.(new DOMMatrix().translate(x, y).scale(s.pattern.size[0] * cell / t.width, s.pattern.size[1] * cell / t.height));
+    g.fillStyle = pat;
+    g.fillRect(x, y, w, h);
+  };
+  fill(specOf(r.wallpaper), 0, 0, px, band);
+  fill(specOf(r.floor), 0, band, px, px - band);
+  g.strokeStyle = '#3B2F28'; g.lineWidth = 1.5;
+  const list = (r.furniture ?? []).map(resolveFurn).sort((a, b) => (b.layer === 'rug') - (a.layer === 'rug'));
+  for (const f of list) {
+    const e = f.e;
+    let x, y, w, h;
+    if (e.wall) [x, y, w, h] = e.wall === 'n' ? [e.slot * cell, 2, cell, band - 4] : [e.wall === 'w' ? 0 : px - 6, band + e.slot * ch, 6, ch];
+    else { const [fw, fd] = dims(f.footprint, e.rot ?? 0); [x, y, w, h] = [e.gx * cell, band + e.gz * ch, fw * cell, fd * ch]; }
+    g.globalAlpha = f.layer === 'rug' ? 0.6 : 1;
+    g.fillStyle = furnColor(f);
+    g.fillRect(x + 1, y + 1, w - 2, h - 2);
+    g.strokeRect(x + 1, y + 1, w - 2, h - 2);
+  }
+  g.globalAlpha = 1;
+  if (r.host) { g.fillStyle = '#F2B36B'; g.beginPath(); g.arc(r.host.lx * cell, band + r.host.lz * ch, cell * 0.32, 0, Math.PI * 2); g.fill(); g.stroke(); }
+  return cv.toDataURL('image/png');
+}
+
+/* ---------- 방 3D 보기: 껍데기 + 가구 모델 (게임 visit.js 의 poseRoot 와 같은 자리) ---------- */
+function wallMount(wall, slot) {
+  const gap = 0.012;
+  if (wall === 'n') return { x: RX0 + slot + 0.5, z: RZ0 + gap, rotY: 0 };
+  if (wall === 'w') return { x: RX0 + gap, z: RZ0 + slot + 0.5, rotY: Math.PI / 2 };
+  return { x: RX0 + ROOM_W - gap, z: RZ0 + slot + 0.5, rotY: -Math.PI / 2 };
+}
+function poseRoot(root, r) {
+  const e = r.e;
+  if (e.wall) { const m = wallMount(e.wall, e.slot); root.position.set(m.x, 0, m.z); root.rotation.y = m.rotY; }
+  else { const b = boxOf(e, r.footprint); root.position.set(RX0 + b.cx, 0, RZ0 + b.cz); root.rotation.y = (e.rot ?? 0) * Math.PI / 2; }
+}
+const furnCache = {};
+const furnGLTF = m => furnCache[m.slug] ??= loadJSON(`${FURN}models/${m.slug}.glb.json`).then(j => parseGLB(j.data)).catch(e => { delete furnCache[m.slug]; throw e; });
+async function furniturePiece(e) {
+  const r = resolveFurn(e);
+  if (!r.m) return placeholderPiece(r);
+  const gltf = await furnGLTF(r.m);
+  const sp = r.m.spec ?? {}, pal = { ...(sp.palette ?? {}), ...(sp.variants?.[e.variant]?.palette ?? {}) };
+  const FLAT = new Set(sp.style?.flat ?? []), obj = gltf.scene.clone(true), meshes = [];
+  obj.traverse(o => {
+    if (!o.isMesh) return;
+    const name = o.material.name, color = pal[name] ?? o.material.color;
+    const m = FLAT.has(name) ? new THREE.MeshBasicMaterial({ color }) : new THREE.MeshToonMaterial({ color, gradientMap: grad });
+    m.name = name;
+    o.material = m;
+    o.userData.keepGeo = true;
+    meshes.push(o);
+  });
+  for (const o of meshes) {
+    if (NO_OUTLINE.has(o.material.name) || sp.style?.noOutline?.includes(o.material.name)) continue;
+    const ol = new THREE.Mesh(o.geometry, outlineMat);
+    ol.userData.keepGeo = true;
+    o.add(ol);
+  }
+  const root = new THREE.Group();
+  root.add(obj);
+  poseRoot(root, r);
+  return root;
+}
+/** 모델이 없는 새 가구: box [가로, 깊이, 높이] 색 상자 */
+function placeholderPiece(r) {
+  const [bw, bd, bh] = Array.isArray(r.e.box) ? r.e.box : [r.footprint[0], r.footprint[1], 0.8];
+  const floor = !r.e.wall;
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(bw * 0.92, bh, bd * 0.92), new THREE.MeshToonMaterial({ color: r.e.color ?? '#C99A63', gradientMap: grad }));
+  mesh.position.set(0, floor ? bh / 2 : 1.2, floor ? 0 : bd / 2);
+  const root = new THREE.Group();
+  root.add(mesh);
+  poseRoot(root, r);
+  return root;
+}
+// 주민 자리: 캐릭터 키(1.0) 만한 기둥 + 바라보는 쪽 코
+function hostMarker(h) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.9, 16), new THREE.MeshToonMaterial({ color: 0xf2b36b, gradientMap: grad }));
+  body.position.y = 0.45;
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.24, 12), new THREE.MeshToonMaterial({ color: 0x3b2f28, gradientMap: grad }));
+  nose.rotation.x = Math.PI / 2;
+  nose.position.set(0, 0.72, 0.28);
+  g.add(body, nose);
+  g.position.set(RX0 + h.lx, 0, RZ0 + h.lz);
+  g.rotation.y = { s: 0, e: Math.PI / 2, n: Math.PI, w: -Math.PI / 2 }[h.face] ?? 0;
+  return g;
+}
+async function showRoom3D(keepCamera = false) {
+  const seq = loadSeq, L = draft.layout;
+  shell = buildShell(specOf(L.wallpaper) ?? specOf('wp-01'), specOf(L.floor) ?? specOf('fl-01'));
+  holder = shell.group;
+  holder.add(hostMarker(L.host));
+  scene.add(holder);
+  outlineW.value = 0.008;
+  if (!keepCamera) frame();
+  $('viewerMsg').hidden = !L.furniture.length;
+  $('viewerMsg').textContent = '가구 불러오는 중…';
+  const pieces = await Promise.all(L.furniture.map(e => furniturePiece(e).catch(() => placeholderPiece(resolveFurn(e)))));
+  if (seq !== loadSeq) { pieces.forEach(disposeTree); return; }
+  pieces.forEach(p => holder.add(p));
+  $('viewerMsg').hidden = true;
+}
+
+/* ---------- 방 배치 격자 (ET-04) ---------- */
+// 그림 크기 (칸 단위): 서·동 벽 띠 0.6 + 8칸 + 0.6, 북 벽 띠 0.6 + 8칸. 좌표 (x, z) = 방 기준 (북서쪽 모서리 0,0)
+const OX = 0.6, OZ = 0.6, PW = ROOM_W + 2 * OX, PH = ROOM_D + OZ;
+const at = (x, z, w, d) => `left:${(x + OX) / PW * 100}%;top:${(z + OZ) / PH * 100}%;width:${w / PW * 100}%;height:${d / PH * 100}%`;
+let selPiece = null, drag = null;   // selPiece = 가구 _id | 'host' | null
+const bgCache = {};
+const bgURL = s => bgCache[s.slug] ??= patternCanvas(s, 64).toDataURL('image/png');
+function renderPlan() {
+  const L = draft.layout, wp = specOf(L.wallpaper), fl = specOf(L.floor), chk = checkLayout(L), fp = frameSpec?.palette ?? {};
+  // 무늬 배경: 한 칸 = 1m, 그림 요소 크기(칸) 대비 무늬 크기(m)
+  const bg = (s, w, h) => s?.pattern ? `background-image:url(${bgURL(s)});background-size:${s.pattern.size[0] / w * 100}% ${s.pattern.size[1] / h * 100}%;background-color:${resolveFill(s, s.pattern.base) ?? '#FFF'}` : 'background-color:#EEE';
+  const parts = [
+    `<div class="plan-wall" style="${at(-OX, -OZ, PW, OZ)};${bg(wp, PW, OZ)};border-color:${wp?.palette?.molding ?? '#8C6440'}"></div>`,
+    `<div class="plan-wall" style="${at(-OX, 0, OX, ROOM_D)};${bg(wp, OX, ROOM_D)};border-color:${wp?.palette?.molding ?? '#8C6440'}"></div>`,
+    `<div class="plan-wall" style="${at(ROOM_W, 0, OX, ROOM_D)};${bg(wp, OX, ROOM_D)};border-color:${wp?.palette?.molding ?? '#8C6440'}"></div>`,
+    `<div class="plan-floor" style="${at(0, 0, ROOM_W, ROOM_D)};${bg(fl, ROOM_W, ROOM_D)}"></div>`,
+    ...WINDOWS.map(k => `<div class="plan-win" style="${at(Number(k.split(':')[1]) + 0.08, -0.5, 0.84, 0.36)};background:${fp.pane ?? '#CDEBF5'};border-color:${fp.frameTrim ?? '#FFF8E6'}"></div>`),
+    `<div class="plan-mat" style="${at(3.32, 7.24, 1.36, 0.66)};background:${fp.doormat ?? '#C96F4A'};border:3px solid ${fp.doormatEdge ?? '#8C4A33'}">문</div>`,
+    `<div class="plan-grid" style="${at(0, 0, ROOM_W, ROOM_D)}"></div>`,
+  ];
+  const list = L.furniture.map(resolveFurn).sort((a, b) => (b.layer === 'rug') - (a.layer === 'rug'));
+  for (const r of list) {
+    const e = r.e;
+    let pos;
+    if (e.wall) pos = e.wall === 'n' ? at(e.slot + 0.06, -OZ + 0.04, 0.88, OZ - 0.08) : at(e.wall === 'w' ? -OX + 0.04 : ROOM_W + 0.04, e.slot + 0.06, OX - 0.08, 0.88);
+    else { const [w, d] = dims(r.footprint, e.rot ?? 0); pos = at(e.gx + 0.04, e.gz + 0.04, w - 0.08, d - 0.08); }
+    const cls = ['piece', r.layer === 'rug' && 'rug', e.wall && 'wall', selPiece === e._id && 'sel', chk.bad.has(e._id) && 'bad'].filter(Boolean).join(' ');
+    const v = e.variant && r.m?.spec?.variants?.[e.variant], vc = v ? Object.values(v.palette)[0] : null;
+    parts.push(`<div class="${cls}" data-pid="${esc(e._id)}" style="${pos};${r.m ? '' : `background:${esc(e.color ?? '#C99A63')}`}" title="${esc(r.name)}${v ? ` · ${esc(v.label)}` : ''}">`
+      + (r.m ? `<img src="${FURN}renders/${esc(r.m.slug)}_thumb.png" alt="" draggable="false">` : '')
+      + `<span class="lbl">${esc(r.name)}</span>${e.wall ? '' : `<i class="front f${e.rot ?? 0}"></i>`}${vc ? `<i class="vdot" style="background:${vc}"></i>` : ''}</div>`);
+  }
+  const h = L.host;
+  parts.push(`<div class="host${selPiece === 'host' ? ' sel' : ''}${chk.bad.has('host') ? ' bad' : ''}" data-host style="left:${(h.lx + OX) / PW * 100}%;top:${(h.lz + OZ) / PH * 100}%" title="주민 자리 (${esc(cur.ownerName ?? '')})">${esc((cur.ownerName ?? '주')[0])}<i class="${esc(h.face)}"></i></div>`);
+  $('plan').innerHTML = parts.join('');
+  renderChecks(chk);
+}
+function renderChecks(chk) {
+  const ul = $('roomChecks');
+  ul.className = 'checks' + (chk.problems.length ? '' : ' ok');
+  ul.innerHTML = chk.problems.length ? chk.problems.map(p => `<li>${esc(p)}</li>`).join('') : '<li>배치 검사 통과 — 겹침·문 매트·창문 자리·주민 자리 모두 괜찮아요</li>';
+}
+function roomSwatches() {
+  const L = draft.layout, sw = s => { const p = models.find(m => m.type === 'pattern' && m.slug === s); return p ? thumbOf(p) : ''; };
+  $('roomWpSw').src = sw(L.wallpaper); $('roomFlSw').src = sw(L.floor);
+}
+function renderRoomTools() {
+  const L = draft.layout;
+  const opt = (cat, v) => models.filter(m => m.cat === cat).map(m => `<option value="${esc(m.slug)}"${m.slug === v ? ' selected' : ''}>${esc(m.id)} ${esc(m.name)}${m.spec?.shopOnly ? ' (상점 한정)' : m.spec?.starter ? ' (처음부터)' : ''}</option>`).join('');
+  $('roomName').value = L.name ?? '';
+  $('roomWp').innerHTML = opt('wallpaper', L.wallpaper);
+  $('roomFl').innerHTML = opt('floor', L.floor);
+  $('addFurn').innerHTML = furnModels().map(m => `<option value="${esc(m.key)}">${esc(m.id)} ${esc(m.name)} · ${m.place === 'window' ? '창문' : m.place === 'wall' ? '벽' : `${m.footprint?.[0]}×${m.footprint?.[1]}칸`}</option>`).join('');
+  roomSwatches(); renderSel(); renderChecks(checkLayout(L));
+}
+function renderSel() {
+  const L = draft.layout, box = $('selPiece');
+  if (selPiece === 'host') {
+    const h = L.host;
+    box.innerHTML = `<b>주민 자리</b><span class="small muted">(${h.lx}, ${h.lz})</span><span class="ctl-label">바라보는 쪽</span><div class="seg" role="group" aria-label="바라보는 쪽">${['n', 'e', 's', 'w'].map(f => `<button type="button" data-face="${f}" aria-pressed="${h.face === f}">${FACE_LABEL[f]}</button>`).join('')}</div>`;
+    return;
+  }
+  const e = L.furniture.find(f => f._id === selPiece);
+  if (!e) { box.innerHTML = '<span class="small muted">격자에서 가구나 주민 자리(동그라미)를 눌러 고르고 끌어서 옮겨요. 초록 막대가 가구 정면이에요. 키보드: 방향키 옮기기 · R 돌리기 · Delete 빼기</span>'; return; }
+  const r = resolveFurn(e), vs = Object.entries(r.m?.spec?.variants ?? {});
+  box.innerHTML = `<b>${esc(r.name)}</b><span class="small muted">${esc(r.m?.id ?? e.fu ?? '')} · ${e.wall ? `${WALL_LABEL[e.wall]} 벽 ${e.slot}번` : `(${e.gx}, ${e.gz}) ${ROT_LABEL[e.rot ?? 0]}`}</span>`
+    + (e.wall ? '' : '<button type="button" class="btn" data-act="rot">↻ 돌리기</button>')
+    + (vs.length ? `<select data-act="variant" aria-label="색">${vs.map(([k, v]) => `<option value="${esc(k)}"${(e.variant ?? vs[0][0]) === k ? ' selected' : ''}>${esc(v.label)}</option>`).join('')}</select>` : '')
+    + '<button type="button" class="btn" data-act="del">빼기</button>';
+}
+function layoutChanged() {
+  save(); renderStats(); renderSel(); roomSwatches();
+  if (mode === 'plan') renderPlan();
+  else { renderChecks(checkLayout(draft.layout)); if (mode === '3d') { clearModel(); showRoom3D(true); } }
+}
+function rotatePiece(p) {
+  const [w, d] = dims(resolveFurn(p).footprint, (p.rot = ((p.rot ?? 0) + 1) % 4));
+  p.gx = clamp(p.gx, 0, ROOM_W - w); p.gz = clamp(p.gz, 0, ROOM_D - d);
+}
+function removePiece(p) { draft.layout.furniture = draft.layout.furniture.filter(f => f !== p); selPiece = null; }
+// 새 가구: 바닥은 북서쪽부터 처음 맞는 칸, 벽은 빈 벽 자리 (창문 가구는 빈 창문)
+function addFurniture() {
+  const m = models.find(x => x.key === $('addFurn').value), L = draft.layout;
+  if (!m) return;
+  const e = { item: m.item, _id: 'n' + Date.now().toString(36) };
+  if (m.place === 'floor') {
+    const r = resolveFurn(e), [w, d] = dims(r.footprint, 0);
+    let spot = null;
+    for (let gz = 0; gz <= ROOM_D - d && !spot; gz++) for (let gx = 0; gx <= ROOM_W - w && !spot; gx++) {
+      Object.assign(e, { gx, gz, rot: 0 });
+      if (!checkLayout({ ...L, furniture: [...L.furniture, e] }).bad.has(e._id) && !hostHits(L.host, r)) spot = { gx, gz };
+    }
+    Object.assign(e, spot ?? { gx: 0, gz: 0 }, { rot: 0 });
+  } else {
+    const slots = m.place === 'window' ? WINDOWS : ['n', 'w', 'e'].flatMap(w => Array.from({ length: 8 }, (_, i) => `${w}:${i}`)).filter(k => !WINDOW_SET.has(k));
+    const [wall, s] = (slots.find(k => !L.furniture.some(f => f.wall && `${f.wall}:${f.slot}` === k)) ?? slots[0]).split(':');
+    Object.assign(e, { wall, slot: Number(s) });
+  }
+  L.furniture.push(e);
+  selPiece = e._id;
+  layoutChanged();
+}
+$('roomTools').addEventListener('click', ev => {
+  const L = draft?.layout;
+  if (!L) return;
+  if (ev.target.id === 'addFurnBtn') { addFurniture(); return; }
+  const b = ev.target.closest('[data-act="rot"],[data-act="del"],[data-face]');
+  if (!b) return;
+  if (b.dataset.face) L.host.face = b.dataset.face;
+  else {
+    const p = L.furniture.find(f => f._id === selPiece);
+    if (!p) return;
+    if (b.dataset.act === 'rot') rotatePiece(p); else removePiece(p);
+  }
+  layoutChanged();
+});
+$('roomTools').addEventListener('change', ev => {
+  const L = draft?.layout, t = ev.target;
+  if (!L) return;
+  if (t.id === 'roomWp') L.wallpaper = t.value;
+  else if (t.id === 'roomFl') L.floor = t.value;
+  else if (t.dataset.act === 'variant') { const p = L.furniture.find(f => f._id === selPiece); if (!p) return; p.variant = t.value; }
+  else return;
+  layoutChanged();
+});
+$('roomName').addEventListener('input', ev => { if (draft?.layout) { draft.layout.name = ev.target.value; save(); } });
+
+// 끌기: 격자 전체가 포인터를 잡고(다시 그려도 끊기지 않게) 칸에 맞춰 옮긴다. 바닥 가구는 북서쪽 칸, 벽 가구는 가까운 벽 자리, 주민 자리는 0.1칸
+const plan = $('plan');
+const toUnits = ev => { const b = plan.getBoundingClientRect(); return [(ev.clientX - b.left) / b.width * PW - OX, (ev.clientY - b.top) / b.height * PH - OZ]; };
+const wallSpot = (x, z) => {
+  const wall = z <= Math.min(x, ROOM_W - x) ? 'n' : x < ROOM_W - x ? 'w' : 'e';
+  return { wall, slot: clamp(Math.floor(wall === 'n' ? x : z), 0, (wall === 'n' ? ROOM_W : ROOM_D) - 1) };
+};
+plan.addEventListener('pointerdown', ev => {
+  const L = draft?.layout;
+  if (!L) return;
+  plan.focus({ preventScroll: true });
+  const p = ev.target.closest('[data-pid]'), h = ev.target.closest('[data-host]');
+  const [x, z] = toUnits(ev);
+  if (h) { selPiece = 'host'; drag = { kind: 'host', dx: x - L.host.lx, dz: z - L.host.lz }; }
+  else if (p) {
+    const e = L.furniture.find(f => f._id === p.dataset.pid);
+    selPiece = e._id;
+    drag = e.wall ? { kind: 'wall', e } : { kind: 'floor', e, dx: x - e.gx, dz: z - e.gz };
+  } else { selPiece = null; drag = null; renderPlan(); renderSel(); return; }
+  ev.preventDefault();
+  try { plan.setPointerCapture(ev.pointerId); } catch {}
+  renderPlan(); renderSel();
+});
+plan.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  const L = draft.layout, [x, z] = toUnits(ev), e = drag.e;
+  if (drag.kind === 'host') {
+    const lx = round1(clamp(x - drag.dx, 0.3, ROOM_W - 0.3)), lz = round1(clamp(z - drag.dz, 0.3, ROOM_D - 0.3));
+    if (lx === L.host.lx && lz === L.host.lz) return;
+    Object.assign(L.host, { lx, lz });
+  } else if (drag.kind === 'floor') {
+    const [w, d] = dims(resolveFurn(e).footprint, e.rot ?? 0);
+    const gx = clamp(Math.round(x - drag.dx), 0, ROOM_W - w), gz = clamp(Math.round(z - drag.dz), 0, ROOM_D - d);
+    if (gx === e.gx && gz === e.gz) return;
+    Object.assign(e, { gx, gz });
+  } else {
+    const s = wallSpot(x, z);
+    if (s.wall === e.wall && s.slot === e.slot) return;
+    Object.assign(e, s);
+  }
+  drag.moved = true;
+  renderPlan();
+});
+const endDrag = () => { const moved = drag?.moved; drag = null; if (moved) layoutChanged(); };
+plan.addEventListener('pointerup', endDrag);
+plan.addEventListener('pointercancel', endDrag);
+plan.addEventListener('keydown', ev => {
+  const L = draft?.layout;
+  if (!L || !selPiece) return;
+  const step = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[ev.key];
+  if (selPiece === 'host') {
+    if (!step) return;
+    const s = ev.shiftKey ? 0.5 : 0.1;
+    L.host.lx = round1(clamp(L.host.lx + step[0] * s, 0.3, ROOM_W - 0.3));
+    L.host.lz = round1(clamp(L.host.lz + step[1] * s, 0.3, ROOM_D - 0.3));
+  } else {
+    const p = L.furniture.find(f => f._id === selPiece);
+    if (!p) return;
+    if (step) {
+      if (p.wall) p.slot = clamp(p.slot + (p.wall === 'n' ? step[0] : step[1]), 0, 7);
+      else { const [w, d] = dims(resolveFurn(p).footprint, p.rot ?? 0); p.gx = clamp(p.gx + step[0], 0, ROOM_W - w); p.gz = clamp(p.gz + step[1], 0, ROOM_D - d); }
+    } else if (ev.key === 'r' || ev.key === 'R') { if (p.wall) return; rotatePiece(p); }
+    else if (ev.key === 'Delete' || ev.key === 'Backspace') removePiece(p);
+    else return;
+  }
+  ev.preventDefault();
+  layoutChanged();
+});
+
+/* ---------- 방 배치 요청 글 · 배치 JSON ---------- */
+const where = e => e.wall ? `${WALL_LABEL[e.wall]} 벽 ${e.slot}번` : `(${e.gx}, ${e.gz}) ${ROT_LABEL[e.rot ?? 0]}`;
+function layoutJSON(L) {
+  const head = cur.status === 'new' ? { id: cur.id, slug: cur.slug, kind: 'room', owner: cur.spec.owner, ownerName: cur.ownerName } : {};
+  return { ...head, name: L.name, ...(draft.prompt.concept ? { note: draft.prompt.concept } : {}), wallpaper: L.wallpaper, floor: L.floor, host: L.host, furniture: L.furniture.map(({ _id, ...f }) => f) };
+}
+// 방 파일과 같은 모양(가구 한 줄에 하나)으로
+function roomJSON(j) {
+  const { furniture, ...rest } = j;
+  const head = Object.entries(rest).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)}`);
+  return `{\n${[...head, `  "furniture": [${furniture.length ? '\n' + furniture.map(f => '    ' + JSON.stringify(f)).join(',\n') + '\n  ' : ''}]`].join(',\n')}\n}`;
+}
+function roomRequest(refs) {
+  const L = draft.layout, base = pick(spec), B = base.layout, isNewRoom = cur.status === 'new';
+  const out = [isNewRoom ? `[${cur.id} ${cur.ownerName} 방 새로 만들기 요청 · rooms/${cur.slug}.json]` : `[${cur.id} ${cur.ownerName} · ${spec.name} 배치 수정 요청 · 기준 방 v${spec.version}]`];
+  const n0 = out.length;
+  if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
+  out.push(...refLines(refs));
+  if (draft.prompt.concept !== base.prompt.concept) out.push('', '■ 방 설명 (note)', draft.prompt.concept);
+  if (L.name !== B.name) out.push('', '■ 방 이름', `${B.name} → ${L.name}`);
+  const pn = s => { const p = specOf(s); return p ? `${p.id} ${p.name}` : s; };
+  if (L.wallpaper !== B.wallpaper) out.push('', '■ 벽지', `${pn(B.wallpaper)} → ${pn(L.wallpaper)}`);
+  if (L.floor !== B.floor) out.push('', '■ 바닥', `${pn(B.floor)} → ${pn(L.floor)}`);
+  const label = e => { const r = resolveFurn(e), v = r.m?.spec?.variants?.[e.variant]; return `${r.name}${v ? ` · ${v.label.replace(' (기본)', '')}` : ''} (${e.item ?? e.fu})`; };
+  const before = new Map(B.furniture.map(f => [f._id, f])), fl = [];
+  for (const f of L.furniture) {
+    const b = before.get(f._id);
+    if (!b) { fl.push(`- 더함: ${label(f)} → ${where(f)}`); continue; }
+    if (where(b) !== where(f)) fl.push(`- 옮김: ${label(f)} ${where(b)} → ${where(f)}`);
+    if ((b.variant ?? '') !== (f.variant ?? '')) fl.push(`- 색: ${resolveFurn(f).name} ${b.variant ?? '기본'} → ${f.variant ?? '기본'}`);
+  }
+  for (const b of B.furniture) if (!L.furniture.some(f => f._id === b._id)) fl.push(`- 뺌: ${label(b)} ${where(b)}`);
+  if (fl.length) out.push('', '■ 가구', ...fl);
+  const h0 = B.host, h = L.host;
+  if (h.lx !== h0.lx || h.lz !== h0.lz || h.face !== h0.face) out.push('', '■ 주민 자리', `(${h0.lx}, ${h0.lz}) ${FACE_LABEL[h0.face]} → (${h.lx}, ${h.lz}) ${FACE_LABEL[h.face]}`);
+  if (out.length === n0 && !isNewRoom) { out.push('', `(바뀐 내용이 없어요. 이대로 확정이면 "${cur.id} 확정"이라고 보내주세요.)`); return out.join('\n'); }
+  const chk = checkLayout(L);
+  out.push('', '■ 배치 검사', ...(chk.problems.length ? chk.problems.map(p => `- ${p}`) : ['- 문제 없음 (겹침·문 매트·창문 자리·주민 자리)']));
+  out.push('', `■ 배치 JSON (rooms/${cur.slug}.json 에 이 칸들을 그대로)`, roomJSON(layoutJSON(L)));
+  return out.join('\n');
+}
 
 const clock = new THREE.Clock();
 function resize() {
@@ -914,6 +1789,7 @@ function resize() {
 new ResizeObserver(resize).observe(host);
 resize();
 renderer.setAnimationLoop(() => {
+  if (host.hidden || $('viewArea').hidden) return;
   const dt = Math.min(clock.getDelta(), 0.05);
   mixer?.update(dt);
   applyLive();
@@ -922,10 +1798,20 @@ renderer.setAnimationLoop(() => {
 });
 
 const slugFromHash = () => {
-  const h = location.hash.slice(1);
+  const h = decodeURIComponent(location.hash.slice(1));
   return h === 'new' ? NEW : (models.some(m => m.key === h) ? h : null);
 };
 addEventListener('hashchange', () => { const s = slugFromHash(); if (s) select(s); });
-renderTabs();
+renderHead(); renderAreas(); renderTabs();
+// 아이템 목록이 오면 영역 탭에 붙인다 (그 전에 아이템 탭을 열었으면 첫 아이템을 고른다)
+const itemsReady = itemsFetch.then(ix => {
+  models.push(...ix.models.map(m => ({ ...m, category: 'item', key: 'item-' + m.slug, base: ITEMS, area: 'item', cat: m.group, type: 'model' })));
+}).catch(() => {}).finally(() => {
+  itemsLoaded = true;
+  renderHead(); renderAreas();
+  if (area === 'item') { renderTabs(); renderGroups(); if (cur?.area !== 'item' && slug !== NEW && inArea('item')[0]) select(inArea('item')[0].key); }
+});
+if (/^#item-/.test(location.hash)) await itemsReady;
 select(slugFromHash() ?? models[0]?.key);
 </script>
+

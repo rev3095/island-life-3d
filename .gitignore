@@ -16,3 +16,6 @@ Thumbs.db
 # 배경 편집기 게시용 묶음 목록 (node tools/build-editor-index.mjs 로 만든다)
 assets/env/editor-index.json
 assets/furniture/editor-index.json
+assets/items/editor-index.json
+assets/items/editor-models-*.json
+assets/interior/editor-index.json
