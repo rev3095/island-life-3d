@@ -421,17 +421,22 @@ export function makeScenario(bot, sk, opts = {}) {
   });
 
   add('visit', '주민 집 들어가기 (방 구경)', async () => {
-    // 저녁엔 주민이 집에 들어간다 → 집에 있는 가장 가까운 주민 집 문 (가는 동안 나갔으면 다른 집)
-    await bot.setHour(18.5);
-    await bot.wait(20);
-    let who = null;
-    for (let k = 0; k < 4 && !who; k++) {
-      const homes = residents().filter(s => S().town.atHome(s) === 'home').map(s => ({ s, h: S().world.places.villagerHouses.find(x => x.slug === s) })).filter(x => x.h?.door).sort((a, b) => bot.dist(a.h.door) - bot.dist(b.h.door));
-      if (!homes.length) { await bot.wait(15); continue; }
-      await sk.toVillagerDoor(homes[0].s);
-      if (S().town.atHome(homes[0].s) === 'home') who = homes[0].s;
+    // 주민은 자는 시간(밤)엔 노크만 된다. 낮에 '자주 가는 곳 = 집'으로 잠깐 들어가 있을 때 찾아간다 (시각을 바꿔 가며)
+    let who = null, tried = [];
+    for (const hh of [10, 12, 14, 16, 18.5]) {
+      if (who) break;
+      await bot.setHour(hh);
+      for (let k = 0; k < 3 && !who; k++) {
+        await bot.wait(15);
+        const homes = residents().filter(s => S().town.atHome(s) === 'home').map(s => ({ s, h: S().world.places.villagerHouses.find(x => x.slug === s) })).filter(x => x.h?.door).sort((a, b) => bot.dist(a.h.door) - bot.dist(b.h.door));
+        tried.push(`${hh}시 ${homes.length}`);
+        if (!homes.length) continue;
+        await sk.toVillagerDoor(homes[0].s);
+        if (S().town.atHome(homes[0].s) === 'home') who = homes[0].s;
+      }
     }
-    if (!who) return awk('집에 있는 주민이 없어요 (저녁 6시 반)');
+    note('visitTried', tried);
+    if (!who) return awk(`낮에 집에 있는 주민을 못 찾았어요 (${tried.join(', ')})`);
     const v = await sk.visit(who, { goal: { wins: 1 }, shot: '07-villager-room' });
     note('visit', { who, ...v });
     if (!v.entered) return block(`${who} 집 문: 행동 키 ${v.peek}, 방에 못 들어감`);
@@ -446,9 +451,18 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.setHour(18.2);
     await bot.settle(30);
     const P = S().world.places.festival;
-    await bot.walkTo({ x: P.x, z: P.z + 1.6 }, { near: 0.3, label: '광장 가운데' });
-    await bot.face(P);
-    const peek = bot.peek();
+    // 모닥불 둘레 1.6칸 자리를 돌며 '축제 시작'이 뜨는 쪽을 찾는다 (주민이 그쪽에 서 있으면 말 걸기가 먼저 — QA-17)
+    let peek = null, tries = 0;
+    for (const a of [0, 45, -45, 90, -90, 135, -135, 180, 0, 90]) {
+      const r = a * Math.PI / 180;
+      await bot.walkTo({ x: P.x + Math.sin(r) * 1.6, z: P.z + Math.cos(r) * 1.6 }, { near: 0.3, label: '광장 가운데' });
+      await bot.face(P);
+      peek = bot.peek(); tries++;
+      if (peek === 'festival:start') break;
+      if (peek === 'town:talk') bot.issue('polish', 'festival', '모닥불 앞에 주민이 서 있으면 행동 키가 축제 시작 대신 말 걸기로 가요 (우선순위 100 > 95)');
+      await bot.wait(2);
+    }
+    note('festivalStartTries', tries);
     if (peek !== 'festival:start') return block(`광장 가운데에서 행동 키가 '${peek}' (축제 시작이 아님)`);
     bot.policy = { confirm: info => (/사진/.test(info.title) ? Math.max(0, info.buttons.findIndex(b => /괜찮아요/.test(b))) : 0) };
     const shotOn = bot.on('story:shot', e => { if (/s1[01]/.test(e?.id ?? '') && [1, 3].includes(e.index)) bot.shot(`08-${e.id}-${e.shot}`, '축제 장면').catch(() => {}); });
