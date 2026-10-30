@@ -16,9 +16,11 @@ node --test tests/                  # 규칙 테스트 전체 (Node 22+: tests/p
 node --test tests/save.test.mjs     # 테스트 파일 하나
 node tools/build-character.mjs coco | --all [--no-render]        # 캐릭터 9종 Blender 재생성
 node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배경 32종 (nature|prop|building|tile)
+node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용, 커밋 안 함)
+node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 ```
 
-- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=low` 저사양), `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/demos/*.html` 트랙별 데모.
+- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=low` 저사양, `?story=<장면 id>` 장면 재생), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
 - Blender 5.2 경로 기본값 `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe` (`BLENDER` 환경변수로 변경). 빌더는 `.glb`·`.glb.json`·렌더·`stats.json`·`index.json` 을 다시 쓴다. `.blend` 는 gitignore (스크립트로 재생성).
 - lint·빌드 단계는 없다. 브라우저 확인은 dev-server 로 연 주소에서 한다 (`file://` 로는 모듈·fetch 가 안 된다).
 
@@ -76,8 +78,14 @@ node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배�
 
 ### 웹 배포 (게임 링크)
 - 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면 + 묶음 목록) · `packs/<갈래>-<n>.json` · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.
-- 아티팩트는 한 버전에 파일 511개까지라 **에셋(assets/ 의 JSON·.glb.json·그림)은 묶음 파일**로 올라간다 (M6-P0, 게시 파일 145개). 갈래는 `tools/build-web.mjs` `PACKS` (boot = 열자마자 받음). 게시본에서는 `src/core/packs.js` 가 묶음에서 꺼내고, 개발 서버(`/index.html`)는 파일을 하나씩 — 그래서 에셋은 `ctx.assets.loadJSON`·`loadModel` 로 읽고, `<img>` 그림은 `iconEl`/`ctx.assets.url(path)` (blob URL) 로 건다. 직접 `fetch('assets/…')` 는 게시본의 fetch 덮개로만 돈다. 지금 게시본(v6, 파일 하나씩 510개)에서 처음 옮길 때는 `--live` 로 지우기 차례(`publish-<n>.json`)를 만든다. 설계는 `docs/notes/m6-p0-pack.md`.
+- 아티팩트는 한 버전에 파일 511개까지라 **에셋(assets/ 의 JSON·.glb.json·그림)은 묶음 파일**로 올라간다 (M6-P0, 게시 파일 145개). 갈래는 `tools/build-web.mjs` `PACKS` (boot = 열자마자 받음). 게시본에서는 `src/core/packs.js` 가 묶음에서 꺼내고, 개발 서버(`/index.html`)는 파일을 하나씩 — 그래서 에셋은 `ctx.assets.loadJSON`·`loadModel` 로 읽고, `<img>` 그림은 `iconEl`/`ctx.assets.url(path)` (blob URL) 로 건다. 직접 `fetch('assets/…')` 는 게시본의 fetch 덮개로만 돈다. 설계는 `docs/notes/m6-p0-pack.md`.
+- 다시 게시는 바뀐 것만: 빌드 전에 `dist/web/build.json` 을 따로 두고 → 새로 빌드 → `packs[].hash` 가 바뀐 묶음 + `git diff --name-only <지난 build 해시> HEAD -- src index.html` 의 모듈 + 페이지. 새 `files.json` 에 없는 예전 경로는 `files` 에 `null`. 다른 대화에서 올린 파일은 먼저 `list_files`(또는 `read_file`)로 본 뒤 같은 `url` 로 publish (같은 링크 = 플레이어 저장이 남는다). 게시 버전·빌드 해시는 devlog 「게시물」과 홈 `status/game` 에 적는다.
+
+### QA · 자동 플레이 점검 (`docs/qa/`)
+- 봇이 사람처럼 키·창 단추·가상 조이스틱으로만 처음부터 엔딩(그리고 1년 뒤 축제)까지 플레이한다: `tests/playthrough/` (`bot.js` 본체 — 게임 rAF 를 멈추고 `ctx.step(dt)` 를 직접 돌림, `skills.js` 사람 행동 단위, `scenario.js` 단계 목록), 실행기 `tools/playtest.mjs` (CDP). 지름길(`festival.debug` 등)·상태 직접 고치기 금지, 시계만 `time.setHour` 로 당긴다. 결과 `docs/qa/runs/` (커밋 안 함), 보고서 `docs/qa/playthrough-<날짜>.md` (버그 ID `QA-NN`, 크기 치명·큼·작음·다듬기). 새 흐름이 합쳐지면 `scenario.js` 에 단계를 더한다 — `docs/qa/README.md`.
+- QA 결과의 처리(보드 wave7 D47-A): 막힘·저장 깨짐·오류는 그 자리에서 고쳐 합치기 승인만, 밸런스·불편·보기는 7차 보드 QA 칸(`concept/wave7-board.html` 의 `QA` 표)에 선택지로.
 
 ### 병렬 개발 방식
+- 지금 마일스톤은 **M7 출시 준비** (보드 wave7 반영 v1, 트랙 M7-P1–P6 표는 `docs/PLAN.md` 「7차」, 결정·근거 `docs/notes/board7.md`), 다음은 M8 계절 행사.
 - 단계 P1~P6 과 트랙 표는 `docs/PLAN.md`. 트랙마다 브랜치 + git worktree(`../island-worktrees/<브랜치>`)에서 **자기 폴더만** 고치고, 계약 변경은 `docs/notes/<트랙>.md` 에 제안한다. `main` 합치기는 사용자 승인 뒤 조정 세션이 한다 (합치기 전 `git merge-tree --write-tree main <branch>` 로 충돌 확인).
 - 미리보기 브라우저 창이 숨겨져 있으면 `requestAnimationFrame` 이 느려져 fps 값이 의미 없다 — 성능은 `renderer.render` + `gl.finish()` 시간으로 잰다.
