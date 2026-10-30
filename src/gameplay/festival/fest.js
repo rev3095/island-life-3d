@@ -18,6 +18,9 @@ export function checkConfig(cfg, warn = console.warn) {
   }
 }
 
+/** 부품을 받았을 때 알림 글 — 이름 받침에 맞춰 을/를 (「응원 북」을, 「꽃 가랜드」를) */
+export const partToast = (name, n, total = 5) => `축제 부품 「${name}」${josa(name, '을').slice(String(name).length)} 받았어요 (${n}/${total})`;
+
 export function createFestival(ctx, emo, cfg) {
   checkConfig(cfg);
   const { PARTS, PART_BY_ID, PART_OF, ROLES, heartOpen } = makeParts(cfg);
@@ -110,7 +113,7 @@ export function createFestival(ctx, emo, cfg) {
     const n = partCount(f);
     try { S().player?.act?.('pickup', { lock: false })?.catch?.(() => {}); } catch { /* 동작이 없어도 괜찮다 */ }
     events.emit('sfx', { name: 'fossil' });
-    toast(`축제 부품 「${P.name}」를 받았어요 (${n}/5)`, P.emoji);
+    toast(partToast(P.name, n, PARTS.length), P.emoji);
     hud.draw();
     const b = places()?.booths?.find(x => x.id === P.booth);
     const story = S().story;

@@ -1,6 +1,7 @@
 // 섬 전용 이모티콘 세트 (EM-01–36, assets/emotes/emotes.json) 읽기와 그리기. 대화 규칙은 assets/emotes/talk.json (공통) + 주민 파일 emote 칸 (6차 M6-P3).
 // 말풍선·선택기에 쓰는 낱말(토큰): 이모티콘 key ('wave') 또는 아이템 'item:<아이템 id>' (그 아이템의 3D 아이콘, Z1).
 import { withVillagers } from './judge.js';
+import { url as assetUrl, urlNow } from '../../core/packs.js';
 
 export const EMOTES_FILE = 'assets/emotes/emotes.json';
 export const TALK_FILE = 'assets/emotes/talk.json';
@@ -18,8 +19,12 @@ export async function loadEmotes() {
   return createEmoteSet(set, withVillagers(rules, VILLAGERS));
 }
 
-/** set = emotes.json, rules = talk.json → 그리기·이름 도구 */
-export function createEmoteSet(set, rules) {
+/**
+ * set = emotes.json, rules = talk.json → 그리기·이름 도구.
+ * imgUrl(path) = 아이템 그림 경로 → <img src> 주소 | null — 게시본에서는 그림이 묶음 안에 있어 blob 주소를 써야 한다 (core/packs.js).
+ * 아직 주소가 없으면(null) 이번엔 이모지로 그리고 주소를 받아 둔다 (다음 말풍선부터 그림)
+ */
+export function createEmoteSet(set, rules, { imgUrl = urlNow, prefetch = p => assetUrl(p).catch(() => {}) } = {}) {
   const byKey = new Map(set.emotes.map(e => [e.key, e]));
   const svg = (key, label) => {
     const e = byKey.get(key);
@@ -39,7 +44,11 @@ export function createEmoteSet(set, rules) {
         const it = items?.get?.(tok.slice(5));
         if (!it) return svg('gift', label);
         const alt = label ? `alt="${it.name}"` : 'alt="" aria-hidden="true"';
-        return /\.(png|webp|jpg|svg)$/.test(it.icon ?? '') ? `<img class="fe-emo fe-item" src="${it.icon}" ${alt}>` : `<span class="fe-emo fe-glyph" ${label ? `role="img" aria-label="${it.name}"` : 'aria-hidden="true"'}>${it.icon ?? it.emoji ?? '🎁'}</span>`;
+        const isPic = /\.(png|webp|jpe?g|svg)$/i.test(it.icon ?? '');
+        const src = isPic ? imgUrl(it.icon) : null;
+        if (src) return `<img class="fe-emo fe-item" src="${src}" ${alt}>`;
+        if (isPic) prefetch(it.icon);
+        return `<span class="fe-emo fe-glyph" ${label ? `role="img" aria-label="${it.name}"` : 'aria-hidden="true"'}>${(isPic ? null : it.icon) ?? it.emoji ?? '🎁'}</span>`;
       }
       return svg(tok, label);
     },

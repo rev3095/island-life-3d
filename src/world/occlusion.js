@@ -11,6 +11,9 @@ import { Box3, Matrix4 } from 'three';
 const OCCLUDERS = {
   tree: 'bands', 'fruit-tree': 'bands', cedar: 'bands', palm: 'bands',
   'house-player': 'box', 'house-villager': 'box', shop: 'box', museum: 'box', signboard: 'box',
+  // 5차 Z5 축제 광장의 키 큰 것 (무대 3.7 · 아치 3.0 · 부스·덮개 2.6칸). 빠져 있어서 그 뒤(북쪽)에 서면 플레이어가 안 보였다 (QA-07)
+  'festival-stage': 'box', 'festival-arch': 'box', 'festival-cover': 'box',
+  'festival-booth-lantern': 'box', 'festival-booth-music': 'box', 'festival-booth-flower': 'box', 'festival-booth-food': 'box', 'festival-booth-fish': 'box',
 };
 const BANDS = 8;               // 나무 모양 높이 띠 수
 const BODY = [0.18, 0.55, 0.92];   // 캐릭터 몸에서 보는 점 (발·몸·머리, 키 ≈ 1)
