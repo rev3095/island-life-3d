@@ -46,6 +46,9 @@
 
 /* 장면 동안 숨기는 것: 첫날 목록, 주민 이름표 */
 body.story-on .fd-root:not(.fd-top), body.story-on .town-labels { visibility: hidden; }
+/* 휴대폰 터치: 장면 동안 조이스틱·B 는 숨기고 A(넘기기·고르기)만 흐리게 — 전엔 조이스틱 원과 A 가 장면 위에 떠 있었다 (QA-19) */
+body.story-on #touch-controls .tc-zone, body.story-on #touch-controls .tc-b { visibility: hidden; }
+body.story-on #touch-controls .tc-a { opacity: .5; }
 
 @media (prefers-reduced-motion: reduce) {
   .st-bar, .st-choice, .st-photo { transition: none; }
