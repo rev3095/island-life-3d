@@ -37,7 +37,7 @@ test('홈 링크 = 문서 링크 (CLAUDE.md · concept/README.md · 시나리오
   for (const id of ['character', 'env', 'game']) assert.ok(claude.includes(byId[id].url), `${id} 링크가 CLAUDE.md 와 다르다`);
   // 보드 링크 = README 보드 표 줄, 보드 id = 보드 페이지의 window.BOARD.id = reads 의 boards/<id>.
   // 다른 브랜치에서 막 생긴 보드는 합치기 전엔 이 작업 트리에 파일·README 줄이 없다 → 여기 적은 것만 기다려 주고, 파일이 생기면 같은 검사를 받는다.
-  const PENDING_BOARDS = { wave7: 'p10-board7' };
+  const PENDING_BOARDS = {};
   for (const e of LIST.filter(x => x.group === 'board' || x.group === 'archive')) {
     if (!existsSync(resolve(root, e.file))) {
       assert.ok(PENDING_BOARDS[e.id], `${e.id}: ${e.file} 가 없다 (다른 브랜치에서 오는 보드면 PENDING_BOARDS 에)`);
