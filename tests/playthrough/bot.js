@@ -352,12 +352,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
       if (Math.abs(to.x) > 100) return bot.walkLocal(to, { near, timeout });
       // 방 안인데 섬 쪽 목표: 먼저 문 매트(방 남쪽 가운데)로 가서 나온다 (내 집 x 500 · 주민 방 x 540, 방 8×8)
       bot.issue('minor', 'bot', `방 안에서 바깥으로 가라고 해서 먼저 나왔어요 (${label || '목표'})`);
-      const cx = Math.abs(bot.pos().x - 540) < 10 ? 540 : 500;
-      await bot.walkLocal({ x: cx, z: 3.3 }, { near: 0.25, label: '문 매트' });
-      await bot.faceDir(180);
-      bot.press('action');
-      await bot.until(() => !inZone(), { timeout: 8 });
-      if (inZone()) return false;
+      if (!(await bot.exitRoom())) return false;
     }
     const start = bot.gameT;
     const goalT = walkableNear(to);
@@ -433,6 +428,27 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     player().teleport(to.x, to.z);
     await bot.frames(2);
     return true;
+  };
+  /**
+   * 집·주민 방에서 나오기: 문 매트(방 남쪽 가운데, 판정 띠가 좁다 z > 3.15)로 가서 문 쪽(남쪽)으로 민다 — 사람이 문으로 걸어 나가듯.
+   * 안 되면 남쪽을 보고 행동 키. 내 집 x 500 · 주민 방 x 540 (방 8×8, 가운데 z 0)
+   */
+  bot.exitRoom = async () => {
+    if (!inZone()) return true;
+    const cx = Math.abs(bot.pos().x - 540) < 10 ? 540 : 500;
+    await bot.walkLocal({ x: cx, z: 3.35 }, { near: 0.12, label: '문 매트' });
+    for (let k = 0; k < 3 && inZone(); k++) {
+      bot.stick(0, 1, false);
+      await bot.until(() => !inZone() || bot.blocking(), { timeout: 0.8, ui: false });
+      bot.release();
+      await bot.until(() => !inZone(), { timeout: 3 });
+      if (!inZone()) break;
+      await bot.faceDir(180);
+      bot.press('action');
+      await bot.until(() => !inZone(), { timeout: 4 });
+    }
+    if (inZone()) bot.issue('minor', 'house', `방에서 문으로 나가기가 안 돼요 (${bot.peek()})`);
+    return !inZone();
   };
   function localPath(from, to) {
     const isl = world().island, S = 0.25, R = 0.2;

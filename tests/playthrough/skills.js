@@ -340,14 +340,9 @@ export function createSkills(bot) {
   /** 집에서 나오기: 문 매트(남쪽 가운데)로 걸어가서 행동 키 */
   sk.leaveHome = async () => {
     if (!house().inside) return true;
-    const room = house().room;
-    const cx = room?.x0 != null ? room.x0 + room.w / 2 : null;
-    // 들어온 자리(문 매트)는 기록해 둔 들어온 위치 기준
-    if (sk.homeEntry) await bot.walkLocal(sk.homeEntry, { near: 0.25 });
-    await bot.faceDir(180);
-    if (bot.peek() !== 'house-door-out') { await bot.walkLocal({ x: bot.pos().x, z: bot.pos().z + 0.4 }); }
-    await bot.act('action');
+    await bot.exitRoom();
     await bot.until(() => !house().inside, { timeout: 5 });
+    await bot.settle(20);
     return !house().inside;
   };
   /** 가방의 가구 하나 놓기 (집 안에서 빈 바닥 보고) */
@@ -548,11 +543,8 @@ export function createSkills(bot) {
     await bot.wait(1);
     if (shot) await bot.shot(shot, `${slug} 방`);
     if (talk) { const r = await sk.emoteTalk(slug, goal); res.talked = r.opened ? r.sent.map(x => x.kind) : false; }
-    await bot.walkLocal(entry, { near: 0.25 });
-    await bot.faceDir(180);
-    await bot.act('action', { timeout: 10 });
-    res.left = await bot.until(() => Math.abs(bot.pos().x) < 100, { timeout: 6 });
-    if (!res.left) bot.issue('minor', 'house', `${slug} 방에서 문 매트로 나오기가 안 돼요 (${bot.peek()})`);
+    res.left = await bot.exitRoom();
+    await bot.settle(20);
     return res;
   };
 
