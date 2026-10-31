@@ -201,8 +201,10 @@ function injectStyle() {
   color: #4A3B32; font-family: "Jua", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; line-height: 1; cursor: pointer;
   transition: transform .07s, box-shadow .07s, opacity .2s, background .07s; }
 #touch-controls .tc-btn b { font-weight: 400; }
-#touch-controls .tc-btn small { font-size: 11px; opacity: .8; white-space: nowrap; }
+#touch-controls .tc-btn small { font-size: calc(11px * min(var(--pk-fs, 1), 1.2)); opacity: .8; white-space: nowrap; }
 #touch-controls .tc-btn.is-ctx small { opacity: 1; }
+/* 누르는 곳은 보이는 원보다 조금 넓게 (손가락이 가장자리를 스쳐도 눌리게, 7차 D38) */
+#touch-controls .tc-btn::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }
 #touch-controls .tc-a { right: calc(20px + var(--tc-r)); bottom: calc(62px + var(--tc-b)); width: 78px; height: 78px; font-size: 30px;
   background: #F2B36B; box-shadow: 0 4px 0 #C9772E, 0 8px 16px rgba(74, 59, 50, .22); }
 #touch-controls .tc-b { right: calc(108px + var(--tc-r)); bottom: calc(20px + var(--tc-b)); width: 64px; height: 64px; font-size: 25px;
@@ -213,7 +215,17 @@ function injectStyle() {
 #touch-controls.is-ui .tc-stick { opacity: 0; }
 #touch-controls.is-ui .tc-btn:not(.is-down) { opacity: .72; }
 #touch-controls.is-ui .tc-btn small { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) { #touch-controls * { transition: none !important; } }
+/* 가로 휴대폰: 엄지가 쉬는 높이로 조금 올린다 (패드·B +14, A +18 — ui.css 의 도구 단추도 같이) */
+@media (orientation: landscape) and (max-height: 560px) {
+  #touch-controls .tc-stick { left: calc(28px + var(--tc-l)); bottom: calc(34px + var(--tc-b)); }
+  #touch-controls .tc-a { bottom: calc(80px + var(--tc-b)); }
+  #touch-controls .tc-b { bottom: calc(34px + var(--tc-b)); }
+}
+/* 모양으로도 보기 (ui 의 <html class="pk-shapes">): 달릴 때 손잡이 색만 바뀌던 것에 » 표시 */
+.pk-shapes #touch-controls .tc-stick.is-run .tc-knob::after { content: "»"; position: absolute; inset: 0; display: grid; place-items: center; font: 28px/1 "Jua", sans-serif; color: #4A3B32; }
+/* 흔들림 줄이기: ui 의 <html class="pk-calm"> (ui 가 없는 페이지는 기기 설정) */
+.pk-calm #touch-controls * { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { html:not(.pk-calm-off) #touch-controls * { transition: none !important; } }
 `;
   document.head.append(s);
 }

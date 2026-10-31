@@ -11,6 +11,14 @@ import { createShop } from './shop.js';
 import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
 import { createToolRing } from './toolring.js';
+import { ACCESS_KEYS, resolveAccess, applyAccess, captionFor, createCaptions } from './access.js';
+
+/**
+ * 7차 M7-P4 가 만드는 창 (src/ui/transfer.js · report.js). 있으면 ui.transfer / ui.report 로 열고 섬폰에 줄이 생긴다, 없으면 건너뛴다.
+ * 모듈 모양: `export function open(ctx, opts) → Promise` (또는 `export default { open(ctx, opts) }`).
+ * 창은 ctx.services.ui.panel 로 연다. 모듈이 스스로 ctx.services.ui.<이름> 을 채워도 된다 (그때는 그것을 쓴다)
+ */
+export const EXTRA_PANELS = [['transfer', './transfer.js'], ['report', './report.js']];
 
 let dialog = null, hud = null, uiCtx = null;
 const PEEK_EVERY = 0.2;    // 행동 안내(A·B 글자, Space·F) 갱신 간격 (초)
@@ -54,8 +62,20 @@ export default {
     const panels = createPanels(ctx, stackEl);
 
     const toast = (text, icon) => toasts.push(text, icon);
+    // 보기 편하게 (UI-10): <html> 에 글자 배율·class 를 건다. 흔들림은 정하지 않으면 기기 설정을 따른다
+    const calmMq = matchMedia('(prefers-reduced-motion: reduce)');
+    let access = resolveAccess(state.settings, calmMq.matches);
+    const captions = createCaptions(h);
+    const refreshAccess = () => {
+      access = resolveAccess(state.settings, calmMq.matches);
+      applyAccess(access);
+      if (!access.soundText) captions.clear();
+    };
+    calmMq.addEventListener?.('change', refreshAccess);
+    refreshAccess();
     const setSetting = (key, value) => {
       state.settings[key] = value;
+      if (ACCESS_KEYS.includes(key)) refreshAccess();
       if (key === 'keyHint') hud.showHint(value);
       if (['bgm', 'sfx', 'voice'].includes(key)) ctx.services.audio?.setVolume?.(key, value);
       events.emit('settings:changed', { key, value, settings: state.settings });
@@ -80,8 +100,12 @@ export default {
     hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), openTools: () => tools.open(), setHint: v => setSetting('keyHint', v) });
     hud.showHint(state.settings.keyHint !== false);
 
-    root.append(hud.root, fadeEl, stackEl, toasts.root);
+    root.append(hud.root, captions.root, fadeEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
+    // 소리 신호 글자: 켜 두었을 때만 sfx 를 자막으로 (장면·창이 열려 있어도 — 소리는 그대로 나니까)
+    events.on('sfx', p => { if (access.soundText) captions.show(captionFor(p)); });
+    // 저장을 불러오면 설정이 통째로 바뀐다 → 다시 건다
+    events.on('data:loaded', refreshAccess);
     // 터치 화면 노트북처럼 나중에 손가락으로 만지면 core/input 이 패드를 만들고 알려 준다
     events.on('input:touch', () => root.classList.add('pk-touch'));
 
@@ -152,7 +176,19 @@ export default {
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
       panel: (name, root, opts) => panels.open(name, root, opts),   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)
+      /** 7차 UI-10 보기 편하게: 지금 걸린 값 { textSize, scale, shapes, calm, emoteText, soundText } (camera 가 calm 을 본다) */
+      get access() { return access; },
+      setSetting,                                  // 7차: 설정 바꾸기 (state.settings + settings:changed) — 섬폰 밖에서 바꿀 때
     };
+    // P4 창: 기다리지 않는다 (없으면 조용히 건너뛰고, 있으면 섬폰을 열 때 줄이 보인다)
+    for (const [name, path] of EXTRA_PANELS) {
+      import(path).then(mod => {
+        const ui = ctx.services.ui;
+        if (ui[name]?.open) return;                // 모듈이 스스로 채웠다
+        const open = mod.open ?? mod.default?.open;
+        if (typeof open === 'function') ui[name] = { open: opts => open(ctx, opts) };
+      }).catch(() => { if (ctx.debug) console.info(`[ui] ${name} 창 없음 — 섬폰 줄 숨김`); });
+    }
   },
 
   update(dt) {

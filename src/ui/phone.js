@@ -1,16 +1,23 @@
-// 섬폰: 도감·지도·레시피·가방·설정·저장 앱. 앱 화면에서 Esc(B) 는 첫 화면으로, 첫 화면에서는 닫기.
+// 섬폰: 도감·지도·레시피·가방·설정·저장·보기 편하게 앱 (+ P4 의 저장 옮기기·문제 알리기 창이 있으면 그 줄). 앱 화면에서 Esc(B) 는 첫 화면으로, 첫 화면에서는 닫기.
 import { h, fmt, itemInfo, iconEl, recipeNeeds, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
 import { panelShell, gridMove, button } from './panels.js';
 import { birthdayLabel, mmdd } from '../data/birthdays.js';
+import { TEXT_SIZES } from './access.js';
 
-const APPS = [
+/** panel = 섬폰 위에 따로 여는 창 (ctx.services.ui[panel].open) — 그 창이 없으면 줄을 숨긴다 */
+export const APPS = [
   { id: 'dex', name: '도감', icon: '📖', color: '#9ED3A8' },
   { id: 'map', name: '지도', icon: '🗺️', color: '#9CCBE8' },
   { id: 'recipes', name: '레시피', icon: '🔨', color: '#F3C77E' },
   { id: 'bag', name: '가방', icon: '🎒', color: '#F2A99B' },
   { id: 'settings', name: '설정', icon: '⚙️', color: '#D8D0BE' },
   { id: 'save', name: '저장', icon: '💾', color: '#C8B6E2' },
+  { id: 'access', name: '보기 편하게', icon: '👓', color: '#BFE0D8' },   // 7차 UI-10
+  { id: 'transfer', name: '저장 옮기기', icon: '📦', color: '#E8C9A0', panel: 'transfer' },   // 7차 UI-09 (M7-P4)
+  { id: 'report', name: '문제 알리기', icon: '📮', color: '#F0B8B0', panel: 'report' },       // 7차 UI-08 (M7-P4)
 ];
+/** 지금 보일 앱 (P4 창이 아직 없으면 그 줄을 뺀다) */
+export const visibleApps = ui => APPS.filter(a => !a.panel || typeof ui?.[a.panel]?.open === 'function');
 const GREETING = { dawn: '좋은 새벽이에요', day: '좋은 하루예요', dusk: '노을이 예뻐요', night: '포근한 밤이에요' };
 
 export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }) {
@@ -50,7 +57,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
             me.player && h('b', { class: 'pk-phone-me-name' }, me.player),
             me.island && h('span', { class: 'pk-phone-me-island' }, h('span', { 'aria-hidden': 'true' }, '🏝️ '), me.island)),
           h('p', { class: 'pk-phone-greet' }, GREETING[now?.part] ?? '오늘도 포근한 섬이에요'));
-        const grid = h('div', { class: 'pk-apps' }, APPS.map(a => h('button', { type: 'button', class: 'pk-app', dataset: { app: a.id }, onclick: () => launch(a.id) },
+        const grid = h('div', { class: 'pk-apps' }, visibleApps(ctx.services.ui).map(a => h('button', { type: 'button', class: 'pk-app', dataset: { app: a.id }, onclick: () => launch(a.id) },
           h('i', { style: { background: a.color }, 'aria-hidden': 'true' }, a.icon), h('span', null, a.name))));
         view.append(grid);
         const target = grid.querySelector(`[data-app="${lastApp}"]`) ?? grid.firstElementChild;
@@ -60,7 +67,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       const app = APPS.find(a => a.id === id);
       top.replaceChildren(h('button', { type: 'button', class: 'pk-back', 'aria-label': '첫 화면으로', onclick: () => go('home') }, '‹'),
         h('h2', { class: 'pk-phone-title', id: shell.titleId }, h('span', { 'aria-hidden': 'true' }, app.icon), ` ${app.name}`));
-      ({ dex: dexScreen, recipes: recipeScreen, settings: settingsScreen, save: saveScreen })[id]?.(view);
+      ({ dex: dexScreen, recipes: recipeScreen, settings: settingsScreen, save: saveScreen, access: accessScreen })[id]?.(view);
       (view.querySelector('[data-autofocus]') ?? view.querySelector('button, input') ?? top.querySelector('.pk-back')).focus({ preventScroll: true });
       ctx.events.emit('sfx', { name: 'menu' });
     }
@@ -70,6 +77,13 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       lastApp = id;
       if (id === 'map') return void openMap();
       if (id === 'bag') return void openBag({ mode: 'view' });
+      const app = APPS.find(a => a.id === id);
+      if (app?.panel) {
+        // P4 창은 섬폰 위에 쌓아 연다 (닫으면 섬폰으로 돌아온다). 실패해도 섬폰은 그대로
+        try { Promise.resolve(ctx.services.ui?.[app.panel]?.open?.()).catch(e => console.error(`[ui] ${app.panel}`, e)); }
+        catch (e) { console.error(`[ui] ${app.panel}`, e); toast(`${app.name} 창을 열지 못했어요`, '⚠️'); }
+        return;
+      }
       go(id);
     }
 
@@ -79,7 +93,11 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       initialFocus: () => view.querySelector('.pk-app'),
       onCancel: () => (screen === 'home' ? p.close(null) : go('home')),
       onKey(e) {
-        if (screen === 'home' && e.target.closest?.('.pk-app')) return gridMove([...view.querySelectorAll('.pk-app')], 3, e.code);
+        if (screen === 'home' && e.target.closest?.('.pk-app')) {
+          const grid = view.querySelector('.pk-apps');   // 세로 3칸, 가로 휴대폰 6칸
+          const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 3;
+          return gridMove([...grid.querySelectorAll('.pk-app')], cols, e.code);
+        }
         if (screen === 'dex' && e.target.closest?.('[role="tab"]') && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
           const tabs = [...view.querySelectorAll('[role="tab"]')];
           const i = tabs.indexOf(e.target) + (e.code === 'ArrowLeft' ? -1 : 1);
@@ -206,6 +224,40 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     ].filter(Boolean));
   }
 
+  // ---------- 보기 편하게 (7차 UI-10, D42-A 기본 묶음) ----------
+  // 값은 state.settings (textSize · shapes · calm · emoteText · soundText), 거는 일은 ui/access.js
+  function accessScreen(view) {
+    const s = ctx.state.settings;
+    const now = () => ctx.services.ui?.access ?? {};
+    const sizeRow = h('div', { class: 'pk-seg pk-seg-size', role: 'group', 'aria-label': '글자 크기' });
+    const drawSize = () => {
+      const cur = now().textSize ?? s.textSize ?? 'normal';
+      sizeRow.replaceChildren(...Object.entries(TEXT_SIZES).map(([k, [scale, name]]) => h('button', {
+        type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(cur === k), dataset: { size: k },
+        onclick: () => { setSetting('textSize', k); drawSize(); sizeRow.querySelector('[aria-pressed="true"]')?.focus(); },
+      }, h('span', { class: 'pk-size-a', style: { fontSize: `${Math.round(18 * scale)}px` }, 'aria-hidden': 'true' }, '가'), h('span', { class: 'pk-size-name' }, name))));
+    };
+    drawSize();
+    // 스위치: 지금 걸린 값(calm 은 기기 설정 포함)을 보여 주고, 누르면 정해서 저장
+    const toggle = (key, label, sub) => {
+      const id = `pk-acc-${key}`;
+      const b = h('button', { type: 'button', role: 'switch', class: 'pk-switch', 'aria-checked': String(!!now()[key]), 'aria-labelledby': id, 'aria-describedby': `${id}-sub` }, h('span', { class: 'pk-switch-knob' }));
+      b.addEventListener('click', () => { const v = b.getAttribute('aria-checked') !== 'true'; setSetting(key, v); b.setAttribute('aria-checked', String(!!now()[key])); });
+      return h('div', { class: 'pk-set-row pk-acc-row' },
+        h('span', { class: 'pk-acc-label' }, h('span', { id }, label), h('small', { id: `${id}-sub`, class: 'pk-muted pk-acc-sub' }, sub)), b);
+    };
+    view.append(
+      h('p', { class: 'pk-muted pk-small' }, '바꾸면 바로 걸리고, 저장할 때 같이 남아요.'),
+      h('h3', { class: 'pk-set-head' }, '글자 크기'), sizeRow,
+      h('h3', { class: 'pk-set-head' }, '보기'),
+      toggle('shapes', '모양으로도 보기', '켬·끔, 고른 것, 모자란 것을 색 말고 ✓·글자로도 보여 줘요'),
+      toggle('calm', '흔들림 줄이기', '튀는 움직임을 끄고 카메라를 덜 움직여요'),
+      h('h3', { class: 'pk-set-head' }, '대화·소리'),
+      toggle('emoteText', '이모티콘 뜻 보기', '이모티콘 밑에 뜻을 글자로 적어 줘요'),
+      toggle('soundText', '소리를 글자로', '입질·벌 같은 소리 신호를 화면에 글자로 보여 줘요'),
+    );
+  }
+
   /** 이름: 지금 이름과 '이름 다시 정하기' (intro 의 이름 정하기 창을 다시 연다 — 섬폰은 닫는다) */
   function nameRows() {
     const intro = ctx.services.intro;
@@ -245,12 +297,12 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       } });
       const clear = cur && button('지우기', { onclick: () => { bd.setPlayer(null); toast('내 생일을 지웠어요', '🎂'); draw(); } });
       const todays = (bd.today?.() ?? []).map(slug => ctx.services.town?.villagers?.find(V => V.slug === slug)?.person?.name ?? slug);
-      box.replaceChildren(
+      box.replaceChildren(...[
         h('h3', { class: 'pk-set-head' }, '생일'),
         h('div', { class: 'pk-set-row' }, h('span', null, '내 생일'), h('b', { class: 'pk-set-val' }, cur ? `${birthdayLabel(cur)}${bd.isPlayerToday?.() ? ' 🎂' : ''}` : '아직 없어요')),
         h('div', { class: 'pk-set-row pk-set-action', style: { display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'flex-end' } }, m, d, set, clear),
         todays.length > 0 && h('p', { class: 'pk-muted pk-small' }, `🎈 오늘은 ${todays.join(', ')}의 생일이에요`),
-      );
+      ].filter(Boolean));   // replaceChildren 은 false 를 글자로 쓴다 (설정 화면에 'false' 가 보이던 것)
     }
     draw();
     return box;
