@@ -10,12 +10,12 @@ M7-P4 저장 옮기기 (UI-09, D43-A) · 문제 알리기 (UI-08, D46-A) — 브
 | 오류 모으기: window `error`(스크립트 오류 + 파일 못 받음) · `unhandledrejection` · `console.error`(main.js 의 `[boot] … 초기화 실패` = 모듈 실패) → 최근 30개 | `src/core/errors.js` (새) |
 | 저장 옮기기 창: 「저장 글 받기」(글 복사 + 글 상자 + 파일로 받기) / 「불러오기」(붙여 넣기 · 파일 고르기 → 검사 → 확인 창 → 써 넣고 다시 열기) | `src/ui/transfer.js` (새) |
 | 문제 알리기 창: 무엇(5가지) + 글 + 「최근 오류·기기·판·지금 자리도 같이」 + 보낼 내용 미리 보기 → 보내기 / 글 복사 | `src/ui/report.js` (새) |
-| 연결 (최소한, 합칠 때 볼 것 ↓) | `src/main.js` 3줄 · `src/ui/index.js` 3줄 |
+| 연결 (최소한, 합칠 때 볼 것 ↓) | `src/main.js` 3줄 · 두 창 파일의 `export function open(ctx, opts)` (P3 의 `src/ui/index.js` `EXTRA_PANELS` 가 불러온다) |
 | 테스트 25개 (저장 글 12 · 오류·보고 13) | `tests/transfer.test.mjs` · `tests/report.test.mjs` |
 
 ### 다른 트랙 파일에 넣은 줄 (합칠 때 충돌 확인)
 - `src/main.js`: `import { installErrors } from './core/errors.js';` + 모듈 맨 위 `const errors = installErrors();` + ctx 에 `errors,` 한 줄 (`services: {}` 바로 위). P2 가 main.js 그리기 부분을 고치면 줄이 겹치지 않는지만 본다.
-- `src/ui/index.js` (P3 파일): import 두 줄 (`createTransfer`·`createReport`) + `ctx.services.ui = {…}` 바로 뒤에 `Object.assign(ctx.services.ui, { transfer: createTransfer(ctx), report: createReport(ctx) });` 한 줄. P3 가 서비스 표를 바꿔도 이 줄만 남기면 된다.
+- `src/ui/index.js` (P3 파일)는 **이 브랜치에서 고치지 않는다.** P3(`p11-access`)이 init 끝에 `EXTRA_PANELS = [['transfer', './transfer.js'], ['report', './report.js']]` 를 `import()` 해서 `ctx.services.ui.transfer / ui.report = { open: opts => mod.open(ctx, opts) }` 를 만들고 섬폰에 📦 저장 옮기기 · 📮 문제 알리기 줄을 단다. 그래서 두 파일은 `open(ctx, opts) → Promise` 를 내보낸다 (ctx 마다 창 하나, `WeakMap`). **이 브랜치만으로는 ui.transfer·ui.report 가 생기지 않는다** — p11-access 와 합친 뒤 생긴다. 합친 뒤 조정 세션은 `tests/build-web.test.mjs` 의 `PENDING_MODULES` 를 비우면 된다 (P3 부탁).
 - `src/ui/panels.js`·`dom.js` 는 고치지 않았다 (`panelShell`·`button`·`h`·`fmt` 를 가져다 쓰기만). 창 모양 CSS 는 각 파일이 `<style data-pk-report>`·`<style data-pk-transfer>` 로 직접 붙인다 (`ui.css` 는 P3 것이라). 색·글꼴은 `--pk-*` 변수를 그대로 쓴다.
 
 ## 저장 글 모양 (내보내기)
@@ -93,9 +93,8 @@ eyJ2IjoxLCJzYXZlZEF0IjoxNzkzNDE3MDc5NjUyLCJleHBvcnRlZEF0Ijox…   ← base64(UTF
   - `downloads: true` 는 「파일로 받기」 단추용 (없으면 단추가 숨고 글 복사만). 둘 다 동의 창은 처음 쓸 때만 뜬다 (열 때 묻지 않음: 보고는 「보내기」를 눌러야 `use('db')`).
 - 게시 뒤 확인: claude.ai 에서 문제 알리기 → 저장소 `reports` 읽기(Artifact `read_db`), 휴대폰에서 글 복사·파일 고르기, 다른 계정(공유 링크)에서 보내기가 글 복사로 넘어가는지.
 
-### P3 (`p11-access`, 섬폰 메뉴 줄)
-- 섬폰 메뉴에 두 줄: **「저장 옮기기」 → `ctx.services.ui.transfer.open()`** (`{ tab: 'export' | 'import' }` 선택, 기본 export) · **「문제 알리기」 → `ctx.services.ui.report.open()`** (`{ kind?, text? }` 로 미리 고를 수 있음). 둘 다 창이 닫히면 `null` 로 풀리는 Promise, 이미 열려 있으면 같은 Promise. 섬폰 창 위에 쌓여 열린다 (`ui.panel`).
-  - 추천 자리: 저장 앱 화면 아래 「다른 기기로 옮기기」 단추, 설정 맨 아래 「문제 알리기」.
+### P3 (`p11-access`, 섬폰 메뉴 줄) — 섬폰 두 줄·불러오기는 P3 이 이미 넣음 (`EXTRA_PANELS`, 10-31 알림 받음)
+- (넣음) 섬폰 메뉴에 두 줄: **「저장 옮기기」 → `ctx.services.ui.transfer.open()`** (`{ tab: 'export' | 'import' }` 선택, 기본 export) · **「문제 알리기」 → `ctx.services.ui.report.open()`** (`{ kind?, text? }` 로 미리 고를 수 있음). 둘 다 창이 닫히면 `null` 로 풀리는 Promise, 이미 열려 있으면 같은 Promise. 섬폰 창 위에 쌓여 열린다 (`ui.panel`).
 - `panels.js` 제안: 창 안 글 칸(`textarea`·글 `input`)에서 방향키·Enter·Home/End 를 창 이동으로 가져가지 않기 (지금은 range 만 빼 준다). 이 트랙은 `onKey` 로 우회했다 (`report.js` `textFieldKeys` — panels 가 고쳐져도 그대로 둬도 됨).
 - (선택) 오류가 나면 HUD 에 작은 「문제 알리기」 알림: `ctx.errors.on(e => …)` 로 들을 수 있다.
 
@@ -111,7 +110,7 @@ eyJ2IjoxLCJzYXZlZEF0IjoxNzkzNDE3MDc5NjUyLCJleHBvcnRlZEF0Ijox…   ← base64(UTF
 - 새 기기에서 이름 정하기 창이 먼저 뜬다. 거기에 「다른 기기 저장 불러오기」 작은 링크(`ui.transfer.open({ tab: 'import' })`)가 있으면 옮겨 오는 사람이 이름을 새로 정하지 않아도 된다 (지금도 창은 이름 정하기 위에 열리고, 불러오면 다시 열려서 이름 정하기가 건너뛰어진다 — 확인함).
 
 ## 확인
-- `node --test tests/` 286 통과 (새 25).
+- `node --test tests/` 287 통과 (새 26).
 - dev-server 4243 `/index.html` (미리보기 창이 숨겨져 rAF 대신 `ctx.step` 으로 돌림):
   - 이름 정하기(하늘·포근섬) → 사과 5·붕어 1·도토리 +777·플래그 → 「저장 옮기기」 글 복사 → 글 3462자 → 저장 지우고 새 게임(도토리 500, 이름 없음) → 「불러오기」에 잘못된 글 → "확인 값이 달라요 … 지금 저장은 그대로예요" → 진짜 글 → 확인 창 「포근섬 · 하늘 · 도토리 1,277 · 가방 4칸」 → 다시 열림 → **`ctx.state` 가 내보내기 때와 칸마다 같음 (차이 0)**, 사본 `-before-import` 있음, 이름 정하기 건너뜀.
   - 일부러 낸 오류 3개 (setTimeout throw · Promise.reject · 없는 그림) → 문제 알리기 창이 「오류·멈춤」을 미리 고르고 "최근 오류 3개" → 글 칸에서 방향키·Enter 가 글 편집으로 → 보내기 → `assets/review/game-reports.json` 에 위 모양 문서 (1.3 KB).

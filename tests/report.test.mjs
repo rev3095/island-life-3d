@@ -200,3 +200,11 @@ test('textFieldKeys: 글 칸 안의 방향키·Enter 는 창 이동으로 가져
   assert.equal(textFieldKeys({ code: 'Escape', target: e.target }), false, 'Esc 는 창 닫기 그대로');
   assert.equal(textFieldKeys({ code: 'ArrowLeft', target: { matches: () => false } }), false, '단추 위에서는 창 이동');
 });
+
+test('섬폰(P3 EXTRA_PANELS)이 부르는 모양: 두 창 모두 open(ctx, opts) → Promise, ui.panel 이 없으면 null', async () => {
+  for (const path of ['../src/ui/report.js', '../src/ui/transfer.js']) {
+    const mod = await import(path);
+    assert.equal(typeof mod.open, 'function', path);
+    assert.equal(await mod.open({ services: {}, state: createState() }), null, path);
+  }
+});

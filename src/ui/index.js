@@ -11,8 +11,6 @@ import { createShop } from './shop.js';
 import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
 import { createToolRing } from './toolring.js';
-import { createTransfer } from './transfer.js';   // M7-P4: 저장 옮기기·문제 알리기 창 (여는 함수만 서비스로)
-import { createReport } from './report.js';
 
 let dialog = null, hud = null, uiCtx = null;
 const PEEK_EVERY = 0.2;    // 행동 안내(A·B 글자, Space·F) 갱신 간격 (초)
@@ -155,7 +153,6 @@ export default {
       isBlocking: () => panels.blocking(),
       panel: (name, root, opts) => panels.open(name, root, opts),   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)
     };
-    Object.assign(ctx.services.ui, { transfer: createTransfer(ctx), report: createReport(ctx) });   // M7-P4: ui.transfer.open() · ui.report.open()
   },
 
   update(dt) {

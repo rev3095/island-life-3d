@@ -295,3 +295,10 @@ export function createReport(ctx) {
 
   return { open: openReport };
 }
+
+/** 섬폰(src/ui/index.js EXTRA_PANELS, P3)이 부르는 모양: open(ctx, opts) → Promise. ctx 마다 창 하나 */
+const byCtx = new WeakMap();
+export function open(ctx, opts) {
+  if (!byCtx.has(ctx)) byCtx.set(ctx, createReport(ctx));
+  return byCtx.get(ctx).open(opts);
+}
