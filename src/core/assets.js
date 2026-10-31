@@ -7,7 +7,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { readJSON, fromBase64 } from './packs.js';
 
 /** 받은 파일 수, 그림 주소(url·urlNow — <img src> 용 blob URL), 게시본인지(packed), 묶음 상태 */
-export { loadStats, url, urlNow, packed, packStatus } from './packs.js';
+export { loadStats, url, urlNow, packed, packStatus, prefetchPacks } from './packs.js';
 
 const loader = new GLTFLoader();
 const gltfCache = new Map();

@@ -5,11 +5,25 @@
 // GPU 시간(EXT_disjoint_timer_query_webgl2)이 있으면 같이 본다 — 프레임이 느려도 GPU 가 한가하면(다른 이유로 느림) 낮추지 않는다.
 // (GPU 시간만 보면 안 된다: 60fps 에 맞춰 쉬는 GPU 는 클럭을 내려 같은 일을 더 오래 한다)
 
-/** 품질 단계 값 (main.js 의 처음 값과 같게) */
+/** 품질 단계 값 (main.js 의 처음 값과 같게).
+ *  lite(가볍게) = 느린 컴퓨터용: 그림자 끔(광장 그리기 삼각형의 절반 넘게가 그림자 몫) · 화면 효과 끔(바로 그리기) · 화소 배율 1 */
 export const QUALITY = {
-  high: { maxRatio: 2, shadowSize: 2048 },
-  low: { maxRatio: 1.5, shadowSize: 1024 },
+  high: { maxRatio: 2, shadowSize: 2048, shadows: true, post: true },
+  low: { maxRatio: 1.5, shadowSize: 1024, shadows: true, post: true },
+  lite: { maxRatio: 1, shadowSize: 1024, shadows: false, post: false },
 };
+/** 무거운 것부터. 자동 판단은 느리면 한 칸씩 내려간다 */
+export const QUALITY_ORDER = ['high', 'low', 'lite'];
+export const QUALITY_LABELS = { auto: '자동', high: '높게', low: '보통', lite: '가볍게' };
+export const lowerQuality = q => QUALITY_ORDER[Math.min(QUALITY_ORDER.length - 1, QUALITY_ORDER.indexOf(q) + 1)] ?? 'lite';
+
+/** 주소로 고른 품질: ?quality=lite · claude.ai 게시본은 ?… 가 안 넘어오므로 #lite · #low · #high · #quality=lite 도. 없으면 null */
+export function urlQuality({ search = '', hash = '' } = {}) {
+  const q = new URLSearchParams(search).get('quality');
+  if (QUALITY[q]) return q;
+  const h = /^#(?:quality=)?(high|low|lite)(?:$|[&?])/.exec(hash);
+  return h ? h[1] : null;
+}
 
 const WARMUP = 2.5;          // 시작 뒤 셰이더 만들기·첫 그림자 등으로 튀는 시간은 건너뛴다 (초)
 const SAMPLE = 3;            // 재는 시간 (초)
@@ -38,7 +52,7 @@ export function createAutoQuality(ctx, { onSlow }) {
     result.slow = frames.length >= MIN_SAMPLES && result.frame > SLOW_FRAME && (result.gpu == null || result.gpu > SLOW_GPU);
     if (ext) for (const q of [...pending, ...pool]) gl.deleteQuery(q);
     pending.length = pool.length = 0;
-    console.info(`[render] 자동 품질: 프레임 ${result.frame}ms · GPU ${result.gpu ?? '-'}ms (${result.samples}) → ${result.slow ? 'low' : '그대로'}`);
+    console.info(`[render] 자동 품질: 프레임 ${result.frame}ms · GPU ${result.gpu ?? '-'}ms (${result.samples}) → ${result.slow ? '한 칸 낮춤' : '그대로'}`);
     if (result.slow) onSlow?.();
   }
 
@@ -75,7 +89,7 @@ export function createAutoQuality(ctx, { onSlow }) {
 
 // ── 광장 기준 (M7-P2, 보드 wave7 D39-A: 목표 광장 33ms 아래, 넘으면 저사양) ──
 // 처음 몇 초 판단(위)은 어디서든 프레임 간격 가운데 값을 본다. 이것은 사람이 많이 머무는 광장(축제 광장)에 있을 때만,
-// 느린 기기의 긴 프레임(50ms 넘음)도 버리지 않고 평균을 잰다. 한 번 판단하면 그만 (느리면 low, 아니면 그대로).
+// 느린 기기의 긴 프레임(50ms 넘음)도 버리지 않고 평균을 잰다. 한 번 판단하면 그만 (느리면 한 칸 낮춤 — render 가 낮춘 뒤 새로 하나 만들어 lite 까지).
 
 /** 광장 판단 값. 재는 시간은 광장 안에 있던 시간을 모두 더한 것 (드나들어도 이어 잰다) */
 export const PLAZA = {
@@ -142,7 +156,7 @@ export function createPlazaWatch(ctx, { onSlow, opts = PLAZA, now: clock = () =>
       result.state = 'done';
       result.frame = frameStats(gaps);
       result.slow = isPlazaSlow(result.frame, opts);
-      console.info(`[render] 광장 프레임: 평균 ${result.frame.avg}ms · 95% ${result.frame.p95}ms (${result.frame.n}) → ${result.slow ? 'low' : '그대로'}`);
+      console.info(`[render] 광장 프레임: 평균 ${result.frame.avg}ms · 95% ${result.frame.p95}ms (${result.frame.n}) → ${result.slow ? '한 칸 낮춤' : '그대로'}`);
       if (result.slow) onSlow?.();
     },
   };

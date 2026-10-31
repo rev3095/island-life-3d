@@ -185,6 +185,20 @@ export function urlNow(path) {
   return p == null ? path : urlReady.get(p) ?? null;
 }
 
+/** 게임이 열린 뒤 나머지 묶음(가구·아이템·아이콘)을 하나씩 미리 받아 둔다 — 가방·상점·집을 처음 열 때 멈칫하지 않게.
+ *  처음 로딩 크기(boot 묶음)는 그대로. 개발 서버(묶음 없음)에선 아무것도 안 한다. main.js 가 game:ready 뒤에 부른다 */
+export async function prefetchPacks({ gapMs = 1500 } = {}) {
+  if (!manifest) return [];
+  const done = [];
+  for (const [i, p] of manifest.packs.entries()) {
+    if (p.boot || packState.get(i) === 'ready') continue;
+    await new Promise(r => (globalThis.requestIdleCallback ?? setTimeout)(r, { timeout: gapMs }));
+    try { await loadPack(i); done.push(p.path); } catch { /* 실패는 처음 읽을 때 다시 받는다 */ }
+    await new Promise(r => setTimeout(r, gapMs));
+  }
+  return done;
+}
+
 /** 묶음 상태 (확인용): [{ path, boot, files, bytes, state }] — 개발 서버에서는 [] */
 export const packStatus = () => (manifest?.packs ?? []).map((p, i) => ({ path: p.path, boot: !!p.boot, files: p.files.length, bytes: p.bytes, state: packState.get(i) ?? 'idle' }));
 

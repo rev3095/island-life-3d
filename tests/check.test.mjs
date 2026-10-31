@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PLAZA, frameStats, percentile, isPlazaSlow, plazaArea, inArea, createPlazaWatch } from '../src/render/quality.js';
+import { PLAZA, frameStats, percentile, isPlazaSlow, plazaArea, inArea, createPlazaWatch, QUALITY, QUALITY_ORDER, lowerQuality, urlQuality } from '../src/render/quality.js';
 import { CHECK, ROUTE, CHECK_STORE, routeSpots, buildRecord, checkProblems, checkRequested } from '../src/render/check.js';
 import { createEvents } from '../src/core/events.js';
 import { createState } from '../src/core/state.js';
@@ -139,10 +139,11 @@ test('점검: 모양 검사가 틀린 것을 잡는다', () => {
   for (const w of ['moon', 'gpu', 'at', 'NaN']) assert.ok(p.includes(w), `${w} → ${p}`);
 });
 
-test('점검: render/index.js 는 주소에 check 가 있을 때만 점검을 만들고, 광장 판단은 high 일 때만', () => {
+test('점검: render/index.js 는 주소에 check 가 있을 때만 점검을 만들고, 광장 판단은 lite 가 아닐 때만 (느리면 한 칸씩)', () => {
   const src = read('src/render/index.js');
   assert.match(src, /checkRequested\(location\) \? createCheck\(/);
-  assert.match(src, /if \(quality === 'high'\) plazaQ\?\.end\(dt\)/);
+  assert.match(src, /quality === 'lite' \|\| !ctx\.lights \? null/);
+  assert.match(src, /setQuality\(lowerQuality\(quality\)/);
   assert.match(src, /check\?\.begin\(\)/);
   assert.match(src, /check\?\.end\(dt\)/);
 });
@@ -169,4 +170,34 @@ test('시작 단추: 로딩 화면 끝에 「소리 켜고 시작」·「소리 
 test('시작 단추: 소리 기본값은 그대로 0.6 · 0.8 · 0.7 (D45-A)', () => {
   const s = createState().settings;
   assert.deepEqual([s.bgm, s.sfx, s.voice], [0.6, 0.8, 0.7]);
+});
+
+test('품질: 가볍게(lite) = 그림자·화면 효과 끔·배율 1, 한 칸씩 내려가 lite 에서 멈춤', () => {
+  assert.deepEqual(QUALITY_ORDER, ['high', 'low', 'lite']);
+  assert.equal(QUALITY.lite.shadows, false);
+  assert.equal(QUALITY.lite.post, false);
+  assert.equal(QUALITY.lite.maxRatio, 1);
+  assert.ok(QUALITY.high.shadows && QUALITY.low.shadows && QUALITY.high.post && QUALITY.low.post);
+  assert.equal(lowerQuality('high'), 'low');
+  assert.equal(lowerQuality('low'), 'lite');
+  assert.equal(lowerQuality('lite'), 'lite');
+});
+
+test('품질: 주소로 고르기 — 로컬 ?quality=, claude.ai 게시본 #lite · #quality=low', () => {
+  assert.equal(urlQuality({ search: '?quality=lite' }), 'lite');
+  assert.equal(urlQuality({ search: '?quality=low&debug' }), 'low');
+  assert.equal(urlQuality({ hash: '#lite' }), 'lite');
+  assert.equal(urlQuality({ hash: '#quality=high' }), 'high');
+  assert.equal(urlQuality({ hash: '#low&check' }), 'low');
+  assert.equal(urlQuality({ search: '?quality=ultra' }), null);
+  assert.equal(urlQuality({ hash: '#check' }), null);
+  assert.equal(urlQuality({ hash: '#lights' }), null);
+  assert.equal(urlQuality({}), null);
+});
+
+test('품질: main.js 는 처음 품질을 주소(#lite 포함)로 고르고 QUALITY 값으로 그림자를 건다', () => {
+  const src = read('src/main.js');
+  assert.match(src, /urlQuality\(location\)/);
+  assert.match(src, /sun\.castShadow = QUALITY\[quality\]\.shadows/);
+  assert.match(src, /prefetchPacks/);
 });

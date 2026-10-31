@@ -9,6 +9,7 @@ import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
+import { QUALITY, urlQuality } from './render/quality.js';
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
 const errors = installErrors();
@@ -29,11 +30,12 @@ const params = new URLSearchParams(location.search);
 async function boot() {
   const canvas = document.getElementById('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  // 품질: 휴대폰(터치 기기)이나 ?quality=low 면 해상도·그림자를 낮춘다 (그림자가 프레임 시간의 절반쯤 든다)
-  const quality = params.get('quality') ?? (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
-  renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.5 : 2));
+  // 품질: 휴대폰(터치 기기)이나 ?quality=low 면 해상도·그림자를 낮춘다 (그림자가 프레임 시간의 절반쯤 든다).
+  // ?quality=lite · #lite (게시본) = 가볍게: 그림자·화면 효과 끔 (render/quality.js QUALITY). 섬폰 설정 「그래픽」은 저장을 불러온 뒤 render 가 건다
+  const quality = urlQuality(location) ?? (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
+  renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY[quality].maxRatio));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = quality === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#BFE6F7');
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 300);
@@ -44,8 +46,8 @@ async function boot() {
   const hemi = new THREE.HemisphereLight(0xeef8ff, 0xc9d79f, 1.5);
   const sun = new THREE.DirectionalLight(0xffffff, 2.3);
   sun.position.set(-8, 16, 10);
-  sun.castShadow = true;
-  sun.shadow.mapSize.setScalar(quality === 'low' ? 1024 : 2048);
+  sun.castShadow = QUALITY[quality].shadows;
+  sun.shadow.mapSize.setScalar(QUALITY[quality].shadowSize);
   Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
   sun.shadow.bias = -0.0008;
   scene.add(hemi, sun, sun.target);
@@ -86,6 +88,7 @@ async function boot() {
   }
   if (!ctx.services.world) await coreCheck(ctx);
   events.emit('game:ready', { modules: loaded.map(([n]) => n) });
+  setTimeout(() => assets.prefetchPacks?.(), 3000);   // 게시본: 나머지 묶음을 쉬엄쉬엄 미리 받기 (처음 로딩 크기는 그대로)
 
   const resize = () => {
     const w = innerWidth, h = innerHeight;
