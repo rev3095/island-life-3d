@@ -90,6 +90,7 @@ export function actorPosAt(start, a, dur, u) {
   const speed = WALK_SPEED[a.do] ?? WALK_SPEED.walk;
   const need = d / speed;
   const k = need <= 0 ? 1 : clamp01((u * dur) / Math.max(need, 0.001));
+  if (k >= 1) return [a.to[0], a.to[1]];        // 도착은 to 그대로 (lerp 끝값은 소수 오차로 to 와 달라 재생기가 도착을 못 알아챘다)
   return [lerp(from[0], a.to[0], k), lerp(from[1], a.to[1], k)];
 }
 
@@ -103,13 +104,13 @@ export function castOf(scene) {
 // ---------- 카메라 ----------
 
 /**
- * 카메라 자리. cam = { size, target, angle(도, 0 = 대상 남쪽에서 북쪽을 봄 — 게임 기본 카메라와 같은 쪽), height(칸), move },
+ * 카메라 자리. cam = { size, target, angle(도, 0 = 대상 남쪽에서 북쪽을 봄 — 게임 기본 카메라와 같은 쪽), height(칸), dist(칸, 없으면 크기 기본값), move },
  * target = 대상 자리 {x, y, z}, u = 컷 안 진행 0~1. → { pos, look }
  */
 export function cameraAt(cam = {}, target = { x: 0, y: 0, z: 0 }, u = 0) {
   const S = CAM_SIZES[cam.size] ?? CAM_SIZES.full;
   const e = ease(u);
-  let dist = S.dist, pitch = S.pitch, yaw = cam.angle ?? 0;
+  let dist = cam.dist > 0 ? cam.dist : S.dist, pitch = S.pitch, yaw = cam.angle ?? 0;
   if (cam.move === 'push') dist *= lerp(1.15, 0.85, e);
   if (cam.move === 'pull') dist *= lerp(0.85, 1.2, e);
   if (cam.move === 'orbit') yaw += lerp(-14, 14, e);
@@ -122,6 +123,32 @@ export function cameraAt(cam = {}, target = { x: 0, y: 0, z: 0 }, u = 0) {
     z: look.z + Math.cos(y) * Math.cos(p) * dist,
   };
   return { pos, look };
+}
+
+/**
+ * 카메라가 건물·부스 같은 물체 안에 들어가면 대상 쪽으로 당겨 그 물체 앞에 세운다 (QA-01: 광장 남쪽 집 안에서 찍힘).
+ * c = { pos, look }, obstacles = [{ x, z, r, h }] (바닥 원 · 높이). 카메라가 물체보다 높으면 그대로.
+ * 고친 { pos, look } 를 돌려준다 (안 고쳤으면 c 그대로).
+ */
+export function clearCam(c, obstacles = [], { pad = 0.35, minFrac = 0.35 } = {}) {
+  const dx = c.pos.x - c.look.x, dy = c.pos.y - c.look.y, dz = c.pos.z - c.look.z;
+  const L2 = dx * dx + dz * dz;
+  if (L2 < 1e-6) return c;
+  let k = 1;
+  for (const o of obstacles) {
+    const R = o.r + pad;
+    if (Math.hypot(c.pos.x - o.x, c.pos.z - o.z) >= R) continue;          // 카메라가 원 밖이면 상관없다 (사이를 가리는 건 가림 투명이 비친다)
+    // 대상 → 카메라 선이 원에 들어가는 곳 t (0~1)
+    const fx = c.look.x - o.x, fz = c.look.z - o.z;
+    const b = fx * dx + fz * dz, cc = fx * fx + fz * fz - R * R;
+    const disc = b * b - L2 * cc;
+    if (cc <= 0) continue;                                                   // 대상이 원 안 = 대상이 그 물체 곁에 붙어 선 것 → 건드리지 않는다
+    const t = (-b - Math.sqrt(Math.max(0, disc))) / L2;
+    if (c.look.y + dy * t > (o.h ?? 3) + 0.2) continue;                     // 그 자리에서 카메라 높이가 물체 위
+    k = Math.min(k, Math.max(minFrac, t));
+  }
+  if (k >= 1) return c;
+  return { pos: { x: c.look.x + dx * k, y: c.look.y + dy * k, z: c.look.z + dz * k }, look: c.look };
 }
 
 /** 두 카메라 사이 (pan 이동) */
@@ -230,6 +257,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
       if (s.cam) {
         if (!CAM_SIZES[s.cam.size]) err.push(sp(`cam.size ${s.cam.size}`));
         if (s.cam.move && !CAM_MOVES[s.cam.move]) err.push(sp(`cam.move ${s.cam.move}`));
+        if (s.cam.dist != null && !(num(s.cam.dist) && s.cam.dist >= 1 && s.cam.dist <= 40)) err.push(sp('cam.dist 는 1~40칸'));
         if (s.cam.place != null && !PLACES[s.cam.place]) err.push(sp(`cam.place ${s.cam.place}`));
         const tg = s.cam.target;
         if (tg != null && !Array.isArray(tg) && !CAM_TARGETS_SPECIAL[tg] && cast && !cast.includes(tg)) err.push(sp(`cam.target ${tg}`));

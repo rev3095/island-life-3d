@@ -35,7 +35,7 @@
     { "key": "A", "title": "광장 무대 앞 두 줄", "recommended": true, "desc": "…", "place": "dock"?,   // place 는 연출안마다 바꿀 수 있다
       "shots": [
         { "id": "c1", "note": "컷 설명", "dur": 4,
-          "cam": { "size": "group", "target": "group", "angle": 0, "move": "static", "height": 0, "place": "pond"? },
+          "cam": { "size": "group", "target": "group", "angle": 0, "move": "static", "height": 0, "dist": 6?, "place": "pond"? },
           "transition": "fade" | "white" | (없음 = 바로),
           "music": "evening" | "auto" | "stop" | (없음 = 그대로),
           "sfx": "door"?, "caption": "{island} 축제"?, "wait": true?, "photo": true?,
@@ -53,7 +53,8 @@
 ```
 
 - 좌표: 기준 자리에서 x 동쪽+, z 남쪽+ (칸). `face` 숫자는 `player.facing` 과 같은 뜻의 도(0 북 · 90 서 · 180 남 · -90 동). 카메라 `angle` 0 = 대상 남쪽에서 북쪽을 봄(게임 기본 카메라 쪽), 180 = 북쪽에서.
-- 카메라 크기 `wide full group medium close overhead`, 움직임 `static push pull orbit crane pan`(pan = 앞 컷 끝 카메라에서 이어 옮기기). 대상 = 배우 slug · `place` · `group`(보이는 배우 가운데) · `[x, z]`. 대상이 배우면 걸어도 따라간다.
+- 카메라 크기 `wide full group medium close overhead`, 움직임 `static push pull orbit crane pan`(pan = 앞 컷 끝 카메라에서 이어 옮기기). 대상 = 배우 slug · `place` · `group`(보이는 배우 가운데) · `[x, z]`. 대상이 배우면 걸어도 따라간다. `dist`(칸) = 카메라 거리를 크기 기본값 대신 (좁은 축제 광장처럼 카메라가 부스·집에 닿을 때, 편집기 "거리(칸)").
+- 재생기는 카메라가 집·가게·부스·무대·나무 바닥 원 안(그 높이 아래)에 들어가면 대상 쪽으로 당겨 그 앞에 세운다 (`rules.clearCam`, 물체 크기 표 `index.js BLOCKERS`). 사이를 가리는 물체는 당기지 않는다 — 장면 자리·각도로 피한다. (가림 투명 `world.occlusion.watch` 는 배우 모델도 비치게 해 앞줄이 흐려져서 쓰지 않는다.)
 - 배우는 장면 안에서 이어진다: 한 번 놓으면 다음 컷에도 그 자리. `to` 를 주면 그 컷부터 일정한 빠르기(걷기 2.1·달리기 4.2칸/초)로 가고, 컷이 바뀌어도 도착할 때까지 간다. 말풍선은 컷마다 새로.
 - 글 자리: `{player}` `{island}` (intro 가 조사까지 채움), 트리거 내용 `{part.emoji}` `{part.name}` `{n}`.
 
@@ -104,7 +105,7 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 
 0. 먼저 `git merge main` 으로 story 브랜치를 맞춘다 (다른 트랙 결과가 main 에 들어와 있다. v1 은 main bed3fc9 에 합쳐짐, 게임 링크 버전 6. Z5 축제·M6 은 main 7ec3912, 주민 대사 데이터 `assets/villagers/<slug>.json`·광장 자리 `assets/island/layout.json` 은 main 3e56237).
    - 파일 수 한계는 풀렸다 (M6 묶음 파일, main 7ec3912 · 게임 링크 버전 9 · 160파일). 새 장면 파일을 더해도 된다 — `files.js` 의 `SCENE_FILES` 에만 넣는다.
-   - **다음 반영 때 같이 할 것 (Z5 맞추기)**: 축제 장면 s05~s12 를 실제 축제에 맞춘다 — `docs/notes/z5-festival.md` 의 이벤트·`world.places.festival` (가운데·무대 북쪽 5칸 `stage`·부스 `booths[].front`·진행판 `board`). ① s10·s11 줄 세우기 자리를 무대 앞(`stage.front`)·부스와 겹치지 않게, ② s05~s09 는 `booth` 자리 기준으로 부스 앞에서 보이게, ③ 말풍선 이모지를 섬 이모티콘 세트(`assets/emotes/emotes.json` key, `festival.emotes.svg(key)`)로 바꿀지 사용자에게 묻기 (H4). 게임에서 `festival.debug` 로 부품·축제를 불러 실제로 틀어 본다.
+   - **다음 반영 때 같이 할 것 (Z5 맞추기)**: 축제 장면을 실제 축제에 맞춘다 — `docs/notes/z5-festival.md` 의 이벤트·`world.places.festival` (가운데 = 모닥불, 무대 북쪽 5칸 `stage`·부스 `booths[].front`·진행판 `board`). ① s10·s11 은 v2 에서 맞춤 (QA-01·02, 아래 반영 기록), ② s05~s09 는 `booth` 자리 기준으로 부스 앞에서 보이게, ③ 말풍선 이모지를 섬 이모티콘 세트(`assets/emotes/emotes.json` key, `festival.emotes.svg(key)`)로 바꿀지 사용자에게 묻기 (H4). 게임에서 `festival.debug` 로 부품·축제를 불러 실제로 틀어 본다.
 1. ArtifactData `list` 로 편집기의 `drafts`·`timeline` 을 읽고, `get applied/story` (없으면 v0).
 2. drafts 의 `scene` 마다 `assets/story/scenes/<id>.json` 과 비교해 바뀐 장면만 고른다. 바뀐 게 없고 의견도 그대로면 그렇게 알리고 끝.
    - **고침**: 장면 파일을 drafts 내용으로 바꾸고 `version` +1, 확정(`approved`)이던 장면은 `review` 로.
@@ -126,6 +127,7 @@ stop()  playing → { id, take, shot } | null   queue   scenes()   scene(id)   i
 |---|---|---|---|
 | v0 | 2026-10-29 | 첫 초안 12장면 (status draft) | 4f90074 |
 | v1 | 2026-10-29 | **추천안 A 로 12장면 모두 임시 확정** (status approved, 사용자: "향후 변경될 수 있음"). 고치면 그 장면 version +1 · status review | (이 표 다음 커밋) |
+| v2 | 2026-10-31 | QA-01·02 (조정 세션 전달, 사용자 승인): 축제 광장(가운데 모닥불 · 남쪽 부스 · 북쪽 무대)에 맞춰 **s11** 연출안 A 를 무대 앞 두 줄 + 광장 안 동남쪽 카메라(`dist` 6.8)로 — 집 안에서 찍히던 단체 사진이 주민 열·무대가 다 보이게. **s10** 연출안 A 는 모닥불 둘레 반달(서·북)로 서고 카메라는 부스 없는 동남쪽·높은 각도. 두 장면 version 2 · status review. 같이: 카메라 `dist` 칸, 집·부스 안 카메라 당기기(`clearCam`), 걸어서 도착한 배우가 정한 방향을 안 보던 버그(소수 오차) 고침. 연출안 B·C 는 그대로 (고르면 당기기만 걸림). 편집기 버전 3 | 97007a1 |
 
 ## 첫 시나리오 초안 (v0, 12장면)
 
