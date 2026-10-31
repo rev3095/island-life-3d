@@ -2,19 +2,19 @@
 
 이 문서는 세션이 끝나거나 `/clear` 하기 전에 대화와 작업을 보고서로 남긴 기록이다. 새 세션은 **「현재 상태」부터 읽고**, 자세한 경위는 「세션 기록」을 본다. 구조·명령어는 [CLAUDE.md](CLAUDE.md), 개발 단계는 [docs/PLAN.md](docs/PLAN.md), 모듈 약속은 [docs/CONTRACTS.md](docs/CONTRACTS.md), 실행법은 [README.md](README.md).
 
-마지막 갱신: 2026-10-31 (세션 3)
+마지막 갱신: 2026-10-31 (세션 3, M7 합침·게임 v12)
 
 ---
 
 ## 현재 상태 (2026-10-31 기준)
 
 ### 한 줄 요약
-M0~M6 끝, **M7 출시 준비 중**. 10-30 병렬 3세션(편집기 홈 전체 관리 · QA 자동 플레이 · 7차 보드)을 `main` 에 합쳤다(22d7a09 + 테스트 정리, 테스트 261). **자동 봇이 개발판·게시본·휴대폰 셋 다 처음부터 엔딩까지 막힘 없이 갔다** (보고서 `docs/qa/playthrough-2026-10-30.md`, 버그 19건 중 7건 고침). 게임 링크 v11 (빌드 f638fc8). 다음 = 7차 보드 반영 v1 대로 M7-P2·P3·P4 트랙 + QA 가 남긴 큰 문제(엔딩 사진 카메라 QA-01 등).
+M0~M6 끝, **M7 출시 준비 중**. **10-31 M7-P2·P3·P4 + 스토리 QA-01·02 합침 (main 79a168f, 테스트 308), 게임 v12** — 기기 점검 `#check`·시작 단추·저사양 기준, 휴대폰 세로·섬폰 「보기 편하게」, 저장 옮기기·문제 알리기(게임 저장소 `reports`), 엔딩 사진·축제 장면 카메라. 그 전: 10-30 병렬 3세션(편집기 홈 전체 관리 · QA 자동 플레이 · 7차 보드)을 `main` 에 합쳤다(22d7a09 + 테스트 정리, 테스트 261). **자동 봇이 개발판·게시본·휴대폰 셋 다 처음부터 엔딩까지 막힘 없이 갔다** (보고서 `docs/qa/playthrough-2026-10-30.md`, 버그 19건 중 7건 고침). 게임 링크 v11 (빌드 f638fc8). 다음 = 7차 보드 반영 v1 대로 M7-P2·P3·P4 트랙 + QA 가 남긴 큰 문제(엔딩 사진 카메라 QA-01 등).
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 11 (빌드 f638fc8, 2026-10-31, 게시 파일 152)** — QA 고침 7건 · 145개 임시 확정(스펙 status). 올리기 = 페이지 + 바뀐 묶음 4(island-1 · people-2 · furniture-1 · items-1) + 모듈 6, 지우기 0. 올리기 전 게시본 10개가 3e56237 빌드와 같은 바이트인지 확인. 다음엔 `build.json` 의 packs hash 를 f638fc8 것과 비교 + `git diff --name-only f638fc8 HEAD -- src index.html` |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 12 (빌드 79a168f, 2026-10-31, 게시 파일 157)** — M7-P2·P3·P4 + 스토리 QA-01·02. **capabilities 처음 붙임**: `db` (뿌리 read·write admin · `reports`·`checks` read·write interact) · `user` · `downloads`. 올리기 = 페이지 + 바뀐 묶음 1(island-1) + 모듈 19(새 5: errors·check·access·report·transfer), 지우기 0. 기기 점검 = 링크 끝 `#check`. 다음엔 packs hash 를 79a168f 것과 비교 + `git diff --name-only 79a168f HEAD -- src index.html` |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
 | **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
@@ -30,7 +30,8 @@ M0~M6 끝, **M7 출시 준비 중**. 10-30 병렬 3세션(편집기 홈 전체 �
 | **6차 검수 보드 v0.6** | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `concept/wave6-board.html` + `board-kit.js` | 버전 1 (보드 id `wave6`). **반영 v1 (임시)** = D26–D35 모두 추천안 A, 의견 없음 → M6 시작. M6 편집기 완성: 지금 편집할 수 있는 것 점검표(❌ 9 · △ 1), 결정 D26–D35, 새 편집기·탭 ET-01–11, 트랙 M6-P1–P6 |
 
 ### 진행 중
-**10-31 병렬 3세션 (main b37e5ba 에서)** — 7차 보드 반영 v1 대로. 합치기는 사용자 확인 뒤.
+**10-31 합침 (main 8d1a943 · c93bfd3 · c657e79 · 41931f3 + 79a168f)**: 아래 4브랜치를 `--no-ff` 로 (시험 합치기 `_trial-m7` 에서 먼저: 충돌 0 · 테스트 308 · 섬폰 새 줄 셋). `build-web.test.mjs` `PENDING_MODULES` 비움. 로컬 `/artifact/` 자원 199개 4xx 0 · 시작 단추 둘 · 콘솔 오류 0 → 게임 v12, 홈 `status/game` v5. 남은 일: 홈 목록 `game` 에 `reads: ["reports","checks"]` (홈 세션) · "전체 요청 확인" 때 게임 저장소 `reports` 읽기 · `report.js` 의 `textFieldKeys` 우회는 빼도 됨(선택) · CONTRACTS 「7차」 설정 칸 제안(`docs/notes/p11-access.md`) · 사용자 RC-05–08(claude.ai·휴대폰·`#check` 결과 저장).
+**(끝남) 10-31 병렬 3세션 (main b37e5ba 에서)** — 기록용.
 | 세션 | id | 브랜치 · 포트 | 할 일 |
 |---|---|---|---|
 | M7-P2 기기 점검·시작 단추 | `local_1c450e40-7b58-4f3d-8396-ac8ef9b09ce3` | `p11-check` · 4241 | `?check` 30초 자동 순회·잰 값 저장(UI-07), 광장 33ms 넘으면 저사양, 로딩 끝 "소리 켜고/없이 시작"(UI-11) |
@@ -273,7 +274,9 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 1-c | (게시) | `build-web` → 지난 빌드(3e56237)와 묶음 해시 비교: 바뀐 묶음 4 + 모듈 6 + 페이지. 게시본 10개가 3e56237 내용과 같은 바이트인지 해시로 확인 뒤 같은 링크로 | 게임 v11 (152파일), 홈 `status/game` v4 |
 | 1-d | (/init) | CLAUDE.md: 명령어(build-web·playtest)·페이지 목록, 웹 다시 게시 절(바뀐 것만 올리는 순서), QA 절, 지금 마일스톤 M7 | 커밋 |
 | 1-e | (/save-session) | 이 devlog 「현재 상태」·게시물·다음에 할 일 갱신, 이 세션 기록 | 커밋 |
-| 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 진행 중 |
+| 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 넷 다 끝남 |
+| 3 | 회의 중 음소거 / 게임 소리 끄기 | 앱 알림 소리 끔(설정), 세션들에 미리보기 소리 끄기 부탁 → 사용자가 직접 음소거해서 취소 | 알림 소리는 꺼 둔 채 |
+| 4 | 합치고 게시 | 시험 합치기 → main 에 4브랜치(충돌 0, 테스트 308) → `/artifact/` 확인 → 게임 v12 (db·user·downloads 처음) → 홈 `status/game` v5 | 끝 |
 
 #### 2. 합친 것
 | 브랜치 | 커밋 | 내용 |
