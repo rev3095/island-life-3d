@@ -16,7 +16,7 @@ const read = p => readFileSync(join(ROOT, p), 'utf8');
 const packOf = new Map(plan.packs.flatMap(p => p.files.map(f => [f.path, p])));
 // 다른 트랙 브랜치에서 올 모듈 (합치기 전엔 이 작업 트리에 없다): 없을 때만 '없는 모듈 글자' 주의를 기다려 준다. 합친 뒤 비운다.
 //   7차 M7-P4 저장 옮기기·문제 알리기 창 — src/ui/index.js 의 EXTRA_PANELS 가 있으면 불러온다 (M7-P3)
-const PENDING_MODULES = { 'src/ui/transfer.js': 'src/ui/index.js', 'src/ui/report.js': 'src/ui/index.js' };
+const PENDING_MODULES = {};   // 7차 P3·P4 가 합쳐져 비움 (다음 트랙이 아직 없는 모듈을 부를 때만 채운다)
 const pending = p => PENDING_MODULES[p] && !existsSync(join(ROOT, p));
 const warnings = plan.warnings.filter(w => !Object.keys(PENDING_MODULES).some(p => pending(p) && w === `없는 모듈 글자 (건너뜀): ${PENDING_MODULES[p]}: ./${posix.basename(p)}`));
 
