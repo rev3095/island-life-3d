@@ -9,6 +9,9 @@ import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
+import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
+
+const errors = installErrors();
 
 // 불러오는 순서 = 초기화 순서. 앞 모듈이 ctx.services 에 올린 것을 뒤 모듈이 쓸 수 있다.
 const MODULES = [
@@ -55,6 +58,7 @@ async function boot() {
     assets, materials, constants,
     lights: { hemi, sun, sunOffset: new THREE.Vector3(-8, 16, 10) },   // sunOffset: focus 기준 해 방향·거리 (sky 가 바꾼다)
     uiRoot: document.getElementById('ui'),
+    errors,                             // core/errors.js: 최근 오류 기록 (ui.report)
     services: {},                       // 모듈이 서로에게 주는 기능: data, time, world, player, ui, audio ...
     focus: new THREE.Vector3(),         // 카메라가 따라가는 지점 (보통 플레이어). 곡면 월드 중심이기도 하다.
     debug: params.has('debug'),
