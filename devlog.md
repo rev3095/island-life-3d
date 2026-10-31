@@ -9,14 +9,14 @@
 ## 현재 상태 (2026-10-31 기준)
 
 ### 한 줄 요약
-M0~M6 끝, **M7 출시 준비 중**. **10-31 M7-P2·P3·P4 + 스토리 QA-01·02 합침 (main 79a168f, 테스트 308), 게임 v12** — 기기 점검 `#check`·시작 단추·저사양 기준, 휴대폰 세로·섬폰 「보기 편하게」, 저장 옮기기·문제 알리기(게임 저장소 `reports`), 엔딩 사진·축제 장면 카메라. 그 전: 10-30 병렬 3세션(편집기 홈 전체 관리 · QA 자동 플레이 · 7차 보드)을 `main` 에 합쳤다(22d7a09 + 테스트 정리, 테스트 261). **자동 봇이 개발판·게시본·휴대폰 셋 다 처음부터 엔딩까지 막힘 없이 갔다** (보고서 `docs/qa/playthrough-2026-10-30.md`, 버그 19건 중 7건 고침). 게임 링크 v11 (빌드 f638fc8). 다음 = 7차 보드 반영 v1 대로 M7-P2·P3·P4 트랙 + QA 가 남긴 큰 문제(엔딩 사진 카메라 QA-01 등).
+M0~M6 끝, **M7 출시 준비 중 — P1~P5 끝, 남은 것 P6 출시 + 보드 D49–D57 선택**. 게임 v13 (빌드 0490b87, P5 + 마우스 막힘 고침). **10-31 M7-P2·P3·P4 + 스토리 QA-01·02 합침 (main 79a168f, 테스트 308), 게임 v12** — 기기 점검 `#check`·시작 단추·저사양 기준, 휴대폰 세로·섬폰 「보기 편하게」, 저장 옮기기·문제 알리기(게임 저장소 `reports`), 엔딩 사진·축제 장면 카메라. 그 전: 10-30 병렬 3세션(편집기 홈 전체 관리 · QA 자동 플레이 · 7차 보드)을 `main` 에 합쳤다(22d7a09 + 테스트 정리, 테스트 261). **자동 봇이 개발판·게시본·휴대폰 셋 다 처음부터 엔딩까지 막힘 없이 갔다** (보고서 `docs/qa/playthrough-2026-10-30.md`, 버그 19건 중 7건 고침). 게임 링크 v11 (빌드 f638fc8). 다음 = 7차 보드 반영 v1 대로 M7-P2·P3·P4 트랙 + QA 가 남긴 큰 문제(엔딩 사진 카메라 QA-01 등).
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 12 (빌드 79a168f, 2026-10-31, 게시 파일 157)** — M7-P2·P3·P4 + 스토리 QA-01·02. **capabilities 처음 붙임**: `db` (뿌리 read·write admin · `reports`·`checks` read·write interact) · `user` · `downloads`. 올리기 = 페이지 + 바뀐 묶음 1(island-1) + 모듈 19(새 5: errors·check·access·report·transfer), 지우기 0. 기기 점검 = 링크 끝 `#check`. 다음엔 packs hash 를 79a168f 것과 비교 + `git diff --name-only 79a168f HEAD -- src index.html` |
-| **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
-| **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 13 (빌드 0490b87, 2026-10-31, 게시 파일 159)** — M7-P5 힌트·건너뛰기·섬폰 「안내」 + 장면 층 마우스 막힘 고침. 올리기 = 페이지 + 모듈 9(새 2: intro/tips·guide), 묶음 0. capabilities 는 v12 것 그대로(`db` 3규칙·`user`·`downloads`). 다음엔 packs hash 를 0490b87 것과 비교 + `git diff --name-only 0490b87 HEAD -- src index.html` |
+| **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 6 (10-31: 게임 카드에 게임 저장소 문제 알리기 `reports`·기기 점검 `checks`). 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
+| **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | **버전 3 (10-31): QA 칸 QA-01–19 (고침 10 · 고르기 9 → 결정 D49–D57), 목표 표 잰 값 — 사용자 선택 대기.** 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
 | 섬 지도 편집기 | https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST | `map-editor.html` (+ `assets/island/layout.json`) | 반영 v0. "지도 반영" |
 | 게임 숫자 표 | https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj | `data-editor.html` (+ `assets/data/`) | 반영 v0. "숫자 반영" |
@@ -283,7 +283,8 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 1-e | (/save-session) | 이 devlog 「현재 상태」·게시물·다음에 할 일 갱신, 이 세션 기록 | 커밋 |
 | 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 넷 다 끝남 |
 | 3 | 회의 중 음소거 / 게임 소리 끄기 | 앱 알림 소리 끔(설정), 세션들에 미리보기 소리 끄기 부탁 → 사용자가 직접 음소거해서 취소 | 알림 소리는 꺼 둔 채 |
-| 5 | 이후 개발 알려 줘, 지금 P 과정, 재개 | 작업 폴더 `p11-tune` → M7-P5 세션 시작, 보드 세션에 QA 칸 채우기·홈 세션에 reports·checks 줄 부탁 | 셋 다 끝남: `p11-tune` a67a344(장면 층이 마우스·터치를 막던 막힘 버그 — v12 게시본에도 있음) · df4e50a(힌트·건너뛰기·섬폰 안내, 처음 하는 사람 7일 → 숫자 표 초안) · `p10-board7` 58083fc(보드 v3, QA 칸 고침 10·고르기 9 → D49–D57) · `p10-hub` 2a6aca2(홈 v6, reports·checks). 시험 합치기 충돌 0 · 테스트 320. 합치기는 사용자 확인 대기 |
+| 5 | 이후 개발 알려 줘, 지금 P 과정, 재개 | 작업 폴더 `p11-tune` → M7-P5 세션 시작, 보드 세션에 QA 칸 채우기·홈 세션에 reports·checks 줄 부탁 | 셋 다 끝남: `p11-tune` a67a344(장면 층이 마우스·터치를 막던 막힘 버그 — v12 게시본에도 있음) · df4e50a(힌트·건너뛰기·섬폰 안내, 처음 하는 사람 7일 → 숫자 표 초안) · `p10-board7` 58083fc(보드 v3, QA 칸 고침 10·고르기 9 → D49–D57) · `p10-hub` 2a6aca2(홈 v6, reports·checks). 시험 합치기 충돌 0 · 테스트 320. 합침 |
+| 6 | 합치고 게시 | `p11-tune`·`p10-board7`·`p10-hub` 합침(충돌 0, 테스트 320) → `/artifact/` 에서 실제 마우스로 「소리 없이 시작」·섬폰 단추 눌러 확인 → 게임 v13, 홈 `status/game` v7 | 끝 |
 | 4 | 합치고 게시 | 시험 합치기 → main 에 4브랜치(충돌 0, 테스트 308) → `/artifact/` 확인 → 게임 v12 (db·user·downloads 처음) → 홈 `status/game` v5 | 끝 |
 
 #### 2. 합친 것
