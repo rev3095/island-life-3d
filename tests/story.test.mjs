@@ -75,6 +75,19 @@ test('카메라 계산: 각도 0 = 대상 남쪽, 크기·움직임', () => {
   assert.ok(d({ size: 'close' }, 0) < d({ size: 'wide' }, 0));
   const p = R.project(c.pos, c.look, c.look);
   assert.ok(Math.abs(p.x - 0.5) < 1e-6 && Math.abs(p.y - 0.5) < 1e-6, '바라보는 점 = 화면 가운데');
+  assert.ok(Math.abs(d({ size: 'group', dist: 5 }, 0) - 5) < 1e-9, 'dist 로 거리를 정한다');
+});
+
+test('카메라가 집·부스 안에 들어가면 대상 쪽으로 당긴다 (QA-01)', () => {
+  const look = { x: 0, y: 0.6, z: 0 };
+  const c = R.cameraAt({ size: 'group', angle: 0 }, { x: 0, y: 0, z: 0 }, 0);
+  const house = { x: 0, z: c.pos.z - 0.5, r: 1.45, h: 2.9 };
+  const k = R.clearCam(c, [house]);
+  assert.ok(Math.hypot(k.pos.x - house.x, k.pos.z - house.z) >= house.r, '집 밖으로');
+  assert.ok(k.pos.z > look.z && k.pos.z < house.z, '집 앞 (대상 쪽)');
+  assert.equal(R.clearCam(c, [{ x: 5, z: 5, r: 1, h: 3 }]), c, '안 걸리면 그대로');
+  assert.equal(R.clearCam(c, [{ ...house, h: 1 }]), c, '카메라가 물체보다 높으면 그대로');
+  assert.equal(R.clearCam(c, [{ x: 0, z: 0.5, r: 30, h: 9 }]), c, '대상이 물체 원 안이면 건드리지 않는다');
 });
 
 test('배우 자리 쌓기·걷기', () => {
@@ -86,6 +99,7 @@ test('배우 자리 쌓기·걷기', () => {
   assert.deepEqual(Object.keys(R.castAt(take, 2)).sort(), ['bori', 'coco']);
   assert.deepEqual(R.actorPosAt([0, 0], { to: [4.2, 0], do: 'walk' }, 1, 1), [2.1, 0], '걷기 2.1칸/초');
   assert.deepEqual(R.actorPosAt([0, 0], { to: [1, 0], do: 'run' }, 1, 5), [1, 0], '도착하면 멈춘다');
+  assert.deepEqual(R.actorPosAt([0, 0], { at: [-3.4, 0.4], to: [-0.6, -1.5] }, 1, 9), [-0.6, -1.5], '도착 자리는 소수 오차 없이 to 그대로');
   assert.equal(R.fillTokens('{part.emoji} {n}/5', { part: { emoji: '🏮' }, n: 2 }), '🏮 2/5');
   assert.equal(R.fillTokens('{player}', {}), '{player}', '모르는 자리는 그대로 (intro 가 채운다)');
 });

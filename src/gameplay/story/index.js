@@ -12,6 +12,13 @@ const CURVE = 0.0026;        // 장면 동안 곡면 월드 세기 (가까운 �
 const FADE_IN = 0.5, FADE_OUT = 0.4;
 const START_DELAY = 0.5;     // 트리거 뒤 바로 틀지 않고 조금 기다린다 (알림·소리가 먼저)
 const PREVIEW_VARS = { part: { emoji: '🎁', name: '축제 부품' } };
+// 카메라가 들어가면 안 되는 물체: 종류 → [바닥 반지름(칸, 크기 1 기준), 높이]. 배경 스펙 통계(bbox)에서 어림. rules.clearCam 이 쓴다
+const BLOCKERS = {
+  'house-villager': [1.45, 2.9], 'house-player': [1.45, 2.9], shop: [2.2, 3.3], museum: [3, 3.7],
+  'festival-stage': [2.9, 3.7], 'festival-cover': [1.5, 2], 'festival-booth': [1.5, 2.7],
+  tree: [0.8, 2.3], 'fruit-tree': [0.8, 2.3], cedar: [0.8, 3], palm: [0.8, 3],
+};
+const blockerOf = kind => BLOCKERS[kind] ?? (kind?.startsWith('festival-booth') ? BLOCKERS['festival-booth'] : null);
 
 let S = null;
 
@@ -266,7 +273,17 @@ export default {
       const cam = P.shot?.cam ?? {};
       let c = R.cameraAt(cam, targetNow(cam), u);
       if (cam.move === 'pan' && P.lastCam) c = R.blendCam(P.lastCam, c, u);
-      return c;
+      return R.clearCam(c, obstaclesNear(c));
+    }
+    /** 카메라 둘레의 집·부스·나무 (바닥 원 · 높이) */
+    function obstaclesNear(c) {
+      const q = svc().world?.objects?.query?.(c.pos.x, c.pos.z, 4) ?? [];
+      const out = [];
+      for (const o of q) {
+        const b = blockerOf(o.kind);
+        if (b) out.push({ x: o.x, z: o.z, r: b[0] * (o.scale ?? 1), h: b[1] * (o.scale ?? 1) });
+      }
+      return out;
     }
 
     function hideTown(show = false) {

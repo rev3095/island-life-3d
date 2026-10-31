@@ -539,6 +539,7 @@ function shotCard(take, sh, i) {
       <label class="f">누구를<select data-k="${P}.cam.target">${castOpts(cam.target, R.CAM_TARGETS_SPECIAL)}</select></label>
       <label class="f">움직임<select data-k="${P}.cam.move">${opt(R.CAM_MOVES, cam.move ?? 'static')}</select></label>
       <label class="f">각도 ${esc(cam.angle ?? 0)}°<input type="range" min="-180" max="180" step="15" data-k="${P}.cam.angle" data-num="1" value="${esc(cam.angle ?? 0)}" aria-label="카메라 각도 (0 = 앞에서)"></label>
+      <label class="f">거리(칸)<input type="number" min="1" max="40" step="0.5" data-k="${P}.cam.dist" data-num="1" value="${esc(cam.dist ?? '')}" placeholder="${esc(R.CAM_SIZES[cam.size]?.dist ?? '')}" aria-label="카메라 거리 (비우면 크기 기본값)"></label>
       <label class="f">다른 곳 비추기<select data-k="${P}.cam.place">${opt({ '': '장면 장소', ...R.PLACES }, cam.place ?? '')}</select></label>
     </div>
     <div class="fields">
