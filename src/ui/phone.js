@@ -13,6 +13,7 @@ export const APPS = [
   { id: 'settings', name: '설정', icon: '⚙️', color: '#D8D0BE' },
   { id: 'save', name: '저장', icon: '💾', color: '#C8B6E2' },
   { id: 'access', name: '보기 편하게', icon: '👓', color: '#BFE0D8' },   // 7차 UI-10
+  { id: 'guide', name: '안내', icon: '💡', color: '#F6E3A1', panel: 'guide' },   // 7차 M7-P5: 첫날 할 일·조작·지난 힌트 (창은 intro 가 ui.guide 로 채운다)
   { id: 'transfer', name: '저장 옮기기', icon: '📦', color: '#E8C9A0', panel: 'transfer' },   // 7차 UI-09 (M7-P4)
   { id: 'report', name: '문제 알리기', icon: '📮', color: '#F0B8B0', panel: 'report' },       // 7차 UI-08 (M7-P4)
 ];
