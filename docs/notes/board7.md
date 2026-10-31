@@ -4,7 +4,7 @@
 
 `concept/README.md` 「새 보드 만드는 법」 그대로. 5·6차 보드와 같은 모양(색·글꼴·카드)에, 결정 카드마다 SVG 스케치를 더했다. 게시 v1 (2026-10-30), capabilities `db`(`applied`·`history` 쓰기 admin) · `user`, 아이콘 palette. 게시 뒤 저장소: `boards`·`applied` 모두 비어 있음 (아직 고른 것 없음 — 페이지는 추천안을 미리 골라 둔 채로 열린다).
 
-보드 차례: 마일스톤 M0–M8 → 지금 출시 준비 상태(13줄) → 결정 D36–D48 → 새 화면 UI-06–11 → 출시 점검표 RC-01–12 → QA 결과(QA-01–, 지금 빈 표) → 진행 계획 M7-P1–P6 · M8 → 요청 글.
+보드 차례: 마일스톤 M0–M8 → 지금 출시 준비 상태(13줄) → 결정 D36–D48 → 새 화면 UI-06–11 → 출시 점검표 RC-01–12 → QA 결과(QA-01–19 표 + 고를 것 D49–D57 카드) → 진행 계획 M7-P1–P6 · M8 → 요청 글.
 
 ## 반영 v1 (2026-10-30, 임시) — 사용자 "7차 검수 보드 작성 완료, 반영"
 - 보드 저장소 `boards/wave7` (v6, `status: requested`): **D37-B · D41-B**, 나머지 11개 추천안 A. 의견 하나 — **D41**: "D41-B 임시 실행, 추후 D41-A 방향으로 밸런스 변경 예정".
@@ -15,6 +15,26 @@
   - D45-A → 소리 값은 그대로 (`state.js` 손대지 않음). 시작 단추만 P2.
 - 보드 다시 게시(v2): 진행 계획 표를 v1 계획으로, UI-06 "만들지 않음", RC-08 글, 머리 줄 "반영 v1".
 - 트랙 표: `docs/PLAN.md` 「7차」. P2·P3·P4 는 바로 시작할 수 있고 P5 는 QA 결과 뒤, P6 은 조정 세션.
+
+## QA 결과 칸 (2026-10-31, 게시 v3) — 조정 세션 부탁 ("이후 개발 재개")
+- main(b3525f2, QA 보고서·M7-P2·P3·P4·스토리 합친 뒤)을 이 브랜치에 맞춘 뒤 `docs/qa/playthrough-2026-10-30.md` 를 옮김.
+- `const QA` = QA-01–19 그대로 `[id, 무엇, 크기(보고서 크기: 치명·큼·작음·다듬기), 처리]`, 처리는 `['fix', 어디서·커밋]` 또는 `['pick', 결정 id, 덧붙임]`:
+  - **고침 10**: QA-04·06·07·08 (qa edf80c1) · QA-15·16 (qa 9f34110) · QA-19 (qa bbd0f59) · QA-12 (M7-P3 bca7dc3) · QA-01·02 카메라 (스토리 97007a1 — QA-02 부스 배치 자체는 그대로).
+  - **보드에서 고르기 9** → 결정 카드 **D49–D57** (`DECISIONS` 에 `qa:` 칸을 붙여 같이 둠 — `tools/hub-catalog.mjs` 가 `const DECISIONS` 를 읽으므로 홈 「보드 결정」에도 들어간다. 그리는 곳만 "QA 결과" 절). 추천안은 모두 A (아래 표).
+- QA 칸 위 숫자 6개 (막힘 0 · 통과 68/75 · 콘솔 오류 0 · 버그 19 · 고침 10 · 고를 것 9), `goalTable()` "지금 (QA 10-30)" 칸, 머리 줄 `QA 결과 19 (고침 10 · 고르기 9)`·`QA 고를 것 9`, 지금 상태 첫 줄 ✅, RC-01·02·04 ✅ · RC-03 △ (새로고침 이어 하기는 첫날만), 계획 표 P1 끝 · P2–P4 합침 · P5 하는 중, 게임 링크 v12.
+- 홈 `status/wave7` v2: `open` 9, `openItems` D49–D57, `published` 3.
+
+| 결정 | QA | 묻는 것 | 추천 (A) | 다른 안 | 고칠 곳 |
+|---|---|---|---|---|---|
+| D49 | QA-03 | 무대 지붕이 화면 아래를 덮음 | 가림 투명이 화면 아래 끝 땅 점도 봄 (QA 시험해 보니 됨) | B BD-06 3.7 → 2.6칸 (배경 요청) · C 둘 다 | `src/world/occlusion.js` · (B) 배경 편집기 |
+| D50 | QA-05 | 두부 때문에 엔딩이 막히지 않게 | 마음 열기에 선물·부탁도 (이모티콘 성공 2번 대신) | B 두부 ⏳ + 다른 것도 인정 · C 힌트만 (P5) | `src/gameplay/festival/parts.js heartOpen` · (B) `assets/villagers/dubu.json emote` |
+| D51 | QA-09 | 밤에 시작한 첫날 팔기 | 첫날만 밤톨이 문 너머로 사 줌 | B 밤엔 팔기를 내일 할 일로 · C 그대로 | `src/gameplay/town/keepers.js` · `src/gameplay/intro/` (P5) |
+| D52 | QA-10 | 첫날 도토리 | 숫자 그대로, 밤톨 말만 ("하나 먼저, 벽지는 내일") | B 선물 1,000 → 2,000 (`intro/rules.js REWARD`) · C 첫날 벽지 600 | `assets/villagers/bamtol.json` · (B·C) P5 |
+| D53 | QA-11 | 감정 알림 | "호박으로 밝혀졌어요!" | B + 바로 기증 묻기 · C 그대로 | `src/gameplay/town/keepers.js appraiseTalk` |
+| D54 | QA-13 | 얼마나 더 친해져야 | 하트 칸 + 남은 수 (♥ 22/30 · 🙂 1/2) | B 말로만 단계 · C 그대로 | `src/gameplay/festival/fest.js ask` (P5 가 만드는 중 — 고른 모양에 맞춤) |
+| D55 | QA-14 | 둘째 해 축제를 놓치면 | 그 날부터 사흘 안 (2/29 → 2/28) | B 그 해 안 처음 들어온 날 · C 그날만 (2/29 만 고침) | `src/gameplay/festival/parts.js festivalDueOn` |
+| D56 | QA-17 | 모닥불·문 앞 주민 | 둘 다: 축제 날 모닥불 앞은 축제 시작 먼저 + 주민이 문 앞·둘레에서 비켜 섬 | B 축제 시작만 먼저 · C 그대로 | `src/gameplay/festival/fest.js register` · `src/gameplay/town/` |
+| D57 | QA-18 | 맑은 날 주민 방 | 잠들기 전 1~2시간은 집에 | B 주민마다 집에 있는 시간 (성격·대화 탭) · C 그대로 | `src/gameplay/town/villager.js shouldBeOut` · 주민 파일 `schedule` |
 
 ## 결정과 추천안
 
@@ -63,11 +83,12 @@
 겹치면 안 되는 곳: `src/ui/` 는 P3 만 (P4 는 새 파일 둘만 만들고 메뉴 줄은 P3 에 부탁). `src/core/` 는 P3 `input.js`, P4 `errors.js`(새)만 (반영 v1 로 P2 `packs.js`·P5 `state.js` 는 빠짐). 로딩 화면(`web-loader.html`)은 P2 만 — 그래서 시작 단추 UI-11 도 P2. 다른 트랙 파일이 꼭 필요하면 `docs/notes/<트랙>.md` 에 제안.
 
 ## QA 결과 칸 (D47) 채우는 법
-- QA 세션 결과가 `docs/qa/` 에 오면: 큰 문제를 `concept/wave7-board.html` 의 `const QA = []` 에 `[id, 무엇, 크기, 처리]` 로 (`QA-01` 부터, 크기 = 막힘·저장·오류·밸런스·불편·보기, 처리 = D47 대로 "바로 고침 (P?)" 또는 "보드에서 고르기"), 밸런스 숫자는 `goalTable()` 의 "지금" 칸(지금은 "QA 가 잼")에 → 같은 file_path 로 다시 게시 (capabilities 생략). 머리 줄 `QA 결과 0` 숫자도.
-- "보드에서 고르기" 문제가 여러 개면 결정 카드(D49–)로 올리는 것도 된다 — 그때는 README ID 표의 D 줄을 고친다.
+- 다음 QA 결과가 `docs/qa/` 에 오면: `concept/wave7-board.html` 의 `const QA` 에 이어서 `[id, 무엇, 크기, ['fix', 어디서·커밋] | ['pick', 결정 id, 덧붙임]]` (ID 는 보고서 그대로 QA-20–), 고를 것은 `DECISIONS` 끝에 `{ id: 'D58', qa: 'QA-20', q, now, opts }` + `sketch()` 의 그림 하나, 밸런스 숫자는 `goalTable()` "지금" 칸 (도감 절반은 아직 안 잼) → 같은 file_path 로 다시 게시 (capabilities 생략). 숫자 칸·머리 줄은 `QA` 배열에서 저절로 센다 (`qaSum` 의 버그 크기 줄만 손으로).
+- 결정 id 를 더하면 README ID 표의 D 줄을 고친다.
 
 ## "검수 보드 반영" 때
-`concept/README.md` 순서 그대로: `boards/wave7` ↔ `applied/wave7` 비교 → 위 「결정과 추천안」의 걸리는 트랙대로 계획 → PLAN 7차 표 → 작업 폴더·세션 → `applied/wave7` v1 · `history/wave7-v1` (`commit` = 반영 직전 main) → 편집기 홈 `status/wave7`. 사용자가 아무것도 안 바꾸면 저장소가 비어 있을 수 있다 (6차처럼 추천안 그대로를 v1 로 기록).
+`concept/README.md` 순서 그대로: `boards/wave7` ↔ `applied/wave7` 비교 → 위 「결정과 추천안」의 걸리는 트랙대로 계획 → PLAN 7차 표 → 작업 폴더·세션 → `applied/wave7` v<n> · `history/wave7-v<n>` (`commit` = 반영 직전 main) → 편집기 홈 `status/wave7`. 사용자가 아무것도 안 바꾸면 저장소가 비어 있을 수 있다 (6차처럼 추천안 그대로를 v1 로 기록).
+- **D49–D57 (v2 반영 때)**: `boards/wave7` (v7, 반영 v1 때 Claude 가 씀) 의 `picks` 에는 D36–D48 만 있다. 사용자가 보드에서 하나라도 바꾸면 페이지가 화면의 선택 전부(D49–D57 포함)를 저장한다. 그래도 D49–D57 이 없으면 화면에 골라져 있던 **추천안 A 를 고른 것으로** 보고 `applied/wave7` v2 `picks` 에 22개를 모두 적는다. 할 일은 위 「QA 결과 칸」 표의 "고칠 곳" 대로 — 대부분 town·festival·world 의 작은 고침이라 트랙 하나(예: M7-P7 QA 남은 것, `src/gameplay/town/`·`festival/`(P3 의 `talkui.js`·`festival.css` 빼고)·`src/world/occlusion.js`)로 묶고, D50-C·D52-B/C·D54 는 P5 (첫날 안내·숫자)와 겹치므로 P5 가 끝난 뒤나 P5 에 넘긴다.
 
 ## 다른 세션에 (부탁)
 - **편집기 홈 (`p10-hub`, `editors.html` 주인)**: `editors-list` 의 `board` 무리 맨 앞(wave6 위)에 이 줄을 더하고 홈을 다시 게시해 주세요:
@@ -76,6 +97,7 @@
     "edits": "M7 출시 준비. 결정 D36–D48, 새 화면 UI-06–11, 출시 점검 RC-01–12, QA 결과 QA-01–.",
     "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave7", "applied/wave7"] },
   ```
+  (10-31) 보드에 D49–D57 이 생겼으니 이 줄 `edits` 를 `"M7 출시 준비. 결정 D36–D48, QA 결과 QA-01–19 와 고를 것 D49–D57, 새 화면 UI-06–11, 출시 점검 RC-01–12."` 로 — 홈 「보드 결정」 목록은 합친 뒤 `node tools/hub-catalog.mjs` 를 다시 돌리면 D49–D57 이 들어간다 (`tests/hub.test.mjs` 는 D36–D48 만 확인).
   그리고 `tests/hub.test.mjs` 의 README 보드 표 검사 목록(`['wave5', 'z5', 'wave6', 'concept']`)에 `'wave7'` 을, `concept/README.md` 「반영 기록 공용 모양」의 보드 id 예(`wave5` · `z5` · `wave6`)에 `wave7` 을. 홈 저장소 `status/wave7` 처음 값은 `{ id: 'wave7', open: 0, openItems: [], requested: false, applied: null, recent: [], published: 1, note: '게시 v1 — 사용자 선택 대기', checkedAt, updatedAt, updatedBy: 'claude' }`.
   - D46-A 를 고르면 홈 목록 `game` 항목 `reads` 에 게임 저장소 `reports` (`status:'new'`) 를 더하는 일이 생긴다 (P4 가 저장소 모양을 정한 뒤).
 - **조정 세션**: devlog 「게시물」에 이 보드 줄, `docs/PLAN.md` M7 줄 "예정 → 보드 wave7 v1, 선택 대기".
@@ -84,3 +106,4 @@
 ## 확인한 것 · 못 한 것
 - 확인: dev-server `/concept/wave7-board.html` (포트 4233) 콘솔 오류 0, 결정 13·라디오 39(추천안 13 골라짐)·의견 칸 32·그림 19(결정 13 + 화면 6), 1009px·375px 에서 가로 넘침 0, 스케치 19장 눈으로 확인(D38 글자 잘림 고침), 선택을 바꾸고 의견을 적으면 저장(로컬은 이 브라우저)·요청 글에 "(추천안에서 바꿈)"·의견 줄이 나오고 되돌리면 지워짐. 게시 v1 뒤 저장소 `boards`·`applied` 읽기 (둘 다 비어 있음, view 권한으로도 읽힘). `node --test tests/` 254/254.
 - 못 함: claude.ai 에서 보드를 직접 열어 저장소에 써 보기(사용자 창), 어두운 화면 눈 확인(토큰은 6차와 같음, 스케치는 밝은 받침에 고정색).
+- 확인 (10-31, QA 칸 · 게시 v3): 콘솔 오류 0, 결정 22 (본 절 13 + QA 절 9)·라디오 66·의견 칸 41·그림 28, QA 표 19줄, `hub-catalog.mjs boardDecisions` 가 22개를 읽음 (추천 모두 A), 1024px·375px 가로 넘침 0 (QA 표는 375 에서 표만 옆으로 밀림 — `min-width: 600px`), 새 스케치 9장 눈으로 확인(D52·D56 글자 겹침, 주민 그림 종족 고침 — 두부 곰·느루 거북), D55 를 B 로 바꾸면 요청 글에 "(추천안에서 바꿈)"·로컬 저장, 되돌림. `node --test tests/` 308/308. 게시 v3 뒤 `boards/wave7` 그대로 (v7, D36–D48 만).
