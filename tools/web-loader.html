@@ -3,7 +3,7 @@
      window 'island:load' 이벤트), 모듈 준비(window.__island.services), 끝(game:ready). -->
 <style>
   /* Layout: 하늘색 막 가운데에 작은 섬 그림 → 게임 이름 → 도토리가 굴러가는 진행 막대 → 단계·파일 수 → 저장 안내.
-     다 받으면 막이 걷히고, 소리가 아직 잠겨 있으면 화면 아래쪽에 안내 한 줄 */
+     다 받으면 시작 단추 둘(소리 켜고 / 소리 없이, UI-11)과 iPhone 무음 안내 → 누르면 막이 걷힌다. 그래도 소리가 잠겨 있으면 안내 한 줄 */
   :root {
     --ld-sky: #BFE6F7;
     --ld-sky-low: #EAF7FC;
@@ -41,6 +41,12 @@
   .ld-btn:focus-visible { outline: 3px solid var(--ld-leaf); outline-offset: 3px; }
   .ld-note { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--ld-muted); }
   .ld-note.is-warn { color: var(--ld-warn); }
+  /* 시작 단추 (M7-P2 · UI-11 · D45-A): 누르는 것이 곧 첫 입력이라 소리·키보드가 바로 켜진다 */
+  .ld-start { display: grid; gap: 10px; justify-items: center; margin-top: 2px; }
+  .ld-start .ld-actions { margin-top: 0; }
+  .ld-start .ld-btn { font-size: 18px; padding: 14px 22px; }
+  .ld-start .ld-btn svg { width: 20px; height: 20px; margin: -4px 6px -4px 0; vertical-align: middle; }
+  .ld-tip { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ld-muted); text-wrap: balance; word-break: keep-all; }
   #loader.is-error .ld-fill { background: var(--ld-warn); }
   #loader.is-error .ld-island { animation: none; }
   /* 위쪽 HUD(시계·도토리·섬폰 단추) 바로 아래 가운데. 아래쪽은 휴대폰 조이스틱·A/B·도구 단추 자리라 피한다 */
@@ -84,6 +90,13 @@
     </div>
     <p class="ld-step" id="ld-step">게임 파일을 받는 중…</p>
     <p class="ld-count" id="ld-count">&nbsp;</p>
+    <div class="ld-start" id="ld-start" hidden>
+      <div class="ld-actions">
+        <button class="ld-btn" id="ld-sound" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6M15.5 4.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>소리 켜고 시작</button>
+        <button class="ld-btn is-soft" id="ld-mute" type="button">소리 없이 시작</button>
+      </div>
+      <p class="ld-tip">iPhone 은 무음 모드(옆 스위치·제어 센터)를 켜 두면 소리가 나지 않아요.</p>
+    </div>
     <div class="ld-actions" id="ld-actions" hidden>
       <button class="ld-btn" id="ld-retry" type="button">다시 시도</button>
       <button class="ld-btn is-soft" id="ld-skip" type="button" hidden>이대로 할래요</button>
@@ -101,6 +114,7 @@
   const $ = id => document.getElementById(id);
   const box = $('loader'), bar = box.querySelector('.ld-bar'), stepEl = $('ld-step'), countEl = $('ld-count');
   const actions = $('ld-actions'), retry = $('ld-retry'), skip = $('ld-skip'), note = $('ld-note'), hint = $('sound-hint');
+  const startBox = $('ld-start'), soundBtn = $('ld-sound'), muteBtn = $('ld-mute');
   const js = new Set();
   let assets = { started: 0, done: 0, failed: 0, failedUrls: [] };
   let ready = false, stopped = false, slow = false, best = 0, lastKey = '', lastChange = performance.now();
@@ -202,14 +216,65 @@
     done();
   }
 
-  // 막 걷기 → 소리가 아직 잠겨 있으면 안내 (audio 서비스의 unlocked 를 보다가 켜지면 지운다)
+  // ── 시작 단추 (UI-11) ──
+  // 소리 없이 = 섬폰 설정의 소리 크기 셋을 0 으로 (섬폰에서 다시 올릴 수 있다. 기본값 0.6·0.8·0.7 은 그대로, D45-A).
+  // 0 으로 내리기 전 값을 이 브라우저에 적어 두고, 다음에 「소리 켜고 시작」을 누르면 셋 다 0 일 때만 되돌린다.
+  // 첫 누름(pointerdown·keydown)에 audio 가 소리를 깨우므로, 그보다 먼저(창 capture — 이 글이 main.js 보다 앞서 단다) 크기를 정한다.
+  const VOLS = ['bgm', 'sfx', 'voice'], MUTED = 'island:start-muted';
+  let choice = null;
+  function setVolumes(vals) {
+    const ctx = window.__island, set = ctx?.state?.settings;
+    if (!set) return;
+    for (const k of VOLS) {
+      if (typeof vals[k] !== 'number' || set[k] === vals[k]) continue;
+      set[k] = vals[k];
+      ctx.services?.audio?.setVolume?.(k, vals[k]);
+      ctx.events?.emit?.('settings:changed', { key: k, value: vals[k], settings: set });
+    }
+  }
+  function choose(sound) {
+    if (choice != null) return;
+    choice = sound ? 'sound' : 'mute';
+    const set = window.__island?.state?.settings;
+    if (!set) return;
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(MUTED) || 'null'); } catch { /* 막힌 저장소 */ }
+    if (!sound) {
+      if (VOLS.some(k => set[k] > 0)) try { localStorage.setItem(MUTED, JSON.stringify(Object.fromEntries(VOLS.map(k => [k, set[k]])))); } catch { /* 막힌 저장소 */ }
+      setVolumes({ bgm: 0, sfx: 0, voice: 0 });
+    } else {
+      if (saved && VOLS.every(k => !set[k])) setVolumes(saved);
+      try { localStorage.removeItem(MUTED); } catch { /* 막힌 저장소 */ }
+    }
+  }
+  const early = e => {
+    if (startBox.hidden || (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ')) return;
+    if (soundBtn.contains(e.target)) choose(true);
+    else if (muteBtn.contains(e.target)) choose(false);
+  };
+  for (const type of ['pointerdown', 'keydown', 'touchend']) addEventListener(type, early, { capture: true, passive: true });
+  soundBtn.addEventListener('click', () => { choose(true); window.__island?.services?.audio?.unlock?.(); lift(); });
+  muteBtn.addEventListener('click', () => { choose(false); lift(); });
+
+  // 다 받으면 시작 단추를 보여 준다 (소리 서비스가 없어도 같은 단추 — 둘 다 그냥 시작)
   function done() {
     stopped = true;
     box.setAttribute('aria-busy', 'false');
+    box.classList.remove('is-error');
+    stepEl.textContent = '섬에 도착했어요!';
+    countEl.hidden = true;
+    actions.hidden = true;
+    startBox.hidden = false;
+    soundBtn.focus({ preventScroll: true });
+  }
+
+  // 막 걷기 → 소리가 아직 잠겨 있으면 안내 (audio 서비스의 unlocked 를 보다가 켜지면 지운다)
+  function lift() {
+    for (const type of ['pointerdown', 'keydown', 'touchend']) removeEventListener(type, early, { capture: true });
     box.classList.add('is-done');
     setTimeout(() => box.remove(), 600);
     const audio = () => window.__island?.services?.audio;
-    if (!audio() || audio().unlocked) return hint.remove();
+    if (!audio() || audio().unlocked || choice === 'mute') return hint.remove();
     // claude.ai 안(iframe)에서는 한 번 눌러야 키보드도 게임에 들어온다
     if (!window.__island.input?.touch) hint.querySelector('span').textContent = '화면을 한 번 클릭하면 소리와 키보드가 켜져요';
     hint.hidden = false;
