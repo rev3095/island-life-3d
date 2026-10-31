@@ -70,6 +70,15 @@
 .fd-go:hover { transform: translateY(-1px); }
 .fd-go:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--fd-accent-deep); }
 .fd-card.is-shake { animation: fd-shake .3s ease; }
+/* 첫날 안내 고르기 (7차 D44-A) */
+.fd-guide-pick { margin-bottom: 10px; }
+.fd-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fd-mode { display: grid; gap: 2px; min-height: 56px; padding: 8px 10px; border: 0; border-radius: 16px; background: #FFFDF6; box-shadow: inset 0 0 0 2px var(--fd-edge); text-align: left; cursor: pointer; }
+.fd-mode b { font: 400 17px var(--fd-display); }
+.fd-mode span { font-size: 13px; color: var(--fd-ink-soft); word-break: keep-all; }
+.fd-mode[aria-pressed="true"] { background: #FBEBCB; box-shadow: inset 0 0 0 3px var(--fd-accent-deep); }
+.fd-mode[aria-pressed="true"] b::before { content: "✓ "; color: var(--fd-accent-deep); }
+.fd-mode-note { font-size: 13px; color: var(--fd-ink-soft); word-break: keep-all; }
 
 /* ---------- 첫날 할 일 목록 (왼쪽 위 시계 아래) ---------- */
 .fd-list {
@@ -78,7 +87,10 @@
   pointer-events: auto; transition: opacity .25s, transform .25s, visibility .25s; animation: fd-slide .4s cubic-bezier(.2, 1.3, .4, 1);
 }
 .fd-list.is-away { opacity: 0; visibility: hidden; transform: translateX(-12px); }
-.fd-head { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 42px; padding: 8px 12px 6px 14px; border: 0; background: none; font: 17px var(--fd-display); text-align: left; cursor: pointer; }
+.fd-head-row { display: flex; align-items: stretch; }
+.fd-head { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; min-height: 42px; padding: 8px 6px 6px 14px; border: 0; background: none; font: 17px var(--fd-display); text-align: left; cursor: pointer; }
+.fd-skip { flex: none; width: 40px; margin: 4px 6px 0 0; border: 0; border-radius: 50%; background: none; font-size: 14px; color: var(--fd-ink-soft); cursor: pointer; }
+.fd-skip:hover, .fd-skip:focus-visible { background: rgba(74, 59, 50, .08); color: var(--fd-ink); }
 .fd-head-n { margin-left: auto; padding: 1px 9px; border-radius: 999px; background: var(--fd-accent); font-size: 14px; font-variant-numeric: tabular-nums; }
 .fd-caret { font-size: 12px; transition: transform .2s; }
 .fd-list.is-collapsed .fd-caret { transform: rotate(-90deg); }
@@ -115,6 +127,54 @@
   .fd-list { top: calc(80px + var(--sat)); width: 220px; }
 }
 
+/* ---------- 힌트 카드 (7차 M7-P5: 오른쪽 위 메뉴 단추 아래, 잠깐 떴다 사라짐) ---------- */
+.fd-tip {
+  position: absolute; right: calc(14px + var(--sar)); top: calc(118px + var(--sat)); width: min(340px, calc(100% - 28px - var(--sal) - var(--sar)));
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; padding: 12px 14px 10px;
+  background: rgba(255, 248, 230, .97); border-radius: 18px; box-shadow: 0 0 0 3px #F6E3A1, var(--fd-shadow);
+  pointer-events: auto; transition: opacity .25s, transform .25s;
+}
+.fd-tip.is-new { animation: fd-tip-in .35s cubic-bezier(.2, 1.3, .4, 1); }
+.fd-tip.is-out { opacity: 0; transform: translateY(-8px); }
+.fd-tip-icon { font-size: calc(26px * var(--pk-fs, 1)); line-height: 1.1; }
+.fd-tip-body { display: grid; gap: 3px; min-width: 0; }
+.fd-tip-title { font: 400 calc(16px * var(--pk-fs, 1))/1.3 var(--fd-display); }
+.fd-tip-text { font-size: calc(14px * var(--pk-fs, 1)); line-height: 1.5; word-break: keep-all; }
+.fd-tip-more { font-size: calc(12px * var(--pk-fs, 1)); color: var(--fd-ink-soft); }
+.fd-tip-ok { grid-column: 2; justify-self: end; min-height: 36px; padding: 4px 16px; border: 0; border-radius: 999px; background: var(--fd-accent); box-shadow: 0 2px 0 var(--fd-accent-deep); font: calc(15px * var(--pk-fs, 1)) var(--fd-display); cursor: pointer; }
+/* 휴대폰 세로: 왼쪽 할 일 목록 밑으로 (오른쪽 위 메뉴 단추·목록과 겹치지 않게) */
+@media (max-width: 640px) {
+  .fd-tip { left: calc(14px + var(--sal)); right: calc(14px + var(--sar)); width: auto; top: calc(200px + var(--sat)); }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .fd-tip { top: calc(70px + var(--sat)); width: min(320px, 46vw); }
+}
+.pk-calm .fd-tip { animation: none !important; transition: none !important; }
+
+/* ---------- 섬폰 「💡 안내」 창 (ui 창 겉모양 .pk-card 안쪽만, ui 색 변수를 쓴다) ---------- */
+.fd-guide { width: min(460px, 100%); }
+.fd-guide-body { display: flex; flex-direction: column; gap: 6px; padding-top: 14px; }
+.fd-guide-head { margin: 10px 0 2px; font: 400 calc(16px * var(--pk-fs, 1)) var(--pk-display, inherit); color: var(--pk-ink-soft, #7A6656); }
+.fd-guide-head:first-child { margin-top: 0; }
+.fd-guide-steps, .fd-guide-friends, .fd-guide-tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fd-guide-step { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; padding: 6px 8px; border-radius: 12px; background: var(--pk-slot, #F7EFDC); }
+.fd-guide-mark { width: 20px; height: 20px; margin-top: 2px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 2px var(--pk-edge, #E2D2AE); font-size: 12px; color: #fff; }
+.fd-guide-step.is-done .fd-guide-mark { background: #7DB06A; box-shadow: none; }
+.fd-guide-label { font: 400 calc(15px * var(--pk-fs, 1)) var(--pk-display, inherit); }
+.fd-guide-hint, .fd-guide-note, .fd-guide-tip p { margin: 2px 0 0; font-size: calc(13px * var(--pk-fs, 1)); line-height: 1.5; color: var(--pk-ink-soft, #7A6656); word-break: keep-all; }
+.fd-guide-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.fd-guide-btn { font-size: calc(15px * var(--pk-fs, 1)); }
+.fd-guide-friend { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; padding: 6px 10px; border-radius: 12px; background: var(--pk-slot, #F7EFDC); font-size: calc(14px * var(--pk-fs, 1)); }
+.fd-guide-friend b { font: 400 calc(15px * var(--pk-fs, 1)) var(--pk-display, inherit); }
+.fd-guide-friend.is-open { box-shadow: inset 0 0 0 2px #F2B36B; }
+.fd-guide-friend.is-part { opacity: .75; }
+.fd-meter { display: inline-block; width: 56px; height: 8px; margin-right: 2px; border-radius: 999px; background: var(--pk-edge, #E2D2AE); overflow: hidden; vertical-align: middle; }
+.fd-meter i { display: block; height: 100%; background: #EE8FA0; border-radius: inherit; }
+.fd-guide-tip { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding: 6px 8px; border-radius: 12px; background: var(--pk-slot, #F7EFDC); }
+.fd-guide-tip-icon { font-size: calc(20px * var(--pk-fs, 1)); }
+.fd-guide-tip b { font: 400 calc(15px * var(--pk-fs, 1)) var(--pk-display, inherit); }
+
+@keyframes fd-tip-in { from { opacity: 0; transform: translateY(-10px) scale(.96); } }
 @keyframes fd-fade { from { opacity: 0; } }
 @keyframes fd-pop { from { opacity: 0; transform: scale(.92) translateY(10px); } }
 @keyframes fd-slide { from { opacity: 0; transform: translateX(-16px); } }

@@ -133,7 +133,11 @@ export function markDone(p, id, dayKey = null) {
   return true;
 }
 export const doneCount = p => STEPS.filter(s => p.done[s.id]).length;
-export const currentStep = p => STEPS.find(s => !p.done[s.id]) ?? null;
+/** 지금 할 일: 맨 앞 빈칸. blocked = 지금은 못 하는 단계 (밤에 상점이 닫힌 '팔기' 등) → 그 뒤 빈칸부터, 다 막혔으면 맨 앞 빈칸 */
+export function currentStep(p, blocked = []) {
+  const left = STEPS.filter(s => !p.done[s.id]);
+  return left.find(s => !blocked.includes(s.id)) ?? left[0] ?? null;
+}
 export const allDone = p => STEPS.every(s => p.done[s.id]);
 export const rewardPending = p => !!p.finished && !p.rewarded;
 
@@ -194,9 +198,9 @@ export function hintFor(id, { touch = false, shopOpen = true, canSell = true, ca
   return text;
 }
 
-/** 목록 그리기용 → { steps: [{ id, label, icon, done, current }], n, total, current, finished, reward } */
-export function viewOf(p) {
-  const cur = currentStep(p);
+/** 목록 그리기용 → { steps: [{ id, label, icon, done, current }], n, total, current, finished, reward, ahead (막힌 단계를 건너뛰었나) } */
+export function viewOf(p, { blocked = [] } = {}) {
+  const cur = p.finished ? null : currentStep(p, blocked);   // 다 마쳤거나 건너뛰었으면 밤톨에게 알려 주기만 (건너뛴 뒤 다시 띄운 목록)
   return {
     steps: STEPS.map(s => ({ id: s.id, label: s.label, icon: s.icon, done: !!p.done[s.id], current: cur?.id === s.id })),
     n: doneCount(p),
@@ -204,5 +208,6 @@ export function viewOf(p) {
     current: cur?.id ?? (rewardPending(p) ? 'reward' : null),
     finished: !!p.finished,
     reward: rewardPending(p),
+    ahead: !!cur && cur.id !== currentStep(p)?.id,
   };
 }
