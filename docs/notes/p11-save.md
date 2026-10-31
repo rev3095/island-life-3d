@@ -116,4 +116,5 @@ eyJ2IjoxLCJzYXZlZEF0IjoxNzkzNDE3MDc5NjUyLCJleHBvcnRlZEF0Ijox…   ← base64(UTF
   - 일부러 낸 오류 3개 (setTimeout throw · Promise.reject · 없는 그림) → 문제 알리기 창이 「오류·멈춤」을 미리 고르고 "최근 오류 3개" → 글 칸에서 방향키·Enter 가 글 편집으로 → 보내기 → `assets/review/game-reports.json` 에 위 모양 문서 (1.3 KB).
   - 새로 연 페이지에서 `ctx.errors` 0개 (= console.error 0), 두 창 열고 닫기 정상. 휴대폰 폭 375 에서 두 창 가로 넘침 없음.
   - 웹 빌드 `node tools/build-web.mjs` → `/artifact/`: 새 모듈 3개가 들어가고 `ui.transfer`·`ui.report` 있음, 오류 0, 같은 저장 이어짐.
+- P3 와 합친 모습 (10-31, 이 브랜치 97d6748 + p11-access 작업 폴더의 커밋 전 변경을 임시 작업 트리에 얹어서): `node --test tests/` 295 통과, 섬폰 📦·📮 줄이 보이고 누르면 섬폰 위에 저장 옮기기·문제 알리기 창이 쌓여 열리고, 닫으면 섬폰으로 돌아옴, 오류 0. (섬폰은 연 지 160ms 안의 누르기를 무시한다 — 정상.)
 - 못 한 것: **클립보드 복사 성공** (숨은 미리보기 창은 클립보드가 막혀 대신 글 상자 고르기로 넘어가는 것만 봄 — 보이는 브라우저에서 확인 필요), claude.ai 에서 `reports` 쓰기와 `downloads` 확인 창 (게임 capabilities 는 P6), 휴대폰의 파일 고르기, 다른 계정(공유 링크)에서 글 복사로 넘어가기.
