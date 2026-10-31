@@ -95,7 +95,7 @@ eyJ2IjoxLCJzYXZlZEF0IjoxNzkzNDE3MDc5NjUyLCJleHBvcnRlZEF0Ijox…   ← base64(UTF
 
 ### P3 (`p11-access`, 섬폰 메뉴 줄) — 섬폰 두 줄·불러오기는 P3 이 이미 넣음 (`EXTRA_PANELS`, 10-31 알림 받음)
 - (넣음) 섬폰 메뉴에 두 줄: **「저장 옮기기」 → `ctx.services.ui.transfer.open()`** (`{ tab: 'export' | 'import' }` 선택, 기본 export) · **「문제 알리기」 → `ctx.services.ui.report.open()`** (`{ kind?, text? }` 로 미리 고를 수 있음). 둘 다 창이 닫히면 `null` 로 풀리는 Promise, 이미 열려 있으면 같은 Promise. 섬폰 창 위에 쌓여 열린다 (`ui.panel`).
-- `panels.js` 제안: 창 안 글 칸(`textarea`·글 `input`)에서 방향키·Enter·Home/End 를 창 이동으로 가져가지 않기 (지금은 range 만 빼 준다). 이 트랙은 `onKey` 로 우회했다 (`report.js` `textFieldKeys` — panels 가 고쳐져도 그대로 둬도 됨).
+- (P3 이 고침, p11-access 41d6980) `panels.js` 가 창 안 글 칸에서 방향키·toggleKey 를 가져가지 않는다. 이 트랙의 우회(`report.js` `textFieldKeys`, 두 창의 `onKey`)는 이 브랜치만 따로 돌 때를 위해 남겨 두었다 — 합친 뒤 조정 세션이 빼도 되고 남겨도 충돌 없음.
 - (선택) 오류가 나면 HUD 에 작은 「문제 알리기」 알림: `ctx.errors.on(e => …)` 로 들을 수 있다.
 
 ### P2 (`p11-check`, 로딩 화면)
