@@ -1,6 +1,8 @@
 /* 스토리 장면 층: 위아래 띠, 이모티콘 말풍선, 고르기, 사진 틀. 색은 게임 ui 의 갈색 잉크·크림과 맞춘다 */
 .st-root { position: absolute; inset: 0; z-index: 40; pointer-events: none; font-family: "Jua", "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #3B2F28; }
 .st-root.is-on { pointer-events: auto; }
+/* index.html 의 `#ui > * { pointer-events: auto }` 가 위 줄보다 세서, 장면이 없을 때도 화면 전체(z 40)가 마우스·터치를 막았다 (7차 P5 에서 찾음) */
+#ui > .st-root:not(.is-on) { pointer-events: none; }
 .st-fade { position: absolute; inset: 0; background: #2E2420; opacity: 0; pointer-events: none; }
 
 .st-bar { position: absolute; left: 0; right: 0; height: 11vh; background: #1E1814; transform: scaleY(0); transition: transform .45s ease; }
