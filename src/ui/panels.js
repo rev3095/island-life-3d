@@ -89,10 +89,13 @@ export function createPanels(ctx, stackEl) {
     if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
     if (p.opts.onKey?.(e, p)) { e.preventDefault(); return; }
     const field = e.target.closest?.('input, textarea, select');
+    // 글 칸(문제 알리기 등, 7차 P4): 방향키는 글자 사이를 옮기고, 창 여닫는 글자 키(P 등)는 글자로 들어가야 한다
+    const typing = field && (field.tagName === 'TEXTAREA' || (field.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button', 'submit'].includes(field.type)));
     switch (e.code) {
       case 'Escape': e.preventDefault(); if (!e.repeat) p.cancel(); return;
       case 'Tab': e.preventDefault(); cycle(p, e.shiftKey ? -1 : 1); return;
       case 'ArrowUp': case 'ArrowDown': case 'ArrowLeft': case 'ArrowRight':
+        if (typing) return;
         if (field?.type === 'range' && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) return;   // 슬라이더 값 바꾸기
         e.preventDefault();
         cycle(p, e.code === 'ArrowUp' || e.code === 'ArrowLeft' ? -1 : 1);
@@ -102,7 +105,7 @@ export function createPanels(ctx, stackEl) {
         if (!p.root.contains(document.activeElement)) { e.preventDefault(); p.opts.onAction ? p.opts.onAction(p) : focusFirst(p); }
         return;   // 포커스된 버튼은 브라우저가 눌러 준다
       default:
-        if (p.opts.toggleKey && e.code === p.opts.toggleKey && !e.repeat) { e.preventDefault(); p.cancel(); }
+        if (p.opts.toggleKey && e.code === p.opts.toggleKey && !e.repeat && !typing) { e.preventDefault(); p.cancel(); }
     }
   }, true);
 

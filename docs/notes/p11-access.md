@@ -47,6 +47,8 @@
 - 창은 `ctx.services.ui.panel(name, root, opts)` 로 (섬폰 위에 쌓인다). 섬폰 줄 이름·아이콘은 P3 몫 (`phone.js` `APPS`).
 - 웹 빌드: `'./transfer.js'` 글자를 `tools/build-web.mjs` 가 읽어 파일이 있으면 게시 목록에 넣는다. 합치기 전 테스트를 위해 `tests/build-web.test.mjs` 에 **`PENDING_MODULES`** (두 파일이 없을 때만 '없는 모듈 글자' 주의를 봐줌) — **P4 를 합친 뒤 조정 세션이 비운다** (hub 테스트의 `PENDING_BOARDS` 와 같은 방식).
 - P4 세션에 같은 내용을 메시지로 보냈다 (10-31).
+- P4 답 (p11-save 97d6748): `open(ctx, opts)` 로 맞췄고 `src/ui/index.js` 는 안 고친다. 옵션 transfer `{ tab: 'export'|'import' }`, report `{ kind?, text? }`. 두 작업 폴더를 얹어 node --test 295 통과·섬폰 📦·📮 → 창이 쌓여 열림 (P4 확인).
+- P4 부탁으로 `src/ui/panels.js`: 창 안 **글 칸**(text input·textarea)에선 방향키가 글자 사이를 옮기고, 창 여닫는 글자 키(섬폰 P 등)가 창을 닫지 않는다 → report.js 의 `textFieldKeys` 우회는 합친 뒤 빼도 된다.
 
 ## 계약 제안 (CONTRACTS.md 「7차」에 넣었으면 하는 것)
 1. `state.settings` 칸 더하기: `textSize` · `shapes` · `calm` · `emoteText` · `soundText` (주인 ui). `calm` 은 undefined = 기기 설정.
