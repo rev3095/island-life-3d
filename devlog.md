@@ -31,6 +31,13 @@ M0~M6 끝, **M7 출시 준비 중**. **10-31 M7-P2·P3·P4 + 스토리 QA-01·02
 
 ### 진행 중
 **10-31 합침 (main 8d1a943 · c93bfd3 · c657e79 · 41931f3 + 79a168f)**: 아래 4브랜치를 `--no-ff` 로 (시험 합치기 `_trial-m7` 에서 먼저: 충돌 0 · 테스트 308 · 섬폰 새 줄 셋). `build-web.test.mjs` `PENDING_MODULES` 비움. 로컬 `/artifact/` 자원 199개 4xx 0 · 시작 단추 둘 · 콘솔 오류 0 → 게임 v12, 홈 `status/game` v5. 남은 일: 홈 목록 `game` 에 `reads: ["reports","checks"]` (홈 세션) · "전체 요청 확인" 때 게임 저장소 `reports` 읽기 · `report.js` 의 `textFieldKeys` 우회는 빼도 됨(선택) · CONTRACTS 「7차」 설정 칸 제안(`docs/notes/p11-access.md`) · 사용자 RC-05–08(claude.ai·휴대폰·`#check` 결과 저장).
+**10-31 M7 다음 단계 (main 9e6e24e 에서)** — 사용자 "이후 개발 재개".
+| 세션 | id | 브랜치 · 포트 | 할 일 |
+|---|---|---|---|
+| M7-P5 첫날 안내·밸런스 | `local_fa418fa8-99db-4809-a1da-ba1a65e68fb3` | `p11-tune` · 4244 | 막힌 곳 힌트(두부 QA-05·친해지기 정도 QA-13), 안내 건너뛰기, 섬폰에서 다시 보기, `--novice` 로 날 수 재기 → 숫자 표 초안(QA-10 포함) |
+| 7차 보드 (QA 칸) | `local_5c1ef093-b63e-4d66-94d2-aa213ac49254` | `p10-board7` | main 맞춘 뒤 QA-01–19 를 보드 QA 칸에(고친 것 / 보드에서 고르기), `goalTable` 잰 값 → 보드 다시 게시 |
+| 편집기 홈 | `local_b2efaa7b-8c66-4d56-a5d5-3ba1fa6ed044` | `p10-hub` | main 맞춘 뒤 홈 `game` 에 `reads: reports·checks`, "전체 요청 확인" 때 게임 저장소 읽는 순서 → 홈 다시 게시 |
+
 **(끝남) 10-31 병렬 3세션 (main b37e5ba 에서)** — 기록용.
 | 세션 | id | 브랜치 · 포트 | 할 일 |
 |---|---|---|---|
@@ -276,6 +283,7 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 1-e | (/save-session) | 이 devlog 「현재 상태」·게시물·다음에 할 일 갱신, 이 세션 기록 | 커밋 |
 | 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 넷 다 끝남 |
 | 3 | 회의 중 음소거 / 게임 소리 끄기 | 앱 알림 소리 끔(설정), 세션들에 미리보기 소리 끄기 부탁 → 사용자가 직접 음소거해서 취소 | 알림 소리는 꺼 둔 채 |
+| 5 | 이후 개발 알려 줘, 지금 P 과정, 재개 | 작업 폴더 `p11-tune` → M7-P5 세션 시작, 보드 세션에 QA 칸 채우기·홈 세션에 reports·checks 줄 부탁 | 진행 중 |
 | 4 | 합치고 게시 | 시험 합치기 → main 에 4브랜치(충돌 0, 테스트 308) → `/artifact/` 확인 → 게임 v12 (db·user·downloads 처음) → 홈 `status/game` v5 | 끝 |
 
 #### 2. 합친 것
