@@ -3,9 +3,10 @@
 // 전체 관리 표(tools/hub-catalog.mjs 목록 + 홈 계산 hub-logic)가 저장소 파일·편집기 주소와 맞는다.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import vm from 'node:vm';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -15,7 +16,7 @@ const LIST = JSON.parse(home.match(/<script type="application\/json" id="editors
 const byId = Object.fromEntries(LIST.map(e => [e.id, e]));
 const GROUPS = ['editor', 'board', 'game', 'soon', 'archive'];
 // 채팅 명령 → 그 명령을 설명하는 문서 (CLAUDE.md 편집기 절 · concept/README.md · 각 트랙 노트)
-const COMMANDS = ['요청 확인', '배경 요청 확인', '시나리오 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
+const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
 
 test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 맞다', () => {
   assert.equal(new Set(LIST.map(e => e.id)).size, LIST.length, 'id 겹침');
@@ -81,8 +82,8 @@ test('board-kit.js: window.BOARD 가 없어도 ApplyLog 가 실리고, 기록 �
 test('홈: 바로 가기 링크가 목록과 같고, 스크립트 없이도 보인다', () => {
   const quick = home.match(/<nav class="quick"[\s\S]*?<\/nav>/)?.[0] ?? '';
   const hrefs = new Set([...quick.matchAll(/href="([^"]+)"/g)].map(m => m[1]));
-  const urls = new Set(LIST.map(e => e.url).filter(Boolean));
-  assert.deepEqual([...hrefs].sort(), [...urls].sort(), '바로 가기(nav.quick) 링크 = editors-list 의 url 전부');
+  const urls = new Set(LIST.flatMap(e => (e.url ? [e.url, ...(e.links ?? []).map(l => `${e.url}#${l.hash}`)] : [])));
+  assert.deepEqual([...hrefs].sort(), [...urls].sort(), '바로 가기(nav.quick) 링크 = editors-list 의 url 전부 (+ links 의 #…)');
 });
 
 test('홈: 실패 상자를 맨 먼저 걸고, 외부 글꼴·파일에 화면이 막히지 않는다', () => {
@@ -191,4 +192,90 @@ test('전체 관리 흐름이 문서에 있다 (확정해도 지우지 않고 �
   for (const k of ['manage/', 'catalog/', 'marks/', "'reopen'", "'fix'", "'approve'", 'hub-catalog.mjs']) assert.ok(readme.includes(k), `README 에 ${k}`);
   for (const k of ['전체 관리', 'hub-catalog.mjs', 'manage']) assert.ok(claude.includes(k), `CLAUDE.md 에 ${k}`);
   assert.ok(/지우지 않/.test(readme) && /지우지 않/.test(claude), '확정해도 편집기·요소를 지우지 않는다는 규칙');
+});
+
+
+/* ---------- 게임 저장소 (문제 알리기 reports · 기기 점검 checks) → 홈 status/game ---------- */
+test('홈 목록 game: 게임 저장소 reports·checks 를 읽고, 기기 점검 링크(#check)가 게임이 켜는 주소와 같다', async () => {
+  const g = byId.game;
+  assert.deepEqual(g.reads, ['reports', 'checks']);
+  assert.equal(g.openLabel, '새 문제');
+  assert.equal(g.command, '전체 요청 확인', '게임 문제는 "전체 요청 확인" 때 처리');
+  const { checkRequested, CHECK_STORE } = await import('../src/render/check.js');
+  assert.equal(CHECK_STORE.collection, g.reads[1], '기기 점검 컬렉션');
+  assert.ok(read('src/ui/report.js').includes('db.doc(`reports/${id}`)'), '문제 알리기는 reports/<id> 에 쓴다');
+  for (const l of g.links) {
+    assert.match(l.hash, /^[\w.~-]+$/);
+    assert.ok(checkRequested({ hash: `#${l.hash}` }), `게임이 #${l.hash} 로 기기 점검을 켠다`);
+  }
+});
+
+test('게임 카드 요약 (HubLogic.game · tools/hub-game.mjs): 게임이 쓰는 문서 모양 그대로 → 새 문제 수·최근 점검', async () => {
+  const H = loadLogic();
+  const { REPORT_KINDS } = await import('../src/ui/report.js');
+  const { buildRecord } = await import('../src/render/check.js');
+  const { ROUTE, readRows, gameStatus } = await import('../tools/hub-game.mjs');
+  assert.deepEqual(plain(H.REPORT_KINDS), Object.fromEntries(REPORT_KINDS), '문제 종류·이름 = 게임 문제 알리기 창');
+  assert.deepEqual(Object.keys(ROUTE).sort(), REPORT_KINDS.map(([k]) => k).sort(), 'D47 처리 길이 종류마다 있다');
+
+  const reports = [
+    { id: 'r20261031-100000-aaaa', status: 'new', kind: 'stuck', text: '  다리 앞에서\n  못 가요 ' + '가'.repeat(60), createdAt: 100 },
+    { id: 'r20261031-110000-bbbb', status: 'new', kind: 'look', text: '', createdAt: 200 },
+    { id: 'r20261030-090000-cccc', status: 'done', kind: 'error', createdAt: 50, reply: '고쳤어요', commit: 'abc1234' },
+    { id: 'r20261030-080000-dddd', status: 'board', kind: 'other', createdAt: 40, qa: 'QA-20' },
+  ];
+  const device = { gpu: 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)', screen: { w: 1170, h: 2532, vw: 390, vh: 844, dpr: 3 }, touch: true };
+  const rec = (gap, at) => buildRecord({ spots: [{ id: 'plaza', label: '광장' }], samples: { plaza: { gaps: Array(90).fill(gap) } }, device,
+    quality: { start: 'high', end: gap > 33 ? 'low' : 'high' }, startedAt: at, ms: 28000, build: 'b1', where: 'claude' });
+  const checks = [{ id: 'c1', ...rec(41, '2026-10-31T03:00:00.000Z') }, { id: 'c2', ...rec(16, '2026-10-31T04:00:00.000Z') }, { id: 'x', kind: 'something-else' }];
+
+  const g = plain(H.game(reports, checks));
+  assert.equal(g.open, 2, 'status new 만 센다');
+  assert.deepEqual(g.openItems.map(i => i.id), ['r20261031-110000-bbbb', 'r20261031-100000-aaaa'], '새 것부터');
+  assert.equal(g.openItems[1].text.length, 40, '글은 40자 (빈칸 줄임)');
+  assert.ok(g.openItems[1].text.startsWith('다리 앞에서 못 가요'));
+  assert.deepEqual(Object.keys(g.openItems[0]).sort(), ['createdAt', 'id', 'kind', 'text']);
+  assert.deepEqual(g.reports, { total: 4, new: 2, working: 0, done: 1, board: 1, dup: 0 });
+  assert.equal(g.checks.total, 2, '기기 점검 문서만');
+  assert.equal(g.checks.slow, 1, '광장 평균 33ms 넘은 점검');
+  assert.deepEqual(g.checks.recent.map(c => c.id), ['c2', 'c1']);
+  assert.deepEqual(g.checks.recent[1], { id: 'c1', at: Date.parse('2026-10-31T03:00:00.000Z'), where: 'claude', build: 'b1', gpu: 'Intel(R) UHD Graphics 620', touch: true,
+    screen: '390×844 ×3', quality: { start: 'high', end: 'low', fixed: false }, plaza: { avg: 41, p95: 41, goal: 33, ok: false }, errors: 0 });
+  assert.equal(H.gpuName('ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)'), 'Apple M1');
+  assert.equal(H.gpuName('Mali-G78'), 'Mali-G78');
+  assert.equal(H.gpuName(null), null);
+  assert.deepEqual(plain(H.game()), { open: 0, openItems: [], reports: { total: 0, new: 0, working: 0, done: 0, board: 0, dup: 0 }, checks: { total: 0, slow: 0, recent: [] } });
+  const many = Array.from({ length: 300 }, (_, i) => ({ id: `r${i}`, status: 'new', kind: 'other', text: 'x'.repeat(1000), createdAt: i }));
+  const big = plain(H.game(many, Array.from({ length: 300 }, (_, i) => ({ id: `c${i}`, ...rec(20, new Date(i * 1000).toISOString()) }))));
+  assert.equal(big.open, 300);
+  assert.equal(big.openItems.length, 5);
+  assert.equal(big.checks.recent.length, 5);
+  assert.ok(Buffer.byteLength(JSON.stringify(big)) < 8 * 1024, 'status/game 은 작게 (최근 5개씩)');
+
+  // 도구: ArtifactData out_dir 폴더(<id>.json) 와 dev-server 행 배열(docId) 을 같게 읽는다
+  const dir = mkdtempSync(join(tmpdir(), 'hub-game-'));
+  try {
+    mkdirSync(join(dir, 'reports'));
+    for (const { id, ...d } of reports) writeFileSync(join(dir, 'reports', `${id}.json`), JSON.stringify(d));
+    writeFileSync(join(dir, 'game-reports.json'), JSON.stringify(reports.map(({ id, ...d }) => ({ ...d, docId: id, id: 'auto' + id.slice(-4) }))));
+    const a = readRows(dir, 'reports'), b = readRows(join(dir, 'game-reports.json'), 'reports');
+    assert.deepEqual(a.map(r => r.id).sort(), reports.map(r => r.id).sort(), 'out_dir 폴더: 문서 id = 파일 이름 (부모 폴더를 줘도 reports/ 를 찾는다)');
+    assert.deepEqual(b.map(r => r.id).sort(), reports.map(r => r.id).sort(), '행 배열: docId 가 문서 id');
+    assert.deepEqual(readRows(join(dir, 'none'), 'checks'), []);
+    const st = gameStatus({ reports: a, checks, now: 7 });
+    assert.equal(st.checkedAt, 7);
+    assert.equal(st.updatedBy, 'claude');
+    assert.deepEqual({ ...st, checkedAt: 0, updatedAt: 0, updatedBy: 0 }, { ...plain(H.game(reports, checks)), checkedAt: 0, updatedAt: 0, updatedBy: 0 });
+    assert.ok(!('published' in st) && !('note' in st), 'update 칸만 (게시 버전·글은 그대로)');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+
+  // 홈: 로컬 dev-server 는 게임 흉내 파일을 바로 읽고, 카드가 새 문제 줄을 사람 말로 그린다
+  assert.ok(home.includes("'game-reports', 'checks'") && home.includes('H.game('), '로컬 흉내: api/db/game-reports · api/db/checks');
+  assert.ok(home.includes('function todoText') && home.includes('H.REPORT_KINDS'), 'openItems 의 { kind, text } 를 글로');
+});
+
+test('게임 저장소 처리 순서가 문서에 있다 (D47: 고침 → done, 보드로 → board)', () => {
+  const claude = read('CLAUDE.md'), readme = read('concept/README.md'), note = read('docs/notes/hub-manage.md');
+  for (const [name, doc] of [['CLAUDE.md', claude], ['README', readme]]) for (const k of ['reports', 'checks', 'hub-game.mjs', 'status/game', "'board'", 'D47']) assert.ok(doc.includes(k), `${name} 에 ${k}`);
+  for (const k of ['assets/review/game-reports.json', 'assets/review/checks.json', 'hub-game.mjs']) assert.ok(note.includes(k), `hub-manage 노트에 ${k}`);
 });

@@ -18,6 +18,15 @@
 
 **7차 보드 (wave7, 7차 보드 세션 요청)**: 목록 보드 무리 맨 앞에 wave7 줄 · 바로 가기 링크 · README 보드 id 예 (커밋 44ff323), 홈 **게시 버전 5**. 보드 파일·README 보드 표 줄은 `p10-board7` 에 있어서, 합치기 전 이 브랜치에서는 `tests/hub.test.mjs` 가 `PENDING_BOARDS` 에 적은 wave7 만 기다려 주고 (파일이 생기면 같은 검사), `hub-catalog.mjs` 는 그 보드를 건너뛰고 알린다. `git merge-tree` 로 p10-hub + p10-board7 합침은 충돌 없음, 그 합친 트리에서 테스트 259 통과·목록 340줄(보드 결정 D8–D48 41). **홈 저장소 `catalog/*` 는 그 합친 트리로 만든 340줄** (`meta/catalog.commit` = `44ff323+p10-board7@1dd6704`). 합친 뒤 `PENDING_BOARDS` 에서 wave7 을 지우면 된다 (남아 있어도 파일이 있으면 정상 검사).
 
+**게임 저장소 (2026-10-31, 조정 세션 요청 — "이후 개발 재개")**: main 9e6e24e 를 합침(빨리 감기). 게임 v12 에 처음 생긴 게임 저장소(capabilities `db` 뿌리 read·write admin · `reports`·`checks` read·write interact · `user` · `downloads`)를 홈 게임 카드가 보이게 했다.
+- 홈 목록 `game`: `"command": "전체 요청 확인"`, `"openLabel": "새 문제"`, `"reads": ["reports", "checks"]`, `"links": [{ "label": "기기 점검 열기", "hash": "check" }]` (카드 단추 + 바로 가기 「기기 점검 ↗」 = 게임 링크 끝 `#check`). 머리 띠의 처리할 것 수에 게임 새 문제도 든다.
+- 카드: 「문제 알리기」 줄 = 새 문제 수 · 지금까지 몇 개(처리 중·고침·보드로·겹침), 새 문제 최근 5개를 "막혔어요 · 글 · 때" 로 · 「기기 점검」 줄 = 몇 번 · 광장 느림 수 · 최근 5개(때 · GPU · 화면 · 광장 평균 ms ✓/느림 · 품질 high→low · 오류). Claude 가 아직 안 읽었으면 그렇게 적는다.
+- 계산 `HubLogic.game(reports, checks)` (`editors.html` hub-logic 블록) → `{ open, openItems, reports, checks }`. 같은 블록을 **`tools/hub-game.mjs`** 가 돌린다: `--reports`·`--checks` 에 ArtifactData `out_dir` 폴더(문서 id = 파일 이름) 또는 dev-server 행 배열, 결과 `assets/review/hub/status-game.json` 을 홈 `status/game` 에 `update`. 새 문제마다 D47 처리 길(`ROUTE`: stuck·error·save = 바로 고침, look = 보드, other = 판단)도 찍어 준다.
+- 로컬 흉내: 게임이 dev-server 에 남기는 **`assets/review/game-reports.json`** (행마다 `docId`) · **`assets/review/checks.json`** 을 홈 `/editors.html` 이 바로 읽어 같은 계산으로 카드를 그린다 (`assets/review/` 는 gitignore 라 파일은 커밋하지 않는다). `node tools/hub-game.mjs` 인자 없이 = 이 두 파일.
+- 처리 순서는 `concept/README.md` 「게임 저장소」·「"전체 요청 확인"」 2·4·7번, `CLAUDE.md` "전체 요청 확인" 줄. 테스트 3개 더함 (목록 game 항목 ↔ `check.js` `checkRequested('#check')`·`CHECK_STORE`·`report.js` `reports/${id}` · 게임이 쓰는 실제 문서 모양(`buildRecord`·`REPORT_KINDS`)으로 요약 계산 · 문서).
+- 게임 저장소는 지금 비어 있다 (`reports` 0 · `checks` 0, 10-31 읽음) → 홈 `status/game` 에 빈 요약을 써 둠 (문서 v6, `published: 12`·`note` 는 그대로). 홈 **게시 버전 6** (capabilities 그대로).
+- 확인: `node --test tests/` 311 통과 (hub 12). 로컬 4231 `/editors.html` 에 흉내 문제 3개(새 2)·점검 2개(광장 느림 1)를 넣어 카드 그림·머리 띠 "편집기·보드·게임 2개"·「기기 점검 열기」 링크(`…#check`)·375 폭 넘침 0·콘솔 오류 0. 못 한 것: claude.ai 에서 실제 문제 알리기·`#check` 결과가 쌓인 뒤의 카드 (저장소가 비어 있어 "아직 받은 것 없음" 상태만 실제로 씀).
+
 목록 (2026-10-30, 커밋 0c14b41 기준, wave7 전): 캐릭터 10 · 주민 성격·대화 9 · 배경 52 · 가구 34 · 아이템 86 (아이콘 97) · 벽지·바닥 16 · 방 배치 7 (RM-07 단풍 방은 파일 없음 = 새로 만들 것) · 장면 12 · 소리 44 (곡 10 · 선곡 표 1 · 효과음 24 · 목소리 9) · 섬 지도 15칸 · 숫자 표 11 · 스타일 3 · 보드 결정 28 (D8–D35) = **327줄**, 검수 대기·새로 1.
 
 ## "열리지 않음" — 원인 후보와 확인할 것

@@ -185,12 +185,13 @@ input:focus-visible, textarea:focus-visible { outline: 2px solid var(--sea); out
 .todo { margin: 0; padding-left: 18px; font-size: 13px; }
 .later { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
 .foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.foot .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
 details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
 
 /* 단추·링크 */
 button, a.btn { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
-button.ghost { background: transparent; color: var(--leaf); }
+button.ghost, a.btn.ghost { background: transparent; color: var(--leaf); }
 button.tiny { font-size: 12px; padding: 2px 9px; border-radius: 8px; }
 button:disabled { opacity: .45; cursor: default; }
 a.btn.off { background: transparent; color: var(--muted); border-color: var(--line); border-style: dashed; cursor: default; }
@@ -244,6 +245,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <a href="https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT" target="_blank" rel="noopener">5차 보드 ↗</a>
       <a href="https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM" target="_blank" rel="noopener">컨셉 보드 ↗</a>
       <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ" target="_blank" rel="noopener">게임 ↗</a>
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#check" target="_blank" rel="noopener">기기 점검 ↗</a>
     </nav>
   </header>
 
@@ -298,7 +300,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
 
   <section id="play">
     <div class="sec-head"><p class="id">GAME</p><h2>게임</h2>
-      <p class="muted">반영이 끝날 때마다 바뀐 파일만 같은 링크에 다시 올려요 (D35-A).</p></div>
+      <p class="muted">반영이 끝날 때마다 바뀐 파일만 같은 링크에 다시 올려요 (D35-A). 게임 안 섬폰 「📮 문제 알리기」와 기기 점검(링크 끝 <code>#check</code>) 결과는 게임 저장소에 쌓이고, "전체 요청 확인" 때 Claude 가 읽어 여기에 옮겨 적어요 (D46-A · D47-A: 막힘·저장·오류는 바로 고치고, 밸런스·불편·보기는 7차 보드 QA 칸으로).</p></div>
     <div class="cards" data-group="game"></div>
   </section>
 
@@ -313,7 +315,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <li><b>기록</b><span class="small muted">반영 기록에 새 버전을 남기고, 요청에 답을 달고, 이 홈 목록과 숫자를 고쳐요.</span></li>
     </ol>
     <div class="tblwrap"><table class="tbl" id="cmdTable"><thead><tr><th>채팅 명령</th><th>무엇을</th><th>어디</th></tr></thead><tbody>
-      <tr><td><code>"전체 요청 확인"</code></td><td>모든 편집기·보드의 새 요청과 바뀐 선택, 이 홈 「전체 관리」에서 남긴 요청을 모아 아래 명령 순서대로 한 번에 처리</td><td class="small">이 홈</td></tr>
+      <tr><td><code>"전체 요청 확인"</code></td><td>모든 편집기·보드의 새 요청과 바뀐 선택, 게임의 문제 알리기·기기 점검, 이 홈 「전체 관리」에서 남긴 요청을 모아 아래 명령 순서대로 한 번에 처리</td><td class="small">이 홈</td></tr>
       <tr><td><code>"요청 확인"</code></td><td>캐릭터·주민 성격 요청을 처리하고 모델을 다시 만들기</td><td class="small">캐릭터 편집기</td></tr>
       <tr><td><code>"배경 요청 확인"</code></td><td>배경·가구·아이템·벽지/바닥·방 배치 요청 처리</td><td class="small">배경 편집기</td></tr>
       <tr><td><code>"시나리오 반영"</code></td><td>고친 장면·순서·의견을 장면 파일에 넣기, 되돌리기</td><td class="small">시나리오 편집기</td></tr>
@@ -356,8 +358,9 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "concept", "group": "archive", "name": "컨셉 보드 v0.1", "url": "https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM", "file": "concept/concept-board.html",
     "edits": "1차 계획 (저장 없음)", "command": null, "reads": [] },
   { "id": "game", "group": "game", "name": "게임 「포근섬 이야기」", "url": "https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ", "file": "dist/web/index.html",
-    "edits": "편집기에서 반영한 것이 모두 들어가는 게임. 휴대폰에서도 열려요.",
-    "command": null, "reads": [] },
+    "edits": "편집기에서 반영한 것이 모두 들어가는 게임. 휴대폰에서도 열려요. 섬폰 「문제 알리기」로 남긴 글과 기기 점검(링크 끝 #check) 결과가 게임 저장소에 쌓여요.",
+    "command": "전체 요청 확인", "openLabel": "새 문제", "reads": ["reports", "checks"],
+    "links": [{ "label": "기기 점검 열기", "hash": "check" }] },
   { "id": "sound", "group": "editor", "name": "곡 편집기 · 효과음 표", "url": "https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2", "file": "sound-editor.html", "et": "ET-06 · ET-07", "track": "M6-P4",
     "edits": "장소·시간대·날씨별 곡 10 (박자·악기·음)과 선곡 표, 효과음 24 · 목소리 9 의 높이·길이·크기. 미리 듣기.",
     "command": "소리 반영", "openLabel": "새 요청", "reads": ["drafts/*", "requests/sound", "applied/sound"] },
@@ -453,7 +456,54 @@ window.HubLogic = (function () {
     var names = picked.map(function (r) { return r.name + (r.ref ? '(' + r.ref + ')' : ''); });
     return '전체 요청 확인 — ' + (KINDS[kind] ? KINDS[kind].long : kind) + ' ' + picked.length + '개: ' + names.join(', ') + (String(note || '').trim() ? '\n의견: ' + String(note).trim() : '');
   }
-  return { KINDS: KINDS, STATES: STATES, MAX: MAX, key: key, rows: rows, filter: filter, counts: counts, request: request, chatText: chatText };
+  /* ---------- 게임 저장소 → 홈 status/game 요약 ----------
+     게임의 문제 알리기(reports/<id>)·기기 점검(checks/<id>)은 게임 아티팩트 저장소에 쌓인다. 홈은 그 저장소를 못 읽으니
+     "전체 요청 확인" 때 Claude 가 읽어 이 함수(tools/hub-game.mjs 가 같은 블록을 돌림)로 요약해 status/game 에 쓴다.
+     로컬 dev-server 에서는 홈이 assets/review/game-reports.json·checks.json 을 바로 읽어 같은 요약을 만든다. */
+  var REPORT_KINDS = { stuck: '막혔어요', error: '오류·멈춤', save: '저장', look: '보기·소리', other: '그 밖' };
+  var REPORT_STATES = { new: '새 문제', working: '처리 중', done: '고침', board: '보드로', dup: '겹침' };
+  var GAME_ITEMS = 5, GAME_CHECKS = 5;
+  function cut(s, n) { s = String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+  function stamp(v) { var t = typeof v === 'number' ? v : Date.parse(v); return isFinite(t) ? t : 0; }
+  function round(v) { return typeof v === 'number' && isFinite(v) ? Math.round(v * 10) / 10 : null; }
+  /** 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)' → 'Intel(R) UHD Graphics 620' */
+  function gpuName(g) {
+    g = String(g || '');
+    var m = /^ANGLE \(([^,]*),\s*([^,]*)/.exec(g);
+    if (m) g = m[2] || m[1];
+    g = g.replace(/^ANGLE \w+ Renderer:\s*/, '').replace(/\s+(Direct3D|OpenGL|Vulkan|\(0x).*$/, '');
+    return cut(g, 60) || null;
+  }
+  function checkLine(c) {
+    var d = c.device || {}, sc = d.screen || {}, q = c.quality || {}, p = c.plaza || {};
+    return {
+      id: c.id, at: stamp(c.at), where: c.where || null, build: c.build || null,
+      gpu: gpuName(d.gpu), touch: !!d.touch,
+      screen: sc.vw && sc.vh ? sc.vw + '×' + sc.vh + (sc.dpr ? ' ×' + round(sc.dpr) : '') : null,
+      quality: { start: q.start || null, end: q.end || null, fixed: !!q.fixed },
+      plaza: { avg: round(p.avg), p95: round(p.p95), goal: p.goal || 33, ok: p.ok === undefined ? null : !!p.ok },
+      errors: c.errors && typeof c.errors.count === 'number' ? c.errors.count : 0,
+    };
+  }
+  /** reports·checks = [{id, …문서}] → { open, openItems, reports: {total, new, working, done, board, dup}, checks: {total, slow, recent} } */
+  function game(reports, checks) {
+    reports = Array.isArray(reports) ? reports.filter(Boolean) : [];
+    checks = Array.isArray(checks) ? checks.filter(function (c) { return c && c.kind === 'device-check'; }) : [];
+    var tally = { total: reports.length };
+    Object.keys(REPORT_STATES).forEach(function (k) { tally[k] = 0; });
+    reports.forEach(function (r) { if (tally[r.status] !== undefined) tally[r.status]++; });
+    var newest = function (a, b) { return stamp(b.createdAt || b.at) - stamp(a.createdAt || a.at) || String(b.id).localeCompare(String(a.id)); };
+    var open = reports.filter(function (r) { return r.status === 'new'; }).sort(newest);
+    var recent = checks.slice().sort(newest).slice(0, GAME_CHECKS).map(checkLine);
+    return {
+      open: open.length,
+      openItems: open.slice(0, GAME_ITEMS).map(function (r) { return { id: r.id, kind: r.kind || 'other', text: cut(r.text, 40), createdAt: stamp(r.createdAt) }; }),
+      reports: tally,
+      checks: { total: checks.length, slow: checks.filter(function (c) { return c.plaza && c.plaza.ok === false; }).length, recent: recent },
+    };
+  }
+  return { KINDS: KINDS, STATES: STATES, MAX: MAX, key: key, rows: rows, filter: filter, counts: counts, request: request, chatText: chatText,
+    REPORT_KINDS: REPORT_KINDS, REPORT_STATES: REPORT_STATES, game: game, gpuName: gpuName };
 })();
 </script>
 <script src="concept/board-kit.js"></script>
@@ -495,7 +545,7 @@ function editorCounts(id) {
   return `${parts.join(' · ')} — ${review ? `<b>검수 대기 ${review}</b>` : '모두 확정'} · <a href="#manage" data-filter="${esc(groups[0].group)}">전체 관리에서 보기</a>`;
 }
 function pill(e, s) {
-  if (e.group === 'game') return s?.published ? `<span class="pill">게시 v${num(s.published)}</span>` : '';
+  if (e.group === 'game') return (num(s?.open) ? `<span class="pill open">${esc(e.openLabel ?? '새 문제')} ${num(s.open)}</span>` : '') + (s?.published ? `<span class="pill">게시 v${num(s.published)}</span>` : '');
   if (!e.url && !okUrl(s?.url)) return '<span class="pill quiet">준비 중</span>';
   if (store === 'loading') return '<span class="pill quiet">불러오는 중</span>';
   if (store === 'none') return '<span class="pill quiet">현황 없음</span>';
@@ -504,29 +554,55 @@ function pill(e, s) {
   if (s.requested) return '<span class="pill req">반영 요청 표시됨</span>';
   return '<span class="pill ok">새 것 없음</span>';
 }
+// 처리할 것 한 줄: 글 그대로, 또는 게임 문제 알리기 { id, kind, text, createdAt }
+function todoText(t) {
+  if (typeof t === 'string') return esc(t);
+  if (t && (t.kind || t.text)) return `<b>${esc(H.REPORT_KINDS[t.kind] ?? t.kind ?? '문제')}</b> · ${t.text ? esc(t.text) : '<span class="muted">(글 없음)</span>'}${t.createdAt ? ` <span class="muted">· ${esc(when(t.createdAt))}</span>` : ''}`;
+  return esc(JSON.stringify(t));
+}
+// 게임 카드: 게임 저장소의 문제 알리기 수 · 최근 기기 점검 (Claude 가 status/game 에 옮겨 적은 것, 로컬은 바로 읽은 것)
+const ms = v => (v === null || v === undefined ? '—' : `${v}ms`);
+function gameFacts(s) {
+  const r = s?.reports, c = s?.checks;
+  const notRead = store === 'local' ? '개발 서버에 아직 없음' : '아직 읽지 않았어요 — "전체 요청 확인" 때 Claude 가 게임 저장소를 읽어 적어요';
+  const reports = r && num(r.total)
+    ? `${num(s.open) ? `<b>새 문제 ${num(s.open)}</b>` : '새 문제 없음'} · 지금까지 ${num(r.total)}개 (${['working', 'done', 'board', 'dup'].filter(k => num(r[k])).map(k => `${H.REPORT_STATES[k]} ${num(r[k])}`).join(' · ') || '모두 새 것'})`
+    : `<span class="muted">${r ? '아직 받은 것 없음' : notRead}</span>`;
+  const items = Array.isArray(s?.openItems) && s.openItems.length ? `<ul class="todo">${s.openItems.slice(0, 5).map(t => `<li>${todoText(t)}</li>`).join('')}</ul>` : '';
+  const recent = Array.isArray(c?.recent) ? c.recent.slice(0, 5) : [];
+  const checks = recent.length
+    ? `${num(c.total)}번${num(c.slow) ? ` · <b>광장 느림 ${num(c.slow)}</b>` : ''}<ul class="todo">${recent.map(x =>
+        `<li>${esc(when(x.at))} · ${esc(x.gpu ?? '기기 모름')}${x.touch ? ' (터치)' : ''}${x.screen ? ` · ${esc(x.screen)}` : ''} · 광장 평균 ${esc(ms(x.plaza?.avg))}${x.plaza?.ok === true ? ' ✓' : x.plaza?.ok === false ? ' <b>느림</b>' : ''} · 품질 ${esc(x.quality?.start ?? '?')}${x.quality?.end && x.quality.end !== x.quality.start ? `→${esc(x.quality.end)}` : ''}${num(x.errors) ? ` · 오류 ${num(x.errors)}` : ''}</li>`).join('')}</ul>`
+    : `<span class="muted">${c ? '아직 없음 — 휴대폰·다른 컴퓨터에서 「기기 점검 열기」 → 30초 뒤 「결과 저장」' : notRead}</span>`;
+  return [['문제 알리기', reports + items], ['기기 점검', checks]];
+}
 function card(e) {
   const s = status[e.id];
   const url = e.url ?? (okUrl(s?.url) ? s.url : null);
   const ap = s?.applied;
-  const items = Array.isArray(s?.openItems) ? s.openItems.slice(0, 5) : [];
+  const items = Array.isArray(s?.openItems) && e.group !== 'game' ? s.openItems.slice(0, 5) : [];   // 게임은 「문제 알리기」 줄 안에
   const counts = e.group === 'editor' ? editorCounts(e.id) : null;
   const facts = [
     ['고치는 것', esc(e.edits)],
     counts ? ['요소', counts] : null,
+    ...(e.group === 'game' ? gameFacts(s) : []),
     e.command ? ['채팅 명령', `<code>"${esc(e.command)}"</code> ${e.group === 'soon' && !url ? '<span class="muted small">(만든 뒤부터)</span>' : `<button type="button" class="ghost tiny" data-copy="${esc(e.command)}">복사</button>`}`] : null,
-    e.group !== 'soon' || s ? ['마지막 반영', ap ? `<b>v${num(ap.version)}</b>${ap.appliedAt ? ` · ${esc(when(ap.appliedAt))}` : ''}${ap.summary ? ` · ${esc(ap.summary)}` : ''}` : '<span class="muted">반영 기록 없음</span>'] : null,
+    (e.group !== 'soon' || s) && e.group !== 'game' ? ['마지막 반영', ap ? `<b>v${num(ap.version)}</b>${ap.appliedAt ? ` · ${esc(when(ap.appliedAt))}` : ''}${ap.summary ? ` · ${esc(ap.summary)}` : ''}` : '<span class="muted">반영 기록 없음</span>'] : null,
     s?.published && e.group !== 'game' ? ['게시', `v${num(s.published)}`] : null,
     s?.checkedAt ? ['확인한 때', esc(when(s.checkedAt))] : null,
     e.et ? ['ID · 트랙', `<span class="id">${esc(e.et)}</span> · ${esc(e.track ?? '')}`] : null,
   ].filter(Boolean);
   const recent = Array.isArray(s?.recent) ? AL.list(s.recent.slice(0, 3), { title: n => `최근 반영 기록 ${n}개 (되돌리기는 편집기에서)` }) : '';
+  // 같은 링크 끝 #… 로 여는 곳 (게임 #check = 기기 점검). 목록의 links: [{ label, hash }]
+  const more = url && Array.isArray(e.links) ? e.links.filter(l => /^[\w.~-]+$/.test(l?.hash ?? '')).map(l =>
+    `<a class="btn ghost" href="${esc(url)}#${esc(l.hash)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('') : '';
   const link = url
-    ? `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">열기 ↗</a>`
+    ? `<span class="btns"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">열기 ↗</a>${more}</span>`
     : `<a class="btn off" aria-disabled="true">링크 준비 중</a>`;
   return `<article class="ed${e.group === 'soon' ? ' soon' : ''}" id="${esc(e.id)}">
     <div class="head"><span class="id">${esc(e.id)}</span><h3>${esc(e.name)}</h3>${pill(e, s)}</div>
     <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
-    ${items.length ? `<ul class="todo">${items.map(t => `<li>${esc(typeof t === 'string' ? t : JSON.stringify(t))}</li>`).join('')}</ul>` : ''}
+    ${items.length ? `<ul class="todo">${items.map(t => `<li>${todoText(t)}</li>`).join('')}</ul>` : ''}
     ${s?.note ? `<p class="small muted">${esc(s.note)}</p>` : ''}
     ${recent}
     ${e.later ? `<p class="later">${esc(e.later)}</p>` : ''}
@@ -559,7 +635,7 @@ function renderTop() {
   const where = live.filter(e => num(status[e.id]?.open) || status[e.id]?.requested);
   const mine = pendingReqs().length;
   const parts = [];
-  if (open || where.length) parts.push(`편집기·보드 <b>${open}개</b> · ${where.map(e => `<a href="#${esc(e.id)}">${esc(e.name)}</a>`).join(' · ')}`);
+  if (open || where.length) parts.push(`편집기·보드·게임 <b>${open}개</b> · ${where.map(e => `<a href="#${esc(e.id)}">${esc(e.name)}</a>`).join(' · ')}`);
   if (mine) parts.push(`<a href="#reqList">이 홈에서 남긴 요청 <b>${mine}개</b></a>`);
   $('sumLine').innerHTML = parts.length ? `처리할 것 — ${parts.join(' · ')}` : '처리할 것 없음 — 마지막 확인 때 모든 편집기가 반영돼 있었어요.';
   const ch = meta.check, cat = meta.catalog;
@@ -775,9 +851,12 @@ function watchDb() {
 // dev-server 의 /api/db/hub-<이름> (assets/review/hub-*.json, 행마다 docId) 를 읽어 흉내 낸다
 async function pullLocal() {
   const rows = c => fetch(`api/db/${c}`).then(r => (r.ok ? r.json() : [])).catch(() => []);
-  const [st, mt, ct, mk, mg] = await Promise.all(['hub-status', 'hub-meta', 'hub-catalog', 'hub-marks', 'hub-manage'].map(rows));
+  const [st, mt, ct, mk, mg, gr, gc] = await Promise.all(['hub-status', 'hub-meta', 'hub-catalog', 'hub-marks', 'hub-manage', 'game-reports', 'checks'].map(rows));
   const docs = list => Object.fromEntries(list.filter(r => r.docId).map(r => [r.docId, r]));
   status = docs(st); meta = docs(mt); catalog = docs(ct); marks = docs(mk); manage = mg;
+  // 게임 저장소 흉내 (같은 dev-server 라 바로 읽힌다): 게임이 남긴 문제 알리기·기기 점검 → status/game 요약
+  const withId = list => list.map(r => ({ ...r, id: r.docId ?? r.id }));
+  status.game = { ...status.game, ...H.game(withId(gr), withId(gc)) };
   render();
 }
 async function connect() {
