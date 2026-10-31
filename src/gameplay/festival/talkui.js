@@ -1,8 +1,16 @@
 // 이모티콘 대화 화면 (UI-04): 주민 머리 위 말풍선 + 화면 아래 선택기(묶음 탭 6 · 격자 · 보낼 칸 3 · 보내기 · 닫기).
 // ui 의 창 쌓기(ctx.services.ui.panel)로 열어서 창이 열린 동안 게임 입력이 막히고, 키·A/B 버튼이 이 창으로 온다.
 // 글자는 화면에 쓰지 않는다 — 단추마다 이름(aria-label), 말풍선 내용은 스크린리더용 줄에만.
+// 단, 섬폰 「보기 편하게」의 '이모티콘 뜻 보기'(7차 UI-10, <html class="pk-emote-words">)를 켜면 뜻 글자(.fe-word)가 보인다.
 const CSS = new URL('./festival.css', import.meta.url).href;
 const MAX = 3;
+const INK = '#4A3B32';
+/** 보내기(종이비행기) · 기다리기(모래시계) · 잘 가(열린 문 + 나가는 화살표, QA-12: 인사 탭의 손 흔들기와 헷갈리지 않게) */
+const ICON = {
+  send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 L20 5 L15 19 L12 13z" fill="currentColor"/></svg>',
+  wait: `<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/></g></svg>`,
+  bye: `<svg viewBox="0 0 48 48" aria-hidden="true" class="fe-emo"><g stroke="${INK}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M9 42 V7 h20 v35" fill="#F3E0BC"/><path d="M9 7 l13 5 v34 l-13 -4z" fill="#C98F55"/><circle cx="18.5" cy="27" r="1.6" fill="${INK}"/><path d="M31 25 h12 M38 19 l6 6 -6 6" fill="none"/></g></svg>`,
+};
 
 export function ensureCss() {
   if (document.querySelector('link[data-festival-css]')) return;
@@ -10,6 +18,9 @@ export function ensureCss() {
   l.rel = 'stylesheet'; l.href = CSS; l.dataset.festivalCss = '';
   document.head.append(l);
 }
+
+/** 뜻 글자 줄 (보기 편하게를 켰을 때만 css 가 보인다). 화면 읽기는 aria-label 이 있으니 숨긴다 */
+const word = text => { const w = el('span', 'fe-word', { 'aria-hidden': 'true' }); w.textContent = text; return w; };
 
 const el = (tag, cls, attrs = {}) => {
   const e = document.createElement(tag);
@@ -33,10 +44,11 @@ export function openTalkUI(ctx, emo, who) {
   nameTag.textContent = who.name;
   nameTag.style.background = who.color ?? '#F2B36B';
   const emos = el('div', 'fe-bubble-emos');
+  const words = el('p', 'fe-bubble-words', { 'aria-hidden': 'true' });
   const next = el('span', 'fe-next', { 'aria-hidden': 'true' });
   next.textContent = '▼';
   const live = el('p', 'fe-sr', { 'aria-live': 'polite' });
-  bubble.append(nameTag, emos, next, live);
+  bubble.append(nameTag, emos, words, next, live);
 
   const dock = el('div', 'fe-dock');
   const choices = el('div', 'fe-choices', { role: 'group', 'aria-label': '대답 고르기' });
@@ -46,9 +58,9 @@ export function openTalkUI(ctx, emo, who) {
   const bar = el('div', 'fe-bar');
   const slotsEl = el('div', 'fe-slots', { role: 'group', 'aria-label': '보낼 이모티콘 (최대 3개)' });
   const sendBtn = el('button', 'fe-send', { type: 'button', 'aria-label': '보내기 (비우면 기다리기)' });
-  sendBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 L20 5 L15 19 L12 13z" fill="currentColor"/></svg>';
   const byeBtn = el('button', 'fe-bye', { type: 'button', 'aria-label': '잘 가 (대화 끝내기)' });
-  byeBtn.innerHTML = emo.svg('wave', false);
+  byeBtn.innerHTML = ICON.bye;
+  byeBtn.append(word('그만'));
   bar.append(slotsEl, sendBtn, byeBtn);
   picker.append(tabs, grid, bar);
   dock.append(choices, picker);
@@ -65,6 +77,7 @@ export function openTalkUI(ctx, emo, who) {
     bubble.hidden = !toks.length;
     const text = emo.say(toks, items());
     live.textContent = `${who.name}: ${text}`;
+    words.textContent = text;
     if (toks.length) ctx.events.emit('dialog:line', { speaker: who.name, text: '♪'.repeat(Math.max(2, toks.length * 3)), voice: who.voice });
     bubble.classList.remove('is-pop'); void bubble.offsetWidth; bubble.classList.add('is-pop');
   }
@@ -76,6 +89,7 @@ export function openTalkUI(ctx, emo, who) {
       const first = emo.player.find(e => e.cat === c.key);
       const b = el('button', 'fe-tab', { type: 'button', role: 'tab', 'aria-selected': String(i === tab), 'aria-label': `${i + 1} ${c.name}` });
       b.innerHTML = emo.svg(first?.key, false);
+      b.append(word(c.name));
       b.addEventListener('click', () => { tab = i; drawTabs(); drawGrid(); });
       return b;
     }));
@@ -84,8 +98,10 @@ export function openTalkUI(ctx, emo, who) {
     const cat = cats[tab]?.key;
     const list = [...new Set([...emo.player.filter(e => e.cat === cat).map(e => e.key), ...(cat === 'thing' ? extra : [])])];
     grid.replaceChildren(...list.map(k => {
-      const b = el('button', 'fe-cell', { type: 'button', 'aria-label': String(k).startsWith('item:') ? emo.say([k], items()) : emo.name(k) });
+      const name = String(k).startsWith('item:') ? emo.say([k], items()) : emo.name(k);
+      const b = el('button', 'fe-cell', { type: 'button', 'aria-label': name });
       b.innerHTML = tok(k, false);
+      b.append(word(name));
       b.addEventListener('click', () => add(k));
       return b;
     }));
@@ -97,7 +113,12 @@ export function openTalkUI(ctx, emo, who) {
       if (k) { b.innerHTML = tok(k, false); b.addEventListener('click', () => { slots.splice(i, 1); drawSlots(); }); }
       return b;
     }));
-    sendBtn.classList.toggle('is-wait', !slots.length);
+    // 비었을 때 = 기다리기: 색(파랑)만이 아니라 그림(모래시계)·글자도 바꾼다 (7차 UI-10 색만으로 구분 X)
+    const wait = !slots.length;
+    sendBtn.classList.toggle('is-wait', wait);
+    sendBtn.innerHTML = wait ? ICON.wait : ICON.send;
+    sendBtn.append(word(wait ? '기다리기' : '보내기'));
+    sendBtn.setAttribute('aria-label', wait ? '기다리기 (아무것도 안 보내기)' : '보내기');
   }
   function add(k) {
     if (slots.length >= MAX) { slotsEl.classList.remove('is-full'); void slotsEl.offsetWidth; slotsEl.classList.add('is-full'); return; }
@@ -157,7 +178,8 @@ export function openTalkUI(ctx, emo, who) {
       picker.hidden = true;
       choices.replaceChildren(...options.map((o, i) => {
         const b = el('button', 'fe-choice', { type: 'button', 'aria-label': emo.say(o, items()) });
-        b.innerHTML = o.map(t => tok(t, false)).join('');
+        b.innerHTML = `<span class="fe-choice-emos">${o.map(t => tok(t, false)).join('')}</span>`;
+        b.append(word(emo.say(o, items())));
         b.addEventListener('click', () => finish(i));
         return b;
       }));

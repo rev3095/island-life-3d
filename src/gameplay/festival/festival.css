@@ -16,14 +16,15 @@
 .fe-bubble-emos { display: flex; gap: 6px; position: relative; z-index: 1; }
 .fe-bubble-emos .fe-emo { width: 44px; height: 44px; }
 .fe-bubble-emos .fe-glyph { font-size: 36px; line-height: 44px; }
-.fe-name { position: absolute; left: 12px; top: -14px; font-size: 13px; font-weight: 700; color: #4A3B32; padding: 1px 10px; border-radius: 999px; border: 2px solid #4A3B32; }
-.fe-next { position: absolute; right: 8px; bottom: 2px; font-size: 11px; color: #A8642E; opacity: 0; }
+.fe-name { position: absolute; left: 12px; top: -14px; font-size: calc(13px * var(--pk-fs, 1)); font-weight: 700; color: #4A3B32; padding: 1px 10px; border-radius: 999px; border: 2px solid #4A3B32; }
+.fe-next { position: absolute; right: 8px; bottom: 2px; font-size: calc(11px * var(--pk-fs, 1)); color: #A8642E; opacity: 0; }
 .fe-bubble.is-wait .fe-next { opacity: 1; }
-@media (prefers-reduced-motion: no-preference) {
-  .fe-bubble.is-pop .fe-bubble-emos { animation: fe-pop .28s ease-out; }
-  .fe-bubble.is-wait .fe-next { animation: fe-bob 1s ease-in-out infinite; }
-  .fe-slots.is-full { animation: fe-shake .3s; }
-}
+.fe-bubble.is-pop .fe-bubble-emos { animation: fe-pop .28s ease-out; }
+.fe-bubble.is-wait .fe-next { animation: fe-bob 1s ease-in-out infinite; }
+.fe-slots.is-full { animation: fe-shake .3s; }
+/* 흔들림 줄이기: 섬폰 「보기 편하게」(<html class="pk-calm">), 정하지 않았으면 기기 설정 — 섬폰에서 끄면 .pk-calm-off */
+.pk-calm .fe-talk *, .pk-calm .fe-rhythm * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { html:not(.pk-calm-off) .fe-talk *, html:not(.pk-calm-off) .fe-rhythm * { animation: none !important; } }
 @keyframes fe-pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fe-bob { 50% { transform: translateY(3px); } }
 @keyframes fe-shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -68,6 +69,22 @@
   .pk-touch .fe-dock { bottom: calc(8px + var(--sab, 0px)); right: calc(182px + var(--sar, 0px)); width: min(420px, calc(100vw - 206px)); }
 }
 
+/* 이모티콘 뜻 글자 (7차 UI-10 '이모티콘 뜻 보기' = <html class="pk-emote-words">). 끄면 안 보인다 */
+.fe-word, .fe-bubble-words { display: none; }
+.fe-choice-emos { display: flex; gap: 4px; }
+.pk-emote-words .fe-word { display: block; max-width: 100%; margin-top: 1px; font-size: calc(11px * var(--pk-fs, 1)); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: keep-all; }
+.pk-emote-words .fe-bubble { flex-wrap: wrap; max-width: min(320px, calc(100vw - 24px)); }
+.pk-emote-words .fe-bubble-words { display: block; flex-basis: 100%; margin: 2px 0 0; font-size: calc(14px * var(--pk-fs, 1)); line-height: 1.35; color: #4A3B32; text-align: center; word-break: keep-all; }
+.pk-emote-words .fe-choice { flex-direction: column; align-items: center; }
+.pk-emote-words .fe-choice .fe-word { font-size: calc(12px * var(--pk-fs, 1)); white-space: normal; }
+.pk-emote-words .fe-cell, .pk-emote-words .fe-tab { padding: 3px 1px 2px; }
+.pk-emote-words .fe-cell .fe-word { white-space: normal; text-overflow: clip; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-align: center; }
+/* 보내기·잘 가 단추는 글자를 늘 붙인다 (그림만으로는 헷갈림, QA-12) */
+.fe-send .fe-word, .fe-bye .fe-word { display: block; font-size: calc(11px * var(--pk-fs, 1)); line-height: 1.1; margin-top: 1px; }
+.fe-bye { min-width: 56px !important; }
+/* 모양으로도 보기: 고른 묶음 탭은 노란색 + 굵은 밑줄 */
+.pk-shapes .fe-tab[aria-selected="true"] { border-width: 2px 2px 6px !important; }
+
 /* 축제 진행판 (UI-05): 화면 위 가운데, 부품 다섯 칸 */
 .fe-hud { position: absolute; left: 50%; top: max(10px, env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 3; pointer-events: none;
   display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(251, 247, 242, .9); border: 2px solid #4A3B32; border-radius: 999px; }
@@ -88,7 +105,7 @@ body.story-on .fe-hud { visibility: hidden; }
 /* 리듬 놀이 (FB-02) */
 .fe-rhythm { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: max(18px, env(safe-area-inset-bottom, 0px)); pointer-events: auto; }
 .fe-rh-card { width: min(560px, calc(100vw - 24px)); background: rgba(251, 247, 242, .97); border: 3px solid #4A3B32; border-radius: 18px; padding: 10px 12px; display: grid; gap: 8px; }
-.fe-rh-head { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #4A3B32; }
+.fe-rh-head { display: flex; align-items: center; gap: 8px; font-size: calc(18px * var(--pk-fs, 1)); font-weight: 700; color: #4A3B32; }
 .fe-rh-head .fe-emo { width: 28px; height: 28px; }
 .fe-rh-track { position: relative; height: 64px; border-radius: 12px; background: #F3E0BC; overflow: hidden; }
 .fe-rh-line { position: absolute; left: 18%; top: 6px; bottom: 6px; width: 6px; margin-left: -3px; background: #E8504F; border-radius: 3px; }

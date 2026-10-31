@@ -1,5 +1,6 @@
 // 동물의 숲처럼 남쪽 위에서 비스듬히 내려다보는 고정 각도 카메라.
 // 플레이어를 부드럽게 따라가고(감쇠), 걷는 방향으로 살짝 앞을 비춘다. 휠·두 손가락으로 가까이/멀리.
+// 세로 화면(휴대폰)은 좌우가 좁아서 시야각·거리를 늘린다 (7차 D38, portraitView). 흔들림 줄이기(ui.access.calm)면 앞보기를 줄인다.
 
 // 섬 밖(바깥): 조금 낮게 보고 곡면을 세게 → 휘어 넘어가는 지평선 위로 하늘 띠가 남는다 (기본 확대 0.15 에서 화면 위 5~8%, 가까이 10%).
 // 곡면이 셀수록 지평선이 가까워지고, 각도가 낮을수록 화면 위 끝이 수평에 가까워진다. 둘을 같이 맞춘 값.
@@ -13,7 +14,17 @@ const INDOOR = {
   far: { dist: 21, pitch: 45, curve: 0.0018 },
 };
 const LOOK_AHEAD = 0.34;      // 속도(칸/초) × 초
+const CALM_AHEAD = 0.12;      // 흔들림 줄이기: 방향을 바꿀 때 화면이 덜 쏠린다
 const FOLLOW = 4.5;           // 따라가기 빠르기 (클수록 딱 붙는다)
+export const BASE_FOV = 32;   // main.js 의 PerspectiveCamera 세로 시야각
+/** 세로 화면 맞춤: 가로/세로 비율이 1 아래로 내려갈수록(0.47 아래 = 375×812·390×844 휴대폰에서 끝까지) 시야각·거리를 늘리고 조금 더 내려다본다 */
+export const PORTRAIT = { full: 0.47, fov: 14, dist: 0.1, pitch: 4 };   // 거리는 조금만 — 멀어질수록 카메라 앞 지붕(QA-03)이 화면 아래를 더 가린다
+
+/** 화면 비율 → { fov, distK, pitch(더할 도) }. 가로 화면은 그대로 */
+export function portraitView(aspect) {
+  const p = Number.isFinite(aspect) ? Math.min(1, Math.max(0, (1 - aspect) / (1 - PORTRAIT.full))) : 0;
+  return { p, fov: BASE_FOV + PORTRAIT.fov * p, distK: 1 + PORTRAIT.dist * p, pitch: PORTRAIT.pitch * p };
+}
 
 export function createCameraRig(ctx) {
   const { THREE, camera, renderer, materials } = ctx;
@@ -49,10 +60,13 @@ export function createCameraRig(ctx) {
     if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomTarget = Math.max(0, zoomTarget - 0.25);
   });
 
+  let lastFov = camera.fov;
   function place() {
     const P = bounds ? INDOOR : PRESETS;
-    const pitch = THREE.MathUtils.degToRad(lerp(P.near.pitch, P.far.pitch, zoom));
-    const dist = lerp(P.near.dist, P.far.dist, zoom);
+    const tall = portraitView(camera.aspect);
+    if (Math.abs(tall.fov - lastFov) > 0.01) { camera.fov = lastFov = tall.fov; camera.updateProjectionMatrix(); }
+    const pitch = THREE.MathUtils.degToRad(lerp(P.near.pitch, P.far.pitch, zoom) + tall.pitch);
+    const dist = lerp(P.near.dist, P.far.dist, zoom) * tall.distK;
     const fx = bounds ? THREE.MathUtils.clamp(focus.x, bounds.x0, bounds.x1) : focus.x;
     const fz = bounds ? THREE.MathUtils.clamp(focus.z, bounds.z0, bounds.z1) : focus.z;
     tmp.set(fx, focus.y + 0.55, fz);
@@ -74,8 +88,9 @@ export function createCameraRig(ctx) {
     snap(target) { focus.copy(target); ahead.set(0, 0, 0); zoom = zoomTarget; place(); },
     update(dt, target, vx, vz) {
       const k = 1 - Math.exp(-dt * 3);
-      ahead.x += (vx * LOOK_AHEAD - ahead.x) * k;
-      ahead.z += (vz * LOOK_AHEAD * 0.7 - ahead.z) * k;
+      const look = ctx.services.ui?.access?.calm ? CALM_AHEAD : LOOK_AHEAD;
+      ahead.x += (vx * look - ahead.x) * k;
+      ahead.z += (vz * look * 0.7 - ahead.z) * k;
       const f = 1 - Math.exp(-dt * FOLLOW);
       focus.x += (target.x + ahead.x - focus.x) * f;
       focus.z += (target.z + ahead.z - focus.z) * f;
