@@ -9,6 +9,7 @@
     "src/core/packs.js",
     "src/core/materials.js",
     "src/core/state.js",
+    "src/render/check.js",
     "src/render/cull.js",
     "src/render/index.js",
     "src/render/post.js",

@@ -4,13 +4,15 @@
 // 처음 프리셋: 주소 ?style= > 섬폰 설정(state.settings.style, 저장됨) > cozy. 섬폰에서 바꾸면 settings:changed {key:'style'} 로 따라간다.
 // 집 안(scene:indoor {on})에선 프리셋 위에 INDOOR 값을 잠깐 얹는다 (get() 은 얹기 전 값).
 // 품질(ctx.quality = 'high' | 'low'): main.js 가 처음 값을 정하고, 주소에 ?quality= 가 없으면 처음 몇 초 GPU 시간을 재 보고 느리면 low 로 낮춘다 (quality.js).
+// 그 뒤 광장에서 평균 프레임이 33ms 를 넘어도 low 로 (quality.js 「광장 기준」). 주소에 ?check (게시본은 #check) 가 있으면 기기 점검 30초 (check.js).
 // 매 프레임 그리기 전에 cull.js 가 화면 밖 캐릭터를 빼고 그림자 범위를 보이는 땅에 맞춘다.
 import * as THREE from 'three';
 import * as materials from '../core/materials.js';
 import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 import { createCuller } from './cull.js';
-import { createAutoQuality, QUALITY } from './quality.js';
+import { createAutoQuality, createPlazaWatch, QUALITY } from './quality.js';
+import { createCheck, checkRequested } from './check.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
 
@@ -133,6 +135,10 @@ export function createView(ctx, { preset: startPreset } = {}) {
     },
     /** 자동 품질 판단 결과 (확인용): { state, gpu, frame, samples } */
     get autoQuality() { return autoQ?.result ?? null; },
+    /** 광장 판단 결과 (확인용): { state, frame: { n, avg, p50, p95, max }, slow } */
+    get plazaQuality() { return plazaQ?.result ?? null; },
+    /** 기기 점검 (?check 일 때만): { state, result } */
+    get check() { return check; },
     /** set('toon') = 프리셋으로, set({ bloom: 0.5 }) = 지금 값에 덮어쓰기, set({ preset: 'cozy', ...값 }) = 프리셋 위에 덮어쓰기 */
     set(v) {
       if (typeof v === 'string') return service.use(v);
@@ -172,6 +178,9 @@ export function createView(ctx, { preset: startPreset } = {}) {
   const fixed = typeof location !== 'undefined' && new URLSearchParams(location.search).has('quality');
   const autoQ = fixed || quality === 'low' ? null
     : createAutoQuality(ctx, { onSlow: () => service.setQuality('low', { auto: true }) });
+  const plazaQ = fixed || quality === 'low' || !ctx.lights ? null
+    : createPlazaWatch(ctx, { onSlow: () => service.setQuality('low', { auto: true }) });
+  const check = typeof location !== 'undefined' && checkRequested(location) ? createCheck(ctx, { service }) : null;
 
   const view = {
     service,
@@ -189,6 +198,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
       culler?.update(dt);
       ctx.services.world?.prepareFrame?.();     // 배경 묶음: 보이는 칸만 (그림자 범위를 맞춘 뒤)
       autoQ?.begin();
+      check?.begin();
       // 새로 생긴 sky 셰이더 재질 찾기 (가벼움: 1초에 한 번)
       if ((scanIn -= dt) <= 0) {
         scanIn = 1;
@@ -213,6 +223,8 @@ export function createView(ctx, { preset: startPreset } = {}) {
         renderer.shadowMap.autoUpdate = auto;
       }
       autoQ?.end(dt);
+      if (quality === 'high') plazaQ?.end(dt);
+      check?.end(dt);
       last.ms = performance.now() - t0;
       last.passes = params.post && post ? post.composer.passes.filter(p => p.enabled).map(p => p.constructor.name === 'ShaderPass' ? p.material.name : p.constructor.name) : ['direct'];
     },
