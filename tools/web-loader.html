@@ -46,6 +46,11 @@
   .ld-start .ld-actions { margin-top: 0; }
   .ld-start .ld-btn { font-size: 18px; padding: 14px 22px; }
   .ld-start .ld-btn svg { width: 20px; height: 20px; margin: -4px 6px -4px 0; vertical-align: middle; }
+  .ld-spec { display: grid; gap: 6px; justify-items: center; margin: 0 0 4px; }
+  .ld-spec-label { margin: 0; font-size: 13px; color: var(--ld-muted); }
+  .ld-spec-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px; background: rgba(226, 210, 174, .55); border-radius: 999px; }
+  .ld-spec-row button { font: 400 14px/1 var(--ld-display); padding: 9px 12px; border: 0; border-radius: 999px; background: none; color: var(--ld-ink); cursor: pointer; white-space: nowrap; }
+  .ld-spec-row button[aria-pressed="true"] { background: var(--ld-cream); box-shadow: 0 2px 0 var(--ld-edge); }
   .ld-tip { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ld-muted); text-wrap: balance; word-break: keep-all; }
   #loader.is-error .ld-fill { background: var(--ld-warn); }
   #loader.is-error .ld-island { animation: none; }
@@ -91,6 +96,12 @@
     <p class="ld-step" id="ld-step">게임 파일을 받는 중…</p>
     <p class="ld-count" id="ld-count">&nbsp;</p>
     <div class="ld-start" id="ld-start" hidden>
+      <div class="ld-spec">
+        <p class="ld-spec-label" id="ld-spec-label">그래픽 사양 · 끊기면 낮춰 주세요</p>
+        <div class="ld-spec-row" id="ld-spec" role="group" aria-labelledby="ld-spec-label">
+          <button type="button" data-q="min">매우 낮음</button><button type="button" data-q="low">낮음</button><button type="button" data-q="mid">적정</button><button type="button" data-q="high">높음</button>
+        </div>
+      </div>
       <div class="ld-actions">
         <button class="ld-btn" id="ld-sound" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6M15.5 4.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>소리 켜고 시작</button>
         <button class="ld-btn is-soft" id="ld-mute" type="button">소리 없이 시작</button>
@@ -249,12 +260,30 @@
   }
   const early = e => {
     if (startBox.hidden || (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ')) return;
+    // 사양 단추는 소리를 깨우지 않는다 (audio 의 첫 누름 깨우기가 이 뒤에 달려 있다 — 소리 없이 시작을 고르기 전에 노래가 나지 않게)
+    if (specBox.contains(e.target)) { e.stopImmediatePropagation(); return; }
     if (soundBtn.contains(e.target)) choose(true);
     else if (muteBtn.contains(e.target)) choose(false);
   };
   for (const type of ['pointerdown', 'keydown', 'touchend']) addEventListener(type, early, { capture: true, passive: true });
   soundBtn.addEventListener('click', () => { choose(true); window.__island?.services?.audio?.unlock?.(); lift(); });
   muteBtn.addEventListener('click', () => { choose(false); lift(); });
+
+  // ── 그래픽 사양 (매우 낮음 · 낮음 · 적정 · 높음, render/quality.js) ──
+  // 눌린 단추 = 지금 사양 (처음은 적정, 주소 #low 등이 있으면 그것). 누르면 섬폰 설정과 같은 칸(state.settings.spec)에 저장된다
+  const specBox = $('ld-spec');
+  function drawSpec() {
+    const q = window.__island?.services?.style?.quality;
+    for (const b of specBox.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.q === q));
+    specBox.closest('.ld-spec').hidden = !q;
+  }
+  specBox.addEventListener('click', e => {
+    const q = e.target.closest('button')?.dataset.q;
+    const ui = window.__island?.services?.ui;
+    if (!q || !ui?.setSetting) return;
+    ui.setSetting('spec', q);
+    drawSpec();
+  });
 
   // 다 받으면 시작 단추를 보여 준다 (소리 서비스가 없어도 같은 단추 — 둘 다 그냥 시작)
   function done() {
@@ -265,6 +294,7 @@
     countEl.hidden = true;
     actions.hidden = true;
     startBox.hidden = false;
+    drawSpec();
     soundBtn.focus({ preventScroll: true });
   }
 

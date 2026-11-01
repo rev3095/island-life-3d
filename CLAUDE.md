@@ -20,7 +20,7 @@ node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 ```
 
-- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=low` 저사양, `?story=<장면 id>` 장면 재생), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
+- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=min|low|mid|high` 그래픽 사양 매우 낮음·낮음·적정·높음 (게시본은 링크 끝 `#low` 등, 처음은 적정 + 느리면 자동으로 한 칸씩, 섬폰 설정·로딩 화면에서 고르면 `state.settings.spec` — 값은 `src/render/quality.js` `QUALITY`), `?story=<장면 id>` 장면 재생), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
 - Blender 5.2 경로 기본값 `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe` (`BLENDER` 환경변수로 변경). 빌더는 `.glb`·`.glb.json`·렌더·`stats.json`·`index.json` 을 다시 쓴다. `.blend` 는 gitignore (스크립트로 재생성).
 - lint·빌드 단계는 없다. 브라우저 확인은 dev-server 로 연 주소에서 한다 (`file://` 로는 모듈·fetch 가 안 된다).
 

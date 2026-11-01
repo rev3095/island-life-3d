@@ -213,27 +213,32 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       }, t)));
     };
     drawStyle();
-    // 그래픽 (자동 · 높게 · 보통 · 가볍게): state.settings.graphics 로 저장되고 render 가 settings:changed 로 따라간다. 가볍게 = 그림자·빛 효과 끔
-    const GFX = [['auto', '자동'], ['high', '높게'], ['low', '보통'], ['lite', '가볍게']];
-    const gfxRow = h('div', { class: 'pk-seg', role: 'group', 'aria-label': '그래픽' });
-    const gfxNote = h('p', { class: 'pk-muted pk-small' });
-    const drawGfx = () => {
-      const cur = s.graphics ?? 'auto';
-      gfxRow.replaceChildren(...GFX.map(([m, t]) => h('button', {
+    // 그래픽 사양 (매우 낮음 · 낮음 · 적정 · 높음, render/quality.js): 고르면 state.settings.spec 로 저장되고 render 가 settings:changed 로 따라간다.
+    // 안 골랐으면 자동 — 적정으로 시작해 느리면 render 가 한 칸씩 낮춘다. 눌린 단추 = 지금 사양, 「자동으로」 = 고른 것 지우기
+    const SPEC = [['min', '매우 낮음'], ['low', '낮음'], ['mid', '적정'], ['high', '높음']];
+    const SPEC_NOTE = { high: '그림자·빛 효과까지 모두 그려요.', mid: '그림자·빛 효과 없이 그려요.', low: '외곽선도 빼고, 큰 화면은 작게 그려 늘려요.', min: '가장 가볍게 — 더 작게 그리고 초당 30장으로 쉬어요.' };
+    const specRow = h('div', { class: 'pk-seg pk-seg-spec', role: 'group', 'aria-label': '그래픽 사양' });
+    const specNote = h('p', { class: 'pk-muted pk-small' });
+    const drawSpec = () => {
+      const cur = style?.quality ?? 'mid';
+      const picked = !!style?.specFixed;
+      specRow.replaceChildren(...SPEC.map(([m, t]) => h('button', {
         type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(cur === m), disabled: !style,
-        onclick: () => { setSetting('graphics', m); drawGfx(); gfxRow.querySelector('[aria-pressed="true"]')?.focus(); },
+        onclick: () => { setSetting('spec', m); drawSpec(); specRow.querySelector('[aria-pressed="true"]')?.focus(); },
       }, t)));
-      const now = GFX.find(([m]) => m === style?.quality)?.[1];
-      gfxNote.textContent = `${now ? `지금 ${now}. ` : ''}화면이 끊기면 「가볍게」(그림자·빛 효과를 꺼요)`;
+      const auto = picked && s.spec && s.spec !== 'auto'
+        ? h('button', { type: 'button', class: 'pk-spec-auto', onclick: () => { setSetting('spec', 'auto'); drawSpec(); } }, '자동으로')
+        : null;
+      specNote.replaceChildren(`${SPEC_NOTE[cur] ?? ''} ${picked ? '고른 사양 그대로예요.' : '자동: 끊기면 알아서 낮춰요.'} `, auto ?? '');
     };
-    drawGfx();
+    drawSpec();
     view.append(...[
       nameRows(),
       birthdayRows(),
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
       h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
-      h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, style && gfxRow, style && gfxNote, toggle('outline', '외곽선'), fullscreenRow(),
+      h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, style && h('h3', { class: 'pk-set-head' }, '그래픽 사양'), style && specRow, style && specNote, toggle('outline', '외곽선'), fullscreenRow(),
       !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
       h('h3', { class: 'pk-set-head' }, '대화'), toggle('textLines', '주민 글 대사 보기', false),   // 5차 Z5: 끄면 이모티콘으로만 (검수 보드 z5 D14-A)
     ].filter(Boolean));

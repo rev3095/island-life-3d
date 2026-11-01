@@ -3,16 +3,17 @@
 // main.js 는 createView(ctx) 한 번, 창 크기가 바뀌면 view.setSize(w, h), 매 프레임 view.render(dt) 만 부른다.
 // 처음 프리셋: 주소 ?style= > 섬폰 설정(state.settings.style, 저장됨) > cozy. 섬폰에서 바꾸면 settings:changed {key:'style'} 로 따라간다.
 // 집 안(scene:indoor {on})에선 프리셋 위에 INDOOR 값을 잠깐 얹는다 (get() 은 얹기 전 값).
-// 품질(ctx.quality = 'high' | 'low' | 'lite'): main.js 가 처음 값을 정하고, 처음 몇 초 GPU 시간을 재 보고 느리면 한 칸 낮춘다 (quality.js).
-// 그 뒤 광장에서 평균 프레임이 33ms 를 넘어도 한 칸씩 (quality.js 「광장 기준」, high → low → lite). lite 는 그림자·화면 효과를 끈다.
-// 주소(?quality= · 게시본 #lite)나 섬폰 설정 「그래픽」(state.settings.graphics)으로 고르면 자동 판단은 쉰다. 주소에 ?check (게시본은 #check) 가 있으면 기기 점검 30초 (check.js).
+// 사양(ctx.quality = 'high' 높음 | 'mid' 적정 | 'low' 낮음 | 'min' 매우 낮음, 값은 quality.js QUALITY): main.js 가 처음 값(적정)을 정하고,
+// 처음 몇 초가 느리면 한 칸, 그 뒤 광장에서 평균 프레임이 33ms 를 넘어도 한 칸씩 낮춘다 (quality.js 「광장 기준」, 매우 낮음까지).
+// 주소(?quality= · 게시본 #low)나 섬폰 설정 「그래픽 사양」(state.settings.spec)으로 고르면 자동 판단은 쉰다. 주소에 ?check (게시본은 #check) 가 있으면 기기 점검 30초 (check.js).
+// 셰이더는 처음 보일 때 만들어져 걷다가 멈칫하므로, 게임이 열린 뒤·사양을 바꾼 뒤 장면 전체를 미리 만들어 둔다 (warmShaders).
 // 매 프레임 그리기 전에 cull.js 가 화면 밖 캐릭터를 빼고 그림자 범위를 보이는 땅에 맞춘다.
 import * as THREE from 'three';
 import * as materials from '../core/materials.js';
 import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 import { createCuller } from './cull.js';
-import { createAutoQuality, createPlazaWatch, QUALITY, lowerQuality, urlQuality } from './quality.js';
+import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
 import { createCheck, checkRequested } from './check.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -93,11 +94,22 @@ export function createView(ctx, { preset: startPreset } = {}) {
     look.uOutlineScale.value = ink ? 1 : p.outlineScale;
     look.uOutlineTint.value = ink ? 0 : p.outlineTint;
     look.uOutlineDark.value = p.outlineDark;
-    materials.setOutlinesVisible(p.outline !== 'off');
+    materials.setOutlinesVisible(p.outline !== 'off' && QUALITY[quality]?.outlines !== false);   // 낮음·매우 낮음은 외곽선 없이
     if (p.post && postOn()) ensurePost().apply(p);
   }
-  /** 이 품질에서 화면 효과를 쓰는가 (lite 는 바로 그리기) */
+  /** 이 사양에서 화면 효과를 쓰는가 (적정 아래는 바로 그리기) */
   const postOn = () => QUALITY[quality]?.post !== false;
+  /** 장면의 셰이더를 미리 만들어 둔다 (처음 보이는 물체·주민 때문에 걷다가 멈칫하지 않게). 병렬 컴파일이 없으면 이 한 번에 몰아서 */
+  let warmTimer = 0;
+  function warmShaders(delay = 400) {
+    clearTimeout(warmTimer);
+    warmTimer = setTimeout(() => {
+      const t0 = performance.now();
+      Promise.resolve(renderer.compileAsync?.(scene, camera))
+        .then(() => console.info(`[render] 셰이더 미리 만들기 ${Math.round(performance.now() - t0)}ms (프로그램 ${renderer.info.programs?.length ?? '?'}개)`))
+        .catch(() => {});
+    }, delay);
+  }
 
   function frame(p, dt) {
     if (p.post && postOn()) {
@@ -116,13 +128,16 @@ export function createView(ctx, { preset: startPreset } = {}) {
     labels: { ...PRESET_LABELS },
     params: PARAMS,
     get quality() { return quality; },
-    /** 품질 바꾸기 ('high' | 'low' | 'lite'): 화소 배율 · 그림자(켜기·지도 크기) · 화면 효과(켜기·해상도). ctx.quality 도 바꾸고 quality:changed 를 보낸다 */
+    /** 사양 차례 (무거운 것부터 high · mid · low · min = 높음 · 적정 · 낮음 · 매우 낮음) */
+    qualities: QUALITY_ORDER,
+    /** 사양 바꾸기 ('high' | 'mid' | 'low' | 'min', 예전 'lite' = 'mid'): 화소 배율 · 그림자(켜기·지도 크기) · 화면 효과 · 외곽선 · 초당 장수(main.js 가 ctx.quality 로 본다).
+     *  ctx.quality 도 바꾸고 quality:changed 를 보낸다 */
     setQuality(q, { auto = false } = {}) {
-      if (!QUALITY[q] || q === quality) return quality;
+      q = normalizeQuality(q);
+      if (!q || q === quality) return quality;
       quality = q;
       ctx.quality = q;
       const cfg = QUALITY[q];
-      renderer.setPixelRatio(Math.min(devicePixelRatio, cfg.maxRatio));
       const sun = ctx.lights?.sun;
       if (sun) sun.castShadow = cfg.shadows !== false;   // 빛 수가 바뀌어 재질은 three 가 알아서 다시 만든다 (한 번 잠깐 멈춤)
       if (sun && sun.shadow.mapSize.x !== cfg.shadowSize) {
@@ -131,10 +146,11 @@ export function createView(ctx, { preset: startPreset } = {}) {
         sun.shadow.map = null;                     // 다음 그림자 그리기 때 새 크기로 만든다
       }
       if (post) { post.dispose(); post = null; }   // 화면 효과는 새 품질로 다시 만든다 (빛 번짐·흐림 해상도)
-      view.setSize(size.w, size.h);
+      view.setSize(size.w, size.h);              // 화소 배율도 여기서 (ratioFor)
       apply(live());
+      warmShaders();                               // 그림자를 켜고 끄면 셰이더가 모두 바뀐다
       events?.emit('quality:changed', { quality: q, auto });
-      console.info(`[render] 품질 ${q}${auto ? ' (자동)' : ''}`);
+      console.info(`[render] 사양 ${q}${auto ? ' (자동)' : ''}`);
       return quality;
     },
     /** 자동 품질 판단 결과 (확인용): { state, gpu, frame, samples } */
@@ -178,33 +194,39 @@ export function createView(ctx, { preset: startPreset } = {}) {
   events?.on('data:loaded', () => { const s = ctx.state?.settings?.style; if (!fromUrl && PRESETS[s] && s !== presetName) service.use(s); });
   events?.on('settings:changed', ({ key, value }) => { if (key === 'style' && PRESETS[value]) service.use(value); });
   events?.on('scene:indoor', ({ on }) => { indoor = !!on; apply(live()); });
-  // 자동 품질: 처음 몇 초 GPU 시간이 길면 (high 로 시작했을 때만), 그 뒤엔 광장에서 느리면 한 칸씩 낮춘다.
-  // 주소로 고른 품질은 끝까지, 섬폰 「그래픽」으로 고른 품질은 「자동」으로 돌릴 때까지 그대로 둔다.
+  // 자동 사양: 처음 몇 초가 느리면 한 칸, 그 뒤엔 광장에서 느리면 한 칸씩 낮춘다 (매우 낮음이면 그만).
+  // 주소로 고른 사양은 끝까지, 섬폰 「그래픽 사양」으로 고른 사양은 「자동」으로 돌릴 때까지 그대로 둔다.
+  const LAST = QUALITY_ORDER[QUALITY_ORDER.length - 1];
   const urlQ = typeof location !== 'undefined' ? urlQuality(location) : null;
   const startQ = quality;
   let fixed = !!urlQ;
   let plazaQ = null;
-  const armPlaza = () => { plazaQ = fixed || quality === 'lite' || !ctx.lights ? null : createPlazaWatch(ctx, { onSlow: stepDown }); };
+  const armPlaza = () => { plazaQ = fixed || quality === LAST || !ctx.lights ? null : createPlazaWatch(ctx, { onSlow: stepDown }); };
   function stepDown() {
     service.setQuality(lowerQuality(quality), { auto: true });
-    armPlaza();                                    // 낮춘 뒤에도 광장에서 느리면 한 칸 더 (lite 면 그만)
+    armPlaza();                                    // 낮춘 뒤에도 광장에서 느리면 한 칸 더
   }
-  let autoQ = fixed || quality !== 'high' ? null : createAutoQuality(ctx, { onSlow: stepDown });
+  let autoQ = fixed || quality === LAST ? null : createAutoQuality(ctx, { onSlow: stepDown });
   armPlaza();
-  /** 섬폰 「그래픽」: 'high' | 'low' | 'lite' = 그 품질로 고정, 'auto'(또는 없음) = 처음 품질로 돌아가 자동 판단 */
-  function useGraphics(g) {
+  /** 섬폰 「그래픽 사양」: 'high' | 'mid' | 'low' | 'min' = 그 사양으로 고정, 'auto'(또는 없음) = 처음 사양으로 돌아가 자동 판단 */
+  function useSpec(g) {
     if (urlQ) return;
-    if (QUALITY[g]) { fixed = true; autoQ = plazaQ = null; service.setQuality(g); }
+    const q = normalizeQuality(g);
+    if (q) { fixed = true; autoQ = plazaQ = null; service.setQuality(q); }
     else if (fixed) { fixed = false; service.setQuality(startQ); armPlaza(); }
   }
-  events?.on('data:loaded', () => useGraphics(ctx.state?.settings?.graphics));
-  events?.on('settings:changed', ({ key, value }) => { if (key === 'graphics') useGraphics(value); });
+  /** 고른 사양이 있나 (주소·섬폰). 섬폰 화면이 「자동」 표시에 쓴다 */
+  Object.defineProperty(service, 'specFixed', { get: () => fixed, enumerable: true });
+  events?.on('data:loaded', () => useSpec(ctx.state?.settings?.spec));
+  events?.on('settings:changed', ({ key, value }) => { if (key === 'spec') useSpec(value); });
+  events?.on('game:ready', () => warmShaders(800));
   const check = typeof location !== 'undefined' && checkRequested(location) ? createCheck(ctx, { service }) : null;
 
   const view = {
     service,
     setSize(w, h) {
       size.w = w; size.h = h;
+      renderer.setPixelRatio(ratioFor(quality, w, h, globalThis.devicePixelRatio ?? 1));   // 낮음·매우 낮음은 큰 창에서 작게 그려 늘린다
       renderer.setSize(w, h, false);
       if (post) { post.setSize(w, h); const p = live(); if (p.post) post.apply(p); }
     },

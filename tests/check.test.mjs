@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PLAZA, frameStats, percentile, isPlazaSlow, plazaArea, inArea, createPlazaWatch, QUALITY, QUALITY_ORDER, lowerQuality, urlQuality } from '../src/render/quality.js';
+import { PLAZA, frameStats, percentile, isPlazaSlow, plazaArea, inArea, createPlazaWatch, QUALITY, QUALITY_ORDER, QUALITY_LABELS, DEFAULT_QUALITY, lowerQuality, urlQuality, normalizeQuality, ratioFor, createFrameGate } from '../src/render/quality.js';
 import { CHECK, ROUTE, CHECK_STORE, routeSpots, buildRecord, checkProblems, checkRequested } from '../src/render/check.js';
 import { createEvents } from '../src/core/events.js';
 import { createState } from '../src/core/state.js';
@@ -139,10 +139,10 @@ test('점검: 모양 검사가 틀린 것을 잡는다', () => {
   for (const w of ['moon', 'gpu', 'at', 'NaN']) assert.ok(p.includes(w), `${w} → ${p}`);
 });
 
-test('점검: render/index.js 는 주소에 check 가 있을 때만 점검을 만들고, 광장 판단은 lite 가 아닐 때만 (느리면 한 칸씩)', () => {
+test('점검: render/index.js 는 주소에 check 가 있을 때만 점검을 만들고, 광장 판단은 매우 낮음이 아닐 때만 (느리면 한 칸씩)', () => {
   const src = read('src/render/index.js');
   assert.match(src, /checkRequested\(location\) \? createCheck\(/);
-  assert.match(src, /quality === 'lite' \|\| !ctx\.lights \? null/);
+  assert.match(src, /quality === LAST \|\| !ctx\.lights \? null/);
   assert.match(src, /setQuality\(lowerQuality\(quality\)/);
   assert.match(src, /check\?\.begin\(\)/);
   assert.match(src, /check\?\.end\(dt\)/);
@@ -172,32 +172,83 @@ test('시작 단추: 소리 기본값은 그대로 0.6 · 0.8 · 0.7 (D45-A)', (
   assert.deepEqual([s.bgm, s.sfx, s.voice], [0.6, 0.8, 0.7]);
 });
 
-test('품질: 가볍게(lite) = 그림자·화면 효과 끔·배율 1, 한 칸씩 내려가 lite 에서 멈춤', () => {
-  assert.deepEqual(QUALITY_ORDER, ['high', 'low', 'lite']);
-  assert.equal(QUALITY.lite.shadows, false);
-  assert.equal(QUALITY.lite.post, false);
-  assert.equal(QUALITY.lite.maxRatio, 1);
-  assert.ok(QUALITY.high.shadows && QUALITY.low.shadows && QUALITY.high.post && QUALITY.low.post);
-  assert.equal(lowerQuality('high'), 'low');
-  assert.equal(lowerQuality('low'), 'lite');
-  assert.equal(lowerQuality('lite'), 'lite');
+test('사양: 넷 — 높음·적정·낮음·매우 낮음, 처음은 적정, 한 칸씩 내려가 매우 낮음에서 멈춤', () => {
+  assert.deepEqual(QUALITY_ORDER, ['high', 'mid', 'low', 'min']);
+  assert.deepEqual(QUALITY_LABELS, { high: '높음', mid: '적정', low: '낮음', min: '매우 낮음' });
+  assert.equal(DEFAULT_QUALITY, 'mid');
+  // 높음만 그림자·화면 효과, 적정까지 외곽선, 매우 낮음만 초당 30장
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].shadows), [true, false, false, false]);
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].post), [true, false, false, false]);
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].outlines), [true, true, false, false]);
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].fps), [0, 0, 0, 30]);
+  assert.equal(lowerQuality('high'), 'mid');
+  assert.equal(lowerQuality('mid'), 'low');
+  assert.equal(lowerQuality('low'), 'min');
+  assert.equal(lowerQuality('min'), 'min');
+  assert.equal(lowerQuality('lite'), 'low');            // 예전 이름 lite = 적정
+  assert.equal(normalizeQuality('lite'), 'mid');
+  assert.equal(normalizeQuality('ultra'), null);
 });
 
-test('품질: 주소로 고르기 — 로컬 ?quality=, claude.ai 게시본 #lite · #quality=low', () => {
-  assert.equal(urlQuality({ search: '?quality=lite' }), 'lite');
-  assert.equal(urlQuality({ search: '?quality=low&debug' }), 'low');
-  assert.equal(urlQuality({ hash: '#lite' }), 'lite');
+test('사양: 화소 배율 — 큰 창은 낮음·매우 낮음에서 작게, 작은 창(휴대폰)은 1, 0.5 아래로 안 내림', () => {
+  assert.equal(ratioFor('high', 1920, 1080, 1.5), 1.5);
+  assert.equal(ratioFor('high', 1920, 1080, 3), 2);
+  assert.equal(ratioFor('mid', 1920, 1080, 1.5), 1);
+  assert.equal(ratioFor('mid', 390, 844, 3), 1);
+  assert.ok(ratioFor('low', 1920, 1080, 1) < 0.7 && ratioFor('low', 1920, 1080, 1) >= 0.6);   // 화소 75만 개 안쪽
+  assert.ok(ratioFor('low', 1920, 1080, 1) ** 2 * 1920 * 1080 <= 750_000 * 1.01);
+  assert.equal(ratioFor('low', 390, 844, 3), 1);
+  assert.equal(ratioFor('min', 1920, 1080, 1), 0.5);    // √(40만 ÷ 207만) ≈ 0.44 → 0.5
+  assert.ok(ratioFor('min', 1280, 800, 1) < ratioFor('low', 1280, 800, 1));
+  assert.ok(ratioFor('low', 1280, 800, 1) < ratioFor('mid', 1280, 800, 1));
+  assert.equal(ratioFor('min', 0, 0, 1), 1);            // 크기를 모를 때는 배율 상한만
+});
+
+test('사양: 주소로 고르기 — 로컬 ?quality=, claude.ai 게시본 #low · #min · #quality=high, 예전 #lite = 적정', () => {
+  assert.equal(urlQuality({ search: '?quality=low' }), 'low');
+  assert.equal(urlQuality({ search: '?quality=lite' }), 'mid');
+  assert.equal(urlQuality({ search: '?quality=min&debug' }), 'min');
+  assert.equal(urlQuality({ hash: '#lite' }), 'mid');
+  assert.equal(urlQuality({ hash: '#mid' }), 'mid');
+  assert.equal(urlQuality({ hash: '#min' }), 'min');
   assert.equal(urlQuality({ hash: '#quality=high' }), 'high');
   assert.equal(urlQuality({ hash: '#low&check' }), 'low');
   assert.equal(urlQuality({ search: '?quality=ultra' }), null);
   assert.equal(urlQuality({ hash: '#check' }), null);
   assert.equal(urlQuality({ hash: '#lights' }), null);
+  assert.equal(urlQuality({ hash: '#minimal' }), null);
   assert.equal(urlQuality({}), null);
 });
 
-test('품질: main.js 는 처음 품질을 주소(#lite 포함)로 고르고 QUALITY 값으로 그림자를 건다', () => {
+test('사양: main.js 는 처음 사양을 주소 또는 적정으로, 그림자는 QUALITY 값, 매우 낮음은 초당 장수 상한', () => {
   const src = read('src/main.js');
-  assert.match(src, /urlQuality\(location\)/);
+  assert.match(src, /urlQuality\(location\) \?\? DEFAULT_QUALITY/);
   assert.match(src, /sun\.castShadow = QUALITY\[quality\]\.shadows/);
+  assert.match(src, /gate\(clock\.getDelta\(\), QUALITY\[ctx\.quality\]\?\.fps\)/);
   assert.match(src, /prefetchPacks/);
+});
+
+test('사양: 섬폰 설정·로딩 화면에 네 단추, 고르면 settings.spec 으로', () => {
+  const phone = read('src/ui/phone.js');
+  assert.match(phone, /\['min', '매우 낮음'\], \['low', '낮음'\], \['mid', '적정'\], \['high', '높음'\]/);
+  assert.match(phone, /setSetting\('spec', m\)/);
+  const loader = read('tools/web-loader.html');
+  for (const q of ['min', 'low', 'mid', 'high']) assert.match(loader, new RegExp(`data-q="${q}"`));
+  assert.match(loader, /setSetting\('spec', q\)/);
+  const render = read('src/render/index.js');
+  assert.match(render, /key === 'spec'/);
+  assert.match(render, /compileAsync/);
+});
+
+test('사양: 초당 장수 상한 — 60Hz 화면에서 매우 낮음(30)은 두 번에 한 번, 상한 없으면 매번', () => {
+  const gate = createFrameGate();
+  const hz = 1 / 60;
+  const drawn = Array.from({ length: 60 }, () => gate(hz, 30)).filter(dt => dt !== null);
+  assert.equal(drawn.length, 30);
+  for (const dt of drawn) assert.ok(Math.abs(dt - 2 * hz) < 1e-9);       // 건너뛴 시간까지 모아서
+  const free = createFrameGate();
+  assert.equal(Array.from({ length: 60 }, () => free(hz, 0)).filter(dt => dt !== null).length, 60);
+  assert.equal(free(1, 0), 0.05);                                          // 오래 멈췄다 와도 0.05 까지
+  const slow = createFrameGate();                                          // 화면이 30Hz 보다 느리면 매번 그린다
+  assert.equal(Array.from({ length: 20 }, () => slow(1 / 24, 30)).filter(dt => dt !== null).length, 20);
 });

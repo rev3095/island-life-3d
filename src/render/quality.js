@@ -1,28 +1,59 @@
-// 품질 단계와 자동 판단.
-// main.js 가 처음 품질을 정한다 (?quality=low · 터치 기기 → low). 데스크톱에서 high 로 시작했는데 처음 몇 초가 느리면 low 로 한 번 낮춘다.
-// 그 뒤에도 광장(축제 광장)에서 평균 프레임이 33ms 를 넘으면 low 로 (createPlazaWatch, 아래 「광장 기준」).
+// 사양(품질) 단계와 자동 판단.
+// 단계 넷 (가벼운 것 ← → 무거운 것): min 매우 낮음 · low 낮음 · mid 적정 · high 높음. 처음은 적정(DEFAULT_QUALITY).
+// 주소(?quality=low · 게시본 #low)나 섬폰 설정 「그래픽 사양」(state.settings.spec)으로 고르면 그대로, 아니면 자동:
+// 처음 몇 초가 느리면 한 칸 낮추고, 그 뒤에도 광장(축제 광장)에서 평균 프레임이 33ms 를 넘으면 한 칸씩 (createPlazaWatch, 아래 「광장 기준」).
 // 재는 것: 화면이 보이는 동안의 실제 프레임 간격(rAF). 숨겨진 창·디버거 멈춤처럼 너무 긴 간격(50ms 넘음)은 버린다.
 // GPU 시간(EXT_disjoint_timer_query_webgl2)이 있으면 같이 본다 — 프레임이 느려도 GPU 가 한가하면(다른 이유로 느림) 낮추지 않는다.
 // (GPU 시간만 보면 안 된다: 60fps 에 맞춰 쉬는 GPU 는 클럭을 내려 같은 일을 더 오래 한다)
+// 2026-11-01 Intel UHD · 1280×800 광장 GPU 시간: 높음 38ms · (예전 보통 22ms) · 적정 14.6ms. 칠하는 화소(땅·물체)·외곽선·그림자·화면 효과 순으로 무겁다.
 
-/** 품질 단계 값 (main.js 의 처음 값과 같게).
- *  lite(가볍게) = 느린 컴퓨터용: 그림자 끔(광장 그리기 삼각형의 절반 넘게가 그림자 몫) · 화면 효과 끔(바로 그리기) · 화소 배율 1 */
+/** 사양 단계 값.
+ *  maxRatio·maxPixels: 화소 배율 = min(기기 배율, maxRatio, √(maxPixels ÷ 화면 CSS 화소)), 0.5 아래로는 안 내린다 (ratioFor).
+ *    — 낮음·매우 낮음은 큰 화면에서 작게 그려 늘린다 (휴대폰처럼 작은 화면은 1 그대로).
+ *  shadows: 해 그림자 (광장 그리기 삼각형의 절반 넘게가 그림자 몫) · post: 화면 효과 5단계(빛 번짐·흐림·색 보정·FXAA) — 끄면 바로 그리기
+ *  outlines: 외곽선 껍데기 (그리기 호출·삼각형이 그만큼 더) · fps: 초당 장수 상한 (0 = 화면 주사율대로) */
 export const QUALITY = {
-  high: { maxRatio: 2, shadowSize: 2048, shadows: true, post: true },
-  low: { maxRatio: 1.5, shadowSize: 1024, shadows: true, post: true },
-  lite: { maxRatio: 1, shadowSize: 1024, shadows: false, post: false },
+  high: { maxRatio: 2, maxPixels: Infinity, shadowSize: 2048, shadows: true, post: true, outlines: true, fps: 0 },
+  mid: { maxRatio: 1, maxPixels: Infinity, shadowSize: 1024, shadows: false, post: false, outlines: true, fps: 0 },
+  low: { maxRatio: 1, maxPixels: 750_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 0 },
+  min: { maxRatio: 1, maxPixels: 400_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 30 },
 };
+export const DEFAULT_QUALITY = 'mid';
 /** 무거운 것부터. 자동 판단은 느리면 한 칸씩 내려간다 */
-export const QUALITY_ORDER = ['high', 'low', 'lite'];
-export const QUALITY_LABELS = { auto: '자동', high: '높게', low: '보통', lite: '가볍게' };
-export const lowerQuality = q => QUALITY_ORDER[Math.min(QUALITY_ORDER.length - 1, QUALITY_ORDER.indexOf(q) + 1)] ?? 'lite';
+export const QUALITY_ORDER = ['high', 'mid', 'low', 'min'];
+export const QUALITY_LABELS = { high: '높음', mid: '적정', low: '낮음', min: '매우 낮음' };
+/** 예전 이름 (v14 #lite 링크 = 지금 적정) */
+const ALIASES = { lite: 'mid' };
+export const normalizeQuality = q => (QUALITY[q] ? q : ALIASES[q] ?? null);
+export const lowerQuality = q => QUALITY_ORDER[Math.min(QUALITY_ORDER.length - 1, QUALITY_ORDER.indexOf(normalizeQuality(q) ?? 'low') + 1)];
 
-/** 주소로 고른 품질: ?quality=lite · claude.ai 게시본은 ?… 가 안 넘어오므로 #lite · #low · #high · #quality=lite 도. 없으면 null */
+/** 초당 장수 상한 문지기: gate(지난 화면 갱신 뒤 흐른 초, 상한) → 이번에 그릴 dt(초, 0.05 까지) 또는 null(건너뜀).
+ *  상한이 0 이면 늘 그린다. 건너뛴 시간은 모아 두었다가 다음에 한 번에 (main.js 의 화면 갱신마다 부른다) */
+export function createFrameGate() {
+  let waited = 0;
+  return (elapsed, cap = 0) => {
+    waited += elapsed;
+    if (cap && waited < 1 / cap - 0.004) return null;
+    const dt = Math.min(waited, 0.05);
+    waited = 0;
+    return dt;
+  };
+}
+
+/** 화소 배율: 기기 배율·단계 상한·화소 수 상한 중 가장 작은 것 (0.5 아래로는 안 내림). w·h = 화면 CSS 크기 */
+export function ratioFor(q, w, h, dpr = 1) {
+  const cfg = QUALITY[normalizeQuality(q) ?? DEFAULT_QUALITY];
+  const byPixels = Number.isFinite(cfg.maxPixels) && w > 0 && h > 0 ? Math.sqrt(cfg.maxPixels / (w * h)) : Infinity;
+  const r = Math.min(dpr, cfg.maxRatio, byPixels);
+  return Math.max(0.5, Math.round(r * 100) / 100);
+}
+
+/** 주소로 고른 사양: ?quality=low · claude.ai 게시본은 ?… 가 안 넘어오므로 #low · #min · #mid · #high · #quality=low 도 (#lite = 적정). 없으면 null */
 export function urlQuality({ search = '', hash = '' } = {}) {
-  const q = new URLSearchParams(search).get('quality');
-  if (QUALITY[q]) return q;
-  const h = /^#(?:quality=)?(high|low|lite)(?:$|[&?])/.exec(hash);
-  return h ? h[1] : null;
+  const q = normalizeQuality(new URLSearchParams(search).get('quality'));
+  if (q) return q;
+  const h = /^#(?:quality=)?(high|mid|low|min|lite)(?:$|[&?])/.exec(hash);
+  return h ? normalizeQuality(h[1]) : null;
 }
 
 const WARMUP = 2.5;          // 시작 뒤 셰이더 만들기·첫 그림자 등으로 튀는 시간은 건너뛴다 (초)
@@ -89,7 +120,7 @@ export function createAutoQuality(ctx, { onSlow }) {
 
 // ── 광장 기준 (M7-P2, 보드 wave7 D39-A: 목표 광장 33ms 아래, 넘으면 저사양) ──
 // 처음 몇 초 판단(위)은 어디서든 프레임 간격 가운데 값을 본다. 이것은 사람이 많이 머무는 광장(축제 광장)에 있을 때만,
-// 느린 기기의 긴 프레임(50ms 넘음)도 버리지 않고 평균을 잰다. 한 번 판단하면 그만 (느리면 한 칸 낮춤 — render 가 낮춘 뒤 새로 하나 만들어 lite 까지).
+// 느린 기기의 긴 프레임(50ms 넘음)도 버리지 않고 평균을 잰다. 한 번 판단하면 그만 (느리면 한 칸 낮춤 — render 가 낮춘 뒤 새로 하나 만들어 매우 낮음까지).
 
 /** 광장 판단 값. 재는 시간은 광장 안에 있던 시간을 모두 더한 것 (드나들어도 이어 잰다) */
 export const PLAZA = {

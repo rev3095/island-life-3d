@@ -9,7 +9,7 @@ import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
-import { QUALITY, urlQuality } from './render/quality.js';
+import { QUALITY, DEFAULT_QUALITY, urlQuality, ratioFor, createFrameGate } from './render/quality.js';
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
 const errors = installErrors();
@@ -30,10 +30,10 @@ const params = new URLSearchParams(location.search);
 async function boot() {
   const canvas = document.getElementById('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  // 품질: 휴대폰(터치 기기)이나 ?quality=low 면 해상도·그림자를 낮춘다 (그림자가 프레임 시간의 절반쯤 든다).
-  // ?quality=lite · #lite (게시본) = 가볍게: 그림자·화면 효과 끔 (render/quality.js QUALITY). 섬폰 설정 「그래픽」은 저장을 불러온 뒤 render 가 건다
-  const quality = urlQuality(location) ?? (matchMedia('(pointer: coarse)').matches ? 'low' : 'high');
-  renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY[quality].maxRatio));
+  // 사양: 처음은 적정(그림자·화면 효과 끔). 주소 ?quality=low · 게시본 #low 로 고를 수 있다 (render/quality.js QUALITY — 높음·적정·낮음·매우 낮음).
+  // 섬폰 설정 「그래픽 사양」은 저장을 불러온 뒤 render 가 건다. 화소 배율은 창 크기에 따라 render(view.setSize)가 다시 정한다
+  const quality = urlQuality(location) ?? DEFAULT_QUALITY;
+  renderer.setPixelRatio(ratioFor(quality, innerWidth, innerHeight, devicePixelRatio));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
   const scene = new THREE.Scene();
@@ -64,7 +64,7 @@ async function boot() {
     services: {},                       // 모듈이 서로에게 주는 기능: data, time, world, player, ui, audio ...
     focus: new THREE.Vector3(),         // 카메라가 따라가는 지점 (보통 플레이어). 곡면 월드 중심이기도 하다.
     debug: params.has('debug'),
-    quality,                            // 'high' | 'low'
+    quality,                            // 'high' | 'mid' | 'low' | 'min' (render 가 바꾼다)
   };
   window.__island = ctx;                // 개발용: 콘솔에서 상태 확인
 
@@ -112,7 +112,12 @@ async function boot() {
     view.render(dt);
   };
   ctx.step = step;
-  renderer.setAnimationLoop(() => step(Math.min(clock.getDelta(), 0.05)));
+  // 사양에 초당 장수 상한이 있으면(매우 낮음 30) 그 사이 화면 갱신은 건너뛴다 — 지나간 시간은 모아서 한 번에
+  const gate = createFrameGate();
+  renderer.setAnimationLoop(() => {
+    const dt = gate(clock.getDelta(), QUALITY[ctx.quality]?.fps);
+    if (dt !== null) step(dt);
+  });
 }
 
 /** world 모듈이 없을 때: 공용 도구(모델 불러오기·툰 재질·곡면 월드)가 제대로 도는지 보여주는 확인 장면 */

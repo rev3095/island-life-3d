@@ -312,8 +312,10 @@ export function createKit(ctx) {
   // 섬폰 외곽선 설정: main.js 가 외곽선 메시를 모두 켜고 끈 뒤 빈 묶음(count 0)은 다시 숨긴다 (빈 그리기 호출 방지)
   ctx.events?.on('settings:changed', ({ key }) => { if (key === 'outline') for (const b of batches) b.refreshVisible(); });
   const BIN = 2, BINS = 64, binCount = new Int32Array(BINS + 1);     // 가까운 순 정렬: 2칸 단위 거리 칸
-  // 외곽선을 그리는 거리 (카메라에서). 1280×800 에서 30 이면 굵기가 0.3화소쯤 → 그 너머는 안 보인다. low 는 더 가깝게
-  const OUTLINE_FAR = { high: 30, low: 22 };
+  // 외곽선을 그리는 거리 (카메라에서). 1280×800 에서 30 이면 굵기가 0.3화소쯤 → 그 너머는 안 보인다. 적정은 조금 더 가깝게 (낮음 아래는 외곽선 없음)
+  const OUTLINE_FAR = { high: 30, mid: 26 };
+  // 그리는 거리 (초점에서, 칸). 낮은 사양은 먼 칸을 뺀다 — 곡면 월드라 먼 곳은 지평선 쪽으로 내려가 작게 보인다. 없으면 끝까지 (render/quality.js 사양 이름)
+  const DRAW_FAR = { low: 28, min: 22 };   // 광장에서 삼각형 낮음 −8% · 매우 낮음 −26% (2026-11-01, 1280×800)
   const tv = new THREE.Vector3(), pm = new THREE.Matrix4();
   const view = new THREE.Frustum();
   let shadowF = null, curK = 0, curZ = 0;
@@ -321,8 +323,10 @@ export function createKit(ctx) {
     for (let i = 0; i < 6; i++) { const p = planes[i]; if (p.normal.x * x + p.normal.y * y + p.normal.z * z + p.constant < -r) return true; }
     return false;
   };
+  let farR2 = 0, curX = 0;
   const test = (sph, i, shadow) => {
     const x = sph[i], y = sph[i + 1], z = sph[i + 2], r = sph[i + 3];
+    if (farR2 && (x - curX) ** 2 + (z - curZ) ** 2 > farR2 + r * r) return false;
     const dz = Math.abs(z - curZ);
     if (!outside(view.planes, x, y - curK * dz * dz, z, r + curK * (2 * dz * r + r * r) + 0.05)) return true;
     return shadow && shadowF !== null && !outside(shadowF.planes, x, y, z, r);
@@ -333,7 +337,9 @@ export function createKit(ctx) {
     cam.updateMatrixWorld();
     pm.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
     view.setFromProjectionMatrix(pm);
-    curK = materials.curve.uCurve.value; curZ = ctx.focus.z;
+    curK = materials.curve.uCurve.value; curZ = ctx.focus.z; curX = ctx.focus.x;
+    const far = api.drawFar[ctx.quality] ?? 0;
+    farR2 = far > 0 ? far * far : 0;
     shadowF = null;
     const sun = ctx.lights?.sun;
     if (sun?.castShadow && ctx.renderer.shadowMap.enabled) {
@@ -344,7 +350,7 @@ export function createKit(ctx) {
     // 카메라·곡면·그림자 카메라가 그대로면 바뀐 묶음만 다시 고른다
     const e = pm.elements, s = shadowF ? sun.shadow.matrix.elements : null;
     const key = `${e[12].toFixed(3)},${e[13].toFixed(3)},${e[14].toFixed(3)},${e[0].toFixed(4)},${e[5].toFixed(4)},${e[6].toFixed(4)},${curK.toFixed(5)},${curZ.toFixed(2)}`
-      + (s ? `|${s[12].toFixed(3)},${s[13].toFixed(3)},${s[0].toFixed(4)},${s[5].toFixed(4)}` : '');
+      + (s ? `|${s[12].toFixed(3)},${s[13].toFixed(3)},${s[0].toFixed(4)},${s[5].toFixed(4)}` : '') + (farR2 ? `|${curX.toFixed(1)},${farR2}` : '');
     const olFar = OUTLINE_FAR[ctx.quality] ?? OUTLINE_FAR.high;
     const all = key !== lastKey || olFar !== lastOl;
     lastKey = key; lastOl = olFar;
@@ -359,6 +365,6 @@ export function createKit(ctx) {
   function prepareFrame() { hooked = true; prepare(); }
 
   // noCull: 확인용 — true 면 칸마다 판정 없이 모두 그린다 (가까운 순 정렬·외곽선 거리는 그대로)
-  const api = { uTime, material, buildTemplate, Batch, updateCulling, prepareFrame, batches, noCull: false };
+  const api = { uTime, material, buildTemplate, Batch, updateCulling, prepareFrame, batches, noCull: false, drawFar: DRAW_FAR };
   return api;
 }

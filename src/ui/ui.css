@@ -493,3 +493,8 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
 @keyframes pk-toast-out { to { opacity: 0; transform: translateY(-8px); } }
 /* 흔들림 줄이기: <html class="pk-calm"> — 섬폰에서 정하지 않으면 기기 설정(prefers-reduced-motion)을 따른다 (ui/access.js) */
 .pk-calm .pk-root *, .pk-calm .pk-root *::before, .pk-calm .pk-root *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+
+/* 그래픽 사양 (매우 낮음 · 낮음 · 적정 · 높음) — 네 칸이라 글자를 조금 작게, 줄바꿈 없이 */
+.pk-seg-spec { gap: 4px; }
+.pk-seg-spec .pk-seg-btn { padding: 0 4px; font-size: calc(13.5px * var(--pk-fs, 1)); white-space: nowrap; }
+.pk-spec-auto { padding: 0; border: 0; background: none; color: var(--pk-ink); font: inherit; text-decoration: underline; cursor: pointer; }

@@ -6,7 +6,7 @@
 // 플레이어는 점검 동안 얼려 두고 자리만 옮긴다 (광장에서는 작은 원을 돈다). 끝나면 원래 자리로 돌려놓는다.
 // render/index.js 가 주소에 check 가 있을 때만 (checkRequested) 만들고, 매 프레임 그리기 앞뒤로 begin() · end(dt) 를 부른다.
 // 아래 순수 함수(routeSpots · buildRecord · checkProblems)는 tests/check.test.mjs 가 Node 에서 검사한다 — 모듈 위쪽에서 DOM 을 건드리지 않는다.
-import { frameStats, plazaArea, PLAZA, urlQuality } from './quality.js';
+import { frameStats, plazaArea, PLAZA, urlQuality, normalizeQuality, QUALITY_LABELS } from './quality.js';
 
 /** 점검 시간 (초). warm + 자리 sec 합 = total */
 export const CHECK = {
@@ -217,7 +217,7 @@ export function createCheck(ctx, { service } = {}) {
   const { renderer, events } = ctx;
   const gl = renderer.getContext();
   const errors = watchErrors();
-  const isFixed = () => !!urlQuality(location) || ['high', 'low', 'lite'].includes(ctx.state?.settings?.graphics);   // 저장을 불러온 뒤에 본다
+  const isFixed = () => !!urlQuality(location) || !!normalizeQuality(ctx.state?.settings?.spec);   // 저장을 불러온 뒤에 본다 (섬폰 「그래픽 사양」)
   let state = 'boot', ready = false, t0 = 0, frameT0 = 0, lastNow = 0, frameNo = 0, skipGap = false;
   let spots = [], spot = -1, samples = {}, home = null, froze = false, startedAt = null, quality = null, result = null;
   let pill = null, card = null, ring = null, pillText = null;
@@ -290,7 +290,8 @@ export function createCheck(ctx, { service } = {}) {
   function showCard(rec) {
     css();
     const d = rec.device, q = rec.quality;
-    const qText = q.changes.length ? `${q.start} → ${q.end} (${q.changes.map(c => `${c.auto ? '자동' : '바꿈'}, ${spots.find(s => s.id === c.stop)?.label ?? '?'} ${c.at}초`).join(' · ')})` : `${q.end}${q.fixed ? ' (골라 둔 품질)' : ''}`;
+    const L = k => QUALITY_LABELS[k] ?? k;
+    const qText = q.changes.length ? `${L(q.start)} → ${L(q.end)} (${q.changes.map(c => `${c.auto ? '자동' : '바꿈'}, ${spots.find(s => s.id === c.stop)?.label ?? '?'} ${c.at}초`).join(' · ')})` : `${L(q.end)}${q.fixed ? ' (골라 둔 사양)' : ''}`;
     const dl = el('dl');
     const row = (k, v) => dl.append(el('dt', {}, k), el('dd', {}, v));
     row('GPU', d.gpu);
