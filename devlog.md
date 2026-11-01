@@ -2,7 +2,7 @@
 
 이 문서는 세션이 끝나거나 `/clear` 하기 전에 대화와 작업을 보고서로 남긴 기록이다. 새 세션은 **「현재 상태」부터 읽고**, 자세한 경위는 「세션 기록」을 본다. 구조·명령어는 [CLAUDE.md](CLAUDE.md), 개발 단계는 [docs/PLAN.md](docs/PLAN.md), 모듈 약속은 [docs/CONTRACTS.md](docs/CONTRACTS.md), 실행법은 [README.md](README.md).
 
-마지막 갱신: 2026-10-31 (세션 3, M7 합침·게임 v12)
+마지막 갱신: 2026-11-01 (세션 3, 게임 v15 그래픽 사양)
 
 ---
 
@@ -14,7 +14,7 @@ M0~M6 끝, **M7 출시 준비 중 — P1~P5 끝, 남은 것 P6 출시 + 보드 D
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 14 (빌드 f871912, 2026-10-31, 게시 파일 159, 링크 공개)** — 그래픽 「가볍게」(lite: 그림자·화면 효과 끔·배율 1, 링크 끝 `#lite` 또는 섬폰 설정 「그래픽」, 자동은 느리면 high→low→lite 한 칸씩) + 나머지 묶음 미리 받기. 올리기 = 페이지 + 모듈 7. 다음엔 packs hash 를 f871912 것과 비교 + `git diff --name-only f871912 HEAD -- src index.html` |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 15 (빌드 4bd0f81, 2026-11-01, 게시 파일 159, 링크 공개)** — 그래픽 사양 4단계 매우 낮음·낮음·적정·높음 (처음 적정 + 느리면 자동 한 칸씩, 섬폰 설정·로딩 화면, 링크 끝 `#min` `#low` `#mid` `#high`, 예전 `#lite` = 적정), 셰이더 미리 만들기. 올리기 = 페이지 + 모듈 7. 다음엔 packs hash 를 4bd0f81 것과 비교 + `git diff --name-only 4bd0f81 HEAD -- src index.html` |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 6 (10-31: 게임 카드에 게임 저장소 문제 알리기 `reports`·기기 점검 `checks`). 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
 | **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | **버전 3 (10-31): QA 칸 QA-01–19 (고침 10 · 고르기 9 → 결정 D49–D57), 목표 표 잰 값 — 사용자 선택 대기.** 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
@@ -284,6 +284,7 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 넷 다 끝남 |
 | 3 | 회의 중 음소거 / 게임 소리 끄기 | 앱 알림 소리 끔(설정), 세션들에 미리보기 소리 끄기 부탁 → 사용자가 직접 음소거해서 취소 | 알림 소리는 꺼 둔 채 |
 | 5 | 이후 개발 알려 줘, 지금 P 과정, 재개 | 작업 폴더 `p11-tune` → M7-P5 세션 시작, 보드 세션에 QA 칸 채우기·홈 세션에 reports·checks 줄 부탁 | 셋 다 끝남: `p11-tune` a67a344(장면 층이 마우스·터치를 막던 막힘 버그 — v12 게시본에도 있음) · df4e50a(힌트·건너뛰기·섬폰 안내, 처음 하는 사람 7일 → 숫자 표 초안) · `p10-board7` 58083fc(보드 v3, QA 칸 고침 10·고르기 9 → D49–D57) · `p10-hub` 2a6aca2(홈 v6, reports·checks). 시험 합치기 충돌 0 · 테스트 320. 합침 |
+| 8 | lite 링크 + 사양 넷(매우 낮음·낮음·적정=lite·높음), 웹이라 렉 심함 → 최적화·모드 제작·테스트·활성화 뒤 링크 | 이 컴퓨터(Intel UHD, 1280×800)에서 GPU 타이머로 잼: 높음 38ms · 예전 보통 22ms · 적정 14.6ms, 칠하는 화소·외곽선·그림자·화면 효과 순. 걷다가 새 셰이더 70ms 멈춤도 잡음 → 사양 high·mid·low·min (낮음: 외곽선 끔·화소 75만 개·28칸, 매우 낮음: 화소 40만 개·22칸·초당 30장), 처음 적정 + 자동 한 칸씩, 섬폰 「그래픽 사양」·로딩 화면 네 단추(`settings.spec`, 소리 안 깨움), 셰이더 미리 만들기(compileAsync 53ms), 테스트 326 (4bd0f81) → 게임 v15, 홈 `status/game` v9 | 끝 (느린 컴퓨터 실제 확인은 사용자) |
 | 7 | 다른 컴퓨터에서 렉 — 처음에 다 받는 거 아님? 가벼운 버전 | 진단: 처음엔 묶음 3개(7.7MB)만, 나머지 5개는 처음 열 때. 렉은 그리기 쪽 — 광장 한 프레임 삼각형 152만(그림자 몫 82만·외곽선 29만), 화면 효과 5단계, 기존 low 는 배율·그림자 크기만 조금. → lite 단계(호출 194→90, 삼각형 →71만, 바로 그리기) + `#lite` + 섬폰 「그래픽」 + 자동 한 칸씩 + 묶음 미리 받기 (f871912, 테스트 323) → 게임 v14 | 끝 (실제 느린 컴퓨터 확인은 사용자) |
 | 6 | 합치고 게시 | `p11-tune`·`p10-board7`·`p10-hub` 합침(충돌 0, 테스트 320) → `/artifact/` 에서 실제 마우스로 「소리 없이 시작」·섬폰 단추 눌러 확인 → 게임 v13, 홈 `status/game` v7 | 끝 |
 | 4 | 합치고 게시 | 시험 합치기 → main 에 4브랜치(충돌 0, 테스트 308) → `/artifact/` 확인 → 게임 v12 (db·user·downloads 처음) → 홈 `status/game` v5 | 끝 |
