@@ -180,9 +180,13 @@ export function createOcclusion(ctx, objects) {
       C.x = ctx.camera.position.x; C.y = ctx.camera.position.y; C.z = ctx.camera.position.z;
       const k = ctx.materials.curve.uCurve.value, fz = ctx.focus.z;
       for (const T of targets) {
-        // 카메라는 남쪽 위에 있다 → 대상에서 카메라 쪽으로 조금 간 곳 둘레의 물체만 본다
-        const qx = T.x + (C.x - T.x) * 0.1, qz = T.z + Math.sign(C.z - T.z || 1) * AHEAD;
-        for (const q of objects.api.query(qx, qz, RADIUS)) {
+        // 대상에서 카메라 쪽으로 조금 간 곳 둘레의 물체만 본다 (보통 카메라는 남쪽 위. 시점 조작으로 둘레를 돌면 그쪽으로).
+        // 카메라가 낮으면(올려다보기 — 높이각 17° 아래) 광선이 키 큰 물체를 카메라 가까이서도 지나므로 카메라까지 덮는다
+        const ex = C.x - T.x, ez = C.z - T.z, L = Math.hypot(ex, ez);
+        const ux = L > 1e-3 ? ex / L : 0, uz = L > 1e-3 ? ez / L : 1;
+        const low = C.y - T.y < L * 0.3;
+        const reach = low ? Math.max(AHEAD, L / 2) : AHEAD, rad = low ? Math.max(RADIUS, L / 2 + 1.2) : RADIUS;
+        for (const q of objects.api.query(T.x + ux * reach, T.z + uz * reach, rad)) {
           const type = OCCLUDERS[q.kind];
           if (!type || hit.has(q.id)) continue;     // 이미 다른 대상을 가린 물체는 또 볼 필요 없다
           const o = objects.raw(q.id);

@@ -2,7 +2,8 @@
 //   이동: WASD / 방향키 (+ Shift 달리기), 마우스로 땅 누르기·꾹 누르고 따라가기 (player/mouse.js), 휴대폰은 왼쪽 아래 떠다니는 패드 (끝까지 밀면 달리기)
 //   action  Space/Enter (말 걸기·도구 쓰기)   pickup F (줍기)      휴대폰: A · B
 //   toolPrev Q   toolNext E   tool1~5 숫자키   bag I/Tab   phone P/Esc   map M
-// 화면 위쪽 = 월드 -Z (카메라가 남쪽에서 북쪽을 본다).
+//   시점: R/PageUp 올려다보기 · V/PageDown 내려다보기 (누르는 동안, look.y — player/camera.js 가 읽는다)
+// 화면 위쪽 = 월드 -Z (카메라가 남쪽에서 북쪽을 본다). 카메라가 둘레를 돌면(viewYaw) 키보드·패드 방향도 같이 돈다.
 // 터치 조작은 (pointer: coarse) 기기에서 처음부터, 그 밖의 기기는 화면을 처음 손가락으로 만질 때 생긴다 (이벤트 input:touch).
 // 주소에 ?touch=1 이면 늘 켜고, ?touch=0 이면 끈다.
 const KEYS = {
@@ -10,7 +11,15 @@ const KEYS = {
   KeyI: 'bag', Tab: 'bag', KeyP: 'phone', Escape: 'phone', KeyM: 'map',
   Digit1: 'tool1', Digit2: 'tool2', Digit3: 'tool3', Digit4: 'tool4', Digit5: 'tool5', Digit0: 'toolNone',
 };
+const LOOK_KEYS = { KeyR: 1, PageUp: 1, KeyV: -1, PageDown: -1 };
 const MOVE = { KeyW: [0, -1], ArrowUp: [0, -1], KeyS: [0, 1], ArrowDown: [0, 1], KeyA: [-1, 0], ArrowLeft: [-1, 0], KeyD: [1, 0], ArrowRight: [1, 0] };
+
+/** 화면 기준 이동(x 오른쪽, z 아래쪽) → 월드 방향. 카메라가 둘레를 yaw 만큼 돌면(player/camera.js) 화면 위쪽 = 카메라가 보는 쪽 (−sin, −cos) */
+export function viewMove(x, z, yaw = 0) {
+  if (!yaw || (!x && !z)) return { x, z };
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  return { x: x * c + z * s, z: z * c - x * s };
+}
 
 const STICK_R = 50;     // 손잡이가 움직이는 반지름(px)
 const DEAD = 0.14;      // 이보다 덜 밀면 서 있다
@@ -24,6 +33,10 @@ export function createInput(events, { touchRoot = document.body } = {}) {
   const api = {
     move: { x: 0, z: 0 },      // 길이 0~1
     run: false,
+    /** 시점 키: y = 1 올려다보기 · −1 내려다보기 · 0 */
+    look: { y: 0 },
+    /** 카메라가 둘레를 돈 각 (라디안, player/camera.js 가 넣는다). 0 이면 화면 위쪽 = 북쪽 */
+    viewYaw: 0,
     /** UI 창이 열리면 ui 모듈이 false 로 바꾼다 (터치 패드는 숨기고 A·B 만 남긴다) */
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; pad?.setEnabled(enabled); },
@@ -31,9 +44,12 @@ export function createInput(events, { touchRoot = document.body } = {}) {
     /** 마우스로 걷기 (player/mouse.js 가 넣는다): get() → { x, z, run } | null, cancel(). 키보드·패드가 우선 */
     pointerMove: null,
     update() {
-      let x = 0, z = 0, pointerRun = false;
-      for (const code of held) { const m = MOVE[code]; if (m) { x += m[0]; z += m[1]; } }
+      let x = 0, z = 0, pointerRun = false, ly = 0;
+      for (const code of held) { const m = MOVE[code]; if (m) { x += m[0]; z += m[1]; } ly += LOOK_KEYS[code] ?? 0; }
+      api.look.y = enabled ? Math.sign(ly) : 0;
       if (stick.active) { x = stick.x; z = stick.z; }
+      // 화면 위쪽 = 카메라가 보는 쪽 (마우스로 걷기는 땅 위 점이라 돌리지 않는다)
+      if (api.viewYaw && (x || z)) ({ x, z } = viewMove(x, z, api.viewYaw));
       if (x || z || stick.active) api.pointerMove?.cancel();
       else if (enabled && api.pointerMove) {
         const p = api.pointerMove.get();
@@ -60,7 +76,7 @@ export function createInput(events, { touchRoot = document.body } = {}) {
     held.add(e.code);
     const intent = KEYS[e.code];
     if (intent && !e.repeat) { e.preventDefault(); api.press(intent); }
-    else if (MOVE[e.code] || e.code === 'Space') e.preventDefault();
+    else if (MOVE[e.code] || LOOK_KEYS[e.code] || e.code === 'Space') e.preventDefault();
   });
   addEventListener('keyup', e => held.delete(e.code));
   addEventListener('blur', () => { held.clear(); pad?.release(); });
