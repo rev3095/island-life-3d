@@ -41,10 +41,11 @@ const packable = p => p.startsWith('assets/') && (p.endsWith('.json') || !!image
 //   env       — world·sky: assets.loadEnv / loadEnvSpec (src/core/assets.js PATHS)
 //   character — player·town: assets.loadCharacter / loadCharacterSpec (목록은 assets.loadCharacterIndex)
 //   furniture — house: src/gameplay/house/furniture.js, 썸네일 = data 아이템 icon (src/data/items.js)
-//   items     — 가구를 뺀 아이템 아이콘 = data 아이템 icon (변형마다 하나), 들어 보이는 모델(hold)만 .glb.json (gather/meshes.js heldModel, 5차 Z1)
+//   items     — 가구를 뺀 아이템 아이콘 = data 아이템 icon (변형마다 하나) + 모델 .glb.json 모두
+//               (들어 보이기 gather/meshes.js heldModel · 상점 진열·박물관 전시 house/places.js itemModel — 실내가 생긴 뒤로 모든 아이템 모델을 쓴다)
 const itemFiles = slug => {
   const m = JSON.parse(read('assets/items/index.json')).models.find(x => x.slug === slug);
-  return [...(m?.items ?? []).map(x => x.icon), ...(m?.hold ? [`assets/items/models/${slug}.glb.json`] : [])];
+  return [...(m?.items ?? []).map(x => x.icon), ...(m ? [`assets/items/models/${slug}.glb.json`] : [])];
 };
 export const FAMILIES = [
   { name: 'env', index: 'assets/env/index.json', each: s => [`assets/env/models/${s}.glb.json`, `assets/env/specs/${s}.json`] },
