@@ -222,7 +222,7 @@ test('사양: 주소로 고르기 — 로컬 ?quality=, claude.ai 게시본 #low
 
 test('사양: main.js 는 처음 사양을 주소 또는 적정으로, 그림자는 QUALITY 값, 매우 낮음은 초당 장수 상한', () => {
   const src = read('src/main.js');
-  assert.match(src, /urlQuality\(location\) \?\? DEFAULT_QUALITY/);
+  assert.match(src, /urlQuality\(location\) \?\? saved \?\? DEFAULT_QUALITY/);   // 주소 > 저장된 섬폰 사양 > 적정
   assert.match(src, /sun\.castShadow = QUALITY\[quality\]\.shadows/);
   assert.match(src, /gate\(clock\.getDelta\(\), QUALITY\[ctx\.quality\]\?\.fps\)/);
   assert.match(src, /prefetchPacks/);
@@ -251,4 +251,43 @@ test('사양: 초당 장수 상한 — 60Hz 화면에서 매우 낮음(30)은 �
   assert.equal(free(1, 0), 0.05);                                          // 오래 멈췄다 와도 0.05 까지
   const slow = createFrameGate();                                          // 화면이 30Hz 보다 느리면 매번 그린다
   assert.equal(Array.from({ length: 20 }, () => slow(1 / 24, 30)).filter(dt => dt !== null).length, 20);
+});
+
+test('사양: 저장 글에서 섬폰 사양 미리 읽기 (렌더러 만들기 전 — 계단 무늬 줄이기)', async () => {
+  const { savedSpec } = await import('../src/render/quality.js');
+  const raw = JSON.stringify({ v: 1, savedAt: 1, state: { settings: { bgm: 0.6, spec: 'min', outline: true } } });
+  assert.equal(savedSpec(raw), 'min');
+  assert.equal(savedSpec(JSON.stringify({ state: { settings: { spec: 'auto' } } })), null);
+  assert.equal(savedSpec(JSON.stringify({ state: { settings: { spec: 'lite' } } })), 'mid');
+  assert.equal(savedSpec(null), null);
+  assert.equal(savedSpec('{}'), null);
+  // 낮음·매우 낮음만 계단 무늬 줄이기를 끈다
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].aa), [true, true, false, false]);
+  assert.match(read('src/main.js'), /powerPreference: 'high-performance'/);
+});
+
+test('사양: 셰이더 켜고 끄기 — 구름 그림자·렌즈 빛은 높음·적정만, 매우 낮음은 물결·하늘 반사·솜구름까지 끔', () => {
+  const fx = q => QUALITY[q].fx;
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).cloudShadow), [1, 1, 0, 0]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).flare), [true, true, false, false]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).skyReflect), [1, 1, 1, 0]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).water), [1, 1, 1, 0]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).puffs), [true, true, true, false]);
+  for (const q of QUALITY_ORDER) for (const k of ['cloudShadow', 'skyReflect', 'flare', 'spec', 'rim', 'ao', 'water', 'puffs']) assert.ok(k in fx(q), `${q}.${k}`);
+  const render = read('src/render/index.js');
+  assert.match(render, /look\.uCloudGate\.value = on\('cloudShadow'\)/);
+  assert.match(render, /look\.uWater\.value = p\.water \* on\('water'\)/);
+  const mat = read('src/core/materials.js');
+  assert.match(mat, /float cloudK = uCloudShadow \* uCloudGate;/);
+  assert.match(mat, /if \( waterK > 0\.0 && uSkyReflect > 0\.0 \)/);
+});
+
+test('하늘: 해 렌즈 빛 — 사양이 켜고, 집 안·흐림·해가 안 보이면 숨김', async () => {
+  const { flareStrength } = await import('../src/sky/flare.js');
+  assert.equal(flareStrength({ enabled: true, sunVis: 1, overcast: 0 }), 1);
+  assert.equal(flareStrength({ enabled: false, sunVis: 1 }), 0);
+  assert.equal(flareStrength({ enabled: true, indoor: true, sunVis: 1 }), 0);
+  assert.equal(flareStrength({ enabled: true, sunVis: 1, overcast: 0.7 }), 0);
+  assert.equal(flareStrength({ enabled: true, sunVis: 0.02 }), 0);
+  assert.ok(flareStrength({ enabled: true, sunVis: 0.5, overcast: 0.1 }) < 0.5);
 });

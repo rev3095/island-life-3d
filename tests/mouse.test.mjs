@@ -66,6 +66,7 @@ test('하늘: 사양 넷마다 하늘 셰이더 선택지가 있고, 돔은 불�
   assert.match(dome, /gl_Position\.z \*= 0\.99999/);
   assert.match(dome, /cloudDensity\(d, n, uv\)/);          // 별은 구름 뒤에서 가려진다
   const sky = read('src/sky/index.js');
-  assert.match(sky, /events\.on\('quality:changed', \(\{ quality \}\) => dome\.setQuality\(quality\)\)/);
+  assert.match(sky, /events\.on\('quality:changed', \(\{ quality \}\) => tier\(quality\)\)/);
+  assert.match(sky, /const tier = q => \{ dome\.setQuality\(q\); applyPuffs\(\); \}/);
   assert.match(sky, /cover: wx\.cover/);
 });

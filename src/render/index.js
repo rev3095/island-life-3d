@@ -13,7 +13,7 @@ import * as materials from '../core/materials.js';
 import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 import { createCuller } from './cull.js';
-import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
+import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, DEFAULT_QUALITY, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
 import { createCheck, checkRequested } from './check.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -79,15 +79,20 @@ export function createView(ctx, { preset: startPreset } = {}) {
 
   /** 값 → 재질 uniform · 외곽선 · 화면 효과 */
   function apply(p) {
+    // 사양별 셰이더 켜고 끄기 (quality.js QUALITY[].fx). uniform 이 0 이면 셰이더가 그 계산을 통째로 건너뛴다 (모든 조각이 같은 갈래라 싸다)
+    const fx = QUALITY[quality]?.fx ?? {};
+    const on = k => (fx[k] ?? 1) ? 1 : 0;
     look.uBands.value = p.bands; look.uBandSoft.value = p.bandSoft; look.uShadeFloor.value = p.shadeFloor;
     look.uWrap.value = p.wrap; look.uCastDark.value = p.castDark;
     look.uShadeTint.value.set(p.shadeTint); look.uLitTint.value.set(p.litTint); look.uShadeSat.value = p.shadeSat;
-    look.uRim.value = p.rim; look.uRimChar.value = p.rimChar; look.uRimPower.value = p.rimPower;
-    look.uSpec.value = p.spec; look.uSpecSize.value = p.specSize;
+    look.uRim.value = p.rim * on('rim'); look.uRimChar.value = p.rimChar * on('rim'); look.uRimPower.value = p.rimPower;
+    look.uSpec.value = p.spec * on('spec'); look.uSpecSize.value = p.specSize;
     look.uPaint.value = p.paint; look.uPaintScale.value = p.paintScale;
-    look.uAO.value = p.ao; look.uAOHeight.value = p.aoHeight;
+    look.uAO.value = p.ao * on('ao'); look.uAOHeight.value = p.aoHeight;
     look.uWind.value = p.wind; look.uWindSpeed.value = p.windSpeed;
-    look.uWater.value = p.water; look.uWaterScale.value = p.waterScale;
+    look.uWater.value = p.water * on('water'); look.uWaterScale.value = p.waterScale;
+    if (look.uCloudGate) look.uCloudGate.value = on('cloudShadow');       // 구름 그림자 (세기·구름 양은 sky 가)
+    if (look.uSkyReflect) look.uSkyReflect.value = on('skyReflect');      // 물 하늘 반사 (하늘 색은 sky 가)
     look.uGlow.value = p.glow;
     // 외곽선: ink = 예전 갈색 잉크 그대로, subtle = 가늘고 물체 색을 어둡게, off = 재질째 숨김 (섬폰 외곽선 끄기와는 따로)
     const ink = p.outline === 'ink';
@@ -153,6 +158,8 @@ export function createView(ctx, { preset: startPreset } = {}) {
       console.info(`[render] 사양 ${q}${auto ? ' (자동)' : ''}`);
       return quality;
     },
+    /** 계단 무늬 줄이기(MSAA)가 지금 사양과 다르면 true — 렌더러를 만들 때만 정해져서 다시 열어야 맞춰진다 (섬폰 설정 안내) */
+    get needsReload() { return (QUALITY[quality]?.aa !== false) !== !!renderer.getContextAttributes?.()?.antialias; },
     /** 자동 품질 판단 결과 (확인용): { state, gpu, frame, samples } */
     get autoQuality() { return autoQ?.result ?? null; },
     /** 광장 판단 결과 (확인용): { state, frame: { n, avg, p50, p95, max }, slow } */
@@ -198,7 +205,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
   // 주소로 고른 사양은 끝까지, 섬폰 「그래픽 사양」으로 고른 사양은 「자동」으로 돌릴 때까지 그대로 둔다.
   const LAST = QUALITY_ORDER[QUALITY_ORDER.length - 1];
   const urlQ = typeof location !== 'undefined' ? urlQuality(location) : null;
-  const startQ = quality;
+  const startQ = urlQ ?? DEFAULT_QUALITY;          // 「자동으로」 = 주소 사양 또는 적정에서 다시 (저장된 사양으로 열었어도)
   let fixed = !!urlQ;
   let plazaQ = null;
   const armPlaza = () => { plazaQ = fixed || quality === LAST || !ctx.lights ? null : createPlazaWatch(ctx, { onSlow: stepDown }); };

@@ -9,7 +9,7 @@ import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
-import { QUALITY, DEFAULT_QUALITY, urlQuality, ratioFor, createFrameGate } from './render/quality.js';
+import { QUALITY, DEFAULT_QUALITY, urlQuality, ratioFor, createFrameGate, savedSpec } from './render/quality.js';
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
 const errors = installErrors();
@@ -29,10 +29,15 @@ const params = new URLSearchParams(location.search);
 
 async function boot() {
   const canvas = document.getElementById('game');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   // 사양: 처음은 적정(그림자·화면 효과 끔). 주소 ?quality=low · 게시본 #low 로 고를 수 있다 (render/quality.js QUALITY — 높음·적정·낮음·매우 낮음).
   // 섬폰 설정 「그래픽 사양」은 저장을 불러온 뒤 render 가 건다. 화소 배율은 창 크기에 따라 render(view.setSize)가 다시 정한다
-  const quality = urlQuality(location) ?? DEFAULT_QUALITY;
+  // 저장된 섬폰 사양은 저장을 다 읽기 전에 미리 엿봐서 처음부터 그 사양으로 연다 (열자마자 바꾸면 셰이더를 두 번 만든다).
+  // 계단 무늬 줄이기(MSAA)는 렌더러를 만들 때만 정해진다 → 낮음·매우 낮음은 끔 (내장 그래픽에서 화소 칠하기가 가장 비싸다).
+  // powerPreference: 그래픽 카드가 둘인 노트북에서 빠른 쪽을 쓴다
+  let saved = null;
+  try { saved = savedSpec(localStorage.getItem('island-life-save-v1')); } catch { /* 막힌 저장소 */ }
+  const quality = urlQuality(location) ?? saved ?? DEFAULT_QUALITY;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: QUALITY[quality].aa !== false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(ratioFor(quality, innerWidth, innerHeight, devicePixelRatio));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;

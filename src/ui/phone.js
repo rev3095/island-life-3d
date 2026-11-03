@@ -216,7 +216,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     // 그래픽 사양 (매우 낮음 · 낮음 · 적정 · 높음, render/quality.js): 고르면 state.settings.spec 로 저장되고 render 가 settings:changed 로 따라간다.
     // 안 골랐으면 자동 — 적정으로 시작해 느리면 render 가 한 칸씩 낮춘다. 눌린 단추 = 지금 사양, 「자동으로」 = 고른 것 지우기
     const SPEC = [['min', '매우 낮음'], ['low', '낮음'], ['mid', '적정'], ['high', '높음']];
-    const SPEC_NOTE = { high: '그림자·빛 효과까지 모두 그려요.', mid: '그림자·빛 효과 없이 그려요.', low: '외곽선도 빼고, 큰 화면은 작게 그려 늘려요.', min: '가장 가볍게 — 더 작게 그리고 초당 30장으로 쉬어요.' };
+    const SPEC_NOTE = { high: '그림자·빛 효과·구름 그림자·해 렌즈 빛까지 모두 그려요.', mid: '그림자·빛 효과 없이, 구름 그림자·해 렌즈 빛은 그려요.', low: '외곽선·구름 그림자도 빼고, 큰 화면은 작게 그려 늘려요.', min: '가장 가볍게 — 물결·솜구름도 빼고 더 작게, 초당 30장으로 쉬어요.' };
     const specRow = h('div', { class: 'pk-seg pk-seg-spec', role: 'group', 'aria-label': '그래픽 사양' });
     const specNote = h('p', { class: 'pk-muted pk-small' });
     const drawSpec = () => {
@@ -229,7 +229,8 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       const auto = picked && s.spec && s.spec !== 'auto'
         ? h('button', { type: 'button', class: 'pk-spec-auto', onclick: () => { setSetting('spec', 'auto'); drawSpec(); } }, '자동으로')
         : null;
-      specNote.replaceChildren(`${SPEC_NOTE[cur] ?? ''} ${picked ? '고른 사양 그대로예요.' : '자동: 끊기면 알아서 낮춰요.'} `, auto ?? '');
+      const reload = style?.needsReload ? (cur === 'low' || cur === 'min' ? ' 다시 열면 계단 무늬 줄이기도 꺼져 더 가벼워요.' : ' 다시 열면 계단 무늬가 더 매끄러워요.') : '';
+      specNote.replaceChildren(`${SPEC_NOTE[cur] ?? ''}${reload} ${picked ? '고른 사양 그대로예요.' : '자동: 끊기면 알아서 낮춰요.'} `, auto ?? '');
     };
     drawSpec();
     view.append(...[

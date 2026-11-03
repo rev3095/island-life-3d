@@ -16,7 +16,7 @@
     "src/render/presets.js",
     "src/render/quality.js",
     "src/sky/clock.js",
-    "src/sky/clouds.js",
+    "src/sky/clouds.js", "src/sky/flare.js",
     "src/sky/debug.js",
     "src/sky/dome.js",
     "src/sky/index.js",

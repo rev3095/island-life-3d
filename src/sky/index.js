@@ -8,6 +8,8 @@ import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
 import { createDome } from './dome.js';
 import { createClouds } from './clouds.js';
+import { createFlare, flareStrength } from './flare.js';
+import { QUALITY } from '../render/quality.js';
 import { createPrecip } from './precip.js';
 import { createSurfaces } from './surfaces.js';
 import { loadEnvSpecs, buildSeasonPalettes, fallbackPalettes } from './seasons.js';
@@ -25,13 +27,16 @@ const TAU = { overcast: 4, rain: 2.5, snow: 3, rainbow: 5, cover: 6 };   // 초
 const WET_IN = 25, WET_OUT = 60;                                         // 땅은 천천히 젖고 더 천천히 마른다
 const SCAN_EVERY = 3;                                                    // 밤 조명 재질 다시 훑기 (초)
 const SUN_DIST = 24;
+const CLOUD_SHADOW = 0.3;              // 구름 그림자 진하기 (해를 받은 곳에서 최대 30% 어둡게)
+const CLOUD_DRIFT = [0.0042, 0.0014];  // 구름 그림자 흐름 (무늬 좌표/초 ≈ 0.35칸/초 — 하늘 구름과 같은 쪽으로)
 
 const setSRGB = (color, a) => color.setRGB(a[0], a[1], a[2], THREE.SRGBColorSpace);
 
 export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
   let realShift = 0, pausedMs = null, weatherOverride = null, seasonOverride = null;
-  let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs }))
+  let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs })) — 매우 낮음 사양은 늘 숨김 (applyPuffs)
+  let flare = null;                 // 해 렌즈 빛 (flare.js, 불러온 뒤)
   let indoor = false;               // 집 안: 하늘·구름·비·눈을 숨기고 실내 조명 (setIndoor)
   let palettes = fallbackPalettes();
   let fc = { key: null, segs: null };
@@ -124,13 +129,13 @@ export function createSky(ctx) {
       if (on === indoor) return;
       indoor = on;
       for (const g of [dome.group, clouds.group, precip.group]) g.visible = !on;
-      if (!on && !puffs) clouds.group.visible = false;
+      if (!on) applyPuffs();
       step(0);
       events.emit('scene:indoor', { on });
     },
     /** 하늘 셰이더 값 (src/sky/dome.js SKY_FX 이름) 바꾸기 → 지금 값. puffs = 북쪽 먼 하늘의 3D 솜구름 보이기. 하늘 검수 보드 미리 보기가 쓴다 */
     skyFx(v = {}) {
-      if (typeof v.puffs === 'boolean') { puffs = v.puffs; clouds.group.visible = puffs && !indoor; }
+      if (typeof v.puffs === 'boolean') { puffs = v.puffs; applyPuffs(); }
       return { ...dome.setFx(v), puffs };
     },
   };
@@ -138,6 +143,8 @@ export function createSky(ctx) {
   // 장면 물체
   const dome = createDome({ quality: ctx.quality });   // 하늘 셰이더는 사양(render/quality.js)에 따라 구름 겹 수·빛살·은하수를 줄인다
   const clouds = createClouds(ctx.materials);
+  /** 북쪽 3D 솜구름 보이기 = 보드 값(puffs) · 사양(매우 낮음은 숨김 — 그리기 호출·삼각형 아끼기) · 집 밖 */
+  const applyPuffs = () => { clouds.group.visible = puffs && !indoor && QUALITY[ctx.quality]?.fx?.puffs !== false; };
   const precip = createPrecip(ctx.materials.curve);
   const surfaces = createSurfaces(ctx.materials.curve);
   let debug = null;
@@ -196,6 +203,17 @@ export function createSky(ctx) {
     const viewScale = viewH / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
     dome.update(look, camera, elapsed, ctx.renderer?.getPixelRatio() ?? 1, { cover: wx.cover, grey: Math.min(1, wx.overcast * 0.6 + wx.rain * 0.4), night: nf });
     clouds.update(dt, ctx.focus, wx.cover, Math.min(1, wx.overcast * 0.55 + wx.rain * 0.45), look.horizon);
+    // 하늘 → 땅·물 셰이더 (core/materials.js look): 구름 그림자는 해가 보일 때만, 흐를수록 짙게 · 물에 비칠 하늘 색 (선형)
+    const L = ctx.materials?.look;
+    if (L?.uCloudShadow) {
+      L.uCloudShadow.value = indoor ? 0 : CLOUD_SHADOW * look.sunVis * (1 - 0.75 * wx.overcast);
+      L.uCloudCover.value = wx.cover;
+      L.uCloudOffset.value.x = (L.uCloudOffset.value.x + dt * CLOUD_DRIFT[0]) % 1;
+      L.uCloudOffset.value.y = (L.uCloudOffset.value.y + dt * CLOUD_DRIFT[1]) % 1;
+      L.uSkyZenithL.value.setRGB(look.zenith[0], look.zenith[1], look.zenith[2], THREE.SRGBColorSpace);
+      L.uSkyHorizonL.value.setRGB(look.horizon[0], look.horizon[1], look.horizon[2], THREE.SRGBColorSpace);
+    }
+    flare?.update(camera, look.sunSky, flareStrength({ enabled: !!QUALITY[ctx.quality]?.fx?.flare, indoor, sunVis: look.sunVis, overcast: wx.overcast }), Math.min(1, look.weights.dawn + look.weights.dusk));
     precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf) }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
 
     if ((scanIn -= dt) <= 0) { scanIn = SCAN_EVERY; surfaces.scan(scene); }
@@ -219,8 +237,11 @@ export function createSky(ctx) {
       Object.assign(wx, WX[last.weather]);
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
-      events.on('quality:changed', ({ quality }) => dome.setQuality(quality));
-      dome.setQuality(ctx.quality);   // 주소로 고른 사양 (저장된 사양은 quality:changed 로)
+      const tier = q => { dome.setQuality(q); applyPuffs(); };
+      events.on('quality:changed', ({ quality }) => tier(quality));
+      tier(ctx.quality);              // 처음 사양 (주소·저장된 사양). 바꾸면 quality:changed 로
+      // 해 렌즈 빛 (three.js 예제 Lensflare) — 못 불러와도 하늘은 그대로
+      createFlare(THREE).then(f => { flare = f; scene.add(f.object); }).catch(e => console.warn('[sky] 해 렌즈 빛을 못 불러왔어요', e));
       syncSeason(n.season);
       if (ctx.debug) debug = createDebugPanel(ctx.uiRoot, service);
       step(0);

@@ -11,13 +11,26 @@
  *  maxRatio·maxPixels: 화소 배율 = min(기기 배율, maxRatio, √(maxPixels ÷ 화면 CSS 화소)), 0.5 아래로는 안 내린다 (ratioFor).
  *    — 낮음·매우 낮음은 큰 화면에서 작게 그려 늘린다 (휴대폰처럼 작은 화면은 1 그대로).
  *  shadows: 해 그림자 (광장 그리기 삼각형의 절반 넘게가 그림자 몫) · post: 화면 효과 5단계(빛 번짐·흐림·색 보정·FXAA) — 끄면 바로 그리기
- *  outlines: 외곽선 껍데기 (그리기 호출·삼각형이 그만큼 더) · fps: 초당 장수 상한 (0 = 화면 주사율대로) */
+ *  outlines: 외곽선 껍데기 (그리기 호출·삼각형이 그만큼 더) · fps: 초당 장수 상한 (0 = 화면 주사율대로)
+ *  aa: 계단 무늬 줄이기(MSAA) — 렌더러를 만들 때만 정할 수 있어서, 처음 사양(주소·저장된 사양)으로 정하고 바꾸면 다시 열 때 걸린다
+ *  fx: 셰이더 켜고 끄기 (uniform 이라 셰이더를 다시 만들지 않는다, render/index.js apply):
+ *    cloudShadow 구름 그림자 · skyReflect 물 하늘 반사 · flare 해 렌즈 빛(sky) · spec 하이라이트 · rim 가장자리 빛 · ao 접촉 그늘 · water 물결 무늬 · puffs 북쪽 3D 솜구름(sky) */
 export const QUALITY = {
-  high: { maxRatio: 2, maxPixels: Infinity, shadowSize: 2048, shadows: true, post: true, outlines: true, fps: 0 },
-  mid: { maxRatio: 1, maxPixels: Infinity, shadowSize: 1024, shadows: false, post: false, outlines: true, fps: 0 },
-  low: { maxRatio: 1, maxPixels: 750_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 0 },
-  min: { maxRatio: 1, maxPixels: 400_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 30 },
+  high: { maxRatio: 2, maxPixels: Infinity, shadowSize: 2048, shadows: true, post: true, outlines: true, fps: 0, aa: true,
+    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true } },
+  mid: { maxRatio: 1, maxPixels: Infinity, shadowSize: 1024, shadows: false, post: false, outlines: true, fps: 0, aa: true,
+    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true } },
+  low: { maxRatio: 1, maxPixels: 750_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 0, aa: false,
+    fx: { cloudShadow: 0, skyReflect: 1, flare: false, spec: 0, rim: 1, ao: 0, water: 1, puffs: true } },
+  min: { maxRatio: 1, maxPixels: 400_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 30, aa: false,
+    fx: { cloudShadow: 0, skyReflect: 0, flare: false, spec: 0, rim: 0, ao: 0, water: 0, puffs: false } },
 };
+/** 저장 글(localStorage 'island-life-save-v1' 의 JSON 글자)에서 섬폰 「그래픽 사양」만 빨리 꺼낸다 → 사양 이름 | null.
+ *  main.js 가 렌더러를 만들기 전에(저장을 다 읽기 전) 계단 무늬 줄이기를 정하려고 쓴다 */
+export function savedSpec(raw) {
+  const m = typeof raw === 'string' ? /"spec"\s*:\s*"(\w+)"/.exec(raw) : null;
+  return m ? normalizeQuality(m[1]) : null;
+}
 export const DEFAULT_QUALITY = 'mid';
 /** 무거운 것부터. 자동 판단은 느리면 한 칸씩 내려간다 */
 export const QUALITY_ORDER = ['high', 'mid', 'low', 'min'];

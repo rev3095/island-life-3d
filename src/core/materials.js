@@ -34,7 +34,40 @@ export const look = {
   // 외곽선: 굵기 배율 · 바탕색 섞기(0 = 갈색 잉크, 1 = 물체 색을 어둡게) · 어둡게 하는 정도
   uOutlineScale: { value: 1 }, uOutlineTint: { value: 0 }, uOutlineDark: { value: 0.55 },
   uOutlineFallback: { value: new THREE.Color('#7A6656') },   // 바탕색을 모르는 외곽선(합친 배경 묶음)에 쓰는 색
+  // 2026-11-04 하늘과 잇기 (sky 가 매 프레임 넣고, render 가 사양별로 켜고 끈다 — docs/SHADERS.md 「구름 그림자 · 물 하늘 반사」)
+  // 구름 그림자: 땅·물체에 흘러가는 구름 그림자. 세기(sky: 해 보임·흐림) × 켜기(render: 사양) · 구름 양(날씨) · 흐르는 자리 · 잡음 무늬(작은 타일 그림 1장)
+  uCloudShadow: { value: 0 }, uCloudGate: { value: 0 }, uCloudCover: { value: 0 }, uCloudOffset: { value: new THREE.Vector2() },
+  uCloudTex: { value: null },
+  // 물 하늘 반사: 바다·강에 하늘색이 비침 (비스듬히 볼수록 세게). 세기(render: 사양) · 하늘 색(sky, 선형)
+  uSkyReflect: { value: 0 }, uSkyZenithL: { value: new THREE.Color(0.3, 0.6, 0.9) }, uSkyHorizonL: { value: new THREE.Color(0.7, 0.85, 1) },
 };
+
+/** 구름 그림자 무늬: 이음매 없이 반복되는 부드러운 값 잡음 64×64 (한 번만 만든다, 조각마다 그림 1번 읽기 — 계산 잡음보다 싸다) */
+look.uCloudTex.value = (() => {
+  const N = 64, data = new Uint8Array(N * N * 4);
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  // 격자 칸 수 · 무게 (4·8·16칸 = 큰 덩어리 + 잔물결). 칸 수가 64 를 나누므로 가장자리가 이어진다
+  const grid = cells => { const a = Array.from({ length: cells * cells }, rnd); return { cells, at: (x, y) => a[((y % cells + cells) % cells) * cells + ((x % cells + cells) % cells)] }; };
+  const layers = [[grid(4), 0.55], [grid(8), 0.3], [grid(16), 0.15]];
+  const sm = t => t * t * (3 - 2 * t);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    let v = 0;
+    for (const [{ cells, at: g }, w] of layers) {
+      const fx = x / N * cells, fy = y / N * cells, ix = Math.floor(fx), iy = Math.floor(fy), tx = sm(fx - ix), ty = sm(fy - iy);
+      const a = g(ix, iy), b = g(ix + 1, iy), c = g(ix, iy + 1), d = g(ix + 1, iy + 1);
+      v += w * ((a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty);
+    }
+    const i = (y * N + x) * 4, b8 = Math.round(Math.min(1, Math.max(0, v)) * 255);
+    data[i] = data[i + 1] = data[i + 2] = b8; data[i + 3] = 255;
+  }
+  const t = new THREE.DataTexture(data, N, N, THREE.RGBAFormat);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true;
+  t.colorSpace = THREE.NoColorSpace;
+  t.needsUpdate = true;
+  return t;
+})();
 
 // 재질 이름 → 효과 (재질 이름 = 스펙 팔레트 키)
 export const STYLE_NAMES = {
@@ -194,6 +227,10 @@ uniform float uStyleTime, uBands, uBandSoft, uShadeFloor, uWrap, uCastDark, uSha
 uniform vec3 uShadeTint, uLitTint;
 uniform float uRim, uRimChar, uRimPower, uSpec, uSpecSize, uPaint, uPaintScale, uAO, uAOHeight, uWater, uWaterScale, uGlow;
 uniform float uMatRim, uMatSpec, uMatAO, uMatPaint;     // 재질마다 (캐릭터는 림 세게, 물은 접촉 그늘 없음 …)
+uniform float uCloudShadow, uCloudGate, uCloudCover, uSkyReflect;
+uniform vec2 uCloudOffset;
+uniform sampler2D uCloudTex;
+uniform vec3 uSkyZenithL, uSkyHorizonL;
 varying vec3 vStyleWorld;
 varying float vStylePaint;
 varying float vStyleBase;
@@ -268,6 +305,13 @@ const STYLE_COMPOSE = /* glsl */ `
   float ao = uAO * uMatAO * ( 1.0 - smoothstep( 0.0, uAOHeight, aoH ) ) * ( 1.0 - smoothstep( 0.55, 0.9, wn.y ) );
   reflectedLight.indirectDiffuse *= 1.0 - ao;
   reflectedLight.directDiffuse *= 1.0 - ao * 0.6;
+  // 구름 그림자: 해를 받은 곳만 흘러가는 구름 모양으로 어둡게 (그림 1번 읽기 — 사양 낮음·매우 낮음은 uCloudGate 0 으로 건너뜀)
+  float cloudK = uCloudShadow * uCloudGate;
+  if ( cloudK > 0.0 ) {
+    float cn = texture2D( uCloudTex, vStyleWorld.xz * 0.012 + uCloudOffset ).r;
+    float cut = mix( 0.6, 0.36, uCloudCover );
+    reflectedLight.directDiffuse *= 1.0 - smoothstep( cut, cut + 0.14, cn ) * cloudK * styleSun;
+  }
   // 그늘 채도: 해를 덜 받은 곳일수록 색을 진하게
   vec3 lsum = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse;
   float lum = dot( lsum, vec3( 0.2126, 0.7152, 0.0722 ) );
@@ -294,6 +338,11 @@ const STYLE_COMPOSE = /* glsl */ `
     if ( waterK > 0.0 && uWater > 0.0 ) {
       float wpat = styleWater( vStyleWorld.xz * uWaterScale, uStyleTime );
       totalEmissiveRadiance += wpat * uWater * waterK * ( skyLight * 0.22 + reflectedLight.directDiffuse * 0.42 );
+    }
+    // 물 하늘 반사: 하늘 색이 물에 비침 — 비스듬히 볼수록(프레넬) 세고, 가까운 발밑은 물 색 그대로
+    if ( waterK > 0.0 && uSkyReflect > 0.0 ) {
+      float wf = pow( 1.0 - saturate( dot( geometryNormal, geometryViewDir ) ), 3.0 );
+      totalEmissiveRadiance += mix( uSkyHorizonL, uSkyZenithL, 0.3 ) * ( 0.08 + 0.42 * wf ) * uSkyReflect * waterK;
     }
   #endif
   #ifdef STYLE_GLOW
