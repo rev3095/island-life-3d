@@ -70,7 +70,7 @@ export async function createKeepers(ctx, town, lines) {
   // 플레이어가 들어오는데 주인이 아직 밖(걸어가는 중·문 옆)이면 바로 계산대로 — 안에선 밖이 안 보인다
   ctx.events.on('place:enter', ({ place } = {}) => {
     const K = all.find(k => k.home === place);
-    if (!K || !['walk', 'stand', 'goingIn', 'toDesk'].includes(K.mode)) return;
+    if (!K || !['walk', 'stand', 'goingIn', 'toDesk', 'inside'].includes(K.mode)) return;
     if (K === B && !isOpen(context(ctx).now.hour)) return;
     toDesk(K);
   });
@@ -420,7 +420,10 @@ export async function createKeepers(ctx, town, lines) {
       },
       run: t => {
         // 문: 영업 중이고 실내가 있으면 들어간다 (D73-A — 창은 계산대에서). 문 닫았으면 지금처럼 밤톨이 안에서 대답
-        if (t === 'door' && indoor() && isOpen(context(ctx).now.hour) && B.mode !== 'inside') return indoor().enter('shop');
+        if (t === 'door' && indoor() && isOpen(context(ctx).now.hour)) {
+          if (B.mode === 'inside') toDesk(B);   // 문 열 시각이 막 지났는데 아직 안 바뀐 프레임
+          return indoor().enter('shop');
+        }
         return town.conversation(B, shopFlow, { face: B.mode !== 'inside' });
       },
     }));
@@ -443,7 +446,7 @@ export async function createKeepers(ctx, town, lines) {
 
   /** 상점·박물관 문 (house.places 가 문 쪽으로 밀 때 묻는다): 'open' 들어갈 수 있음 · 'closed' 문 닫음 · null 아직 (첫날 안내 전) */
   function placeRule(kind) {
-    if (kind === 'shop') return intro.pending ? null : isOpen(context(ctx).now.hour) && B.mode !== 'inside' ? 'open' : 'closed';
+    if (kind === 'shop') return intro.pending ? null : isOpen(context(ctx).now.hour) ? 'open' : 'closed';
     return kind === 'museum' ? 'open' : null;
   }
 
