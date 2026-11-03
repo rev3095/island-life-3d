@@ -382,6 +382,7 @@ stats() → { ms, passes }
 - 행동 키: 실내 문 매트 나가기 `house-place-out` **90**, 실내에선 도구를 쓰지 않음 `house-place-idle` **20**.
 - `room.js`: `buildRoom(ctx, { size: [가로, 깊이], windows, door: { gx0, gx1 }, name })`, `cameraBox(origin, w, d)`, `cornerOf(origin, w, d)` (→ `{ x0, z0, w, d }`, `wallMount` 가 `w` 로 동쪽 벽을 잡는다). 8×8 방은 예전 값 그대로.
 - 방 배치 `assets/interior/places/<shop|museum>.json` (RM-08 · RM-09) — 주민 방 모양 + `size`·`windows`·`door`·`keeper`·`talk`·`furniture[].role 'counter'`·`scale`·`look`, 상점 `stock`, 박물관 `cases`·`fossils`. 검사 `checkPlace` (`placedata.js`).
+- 방 배치 가구 `deco: true` (주민 방·상점·박물관 공통) = 1칸짜리 구석 소품. 사양(`ctx.quality`) 낮음·매우 낮음이면 숨기고 충돌에서도 뺀다. 단풍 방 RM-07 = `assets/interior/rooms/rm-07.json`.
 
 ### town 추가
 - `town.placeRule(kind)` → `'open'` | `'closed'` | null (첫날 안내 전) — house.places 가 문 쪽으로 밀 때 묻는다. 상점은 영업시간(`economy.isOpen`)에만 open, 박물관은 늘 open.

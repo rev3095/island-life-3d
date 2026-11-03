@@ -150,7 +150,7 @@ details summary { cursor: pointer; font-size: 14px; }
   </section>
 
   <section id="res">
-    <div class="sec-head"><p class="id">RM-08 · RM-09 · FU-35 · FU-36 · AN-06 · AN-07 · UI-12</p><h2>새 리소스</h2>
+    <div class="sec-head"><p class="id">RM-07 · RM-08 · RM-09 · FU-35 · FU-36 · AN-06 · AN-07 · UI-12</p><h2>새 리소스</h2>
       <p class="muted">방 배치는 주민 방(RM-01–06)과 같은 모양의 JSON 이에요 (<code>assets/interior/places/</code>). 가구는 지금 있는 모델을 먼저 쓰고, 모델이 없는 것은 색 상자(임시)로 두었다가 배경 편집기 「가구」 요청으로 모델을 만들면 저절로 바뀌어요.</p></div>
     <div class="grid wide" id="resCards"></div>
   </section>
@@ -200,6 +200,8 @@ const houseFront = (x, y, { open = 0, dark = false, out = false } = {}) => {
 const AUDIT = [
   ['내 집', '문 앞 Space · 문 쪽으로 밀기 → 문 소리 → 화면 어두워짐 → 방 안 순간이동. 문이 열리는 모습·걷는 동작 없음', '✅ 8×8 방, 가구·작업대·벽지', '문 동작 AN-06·07, 원형 전환 UI-12'],
   ['주민 집 (6곳)', '집에 깨어 있을 때만 들어감 (자면 노크, 외출이면 잠김). 들어가는 모습은 내 집과 같음', '✅ RM-01–06 주민마다 테마 방', '같은 문 동작'],
+  ['단풍 집 (이사 온 뒤)', '집 모델은 있는데 방 파일이 없어 빈 기본 방(벽지 WP-01·가구 없음)으로 열림', '❌ 빈 방', 'RM-07 단풍 수집 서재 · 같은 문 동작'],
+  ['축제 무대·부스', '지붕만 있는 열린 무대·가판대 — 둘레에 서서 놀고 사진을 찍는 곳', '— 들어가는 곳 아님', '실내 만들지 않음 (판단)'],
   ['도토리상점', '문 앞 Space → 밤톨 인사 → 사기·팔기 창. 밤톨은 문 옆 밖에 서 있음', '❌ 없음', 'RM-08 실내 · 계산대에서 창 (D69 · D72 · D73)'],
   ['박물관', '문 앞 Space → 느루 인사 → 기증·이야기·감정. 느루는 문 옆 밖', '❌ 없음', 'RM-09 실내 · 기증한 것이 보임 (D70 · D71 · D72 · D73)'],
 ];
@@ -341,6 +343,13 @@ function plan(kind) {
     for (const gx of [3, 4, 7, 8]) for (const gz of [0, 2]) b += at(x0, y0, gx, gz, 1, 1, P.white);
     b += at(x0, y0, 5, 0, 2, 2, '#E9D6B4', '🦕', 12) + at(x0, y0, 5, 4, 2, 1, P.door, '안내대', 8) + keeper(x0 + 6 * cell, y0 + 4 * cell - 2, '#7A6A9A') + at(x0, y0, 5, 6, 2, 1, P.acc);
     b += T(x0 + 6 * cell, y0 + 7 * cell + 14, '실제 12×8 칸 (그림은 7줄로 줄임)', { size: 9, anchor: 'middle', fill: P.acc });
+  } else if (kind === 'danpung') {
+    const x0 = 100, y0 = 18;
+    b += grid(8, 7, x0, y0, '#A77B55', P.soft);
+    b += at(x0, y0, 2, 0, 2, 1, '#8A5A3C', '책장', 8) + at(x0, y0, 4, 0, 2, 1, '#8A5A3C', '책장', 8) + at(x0, y0, 6, 2, 2, 2, '#E9D6B4', '🦕', 12);
+    b += at(x0, y0, 0, 2, 1, 1, P.leaf, '🐞', 9) + at(x0, y0, 0, 3, 1, 1, P.glass, '🌿', 9) + at(x0, y0, 2, 3, 2, 2, P.wood, '책상', 8) + at(x0, y0, 1, 4, 1, 1, P.log);
+    b += `<circle cx="${x0 + 4.5 * cell}" cy="${y0 + 5.5 * cell}" r="${cell * 1.4}" fill="#E9A86B" opacity=".75"/>` + `<circle cx="${x0 + 4.5 * cell}" cy="${y0 + 5.2 * cell}" r="7" fill="#D9583B"/>` + at(x0, y0, 3, 6, 2, 1, P.acc);
+    b += T(x0 + 6.5 * cell, y0 - 3, '🐚', { size: 10, anchor: 'middle' }) + T(60, 70, '단풍', { size: 11, anchor: 'middle', fill: '#D9583B' }) + T(60, 86, '자리 ●', { size: 9, anchor: 'middle', fill: P.acc });
   } else if (kind === 'stand') {
     b += `<ellipse cx="90" cy="104" rx="46" ry="9" fill="${P.line}"/>` + R(52, 70, 76, 30, P.white, 4, ` stroke="${P.line}"`) + R(46, 64, 88, 10, P.soft, 3) + T(90, 58, '🦴', { size: 22, anchor: 'middle' });
     b += R(184, 52, 100, 48, P.soft, 4) + R(178, 46, 112, 10, P.wood, 3) + T(234, 42, '🛋', { size: 22, anchor: 'middle' }) + T(90, 124, '박물관 받침 1×1', { size: 10, anchor: 'middle' }) + T(234, 124, '상점 진열 받침 2×2', { size: 10, anchor: 'middle' });
@@ -360,6 +369,7 @@ function plan(kind) {
 const RES = [
   ['RM-08', '도토리상점 실내', 'shop', 'D69 · D72 · D73', '10×7 칸 · 벽지 WP-05 통나무 벽 · 바닥 FL-02 밝은 판자 · 창 n:1·n:8 · 계산대 뒤 밤톨. 진열 받침 2곳에 오늘의 가구 2개(날마다 바뀜), 오른쪽 진열대에 도구 5·꽃씨 2. 가구는 지금 모델(벽시계·액자·화분·스탠드·러그).', '<code>assets/interior/places/shop.json</code>'],
   ['RM-09', '박물관 실내', 'museum', 'D70 · D71 · D72', '12×8 칸 · 벽지 WP-01 크림 줄무늬 · 바닥 FL-07 연못 돌바닥 · 창 n:5·n:6. 왼쪽 긴 수조 물고기 20자리, 오른쪽 긴 유리 상자 곤충 22자리, 가운데 받침 8개에 화석, 공룡 모형(FU-20). 입구 앞 안내대 뒤 느루.', '<code>assets/interior/places/museum.json</code>'],
+  ['RM-07', '단풍 수집 서재 (새)', 'danpung', '조정 세션 요청', '8×8 · 벽지 WP-01 크림 줄무늬 · 바닥 FL-05 짙은 판자. 꼼꼼한 수집가 여우답게 북쪽 벽 가득 책장 둘(도감), 서쪽 곤충 상자·작은 온실, 동쪽 공룡 모형, 창에 조개 커튼, 가운데 둥근 깔개와 나무 책상·의자, 벽시계·액자. 가구는 모두 지금 모델(FU-01–34). 단풍 잎 벽지(새 WP)가 필요하면 의견으로.', '<code>assets/interior/rooms/rm-07.json</code> · 배경 편집기 「방 배치」에서 고치기'],
   ['FU-35', '진열 받침 (새, 임시 상자)', 'stand', 'D69 · D71', '박물관 화석 받침(1×1, 높이 0.55)과 상점 진열 받침(2×2, 높이 0.18). 모델이 생기기 전엔 색 상자. 긴 수조·유리 상자도 v1 은 반투명 상자.', '배경 편집기 「가구」 (요청하면 Blender 모델)'],
   ['FU-36', '계산대 · 안내대 (임시: FU-29 재사용)', 'counter', 'D69 · D70', '부엌 조리대(FU-29) 모델을 높이만 0.6배로 낮춰 계산대로 씀 — 밤톨·느루(키 0.8)가 가려지지 않게. 상점 전용 모양(도토리 저울·나무 상판)이 필요하면 의견으로 — 배경 편집기에서 새 가구로 만들어요.', '<code>assets/furniture</code>'],
   ['AN-06', '문 열기', 'door', 'D67', '건물 문 크기 그대로 덧씌운 문짝이 경첩 쪽으로 안으로 접혀 들어가며 열리고, 뒤는 어두운 문간. 내 집·주민 집·상점·박물관 문 크기는 각 건물 모델(BD-01·02·03·04)에서 읽어요.', '<code>src/gameplay/house/door.js</code>'],
@@ -379,11 +389,13 @@ const PLAN = [
   ['밤톨·느루가 계산대·안내대에, 문 Space = 들어가기, 계산대 Space = 지금 창', '<code>src/gameplay/town/keepers.js</code>', 'D72-A · D73-A'],
   ['QA 봇이 새 흐름으로 상점·박물관에 들어가 계산대에서 사고팔고 나옴', '<code>tests/playthrough/skills.js</code>·<code>bot.js</code>', '—'],
   ['테스트: 방 배치 검사·문 크기·저장 이어 하기(상점 안에서 저장 → 다시 열기)', '<code>tests/places.test.mjs</code> (새)', '—'],
+  ['단풍 방 RM-07 (이사 온 단풍의 집 = 빈 방이던 것)', '<code>assets/interior/rooms/rm-07.json</code> · <code>index.json</code> · <code>interior.js</code> WEB_FILES · <code>tests/interior.test.mjs</code>', 'RM-07'],
+  ['사양 낮음·매우 낮음: 방 배치의 <code>deco</code> 소품(구석 화분·스탠드·액자 등)과 수조 물·물풀 장식을 숨기고 충돌에서도 뺌, 매우 낮음은 전시 물고기가 가만히 (그림자·외곽선은 원래 사양이 끔)', '<code>places.js</code> · <code>visit.js</code> · 방 배치 <code>deco</code>', '사양'],
 ];
 $('planRows').innerHTML = PLAN.map(([a, b, c]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="id">${c}</td></tr>`).join('');
 
 /* ---------- 머리 숫자 ---------- */
-$('pills').innerHTML = ['<span class="pill wait">반영 v1 (임시) · 추천안 모두 A</span>', '결정 7 (D67–D73)', '새 리소스 7 (RM-08·09 · FU-35·36 · AN-06·07 · UI-12)', '장소 4 (내 집 · 주민 집 · 상점 · 박물관)']
+$('pills').innerHTML = ['<span class="pill wait">반영 v1 (임시) · 추천안 모두 A</span>', '결정 7 (D67–D73)', '새 리소스 8 (RM-07·08·09 · FU-35·36 · AN-06·07 · UI-12)', '장소 5 (내 집 · 주민 집 · 단풍 집 · 상점 · 박물관)', '사양 낮음·매우 낮음: 작은 소품 빼기']
   .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
 
 /* ---------- 요청 글 ---------- */

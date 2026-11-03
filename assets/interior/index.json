@@ -154,6 +154,16 @@
       "status": "approved",
       "wallpaper": "wp-07",
       "floor": "fl-07"
+    },
+    {
+      "id": "RM-07",
+      "slug": "rm-07",
+      "owner": "danpung",
+      "name": "단풍 수집 서재",
+      "version": 1,
+      "status": "review",
+      "wallpaper": "wp-01",
+      "floor": "fl-05"
     }
   ]
 }

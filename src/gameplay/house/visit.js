@@ -6,6 +6,7 @@
 //    atHome 이 없는 town 이면 언제나 열린다.
 //  - 방은 x = 540 에 하나 지어 두고 들어갈 때마다 그 주민 방 스펙(assets/interior/rooms/rm-0N.json)대로 벽지·바닥·가구를 바꿔 끼운다.
 //  - 가구: 아이템 id(item) 또는 FU 번호(fu). 가구 목록(assets/furniture/index.json)에 없으면 스펙의 box 크기·색으로 임시 상자 → 목록에 들어오면 저절로 모델.
+//  - 방 배치의 deco 소품은 사양(ctx.quality) 낮음·매우 낮음이면 숨기고 충돌에서도 뺀다 (작은 구석 소품만 deco 로 적는다).
 //  - 주민 방 가구는 건드릴 수 없다 (충돌만). 주민을 방 안에 세우는 일은 town 이 house:enter { owner, host } 를 받아서 한다.
 // 상태: state.house.visit = 주민 방 안에서 저장했으면 그 주민 slug (이어하기).
 import { ROOM_W, ROOM_D, boxOf, moveCircle, inBox } from './grid.js';
@@ -36,7 +37,8 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
 
   // ── 구역: 주민 방 바닥·벽·가구 충돌 ──
   const local = (x, z) => ({ lx: x - vx0, lz: z - vz0 });
-  const blockers = () => V.list.filter(r => !r.rec.wall && r.layer !== 'rug').map(r => {
+  const lite = () => ctx.quality === 'low' || ctx.quality === 'min';
+  const blockers = () => V.list.filter(r => !r.rec.wall && r.layer !== 'rug' && !(r.entry.deco && lite())).map(r => {
     const b = boxOf(r.rec, r.footprint);
     return { x0: b.x0 + 0.04, z0: b.z0 + 0.04, x1: b.x1 - 0.04, z1: b.z1 - 0.04 };
   });
@@ -110,9 +112,17 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
       try { return r.real ? await realPiece(r) : placeholder(r); }
       catch (e) { console.warn('[house] 주민 방 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(r); }
     }));
+    made.forEach((o, i) => { if (o) o.deco = !!V.list[i].entry.deco; });
     V.objs = made.filter(Boolean);
     for (const o of V.objs) room.group.add(o.root);
+    applyQuality();
   }
+  /** 사양 낮음·매우 낮음: 작은 장식(deco)은 뺀다 */
+  function applyQuality() {
+    const hide = lite();
+    for (const o of V.objs) if (o.deco) o.root.visible = !hide;
+  }
+  events.on('quality:changed', () => applyQuality());
   function poseRoot(root, r) {
     if (r.rec.wall) {
       const m = wallMount(r.rec.wall, r.rec.slot, corner);

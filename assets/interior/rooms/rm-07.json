@@ -1,0 +1,30 @@
+{
+  "id": "RM-07",
+  "slug": "rm-07",
+  "kind": "room",
+  "owner": "danpung",
+  "ownerName": "단풍",
+  "name": "단풍 수집 서재",
+  "version": 1,
+  "status": "review",
+  "note": "꼼꼼한 수집가 여우 (실내 보드 RM-07). 북쪽 벽 가득 책장(도감), 서쪽 벽 곤충 상자·작은 온실, 동쪽 공룡 모형, 창에 조개 커튼, 가운데 둥근 깔개와 나무 책상. 가을 색 가구. deco = 사양 낮음·매우 낮음에서 빼는 작은 소품.",
+  "wallpaper": "wp-01",
+  "floor": "fl-05",
+  "host": { "lx": 4.5, "lz": 5.2, "face": "s" },
+  "furniture": [
+    { "item": "furn.bookshelf", "gx": 2, "gz": 0, "rot": 0 },
+    { "item": "furn.bookshelf", "gx": 4, "gz": 0, "rot": 0 },
+    { "item": "furn.dino-model", "gx": 6, "gz": 2, "rot": 3 },
+    { "item": "furn.bug-case", "gx": 0, "gz": 2, "rot": 1 },
+    { "item": "furn.terrarium", "gx": 0, "gz": 3, "rot": 1 },
+    { "item": "furn.log-table", "gx": 2, "gz": 3, "rot": 0 },
+    { "item": "furn.log-chair", "gx": 1, "gz": 4, "rot": 1 },
+    { "item": "furn.round-rug", "gx": 3, "gz": 4, "rot": 0 },
+    { "item": "furn.floor-lamp", "gx": 7, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.plant-pot", "gx": 0, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.fruit-basket", "variant": "apple", "gx": 7, "gz": 5, "rot": 0, "deco": true },
+    { "item": "furn.shell-curtain", "wall": "n", "slot": 6 },
+    { "item": "furn.picture-frame", "wall": "w", "slot": 5 },
+    { "item": "furn.wall-clock", "wall": "e", "slot": 5 }
+  ]
+}

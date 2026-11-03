@@ -4,6 +4,7 @@
 //    town.placeRule(kind) 이 'open' 일 때만. 나가기는 문 매트에서 행동 키(90) 또는 아래로 밀기. 드나드는 동작은 door.js (내 집·주민 집과 같다).
 //  - 상점: 진열 받침·진열대에 오늘의 물건(economy.stockGroups — 가구 2 · 도구 · 꽃씨 · 묘목)을 진짜 모델로. 날마다 들어갈 때 다시 놓는다.
 //  - 박물관: 긴 수조(물고기)·곤충 유리 상자·화석 받침. 아이템 표 순서로 자리가 정해져 있고, 기증한 것만 그 자리에 아이템 모델(assets/items)이 놓인다.
+//  - 사양(ctx.quality)이 낮음·매우 낮음이면 배치의 deco 소품·수조 물·물풀 장식을 숨기고, 매우 낮음이면 전시 물고기가 움직이지 않는다 (그림자·외곽선은 render 가 사양대로 끈다).
 //  - 주인(밤톨·느루)을 계산대·안내대 뒤에 세우는 일은 town 이 한다 (keepers.js 가 info(kind).keeper 를 본다). 들고 날 때 place:enter / place:leave { place }.
 // 상태: state.house.place = 실내에서 저장했으면 'shop'|'museum' (이어하기).
 import { boxOf, moveCircle, inBox } from './grid.js';
@@ -26,6 +27,14 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   const S = state.house;
   const P = { where: null, busy: false, pushT: 0, pushOutT: 0, clock: 0 };
   const rooms = {};
+  /** 사양 낮음·매우 낮음: 작은 장식은 뺀다 */
+  const light = () => ctx.quality === 'low' || ctx.quality === 'min';
+  function applyQuality(R) {
+    const lite = light();
+    for (const o of R.objs) if (o.deco) o.root.visible = !lite;
+    for (const c of R.cases) c.group.traverse(m => { if (m.userData.deco) m.visible = !lite; });
+  }
+  events.on('quality:changed', () => { for (const R of Object.values(rooms)) if (R.room) applyQuality(R); });
 
   await Promise.all(PLACE_KINDS.map(async (kind, i) => {
     try { rooms[kind] = makePlace(kind, await ctx.assets.loadJSON(PLACE_FILES[i])); }
@@ -38,13 +47,15 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     const corner = cornerOf(origin, w, d);
     const list = (spec.furniture ?? []).map((e, i) => resolveFurniture(e, { models: kit.list }, i));
     const R = { kind, spec, origin, w, d, corner, x0: corner.x0, z0: corner.z0, list, room: null, ready: null, objs: [], shown: [], shownKey: null, cases: [] };
-    const blockers = blockersOf(spec, list), bounds = boundsOf(spec);
+    // 사양이 낮아 deco 소품을 숨기면 충돌에서도 뺀다 (보이지 않는 것에 부딪히지 않게)
+    const all = blockersOf(spec, list), lite = blockersOf(spec, list.filter(r => !r.entry.deco)), bounds = boundsOf(spec);
+    const blockers = () => (light() ? lite : all);
     const local = (x, z) => ({ lx: x - R.x0, lz: z - R.z0 });
     const onRug = (lx, lz) => list.some(r => r.layer === 'rug' && inBox(boxOf(r.rec, r.footprint), lx, lz, -0.1));
     world.addZone({
       contains: (x, z) => Math.abs(x - origin.x) < w && Math.abs(z - origin.z) < d,
       collide(fx, fz, nx, nz, r) {
-        const p = moveCircle(blockers, bounds, fx - R.x0, fz - R.z0, nx - R.x0, nz - R.z0, r ?? 0.26);
+        const p = moveCircle(blockers(), bounds, fx - R.x0, fz - R.z0, nx - R.x0, nz - R.z0, r ?? 0.26);
         return { x: p.x + R.x0, z: p.z + R.z0 };
       },
       heightAt: (x, z) => { const { lx, lz } = local(x, z); return onRug(lx, lz) ? 0.03 : 0; },
@@ -52,7 +63,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       isWalkable(x, z) {
         const { lx, lz } = local(x, z);
         if (lx < bounds.x0 || lz < bounds.z0 || lx > bounds.x1 || lz > bounds.z1) return false;
-        return !blockers.some(b => inBox(b, lx, lz));
+        return !blockers().some(b => inBox(b, lx, lz));
       },
     });
     return R;
@@ -85,7 +96,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     R.ready = Promise.all(R.list.map(async r => {
       try { return r.real ? await realPiece(R, r) : placeholder(R, r); }
       catch (e) { console.warn('[house] 실내 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(R, r); }
-    })).then(objs => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); });
+    })).then(objs => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); applyQuality(R); });
     return R.ready;
   }
   function poseRoot(R, root, r) {
@@ -103,6 +114,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   async function realPiece(R, r) {
     const obj = await kit.make(r.item, { variant: r.entry.variant ?? null });
     poseRoot(R, obj.root, r);
+    obj.deco = !!r.entry.deco;
     return obj;
   }
   /** 모델이 아직 없는 가구 (FU-35 받침 등): box [가로, 깊이, 높이] 색 상자 — visit.js 와 같은 모양 */
@@ -120,7 +132,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     mesh.castShadow = mesh.receiveShadow = true;
     root.add(mesh);
     poseRoot(R, root, r);
-    return { root, tick() {}, dispose() { root.removeFromParent(); geo.dispose(); mat.dispose(); } };
+    return { root, deco: !!r.entry.deco, tick() {}, dispose() { root.removeFromParent(); geo.dispose(); mat.dispose(); } };
   }
 
   /** 긴 수조·곤충 유리 상자: 받침 + 바닥(모래·풀) + 물 + 유리 + 테두리 (모델이 생기기 전 FU-35 같은 임시 모양) */
@@ -131,7 +143,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     const w = c.lx1 - c.lx0, d = c.lz1 - c.lz0, h = c.h ?? 1.5;
     g.position.set(R.x0 + (c.lx0 + c.lx1) / 2, 0, R.z0 + (c.lz0 + c.lz1) / 2);
     const mats = [];
-    const box = (bw, bh, bd, y, color, { opacity = 1, name = 'caseFrame', shadow = true, x = 0, z = 0 } = {}) => {
+    const box = (bw, bh, bd, y, color, { opacity = 1, name = 'caseFrame', shadow = true, x = 0, z = 0, deco = false } = {}) => {
       const m = materials.toonMaterial(color, { name });
       if (opacity < 1) { m.transparent = true; m.opacity = opacity; m.depthWrite = false; }
       mats.push(m);
@@ -140,13 +152,14 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       mesh.castShadow = shadow && opacity >= 1;
       mesh.receiveShadow = true;
       if (opacity < 1) mesh.renderOrder = 2;
+      mesh.userData.deco = deco;
       g.add(mesh);
       return mesh;
     };
     box(w, 0.1, d, 0, look.frame);                                                // 받침
     if (look.soil) box(w - 0.08, 0.06, d - 0.08, 0.1, look.soil);
     box(w - 0.08, 0.05, d - 0.08, look.soil ? 0.16 : 0.1, look.floor);            // 모래·풀
-    if (look.fill) box(w - 0.1, h - 0.3, d - 0.1, 0.15, look.fill, { opacity: look.fillOpacity, name: 'caseWater' });
+    if (look.fill) box(w - 0.1, h - 0.3, d - 0.1, 0.15, look.fill, { opacity: look.fillOpacity, name: 'caseWater', deco: true });   // 물 = 반투명 한 겹 더 (사양 낮으면 뺀다)
     if (c.kind === 'terrarium') for (const lv of (c.levels ?? []).slice(1)) box(w - 0.1, 0.03, d - 0.1, lv - 0.04, look.glass, { opacity: 0.45, name: 'caseGlass' });   // 위층 유리 선반
     box(w, h - 0.1, d, 0.1, look.glass, { opacity: 0.22, name: 'caseGlass' });   // 유리
     // 위 테두리 (막대 넷 — 뚜껑으로 덮으면 위에서 보는 카메라에 안이 안 보인다) · 모서리 기둥
@@ -162,6 +175,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       const m = new THREE.Mesh(geo, deco);
       m.position.set(side * (w / 2 - 0.16), 0.3, -d / 2 + 0.2 + t * (d - 0.4));
       if (c.kind !== 'tank') m.rotation.z = side * 0.5;
+      m.userData.deco = true;
       g.add(m);
     }
     R.room.group.add(g);
@@ -291,6 +305,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     P.where = kind;
     S.place = kind;
     R.room.group.visible = true;
+    applyQuality(R);
     player.camera?.setBounds?.(cameraBox(R.origin, R.w, R.d));
     player.camera?.setCurveScale?.(CAMERA_CURVE);
     player.teleport(R.x0 + lx, R.z0 + lz, facing);
@@ -363,7 +378,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     if (R?.room) {
       const now = ctx.services.time?.now?.();
       for (const o of R.objs) o.tick(dt, now);
-      for (const o of R.shown) o.tick?.(dt, now);
+      if (ctx.quality !== 'min') for (const o of R.shown) o.tick?.(dt, now);   // 매우 낮음: 전시 물고기·곤충은 가만히
       R.room.setNight(ctx.services.time?.nightFactor ?? 0);
     }
   }

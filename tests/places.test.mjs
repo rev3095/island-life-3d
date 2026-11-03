@@ -170,3 +170,33 @@ test('저장: 상점·박물관 안 칸(house.place)이 왕복하고, 그 칸이
   assert.equal(back.house.place ?? null, null);
   assert.deepEqual(back.house.furniture, []);
 });
+
+test('사양이 낮을 때 빼는 deco 소품은 1×1 구석 소품만 — 계산대·케이스·받침·주민 방 핵심 가구는 아니다', () => {
+  const rooms = readdirSync(new URL('assets/interior/rooms/', ROOT)).map(f => json(`assets/interior/rooms/${f}`));
+  const all = [...PLACE_KINDS.map(k => specs[k]), ...rooms];
+  let n = 0;
+  for (const spec of all) for (const r of listOf(spec)) {
+    if (!r.entry.deco) continue;
+    n++;
+    const [w, d] = r.footprint;
+    assert.ok(w * d <= 1, `${spec.slug} ${r.key}: deco 는 1칸짜리만`);
+    assert.ok(r.entry.role !== 'counter' && !r.entry.fu && r.real, `${spec.slug} ${r.key}: 계산대·임시 받침은 deco 가 아님`);
+  }
+  assert.ok(n >= 3, 'deco 가 몇 개는 있다');
+  // deco 를 빼도 문 매트 → 계산대 앞 길은 그대로
+  for (const k of PLACE_KINDS) {
+    const lite = { ...specs[k], furniture: specs[k].furniture.filter(f => !f.deco) };
+    assert.deepEqual(checkPlace(lite, furn), [], `${k} (deco 뺌)`);
+  }
+});
+
+test('단풍 방 RM-07: 이사 온 단풍의 집이 빈 기본 방이 아니라 자기 방으로 열린다', () => {
+  const index = json('assets/interior/index.json');
+  const entry = index.rooms.find(r => r.owner === 'danpung');
+  assert.ok(entry, 'interior/index.json 에 단풍 방');
+  assert.equal(entry.id, 'RM-07');
+  const room = json(`assets/interior/rooms/${entry.slug}.json`);
+  assert.ok(room.furniture.length >= 8, '가구가 채워져 있다');
+  assert.ok(room.furniture.every(f => f.item && furn.models.some(m => m.item === f.item)), '모두 지금 가구 모델 (임시 상자 없음)');
+  assert.ok(room.furniture.some(f => f.item === 'furn.bookshelf') && room.furniture.some(f => f.item === 'furn.dino-model'), '수집가 방 (책장 · 공룡 모형)');
+});

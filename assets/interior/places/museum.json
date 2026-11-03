@@ -25,10 +25,10 @@
     { "fu": "FU-35", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 4, "gz": 2, "rot": 0 },
     { "fu": "FU-35", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 7, "gz": 2, "rot": 0 },
     { "fu": "FU-35", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 8, "gz": 2, "rot": 0 },
-    { "item": "furn.plant-pot", "gx": 3, "gz": 6, "rot": 0 },
-    { "item": "furn.plant-pot", "gx": 8, "gz": 6, "rot": 0 },
-    { "item": "furn.picture-frame", "wall": "n", "slot": 3 },
-    { "item": "furn.picture-frame", "wall": "n", "slot": 8 }
+    { "item": "furn.plant-pot", "gx": 3, "gz": 6, "rot": 0, "deco": true },
+    { "item": "furn.plant-pot", "gx": 8, "gz": 6, "rot": 0, "deco": true },
+    { "item": "furn.picture-frame", "wall": "n", "slot": 3, "deco": true },
+    { "item": "furn.picture-frame", "wall": "n", "slot": 8, "deco": true }
   ],
   "cases": [
     { "kind": "tank", "cat": "fish", "name": "긴 수조", "lx0": 0.12, "lz0": 0.45, "lx1": 1.5, "lz1": 6.4, "h": 1.5, "levels": [0.45, 0.95] },
