@@ -117,20 +117,25 @@ export function createCuller(ctx) {
   // ── 그림자 범위 ──
   const sun = ctx.lights?.sun;
   const ndc = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
-  const ray = new THREE.Vector3(), org = new THREE.Vector3(), lv = new THREE.Matrix4(), pt = new THREE.Vector3();
+  const ray = new THREE.Vector3(), org = new THREE.Vector3(), lv = new THREE.Matrix4(), pt = new THREE.Vector3(), fwd = new THREE.Vector3();
   const ax = new THREE.Vector3(), ay = new THREE.Vector3(), az = new THREE.Vector3();
   let rect = null, rectIn = 0;
-  /** 보이는 땅(곡면 무시, 북쪽은 SHADOW_FAR 까지)을 해 쪽에서 본 네모 (해 카메라 좌표) */
+  /** 보이는 땅(곡면 무시, 카메라가 보는 쪽(보통 북쪽)으로 SHADOW_FAR 까지)을 해 쪽에서 본 네모 (해 카메라 좌표) */
   function fitRect() {
     const f = ctx.focus;
     const pts = [];
     camera.updateMatrixWorld();
     org.setFromMatrixPosition(camera.matrixWorld);
+    // 카메라가 보는 수평 방향 (시점 조작으로 둘레를 돌면 북쪽이 아니다)
+    camera.getWorldDirection(fwd).setY(0);
+    if (fwd.lengthSq() < 1e-8) fwd.set(0, 0, -1); else fwd.normalize();
+    const of = (org.x - f.x) * fwd.x + (org.z - f.z) * fwd.z;
     for (const [x, y] of ndc) {
       ray.set(x, y, 0.5).unproject(camera).sub(org).normalize();
-      // y = 0 땅과 만나는 곳, 못 만나거나 너무 멀면 북쪽 FAR 에서 자른다
+      // y = 0 땅과 만나는 곳, 못 만나거나 너무 멀면 보는 쪽 FAR 에서 자른다 (위를 보는 모서리 = 올려다보기)
       let t = ray.y < -1e-4 ? -org.y / ray.y : Infinity;
-      if (ray.z < -1e-4) t = Math.min(t, (f.z - SHADOW_FAR - org.z) / ray.z);
+      const rf = ray.x * fwd.x + ray.z * fwd.z;
+      if (rf > 1e-4) t = Math.min(t, (SHADOW_FAR - of) / rf);
       if (!Number.isFinite(t)) t = 40;
       pt.copy(org).addScaledVector(ray, t);
       pts.push(pt.x, f.y - 0.3, pt.z, pt.x, f.y + SHADOW_TOP, pt.z);
