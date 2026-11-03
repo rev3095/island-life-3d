@@ -88,19 +88,48 @@ export default {
     const museum = createMuseum(ctx, panels, { bag, toast });
     const craft = createCraft(ctx, panels, { toast });
     const tools = createToolRing(ctx, panels);
-    // 화면 전환 막 (집·건물 드나들 때): HUD 위, 창·알림 아래
+    // 화면 전환 막 (집·건물 드나들 때): HUD 위, 창·알림 아래.
+    // shape 'circle' (실내 보드 UI-12): at = { x, y } (화면 px, 없으면 가운데) 둘레로 원이 좁아졌다가 커진다 — 구멍 하나에 큰 그림자를 둘러 덮는다
     const fadeEl = h('div', { class: 'pk-fade', 'aria-hidden': 'true' });
-    const fade = (on = true, sec = 0.3, color) => new Promise(res => {
+    const irisEl = h('div', { class: 'pk-iris', 'aria-hidden': 'true' }, h('i'));
+    const fade = (on = true, sec = 0.3, color, { shape = 'plain', at = null } = {}) => new Promise(res => {
+      const s = Math.max(0, sec), hole = irisEl.firstChild;
+      if (shape === 'circle') {
+        const r = root.getBoundingClientRect();
+        const x = at?.x ?? r.width / 2, y = at?.y ?? r.height / 2;
+        const open = `${Math.ceil(Math.hypot(Math.max(x, r.width - x), Math.max(y, r.height - y)) * 2 + 40)}px`;
+        if (color) irisEl.style.color = color;
+        hole.style.left = `${x}px`; hole.style.top = `${y}px`;
+        if (on && !irisEl.classList.contains('is-on')) {   // 다 열린 원에서 시작
+          hole.style.transitionDuration = '0s';
+          hole.style.width = hole.style.height = open;
+          irisEl.classList.add('is-on');
+          void hole.offsetWidth;
+        }
+        fadeEl.style.transitionDuration = '0s';
+        fadeEl.classList.remove('is-on');
+        hole.style.transitionTimingFunction = on ? 'cubic-bezier(.55, 0, .8, .45)' : 'cubic-bezier(.2, .55, .45, 1)';
+        hole.style.transitionDuration = `${s}s`;
+        hole.style.width = hole.style.height = on ? '0px' : open;
+        setTimeout(() => { if (!on) irisEl.classList.remove('is-on'); res(); }, s * 1000 + 30);
+        return;
+      }
+      if (irisEl.classList.contains('is-on')) {   // 원으로 닫았다가 그냥 열 때: 같은 색 막으로 바꿔 끼운다
+        fadeEl.style.transitionDuration = '0s';
+        fadeEl.classList.add('is-on');
+        irisEl.classList.remove('is-on');
+        void fadeEl.offsetWidth;
+      }
       if (color) fadeEl.style.background = color;
-      fadeEl.style.transitionDuration = `${Math.max(0, sec)}s`;
+      fadeEl.style.transitionDuration = `${s}s`;
       fadeEl.classList.toggle('is-on', !!on);
-      setTimeout(res, Math.max(0, sec) * 1000 + 30);
+      setTimeout(res, s * 1000 + 30);
     });
     dialog = createDialog(ctx, panels);
     hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), openTools: () => tools.open(), setHint: v => setSetting('keyHint', v) });
     hud.showHint(state.settings.keyHint !== false);
 
-    root.append(hud.root, captions.root, fadeEl, stackEl, toasts.root);
+    root.append(hud.root, captions.root, fadeEl, irisEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
     // 소리 신호 글자: 켜 두었을 때만 sfx 를 자막으로 (장면·창이 열려 있어도 — 소리는 그대로 나니까)
     events.on('sfx', p => { if (access.soundText) captions.show(captionFor(p)); });
@@ -172,7 +201,7 @@ export default {
       museum: { open: opts => museum.open(opts) },
       craft: { open: opts => craft.open(opts) },   // 작업대 창 → Promise<만든 레시피 id 들>
       tools: { open: () => tools.open() },         // 도구 고르기 고리 → Promise<{tool} | null>
-      fade,                                        // fade(on, 초, 색?) → Promise (화면 전환 막)
+      fade,                                        // fade(on, 초, 색?, { shape: 'plain'|'circle', at: {x, y} }?) → Promise (화면 전환 막)
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
       panel: (name, root, opts) => panels.open(name, root, opts),   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)

@@ -26,6 +26,7 @@ export const WEB_FILES = [
   'assets/interior/specs/fl-07.json', 'assets/interior/specs/fl-08.json', 'assets/interior/specs/frame.json',
   'assets/interior/rooms/rm-01.json', 'assets/interior/rooms/rm-02.json', 'assets/interior/rooms/rm-03.json',
   'assets/interior/rooms/rm-04.json', 'assets/interior/rooms/rm-05.json', 'assets/interior/rooms/rm-06.json',
+  'assets/interior/rooms/rm-07.json',
 ];
 
 /** 팔레트 키 또는 #색 → #색 (모르면 null) */

@@ -50,6 +50,10 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon, img.pk-dex-icon { w
 /* 화면 전환 막 (ui.fade) */
 .pk-fade { position: absolute; inset: 0; z-index: 1; background: #2E2420; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
 .pk-fade.is-on { opacity: 1; }
+/* 원형 화면 전환 (실내 보드 UI-12): 구멍(i) 둘레를 큰 그림자로 덮고, 구멍 크기를 줄였다 늘린다. 색 = color */
+.pk-iris { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; visibility: hidden; color: #2E2420; }
+.pk-iris.is-on { visibility: visible; }
+.pk-iris i { position: absolute; left: 50%; top: 50%; width: 0; height: 0; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 200vmax currentColor; transition-property: width, height; }
 
 /* ---------- HUD ---------- */
 .pk-hud { position: absolute; inset: 0; pointer-events: none; }
@@ -493,6 +497,7 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
 @keyframes pk-toast-out { to { opacity: 0; transform: translateY(-8px); } }
 /* 흔들림 줄이기: <html class="pk-calm"> — 섬폰에서 정하지 않으면 기기 설정(prefers-reduced-motion)을 따른다 (ui/access.js) */
 .pk-calm .pk-root *, .pk-calm .pk-root *::before, .pk-calm .pk-root *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+.pk-calm .pk-root .pk-fade { transition: opacity .25s ease !important; }   /* 화면 전환 막은 움직임이 아니라 그대로 서서히 (실내 보드 D67 흔들림 줄이기) */
 
 /* 그래픽 사양 (매우 낮음 · 낮음 · 적정 · 높음) — 네 칸이라 글자를 조금 작게, 줄바꿈 없이 */
 .pk-seg-spec { gap: 4px; }

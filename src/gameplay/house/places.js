@@ -1,0 +1,406 @@
+// 도토리상점·박물관 실내 (실내 검수 보드 interiors — RM-08 상점 D69-A · RM-09 박물관 D70-A · 기증품 D71-A).
+//  - 방 배치는 assets/interior/places/<shop|museum>.json (모양은 placedata.js 맨 위). 상점 x = 580, 박물관 x = 620 (room.js PLACE_ROOMS).
+//  - 들어가기는 town 이 정한다: 문 앞 행동 키(town:shop · town:museum, 우선순위 90)가 영업 중이면 house.places.enter(kind). 문 쪽으로 밀기는 여기서 하되
+//    town.placeRule(kind) 이 'open' 일 때만. 나가기는 문 매트에서 행동 키(90) 또는 아래로 밀기. 드나드는 동작은 door.js (내 집·주민 집과 같다).
+//  - 상점: 진열 받침·진열대에 오늘의 물건(economy.stockGroups — 가구 2 · 도구 · 꽃씨 · 묘목)을 진짜 모델로. 날마다 들어갈 때 다시 놓는다.
+//  - 박물관: 긴 수조(물고기)·곤충 유리 상자·화석 받침. 아이템 표 순서로 자리가 정해져 있고, 기증한 것만 그 자리에 아이템 모델(assets/items)이 놓인다.
+//  - 사양(ctx.quality)이 낮음·매우 낮음이면 배치의 deco 소품·수조 물·물풀 장식을 숨기고, 매우 낮음이면 전시 물고기가 움직이지 않는다 (그림자·외곽선은 render 가 사양대로 끈다).
+//  - 주인(밤톨·느루)을 계산대·안내대 뒤에 세우는 일은 town 이 한다 (keepers.js 가 info(kind).keeper 를 본다). 들고 날 때 place:enter / place:leave { place }.
+// 상태: state.house.place = 실내에서 저장했으면 'shop'|'museum' (이어하기).
+import { boxOf, moveCircle, inBox } from './grid.js';
+import { PLACE_ROOMS, buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } from './room.js';
+import { resolveFurniture, FACE, DEFAULT } from './interior.js';
+import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
+
+const PUSH_TIME = 0.2;
+const WALL_Y = 1.15;                    // 임시 벽 가구 아래 끝 높이 (visit.js 와 같다)
+const ITEM_INDEX = 'assets/items/index.json';
+const EXHIBIT_MAX = { fish: 0.8, bug: 0.42, fossil: 0.58 };   // 전시 모델 가장 긴 변 (m) — 작으면 1.8배까지 키우고 넘으면 줄인다
+const CASE_LOOK = {
+  tank: { glass: '#CDEBF5', fill: '#7EC3DD', fillOpacity: 0.32, floor: '#E9D7A8', frame: '#7A5A3E' },
+  terrarium: { glass: '#DDEFE4', fill: null, floor: '#9CCB7A', soil: '#8B6B4A', frame: '#7A5A3E' },
+};
+
+export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSoon }) {
+  const { THREE, scene, events, state, materials } = ctx;
+  const world = ctx.services.world, player = ctx.services.player;
+  const S = state.house;
+  const P = { where: null, busy: false, pushT: 0, pushOutT: 0, clock: 0 };
+  const rooms = {};
+  /** 사양 낮음·매우 낮음: 작은 장식은 뺀다 */
+  const light = () => ctx.quality === 'low' || ctx.quality === 'min';
+  function applyQuality(R) {
+    const lite = light();
+    for (const o of R.objs) if (o.deco) o.root.visible = !lite;
+    for (const c of R.cases) c.group.traverse(m => { if (m.userData.deco) m.visible = !lite; });
+  }
+  events.on('quality:changed', () => { for (const R of Object.values(rooms)) if (R.room) applyQuality(R); });
+
+  await Promise.all(PLACE_KINDS.map(async (kind, i) => {
+    try { rooms[kind] = makePlace(kind, await ctx.assets.loadJSON(PLACE_FILES[i])); }
+    catch (e) { console.warn('[house] 실내 배치를 못 읽었어요', kind, e); }
+  }));
+
+  /** 방 하나의 자리·충돌 (짓기는 처음 들어갈 때) */
+  function makePlace(kind, spec) {
+    const origin = PLACE_ROOMS[kind], [w, d] = sizeOf(spec);
+    const corner = cornerOf(origin, w, d);
+    const list = (spec.furniture ?? []).map((e, i) => resolveFurniture(e, { models: kit.list }, i));
+    const R = { kind, spec, origin, w, d, corner, x0: corner.x0, z0: corner.z0, list, room: null, ready: null, objs: [], shown: [], shownKey: null, cases: [] };
+    // 사양이 낮아 deco 소품을 숨기면 충돌에서도 뺀다 (보이지 않는 것에 부딪히지 않게)
+    const all = blockersOf(spec, list), lite = blockersOf(spec, list.filter(r => !r.entry.deco)), bounds = boundsOf(spec);
+    const blockers = () => (light() ? lite : all);
+    const local = (x, z) => ({ lx: x - R.x0, lz: z - R.z0 });
+    const onRug = (lx, lz) => list.some(r => r.layer === 'rug' && inBox(boxOf(r.rec, r.footprint), lx, lz, -0.1));
+    world.addZone({
+      contains: (x, z) => Math.abs(x - origin.x) < w && Math.abs(z - origin.z) < d,
+      collide(fx, fz, nx, nz, r) {
+        const p = moveCircle(blockers(), bounds, fx - R.x0, fz - R.z0, nx - R.x0, nz - R.z0, r ?? 0.26);
+        return { x: p.x + R.x0, z: p.z + R.z0 };
+      },
+      heightAt: (x, z) => { const { lx, lz } = local(x, z); return onRug(lx, lz) ? 0.03 : 0; },
+      groundAt: () => R.room?.floor?.step ?? 'wood',
+      isWalkable(x, z) {
+        const { lx, lz } = local(x, z);
+        if (lx < bounds.x0 || lz < bounds.z0 || lx > bounds.x1 || lz > bounds.z1) return false;
+        return !blockers().some(b => inBox(b, lx, lz));
+      },
+    });
+    return R;
+  }
+
+  // ── 행동 키: 문 매트에서 나가기, 실내에선 도구를 쓰지 않는다 (주민 방과 같은 자리 20) ──
+  const I = ctx.services.gameplay.interactions;
+  const free = () => !P.busy && !H.busy && !doors.busy;
+  I.add({ name: 'house-place-out', intent: 'action', priority: 90, label: '나가기', test: () => (free() && P.where && onDoormat() ? true : null), run: () => leave() });
+  I.add({ name: 'house-place-idle', intent: 'action', priority: 20, label: '', test: () => (P.where ? true : null), run: () => {} });
+
+  function onDoormat(margin = 0.85) {
+    const R = rooms[P.where];
+    if (!R) return false;
+    const m = doormatOf(R.spec), p = player.position;
+    return Math.abs(p.x - (R.x0 + m.lx)) < 0.75 && p.z - R.z0 > R.d - margin;
+  }
+
+  // ── 짓기: 방·가구·케이스 ──
+  function build(R) {
+    if (R.ready) return R.ready;
+    const sp = interior.specs;
+    R.room = buildRoom(ctx, {
+      origin: R.origin, size: [R.w, R.d], windows: R.spec.windows ?? [], door: doorOf(R.spec), name: `place-${R.kind}`,
+      wallpaper: sp.get(R.spec.wallpaper) ?? sp.get(DEFAULT.wallpaper), floor: sp.get(R.spec.floor) ?? sp.get(DEFAULT.floor), frame: interior.frame,
+    });
+    R.room.group.visible = false;
+    scene.add(R.room.group);
+    for (const c of R.spec.cases ?? []) R.cases.push(buildCase(R, c));
+    R.ready = Promise.all(R.list.map(async r => {
+      try { return r.real ? await realPiece(R, r) : placeholder(R, r); }
+      catch (e) { console.warn('[house] 실내 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(R, r); }
+    })).then(objs => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); applyQuality(R); });
+    return R.ready;
+  }
+  function poseRoot(R, root, r) {
+    if (Array.isArray(r.entry.scale)) root.scale.set(...r.entry.scale);   // 계산대: 주인 키(0.8)에 맞춰 낮춘다
+    if (r.rec.wall) {
+      const m = wallMount(r.rec.wall, r.rec.slot, R.corner);
+      root.position.set(m.x, 0, m.z);
+      root.rotation.y = m.rotY;
+    } else {
+      const b = boxOf(r.rec, r.footprint);
+      root.position.set(R.x0 + b.cx, 0, R.z0 + b.cz);
+      root.rotation.y = r.rec.rot * Math.PI / 2;
+    }
+  }
+  async function realPiece(R, r) {
+    const obj = await kit.make(r.item, { variant: r.entry.variant ?? null });
+    poseRoot(R, obj.root, r);
+    obj.deco = !!r.entry.deco;
+    return obj;
+  }
+  /** 모델이 아직 없는 가구 (FU-35 받침 등): box [가로, 깊이, 높이] 색 상자 — visit.js 와 같은 모양 */
+  function placeholder(R, r) {
+    const [bw0, bd0, bh] = Array.isArray(r.entry.box) ? r.entry.box : [r.footprint[0], r.footprint[1], 0.8];
+    const [bw, bd] = Array.isArray(r.entry.look) ? r.entry.look : [bw0, bd0];   // look = 보이는 가로·깊이 (발자국 box 보다 가늘게 — 화석 받침)
+    const root = new THREE.Group();
+    root.name = `placeholder:${r.fu ?? r.key}`;
+    root.userData.placeholder = r.fu ?? r.key;
+    const mat = materials.toonMaterial(r.entry.color ?? '#C9B79C', { name: 'placeholder' });
+    const w = r.rec.wall ? bw : bw * 0.92, d = r.rec.wall ? bd : bd * 0.92;
+    const geo = new THREE.BoxGeometry(w, bh, d);
+    geo.translate(0, (r.rec.wall ? WALL_Y : 0) + bh / 2, r.rec.wall ? d / 2 : 0);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = mesh.receiveShadow = true;
+    root.add(mesh);
+    poseRoot(R, root, r);
+    return { root, deco: !!r.entry.deco, tick() {}, dispose() { root.removeFromParent(); geo.dispose(); mat.dispose(); } };
+  }
+
+  /** 긴 수조·곤충 유리 상자: 받침 + 바닥(모래·풀) + 물 + 유리 + 테두리 (모델이 생기기 전 FU-35 같은 임시 모양) */
+  function buildCase(R, c) {
+    const look = CASE_LOOK[c.kind] ?? CASE_LOOK.tank;
+    const g = new THREE.Group();
+    g.name = `case:${c.cat}`;
+    const w = c.lx1 - c.lx0, d = c.lz1 - c.lz0, h = c.h ?? 1.5;
+    g.position.set(R.x0 + (c.lx0 + c.lx1) / 2, 0, R.z0 + (c.lz0 + c.lz1) / 2);
+    const mats = [];
+    const box = (bw, bh, bd, y, color, { opacity = 1, name = 'caseFrame', shadow = true, x = 0, z = 0, deco = false } = {}) => {
+      const m = materials.toonMaterial(color, { name });
+      if (opacity < 1) { m.transparent = true; m.opacity = opacity; m.depthWrite = false; }
+      mats.push(m);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), m);
+      mesh.position.set(x, y + bh / 2, z);
+      mesh.castShadow = shadow && opacity >= 1;
+      mesh.receiveShadow = true;
+      if (opacity < 1) mesh.renderOrder = 2;
+      mesh.userData.deco = deco;
+      g.add(mesh);
+      return mesh;
+    };
+    box(w, 0.1, d, 0, look.frame);                                                // 받침
+    if (look.soil) box(w - 0.08, 0.06, d - 0.08, 0.1, look.soil);
+    box(w - 0.08, 0.05, d - 0.08, look.soil ? 0.16 : 0.1, look.floor);            // 모래·풀
+    if (look.fill) box(w - 0.1, h - 0.3, d - 0.1, 0.15, look.fill, { opacity: look.fillOpacity, name: 'caseWater', deco: true });   // 물 = 반투명 한 겹 더 (사양 낮으면 뺀다)
+    if (c.kind === 'terrarium') for (const lv of (c.levels ?? []).slice(1)) box(w - 0.1, 0.03, d - 0.1, lv - 0.04, look.glass, { opacity: 0.45, name: 'caseGlass' });   // 위층 유리 선반
+    box(w, h - 0.1, d, 0.1, look.glass, { opacity: 0.22, name: 'caseGlass' });   // 유리
+    // 위 테두리 (막대 넷 — 뚜껑으로 덮으면 위에서 보는 카메라에 안이 안 보인다) · 모서리 기둥
+    for (const sz of [-1, 1]) box(w + 0.04, 0.06, 0.06, h, look.frame, { z: sz * (d / 2) });
+    for (const sx of [-1, 1]) box(0.06, 0.06, d + 0.04, h, look.frame, { x: sx * (w / 2) });
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(0.05, h - 0.1, 0.05, 0.1, look.frame, { x: sx * (w / 2), z: sz * (d / 2) });
+    // 물풀·잔가지 몇 개 (자리 표시 — 늘 같다)
+    const deco = materials.toonMaterial(c.kind === 'tank' ? '#5FA36B' : '#8A6A4A', { name: 'caseDeco' });
+    mats.push(deco);
+    for (let i = 0; i < 6; i++) {
+      const t = (i + 0.5) / 6, side = i % 2 ? 1 : -1;
+      const geo = c.kind === 'tank' ? new THREE.ConeGeometry(0.05, 0.32 + (i % 3) * 0.1, 5) : new THREE.CylinderGeometry(0.018, 0.024, 0.5, 5);
+      const m = new THREE.Mesh(geo, deco);
+      m.position.set(side * (w / 2 - 0.16), 0.3, -d / 2 + 0.2 + t * (d - 0.4));
+      if (c.kind !== 'tank') m.rotation.z = side * 0.5;
+      m.userData.deco = true;
+      g.add(m);
+    }
+    R.room.group.add(g);
+    return { group: g, dispose() { g.traverse(o => o.geometry?.dispose()); mats.forEach(m => m.dispose()); g.removeFromParent(); } };
+  }
+
+  // ── 진열·전시 (들어갈 때마다 맞춘다) ──
+  let itemIndex = null;
+  const templates = new Map();
+  const loadItemIndex = () => (itemIndex ??= ctx.assets.loadJSON(ITEM_INDEX)
+    .then(j => new Map(j.models.flatMap(m => m.items.map(x => [x.item, m]))))
+    .catch(() => { itemIndex = null; return new Map(); }));
+  /** 아이템 id → 모델 사본 (손에 들어 보이는 모델과 같은 assets/items) | null */
+  async function itemModel(id) {
+    const m = (await loadItemIndex()).get(id);
+    if (!m) return null;
+    if (!templates.has(m.slug)) {
+      const job = ctx.assets.loadModel(`assets/items/models/${m.slug}`).then(gltf => {
+        const { scene: model } = ctx.assets.instantiate(gltf);
+        materials.applyToonStyle(model, { spec: { style: m.style ?? {} } });
+        model.name = `item:${m.slug}`;
+        const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+        return { model, size };
+      });
+      job.catch(() => templates.delete(m.slug));
+      templates.set(m.slug, job);
+    }
+    try { const t = await templates.get(m.slug); return { root: t.model.clone(), size: t.size }; } catch { return null; }
+  }
+  function clearShown(R) {
+    for (const o of R.shown) o.dispose();
+    R.shown = [];
+  }
+  /** 지금 보여 줄 것의 열쇠 (같으면 다시 놓지 않는다) */
+  function shownKey(R) {
+    if (R.kind === 'shop') return `shop:${JSON.stringify(ctx.services.data?.economy?.stockGroups?.() ?? {})}`;
+    const mu = ctx.services.data?.museum;
+    return `museum:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).length).join(',')}:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).join('|')).join('/')}`;
+  }
+  async function refresh(R) {
+    const key = shownKey(R);
+    if (key === R.shownKey) return;
+    R.shownKey = key;
+    clearShown(R);
+    const jobs = R.kind === 'shop' ? stockJobs(R) : exhibitJobs(R);
+    const made = (await Promise.all(jobs)).filter(Boolean);
+    if (R.shownKey !== key) { made.forEach(o => o.dispose()); return; }   // 그 사이 또 바뀌었다
+    R.shown = made;
+    for (const o of made) R.room.group.add(o.root);
+  }
+  function stockJobs(R) {
+    const groups = ctx.services.data?.economy?.stockGroups?.() ?? {};
+    return stockPlan(R.spec, groups).map(async s => {
+      try {
+        if (s.group === 'furniture' && kit.info(s.id)) {
+          const obj = await kit.make(s.id);
+          const fp = kit.info(s.id).footprint ?? [1, 1];
+          obj.root.scale.setScalar(Math.min(1, (s.fit ?? 2) / Math.max(...fp)));
+          obj.root.position.set(R.x0 + s.lx, s.y, R.z0 + s.lz);
+          return obj;
+        }
+        const m = await itemModel(s.id);
+        if (!m) return null;
+        m.root.position.set(R.x0 + s.lx, s.y, R.z0 + s.lz);
+        return { root: m.root, tick() {}, dispose() { m.root.removeFromParent(); } };
+      } catch (e) { console.warn('[house] 진열 물건을 못 놓았어요', s.id, e); return null; }
+    });
+  }
+  function exhibitJobs(R) {
+    const data = ctx.services.data, mu = data?.museum;
+    const lists = Object.fromEntries(MUSEUM_CATS.map(c => [c, (data?.items?.list?.(c) ?? []).map(it => it.id)]));
+    return exhibitPlan(R.spec, lists, id => !!mu?.has?.(id)).filter(e => e.donated).map(async (e, i) => {
+      const m = await itemModel(e.id);
+      if (!m) return null;
+      const k = Math.min(1.8, EXHIBIT_MAX[e.cat] / Math.max(m.size.x, m.size.y, m.size.z, 0.01));
+      m.root.scale.setScalar(k);
+      const x = R.x0 + e.lx, z = R.z0 + e.lz;
+      m.root.position.set(x, e.y, z);
+      // 물고기는 옆모습이 보이게 (머리가 동서로), 곤충·화석은 앞(남쪽)을 본다
+      const turn = e.cat === 'fish' ? (i % 2 ? Math.PI / 2 : -Math.PI / 2) : (i % 3 - 1) * 0.25;
+      m.root.rotation.y = turn;
+      const phase = i * 1.7;
+      return {
+        root: m.root, cat: e.cat,
+        tick() {
+          const t = P.clock;
+          if (e.cat === 'fish') { m.root.position.y = e.y + Math.sin(t * 1.3 + phase) * 0.04; m.root.rotation.y = turn + Math.sin(t * 0.8 + phase) * 0.18; }
+          else if (e.cat === 'bug') m.root.rotation.y = turn + Math.sin(t * 0.6 + phase) * 0.1;
+        },
+        dispose() { m.root.removeFromParent(); },
+      };
+    });
+  }
+  // 박물관 안에서 기증하면 바로 전시 (창이 닫히면 보인다)
+  events.on('museum:changed', () => { const R = rooms.museum; if (R?.room && P.where === 'museum') refresh(R); });
+
+  // ── 드나들기 ──
+  const roomDoor = R => { const m = doormatOf(R.spec); return { x: R.x0 + m.lx, front: R.z0 + m.front, entry: R.z0 + m.entry }; };
+  const keeperSpot = R => { const k = R.spec.keeper; return k ? { x: R.x0 + k.lx, z: R.z0 + k.lz, facing: FACE[k.face] ?? Math.PI } : null; };
+  const roomBox = R => ({ x0: R.x0, z0: R.z0, x1: R.x0 + R.w, z1: R.z0 + R.d });
+
+  async function enter(kind) {
+    const R = rooms[kind];
+    if (!R || P.where || !free() || H.inside || H.visits?.where) return false;
+    P.busy = H.busy = true;
+    try {
+      await build(R);
+      await refresh(R);
+      await doors.through({ dir: 'in', place: world.places?.[kind], kind: PLACE_BUILDING[kind], room: roomDoor(R),
+        arrive: s => goIn(kind, { lx: s.x - R.x0, lz: s.z - R.z0, facing: s.facing }) });
+    } finally { P.busy = H.busy = false; }
+    return true;
+  }
+
+  async function leave() {
+    const R = rooms[P.where];
+    if (!R || !free()) return false;
+    P.busy = H.busy = true;
+    try {
+      await doors.through({ dir: 'out', place: world.places?.[R.kind], kind: PLACE_BUILDING[R.kind], room: roomDoor(R), arrive: s => goOut({ spot: s }) });
+    } finally { P.busy = H.busy = false; }
+    return true;
+  }
+
+  function goIn(kind, { lx, lz, facing }) {
+    const R = rooms[kind];
+    P.where = kind;
+    S.place = kind;
+    R.room.group.visible = true;
+    applyQuality(R);
+    player.camera?.setBounds?.(cameraBox(R.origin, R.w, R.d));
+    player.camera?.setCurveScale?.(CAMERA_CURVE);
+    player.teleport(R.x0 + lx, R.z0 + lz, facing);
+    ctx.services.time?.setIndoor?.(true);
+    ctx.services.audio?.bgm?.(kind);
+    const k = keeperSpot(R);
+    events.emit('place:enter', { place: kind, name: R.spec.name ?? '', keeper: k, room: roomBox(R) });
+    saveSoon(0.5);
+  }
+
+  /** quiet: 저장 불러오기 등으로 밖에 나와 있을 때 (자리를 옮기지 않는다). spot = 섬에 설 곳 (door.js — 문간) */
+  function goOut({ quiet = false, spot = null } = {}) {
+    const kind = P.where, R = rooms[kind];
+    P.where = null;
+    S.place = null;
+    player.camera?.setBounds?.(null);   // 범위를 먼저 풀어야 순간이동 때 카메라가 바로 섬으로 온다
+    player.camera?.setCurveScale?.(1);
+    if (!quiet) {
+      const d = world.places?.[kind]?.door ?? world.places?.spawn ?? { x: 0, z: 0 };
+      const s = spot ?? { x: d.x, z: d.z + 0.15, facing: Math.PI };
+      player.teleport(s.x, s.z, s.facing ?? Math.PI);
+    }
+    if (R?.room) R.room.group.visible = false;
+    ctx.services.time?.setIndoor?.(false);
+    ctx.services.audio?.bgm?.('auto');
+    events.emit('place:leave', { place: kind });
+    saveSoon(0.5);
+  }
+
+  /** 저장에서 이어하기: 실내에서 끝냈으면 다시 그 안에 (서 있던 자리가 걸을 수 없으면 문 매트) */
+  async function resume(kind) {
+    const R = rooms[kind];
+    if (!R) { S.place = null; return; }
+    await build(R);
+    await refresh(R);
+    const p = state.player, lx = p.x - R.x0, lz = p.z - R.z0;
+    const B = boundsOf(R.spec), m = doormatOf(R.spec);
+    const ok = Number.isFinite(lx) && lx > B.x0 && lx < B.x1 && lz > B.z0 && lz < B.z1 && blockersOf(R.spec, R.list).every(b => !inBox(b, lx, lz));
+    goIn(kind, ok ? { lx, lz, facing: p.facing ?? 0 } : { lx: m.lx, lz: m.entry, facing: 0 });
+  }
+
+  function update(dt) {
+    P.clock += dt;
+    const input = ctx.input;
+    const blocked = ctx.services.ui?.isBlocking?.() || input.enabled === false;
+    const R = rooms[P.where];
+    // 저장 불러오기·처음부터 하기로 플레이어가 방 밖에 옮겨졌으면 조용히 나온다
+    if (R && free()) {
+      const p = player.position;
+      if (Math.abs(p.x - R.origin.x) > R.w || Math.abs(p.z - R.origin.z) > R.d) goOut({ quiet: true });
+    }
+    if (S.place !== P.where && !P.busy) S.place = P.where ?? null;
+    if (free() && !blocked && !H.moving && !H.inside && !H.visits?.where) {
+      const p = player.position;
+      if (!P.where) {
+        // 문 쪽으로 밀어서 들어가기 (town 이 연 곳만 — 상점은 영업시간)
+        let hit = null;
+        for (const kind of PLACE_KINDS) {
+          const d = world.places?.[kind]?.door;
+          if (d && rooms[kind] && Math.abs(p.x - d.x) < 0.45 && p.z < d.z - 0.2 && p.z > d.z - 1.0) hit = kind;
+        }
+        const open = hit && (ctx.services.town?.placeRule?.(hit) ?? 'open') === 'open';
+        P.pushT = open && input.move.z < -0.5 ? P.pushT + dt : 0;
+        if (P.pushT > PUSH_TIME) { P.pushT = 0; enter(hit); }
+      } else {
+        P.pushOutT = onDoormat(0.5) && input.move.z > 0.5 ? P.pushOutT + dt : 0;
+        if (P.pushOutT > PUSH_TIME) { P.pushOutT = 0; leave(); }
+      }
+    }
+    if (R?.room) {
+      const now = ctx.services.time?.now?.();
+      for (const o of R.objs) o.tick(dt, now);
+      if (ctx.quality !== 'min') for (const o of R.shown) o.tick?.(dt, now);   // 매우 낮음: 전시 물고기·곤충은 가만히
+      R.room.setNight(ctx.services.time?.nightFactor ?? 0);
+    }
+  }
+
+  const api = {
+    enter, leave,
+    get where() { return P.where; },
+    /** 실내 자리 (월드): keeper 주인이 설 곳 { x, z, facing } · talk 말 거는 곳 { x, z } · doormat · room 범위. 방 배치가 없으면 null */
+    info(kind) {
+      const R = rooms[kind];
+      if (!R) return null;
+      const t = R.spec.talk, m = doormatOf(R.spec);
+      return { keeper: keeperSpot(R), keeperSlug: R.spec.keeper?.slug ?? null, talk: t ? { x: R.x0 + t.lx, z: R.z0 + t.lz } : null, doormat: { x: R.x0 + m.lx, z: R.z0 + m.lz }, room: roomBox(R), name: R.spec.name ?? '' };
+    },
+    /** 개발용: 지금 진열·전시된 것 수, 임시 상자 */
+    shown: kind => (rooms[kind]?.shown ?? []).length,
+    placeholders: kind => (rooms[kind]?.list ?? []).filter(r => !r.real).map(r => r.fu ?? r.key),
+  };
+
+  return {
+    get where() { return P.where; },
+    enter, leave, resume, update, api,
+    doormat: () => (P.where ? api.info(P.where).doormat : null),
+  };
+}

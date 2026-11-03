@@ -359,6 +359,35 @@ stats() → { ms, passes }
 - 셰이더를 덧씌울 때: `#include <begin_vertex>` 표시를 지우지 않는다. uniform 이름 `uTime` 은 world 가 쓰므로 스타일은 `uStyleTime`.
 - 새 `ShaderMaterial` 은 화면 색(sRGB)을 그대로 내보내도 render 가 화면 효과 때 선형으로 바꿔 준다. 직접 맞추려면 sky 처럼 `linearToOutputTexel( vec4( sRGBTransferEOTF( vec4(c, 1.0) ).rgb, a ) )`.
 
+## 실내 검수 보드 interiors (p12-interiors)에서 추가된 약속 (2026-11-04)
+
+배경: `docs/notes/p12-interiors.md`, 보드 https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh (D67–D73). 위 내용과 다르면 이 절이 우선한다.
+
+### 문 드나들기 (house — `src/gameplay/house/door.js`)
+- 내 집·주민 집·상점·박물관이 같은 `doors.through({ dir: 'in'|'out', place, kind, variant, room: { x, front, entry }, arrive(spot) })` 를 쓴다. 들어갈 때: 문짝이 안으로 열림(문 소리) → 문간까지 걸음 → 원이 좁아짐 → `arrive` (실내로 옮기기) → 원이 열리며 한두 걸음. 나올 때 거꾸로, 섬에 나와서 문이 닫힌다. 흔들림 줄이기(`ui.access.calm`)면 걷기·문 동작 없이 문 소리 + 전체 페이드.
+- 지나가는 동안: 플레이어 `freeze`, 가림 투명(`world.occlusion.enabled`) 끔, 행동 키는 `house-door-busy`(우선순위 **300**)가 삼킨다. `ctx.services.house.passing` 이 참.
+- 문짝은 섬 건물 모델(`assets/env` 의 `door` 재질 부분) 크기 그대로 덧씌운 판이다 — 건물 모델을 바꿀 때 `door` 재질 이름을 지킨다 (`tests/places.test.mjs`).
+
+### player
+- `player.walkTo(x, z, { speed = 걷기×0.8, face = true }) → Promise<bool>` — 연출 걷기: 충돌 없이 곧장, 걷기 동작·발소리·높이 따라가기는 그대로, 입력은 받지 않는다(얼어 있어도 걷는다). 도착하면 true, `teleport`·다른 `walkTo` 로 끊기면 false. `player.walking`.
+
+### ui
+- `ui.fade(on, sec, color?, { shape: 'plain'|'circle', at: { x, y } }?)` — `'circle'` 은 화면 점 `at`(px) 둘레로 원이 좁아졌다(on) 커진다(off) (UI-12). 흔들림 줄이기여도 화면 전환 막(`.pk-fade`)은 서서히 바뀐다.
+
+### house 추가
+- `house.where` 에 `'shop'`·`'museum'` 이 더해진다. `house.doormat()` → 지금 방 문 매트 `{ x, z }` | null (QA 봇·편집기용), `house.passing`.
+- `house.places = { enter(kind), leave(), where, info(kind) → { keeper: { x, z, facing }, keeperSlug, talk: { x, z }, doormat, room, name } | null, shown(kind), placeholders(kind) }` — 상점·박물관 실내 (`places.js`). 방 자리 상점 x = 580, 박물관 x = 620 (`room.js` `PLACE_ROOMS`).
+- 이벤트 `place:enter { place, name, keeper, room }` · `place:leave { place }` — 상점·박물관은 `house:enter` 를 쓰지 않는다 (첫날 할 일 '집 들어가기'·주민 방 주인 세우기와 섞이지 않게).
+- 상태 `state.house.place` = 실내에서 저장했으면 `'shop'|'museum'` (없거나 null 이면 밖). 예전 저장은 그대로 열린다.
+- 행동 키: 실내 문 매트 나가기 `house-place-out` **90**, 실내에선 도구를 쓰지 않음 `house-place-idle` **20**.
+- `room.js`: `buildRoom(ctx, { size: [가로, 깊이], windows, door: { gx0, gx1 }, name })`, `cameraBox(origin, w, d)`, `cornerOf(origin, w, d)` (→ `{ x0, z0, w, d }`, `wallMount` 가 `w` 로 동쪽 벽을 잡는다). 8×8 방은 예전 값 그대로.
+- 방 배치 `assets/interior/places/<shop|museum>.json` (RM-08 · RM-09) — 주민 방 모양 + `size`·`windows`·`door`·`keeper`·`talk`·`furniture[].role 'counter'`·`scale`·`look`, 상점 `stock`, 박물관 `cases`·`fossils`. 검사 `checkPlace` (`placedata.js`).
+- 방 배치 가구 `deco: true` (주민 방·상점·박물관 공통) = 1칸짜리 구석 소품. 사양(`ctx.quality`) 낮음·매우 낮음이면 숨기고 충돌에서도 뺀다. 단풍 방 RM-07 = `assets/interior/rooms/rm-07.json`.
+
+### town 추가
+- `town.placeRule(kind)` → `'open'` | `'closed'` | null (첫날 안내 전) — house.places 가 문 쪽으로 밀 때 묻는다. 상점은 영업시간(`economy.isOpen`)에만 open, 박물관은 늘 open.
+- 실내가 있으면(`house.places`) 밤톨·느루는 영업시간엔 계산대·안내대 뒤(mode `'desk'`), 문 앞 행동 키 `town:shop`·`town:museum`(90) = 들어가기(글자 '들어가기'), 실내 계산대 앞 같은 처리기 = 지금의 인사·창(D73-A). 첫날 축하처럼 밖에서 할 일이 있으면 문 옆으로 나왔다가 멀어지면 다시 들어간다. 실내가 없으면 예전처럼 문 옆 밖.
+
 ## 리소스 교체 약속 (2026-10-29, 61종 임시 확정 뒤)
 
 모델은 편집기 요청으로 언제든 다시 만들어 바꿔 끼운다. 게임 코드를 고치지 않고 바꿀 수 있게, 요소마다 필요한 값은 그 요소의 스펙 JSON 하나에 둔다. `tests/assets.test.mjs` 가 아래 약속을 검사한다.

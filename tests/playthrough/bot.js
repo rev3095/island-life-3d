@@ -127,7 +127,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
   bot.settle = async (timeout = 60, quietFor = 0.6) => {
     let calm = 0;
     return bot.until(() => {
-      const busy = bot.blocking() || bot.storyOn() || (S().story?.queue?.length ?? 0) > 0 || !!S().gather?.busy || !!S().player?.acting || ctx.input.enabled === false;
+      const busy = bot.blocking() || bot.storyOn() || (S().story?.queue?.length ?? 0) > 0 || !!S().gather?.busy || !!S().player?.acting || ctx.input.enabled === false
+        || !!S().house?.passing;   // 문 드나드는 중 (실내 보드 — 문 열기·걷기·원형 전환)
       calm = busy ? 0 : calm + bot.dt;
       return calm >= quietFor;
     }, { timeout, label: '조용해지기' });
@@ -327,7 +328,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
   bot.pos = () => ({ x: player().position.x, z: player().position.z });
   bot.dist = (a, b = bot.pos()) => Math.hypot(a.x - b.x, a.z - b.z);
   const tileOf = p => world().island.toTile(p.x, p.z);
-  const inZone = () => Math.abs(player().position.x) > 100;   // 집·주민 방 (섬 밖 좌표)
+  const inZone = () => Math.abs(player().position.x) > 100;   // 집·주민 방·상점·박물관 실내 (섬 밖 좌표)
 
   /** 가까운 걸을 수 있는 칸 (목표 칸이 막혀 있으면 둘레에서) */
   function walkableNear(p, maxR = 3) {
@@ -430,13 +431,14 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     return true;
   };
   /**
-   * 집·주민 방에서 나오기: 문 매트(방 남쪽 가운데, 판정 띠가 좁다 z > 3.15)로 가서 문 쪽(남쪽)으로 민다 — 사람이 문으로 걸어 나가듯.
-   * 안 되면 남쪽을 보고 행동 키. 내 집 x 500 · 주민 방 x 540 (방 8×8, 가운데 z 0)
+   * 집·주민 방·상점·박물관에서 나오기: 문 매트(방 남쪽 가운데, 판정 띠가 좁다)로 가서 문 쪽(남쪽)으로 민다 — 사람이 문으로 걸어 나가듯.
+   * 안 되면 남쪽을 보고 행동 키. 문 매트 자리는 house.doormat() (없는 예전 게임이면 내 집 x 500 · 주민 방 x 540, 방 8×8 의 z 3.35)
    */
   bot.exitRoom = async () => {
     if (!inZone()) return true;
-    const cx = Math.abs(bot.pos().x - 540) < 10 ? 540 : 500;
-    await bot.walkLocal({ x: cx, z: 3.35 }, { near: 0.12, label: '문 매트' });
+    const mat = S().house?.doormat?.();
+    const cx = mat?.x ?? (Math.abs(bot.pos().x - 540) < 10 ? 540 : 500);
+    await bot.walkLocal({ x: cx, z: mat?.z ?? 3.35 }, { near: 0.12, label: '문 매트' });
     for (let k = 0; k < 3 && inZone(); k++) {
       bot.stick(0, 1, false);
       await bot.until(() => !inZone() || bot.blocking(), { timeout: 0.8, ui: false });

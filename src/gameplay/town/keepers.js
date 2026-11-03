@@ -1,5 +1,7 @@
-// 가게 주인: 밤톨(도토리상점 문 옆)·느루(박물관 문 옆). 첫날엔 밤톨이 선착장에서 맞이하고 조작을 알려 준다.
-// 상점·박물관 문 앞에서 행동 키(우선순위 90) → 인사 → ui.shop / ui.museum. 첫날 안내는 우선순위 100.
+// 가게 주인: 밤톨(도토리상점)·느루(박물관). 첫날엔 밤톨이 선착장에서 맞이하고 조작을 알려 준다.
+// 실내 보드 interiors (반영 v1): 상점·박물관에 실내가 있으면(house.places) 영업시간엔 계산대·안내대 뒤에 서 있고(D72-A, mode 'desk'),
+// 문 앞 행동 키(우선순위 90) = 들어가기, 실내 계산대 앞 행동 키 = 인사 → ui.shop / ui.museum (D73-A). 밖에서 할 일(첫날 안내·축하)이 끝나면 다시 들어간다.
+// 실내가 없으면 예전처럼 문 옆 밖에 서서 문 앞 행동 키 → 인사 → 창. 첫날 안내는 우선순위 100.
 // 첫날 할 일(ctx.services.intro, 3차 X3): 이름을 정하는 동안 첫 안내를 미루고, 다 마치면 밤톨이 축하하며 선물을 준다
 // (집 안에서 마쳤으면 집 앞에서 기다리다가, 아니면 상점 문·밤톨 앞에서 우선순위 95).
 import { createActor } from './actor.js';
@@ -8,6 +10,8 @@ import { context, speaker, giveItem } from './talk.js';
 import { pickLines } from './rules.js';
 
 const DOOR_DIST = 1.5, KEEPER_DIST = 1.5, LOOK_DIST = 3;
+const DESK_DIST = 2.6;      // 실내: 계산대 너머 주인까지 (계산대 앞 말 거는 자리에서 2칸 안팎)
+const AWAY_DIST = 7;        // 밖에 나와 있던 주인은 플레이어가 이만큼 멀어지면 다시 들어간다
 const MILESTONES = [5, 10, 20, 30, 40];
 const CAT_KO = { fish: '물고기', bug: '곤충', fossil: '화석' };
 
@@ -28,13 +32,52 @@ export async function createKeepers(ctx, town, lines) {
   };
   const shopDoor = places.shop?.door ?? places.plaza;
   const museumDoor = places.museum?.door ?? places.plaza;
-  const B = makeKeeper('bamtol', bActor, beside(shopDoor, 1));
-  const N = makeKeeper('neuru', nActor, beside(museumDoor, -1));
+  const B = makeKeeper('bamtol', bActor, beside(shopDoor, 1), 'shop', shopDoor);
+  const N = makeKeeper('neuru', nActor, beside(museumDoor, -1), 'museum', museumDoor);
   const all = [B, N];
 
-  function makeKeeper(slug, actor, spot) {
+  // ---- 실내 (house.places, 실내 보드 D72-A): 계산대·안내대 자리. house 가 town 다음에 열리므로 그때그때 본다 ----
+  const indoor = () => ctx.services.house?.places ?? null;
+  const deskOf = K => indoor()?.info?.(K.home)?.keeper ?? null;
+  const where = () => ctx.services.house?.where ?? null;
+  /** 계산대 뒤로 (보이게) */
+  function toDesk(K) {
+    const d = deskOf(K);
+    if (!d) return false;
+    K.mode = 'desk';
+    K.actor.path = [];
+    K.actor.place(d.x, d.z, d.facing);
+    K.actor.setOpacity(1);
+    K.actor.fadeTo = 1;
+    return true;
+  }
+  /** 밖(문 옆)에 나와 있던 주인이 문으로 들어간다: 사라졌다가 계산대(영업 중) 또는 가게 안(문 닫음)으로 */
+  function goIn(K) {
+    K.mode = 'goingIn';
+    K.actor.fade(0, 0.6);
+    town.sfxAt('door', K.door, 0.5);
+  }
+  /** 실내에 있는 주인을 문 옆 밖으로 잠깐 불러낸다 (첫날 축하 등) */
+  function popOut(K) {
+    if (K.mode !== 'desk' && K.mode !== 'inside' && K.mode !== 'goingIn') return;
+    ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
+    K.actor.place(K.spot.x, K.spot.z, Math.PI);
+    K.actor.setOpacity(0);
+    K.actor.fade(1, 0.4);
+    K.mode = 'stand';
+  }
+
+  // 플레이어가 들어오는데 주인이 아직 밖(걸어가는 중·문 옆)이면 바로 계산대로 — 안에선 밖이 안 보인다
+  ctx.events.on('place:enter', ({ place } = {}) => {
+    const K = all.find(k => k.home === place);
+    if (!K || !['walk', 'stand', 'goingIn', 'toDesk', 'inside'].includes(K.mode)) return;
+    if (K === B && !isOpen(context(ctx).now.hour)) return;
+    toDesk(K);
+  });
+
+  function makeKeeper(slug, actor, spot, home, door) {
     const K = {
-      slug, actor, spot, person: KEEPERS[slug], mode: 'stand', run: false, noticedAt: -99, clock: 0, recent: [],
+      slug, actor, spot, home, door, person: KEEPERS[slug], mode: 'stand', run: false, noticedAt: -99, clock: 0, recent: [],
       get talkable() { return actor.visible && actor.opacity > 0.9; },
       beginTalk() { K.prev = K.mode; if (K.mode === 'walk') K.mode = 'talk-walk'; else K.mode = 'talk'; actor.speed = 0; actor.play('idle'); },
       endTalk() { K.mode = K.mode === 'talk-walk' ? 'walk' : K.prev === 'talk' ? 'stand' : K.prev; },
@@ -68,6 +111,8 @@ export async function createKeepers(ctx, town, lines) {
     B.mode = 'intro';
     B.actor.place(s.x, s.z, Math.PI);
   } else if (!isOpen(context(ctx).now.hour)) { B.mode = 'inside'; B.actor.setOpacity(0); B.actor.fadeTo = 0; }
+  else B.mode = 'toDesk';   // house 가 열리면 계산대로 (실내가 없으면 문 옆에 그대로)
+  N.mode = 'toDesk';
 
   function update(dt, now) {
     const pl = ctx.services.player?.position;
@@ -81,18 +126,29 @@ export async function createKeepers(ctx, town, lines) {
         if (res === 'arrived' || res === 'stuck') { K.mode = 'stand'; a.path = []; a.lookAt(p.x, p.z + 5); if (res === 'stuck') a.place(K.spot.x, K.spot.z, Math.PI); }
       } else {
         a.animateMove(0);
+        const still = K.mode === 'stand' || K.mode === 'desk';
         if (pl && pd < LOOK_DIST && a.visible) {
           a.lookAt(pl.x, pl.z);
-          if (K.mode === 'stand' && pd < 2.2 && K.clock - K.noticedAt > 45) { K.noticedAt = K.clock; if (r() < 0.35) K.happy(); }
-        } else if (K.mode === 'stand' && a.wantFacing == null && Math.abs(a.facing) < 2.9) a.lookAt(p.x, p.z + 5);   // 다시 앞(남쪽)을 본다
+          if (still && pd < 2.2 && K.clock - K.noticedAt > 45) { K.noticedAt = K.clock; if (r() < 0.35) K.happy(); }
+        } else if (still && a.wantFacing == null && Math.abs(a.facing) < 2.9) a.lookAt(p.x, p.z + 5);   // 다시 앞(남쪽)을 본다
       }
       a.update(dt, pd < 30);
+      // 실내 (D72-A): house 가 열리면 계산대로, 밖에 나와 있다가 플레이어가 멀어지면 다시 들어간다
+      if (K.mode === 'toDesk') { if (!toDesk(K)) K.mode = 'stand'; }   // 실내가 없으면 문 옆에 그대로
+      else if (K.mode === 'stand' && deskOf(K) && (!pl || pd > AWAY_DIST || where())) goIn(K);
+      else if (K.mode === 'goingIn' && a.opacity < 0.05) {
+        if (K !== B || isOpen(now?.hour ?? context(ctx).now.hour)) toDesk(K);
+        else { K.mode = 'inside'; a.place(K.spot.x, K.spot.z, Math.PI); }
+      }
     }
-    // 밤톨 영업시간
+    // 밤톨 영업시간 (실내가 있으면 문 닫을 때 계산대에서 사라지고, 열 때 계산대에 — 플레이어가 상점 안에 있는 동안은 그대로)
     if (now && !intro.pending) {
       const open = isOpen(now.hour);
       if (B.mode === 'stand' && !open) { B.mode = 'inside'; B.actor.fade(0, 0.8); town.sfxAt('door', shopDoor, 0.5); }
-      else if (B.mode === 'inside' && open) { B.mode = 'stand'; B.actor.place(B.spot.x, B.spot.z, Math.PI); B.actor.fade(1, 0.8); town.sfxAt('door', shopDoor, 0.5); }
+      else if (B.mode === 'desk' && !open && where() !== 'shop') { B.mode = 'inside'; B.actor.fade(0, 0.8); }
+      else if (B.mode === 'inside' && open) {
+        if (!toDesk(B)) { B.mode = 'stand'; B.actor.place(B.spot.x, B.spot.z, Math.PI); B.actor.fade(1, 0.8); town.sfxAt('door', shopDoor, 0.5); }
+      }
     }
     // 첫날: 선착장 가까이 오면 밤톨이 먼저 말을 건다 (이름을 다 정한 뒤)
     if (intro.pending && holding()) intro.held = true;
@@ -166,8 +222,8 @@ export async function createKeepers(ctx, town, lines) {
     const rw = fd.reward;
     const vars = { ...names(), item: d?.items?.get?.(rw.item)?.name ?? '선물' };
     const say = speaker(ctx, B.person, vars);
-    // 문 닫은 시간이면 잠깐 나온다 (끝나면 update 가 다시 가게 안으로 들인다)
-    if (B.prev === 'inside') {
+    // 문 닫은 시간이면 잠깐 나온다 (끝나면 update 가 다시 가게 안으로 들인다). 실내 계산대에 있으면 그 자리에서 (플레이어가 상점 안)
+    if (B.prev === 'inside' || (B.prev === 'desk' && where() !== 'shop')) {
       ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
       B.actor.place(B.spot.x, B.spot.z, Math.PI);
       B.actor.fade(1, 0.4);
@@ -203,7 +259,7 @@ export async function createKeepers(ctx, town, lines) {
     const c = context(ctx), d = ctx.services.data, ui = ctx.services.ui;
     const furn = (d?.economy?.stockGroups?.()?.furniture ?? []).map(id => d.items.get(id)?.name).filter(Boolean);
     const say = speaker(ctx, B.person, { furn: furn.join('랑 ') || '가구' });
-    if (!isOpen(c.now.hour) || B.mode === 'inside') {
+    if ((!isOpen(c.now.hour) && where() !== 'shop') || B.mode === 'inside') {   // 상점 안에 있는 동안은 문 닫을 시간이 지나도 판다
       ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
       await say(pickLines(c.slot === 'dawn' || c.now.hour < 8 && c.now.hour >= 5 ? LB.closed.early : LB.closed.night, r, B.recent));
       return;
@@ -338,34 +394,61 @@ export async function createKeepers(ctx, town, lines) {
       test: () => {
         if (intro.pending || !firstday()?.rewardPending?.()) return null;
         if (visit.on) return near(B.actor.position, 2.2) ? B : null;
+        const at = where();
+        if (at === 'shop') return B.mode === 'desk' && near(B.actor.position, DESK_DIST) && facingTo(B.actor.position) ? B : null;
+        if (at) return null;
         if (places.shop && near(shopDoor, DOOR_DIST) && facingTo(shopDoor)) return B;
-        if (B.talkable && B.mode !== 'walk' && near(B.actor.position, KEEPER_DIST) && facingTo(B.actor.position)) return B;
+        if (B.talkable && B.mode !== 'walk' && B.mode !== 'desk' && near(B.actor.position, KEEPER_DIST) && facingTo(B.actor.position)) return B;
         return null;
       },
-      run: () => town.conversation(B, celebrateFlow, { face: B.mode !== 'inside' }),
+      run: () => {
+        if (!where()) popOut(B);   // 실내 계산대에 있으면 문 밖으로 나와서
+        return town.conversation(B, celebrateFlow, { face: B.mode !== 'inside' });
+      },
     }));
     offs.push(gp.add({
       name: 'town:shop', intent: 'action', priority: 90,
+      label: t => (t === 'door' && indoor() && isOpen(context(ctx).now.hour) ? '들어가기' : t === 'door' ? '가게' : '말 걸기'),
       test: () => {
+        const at = where();
+        if (at === 'shop') return B.mode === 'desk' && B.talkable && near(B.actor.position, DESK_DIST) && facingTo(B.actor.position) ? 'keeper' : null;
+        if (at) return null;
         if (intro.pending || !places.shop) return null;
         if (near(shopDoor, DOOR_DIST) && facingTo(shopDoor)) return 'door';
-        if (B.talkable && B.mode !== 'walk' && near(B.actor.position, KEEPER_DIST) && facingTo(B.actor.position)) return 'keeper';
+        if (B.talkable && B.mode !== 'walk' && B.mode !== 'desk' && near(B.actor.position, KEEPER_DIST) && facingTo(B.actor.position)) return 'keeper';
         return null;
       },
-      run: () => town.conversation(B, shopFlow, { face: B.mode !== 'inside' }),
+      run: t => {
+        // 문: 영업 중이고 실내가 있으면 들어간다 (D73-A — 창은 계산대에서). 문 닫았으면 지금처럼 밤톨이 안에서 대답
+        if (t === 'door' && indoor() && isOpen(context(ctx).now.hour)) {
+          if (B.mode === 'inside') toDesk(B);   // 문 열 시각이 막 지났는데 아직 안 바뀐 프레임
+          return indoor().enter('shop');
+        }
+        return town.conversation(B, shopFlow, { face: B.mode !== 'inside' });
+      },
     }));
     offs.push(gp.add({
       name: 'town:museum', intent: 'action', priority: 90,
+      label: t => (t === 'door' && indoor() ? '들어가기' : t === 'door' ? '박물관' : '말 걸기'),
       test: () => {
+        const at = where();
+        if (at === 'museum') return N.mode === 'desk' && N.talkable && near(N.actor.position, DESK_DIST) && facingTo(N.actor.position) ? 'keeper' : null;
+        if (at) return null;
         if (!places.museum) return null;
         if (near(museumDoor, DOOR_DIST) && facingTo(museumDoor)) return 'door';
-        if (N.talkable && near(N.actor.position, KEEPER_DIST) && facingTo(N.actor.position)) return 'keeper';
+        if (N.talkable && N.mode !== 'desk' && near(N.actor.position, KEEPER_DIST) && facingTo(N.actor.position)) return 'keeper';
         return null;
       },
-      run: () => town.conversation(N, museumFlow),
+      run: t => (t === 'door' && indoor() ? indoor().enter('museum') : town.conversation(N, museumFlow)),
     }));
     return () => offs.forEach(f => f());
   }
 
-  return { all, bamtol: B, neuru: N, intro, update, register, flows: { introFlow, shopFlow, museumFlow, celebrateFlow } };
+  /** 상점·박물관 문 (house.places 가 문 쪽으로 밀 때 묻는다): 'open' 들어갈 수 있음 · 'closed' 문 닫음 · null 아직 (첫날 안내 전) */
+  function placeRule(kind) {
+    if (kind === 'shop') return intro.pending ? null : isOpen(context(ctx).now.hour) ? 'open' : 'closed';
+    return kind === 'museum' ? 'open' : null;
+  }
+
+  return { all, bamtol: B, neuru: N, intro, update, register, placeRule, flows: { introFlow, shopFlow, museumFlow, celebrateFlow } };
 }

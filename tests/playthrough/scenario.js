@@ -202,6 +202,7 @@ export function makeScenario(bot, sk, opts = {}) {
     const r = await sk.shop({ sell: (it, s) => (it.category === 'fish' && s !== fish[0] ? 1 : it.category === 'mat' ? s.count : 0) });
     if (!r?.opened) return block('상점 창이 안 열려요');
     note('sell1', r.earned);
+    note('shopInside', { inside: r.inside, left: r.left });   // 실내 보드: 문 → 실내 → 계산대 → 문 매트로 나옴
     if (r.earned <= 0) { const r2 = await sk.shop({ sell: (it) => (it.category === 'fish' ? 1 : 0) }); note('sell1b', r2?.earned); }
     return stepDone('sell') ? pass(`🌰 +${r.earned}`) : block('팔았는데 단계가 안 넘어감');
   });

@@ -1,4 +1,5 @@
-// 집 안 방: 섬에서 멀리 떨어진 곳(플레이어 집 x = 500, 주민 방 x = 540)에 8×8 칸 방을 짓는다. 바닥·벽지·징두리·창문 둘·문 매트.
+// 집 안 방: 섬에서 멀리 떨어진 곳(플레이어 집 x = 500, 주민 방 x = 540, 상점 580, 박물관 620)에 방을 짓는다. 바닥·벽지·징두리·창문·문 매트.
+// 크기는 보통 8×8 칸, 상점·박물관(places.js)은 size 로 [가로, 깊이] 를 준다.
 // 카메라가 남쪽 위에서 보므로 앞(남쪽) 벽은 세우지 않는다 (동물의 숲 실내처럼).
 // 색·무늬는 모두 스펙(assets/interior/specs): 벽지(WP) = 무늬 + 징두리·몰딩·걸레받이 색, 바닥(FL) = 무늬 + 앞 턱 색, 방 틀(frame) = 창틀·창유리·문 매트.
 // 벽지·바닥은 무늬 텍스처를 붙인 판 (UV = m 단위, 텍스처 repeat = 1 / 무늬 크기) — setWallpaper / setFloor 로 바꿔 끼운다.
@@ -9,6 +10,7 @@ import { patternTexture } from './pattern.js';
 
 export const ROOM = { x: 500, z: 0 };               // 플레이어 방 가운데 (월드)
 export const VISIT_ROOM = { x: 540, z: 0 };         // 주민 방 가운데 (방 하나를 주민마다 다시 꾸며 쓴다)
+export const PLACE_ROOMS = { shop: { x: 580, z: 0 }, museum: { x: 620, z: 0 } };   // 상점·박물관 실내 가운데 (places.js)
 export const WALL_H = 2.6;
 export const WAINSCOT_H = 0.85;
 export const WINDOWS = ['n:1', 'n:6'];               // 북쪽 벽 창문 자리 (칸 번호)
@@ -17,22 +19,28 @@ export const DOOR = { gx0: 3, gx1: 4 };              // 앞쪽 가운데 두 칸
 export const ENTRY = { lx: ROOM_W / 2, lz: ROOM_D - 0.7 };   // 들어오면 문 매트 위, 북쪽을 본다
 export const BOUNDS = { x0: 0.09, z0: 0.09, x1: ROOM_W - 0.09, z1: ROOM_D };   // 걸을 수 있는 네모 (벽 징두리만큼 안쪽)
 export const FADE_OUT = 0.28, FADE_IN = 0.42;         // 드나들 때 어두워졌다 밝아지는 시간 (초)
-/** 방 안 카메라 중심이 머무는 곳 (어디 서도 방 전체가 보이게 좁게) */
-export const cameraBox = (o = ROOM) => ({ x0: o.x - 0.6, x1: o.x + 0.6, z0: o.z, z1: o.z + 1.4 });
+/** 방 안 카메라 중심이 머무는 곳 (어디 서도 방 전체가 보이게 좁게). 8×8 방이면 가로 ±0.6 · 세로 0~1.4, 넓은 방은 그만큼 넓힌다 */
+export function cameraBox(o = ROOM, w = ROOM_W, d = ROOM_D) {
+  const hx = Math.max(0, w / 2 - 3.4);
+  let z0 = o.z - d / 2 + 4, z1 = o.z + d / 2 - 2.6;
+  if (z0 > z1) z0 = z1 = (z0 + z1) / 2;
+  return { x0: o.x - hx, x1: o.x + hx, z0, z1 };
+}
 export const CAMERA_CURVE = 0.3;                      // 방 안 곡면 월드 세기 배율
 
-/** 방 가운데 → 북서쪽 모서리 (방 기준 좌표 0,0 의 월드 위치) */
-export const cornerOf = (o = ROOM) => ({ x0: o.x - ROOM_W / 2, z0: o.z - ROOM_D / 2 });
+/** 방 가운데 → 북서쪽 모서리 (방 기준 좌표 0,0 의 월드 위치). w = 방 가로 (벽 가구 자리에 쓴다) */
+export const cornerOf = (o = ROOM, w = ROOM_W, d = ROOM_D) => ({ x0: o.x - w / 2, z0: o.z - d / 2, w, d });
 /** 플레이어 방 기준 좌표 → 월드 */
 export const { x0, z0 } = cornerOf(ROOM);
 
 /**
- * 방 하나 짓기. specs = { wallpaper, floor, frame } (스펙 JSON).
- * → { group, materials, origin, x0, z0, setWallpaper(spec), setFloor(spec), setNight(nf), dispose() }
+ * 방 하나 짓기. specs = { wallpaper, floor, frame } (스펙 JSON). size = [가로, 깊이] 칸, windows = 북쪽 벽 창 자리, door = 문 매트 칸 { gx0, gx1 }.
+ * → { group, materials, origin, x0, z0, w, d, setWallpaper(spec), setFloor(spec), setNight(nf), dispose() }
  */
-export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame } = {}) {
+export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame, size = [ROOM_W, ROOM_D], windows = WINDOWS, door = DOOR, name = null } = {}) {
   const { THREE, materials } = ctx;
-  const { x0: rx0, z0: rz0 } = cornerOf(origin);
+  const [ROOM_W, ROOM_D] = size;
+  const { x0: rx0, z0: rz0 } = cornerOf(origin, ROOM_W, ROOM_D);
   const parts = {};   // 재질 이름 → [geometry]
   const add = (name, w, h, d, x, y, z, rotY = 0) => {
     const g = new THREE.BoxGeometry(w, h, d);
@@ -73,7 +81,7 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame } = {}) 
   for (const sx of [-1, 1]) add('molding', 0.3, WALL_H + 0.04, 0.3, origin.x + sx * (ROOM_W / 2 + 0.12), WALL_H / 2, rz0 + ROOM_D + 0.1);
 
   // ── 창문 (북쪽 벽) ──
-  for (const key of WINDOWS) {
+  for (const key of windows) {
     const gx = Number(key.split(':')[1]);
     const cx = rx0 + gx + 0.5, wz = rz0 + 0.01;
     add('pane', WINDOW_W - 0.08, WINDOW_H - 0.08, 0.02, cx, WINDOW_Y, wz + 0.005);
@@ -87,12 +95,12 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame } = {}) 
   }
 
   // ── 문 매트 (앞쪽 가운데: 여기서 나간다) ──
-  const mx = rx0 + (DOOR.gx0 + DOOR.gx1 + 1) / 2, mz = rz0 + ROOM_D - 0.42;
+  const mx = rx0 + (door.gx0 + door.gx1 + 1) / 2, mz = rz0 + ROOM_D - 0.42;
   add('doormatEdge', 1.36, 0.03, 0.66, mx, 0.012, mz);
   add('doormat', 1.2, 0.034, 0.52, mx, 0.014, mz);
 
   const group = new THREE.Group();
-  group.name = origin === ROOM ? 'house-room' : 'visit-room';
+  group.name = name ?? (origin === ROOM ? 'house-room' : 'visit-room');
   const mats = {};
   const colorOf = name => frame?.palette?.[name] ?? wallpaper?.palette?.[name] ?? '#FFFFFF';
   for (const [name, geos] of Object.entries(parts)) {
@@ -130,7 +138,7 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame } = {}) 
   const paneDay = new THREE.Color(frame?.palette?.pane ?? '#CDEBF5'), paneNight = new THREE.Color(frame?.palette?.paneNight ?? '#3A4A78');
   const swap = (mat, tex) => { mat.map?.dispose(); mat.map = tex; mat.needsUpdate = true; };
   const room = {
-    group, materials: mats, origin, x0: rx0, z0: rz0,
+    group, materials: mats, origin, x0: rx0, z0: rz0, w: ROOM_W, d: ROOM_D,
     wallpaper: null, floor: null,
     /** 벽지 스펙 바꾸기: 무늬 + 징두리·몰딩·걸레받이·벽 두께 색 */
     setWallpaper(spec) {
@@ -161,10 +169,10 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame } = {}) 
   return room;
 }
 
-/** 벽 가구 자리 → 월드 위치·회전 (모델 원점 = 벽면 바닥, 정면 +Z). corner = 방 북서쪽 모서리 (기본 = 플레이어 방) */
+/** 벽 가구 자리 → 월드 위치·회전 (모델 원점 = 벽면 바닥, 정면 +Z). corner = 방 북서쪽 모서리 (기본 = 플레이어 방, w 가 있으면 그 방 가로) */
 export function wallMount(wall, slot, corner = { x0, z0 }) {
   const gap = 0.012;
   if (wall === 'n') return { x: corner.x0 + slot + 0.5, z: corner.z0 + gap, rotY: 0 };
   if (wall === 'w') return { x: corner.x0 + gap, z: corner.z0 + slot + 0.5, rotY: Math.PI / 2 };
-  return { x: corner.x0 + ROOM_W - gap, z: corner.z0 + slot + 0.5, rotY: -Math.PI / 2 };
+  return { x: corner.x0 + (corner.w ?? ROOM_W) - gap, z: corner.z0 + slot + 0.5, rotY: -Math.PI / 2 };
 }

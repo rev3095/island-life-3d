@@ -1,21 +1,23 @@
 // 주민 집 들어가기 · 주민 방 (5차 Z2, 검수 보드 D9-A 주민마다 테마 방).
 //  - 주민 집 문(world.places.villagerHouses[].door) 앞에서 행동 키(우선순위 91) 또는 문 쪽으로 밀기 → 그 주민 방으로. 문 매트에서 나온다.
+//    드나드는 동작(문 열기·걷기·원형 전환)은 door.js — 내 집·상점·박물관과 같다.
 //    문 규칙은 town 이 정한다 (Z4 약속, notes/z2-interior.md): town.atHome(slug) 'home' → 들어간다, 'out' → 잠김 알림,
 //    'sleep'·'room' → 이 처리기는 비켜서 town:knock(90) 이 노크한다. town.residents() 에 없는 주민(이사 오기 전) 집 문은 없다.
 //    atHome 이 없는 town 이면 언제나 열린다.
 //  - 방은 x = 540 에 하나 지어 두고 들어갈 때마다 그 주민 방 스펙(assets/interior/rooms/rm-0N.json)대로 벽지·바닥·가구를 바꿔 끼운다.
 //  - 가구: 아이템 id(item) 또는 FU 번호(fu). 가구 목록(assets/furniture/index.json)에 없으면 스펙의 box 크기·색으로 임시 상자 → 목록에 들어오면 저절로 모델.
+//  - 방 배치의 deco 소품은 사양(ctx.quality) 낮음·매우 낮음이면 숨기고 충돌에서도 뺀다 (작은 구석 소품만 deco 로 적는다).
 //  - 주민 방 가구는 건드릴 수 없다 (충돌만). 주민을 방 안에 세우는 일은 town 이 house:enter { owner, host } 를 받아서 한다.
 // 상태: state.house.visit = 주민 방 안에서 저장했으면 그 주민 slug (이어하기).
 import { ROOM_W, ROOM_D, boxOf, moveCircle, inBox } from './grid.js';
-import { VISIT_ROOM, buildRoom, wallMount, cornerOf, ENTRY, BOUNDS, FADE_OUT, FADE_IN, cameraBox, CAMERA_CURVE } from './room.js';
+import { VISIT_ROOM, buildRoom, wallMount, cornerOf, ENTRY, BOUNDS, cameraBox, CAMERA_CURVE } from './room.js';
 import { resolveFurniture, visitRule, FACE, DEFAULT } from './interior.js';
 import { josa } from './craft.js';
 
 const PUSH_TIME = 0.2;
 const WALL_Y = 1.15;   // 임시 벽 가구 아래 끝 높이
 
-export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon }) {
+export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) {
   const { THREE, scene, events, state, materials } = ctx;
   const world = ctx.services.world, player = ctx.services.player;
   const S = state.house;
@@ -35,7 +37,8 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
 
   // ── 구역: 주민 방 바닥·벽·가구 충돌 ──
   const local = (x, z) => ({ lx: x - vx0, lz: z - vz0 });
-  const blockers = () => V.list.filter(r => !r.rec.wall && r.layer !== 'rug').map(r => {
+  const lite = () => ctx.quality === 'low' || ctx.quality === 'min';
+  const blockers = () => V.list.filter(r => !r.rec.wall && r.layer !== 'rug' && !(r.entry.deco && lite())).map(r => {
     const b = boxOf(r.rec, r.footprint);
     return { x0: b.x0 + 0.04, z0: b.z0 + 0.04, x1: b.x1 - 0.04, z1: b.z1 - 0.04 };
   });
@@ -57,7 +60,7 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
 
   // ── 행동 키 ──
   const I = ctx.services.gameplay.interactions;
-  const free = () => !H.busy && !V.busy && !H.inside;
+  const free = () => !H.busy && !V.busy && !H.inside && !doors.busy;
   I.add({ name: 'house-visit-in', intent: 'action', priority: 91, label: t => (t.rule === 'locked' ? '노크' : '들어가기'),
     test: () => { const h = free() && !V.where ? doorInFront(true) : null; const rule = h && doorRule(h.slug); return rule ? { ...h, rule } : null; },
     run: t => (t.rule === 'locked' ? locked(t.slug) : enter(t.slug)) });
@@ -109,9 +112,17 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
       try { return r.real ? await realPiece(r) : placeholder(r); }
       catch (e) { console.warn('[house] 주민 방 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(r); }
     }));
+    made.forEach((o, i) => { if (o) o.deco = !!V.list[i].entry.deco; });
     V.objs = made.filter(Boolean);
     for (const o of V.objs) room.group.add(o.root);
+    applyQuality();
   }
+  /** 사양 낮음·매우 낮음: 작은 장식(deco)은 뺀다 */
+  function applyQuality() {
+    const hide = lite();
+    for (const o of V.objs) if (o.deco) o.root.visible = !hide;
+  }
+  events.on('quality:changed', () => applyQuality());
   function poseRoot(root, r) {
     if (r.rec.wall) {
       const m = wallMount(r.rec.wall, r.rec.slot, corner);
@@ -152,31 +163,27 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
     return { x: vx0 + h.lx, z: vz0 + h.lz, facing: FACE[h.face] ?? Math.PI };
   }
 
+  /** 방 문 매트 (door.js 가 걸어 들고 나는 곳, 월드) */
+  const roomDoor = () => ({ x: vx0 + ROOM_W / 2, front: vz0 + ROOM_D, entry: vz0 + ENTRY.lz });
+
   async function enter(slug) {
-    if (H.busy || V.busy || H.inside || V.where || !slug) return false;
+    if (H.busy || V.busy || H.inside || V.where || !slug || doors.busy) return false;
     V.busy = H.busy = true;
-    player.freeze(true);
-    events.emit('sfx', { name: 'door' });
     try {
       const spec = await roomSpecOf(slug);
-      await fadeTo(true, FADE_OUT);
-      await furnish(spec);
-      goIn(slug, { ...ENTRY, facing: 0 });
-      await fadeTo(false, FADE_IN);
-    } finally { player.freeze(false); V.busy = H.busy = false; }
+      await doors.through({ dir: 'in', place: houseOf(slug), kind: 'house-villager', variant: slug, room: roomDoor(),
+        arrive: async s => { await furnish(spec); goIn(slug, { lx: s.x - vx0, lz: s.z - vz0, facing: s.facing }); } });
+    } finally { V.busy = H.busy = false; }
     return true;
   }
 
   async function leave() {
-    if (H.busy || V.busy || !V.where) return false;
+    if (H.busy || V.busy || !V.where || doors.busy) return false;
     V.busy = H.busy = true;
-    player.freeze(true);
-    events.emit('sfx', { name: 'door' });
+    const slug = V.where;
     try {
-      await fadeTo(true, FADE_OUT);
-      goOut();
-      await fadeTo(false, FADE_IN);
-    } finally { player.freeze(false); V.busy = H.busy = false; }
+      await doors.through({ dir: 'out', place: houseOf(slug), kind: 'house-villager', variant: slug, room: roomDoor(), arrive: s => goOut({ spot: s }) });
+    } finally { V.busy = H.busy = false; }
     return true;
   }
 
@@ -196,17 +203,18 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
     saveSoon(0.5);
   }
 
-  /** quiet: 저장 불러오기 등으로 밖에 나와 있을 때 (자리를 옮기지 않는다) */
-  function goOut({ quiet = false } = {}) {
+  /** quiet: 저장 불러오기 등으로 밖에 나와 있을 때 (자리를 옮기지 않는다). spot = 섬에 설 곳 { x, z, facing } (door.js — 문간) */
+  function goOut({ quiet = false, spot = null } = {}) {
     const slug = V.where;
     V.where = null;
     S.visit = null;
+    player.camera?.setBounds?.(null);   // 범위를 먼저 풀어야 순간이동 때 카메라가 바로 섬으로 온다
+    player.camera?.setCurveScale?.(1);
     if (!quiet) {
       const d = houseOf(slug)?.door ?? world.places?.spawn ?? { x: 0, z: 0 };
-      player.teleport(d.x, d.z + 0.15, Math.PI);
+      const s = spot ?? { x: d.x, z: d.z + 0.15, facing: Math.PI };
+      player.teleport(s.x, s.z, s.facing ?? Math.PI);
     }
-    player.camera?.setBounds?.(null);
-    player.camera?.setCurveScale?.(1);
     if (room) room.group.visible = false;
     clearFurniture();
     ctx.services.time?.setIndoor?.(false);
@@ -233,7 +241,7 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
       if (Math.abs(p.x - VISIT_ROOM.x) > ROOM_W || Math.abs(p.z - VISIT_ROOM.z) > ROOM_D) goOut({ quiet: true });
     }
     if (S.visit !== V.where && !V.busy) S.visit = V.where;
-    if (!H.busy && !V.busy && !blocked && !H.moving && !H.inside) {
+    if (!H.busy && !V.busy && !blocked && !H.moving && !H.inside && !doors.busy) {
       if (!V.where) {
         // 문 쪽으로 밀어서 들어가기
         const h = doorInFront(false), p = player.position;
@@ -266,6 +274,8 @@ export function createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon })
   return {
     get where() { return V.where; },
     enter, leave, resume, update,
+    /** 주민 방 안이면 문 매트 (월드) { x, z } */
+    doormat: () => (V.where ? { x: vx0 + ROOM_W / 2, z: vz0 + ROOM_D - 0.45 } : null),
     /** 주민 방 자리 (월드): 주민을 세울 때 · 방 밖에서 미리 볼 때 */
     roomInfo: { x: VISIT_ROOM.x, z: VISIT_ROOM.z, w: ROOM_W, d: ROOM_D, x0: vx0, z0: vz0 },
     /** 지금 꾸민 주민 방에서 주민이 설 곳 { x, z, facing } (slug 를 주면 그 주민 방일 때만) */

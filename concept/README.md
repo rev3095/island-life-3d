@@ -12,21 +12,22 @@
 | 6차 검수 보드 v0.6 (M6 편집기 완성) | `wave6-board.html` + `board-kit.js` | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `wave6` |
 | 7차 검수 보드 v0.7 (M7 출시 준비, D36–D48 · QA 결과 D49–D57) | `wave7-board.html` + `board-kit.js` | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `wave7` |
 | 하늘 검수 보드 v0.1 (하늘 셰이더, D58–D66 · 하늘 층 SK-01–08, 그림 = 게임 화면 `concept/sky/*.jpg`) | `sky-board.html` + `board-kit.js` + `sky/*.jpg` | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `sky` |
+| 실내 검수 보드 v0.1 (상점·박물관 실내 · 문 드나들기, D67–D73) | `interiors-board.html` + `board-kit.js` | https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh | `interiors` |
 
 ## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
-| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67– (실내 보드, `p12-interiors` 세션) |
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) |
 | CH | 캐릭터 | CH-01–10 (CH-11·12 는 후보만) |
 | EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 · PR-01–12 (+z5 PR-13–16) · BD-01–05 (+z5 BD-06–07) · TI-01–07 (+z5 TI-08) |
-| FU | 가구 | FU-01–33 (+z5 FU-34) |
+| FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35 진열 받침 · FU-36 계산대) |
 | IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 |
-| WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 |
-| EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 · ED-01–06 · SF-1–6 · UI-04–05 |
+| WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 (+interiors RM-08 상점 · RM-09 박물관) |
+| EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 (+interiors AN-06 문 열기 · AN-07 걸어 들어가기) · ED-01–06 · SF-1–6 · UI-04–05 |
 | s01– | 장면 (시나리오 편집기) | s01–s12 |
 | ET | 편집기 (wave6) | ET-01– |
-| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 · RC-01–12 · QA-01–19 |
+| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) · RC-01–12 · QA-01–19 |
 | SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
 
 ## 새 보드 만드는 법 (6차부터)

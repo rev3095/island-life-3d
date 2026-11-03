@@ -31,6 +31,7 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 - 모듈 모양: `export default { name, async init(ctx), update(dt, ctx) }`. 기능은 `ctx.services.<이름>` 에 올리고, 모듈끼리는 **이벤트(`ctx.events`)와 서비스로만** 주고받는다. 약속은 `docs/CONTRACTS.md` 가 기준이며 뒤쪽 "1차 합친 뒤 추가된 약속"·"2차 준비" 절이 앞 내용보다 우선한다. 각 모듈의 설계 결정은 `docs/notes/<트랙>.md`.
 - `src/gameplay/index.js` 는 `gather/`(P2)·`town/`(P3)·`house/`(P4) 하위 모듈을 불러오고, **Space/F 행동 키를 우선순위 디스패처**(`ctx.services.gameplay.interactions.add({name, intent, priority, test, run})`)로 나눠 준다. 말 걸기 100 · 문 90 · 가구 80 · 나무 흔들기 60 · 줍기 50 · 도구 10. `input:press` 를 직접 처리하지 말 것 (UI 창이 열려 있으면 `ui.isBlocking()` 으로 막힘).
 - 섬 밖 공간(집 실내 등)은 `world.addZone({contains, collide, heightAt, groundAt, isWalkable})` 로 바닥·벽을 바꿔 끼운다. 플레이어 이동은 `world.collide` / `island.heightAt` 만 쓴다.
+- 실내는 내 집(x 500) · 주민 방(540) · 도토리상점(580) · 박물관(620). 드나들기(문 열기·걸어 들어가기·원형 전환)는 모두 `src/gameplay/house/door.js` 의 `through()` 하나, 상점·박물관 실내는 `places.js` + 방 배치 `assets/interior/places/*.json` (실내 검수 보드 interiors D67–D73, `docs/notes/p12-interiors.md`).
 - 저장되는 상태는 `ctx.state` (`src/core/state.js`), 칸마다 주인 모듈이 정해져 있다. 저장·하루 리셋(05:00 경계)은 data 모듈.
 
 ### 렌더링 규칙 (`src/core/materials.js`)

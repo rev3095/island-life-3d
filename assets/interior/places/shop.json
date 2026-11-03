@@ -1,0 +1,39 @@
+{
+  "id": "RM-08",
+  "slug": "shop",
+  "kind": "place",
+  "place": "shop",
+  "name": "도토리상점",
+  "version": 1,
+  "status": "review",
+  "note": "실내 검수 보드 D69-A: 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 오늘의 가구, 오른쪽에 도구 다섯·꽃씨. 진열 받침·도구 받침은 모델이 생길 때까지 FU-35 임시 상자, 계산대는 FU-29 부엌 조리대 모델(FU-36 자리).",
+  "size": [10, 7],
+  "wallpaper": "wp-05",
+  "floor": "fl-02",
+  "windows": ["n:1", "n:8"],
+  "door": { "gx0": 4, "gx1": 5 },
+  "keeper": { "slug": "bamtol", "lx": 5, "lz": 0.5, "face": "s" },
+  "talk": { "lx": 5, "lz": 2.45 },
+  "furniture": [
+    { "item": "furn.kitchen-counter", "gx": 4, "gz": 1, "rot": 0, "role": "counter", "scale": [1, 0.6, 1] },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 1, "rot": 0 },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 4, "rot": 0 },
+    { "fu": "FU-35", "name": "도구 받침", "box": [1, 3, 0.12], "color": "#B98A5A", "gx": 9, "gz": 1, "rot": 0 },
+    { "fu": "FU-35", "name": "씨앗 진열대", "box": [1, 2, 0.6], "color": "#C99A63", "gx": 9, "gz": 4, "rot": 0 },
+    { "item": "furn.round-rug", "gx": 3, "gz": 3, "rot": 0 },
+    { "item": "furn.plant-pot", "gx": 2, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.floor-lamp", "gx": 7, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.bookshelf", "gx": 8, "gz": 0, "rot": 0 },
+    { "item": "furn.umbrella-stand", "gx": 2, "gz": 6, "rot": 0, "deco": true },
+    { "item": "furn.wall-clock", "wall": "n", "slot": 5 },
+    { "item": "furn.picture-frame", "wall": "n", "slot": 3 },
+    { "item": "furn.rod-rack", "wall": "e", "slot": 2 }
+  ],
+  "stock": [
+    { "group": "furniture", "lx": 1, "lz": 2, "y": 0.18, "fit": 1.7, "count": 1 },
+    { "group": "furniture", "from": 1, "lx": 1, "lz": 5, "y": 0.18, "fit": 1.7, "count": 1 },
+    { "group": "tools", "lx": 9.5, "lz": 1.35, "y": 0.12, "dz": 0.55, "count": 5 },
+    { "group": "seeds", "lx": 9.5, "lz": 4.3, "y": 0.6, "dz": 0.45, "count": 3 },
+    { "group": "saplings", "lx": 9.5, "lz": 5.65, "y": 0.6, "dz": 0.4, "count": 1 }
+  ]
+}
