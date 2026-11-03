@@ -393,16 +393,17 @@ export function makeScenario(bot, sk, opts = {}) {
   });
 
   add('birthday', '주민 생일 (시작한 날 뒤 가장 가까운)', async () => {
-    // 예전엔 두부 생일(11-03)을 박아 두어, 그 뒤 날짜에 새 게임을 시작하면 막혔다 → 아무 주민이든 다음 생일까지 하루씩 넘긴다 (60일까지)
+    // 예전엔 두부 생일(11-03)을 박아 두어, 그 뒤 날짜에 새 게임을 시작하면 막혔다 → 아무 주민이든 다음 생일까지 하루씩 넘긴다.
+    // 10일까지만 (더 넘기면 이사·축제 단계가 다른 계절로 밀려 결과가 흐려진다 — 2026-11-04 60일로 했다가 1월까지 감)
     const got = () => Object.entries(T.notes).find(([k]) => k.startsWith('bday-'))?.[1] ?? null;
     if (!got()) {
-      for (let k = 0; k < 60 && !got(); k++) {
+      for (let k = 0; k < 10 && !got(); k++) {
         if (S().town.birthday?.today?.().length) { await birthday(); break; }
         await bot.nextDay(9); await bot.settle(60);
       }
     }
     const b = got();
-    if (!b) return skip(`60일 안에 주민 생일이 없음 (오늘 ${bot.day()})`);
+    if (!b) return skip(`10일 안에 주민 생일이 없음 (오늘 ${bot.day()})`);
     return b.cake ? pass(`${b.day} ${b.how} 생일 대화 · 케이크 받음`) : awk(`${b.day} 생일 대화 ${b.opened ? `함(${b.how})` : `못 함(${b.how})`} · 케이크 ${b.cake ? '받음' : '없음'}`);
   });
   add('movein', '이사: 집터 → 이삿짐 → 단풍 입주', async () => {
