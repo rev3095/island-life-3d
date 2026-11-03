@@ -2,7 +2,7 @@
 
 이 문서는 세션이 끝나거나 `/clear` 하기 전에 대화와 작업을 보고서로 남긴 기록이다. 새 세션은 **「현재 상태」부터 읽고**, 자세한 경위는 「세션 기록」을 본다. 구조·명령어는 [CLAUDE.md](CLAUDE.md), 개발 단계는 [docs/PLAN.md](docs/PLAN.md), 모듈 약속은 [docs/CONTRACTS.md](docs/CONTRACTS.md), 실행법은 [README.md](README.md).
 
-마지막 갱신: 2026-11-04 (세션 3, 게임 v16 마우스 걷기·하늘 셰이더)
+마지막 갱신: 2026-11-04 (세션 3, 하늘 보드 · 게임 v17 · 시점·실내 세션)
 
 ---
 
@@ -14,8 +14,9 @@ M0~M6 끝, **M7 출시 준비 중 — P1~P5 끝, 남은 것 P6 출시 + 보드 D
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 16 (빌드 b9e7edc, 2026-11-04, 게시 파일 160, 링크 공개)** — 마우스로 걷기(누르면 그 자리로·꾹 누르면 따라가기) + 하늘 셰이더(그라데이션·구름·빛살·은하수, 사양별). 올리기 = 페이지 + 모듈 6(새 `src/player/mouse.js`). 다음엔 packs hash 를 b9e7edc 것과 비교 + `git diff --name-only b9e7edc HEAD -- src index.html` |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 17 (빌드 5f4b43b, 2026-11-04, 게시 파일 160, 링크 공개)** — 하늘 값 조절(`time.skyFx`, 하늘 보드용) · 은하수가 북쪽 하늘에 보이게. v16 = 마우스 걷기·하늘 셰이더. 올리기 = 페이지 + 모듈 2. 다음엔 packs hash 를 5f4b43b 것과 비교 + `git diff --name-only 5f4b43b HEAD -- src index.html` |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | 버전 6 (10-31: 게임 카드에 게임 저장소 문제 알리기 `reports`·기기 점검 `checks`). 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
+| **하늘 검수 보드 v0.1** | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `concept/sky-board.html` + `board-kit.js` + `concept/sky/*.jpg` | 버전 1 (2026-11-04): 결정 D58–D66 · 하늘 층 SK-01–08, 그림 29장 = 게임 v16 화면. **사용자 선택 대기** (추천 = 지금 게임 A). 반영 값 표 `docs/notes/sky-board.md`. 홈 v7 목록·`status/sky`·`catalog/decision`(D49–D66 더함) |
 | **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | **버전 3 (10-31): QA 칸 QA-01–19 (고침 10 · 고르기 9 → 결정 D49–D57), 목표 표 잰 값 — 사용자 선택 대기.** 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
 | 섬 지도 편집기 | https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST | `map-editor.html` (+ `assets/island/layout.json`) | 반영 v0. "지도 반영" |
@@ -284,6 +285,9 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 2 | 네, 셋 다 시작 | 작업 폴더 `p11-check`·`p11-access`·`p11-save` (main b37e5ba) → M7-P2·P3·P4 세션 시작, 스토리 세션에 QA-01·02 전달 | 넷 다 끝남 |
 | 3 | 회의 중 음소거 / 게임 소리 끄기 | 앱 알림 소리 끔(설정), 세션들에 미리보기 소리 끄기 부탁 → 사용자가 직접 음소거해서 취소 | 알림 소리는 꺼 둔 채 |
 | 5 | 이후 개발 알려 줘, 지금 P 과정, 재개 | 작업 폴더 `p11-tune` → M7-P5 세션 시작, 보드 세션에 QA 칸 채우기·홈 세션에 reports·checks 줄 부탁 | 셋 다 끝남: `p11-tune` a67a344(장면 층이 마우스·터치를 막던 막힘 버그 — v12 게시본에도 있음) · df4e50a(힌트·건너뛰기·섬폰 안내, 처음 하는 사람 7일 → 숫자 표 초안) · `p10-board7` 58083fc(보드 v3, QA 칸 고침 10·고르기 9 → D49–D57) · `p10-hub` 2a6aca2(홈 v6, reports·checks). 시험 합치기 충돌 0 · 테스트 320. 합침 |
+| 10 | 하늘 보드 만들기 | 하늘 값 조절(`time.skyFx`, 그늘 세기·색·천정 진하기·별 밝기 값 더함, 지금 모습 그대로) → 게임 화면 29장 찍기(UI 없이 캔버스만, 선택지마다) → `concept/sky-board.html` (D58–D66, SK-01–08) 게시 → README 보드·ID 표, 홈 목록 v7·`status/sky`·`catalog/decision` → 게임 v17 (5f4b43b) | 사용자 선택 대기 |
+| 11 | 따로 세션: 시점 조작 (마우스로 하늘 올려다보기) | 작업 폴더 `p12-camera` (main b450373) → 세션 [p12-camera](local_dc6de9ac-46a9-48a1-9056-771e4e9c4c73) — 오른쪽 버튼 끌기·휴대폰 두 손가락·키, 돌아오기, 사양별 비용 | 진행 중 |
+| 12 | 따로 세션: 장소마다 실제 실내 + Space 문 열기 동작·페이드 | 작업 폴더 `p12-interiors` (main b450373) → 세션 [p12-interiors](local_b0247fb8-139b-4981-853c-5a9aeb5d53e3) — 보드(D67–) 먼저, 추천안 반영 v1 로 상점·박물관 실내·공통 문 전환 | 진행 중 |
 | 9 | 마우스로도 이동, 하늘에 구름·그라데이션·빛 셰이더 | 마우스: `src/player/mouse.js` — 땅 누르기 = 그 자리로(고리 표시), 꾹 누르기 = 커서 따라가기(멀면 달리기), 곡면 월드 맞춘 땅 찍기(10칸 앞까지 오차 0), 키보드·패드·창·장면 우선, 터치는 패드. 하늘: `src/sky/dome.js` 다시 — 세 단 그라데이션·지평선 안개 띠·해 빛무리·노을 쪽 지평선 빛·빛살·툰 구름층(바람·날씨·그늘 두 단·은빛 가장자리)·은하수, 구름 뒤 별 가림, 돔은 빈 화소에만(renderOrder 1000, GPU 0.5ms 안팎), 사양별 구름 5·4·3·2겹. 낮·노을·밤·비 화면 확인, 테스트 332 (b9e7edc) → 게임 v16, 홈 `status/game` v10 | 끝 (스타일 편집기는 아직 옛 하늘 — 다음 게시 때) |
 | 8 | lite 링크 + 사양 넷(매우 낮음·낮음·적정=lite·높음), 웹이라 렉 심함 → 최적화·모드 제작·테스트·활성화 뒤 링크 | 이 컴퓨터(Intel UHD, 1280×800)에서 GPU 타이머로 잼: 높음 38ms · 예전 보통 22ms · 적정 14.6ms, 칠하는 화소·외곽선·그림자·화면 효과 순. 걷다가 새 셰이더 70ms 멈춤도 잡음 → 사양 high·mid·low·min (낮음: 외곽선 끔·화소 75만 개·28칸, 매우 낮음: 화소 40만 개·22칸·초당 30장), 처음 적정 + 자동 한 칸씩, 섬폰 「그래픽 사양」·로딩 화면 네 단추(`settings.spec`, 소리 안 깨움), 셰이더 미리 만들기(compileAsync 53ms), 테스트 326 (4bd0f81) → 게임 v15, 홈 `status/game` v9 | 끝 (느린 컴퓨터 실제 확인은 사용자) |
 | 7 | 다른 컴퓨터에서 렉 — 처음에 다 받는 거 아님? 가벼운 버전 | 진단: 처음엔 묶음 3개(7.7MB)만, 나머지 5개는 처음 열 때. 렉은 그리기 쪽 — 광장 한 프레임 삼각형 152만(그림자 몫 82만·외곽선 29만), 화면 효과 5단계, 기존 low 는 배율·그림자 크기만 조금. → lite 단계(호출 194→90, 삼각형 →71만, 바로 그리기) + `#lite` + 섬폰 「그래픽」 + 자동 한 칸씩 + 묶음 미리 받기 (f871912, 테스트 323) → 게임 v14 | 끝 (실제 느린 컴퓨터 확인은 사용자) |
