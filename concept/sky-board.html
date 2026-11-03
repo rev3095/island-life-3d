@@ -1,0 +1,319 @@
+<title>포근섬 하늘 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 5·6차 보드와 같은 섬 안내 책자 — 마일스톤 → 지금 출시 준비 상태 → 결정(카드마다 스케치) → 새 화면 → 출시 점검표 → QA 결과 → 계획. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+a { color: var(--sea); }
+code { font-family: var(--mono); font-size: .86em; overflow-wrap: anywhere; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정: 스케치 + 선택지 */
+.dec { display: grid; gap: 10px; }
+.decbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 780px) { .decbody { grid-template-columns: 300px minmax(0, 1fr); align-items: start; } }
+.decside { display: grid; gap: 8px; min-width: 0; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+.nowline { font-size: 13px; color: var(--muted); }
+.nowline b { color: var(--ink); font-weight: 400; }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+td.st { font-size: 16px; text-align: center; }
+
+/* 출시 점검표 */
+.rc { gap: 6px; }
+.rc .who { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rc .stmark { font-size: 15px; }
+
+/* QA 결과 */
+.qasum { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.qasum .n { display: grid; align-content: start; padding: 6px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); min-width: 0; }
+#qaTable { min-width: 600px; }   /* 좁은 화면은 표만 옆으로 밀어 봄 (무엇 칸이 한 글자씩 꺾이지 않게) */
+.qasum .n b { font-family: var(--display); font-weight: 400; font-size: 22px; font-variant-numeric: tabular-nums; }
+.tag.fixed { background: var(--leaf); color: var(--panel); }
+.tag.pick { background: var(--acorn); color: var(--panel); }
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+.miles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.mile { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.mile .small { grid-column: 1 / -1; }
+.mile.here { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.mile.done { opacity: .78; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+</style>
+<style>
+/* 하늘 보드 덧붙임: 선택지마다 진짜 게임 화면 그림 (concept/sky/*.jpg, 게임 v16 하늘 셰이더로 찍음) */
+.shot { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 8px; background: var(--stage); }
+.nowgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.nowgrid figure { margin: 0; display: grid; gap: 6px; }
+.nowgrid figcaption { font-size: 13px; color: var(--muted); }
+.decbody.pics { grid-template-columns: minmax(0, 1fr); }
+.opts.pics { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.opt.pic label { gap: 6px; padding: 8px; }
+.opt.pic .shot { border-radius: 7px; }
+.fxval { font-family: var(--mono); font-size: 12px; color: var(--acorn); }
+.layer .what { font-size: 14px; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 하늘 · 검수 보드 v0.1 · 2026-11-04 · 게임 v16</p>
+    <h1>포근섬 하늘 검수 보드</h1>
+    <p class="lede">게임 v16 에 새 <b>하늘 셰이더</b>(그라데이션 · 해 빛무리와 노을빛 · 빛살 · 툰 구름층 · 은하수)를 넣었어요. 아래 그림은 모두 <b>진짜 게임 화면</b>이에요 (선착장에서 하늘 쪽으로 카메라를 들어 찍음). 결정마다 마음에 드는 하늘을 고르고, 고칠 점은 의견 칸에 적어 주세요. 다 고르면 채팅에 <b>"검수 보드 반영"</b>.</p>
+    <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v16)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈</a><a href="https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd">스타일 편집기</a></p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#now">지금 하늘</a><a href="#decide">결정 D58–D66</a><a href="#layers">하늘 층 SK-01–08</a><a href="#spec">사양별 · 시점</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="now">
+    <div class="sec-head"><p class="id">NOW · 게임 v16</p><h2>지금 하늘</h2>
+      <p class="muted">시간·날씨에 따라 저절로 바뀌어요. 평소 플레이 카메라는 위에서 내려다봐서 하늘이 화면 위쪽에 조금만 보이고, 장면(컷신)·엔딩 사진에서 넓게 보여요. 마우스로 하늘을 올려다보는 시점 조작은 다른 세션이 만드는 중이에요 (아래 「사양별 · 시점」).</p></div>
+    <div class="nowgrid" id="nowGrid"></div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS</p><h2>먼저 정할 것 아홉 가지</h2>
+      <p class="muted">A 가 지금 게임에 들어간 하늘이에요 (추천). 바꾸고 싶은 것만 다른 칸을 고르면 돼요.</p></div>
+    <div class="grid wide" style="grid-template-columns: minmax(0, 1fr)" id="decisions"></div>
+  </section>
+
+  <section id="layers">
+    <div class="sec-head"><p class="id">SK-01 – SK-08</p><h2>하늘을 이루는 층</h2>
+      <p class="muted">층마다 의견을 적을 수 있어요 (예: "SK-05 구름을 더 몽글몽글하게", "SK-08 별을 더 크게"). 값 이름은 <code>src/sky/dome.js</code> 의 <code>SKY_FX</code>.</p></div>
+    <div class="grid" id="layerGrid"></div>
+  </section>
+
+  <section id="spec">
+    <div class="sec-head"><p class="id">SPEC · CAMERA</p><h2>사양별 하늘 · 시점</h2>
+      <p class="muted">하늘은 다른 물체를 다 그린 뒤 빈 화소에만 칠해서 한 장에 GPU 0.5ms 안팎이에요 (이 컴퓨터 내장 그래픽, 광장 화면). 느린 기기에선 아래처럼 줄여요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>사양</th><th>구름 잡음 겹</th><th>빛살 (SK-04)</th><th>은하수 (SK-07)</th></tr></thead><tbody id="specTable"></tbody></table></div>
+    <p class="small muted">시점 조작 (마우스 오른쪽 버튼 끌기로 올려다보기 · 휴대폰 두 손가락) 은 <code>p12-camera</code> 세션이 만드는 중이에요. 합쳐지면 이 보드의 하늘을 게임 안에서 직접 올려다볼 수 있어요.</p>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+const img = (name, alt) => `<img class="shot" src="sky/${name}.jpg" alt="${esc(alt)}" loading="lazy" width="640" height="400">`;
+
+/* ---------- 지금 하늘 ---------- */
+const NOW = [
+  ['now-day', '낮 1시 · 맑음 — 세 단 그라데이션, 지평선 안개 띠, 툰 구름층 + 북쪽 3D 솜구름'],
+  ['now-dusk', '노을 5시 반 — 분홍 구름, 라벤더 그늘, 주황 지평선'],
+  ['now-sun', '노을 때 해 쪽 — 해 빛무리, 빛살, 은빛 구름 가장자리'],
+  ['now-night', '밤 10시 반 — 푸른 구름, 별(구름 뒤는 가려짐), 옅은 은하수'],
+  ['now-cloudy', '흐림 — 구름이 많아지고 잿빛'],
+  ['now-rain', '비 — 짙은 비구름, 회색 하늘'],
+];
+$('nowGrid').innerHTML = NOW.map(([n, t]) => `<figure>${img(n, t)}<figcaption>${t}</figcaption></figure>`).join('');
+
+/* ---------- 결정 ---------- */
+// fx = 반영할 SKY_FX 값 (검수 보드 반영 때 Claude 가 그대로 쓴다 — docs/notes/sky-board.md)
+const DECISIONS = [
+  { id: 'D58', q: '맑은 날 구름은 얼마나?', now: '구름 문턱 0.60 — 하늘의 1/3 쯤 (흐림·비는 날씨가 더 늘린다)', opts: [
+    ['A', '지금처럼 조금', '파란 하늘이 넓게, 구름은 띄엄띄엄.', true, { cloudClear: 0.60 }],
+    ['B', '더 많이', '맑은 날도 몽글몽글한 구름이 하늘 절반쯤.', false, { cloudClear: 0.50 }],
+    ['C', '거의 없이', '맑은 날은 파란 하늘, 구름은 흐린 날에만.', false, { cloudClear: 0.72 }] ] },
+  { id: 'D59', q: '구름 가장자리는 어떤 느낌?', now: '툰처럼 조금만 부드러운 경계 (0.07)', opts: [
+    ['A', '툰 (지금)', '그림체와 맞게 테두리가 또렷하되 살짝 부드럽게.', true, { cloudEdge: 0.07 }],
+    ['B', '부드럽게 (수채화)', '가장자리가 번지듯 흐려요.', false, { cloudEdge: 0.20 }],
+    ['C', '또렷한 셀', '스티커처럼 딱 잘린 경계 + 그늘도 진하게.', false, { cloudEdge: 0.015, shade: 0.9 }] ] },
+  { id: 'D60', q: '구름 그늘 면은?', now: '해 반대쪽이 옅은 하늘색·라벤더 (그늘 세기 0.75)', opts: [
+    ['A', '하늘빛·라벤더 (지금)', '포근하고 밝게. 노을엔 분홍빛이 섞여요.', true, { shade: 0.75, shadeDeep: 0 }],
+    ['B', '거의 흰 구름', '그늘을 아주 옅게 — 하얀 솜 같은 구름.', false, { shade: 0.22, shadeDeep: 0 }],
+    ['C', '진한 회청', '그늘이 진해서 구름이 입체적으로 보여요.', false, { shade: 0.85, shadeDeep: 1 }] ] },
+  { id: 'D61', q: '노을·새벽에 해 쪽 지평선 빛은?', now: '해 쪽 지평선이 주황·분홍으로 물듦 (0.34)', opts: [
+    ['A', '지금처럼', '해 쪽만 따뜻하게 물들어요.', true, { sunsetSide: 0.34, sunGlow: 0.16 }],
+    ['B', '더 진하게', '노을빛이 넓고 밝게 퍼져요.', false, { sunsetSide: 0.62, sunGlow: 0.16 }],
+    ['C', '은은하게', '빛무리도 작게 — 해가 또렷이 보여요.', false, { sunsetSide: 0.15, sunGlow: 0.10 }] ] },
+  { id: 'D62', q: '해 둘레 빛살은?', now: '은은한 빛살 (0.10) — 해 쪽을 볼 때만 보여요', opts: [
+    ['A', '은은하게 (지금)', '살짝 보이는 빛줄기.', true, { rays: 0.10 }],
+    ['B', '또렷하게', '애니메이션처럼 굵은 빛줄기.', false, { rays: 0.24 }],
+    ['C', '없이', '빛무리만.', false, { rays: 0 }] ] },
+  { id: 'D63', q: '낮 하늘 색은?', now: '팔레트 PAL-T2 (천정 #8FD3F4 · 지평선 #D8F1FF) 그대로', opts: [
+    ['A', '지금처럼', '밝은 하늘색.', true, { gradDeep: 0 }],
+    ['B', '천정을 더 진한 파랑', '위로 갈수록 짙은 파랑 — 하늘이 높아 보여요.', false, { gradDeep: 0.55 }],
+    ['C', '파스텔', '더 옅고 뽀얀 하늘.', false, { gradDeep: -0.55 }] ] },
+  { id: 'D64', q: '북쪽 먼 하늘의 3D 솜구름은?', now: '셰이더 구름층 앞에 3D 솜구름 5~14개 (날씨 따라)', opts: [
+    ['A', '같이 (지금)', '앞쪽 솜구름이 깊이를 줘요.', true, { puffs: true }],
+    ['B', '빼고 셰이더 구름만', '하늘이 깔끔해지고 조금 가벼워요.', false, { puffs: false }] ] },
+  { id: 'D65', q: '밤하늘은?', now: '옅은 은하수 (0.12) · 별 1400개 · 구름 뒤 별은 가림', opts: [
+    ['A', '은은한 은하수 (지금)', '보일 듯 말 듯.', true, { milky: 0.12, starBoost: 1 }],
+    ['B', '또렷한 은하수 + 별 밝게', '별이 1.6배 밝고 은하수가 뚜렷해요.', false, { milky: 0.28, starBoost: 1.6 }],
+    ['C', '은하수 없이', '별만.', false, { milky: 0, starBoost: 1 }] ] },
+  { id: 'D66', q: '구름 흐르는 빠르기는?', now: '천천히 (1초에 하늘 평면 0.012) — 그림으론 안 보여서 글로만', opts: [
+    ['A', '지금처럼 천천히', '가만히 보면 흐르는 게 보여요.', true, { cloudSpeed: [0.012, 0.004] }],
+    ['B', '두 배 빠르게', '바람 부는 날처럼.', false, { cloudSpeed: [0.024, 0.008] }],
+    ['C', '거의 멈춤', '그림처럼 가만히.', false, { cloudSpeed: [0.003, 0.001] }] ] },
+];
+const fxText = fx => Object.entries(fx).map(([k, v]) => `${k} ${Array.isArray(v) ? v.join('·') : v}`).join(' · ');
+const pic = (d, k) => d.id === 'D66' ? '' : img(`${d.id.toLowerCase()}-${k.toLowerCase()}`, `${d.id}-${k}`);
+const decCard = d => `
+  <div class="card dec" id="dec-${d.id}"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <p class="nowline">지금: <b>${d.now}</b></p>
+    <div class="opts pics">${d.opts.map(([k, t, desc, rec, fx]) => `
+      <div class="opt pic"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+        <label for="${d.id}${k}">${pic(d, k)}<span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span><span class="fxval">${esc(fxText(fx))}</span>${rec ? '<span class="rec">추천 · 지금</span>' : ''}</label></div>`).join('')}</div>
+    ${noteBox(d.id, d.q)}</div>`;
+$('decisions').innerHTML = DECISIONS.map(decCard).join('');
+
+/* ---------- 하늘 층 ---------- */
+const LAYERS = [
+  ['SK-01', '그라데이션', '지평선 → 가운데 → 천정 세 단. 색은 시간대 팔레트(새벽·낮·노을·밤)가 정해요.', 'D63'],
+  ['SK-02', '지평선 안개 띠', '지평선 바로 위 밝은 띠 (haze 0.22). 밤엔 옅게.', '—'],
+  ['SK-03', '해 빛무리 · 노을빛', '해 둘레 넓은 빛 + 둥근 해 + 새벽·노을에 해 쪽 지평선이 물듦.', 'D61'],
+  ['SK-04', '빛살', '해를 도는 빛줄기, 천천히 바뀜. 구름이 많으면 약하게.', 'D62'],
+  ['SK-05', '툰 구름층', '잡음으로 만든 구름이 바람 따라 흐름. 해 반대쪽 그늘 두 단, 해 쪽 가장자리 은빛. 날씨가 양·잿빛을 정함.', 'D58 · D59 · D60 · D66'],
+  ['SK-06', '3D 솜구름', '북쪽 먼 하늘에 떠 있는 입체 구름 5~14개 (툰 재질).', 'D64'],
+  ['SK-07', '은하수', '밤에 북쪽 하늘을 비스듬히 지나는 얼룩진 띠.', 'D65'],
+  ['SK-08', '별 · 달', '별 1400개(반짝임, 구름 뒤 가림), 달은 크림색 원 + 옅은 빛무리.', 'D65'],
+];
+$('layerGrid').innerHTML = LAYERS.map(([id, name, what, dec]) => `
+  <div class="card layer"><div class="head"><span class="id">${id}</span><h3>${name}</h3></div>
+    <p class="what">${what}</p><p class="small muted">걸린 결정: ${dec}</p>${noteBox(id, name)}</div>`).join('');
+
+$('specTable').innerHTML = [['높음', 5, '✅', '✅'], ['적정 (처음)', 4, '✅', '✅'], ['낮음', 3, '—', '✅'], ['매우 낮음', 2, '—', '—']]
+  .map(r => `<tr>${r.map((v, i) => `<td${i ? ' class="st"' : ''}>${v}</td>`).join('')}</tr>`).join('');
+$('pills').innerHTML = ['<span class="pill wait">사용자 선택 대기 · 추천 = 지금 게임(A)</span>', '결정 9 (D58–D66)', '하늘 층 8 (SK-01–08)', '그림 29장 (게임 v16)']
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'sky', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 하늘 검수 보드 v0.1 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ` (바꿈: ${fxText(opt[4])})` : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>

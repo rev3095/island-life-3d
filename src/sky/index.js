@@ -31,6 +31,7 @@ const setSRGB = (color, a) => color.setRGB(a[0], a[1], a[2], THREE.SRGBColorSpac
 export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
   let realShift = 0, pausedMs = null, weatherOverride = null, seasonOverride = null;
+  let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs }))
   let indoor = false;               // 집 안: 하늘·구름·비·눈을 숨기고 실내 조명 (setIndoor)
   let palettes = fallbackPalettes();
   let fc = { key: null, segs: null };
@@ -123,8 +124,14 @@ export function createSky(ctx) {
       if (on === indoor) return;
       indoor = on;
       for (const g of [dome.group, clouds.group, precip.group]) g.visible = !on;
+      if (!on && !puffs) clouds.group.visible = false;
       step(0);
       events.emit('scene:indoor', { on });
+    },
+    /** 하늘 셰이더 값 (src/sky/dome.js SKY_FX 이름) 바꾸기 → 지금 값. puffs = 북쪽 먼 하늘의 3D 솜구름 보이기. 하늘 검수 보드 미리 보기가 쓴다 */
+    skyFx(v = {}) {
+      if (typeof v.puffs === 'boolean') { puffs = v.puffs; clouds.group.visible = puffs && !indoor; }
+      return { ...dome.setFx(v), puffs };
     },
   };
 

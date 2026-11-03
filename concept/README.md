@@ -11,12 +11,13 @@
 | Z5 축제 검수 보드 v0.1 (이모티콘 대화·축제 광장·부품·부스·엔딩, D14–D25) | `z5-festival-board.html` + `board-kit.js` | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `z5` |
 | 6차 검수 보드 v0.6 (M6 편집기 완성) | `wave6-board.html` + `board-kit.js` | https://claude.ai/artifact/Lz3rV3HxTzQVV4RJt1DYvU | `wave6` |
 | 7차 검수 보드 v0.7 (M7 출시 준비, D36–D48 · QA 결과 D49–D57) | `wave7-board.html` + `board-kit.js` | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `wave7` |
+| 하늘 검수 보드 v0.1 (하늘 셰이더, D58–D66 · 하늘 층 SK-01–08, 그림 = 게임 화면 `concept/sky/*.jpg`) | `sky-board.html` + `board-kit.js` + `sky/*.jpg` | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `sky` |
 
 ## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
-| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) |
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67– (실내 보드, `p12-interiors` 세션) |
 | CH | 캐릭터 | CH-01–10 (CH-11·12 는 후보만) |
 | EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 · PR-01–12 (+z5 PR-13–16) · BD-01–05 (+z5 BD-06–07) · TI-01–07 (+z5 TI-08) |
 | FU | 가구 | FU-01–33 (+z5 FU-34) |
@@ -26,6 +27,7 @@
 | s01– | 장면 (시나리오 편집기) | s01–s12 |
 | ET | 편집기 (wave6) | ET-01– |
 | UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 · RC-01–12 · QA-01–19 |
+| SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
 
 ## 새 보드 만드는 법 (6차부터)
 

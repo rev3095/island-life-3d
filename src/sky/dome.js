@@ -26,7 +26,11 @@ export const SKY_FX = {
   cloudFull: 0.30,     // 흐린 날 구름 문턱
   cloudEdge: 0.07,     // 구름 가장자리 부드러움 (툰은 작게)
   silver: 0.55,        // 해 쪽 구름 가장자리 빛
-  milky: 0.10,         // 은하수 밝기
+  shade: 0.75,         // 구름 그늘 면 세기 (0 = 그늘 없는 흰 구름)
+  shadeDeep: 0,        // 구름 그늘 색: 0 = 하늘빛·라벤더, 1 = 진한 회청 (입체감)
+  gradDeep: 0,         // 하늘 그라데이션: + 천정을 더 진한 파랑으로, − 파스텔로 옅게
+  milky: 0.12,         // 은하수 밝기
+  starBoost: 1,        // 별 밝기 배율
 };
 
 const DOME_VS = /* glsl */ `
@@ -75,15 +79,18 @@ float cloudDensity( vec3 d, out float n, out vec2 uv ) {
 const DOME_FS = /* glsl */ `${SKY_OUT}
 uniform vec3 uZenith, uHorizon, uSunDir, uSunColor, uMoonDir;
 uniform float uSunVis, uMoonVis, uGrey, uNight, uGold, uStars;
-uniform float uHaze, uSunGlow, uSunsetSide, uRays, uSilver, uMilky;
+uniform float uHaze, uSunGlow, uSunsetSide, uRays, uSilver, uMilky, uShade, uShadeDeep, uGradDeep;
 varying vec3 vDir;
 ${CLOUD_CORE}
 void main() {
   vec3 d = normalize( vDir );
   float e = d.y;
   // ── 세 단 그라데이션: 지평선 → 가운데 → 천정 ──
-  vec3 mid = mix( uHorizon, uZenith, 0.55 );
-  vec3 col = mix( mix( uHorizon, mid, smoothstep( -0.02, 0.22, e ) ), uZenith, smoothstep( 0.18, 0.8, e ) );
+  // 천정 색 조절: + 더 진한 파랑, − 파스텔 (uGradDeep)
+  vec3 zen = mix( uZenith, uZenith * vec3( 0.62, 0.76, 1.0 ), max( uGradDeep, 0.0 ) );
+  zen = mix( zen, mix( uZenith, vec3( 1.0 ), 0.4 ), max( -uGradDeep, 0.0 ) );
+  vec3 mid = mix( uHorizon, zen, 0.55 );
+  vec3 col = mix( mix( uHorizon, mid, smoothstep( -0.02, 0.22, e ) ), zen, smoothstep( 0.18, 0.8, e ) );
   // 지평선 안개 띠 (낮엔 밝게, 밤엔 옅게)
   col += ( uHorizon * uHaze + 0.03 ) * exp( -abs( e ) * 16.0 ) * ( 1.0 - 0.65 * uNight );
 
@@ -110,7 +117,7 @@ void main() {
 
 #if SKY_MILKY
   // ── 은하수: 기운 큰 원을 따라 얼룩진 띠 (밤에만) ──
-  vec3 mwN = normalize( vec3( 0.35, 0.62, 0.7 ) );
+  vec3 mwN = normalize( vec3( 0.92, 0.28, 0.12 ) );   // 띠가 카메라가 보는 북쪽 하늘을 비스듬히 지나가게
   float band = exp( -pow( dot( d, mwN ) * 3.6, 2.0 ) );
   col += vec3( 0.58, 0.62, 0.92 ) * band * ( 0.45 + 0.55 * skyNoise( d.xz * 11.0 + d.y * 7.0 ) ) * uMilky * uStars;
 #endif
@@ -125,7 +132,8 @@ void main() {
     vec3 cLit = mix( vec3( 1.0, 0.99, 0.96 ), warm * 1.05 + 0.08, uGold * 0.55 );
     // 그늘 면: 잿빛 대신 하늘빛이 비친 옅은 하늘색·라벤더 (노을엔 지평선 색이 섞여 분홍빛)
     vec3 cShade = mix( vec3( 0.84, 0.88, 0.97 ), mix( uZenith, uHorizon, 0.45 + 0.35 * uGold ), 0.38 + 0.2 * uGold );
-    vec3 cc = mix( cLit, cShade, shade * 0.75 );
+    cShade = mix( cShade, vec3( 0.52, 0.58, 0.72 ) * mix( vec3( 1.0 ), uHorizon * 1.2, 0.3 * uGold ), uShadeDeep );   // 진한 회청 (입체감)
+    vec3 cc = mix( cLit, cShade, shade * uShade );
     // 해 쪽 가장자리 빛 (은빛 테두리)
     cc += warm * dens * ( 1.0 - dens ) * 4.0 * pow( s, 4.0 ) * uSilver * uSunVis;
     // 흐린 날 잿빛, 밤엔 어둡고 푸른 구름 (달 쪽 테두리만 옅게)
@@ -182,6 +190,7 @@ export function createDome({ quality = 'mid' } = {}) {
     uZenith: v3(), uHorizon: v3(), uSunDir: v3(), uSunColor: v3(), uMoonDir: v3(), uSunVis: f(0), uMoonVis: f(0),
     uGrey: f(0), uNight: f(0), uGold: f(0), uStars: f(0),
     uHaze: f(SKY_FX.haze), uSunGlow: f(SKY_FX.sunGlow), uSunsetSide: f(SKY_FX.sunsetSide), uRays: f(SKY_FX.rays), uSilver: f(SKY_FX.silver), uMilky: f(SKY_FX.milky),
+    uShade: f(SKY_FX.shade), uShadeDeep: f(SKY_FX.shadeDeep), uGradDeep: f(SKY_FX.gradDeep),
   };
   const domeMat = new THREE.ShaderMaterial({
     uniforms, vertexShader: DOME_VS, fragmentShader: DOME_FS, defines: definesFor(quality),
@@ -229,6 +238,15 @@ export function createDome({ quality = 'mid' } = {}) {
   return {
     group,
     get quality() { return q; },
+    /** 하늘 모양 값 바꾸기 { haze, sunGlow, … } (SKY_FX 이름) — uniform 만 바꾼다. 돌려주는 값 = 지금 값 */
+    setFx(v = {}) {
+      const map = { haze: 'uHaze', sunGlow: 'uSunGlow', sunsetSide: 'uSunsetSide', rays: 'uRays', silver: 'uSilver', milky: 'uMilky',
+        shade: 'uShade', shadeDeep: 'uShadeDeep', gradDeep: 'uGradDeep', cloudScale: 'uCloudScale', cloudClear: 'uCloudClear', cloudFull: 'uCloudFull', cloudEdge: 'uCloudEdge' };
+      for (const [k, u] of Object.entries(map)) if (typeof v[k] === 'number') uniforms[u].value = v[k];
+      if (Array.isArray(v.cloudSpeed)) cloudU.uCloudSpeed.value.set(v.cloudSpeed[0], v.cloudSpeed[1]);
+      if (typeof v.starBoost === 'number') SKY_FX.starBoost = v.starBoost;
+      return Object.fromEntries([...Object.entries(map).map(([k, u]) => [k, uniforms[u].value]), ['cloudSpeed', cloudU.uCloudSpeed.value.toArray()], ['starBoost', SKY_FX.starBoost]]);
+    },
     /** 사양이 바뀌면 (render/quality.js 이름) — 셰이더를 다시 만든다 */
     setQuality(next) {
       if (!SKY_QUALITY[next] || next === q) return;
@@ -255,7 +273,7 @@ export function createDome({ quality = 'mid' } = {}) {
       cloudU.uCover.value = cover;
       uniforms.uGrey.value = grey;
       uniforms.uNight.value = night;
-      starU.uAlpha.value = look.stars;
+      starU.uAlpha.value = Math.min(1.6, look.stars * SKY_FX.starBoost);
       starU.uPixel.value = pixelRatio;
       stars.visible = look.stars > 0.01;
     },
