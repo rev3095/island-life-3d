@@ -1,7 +1,7 @@
 // 처음부터 엔딩까지 자동 플레이 단계. 단계마다 { id, title, run(T) → { status, note } } — status: pass | awkward | block | skip.
 // 막혀도 되도록 다음 단계로 간다 (막힌 단계 뒤 결과는 그 상태에서 이어 본 것). 시계만 time.setHour 로 당기고,
 // 나머지는 모두 행동 키·창 단추로 한다 (festival.debug·상태 고치기 같은 지름길 없음).
-// 날짜: 새 게임 = 실제 오늘(10-30). 두부 생일 11-03, 단풍 이사 = 첫날 + 1(집터) + 3(이삿짐) + 1(입주).
+// 날짜: 새 게임 = 실제 오늘 (어느 날이든 — 생일 단계는 가장 가까운 주민 생일까지 넘긴다). 단풍 이사 = 첫날 + 1(집터) + 3(이삿짐) + 1(입주).
 
 const NAMES = { player: '하늘', island: '몽글' };
 /** 부품 주인 → 무엇이 필요 (assets/festival/config.json parts.list 를 읽어 채운다) */
@@ -392,18 +392,19 @@ export function makeScenario(bot, sk, opts = {}) {
     return placed ? pass('통나무 의자 만들어 방에 놓음') : awk('만들었는데 방에 못 놓음');
   });
 
-  add('birthday', '두부 생일 (11/3)', async () => {
-    const r = T.notes['bday-dubu'];
-    if (!r) {
-      // 루프가 생일 전에 끝났으면 그날까지 하루씩 넘긴다
-      for (let k = 0; k < 8 && bot.day() < `${bot.day().slice(0, 4)}-11-03`; k++) { await bot.nextDay(9); await bot.settle(60); }
-      if (bot.day().endsWith('11-03')) await birthday();
+  add('birthday', '주민 생일 (시작한 날 뒤 가장 가까운)', async () => {
+    // 예전엔 두부 생일(11-03)을 박아 두어, 그 뒤 날짜에 새 게임을 시작하면 막혔다 → 아무 주민이든 다음 생일까지 하루씩 넘긴다 (60일까지)
+    const got = () => Object.entries(T.notes).find(([k]) => k.startsWith('bday-'))?.[1] ?? null;
+    if (!got()) {
+      for (let k = 0; k < 60 && !got(); k++) {
+        if (S().town.birthday?.today?.().length) { await birthday(); break; }
+        await bot.nextDay(9); await bot.settle(60);
+      }
     }
-    const b = T.notes['bday-dubu'];
-    if (!b) return block(`생일 날(11-03)에 못 감 (오늘 ${bot.day()})`);
+    const b = got();
+    if (!b) return skip(`60일 안에 주민 생일이 없음 (오늘 ${bot.day()})`);
     return b.cake ? pass(`${b.day} ${b.how} 생일 대화 · 케이크 받음`) : awk(`${b.day} 생일 대화 ${b.opened ? `함(${b.how})` : `못 함(${b.how})`} · 케이크 ${b.cake ? '받음' : '없음'}`);
   });
-
   add('movein', '이사: 집터 → 이삿짐 → 단풍 입주', async () => {
     for (let k = 0; k < 6 && S().town.movein.stage() !== 'moved'; k++) { await bot.nextDay(9); await bot.settle(60); }
     const stage = S().town.movein.stage();
