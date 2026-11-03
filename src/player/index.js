@@ -3,6 +3,7 @@ import { LoopOnce, LoopRepeat, Vector3 } from 'three';
 import { createCameraRig } from './camera.js';
 import { buildTool } from './tools.js';
 import { createMotions } from './motions.js';
+import { createMouseMove } from './mouse.js';
 
 const WALK = 2.6, RUN = 5.0;          // 칸/초
 const RADIUS = 0.26;                  // 충돌 원 반지름
@@ -101,6 +102,7 @@ export default {
       teleport(x, z, facing = P.facing) {
         P.position.set(x, world ? world.island.heightAt(x, z) : 0, z);
         P.facing = facing; P.vx = P.vz = 0;
+        P.mouse?.cancel();                                // 마우스로 가던 곳은 잊는다
         root.rotation.y = facing + Math.PI;
         P.rig.snap(P.position);
       },
@@ -111,6 +113,9 @@ export default {
       set toolKeys(v) { P.toolKeys = v; }, get toolKeys() { return P.toolKeys; },
     };
     ctx.services.player = api;
+    // 마우스로 걷기 (mouse.js): input 이 키보드·패드가 없을 때 이 방향을 쓴다
+    P.mouse = createMouseMove(ctx, { position: () => P.position });
+    ctx.input.pointerMove = P.mouse;
     const TOOLS = ctx.constants.TOOLS;
     if (saved.tool) setTool(saved.tool, { silent: true });     // TOOLS 다음에 (저장된 도구가 있으면 바로 쓴다)
 
@@ -217,6 +222,7 @@ export default {
     sp.x = pos.x; sp.z = pos.z; sp.facing = P.facing;
 
     P.rig.update(dt, pos, P.vx, P.vz);
+    P.mouse?.update(dt);
   },
 };
 

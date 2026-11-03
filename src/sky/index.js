@@ -129,7 +129,7 @@ export function createSky(ctx) {
   };
 
   // 장면 물체
-  const dome = createDome();
+  const dome = createDome({ quality: ctx.quality });   // 하늘 셰이더는 사양(render/quality.js)에 따라 구름 겹 수·빛살·은하수를 줄인다
   const clouds = createClouds(ctx.materials);
   const precip = createPrecip(ctx.materials.curve);
   const surfaces = createSurfaces(ctx.materials.curve);
@@ -187,7 +187,7 @@ export function createSky(ctx) {
     elapsed = (elapsed + dt) % 2000;
     const viewH = ctx.renderer?.domElement.height || innerHeight;
     const viewScale = viewH / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
-    dome.update(look, camera, elapsed, ctx.renderer?.getPixelRatio() ?? 1);
+    dome.update(look, camera, elapsed, ctx.renderer?.getPixelRatio() ?? 1, { cover: wx.cover, grey: Math.min(1, wx.overcast * 0.6 + wx.rain * 0.4), night: nf });
     clouds.update(dt, ctx.focus, wx.cover, Math.min(1, wx.overcast * 0.55 + wx.rain * 0.45), look.horizon);
     precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf) }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
 
@@ -212,6 +212,8 @@ export function createSky(ctx) {
       Object.assign(wx, WX[last.weather]);
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
+      events.on('quality:changed', ({ quality }) => dome.setQuality(quality));
+      dome.setQuality(ctx.quality);   // 주소로 고른 사양 (저장된 사양은 quality:changed 로)
       syncSeason(n.season);
       if (ctx.debug) debug = createDebugPanel(ctx.uiRoot, service);
       step(0);

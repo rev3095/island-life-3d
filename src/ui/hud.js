@@ -2,7 +2,7 @@
 // 아래 가운데 '지금 Space·F 를 누르면' 안내 (키보드만 — 휴대폰은 A·B 버튼 글자가 바뀐다).
 import { h, fmt, clockText, nowFromDate, toolSvg, TOOL_NAME, WEATHER_ICON, WEATHER_NAME, iconEl } from './dom.js';
 
-const HINT_KEYS = [['WASD', '이동'], ['Shift', '달리기'], ['Space', '행동'], ['F', '줍기'], ['Q/E', '도구'], ['I', '가방'], ['P', '섬폰'], ['M', '지도'], ['H', '안내 숨기기']];
+const HINT_KEYS = [['WASD', '이동'], ['클릭', '그 자리로'], ['Shift', '달리기'], ['Space', '행동'], ['F', '줍기'], ['Q/E', '도구'], ['I', '가방'], ['P', '섬폰'], ['M', '지도'], ['H', '안내 숨기기']];
 
 export function createHud(ctx, { openBag, openPhone, openMap, openTools, setHint }) {
   const time = h('b', { class: 'pk-clock-time' });

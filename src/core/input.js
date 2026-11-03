@@ -1,5 +1,5 @@
 // 키보드·터치를 '의도'로 바꾼다. 다른 모듈은 키 이름이 아니라 의도(action, pickup ...)만 본다.
-//   이동: WASD / 방향키 (+ Shift 달리기), 휴대폰은 왼쪽 아래 떠다니는 패드 (끝까지 밀면 달리기)
+//   이동: WASD / 방향키 (+ Shift 달리기), 마우스로 땅 누르기·꾹 누르고 따라가기 (player/mouse.js), 휴대폰은 왼쪽 아래 떠다니는 패드 (끝까지 밀면 달리기)
 //   action  Space/Enter (말 걸기·도구 쓰기)   pickup F (줍기)      휴대폰: A · B
 //   toolPrev Q   toolNext E   tool1~5 숫자키   bag I/Tab   phone P/Esc   map M
 // 화면 위쪽 = 월드 -Z (카메라가 남쪽에서 북쪽을 본다).
@@ -28,15 +28,22 @@ export function createInput(events, { touchRoot = document.body } = {}) {
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; pad?.setEnabled(enabled); },
     touch: false,
+    /** 마우스로 걷기 (player/mouse.js 가 넣는다): get() → { x, z, run } | null, cancel(). 키보드·패드가 우선 */
+    pointerMove: null,
     update() {
-      let x = 0, z = 0;
+      let x = 0, z = 0, pointerRun = false;
       for (const code of held) { const m = MOVE[code]; if (m) { x += m[0]; z += m[1]; } }
       if (stick.active) { x = stick.x; z = stick.z; }
+      if (x || z || stick.active) api.pointerMove?.cancel();
+      else if (enabled && api.pointerMove) {
+        const p = api.pointerMove.get();
+        if (p) { x = p.x; z = p.z; pointerRun = !!p.run; }
+      }
       const len = Math.hypot(x, z);
       if (len > 1) { x /= len; z /= len; }
       api.move.x = enabled ? x : 0;
       api.move.z = enabled ? z : 0;
-      api.run = enabled && (held.has('ShiftLeft') || held.has('ShiftRight') || (stick.active && Math.hypot(stick.x, stick.z) >= RUN_AT));
+      api.run = enabled && (held.has('ShiftLeft') || held.has('ShiftRight') || pointerRun || (stick.active && Math.hypot(stick.x, stick.z) >= RUN_AT));
     },
     press(intent) { events.emit('input:press', { intent }); },
     /** 터치 조작 켜기 (이미 있으면 그대로) */
