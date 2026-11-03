@@ -238,6 +238,8 @@ export default {
       villagers, keepers: keepers.all,
       /** 지금 섬에 사는 주민 slug 목록 (새 주민은 입주한 뒤부터) */
       residents,
+      /** 상점·박물관 문 (실내 보드): 'open' | 'closed' | null — house.places 가 문 쪽으로 밀 때 묻는다 */
+      placeRule: kind => keepers.placeRule(kind),
       /** 주민이 지금 어디: 'out' 밖 · 'home' 집 안(깨어 있음, 생일·비·저녁) · 'sleep' 자는 시간 · 'room' 플레이어가 방에 있음 · null 섬에 안 삶 */
       atHome(slug) {
         const V = villagers.find(v => v.slug === slug);

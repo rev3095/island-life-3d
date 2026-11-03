@@ -1,19 +1,23 @@
 // 트랙 W3 (P4): 집 실내 · 가구 배치 · 작업대 제작. src/gameplay/index.js 가 불러온다.
-//  - 플레이어 집 문(world.places.playerHouse) 앞에서 행동 키(우선순위 90) 또는 문 쪽으로 밀기 → 잠깐 어두워졌다가 방 안으로.
+//  - 플레이어 집 문(world.places.playerHouse) 앞에서 행동 키(우선순위 90) 또는 문 쪽으로 밀기 → 문이 열리고 걸어 들어가 방 안으로 (door.js, 실내 보드 D67·D68).
 //  - 방은 x = 500 에 지은 8×8 칸 (room.js), world.addZone 으로 바닥·벽 충돌을 바꿔 끼운다.
 //  - 가구: 가방에서 골라 앞 칸에 놓기, 가구 앞 행동 키(80) → 돌리기·옮기기·색 바꾸기·라디오·어항/곤충 상자에 넣기·가방에 넣기, F → 바로 가방에.
 //  - 작업대(방 서쪽 벽): ui.craft 창 (없으면 대화 선택지로, craft.js).
 //  - 5차 Z2: 벽지·바닥(assets/interior 스펙, interior.js·pattern.js). 벽을 보고 행동 키(25) → 꾸미기 메뉴(벽지·바닥 바꾸기·가구 놓기).
 //    상점 코너(ui/shop.js)는 house.interior 로 오늘의 벽지·바닥을 보고 산다. 주민 집 문 → 주민 방(visit.js).
-// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio, nextId, wallpaper, floor, owned, visit } — rec 모양은 grid.js 맨 위 (+ variant 색, holds 넣어 둔 물고기·곤충 id).
+//  - 실내 보드 interiors: 도토리상점·박물관 실내(places.js). 드나들기는 모두 door.js 의 through() 하나로.
+// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio, nextId, wallpaper, floor, owned, visit, place } — rec 모양은 grid.js 맨 위 (+ variant 색, holds 넣어 둔 물고기·곤충 id).
+//   place = 상점·박물관 안에서 저장했으면 'shop'|'museum' (이어하기, places.js).
 // 화면 전환은 ui.fade, 카메라 범위는 player.camera.setBounds — 없으면 직접 한다.
 import { ROOM_W, ROOM_D, boxOf, fits, spotInFront, rotateInPlace, wallInFront, wallFree, moveCircle, inBox } from './grid.js';
-import { ROOM, buildRoom, wallMount, x0, z0, WINDOWS, DOOR, ENTRY, BOUNDS, FADE_OUT, FADE_IN, cameraBox, CAMERA_CURVE } from './room.js';
+import { ROOM, buildRoom, wallMount, x0, z0, WINDOWS, DOOR, ENTRY, BOUNDS, cameraBox, CAMERA_CURVE } from './room.js';
 import { createFurnitureKit } from './furniture.js';
 import { openWorkbench, josa } from './craft.js';
 import { loadInterior, normalizeHouse, todayPick, listOf, entryOf, KIND_NAME } from './interior.js';
 import { swatchURL } from './pattern.js';
 import { createVisits } from './visit.js';
+import { createDoors } from './door.js';
+import { createPlaces } from './places.js';
 
 const WORKBENCH = { id: 'workbench', item: 'workbench', gx: 0, gz: 2, rot: 1 };   // 서쪽 벽에 붙여 동쪽을 본다
 const WORKBENCH_INFO = { footprint: [2, 1], place: 'floor' };
@@ -109,10 +113,10 @@ export default {
       H.bench = wb;
     } catch (e) { console.warn('[house] 작업대 모델을 못 읽었어요', e); }
 
-    // 어두워졌다 밝아지는 막: ui.fade 가 있으면 그것, 없으면 #ui 맨 앞(ui 창보다 아래)에 직접
+    // 어두워졌다 밝아지는 막: ui.fade 가 있으면 그것 (색·원형은 door.js 가 고른다), 없으면 #ui 맨 앞(ui 창보다 아래)에 직접
     let ownFade = null;
-    function fadeTo(on, sec) {
-      if (ctx.services.ui?.fade) return ctx.services.ui.fade(on, sec);
+    function fadeTo(on, sec, color, opts) {
+      if (ctx.services.ui?.fade) return ctx.services.ui.fade(on, sec, color, opts);
       if (!ownFade) {
         ownFade = document.createElement('div');
         ownFade.className = 'house-fade';
@@ -125,6 +129,10 @@ export default {
         setTimeout(res, sec * 1000 + 30);
       });
     }
+
+    // 문 드나들기 (내 집·주민 집·상점·박물관 공용)
+    const doors = createDoors(ctx, { fadeTo });
+    H.doors = doors;
 
     // 저장된 가구 다시 놓기
     await Promise.all(S.furniture.map(r => spawn(r)));
@@ -142,10 +150,12 @@ export default {
 
     // ── 행동 키 ──
     const I = ctx.services.gameplay.interactions;
+    // 문을 지나는 동안(door.js)은 행동 키를 모두 삼킨다 — 문 앞 노크·말 걸기가 끼어들지 않게
+    I.add({ name: 'house-door-busy', priority: 300, label: '', test: () => (doors.busy ? true : null), run: () => {} });
     I.add({ name: 'house-move-drop', intent: 'action', priority: 120, test: () => H.moving, run: () => dropMoving() });
     I.add({ name: 'house-move-cancel', intent: 'pickup', priority: 120, test: () => H.moving, run: () => cancelMoving() });
-    I.add({ name: 'house-door-in', intent: 'action', priority: 90, test: () => (!H.inside && !H.busy && nearDoor(true) ? true : null), run: () => enter() });
-    I.add({ name: 'house-door-out', intent: 'action', priority: 90, test: () => (H.inside && !H.busy && onDoormat() ? true : null), run: () => leave() });
+    I.add({ name: 'house-door-in', intent: 'action', priority: 90, test: () => (!H.inside && !H.busy && !doors.busy && nearDoor(true) ? true : null), run: () => enter() });
+    I.add({ name: 'house-door-out', intent: 'action', priority: 90, test: () => (H.inside && !H.busy && !doors.busy && onDoormat() ? true : null), run: () => leave() });
     I.add({ name: 'house-furniture', intent: 'action', priority: 80, test: () => (H.inside && !H.busy ? targetInFront() : null),
       run: t => (t.kind === 'workbench' ? workbench() : menu(t.rec)) });
     I.add({ name: 'house-furniture-store', intent: 'pickup', priority: 80, test: () => { const t = H.inside && !H.busy ? targetInFront() : null; return t?.kind === 'furniture' ? t : null; },
@@ -154,8 +164,11 @@ export default {
     I.add({ name: 'house-place', intent: 'action', priority: 20, test: () => (H.inside && !H.busy ? true : null), run: () => placeFromBag() });
 
     // 주민 집·주민 방 (visit.js): 같은 화면 전환·가구 모델·스펙을 쓴다
-    const visits = createVisits(ctx, { H, kit, interior, fadeTo, toast, saveSoon });
+    const visits = createVisits(ctx, { H, kit, interior, doors, toast, saveSoon });
     H.visits = visits;
+    // 도토리상점·박물관 실내 (places.js): 같은 문·가구 모델·스펙
+    const places = await createPlaces(ctx, { H, kit, interior, doors, toast, saveSoon });
+    H.places = places;
 
     // 저장에서 이어하기: 집 안에서 끝냈으면 다시 집 안에
     if (S.inside) {
@@ -164,6 +177,7 @@ export default {
       const ok = Number.isFinite(lx) && lx > BOUNDS.x0 && lx < BOUNDS.x1 && lz > BOUNDS.z0 && lz < BOUNDS.z1 && !blockers().some(b => inBox(b, lx, lz));
       goInside(ok ? { lx, lz, facing: p.facing ?? 0 } : { ...ENTRY, facing: 0 });
     } else if (S.visit) await visits.resume(S.visit);
+    else if (S.place) await places.resume(S.place);
 
     ctx.services.house = {
       get inside() { return H.inside; },
@@ -175,8 +189,17 @@ export default {
       workbench: () => workbench(),
       models: () => kit.list.map(m => ({ ...m })),
       room: { x: ROOM.x, z: ROOM.z, w: ROOM_W, d: ROOM_D, x0, z0 },
-      /** 지금 있는 방: 'player' (내 집) | 주민 slug (그 주민 방) | null (밖) */
-      get where() { return H.inside ? 'player' : visits.where; },
+      /** 지금 있는 방: 'player' (내 집) | 주민 slug (그 주민 방) | 'shop' | 'museum' | null (밖) */
+      get where() { return H.inside ? 'player' : visits.where ?? places.where; },
+      /** 지금 방의 문 매트 (나가는 곳, 월드) { x, z } | null — QA 봇·편집기용 */
+      doormat() {
+        if (H.inside) return { x: x0 + ROOM_W / 2, z: z0 + ROOM_D - 0.45 };
+        return visits.doormat() ?? places.doormat();
+      },
+      /** 문 드나드는 중인가 (door.js) */
+      get passing() { return doors.busy; },
+      /** 상점·박물관 실내 (places.js): enter(kind) · leave() · info(kind) → { keeper, talk, doormat, room } */
+      places: places.api,
       /** 주민 방 (visit.js): 들어가기·나오기, 방 자리, 주민이 설 곳 */
       get visiting() { return visits.where; },
       visit: slug => visits.enter(slug),
@@ -229,28 +252,24 @@ export default {
       return Math.abs(p.x - (x0 + ROOM_W / 2)) < 0.75 && p.z - z0 > ROOM_D - 0.85;
     }
 
+    /** 방 문 매트 (door.js 가 걸어 들고 나는 곳, 월드) */
+    const roomDoor = () => ({ x: x0 + ROOM_W / 2, front: z0 + ROOM_D, entry: z0 + ENTRY.lz });
+
     async function enter() {
-      if (H.busy || H.inside) return;
+      if (H.busy || H.inside || doors.busy) return;
       H.busy = true;
-      player.freeze(true);
-      events.emit('sfx', { name: 'door' });
       try {
-        await fadeTo(true, FADE_OUT);
-        goInside({ ...ENTRY, facing: 0 });
-        await fadeTo(false, FADE_IN);
-      } finally { player.freeze(false); H.busy = false; }
+        await doors.through({ dir: 'in', place: world.places?.playerHouse, kind: 'house-player', room: roomDoor(),
+          arrive: s => goInside({ lx: s.x - x0, lz: s.z - z0, facing: s.facing }) });
+      } finally { H.busy = false; }
     }
 
     async function leave() {
-      if (H.busy || !H.inside) return;
+      if (H.busy || !H.inside || doors.busy) return;
       H.busy = true;
-      player.freeze(true);
-      events.emit('sfx', { name: 'door' });
       try {
-        await fadeTo(true, FADE_OUT);
-        goOutside();
-        await fadeTo(false, FADE_IN);
-      } finally { player.freeze(false); H.busy = false; }
+        await doors.through({ dir: 'out', place: world.places?.playerHouse, kind: 'house-player', room: roomDoor(), arrive: s => goOutside(s) });
+      } finally { H.busy = false; }
     }
 
     function goInside({ lx, lz, facing }) {
@@ -271,14 +290,16 @@ export default {
       saveSoon(0.5);
     }
 
-    function goOutside() {
+    /** spot = 섬에 설 곳 { x, z, facing } (door.js — 문간). 없으면 문 앞 */
+    function goOutside(spot) {
       if (H.moving) cancelMoving();
       H.inside = false;
       S.inside = false;
       const d = doorPoint() ?? world.places?.spawn ?? { x: 0, z: 0 };
       player.camera?.setBounds?.(null);
       player.camera?.setCurveScale?.(1);
-      player.teleport(d.x, d.z + 0.15, Math.PI);
+      const s = spot ?? { x: d.x, z: d.z + 0.15, facing: Math.PI };
+      player.teleport(s.x, s.z, s.facing ?? Math.PI);
       room.group.visible = false;
       ctx.services.time?.setIndoor?.(false);
       ctx.services.audio?.bgm?.('auto');
@@ -666,12 +687,14 @@ export default {
     if (!H) return;
     if (H.S.furniture !== H.list) H.resync();
     if (H.room.wallpaper?.slug !== H.S.wallpaper || H.room.floor?.slug !== H.S.floor || !Array.isArray(H.S.owned)) H.showDecor();
+    H.doors.update(dt);
     H.visits.update(dt);
+    H.places.update(dt);
     const player = ctx.services.player, input = ctx.input;
     const blocked = ctx.services.ui?.isBlocking?.() || input.enabled === false;
 
     // 문 쪽으로 밀어서 드나들기
-    if (!H.busy && !blocked && !H.moving) {
+    if (!H.busy && !blocked && !H.moving && !H.doors.busy) {
       if (!H.inside) {
         const d = ctx.services.world.places?.playerHouse?.door;
         const p = player.position;

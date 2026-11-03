@@ -98,11 +98,21 @@ export default {
         return out;
       },
       freeze(v = true) { P.frozen = !!v; if (P.frozen) { P.vx = P.vz = 0; } },
+      /**
+       * 연출 걷기 (문 드나들기 등, 실내 보드 AN-07): 충돌 없이 (x, z) 까지 곧장 걷는다. 걷기 동작·발소리·높이 따라가기는 그대로, 입력은 받지 않는다.
+       * opts: { speed 칸/초 (기본 걷기의 0.8배), face 가는 쪽을 볼지 } → Promise<bool> (도착하면 true, 순간이동·다른 walkTo 로 끊기면 false)
+       */
+      walkTo(x, z, { speed = WALK * 0.8, face = true } = {}) {
+        P.script?.done(false);
+        return new Promise(res => { const s = { x, z, speed, face, done: v => { if (P.script === s) P.script = null; res(v); } }; P.script = s; });
+      },
+      get walking() { return !!P.script; },
       /** 순간이동 (집 안팎 등). facing 생략하면 그대로 */
       teleport(x, z, facing = P.facing) {
         P.position.set(x, world ? world.island.heightAt(x, z) : 0, z);
         P.facing = facing; P.vx = P.vz = 0;
         P.mouse?.cancel();                                // 마우스로 가던 곳은 잊는다
+        P.script?.done(false);
         root.rotation.y = facing + Math.PI;
         P.rig.snap(P.position);
       },
@@ -173,7 +183,17 @@ export default {
     // 충돌하며 움직이기 → 실제로 간 거리로 속도를 잰다 (벽에 붙으면 걷기 동작도 느려진다)
     const pos = P.position;
     const ox = pos.x, oz = pos.z;
-    if (P.vx || P.vz) {
+    const sc = P.script;
+    if (sc) {
+      // 연출 걷기 (walkTo): 입력·충돌 없이 곧장
+      const dx = sc.x - pos.x, dz = sc.z - pos.z, d = Math.hypot(dx, dz), step = sc.speed * dt;
+      if (d <= step || d < 1e-3) { pos.x = sc.x; pos.z = sc.z; P.vx = P.vz = 0; }
+      else {
+        pos.x += (dx / d) * step; pos.z += (dz / d) * step;
+        P.vx = (dx / d) * sc.speed; P.vz = (dz / d) * sc.speed;
+        if (sc.face) P.facing = facingOf(dx, dz);
+      }
+    } else if (P.vx || P.vz) {
       const nx = pos.x + P.vx * dt, nz = pos.z + P.vz * dt;
       const r = world ? world.collide(pos.x, pos.z, nx, nz, RADIUS, pos.y) : { x: nx, z: nz };
       pos.x = r.x; pos.z = r.z;
@@ -189,7 +209,8 @@ export default {
     P.root.rotation.y = P.facing + Math.PI;
 
     // 동작
-    const moving = P.speed > 0.25 && mag > 0.05;
+    const moving = P.speed > 0.25 && (mag > 0.05 || !!sc);
+    if (sc && !P.vx && !P.vz) sc.done(true);
     if (!P.oneShot) {
       const want = !moving ? 'idle' : P.speed > (WALK + RUN) / 2 - 0.3 ? 'run' : 'walk';
       play(want);

@@ -232,9 +232,35 @@ export function createSkills(bot) {
     }
     return true;
   };
+  /**
+   * 상점·박물관 실내 (실내 보드 interiors): 문 앞에서 행동 키 → 문이 열리고 걸어 들어감 → 계산대·안내대 앞에서 주인을 보고 선다 → true.
+   * 실내가 없거나(예전 게임) 문을 닫았거나 첫날 축하처럼 문 앞 행동이 다른 것이면 false (문 앞에서 그대로 행동 키를 누르면 된다)
+   */
+  sk.enterPlace = async (key, label) => {
+    const HP = S().house?.places;
+    if (!HP?.info?.(key) || S().town?.placeRule?.(key) !== 'open') return false;
+    if (bot.peek() !== `town:${key}`) return false;
+    bot.press('action');
+    const ok = await bot.until(() => S().house.where === key && !S().house.passing, { timeout: 10, label: `${label} 들어가기` });
+    if (!ok) { bot.issue('major', 'house', `${label} 문에서 실내로 못 들어가요 (${bot.peek()})`); return false; }
+    await bot.walkLocal(HP.info(key).talk, { near: 0.2, label: `${label} 계산대 앞` });
+    await bot.faceDir(0);
+    if (!(sk.placeShots ??= new Set()).has(key)) { sk.placeShots.add(key); await bot.shot(`interior-${key}`, `${label} 실내 (계산대 앞)`); }
+    const want = key === 'shop' ? /town:(shop|firstday)/ : /town:museum/;
+    if (!want.test(bot.peek() ?? '')) bot.issue('minor', 'house', `${label} 계산대 앞인데 행동 키가 '${bot.peek()}' 이에요`);
+    return true;
+  };
+  /** 실내에서 나오기 (상점·박물관): 문 매트로 가서 나간다 */
+  sk.leavePlace = async () => {
+    if (!S().house?.places?.where) return true;
+    await bot.exitRoom();
+    await bot.settle(20);
+    return !S().house.places.where;
+  };
   /** 상점: mode 'sell' | 'buy'. sellTest(item, slot) → 팔 개수(0 = 안 팜). buy = [id...] */
   sk.shop = async ({ sell = null, buy = [], decor = null } = {}) => {
     if (!(await sk.toDoor('shop', '상점'))) return null;
+    const inside = await sk.enterPlace('shop', '상점');
     const result = { sold: 0, earned: 0, bought: [], decor: null };
     const w0 = bot.acorns();
     let shopOpened = false;
@@ -294,6 +320,8 @@ export function createSkills(bot) {
     };
     await bot.act('action', { timeout: 60 });
     bot.policy = {};
+    if (inside) result.left = await sk.leavePlace();
+    result.inside = inside;
     result.earned = bot.acorns() - w0;
     result.opened = shopOpened;
     return result;
@@ -301,7 +329,8 @@ export function createSkills(bot) {
   /** 박물관: 기증할 수 있는 것을 모두 (같은 것은 하나만) */
   sk.museum = async () => {
     if (!(await sk.toDoor('museum', '박물관'))) return null;
-    const res = { donated: [] };
+    const inside = await sk.enterPlace('museum', '박물관');
+    const res = { donated: [], inside };
     const tried = new Set();
     bot.policy = {
       dialog: texts => { const i = texts.findIndex(t => /기증하러|감정해/.test(t)); return i >= 0 ? i : 0; },
@@ -322,6 +351,7 @@ export function createSkills(bot) {
     };
     await bot.act('action', { timeout: 60 });
     bot.policy = {};
+    if (inside) res.left = await sk.leavePlace();
     return res;
   };
 
@@ -334,7 +364,7 @@ export function createSkills(bot) {
     await bot.faceDir(0);
     if (bot.peek() !== 'house-door-in') { bot.issue('minor', 'house', `집 문 앞에서 '들어가기'가 안 떠요 (${bot.peek()})`); }
     await bot.act('action');
-    await bot.until(() => house().inside, { timeout: 5 });
+    await bot.until(() => house().inside && !house().passing, { timeout: 8 });
     return house().inside;
   };
   /** 집에서 나오기: 문 매트(남쪽 가운데)로 걸어가서 행동 키 */
@@ -537,7 +567,7 @@ export function createSkills(bot) {
       return res;
     }
     await bot.act('action', { timeout: 20 });
-    res.entered = await bot.until(() => Math.abs(bot.pos().x) > 100, { timeout: 6 });
+    res.entered = await bot.until(() => Math.abs(bot.pos().x) > 100 && !S().house?.passing, { timeout: 8 });
     if (!res.entered) return res;
     const entry = bot.pos();
     await bot.wait(1);

@@ -1,0 +1,422 @@
+<title>포근섬 실내 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 5·6·7차 보드와 같은 섬 안내 책자 — 지금 상태 → 문 드나들기 순서 → 결정(카드마다 스케치) → 새 리소스 → 반영 v1. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+a { color: var(--sea); }
+code { font-family: var(--mono); font-size: .86em; overflow-wrap: anywhere; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정: 스케치 + 선택지 */
+.dec { display: grid; gap: 10px; }
+.decbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 780px) { .decbody { grid-template-columns: 300px minmax(0, 1fr); align-items: start; } }
+.decside { display: grid; gap: 8px; min-width: 0; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+.nowline { font-size: 13px; color: var(--muted); }
+.nowline b { color: var(--ink); font-weight: 400; }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+td.st { font-size: 16px; text-align: center; }
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 실내 · 검수 보드 v0.1 · 2026-11-04 · 트랙 p12-interiors</p>
+    <h1>포근섬 실내 검수 보드</h1>
+    <p class="lede">집·주민 집·<b>도토리상점·박물관</b> 모두 문을 열고 걸어 들어가는 진짜 실내로 바꿔요. 지금은 집에 들어갈 때 화면만 어두워졌다 밝아지고, 상점·박물관은 실내가 없어 문 앞에서 바로 창이 열려요. 결정 D67–D73 을 골라 주세요. 추천안으로 <b>반영 v1 (임시)</b>을 먼저 만들어 두고, 다르게 고르면 채팅에 <b>"검수 보드 반영"</b>이라고 하면 바꿔요.</p>
+    <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v16, 실내 전)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈</a><a href="https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh">배경 편집기</a></p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#now">지금 상태</a><a href="#flow">문 드나들기 순서</a><a href="#decide">결정 D67–D73</a><a href="#res">새 리소스</a><a href="#plan">반영 v1</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="now">
+    <div class="sec-head"><p class="id">AUDIT · main b450373 · 게임 v16</p><h2>지금 들어갈 수 있는 곳</h2>
+      <p class="muted">✅ 됨 · △ 일부 · ❌ 아직. 실내는 섬에서 멀리 떨어진 자리(x 500 이후)에 따로 지은 방이고, 들어가면 그 방의 바닥·벽으로 바꿔 끼워요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="auditTable"><thead><tr><th>장소</th><th>지금</th><th>실내</th><th>이번에</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="flow">
+    <div class="sec-head"><p class="id">AN-06 · AN-07 · UI-12</p><h2>문 드나들기 순서 (추천안)</h2>
+      <p class="muted">네 곳 모두 같은 함수(<code>src/gameplay/house/door.js</code>)를 써요. 문 앞에서 Space(휴대폰은 A) 또는 문 쪽으로 밀면 시작하고, 나올 때는 문 매트에서 같아요. 기기 설정 "동작 줄이기"나 섬폰 "흔들림 줄이기"를 켜면 걷는 동작 없이 바로 화면만 바뀌어요.</p></div>
+    <div class="card"><div class="stage"></div>
+      <div class="tblwrap"><table class="tbl small"><thead><tr><th>순서</th><th>들어갈 때</th><th>나올 때</th><th>시간</th></tr></thead><tbody id="flowRows"></tbody></table></div></div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS · D67–D73</p><h2>먼저 정할 것 일곱 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요. 그림은 고른 안이 어떤 모습인지 보여 주는 스케치예요.</p></div>
+    <div id="decisions" class="grid" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="res">
+    <div class="sec-head"><p class="id">RM-08 · RM-09 · FU-35 · FU-36 · AN-06 · AN-07 · UI-12</p><h2>새 리소스</h2>
+      <p class="muted">방 배치는 주민 방(RM-01–06)과 같은 모양의 JSON 이에요 (<code>assets/interior/places/</code>). 가구는 지금 있는 모델을 먼저 쓰고, 모델이 없는 것은 색 상자(임시)로 두었다가 배경 편집기 「가구」 요청으로 모델을 만들면 저절로 바뀌어요.</p></div>
+    <div class="grid wide" id="resCards"></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN · p12-interiors</p><h2>반영 v1 (임시) — 추천안 모두</h2>
+      <p class="muted">사용자 선택을 기다리지 않고 추천안으로 먼저 만들어 브랜치 <code>p12-interiors</code> 에 커밋해 둬요. main 합치기와 게임 링크 다시 게시는 확인 뒤 조정 세션이 해요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>무엇</th><th>파일</th><th>결정</th></tr></thead><tbody id="planRows"></tbody></table></div>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+// 스케치 색 (밝은 받침 위에 그려서 어두운 화면에서도 같은 색)
+const P = { frame: '#FBF7F2', bar: '#3F8F5C', pane: '#E3EEDD', line: '#C9D3C5', acc: '#A8642E', sea: '#9CC3EA', soft: '#F3E7D3', red: '#C9583B', grass: '#8CCB6E', sand: '#EBD9A8', white: '#FBFDF8',
+  wall: '#F3E7D3', door: '#9A6B45', dark: '#2E2420', cream: '#FFF3DC', wood: '#D9B382', log: '#B98A5A', glass: '#BFE3EF', stone: '#C9C4B8', leaf: '#9CCB7A' };
+const T = (x, y, s, { size = 11, anchor = 'start', fill = INK, weight } = {}) =>
+  `<text x="${x}" y="${y}" font-size="${size}" text-anchor="${anchor}" fill="${fill}"${weight ? ` font-weight="${weight}"` : ''}>${esc(s)}</text>`;
+const R = (x, y, w, h, f = P.pane, r = 6, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}"${extra}/>`;
+const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 4}" stroke="${P.acc}" stroke-width="2.5"/><path d="M${x2 - 7} ${y - 5} L${x2} ${y} L${x2 - 7} ${y + 5}z" fill="${P.acc}"/>`;
+const svg = (body, label, h = 130, w = 320) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><rect width="${w}" height="${h}" rx="10" fill="${P.frame}" stroke="${P.line}"/>${body}</svg>`;
+/** 작은 사람 (머리 + 몸). dir 'n' 이면 등, 's' 면 얼굴 */
+const kid = (x, y, s = 1, dir = 'n') => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="14" rx="7" ry="2.5" fill="${P.line}"/><rect x="-6" y="0" width="12" height="13" rx="5" fill="#F2B36B"/><circle cx="0" cy="-5" r="7" fill="#F6D7B0"/>${dir === 's' ? `<circle cx="-2.4" cy="-5" r="1.1" fill="${INK}"/><circle cx="2.4" cy="-5" r="1.1" fill="${INK}"/>` : `<path d="M-7 -6 a7 7 0 0 1 14 0z" fill="#8A5A3C"/>`}</g>`;
+const keeper = (x, y, c = '#A8642E') => `<g transform="translate(${x} ${y})"><circle cx="-6" cy="-12" r="3.5" fill="${c}"/><circle cx="6" cy="-12" r="3.5" fill="${c}"/><circle cx="0" cy="-5" r="8" fill="${c}"/><circle cx="-2.6" cy="-5" r="1.1" fill="${INK}"/><circle cx="2.6" cy="-5" r="1.1" fill="${INK}"/><rect x="-6" y="2" width="12" height="11" rx="5" fill="${c}"/></g>`;
+/** 집 앞모습 + 문 (open 0~1, 안으로 열림 = 좁아짐) */
+const houseFront = (x, y, { open = 0, dark = false, out = false } = {}) => {
+  const dw = 22, dh = 34, dx = x + 29, dy = y + 30;
+  const leafW = out ? dw : dw * Math.cos(open * Math.PI * 0.42);
+  const leaf = out && open ? `<path d="M${dx} ${dy} L${dx - 14 * open} ${dy - 4 * open} L${dx - 14 * open} ${dy + dh + 4 * open} L${dx} ${dy + dh}z" fill="${P.door}"/>` : R(dx, dy, leafW, dh, P.door, 2);
+  return `<path d="M${x} ${y + 26} L${x + 40} ${y} L${x + 80} ${y + 26}z" fill="${P.log}"/>` + R(x + 6, y + 24, 68, 42, P.wall, 3)
+    + R(dx, dy, dw, dh, open || dark ? P.dark : P.door, 2) + (open < 0.99 || out ? leaf : '') + R(x + 12, y + 34, 12, 10, P.glass, 2) + R(x + 56, y + 34, 12, 10, P.glass, 2);
+};
+
+/* ---------- 지금 상태 ---------- */
+const AUDIT = [
+  ['내 집', '문 앞 Space · 문 쪽으로 밀기 → 문 소리 → 화면 어두워짐 → 방 안 순간이동. 문이 열리는 모습·걷는 동작 없음', '✅ 8×8 방, 가구·작업대·벽지', '문 동작 AN-06·07, 원형 전환 UI-12'],
+  ['주민 집 (6곳)', '집에 깨어 있을 때만 들어감 (자면 노크, 외출이면 잠김). 들어가는 모습은 내 집과 같음', '✅ RM-01–06 주민마다 테마 방', '같은 문 동작'],
+  ['도토리상점', '문 앞 Space → 밤톨 인사 → 사기·팔기 창. 밤톨은 문 옆 밖에 서 있음', '❌ 없음', 'RM-08 실내 · 계산대에서 창 (D69 · D72 · D73)'],
+  ['박물관', '문 앞 Space → 느루 인사 → 기증·이야기·감정. 느루는 문 옆 밖', '❌ 없음', 'RM-09 실내 · 기증한 것이 보임 (D70 · D71 · D72 · D73)'],
+];
+$('auditTable').tBodies[0].innerHTML = AUDIT.map(([a, b, c, d]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="small">${c}</td><td class="id">${d}</td></tr>`).join('');
+
+/* ---------- 문 드나들기 순서 ---------- */
+const flowSketch = (() => {
+  let b = '';
+  const steps = [['① 문 열기', 0.0], ['② 걸어 들어감', 0.75], ['③ 원이 좁아짐', 1], ['④ 실내에서 한 걸음', 1]];
+  steps.forEach(([lab, open], i) => {
+    const x = 10 + i * 152;
+    b += T(x + 66, 18, lab, { size: 12, anchor: 'middle', weight: 700 });
+    if (i < 2) {
+      b += R(x, 26, 136, 104, P.grass, 8) + houseFront(x + 28, 34, { open: i === 0 ? 0.55 : 1 });
+      b += kid(x + 68, i === 0 ? 118 : 100, i === 0 ? 1 : 0.85);
+    } else if (i === 2) {
+      b += R(x, 26, 136, 104, P.dark, 8) + `<circle cx="${x + 68}" cy="92" r="26" fill="${P.grass}"/>` + kid(x + 68, 96, 0.85);
+    } else {
+      b += R(x, 26, 136, 104, P.wood, 8) + R(x, 26, 136, 34, P.soft, 8) + R(x + 52, 112, 32, 10, P.acc, 3) + kid(x + 68, 98, 1);
+    }
+    if (i < 3) b += arrow(x + 138, 78, x + 152);
+  });
+  return svg(b, '문 열기, 걸어 들어감, 원이 좁아짐, 실내에서 한 걸음', 140, 616);
+})();
+document.querySelector('#flow .stage').innerHTML = flowSketch;
+const FLOW_ROWS = [
+  ['1', '문 쪽으로 돌아서고 문이 안으로 열린다 (문 소리)', '문 매트에서 남쪽(화면 앞)으로 돌아선다', '0.3초'],
+  ['2', '문 안으로 두세 걸음 걸어 들어간다 — 걷는 사이 원이 좁아지기 시작', '화면 앞쪽으로 두세 걸음 걸어 나간다 — 원이 좁아짐', '0.6초'],
+  ['3', '원이 닫힌다 (플레이어 머리 둘레로) → 실내로 옮김', '원이 닫힌다 → 섬의 문 안쪽으로 옮김 (문은 열린 채)', '0.35초'],
+  ['4', '원이 열리며 문 매트에서 한두 걸음 들어선다', '원이 열리며 문 밖으로 두 걸음 나오고, 문이 닫힌다 (작은 문 소리)', '0.5초'],
+  ['흔들림 줄이기', '돌아서기·걷기·문 동작 없이 문 소리 + 화면만 (어두운 색, 원 없이)', '같음', '0.5초'],
+];
+$('flowRows').innerHTML = FLOW_ROWS.map(r => `<tr>${r.map((c, i) => `<td${i ? '' : ' class="id"'}>${c}</td>`).join('')}</tr>`).join('');
+
+/* ---------- 결정 스케치 ---------- */
+function sketch(id) {
+  let b = '';
+  if (id === 'D67') {   // 문 여는 동작
+    [['A', '열리고 걸어 들어감', 1, true], ['B', '열리고 바로 전환', 1, false], ['C', '페이드만', 0, false]].forEach(([k, n, open, walk], i) => {
+      const x = 8 + i * 104;
+      b += R(x, 8, 96, 98, P.grass, 8) + houseFront(x + 8, 14, { open: open ? 0.9 : 0 }) + kid(x + 48, walk ? 84 : 98, walk ? 0.8 : 0.9);
+      if (walk) b += `<path d="M${x + 48} 112 v-10" stroke="${P.acc}" stroke-width="2" stroke-dasharray="2 3"/>`;
+      b += T(x + 48, 122, `${k} ${n}`, { size: 10, anchor: 'middle' });
+    });
+  } else if (id === 'D68') {   // 전환 모양
+    const box = (x, label, inner) => R(x, 10, 96, 96, P.grass, 8) + inner + T(x + 48, 122, label, { size: 10, anchor: 'middle' });
+    b += box(8, 'A 동그랗게 좁아짐', `<path d="M8 18 a8 8 0 0 1 8 -8 h80 a8 8 0 0 1 8 8 v80 a8 8 0 0 1 -8 8 h-80 a8 8 0 0 1 -8 -8z M56 44 a18 18 0 1 0 0.01 0z" fill="${P.dark}" fill-rule="evenodd"/>` + kid(56, 60, 0.8));
+    b += box(112, 'B 어두운 밤색 (지금)', R(112, 10, 96, 96, P.dark, 8, ' opacity=".88"'));
+    b += box(216, 'C 크림색', R(216, 10, 96, 96, P.cream, 8, ' opacity=".94"'));
+  } else if (id === 'D69') {   // 상점 실내
+    const room = (x, w, inner, label) => R(x, 10, w, 98, P.wood, 6) + R(x, 10, w, 22, P.log, 6) + inner + R(x + w / 2 - 12, 102, 24, 6, P.acc, 2) + T(x + w / 2, 122, label, { size: 10, anchor: 'middle' });
+    b += room(6, 120, R(46, 40, 40, 12, P.door, 3) + keeper(66, 38) + R(12, 44, 22, 22, P.soft, 3) + R(12, 72, 22, 22, P.soft, 3) + T(23, 59, '🛋', { size: 11, anchor: 'middle' }) + T(23, 87, '🪑', { size: 11, anchor: 'middle' }) + R(100, 44, 18, 50, P.soft, 3) + T(109, 72, '🎣', { size: 10, anchor: 'middle' }), 'A 계산대 + 양옆 진열');
+    b += room(132, 100, R(162, 56, 40, 24, P.soft, 4) + T(182, 72, '🛋🪑', { size: 10, anchor: 'middle' }) + R(196, 36, 30, 12, P.door, 3) + keeper(211, 34), 'B 가운데 큰 탁자');
+    b += room(238, 76, R(256, 40, 40, 12, P.door, 3) + keeper(276, 38), 'C 계산대만');
+  } else if (id === 'D70') {   // 박물관 실내
+    const hall = (x, w, inner, label) => R(x, 10, w, 98, P.stone, 6) + R(x, 10, w, 18, P.soft, 6) + inner + T(x + w / 2, 122, label, { size: 10, anchor: 'middle' });
+    b += hall(6, 150, R(10, 32, 22, 70, P.glass, 4) + T(21, 70, '🐟', { size: 11, anchor: 'middle' }) + R(130, 32, 22, 70, P.leaf, 4) + T(141, 70, '🐞', { size: 11, anchor: 'middle' })
+      + [44, 62, 100, 118].map(px => R(px, 34, 12, 12, P.white, 2)).join('') + T(81, 46, '🦕', { size: 13, anchor: 'middle' }) + R(66, 70, 30, 10, P.door, 3) + keeper(81, 66, '#7A6A9A'), 'A 한 홀을 셋으로');
+    b += hall(162, 90, `<path d="M192 28 V108 M222 28 V108" stroke="${P.acc}" stroke-width="3" stroke-dasharray="20 10"/>` + T(177, 64, '🐟', { size: 11, anchor: 'middle' }) + T(207, 64, '🦴', { size: 11, anchor: 'middle' }) + T(237, 64, '🐞', { size: 11, anchor: 'middle' }), 'B 방 셋');
+    b += hall(258, 56, T(270, 50, '🐟', { size: 10 }) + T(290, 66, '🦴', { size: 10 }) + T(272, 84, '🐞', { size: 10 }), 'C 섞기');
+  } else if (id === 'D71') {   // 기증품 보이기
+    const ped = (x, y, inner, empty) => R(x, y, 26, 26, empty ? P.line : P.white, 4) + (inner ? T(x + 13, y + 18, inner, { size: 13, anchor: 'middle' }) : '');
+    b += T(58, 22, 'A 진짜 모델', { size: 10, anchor: 'middle' }) + ped(14, 32, '🐟') + ped(44, 32, '🦴') + ped(74, 32, '', true) + ped(14, 64, '🐞') + ped(44, 64, '', true) + ped(74, 64, '', true) + T(58, 112, '빈 받침 = 아직', { size: 9, anchor: 'middle', fill: P.acc });
+    b += T(160, 22, 'B 이름표 먼저', { size: 10, anchor: 'middle' }) + [0, 1, 2].map(i => R(118 + i * 30, 32, 26, 26, P.white, 4) + R(121 + i * 30, 50, 20, 5, P.line, 2)).join('') + T(133, 50, '🐟', { size: 11, anchor: 'middle' }) + T(160, 112, '자리마다 이름', { size: 9, anchor: 'middle', fill: P.acc });
+    b += T(262, 22, 'C 숫자판만', { size: 10, anchor: 'middle' }) + R(222, 36, 80, 50, P.white, 6) + T(262, 58, '물고기 6/20', { size: 10, anchor: 'middle' }) + T(262, 74, '화석 2/8', { size: 10, anchor: 'middle' });
+  } else if (id === 'D72') {   // 가게 주인 자리
+    b += R(8, 10, 146, 96, P.grass, 8) + houseFront(14, 18) + T(118, 60, '밖엔 없음', { size: 10, anchor: 'middle' }) + R(100, 70, 46, 30, P.wood, 4) + keeper(123, 90) + T(81, 122, 'A 영업시간엔 안에만', { size: 10, anchor: 'middle' });
+    b += R(166, 10, 146, 96, P.grass, 8) + houseFront(172, 18) + keeper(268, 80) + R(258, 30, 46, 30, P.wood, 4) + keeper(281, 50) + T(239, 122, 'B 밖에서 맞이 + 안에도', { size: 10, anchor: 'middle' });
+  } else if (id === 'D73') {   // 실내에서 창 여는 법
+    b += R(8, 10, 96, 96, P.wood, 6) + R(36, 40, 40, 12, P.door, 3) + keeper(56, 38) + kid(56, 78, 0.9) + R(70, 62, 26, 16, P.bar, 8) + T(83, 74, 'A', { size: 10, anchor: 'middle', fill: P.white }) + T(56, 122, 'A 계산대 앞 Space', { size: 10, anchor: 'middle' });
+    b += R(112, 10, 96, 96, P.wood, 6) + keeper(160, 50) + R(168, 26, 34, 18, P.white, 8) + T(185, 39, '어서 와!', { size: 8, anchor: 'middle' }) + kid(160, 92, 0.9) + T(160, 122, 'B 들어서면 먼저 말 걸기', { size: 10, anchor: 'middle' });
+    b += R(216, 10, 96, 96, P.wood, 6) + R(226, 46, 26, 26, P.soft, 3) + T(239, 64, '🛋', { size: 12, anchor: 'middle' }) + kid(239, 92, 0.9) + R(258, 50, 48, 18, P.white, 8) + T(282, 63, '1,200🌰', { size: 8, anchor: 'middle' }) + T(264, 122, 'C 진열대마다 사기', { size: 10, anchor: 'middle' });
+  }
+  return svg(b, `${id} 스케치`);
+}
+
+const DECISIONS = [
+  { id: 'D67', q: '문을 열고 들어가는 동작은 어떻게 할까요?', now: '문 소리 → 화면 어두워짐 → 순간이동 (문은 안 움직이고 걷지 않음)', opts: [
+    ['A', '문이 안으로 열리고 걸어 들어감', '문짝이 안으로 열리며(AN-06) 두세 걸음 걸어 들어가고, 실내에서도 문 매트에서 한두 걸음 들어서요(AN-07). 나올 때는 거꾸로 — 걸어 나오면 문이 닫혀요. 한 번 드나드는 데 1.7초 안팎.', true],
+    ['B', '문이 열리고 바로 전환', '문짝은 열리지만 걷지 않고 바로 화면이 바뀌어요. 1초 안팎으로 빨라요.'],
+    ['C', '지금처럼 페이드만', '문 소리와 화면 전환만 (0.7초).'] ] },
+  { id: 'D68', q: '화면 전환 모양은 무엇으로 할까요?', now: '화면 전체가 어두운 밤색(#2E2420)으로 0.28초에 어두워졌다가 0.42초에 밝아짐', opts: [
+    ['A', '동그랗게 좁아지는 원', '플레이어 머리 둘레로 원이 좁아졌다가(UI-12) 실내에서 다시 커져요. 어디로 가는지 눈이 따라가기 쉬워요. 색은 지금 밤색.', true],
+    ['B', '지금 그대로 — 어두운 밤색 전체', '화면 전체가 같이 어두워졌다 밝아져요.'],
+    ['C', '크림색 전체', '밤색 대신 밝은 크림색으로 — 낮처럼 부드럽지만 밤에는 번쩍여요.'] ] },
+  { id: 'D69', q: '도토리상점 실내는 어떤 모습으로 할까요?', now: '실내 없음', opts: [
+    ['A', '안쪽 계산대 + 양옆 진열대', '10×7 칸. 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 <b>오늘의 가구</b>가 진짜로 놓이고, 오른쪽 진열대에 도구 다섯·꽃씨. 통나무 벽(WP-05)·밝은 판자(FL-02).', true],
+    ['B', '가운데 큰 진열 탁자', '가운데 넓은 탁자에 오늘의 물건을 모두 올리고 계산대는 오른쪽 안. 둘러보며 걷기 좋지만 방이 좁아 보여요.'],
+    ['C', '계산대만 작게', '8×6 칸 작은 방에 계산대와 밤톨만. 진열은 창에서만 봐요.'] ] },
+  { id: 'D70', q: '박물관 실내는 어떻게 나눌까요?', now: '실내 없음', opts: [
+    ['A', '한 홀을 셋으로', '12×8 칸 한 홀. 왼쪽 벽 긴 수조에 물고기, 가운데 안쪽 받침 여덟에 화석과 공룡 모형, 오른쪽 벽 긴 유리 상자에 곤충. 입구 앞 안내대에 느루. 연못 돌바닥(FL-07)·크림 줄무늬(WP-01).', true],
+    ['B', '방 셋을 문으로 나눔', '물고기·화석·곤충 방을 따로 짓고 문으로 오가요. 더 박물관 같지만 드나들기가 세 번 늘어요.'],
+    ['C', '한 방에 섞기', '받침을 섞어 놓아요. 작고 빠르지만 무엇이 모였는지 한눈에 안 보여요.'] ] },
+  { id: 'D71', q: '박물관에 기증한 것은 어떻게 보일까요?', now: '창(목록)에서만 보임', opts: [
+    ['A', '기증한 것만 진짜 3D 모델', '아이템 모델(손에 들어 보이는 것과 같은 모델)을 수조·받침·상자 자리에. 아직 없는 자리는 빈 받침·빈 물이라 채우는 재미가 있어요. 기증하면 다음에 들어갈 때 바로 보여요.', true],
+    ['B', '모든 자리에 이름표 먼저', '빈 자리에도 이름표가 있어 무엇이 남았는지 알 수 있어요 (도감과 겹쳐요).'],
+    ['C', '숫자판만', '벽에 "물고기 6/20" 같은 판만. 모델은 놓지 않아요.'] ] },
+  { id: 'D72', q: '밤톨·느루는 어디에 서 있을까요?', now: '둘 다 섬의 문 옆 밖에 서 있음 (밤톨은 문 닫으면 가게 안으로 사라짐)', opts: [
+    ['A', '영업시간엔 안 (계산대·안내대)', '밖 문 옆엔 서 있지 않고, 들어가면 계산대·안내대 뒤에 있어요. 첫날 안내·첫날 할 일 축하처럼 밖에서 할 일이 있을 때만 나왔다가 다시 들어가요.', true],
+    ['B', '밖에서 맞이하고 안에도', '지금처럼 문 옆 밖에 서 있다가, 들어가면 계산대에도 있어요 (밖에서 말 걸면 바로 창).'] ] },
+  { id: 'D73', q: '실내에서 사기·팔기·기증 창은 어떻게 열까요?', now: '문 앞에서 Space → 인사 → 창', opts: [
+    ['A', '계산대·안내대 앞에서 Space', '주인을 보고 Space → 지금과 같은 인사·고르기(살래요·팔래요 / 기증·이야기·감정) → 창. 둘러보다 원할 때 말을 걸어요.', true],
+    ['B', '들어서면 주인이 먼저 말을 검', '들어서자마자 인사하고 고르기가 떠요. 빠르지만 구경하러 들어갈 때도 대화가 열려요.'],
+    ['C', '진열대마다 바로 사기 (+ 계산대)', '진열대 앞 Space → 그 물건 값 확인 → 사기. 계산대에서는 팔기·전체 목록. 손이 덜 가지만 만들 것이 많아요.'] ] },
+];
+const decCard = d => `
+  <div class="card dec" id="dec-${d.id}"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="decbody"><div class="stage">${sketch(d.id)}</div>
+      <div class="decside"><p class="nowline">지금: <b>${d.now}</b></p>
+        <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+          <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+            <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div></div></div>
+    ${noteBox(d.id, d.q)}</div>`;
+$('decisions').innerHTML = DECISIONS.map(decCard).join('');
+
+/* ---------- 새 리소스 ---------- */
+function plan(kind) {
+  let b = '';
+  const cell = 15;
+  const grid = (W, D, x0, y0, floor, wall) => {
+    let g = R(x0 - 4, y0 - 12, W * cell + 8, 12, wall, 3) + R(x0, y0, W * cell, D * cell, floor, 2);
+    for (let i = 1; i < W; i++) g += `<path d="M${x0 + i * cell} ${y0} v${D * cell}" stroke="${P.white}" stroke-opacity=".35"/>`;
+    for (let j = 1; j < D; j++) g += `<path d="M${x0} ${y0 + j * cell} h${W * cell}" stroke="${P.white}" stroke-opacity=".35"/>`;
+    return g;
+  };
+  const at = (x0, y0, gx, gz, w, d, fill, label = '', fs = 9) => R(x0 + gx * cell + 1, y0 + gz * cell + 1, w * cell - 2, d * cell - 2, fill, 3) + (label ? T(x0 + (gx + w / 2) * cell, y0 + (gz + d / 2) * cell + 3, label, { size: fs, anchor: 'middle' }) : '');
+  if (kind === 'shop') {
+    const x0 = 85, y0 = 26;
+    b += grid(10, 7, x0, y0, P.wood, P.log);
+    b += at(x0, y0, 4, 1, 2, 1, P.door, '계산대') + keeper(x0 + 5 * cell, y0 + 10, '#A8642E');
+    b += at(x0, y0, 0, 1, 2, 2, P.soft, '가구 1') + at(x0, y0, 0, 4, 2, 2, P.soft, '가구 2');
+    b += at(x0, y0, 9, 1, 1, 3, P.soft, '도구', 8) + at(x0, y0, 9, 4, 1, 2, P.leaf, '씨앗', 8);
+    b += at(x0, y0, 3, 3, 4, 3, '#E9C89A') + at(x0, y0, 4, 6, 2, 1, P.acc) + at(x0, y0, 7, 0, 1, 1, P.white, '💡') + at(x0, y0, 2, 0, 1, 1, P.leaf, '🌿');
+    b += T(x0 + 5 * cell, y0 + 7 * cell + 14, '문 매트 (여기서 나감)', { size: 9, anchor: 'middle', fill: P.acc });
+  } else if (kind === 'museum') {
+    const x0 = 70, y0 = 24;
+    b += grid(12, 7, x0, y0, P.stone, P.soft);
+    b += at(x0, y0, 0, 0, 1, 6, P.glass, '물고기', 8) + at(x0, y0, 11, 0, 1, 6, P.leaf, '곤충', 8);
+    for (const gx of [3, 4, 7, 8]) for (const gz of [0, 2]) b += at(x0, y0, gx, gz, 1, 1, P.white);
+    b += at(x0, y0, 5, 0, 2, 2, '#E9D6B4', '🦕', 12) + at(x0, y0, 5, 4, 2, 1, P.door, '안내대', 8) + keeper(x0 + 6 * cell, y0 + 4 * cell - 2, '#7A6A9A') + at(x0, y0, 5, 6, 2, 1, P.acc);
+    b += T(x0 + 6 * cell, y0 + 7 * cell + 14, '실제 12×8 칸 (그림은 7줄로 줄임)', { size: 9, anchor: 'middle', fill: P.acc });
+  } else if (kind === 'stand') {
+    b += `<ellipse cx="90" cy="104" rx="46" ry="9" fill="${P.line}"/>` + R(52, 70, 76, 30, P.white, 4, ` stroke="${P.line}"`) + R(46, 64, 88, 10, P.soft, 3) + T(90, 58, '🦴', { size: 22, anchor: 'middle' });
+    b += R(184, 52, 100, 48, P.soft, 4) + R(178, 46, 112, 10, P.wood, 3) + T(234, 42, '🛋', { size: 22, anchor: 'middle' }) + T(90, 124, '박물관 받침 1×1', { size: 10, anchor: 'middle' }) + T(234, 124, '상점 진열 받침 2×2', { size: 10, anchor: 'middle' });
+  } else if (kind === 'counter') {
+    b += R(60, 66, 200, 36, P.door, 6) + R(52, 58, 216, 12, P.wood, 4) + keeper(160, 50) + R(196, 46, 26, 14, P.acc, 3) + T(160, 122, 'FU-29 부엌 조리대를 0.6배 높이로 (주인이 보이게)', { size: 10, anchor: 'middle' });
+  } else if (kind === 'door') {
+    [0, 0.45, 0.9].forEach((o, i) => { b += houseFront(14 + i * 100, 22, { open: o }) + T(54 + i * 100, 118, ['닫힘', '반쯤', '열림'][i], { size: 10, anchor: 'middle' }); });
+  } else if (kind === 'walk') {
+    b += R(10, 14, 140, 96, P.grass, 8) + houseFront(40, 20, { open: 1 }) + kid(80, 72, 0.8) + kid(80, 100, 0.8) + `<path d="M80 96 V78" stroke="${P.acc}" stroke-width="2" stroke-dasharray="2 3"/>`;
+    b += R(170, 14, 140, 96, P.wood, 8) + R(170, 14, 140, 30, P.soft, 8) + R(222, 96, 36, 10, P.acc, 3) + kid(240, 70, 0.9) + `<path d="M240 98 V82" stroke="${P.acc}" stroke-width="2" stroke-dasharray="2 3"/>`;
+    b += T(80, 124, '밖: 문 안으로 0.6칸', { size: 10, anchor: 'middle' }) + T(240, 124, '안: 문 매트에서 0.7칸', { size: 10, anchor: 'middle' });
+  } else if (kind === 'iris') {
+    b += R(10, 10, 300, 100, P.grass, 8) + `<path d="M10 18 a8 8 0 0 1 8 -8 h284 a8 8 0 0 1 8 8 v84 a8 8 0 0 1 -8 8 h-284 a8 8 0 0 1 -8 -8z M160 34 a26 26 0 1 0 0.01 0z" fill="${P.dark}" fill-rule="evenodd"/>` + kid(160, 62, 0.9) + T(160, 124, '원 가운데 = 플레이어 머리 · 닫힌 동안 실내로 옮김', { size: 10, anchor: 'middle' });
+  }
+  return svg(b, `${kind} 그림`, 132);
+}
+const RES = [
+  ['RM-08', '도토리상점 실내', 'shop', 'D69 · D72 · D73', '10×7 칸 · 벽지 WP-05 통나무 벽 · 바닥 FL-02 밝은 판자 · 창 n:1·n:8 · 계산대 뒤 밤톨. 진열 받침 2곳에 오늘의 가구 2개(날마다 바뀜), 오른쪽 진열대에 도구 5·꽃씨 2. 가구는 지금 모델(벽시계·액자·화분·스탠드·러그).', '<code>assets/interior/places/shop.json</code>'],
+  ['RM-09', '박물관 실내', 'museum', 'D70 · D71 · D72', '12×8 칸 · 벽지 WP-01 크림 줄무늬 · 바닥 FL-07 연못 돌바닥 · 창 n:5·n:6. 왼쪽 긴 수조 물고기 20자리, 오른쪽 긴 유리 상자 곤충 22자리, 가운데 받침 8개에 화석, 공룡 모형(FU-20). 입구 앞 안내대 뒤 느루.', '<code>assets/interior/places/museum.json</code>'],
+  ['FU-35', '진열 받침 (새, 임시 상자)', 'stand', 'D69 · D71', '박물관 화석 받침(1×1, 높이 0.55)과 상점 진열 받침(2×2, 높이 0.18). 모델이 생기기 전엔 색 상자. 긴 수조·유리 상자도 v1 은 반투명 상자.', '배경 편집기 「가구」 (요청하면 Blender 모델)'],
+  ['FU-36', '계산대 · 안내대 (임시: FU-29 재사용)', 'counter', 'D69 · D70', '부엌 조리대(FU-29) 모델을 높이만 0.6배로 낮춰 계산대로 씀 — 밤톨·느루(키 0.8)가 가려지지 않게. 상점 전용 모양(도토리 저울·나무 상판)이 필요하면 의견으로 — 배경 편집기에서 새 가구로 만들어요.', '<code>assets/furniture</code>'],
+  ['AN-06', '문 열기', 'door', 'D67', '건물 문 크기 그대로 덧씌운 문짝이 경첩 쪽으로 안으로 접혀 들어가며 열리고, 뒤는 어두운 문간. 내 집·주민 집·상점·박물관 문 크기는 각 건물 모델(BD-01·02·03·04)에서 읽어요.', '<code>src/gameplay/house/door.js</code>'],
+  ['AN-07', '걸어 들어가기·나오기', 'walk', 'D67', '플레이어가 충돌 없이 문간까지 걷는 연출(걷기 동작·발소리 그대로). 실내 도착 뒤 문 매트에서 한두 걸음. 흔들림 줄이기면 하지 않아요.', '<code>player.walkTo</code> (새 API)'],
+  ['UI-12', '원형 화면 전환', 'iris', 'D68', '<code>ui.fade(켜기, 초, 색, { shape: \'circle\', at })</code> — 원이 플레이어 머리 둘레로 좁아졌다가 커져요. 흔들림 줄이기면 원 없이 전체 페이드.', '<code>src/ui/index.js</code> · <code>ui.css</code>'],
+];
+$('resCards').innerHTML = RES.map(([id, name, kind, dec, what, where]) => `
+  <div class="card"><div class="stage">${plan(kind)}</div>
+    <div class="head"><span class="id">${id}</span><h3>${name}</h3><span class="tag new">새로</span><span class="tag">${dec}</span></div>
+    <dl class="facts"><dt>무엇</dt><dd>${what}</dd><dt>어디에</dt><dd>${where}</dd></dl>${noteBox(id, name)}</div>`).join('');
+
+/* ---------- 반영 v1 ---------- */
+const PLAN = [
+  ['공용 문 전환 — 문 열기·걷기·원형 전환·실내 한 걸음, 나올 때 거꾸로. 흔들림 줄이기면 페이드만', '<code>src/gameplay/house/door.js</code> (새) · <code>src/player/index.js</code> (<code>walkTo</code> 만) · <code>src/ui/index.js</code>·<code>ui.css</code> (원형)', 'D67-A · D68-A'],
+  ['내 집·주민 집이 새 문 전환을 씀 (방·가구·저장은 그대로)', '<code>src/gameplay/house/index.js</code> · <code>visit.js</code>', 'D67-A'],
+  ['상점·박물관 실내 방 — 크기를 받는 방 짓기, 바닥·벽 충돌, 진열·전시', '<code>src/gameplay/house/places.js</code> (새) · <code>room.js</code> · <code>assets/interior/places/*.json</code>', 'D69-A · D70-A · D71-A'],
+  ['밤톨·느루가 계산대·안내대에, 문 Space = 들어가기, 계산대 Space = 지금 창', '<code>src/gameplay/town/keepers.js</code>', 'D72-A · D73-A'],
+  ['QA 봇이 새 흐름으로 상점·박물관에 들어가 계산대에서 사고팔고 나옴', '<code>tests/playthrough/skills.js</code>·<code>bot.js</code>', '—'],
+  ['테스트: 방 배치 검사·문 크기·저장 이어 하기(상점 안에서 저장 → 다시 열기)', '<code>tests/places.test.mjs</code> (새)', '—'],
+];
+$('planRows').innerHTML = PLAN.map(([a, b, c]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="id">${c}</td></tr>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+$('pills').innerHTML = ['<span class="pill wait">반영 v1 (임시) · 추천안 모두 A</span>', '결정 7 (D67–D73)', '새 리소스 7 (RM-08·09 · FU-35·36 · AN-06·07 · UI-12)', '장소 4 (내 집 · 주민 집 · 상점 · 박물관)']
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'interiors', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 실내 검수 보드 v0.1 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>

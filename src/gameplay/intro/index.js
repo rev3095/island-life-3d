@@ -333,7 +333,7 @@ export default {
       const step = R.stepOf(current);
       const target = current === 'reward' ? 'reward' : step?.target;
       const pl = S().player?.position;
-      const pt = target && !S().house?.inside && pl ? placeOf(target) : null;
+      const pt = target && !(S().house?.where ?? S().house?.inside) && pl ? placeOf(target) : null;   // 실내(집·주민 방·상점·박물관)에선 섬 방향을 가리키지 않는다
       if (!pt) return list.direction(null);
       const dx = pt.x - pl.x, dz = pt.z - pl.z, dist = Math.hypot(dx, dz);
       if (dist < NEAR) return list.direction(null);
