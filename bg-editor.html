@@ -195,6 +195,11 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
 .plan-grid { pointer-events: none; border-right: 1px solid rgba(59,47,40,.25); border-bottom: 1px solid rgba(59,47,40,.25);
   background-image: linear-gradient(rgba(59,47,40,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(59,47,40,.22) 1px, transparent 1px); background-size: 12.5% 12.5%; }
 .plan-win { background: #CDEBF5; border: 2px solid #FFF8E6; box-shadow: 0 0 0 1px rgba(59,47,40,.4); pointer-events: none; }
+.plan-case { pointer-events: none; z-index: 3; border: 2px dashed #3B7FA0; border-radius: 6px; background: rgba(205,235,245,.55); }
+.plan-case .lbl { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 10px; color: #23506A; writing-mode: vertical-rl; white-space: nowrap; }
+.plan-spot { width: 2.4%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 4; }
+.plan-spot.stock { background: rgba(255,248,230,.9); border: 2px dashed #4F8A3C; }
+.plan-spot.talk { width: 4.4%; display: grid; place-items: center; font-size: 12px; background: rgba(255,248,230,.85); border: 2px solid #3B2F28; }
 .plan-mat { border-radius: 4px; display: grid; place-items: center; color: #FFF8E6; font-size: 12px; pointer-events: none; }
 .piece { border: 2px solid #3B2F28; border-radius: 8px; background: rgba(255,255,255,.75); cursor: grab; padding: 1px; color: #3B2F28; }
 .piece img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; display: block; }
@@ -231,7 +236,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
   <header>
     <div class="title-row"><h1>배경 편집기</h1><a class="small" href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2" target="_blank" rel="noopener">캐릭터 편집기 열기 ↗</a></div>
     <div class="pills" id="pills"></div>
-    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일, 집 안 가구, 가방에 드는 아이템을 요소 하나하나로 나눠 Blender로 만든 3D 모델과, 집 안 벽지·바닥 무늬, 주민 방 배치입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요. 주민 방은 8×8 칸에 가구를 끌어 놓고 돌려서 배치를 보내 주세요.</p>
+    <p class="muted" style="max-width:74ch">섬을 채울 자연·소품·건물·타일, 집 안 가구, 가방에 드는 아이템을 요소 하나하나로 나눠 Blender로 만든 3D 모델과, 집 안 벽지·바닥 무늬, 주민 방 배치입니다. 아래 격자에서 요소를 눌러 3D로 돌려보고, 그대로 쓸지 정해 주세요. 고칠 점은 그림·영상 레퍼런스와 프롬프트로 "요청 보내기", 새 요소는 각 분류의 "+ 새 요소"로 요청할 수 있어요. 주민 방(8×8)과 도토리상점·박물관은 칸에 가구를 끌어 놓고 돌려서 배치를 보내 주세요.</p>
   </header>
 
   <nav style="display:grid;gap:10px" aria-label="요소 고르기">
@@ -337,7 +342,7 @@ figcaption { font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
     <div class="steps">
       <div class="step"><h3>1. 요소 고르고 요청 보내기</h3><p class="small">격자에서 요소를 고르고 레퍼런스·프롬프트를 넣어 "요청 보내기". 요청과 파일은 이 페이지의 저장소에 요소별로 남아요.</p></div>
       <div class="step"><h3>2. 채팅에서 확인 부탁</h3><p class="small">채팅에 "배경 요청 확인"이라고 보내주세요. Claude가 새 요청을 모두 읽고 레퍼런스를 내려받아 직접 봅니다.</p></div>
-      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>(가구 <code>assets/furniture/specs/</code>, 아이템 <code>assets/items/specs/</code>)에, 모양 변화는 <code>build_env.py</code>(가구 <code>build_furniture.py</code>, 아이템 <code>build_item.py</code>)에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>(<code>build-furniture.mjs</code> · <code>build-item.mjs</code>)로 다시 만들어요. 벽지·바닥은 <code>assets/interior/specs/</code> 무늬 스펙만, 주민 방은 보내 준 배치 JSON 그대로 <code>assets/interior/rooms/</code> 에 넣어요.</p></div>
+      <div class="step"><h3>3. 스펙·모델링 수정 → Blender</h3><p class="small">숫자·색은 <code>assets/env/specs/&lt;요소&gt;.json</code>(가구 <code>assets/furniture/specs/</code>, 아이템 <code>assets/items/specs/</code>)에, 모양 변화는 <code>build_env.py</code>(가구 <code>build_furniture.py</code>, 아이템 <code>build_item.py</code>)에 반영하고 <code>node tools/build-env.mjs &lt;요소&gt;</code>(<code>build-furniture.mjs</code> · <code>build-item.mjs</code>)로 다시 만들어요. 벽지·바닥은 <code>assets/interior/specs/</code> 무늬 스펙만, 주민 방은 보내 준 배치 JSON 그대로 <code>assets/interior/rooms/</code>(상점·박물관은 <code>places/</code>)에 넣어요.</p></div>
       <div class="step"><h3>4. 같은 링크 갱신</h3><p class="small">새 모델·렌더로 편집기가 업데이트되고, 요청 기록에 "반영 완료"와 바뀐 내용이 적혀요. 확정한 요소는 초록 점으로 바뀌어요.</p></div>
     </div>
   </section>
@@ -361,11 +366,11 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 
 const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구',
   fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃',
-  wallpaper: '벽지', floor: '바닥', room: '주민 방' };
+  wallpaper: '벽지', floor: '바닥', room: '방 배치' };
 const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각', furniture: '집 안에 놓는 가구 (작업대에서 만들거나 선물로 받음)',
   fish: '강·바다·연못에서 낚아 손에 들어 보이는 것', bug: '꽃·나무·바위 둘레에서 잡아 들어 보이는 것', fossil: '땅을 파면 나오고, 느루가 감정해 줘요', tool: '채집에 쓰는 도구', mat: '제작에 쓰는 재료',
   seed: '심는 것 (꽃 씨앗 봉투는 색마다 변형)', fruit: '과일나무 열매', shell: '바닷가에서 줍는 것', flower: '꽃 아이템 (모델 하나에 색 변형)',
-  wallpaper: '집 안 벽 무늬 — 상점에서 하루 하나', floor: '집 안 바닥 무늬 — 상점에서 하루 하나', room: '주민 집 안 8×8 칸 방. 가구를 끌어 놓고 돌려요' };
+  wallpaper: '집 안 벽 무늬 — 상점에서 하루 하나', floor: '집 안 바닥 무늬 — 상점에서 하루 하나', room: '주민 집 안 8×8 칸 방과 도토리상점(10×7)·박물관(12×8). 가구를 끌어 놓고 돌려요' };
 // 영역 → 분류. 아이템 분류는 index.json 의 group, 실내 무늬는 kind
 const AREAS = [
   { key: 'env', label: '배경', cats: ['nature', 'prop', 'building', 'tile'] },
@@ -401,14 +406,21 @@ function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if
 let models = [], area = 'env', tab = 'all', itemsLoaded = false, frameSpec = null;
 // 게시본은 요소마다 스펙·통계를 넣은 묶음 목록(editor-index.json, tools/build-editor-index.mjs)을 읽는다 — 아티팩트 파일 수 제한 때문. 없으면 index.json
 const loadIndex = b => loadJSON(b + 'editor-index.json').catch(() => loadJSON(b + 'index.json'));
-// 실내 묶음이 없으면(로컬에서 빌드 전) 목록·스펙·방 파일을 하나씩
+// 실내 묶음이 없으면(로컬에서 빌드 전) 목록·스펙·방 파일을 하나씩. 상점·박물관은 places/, 그 붙박이(계산대·받침·수조 FU-35–42)는 가구 폴더의 fixtures/
+const PLACE_FILES = ['shop', 'museum'], FIX = FURN + 'fixtures/';
 async function loadInterior() {
   try { return await loadJSON(INT + 'editor-index.json'); } catch {}
   const index = await loadJSON(INT + 'index.json');
   const all = await Promise.all(index.models.map(async m => ({ ...m, spec: await loadJSON(`${INT}specs/${m.slug}.json`) })));
   const rooms = await Promise.all((index.rooms ?? []).map(async r => ({ ...r, room: await loadJSON(`${INT}rooms/${r.slug}.json`) })));
-  return { ...index, models: all, rooms, frame: all.find(m => m.kind === 'frame')?.spec };
+  const places = await Promise.all(PLACE_FILES.map(async f => { const room = await loadJSON(`${INT}places/${f}.json`); return { id: room.id, slug: room.slug, name: room.name, version: room.version, status: room.status, room }; }));
+  const fx = await loadJSON(FIX + 'index.json').catch(() => ({ models: [] }));
+  const fixtures = await Promise.all(fx.models.map(async m => ({ ...m, spec: await loadJSON(`${FIX}specs/${m.slug}.json`).catch(() => ({})) })));
+  return { ...index, models: all, rooms, places, fixtures, frame: all.find(m => m.kind === 'frame')?.spec };
 }
+// 상점·박물관 주인 (방 파일에는 slug 만 있다)
+const KEEPER_NAME = { bamtol: '밤톨', neuru: '느루' };
+let fixtures = [];
 // 단풍(CH-10) 방은 아직 파일이 없다 → 빈 방으로 두고, 배치를 정해 요청을 보내면 "배경 요청 확인" 때 rooms/rm-07.json 을 새로 만든다
 const RM07 = { id: 'RM-07', slug: 'rm-07', kind: 'room', owner: 'danpung', ownerName: '단풍', name: '단풍 방', version: 0, status: 'new',
   note: '', wallpaper: 'wp-01', floor: 'fl-01', host: { lx: 4, lz: 3.6, face: 's' }, furniture: [] };
@@ -430,7 +442,11 @@ catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어�
       .map(m => ({ ...m, category: m.kind, key: m.slug, base: INT, area: 'interior', cat: m.kind, type: 'pattern' })));
     const rooms = interior.rooms.map(r => ({ ...r, spec: r.room, ownerName: r.room.ownerName, category: 'room', key: r.slug, base: INT, area: 'room', cat: 'room', type: 'room' }));
     if (!rooms.some(r => r.id === RM07.id)) rooms.push({ ...RM07, spec: RM07, category: 'room', key: RM07.slug, base: INT, area: 'room', cat: 'room', type: 'room' });
-    models.push(...rooms);
+    // 상점·박물관(RM-08·09): 같은 방 배치 격자, 크기·창문·문은 방 파일의 size·windows·door. 배경 건물 shop·museum 과 겹치지 않게 key 앞에 place-
+    const places = (interior.places ?? []).map(p => ({ ...p, spec: p.room, ownerName: KEEPER_NAME[p.room.keeper?.slug] ?? p.room.keeper?.slug, isPlace: true,
+      category: 'room', key: 'place-' + p.slug, base: INT, area: 'room', cat: 'room', type: 'room' }));
+    models.push(...rooms, ...places);
+    fixtures = (interior.fixtures ?? []).map(m => ({ ...m, base: FIX, area: 'fixture', key: 'fix-' + m.slug, type: 'model' }));
   }
 }
 const specOf = s => models.find(m => m.type === 'pattern' && m.slug === s)?.spec ?? null;
@@ -466,7 +482,7 @@ function renderGroups() {
   $('groups').innerHTML = cats.map(c => `<div class="group"><h3>${CAT_LABEL[c]} <span class="small muted">${CAT_NOTE[c]}</span></h3><div class="grid">
     ${models.filter(m => m.cat === c).map(m => `<button type="button" class="pick" data-slug="${esc(m.key)}" aria-pressed="${m.key === slug}">
       <span class="dot ${m.status === 'approved' ? 'ok' : ''}" title="${MODEL_STATUS[m.status]?.[1] ?? ''}"></span>
-      <img src="${esc(thumbOf(m))}" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.type === 'room' ? `${m.ownerName ?? ''} 방` : m.name)}</span></button>`).join('')}
+      <img src="${esc(thumbOf(m))}" alt="" loading="lazy"><span class="id">${esc(m.id)}</span><span class="nm">${esc(m.isPlace ? m.name : m.type === 'room' ? `${m.ownerName ?? ''} 방` : m.name)}</span></button>`).join('')}
     ${c === 'room' ? '' : `<button type="button" class="pick add" data-slug="${NEW}" data-cat="${c}" aria-pressed="${slug === NEW && newCat === c}"><span class="plus">+</span><span class="nm">새 ${addWord(c) === '배경 요소' ? '요소' : addWord(c)}</span></button>`}
   </div></div>`).join('');
 }
@@ -495,7 +511,9 @@ const clone = o => JSON.parse(JSON.stringify(o));
 const blankPrompt = () => ({ concept: '', keywords: [], references: [], avoid: [] });
 const paramValues = () => Object.fromEntries(Object.entries(params).map(([k, v]) => [k, v.value]));
 // 방 배치 draft: 가구 줄마다 _id (처음 있던 것 o0…, 더한 것 n…) 를 붙여 요청 글에서 무엇이 옮겨졌는지 맞춘다. 배치 JSON 에는 넣지 않는다.
-const layoutOf = r => ({ name: r.name, wallpaper: r.wallpaper, floor: r.floor, host: { ...r.host }, furniture: (r.furniture ?? []).map((f, i) => ({ ...f, _id: 'o' + i })) });
+// 상점·박물관은 주민 자리 host 대신 주인 자리 keeper { slug, lx, lz, face } — 격자에서는 똑같이 host 로 다루고 배치 JSON 에서 keeper 로 돌려 놓는다
+const hostOf = r => { const { slug: _, ...h } = r.host ?? r.keeper ?? { lx: 4, lz: 3.6, face: 's' }; return h; };
+const layoutOf = r => ({ name: r.name, wallpaper: r.wallpaper, floor: r.floor, host: hostOf(r), furniture: (r.furniture ?? []).map((f, i) => ({ ...f, _id: 'o' + i })) });
 const pick = s => cur?.type === 'room'
   ? clone({ request: '', prompt: { ...blankPrompt(), concept: s.note ?? '' }, layout: layoutOf(s) })
   : clone({ request: '', prompt: s.prompt ?? blankPrompt(), palette: s.palette ?? {}, params: paramValues() });
@@ -546,9 +564,10 @@ async function select(next) {
     if (slug !== want) return;
     [spec, stats] = cache[want];
   } else { spec = cur.spec; stats = null; }
+  setRoomGeom(type === 'room' ? spec : null);
   variant = null;
   params = paramsOf(spec);
-  $('baseVer').textContent = cur.status === 'new' ? `새 방 (rooms/${file}.json 은 아직 없어요)` : `기준: ${type === 'room' ? '방' : '스펙'} v${spec.version}`;
+  $('baseVer').textContent = cur.status === 'new' ? `새 방 (rooms/${file}.json 은 아직 없어요)` : `기준: ${cur.isPlace ? `places/${file}.json` : type === 'room' ? '방' : '스펙'} v${spec.version}`;
   draft = restore(pick(spec));
   if (type === 'model') {
     renderSheet();
@@ -942,7 +961,7 @@ $('sendReq').addEventListener('click', async () => {
   setStatus('보내는 중…');
   try {
     const refs = activeRefs();
-    // 방 배치는 배치 JSON(layout)과 검사 결과(problems)를 같이 남긴다 — "배경 요청 확인" 때 rooms/<slug>.json 에 그대로 넣는다
+    // 방 배치는 배치 JSON(layout)과 검사 결과(problems)를 같이 남긴다 — "배경 요청 확인" 때 rooms/<slug>.json (상점·박물관은 places/<slug>.json) 에 그대로 넣는다
     await store.add(COL.requests, { slug, ...metaOf(slug === NEW ? draft.category : cur.cat), kind: slug === NEW || cur.status === 'new' ? 'add' : 'edit', base: spec?.version ?? null,
       status: 'new', createdAt: Date.now(), by: await store.who(), text: buildRequest(refs), fields: draft, refs,
       ...(room ? { layout: layoutJSON(draft.layout), problems: checkLayout(draft.layout).problems } : {}) });
@@ -1287,10 +1306,10 @@ function drawFlat() {
 }
 
 /* ---------- 방 껍데기 (게임 src/gameplay/house/room.js 의 buildRoom 을 줄여 옮김) ---------- */
-// 8×8 칸, 북·서·동 벽(앞 벽 없음), 징두리·몰딩·걸레받이, 창문 둘, 문 매트. 뷰어에서는 방 가운데가 원점.
-const ROOM_W = 8, ROOM_D = 8, WALL_H = 2.6, WAINSCOT_H = 0.85, WINDOW_Y = 1.35, WINDOW_W = 0.9, WINDOW_H = 0.8;
-const WINDOWS = ['n:1', 'n:6'], DOOR = { gx0: 3, gx1: 4 };
-const RX0 = -ROOM_W / 2, RZ0 = -ROOM_D / 2;   // 방 기준 좌표 (0, 0) = 북서쪽 모서리
+// 주민 방 8×8 칸 (상점 10×7 · 박물관 12×8 은 방 파일의 size·windows·door), 북·서·동 벽(앞 벽 없음), 징두리·몰딩·걸레받이, 창문 둘, 문 매트. 뷰어에서는 방 가운데가 원점.
+const WALL_H = 2.6, WAINSCOT_H = 0.85, WINDOW_Y = 1.35, WINDOW_W = 0.9, WINDOW_H = 0.8;
+let ROOM_W = 8, ROOM_D = 8, WINDOWS = ['n:1', 'n:6'], DOOR = { gx0: 3, gx1: 4 };
+let RX0 = -ROOM_W / 2, RZ0 = -ROOM_D / 2;   // 방 기준 좌표 (0, 0) = 북서쪽 모서리
 function buildShell(wallpaper, floor) {
   const group = new THREE.Group(), sm = {};
   const colorOf = name => frameSpec?.palette?.[name] ?? wallpaper?.palette?.[name] ?? '#FFFFFF';
@@ -1378,12 +1397,13 @@ function cellsOf(e, fp) {
   return out;
 }
 function boxOf(e, fp) { const [w, d] = dims(fp, e.rot ?? 0); return { x0: e.gx, z0: e.gz, x1: e.gx + w, z1: e.gz + d, cx: e.gx + w / 2, cz: e.gz + d / 2 }; }
-const DOOR_CELLS = new Set([`${DOOR.gx0},${ROOM_D - 1}`, `${DOOR.gx1},${ROOM_D - 1}`]);
-const WINDOW_SET = new Set(WINDOWS);
+let DOOR_CELLS = new Set(), WINDOW_SET = new Set();
+const hostWord = () => cur?.isPlace ? '주인 자리' : '주민 자리';
 const WALL_LABEL = { n: '북쪽', w: '서쪽', e: '동쪽' }, ROT_LABEL = ['남쪽 보기', '동쪽 보기', '북쪽 보기', '서쪽 보기'], FACE_LABEL = { n: '북', e: '동', s: '남 (문 쪽)', w: '서' };
 const furnModels = () => models.filter(m => m.area === 'furniture');
 function resolveFurn(e) {
-  const m = furnModels().find(x => (e.item && x.item === e.item) || (e.fu && x.id === e.fu)) ?? null;
+  const hit = x => (e.item && x.item === e.item) || (e.fu && x.id === e.fu);
+  const m = furnModels().find(hit) ?? fixtures.find(hit) ?? null;
   const box = Array.isArray(e.box) ? e.box : [1, 1, 0.8];
   return { e, m, place: m?.place ?? (e.wall ? 'wall' : 'floor'), layer: m?.layer ?? null, footprint: m?.footprint ?? (e.wall ? [1, 1] : [box[0], box[1]]), name: m?.name ?? e.name ?? e.fu ?? e.item ?? '가구' };
 }
@@ -1416,10 +1436,11 @@ function checkLayout(L) {
     }
   }
   const h = L.host;
-  if (!h || !Number.isFinite(h.lx) || !Number.isFinite(h.lz) || !['n', 'e', 's', 'w'].includes(h.face)) { problems.push('주민 자리 host = { lx, lz, face } 가 필요해요'); bad.add('host'); }
+  const hw = hostWord();
+  if (!h || !Number.isFinite(h.lx) || !Number.isFinite(h.lz) || !['n', 'e', 's', 'w'].includes(h.face)) { problems.push(`${hw} { lx, lz, face } 가 필요해요`); bad.add('host'); }
   else {
-    if (h.lx < 0.5 || h.lx > ROOM_W - 0.5 || h.lz < 0.5 || h.lz > ROOM_D - 1.2) { problems.push('주민 자리가 방 가장자리·문 매트에 너무 가까워요'); bad.add('host'); }
-    for (const r of list) if (!r.e.wall && r.layer !== 'rug' && hostHits(h, r)) { problems.push(`주민 자리가 ${r.name}와 겹쳐요`); bad.add('host'); }
+    if (h.lx < 0.5 || h.lx > ROOM_W - 0.5 || h.lz < 0.5 || h.lz > ROOM_D - 1.2) { problems.push(`${hw}가 방 가장자리·문 매트에 너무 가까워요`); bad.add('host'); }
+    for (const r of list) if (!r.e.wall && r.layer !== 'rug' && hostHits(h, r)) { problems.push(`${hw}가 ${r.name}와 겹쳐요`); bad.add('host'); }
   }
   return { problems, bad };
 }
@@ -1428,9 +1449,9 @@ const furnColor = r => {
   const sp = r.m.spec ?? {}, pal = { ...(sp.palette ?? {}), ...(sp.variants?.[r.e.variant]?.palette ?? {}) };
   return Object.values(pal)[0] ?? '#C99A63';
 };
-// 격자 썸네일: 위 띠 = 북쪽 벽지, 아래 = 바닥 8×8 + 가구 상자 + 주민 자리
+// 격자 썸네일: 위 띠 = 북쪽 벽지, 아래 = 바닥(주민 방 8×8, 상점·박물관은 size) + 가구 상자 + 주민·주인 자리
 function roomThumb(r) {
-  const px = 152, band = 18, cell = px / 8, ch = (px - band) / 8;
+  const [W, D] = r.size ?? [8, 8], px = 152, band = 18, cell = px / W, ch = (px - band) / D;
   const cv = document.createElement('canvas');
   cv.width = cv.height = px;
   const g = cv.getContext('2d');
@@ -1456,7 +1477,8 @@ function roomThumb(r) {
     g.strokeRect(x + 1, y + 1, w - 2, h - 2);
   }
   g.globalAlpha = 1;
-  if (r.host) { g.fillStyle = '#F2B36B'; g.beginPath(); g.arc(r.host.lx * cell, band + r.host.lz * ch, cell * 0.32, 0, Math.PI * 2); g.fill(); g.stroke(); }
+  const h = r.host ?? r.keeper;
+  if (h) { g.fillStyle = '#F2B36B'; g.beginPath(); g.arc(h.lx * cell, band + h.lz * ch, cell * 0.32, 0, Math.PI * 2); g.fill(); g.stroke(); }
   return cv.toDataURL('image/png');
 }
 
@@ -1473,7 +1495,8 @@ function poseRoot(root, r) {
   else { const b = boxOf(e, r.footprint); root.position.set(RX0 + b.cx, 0, RZ0 + b.cz); root.rotation.y = (e.rot ?? 0) * Math.PI / 2; }
 }
 const furnCache = {};
-const furnGLTF = m => furnCache[m.slug] ??= loadJSON(`${FURN}models/${m.slug}.glb.json`).then(j => parseGLB(j.data)).catch(e => { delete furnCache[m.slug]; throw e; });
+// 가구·붙박이 모델은 게시본에서 묶음(editor-models-<n>.json)에 들어 있다 → modelData 가 묶음/파일을 고른다
+const furnGLTF = m => furnCache[m.key] ??= modelData(m).then(parseGLB).catch(e => { delete furnCache[m.key]; throw e; });
 async function furniturePiece(e) {
   const r = resolveFurn(e);
   if (!r.m) return placeholderPiece(r);
@@ -1498,6 +1521,14 @@ async function furniturePiece(e) {
   const root = new THREE.Group();
   root.add(obj);
   poseRoot(root, r);
+  return root;
+}
+/** 박물관 긴 수조·곤충 유리 상자: 붙박이 모델을 칸 사각형 가운데에 (게임 places.js caseFixture 와 같은 자리) */
+async function casePiece(c) {
+  const m = fixtures.find(x => x.slug === c.fixture);
+  if (!m) return null;
+  const root = await furniturePiece({ fu: m.id, gx: 0, gz: 0, rot: 0 });
+  root.position.set(RX0 + (c.lx0 + c.lx1) / 2, 0, RZ0 + (c.lz0 + c.lz1) / 2);
   return root;
 }
 /** 모델이 없는 새 가구: box [가로, 깊이, 높이] 색 상자 */
@@ -1534,15 +1565,28 @@ async function showRoom3D(keepCamera = false) {
   if (!keepCamera) frame();
   $('viewerMsg').hidden = !L.furniture.length;
   $('viewerMsg').textContent = '가구 불러오는 중…';
-  const pieces = await Promise.all(L.furniture.map(e => furniturePiece(e).catch(() => placeholderPiece(resolveFurn(e)))));
-  if (seq !== loadSeq) { pieces.forEach(disposeTree); return; }
-  pieces.forEach(p => holder.add(p));
+  const pieces = await Promise.all([...L.furniture.map(e => furniturePiece(e).catch(() => placeholderPiece(resolveFurn(e)))), ...(cur.spec.cases ?? []).map(c => casePiece(c).catch(() => null))]);
+  if (seq !== loadSeq) { pieces.forEach(p => p && disposeTree(p)); return; }
+  pieces.forEach(p => p && holder.add(p));
   $('viewerMsg').hidden = true;
 }
 
 /* ---------- 방 배치 격자 (ET-04) ---------- */
-// 그림 크기 (칸 단위): 서·동 벽 띠 0.6 + 8칸 + 0.6, 북 벽 띠 0.6 + 8칸. 좌표 (x, z) = 방 기준 (북서쪽 모서리 0,0)
-const OX = 0.6, OZ = 0.6, PW = ROOM_W + 2 * OX, PH = ROOM_D + OZ;
+// 그림 크기 (칸 단위): 서·동 벽 띠 0.6 + 방 가로 + 0.6, 북 벽 띠 0.6 + 방 깊이. 좌표 (x, z) = 방 기준 (북서쪽 모서리 0,0)
+const OX = 0.6, OZ = 0.6;
+let PW = ROOM_W + 2 * OX, PH = ROOM_D + OZ;
+/** 고른 방의 크기·창문·문을 맞춘다 — 주민 방은 8×8 · 창 n:1·n:6 · 문 3–4 칸 (게임 room.js), 상점·박물관은 방 파일의 size·windows·door (places.js). 무늬 보기는 null = 주민 방 */
+function setRoomGeom(r) {
+  [ROOM_W, ROOM_D] = r?.size ?? [8, 8];
+  WINDOWS = r?.windows ?? ['n:1', 'n:6'];
+  DOOR = r?.door ?? { gx0: 3, gx1: 4 };
+  RX0 = -ROOM_W / 2; RZ0 = -ROOM_D / 2;
+  PW = ROOM_W + 2 * OX; PH = ROOM_D + OZ;
+  DOOR_CELLS = new Set(Array.from({ length: DOOR.gx1 - DOOR.gx0 + 1 }, (_, i) => `${DOOR.gx0 + i},${ROOM_D - 1}`));
+  WINDOW_SET = new Set(WINDOWS);
+}
+setRoomGeom(null);
+const STOCK_LABEL = { furniture: '오늘의 가구', tools: '도구', seeds: '꽃씨', saplings: '묘목' };
 const at = (x, z, w, d) => `left:${(x + OX) / PW * 100}%;top:${(z + OZ) / PH * 100}%;width:${w / PW * 100}%;height:${d / PH * 100}%`;
 let selPiece = null, drag = null;   // selPiece = 가구 _id | 'host' | null
 const bgCache = {};
@@ -1557,9 +1601,16 @@ function renderPlan() {
     `<div class="plan-wall" style="${at(ROOM_W, 0, OX, ROOM_D)};${bg(wp, OX, ROOM_D)};border-color:${wp?.palette?.molding ?? '#8C6440'}"></div>`,
     `<div class="plan-floor" style="${at(0, 0, ROOM_W, ROOM_D)};${bg(fl, ROOM_W, ROOM_D)}"></div>`,
     ...WINDOWS.map(k => `<div class="plan-win" style="${at(Number(k.split(':')[1]) + 0.08, -0.5, 0.84, 0.36)};background:${fp.pane ?? '#CDEBF5'};border-color:${fp.frameTrim ?? '#FFF8E6'}"></div>`),
-    `<div class="plan-mat" style="${at(3.32, 7.24, 1.36, 0.66)};background:${fp.doormat ?? '#C96F4A'};border:3px solid ${fp.doormatEdge ?? '#8C4A33'}">문</div>`,
-    `<div class="plan-grid" style="${at(0, 0, ROOM_W, ROOM_D)}"></div>`,
+    `<div class="plan-mat" style="${at((DOOR.gx0 + DOOR.gx1 + 1) / 2 - 0.68, ROOM_D - 0.76, 1.36, 0.66)};background:${fp.doormat ?? '#C96F4A'};border:3px solid ${fp.doormatEdge ?? '#8C4A33'}">문</div>`,
+    `<div class="plan-grid" style="${at(0, 0, ROOM_W, ROOM_D)};background-size:${100 / ROOM_W}% ${100 / ROOM_D}%"></div>`,
   ];
+  // 상점·박물관: 진열 자리(오늘 파는 것·기증한 것이 놓이는 곳)와 말 거는 자리는 보기만 (옮기려면 요청 글에 적기)
+  const S = cur.spec, dot = (x, z) => `left:${(x + OX) / PW * 100}%;top:${(z + OZ) / PH * 100}%`;
+  for (const s of S.stock ?? []) for (let i = 0; i < (s.count ?? 1); i++)
+    parts.push(`<div class="plan-spot stock" style="${dot(s.lx, s.lz + i * (s.dz ?? 0))}" title="진열 자리 · ${esc(STOCK_LABEL[s.group] ?? s.group)}"></div>`);
+  for (const c of S.cases ?? []) parts.push(`<div class="plan-case" style="${at(c.lx0, c.lz0, c.lx1 - c.lx0, c.lz1 - c.lz0)}" title="${esc(c.name)} — 기증한 ${c.cat === 'fish' ? '물고기' : '곤충'}가 들어가요"><span class="lbl">${esc(c.name)}</span></div>`);
+  for (const [x, z] of S.fossils ?? []) parts.push(`<div class="plan-spot stock" style="${dot(x, z)}" title="화석 자리 (기증한 화석이 받침 위에)"></div>`);
+  if (S.talk) parts.push(`<div class="plan-spot talk" style="${dot(S.talk.lx, S.talk.lz)}" title="말 거는 자리 (플레이어가 서는 곳)">💬</div>`);
   const list = L.furniture.map(resolveFurn).sort((a, b) => (b.layer === 'rug') - (a.layer === 'rug'));
   for (const r of list) {
     const e = r.e;
@@ -1569,18 +1620,19 @@ function renderPlan() {
     const cls = ['piece', r.layer === 'rug' && 'rug', e.wall && 'wall', selPiece === e._id && 'sel', chk.bad.has(e._id) && 'bad'].filter(Boolean).join(' ');
     const v = e.variant && r.m?.spec?.variants?.[e.variant], vc = v ? Object.values(v.palette)[0] : null;
     parts.push(`<div class="${cls}" data-pid="${esc(e._id)}" style="${pos};${r.m ? '' : `background:${esc(e.color ?? '#C99A63')}`}" title="${esc(r.name)}${v ? ` · ${esc(v.label)}` : ''}">`
-      + (r.m ? `<img src="${FURN}renders/${esc(r.m.slug)}_thumb.png" alt="" draggable="false">` : '')
+      + (r.m ? `<img src="${esc(r.m.thumb ?? `${r.m.base ?? FURN}renders/${r.m.slug}_thumb.png`)}" alt="" draggable="false">` : '')
       + `<span class="lbl">${esc(r.name)}</span>${e.wall ? '' : `<i class="front f${e.rot ?? 0}"></i>`}${vc ? `<i class="vdot" style="background:${vc}"></i>` : ''}</div>`);
   }
   const h = L.host;
-  parts.push(`<div class="host${selPiece === 'host' ? ' sel' : ''}${chk.bad.has('host') ? ' bad' : ''}" data-host style="left:${(h.lx + OX) / PW * 100}%;top:${(h.lz + OZ) / PH * 100}%" title="주민 자리 (${esc(cur.ownerName ?? '')})">${esc((cur.ownerName ?? '주')[0])}<i class="${esc(h.face)}"></i></div>`);
+  parts.push(`<div class="host${selPiece === 'host' ? ' sel' : ''}${chk.bad.has('host') ? ' bad' : ''}" data-host style="left:${(h.lx + OX) / PW * 100}%;top:${(h.lz + OZ) / PH * 100}%" title="${hostWord()} (${esc(cur.ownerName ?? '')})">${esc((cur.ownerName ?? '주')[0])}<i class="${esc(h.face)}"></i></div>`);
+  $('plan').style.aspectRatio = `${PW} / ${PH}`;
   $('plan').innerHTML = parts.join('');
   renderChecks(chk);
 }
 function renderChecks(chk) {
   const ul = $('roomChecks');
   ul.className = 'checks' + (chk.problems.length ? '' : ' ok');
-  ul.innerHTML = chk.problems.length ? chk.problems.map(p => `<li>${esc(p)}</li>`).join('') : '<li>배치 검사 통과 — 겹침·문 매트·창문 자리·주민 자리 모두 괜찮아요</li>';
+  ul.innerHTML = chk.problems.length ? chk.problems.map(p => `<li>${esc(p)}</li>`).join('') : `<li>배치 검사 통과 — 겹침·문 매트·창문 자리·${hostWord()} 모두 괜찮아요</li>`;
 }
 function roomSwatches() {
   const L = draft.layout, sw = s => { const p = models.find(m => m.type === 'pattern' && m.slug === s); return p ? thumbOf(p) : ''; };
@@ -1592,18 +1644,18 @@ function renderRoomTools() {
   $('roomName').value = L.name ?? '';
   $('roomWp').innerHTML = opt('wallpaper', L.wallpaper);
   $('roomFl').innerHTML = opt('floor', L.floor);
-  $('addFurn').innerHTML = furnModels().map(m => `<option value="${esc(m.key)}">${esc(m.id)} ${esc(m.name)} · ${m.place === 'window' ? '창문' : m.place === 'wall' ? '벽' : `${m.footprint?.[0]}×${m.footprint?.[1]}칸`}</option>`).join('');
+  $('addFurn').innerHTML = [...(cur?.isPlace ? fixtures : []), ...furnModels()].map(m => `<option value="${esc(m.key)}">${esc(m.id)} ${esc(m.name)} · ${m.place === 'window' ? '창문' : m.place === 'wall' ? '벽' : `${m.footprint?.[0]}×${m.footprint?.[1]}칸`}</option>`).join('');
   roomSwatches(); renderSel(); renderChecks(checkLayout(L));
 }
 function renderSel() {
   const L = draft.layout, box = $('selPiece');
   if (selPiece === 'host') {
     const h = L.host;
-    box.innerHTML = `<b>주민 자리</b><span class="small muted">(${h.lx}, ${h.lz})</span><span class="ctl-label">바라보는 쪽</span><div class="seg" role="group" aria-label="바라보는 쪽">${['n', 'e', 's', 'w'].map(f => `<button type="button" data-face="${f}" aria-pressed="${h.face === f}">${FACE_LABEL[f]}</button>`).join('')}</div>`;
+    box.innerHTML = `<b>${hostWord()}</b><span class="small muted">(${h.lx}, ${h.lz})</span><span class="ctl-label">바라보는 쪽</span><div class="seg" role="group" aria-label="바라보는 쪽">${['n', 'e', 's', 'w'].map(f => `<button type="button" data-face="${f}" aria-pressed="${h.face === f}">${FACE_LABEL[f]}</button>`).join('')}</div>`;
     return;
   }
   const e = L.furniture.find(f => f._id === selPiece);
-  if (!e) { box.innerHTML = '<span class="small muted">격자에서 가구나 주민 자리(동그라미)를 눌러 고르고 끌어서 옮겨요. 초록 막대가 가구 정면이에요. 키보드: 방향키 옮기기 · R 돌리기 · Delete 빼기</span>'; return; }
+  if (!e) { box.innerHTML = `<span class="small muted">격자에서 가구나 ${hostWord()}(동그라미)를 눌러 고르고 끌어서 옮겨요. 초록 막대가 가구 정면이에요. 키보드: 방향키 옮기기 · R 돌리기 · Delete 빼기${cur?.isPlace ? '. 점선 점 = 진열 자리, 💬 = 말 거는 자리 (보기만 — 옮기려면 요청 글에 적어 주세요)' : ''}</span>`; return; }
   const r = resolveFurn(e), vs = Object.entries(r.m?.spec?.variants ?? {});
   box.innerHTML = `<b>${esc(r.name)}</b><span class="small muted">${esc(r.m?.id ?? e.fu ?? '')} · ${e.wall ? `${WALL_LABEL[e.wall]} 벽 ${e.slot}번` : `(${e.gx}, ${e.gz}) ${ROT_LABEL[e.rot ?? 0]}`}</span>`
     + (e.wall ? '' : '<button type="button" class="btn" data-act="rot">↻ 돌리기</button>')
@@ -1622,9 +1674,10 @@ function rotatePiece(p) {
 function removePiece(p) { draft.layout.furniture = draft.layout.furniture.filter(f => f !== p); selPiece = null; }
 // 새 가구: 바닥은 북서쪽부터 처음 맞는 칸, 벽은 빈 벽 자리 (창문 가구는 빈 창문)
 function addFurniture() {
-  const m = models.find(x => x.key === $('addFurn').value), L = draft.layout;
+  const key = $('addFurn').value, m = models.find(x => x.key === key) ?? fixtures.find(x => x.key === key), L = draft.layout;
   if (!m) return;
-  const e = { item: m.item, _id: 'n' + Date.now().toString(36) };
+  // 붙박이는 방 파일처럼 fu 번호 + 이름 + 모델을 못 읽을 때 그릴 상자
+  const e = m.area === 'fixture' ? { fu: m.id, name: m.name, box: [...m.footprint, m.size?.[2] ?? 0.6], _id: 'n' + Date.now().toString(36) } : { item: m.item, _id: 'n' + Date.now().toString(36) };
   if (m.place === 'floor') {
     const r = resolveFurn(e), [w, d] = dims(r.footprint, 0);
     let spot = null;
@@ -1634,7 +1687,7 @@ function addFurniture() {
     }
     Object.assign(e, spot ?? { gx: 0, gz: 0 }, { rot: 0 });
   } else {
-    const slots = m.place === 'window' ? WINDOWS : ['n', 'w', 'e'].flatMap(w => Array.from({ length: 8 }, (_, i) => `${w}:${i}`)).filter(k => !WINDOW_SET.has(k));
+    const slots = m.place === 'window' ? WINDOWS : ['n', 'w', 'e'].flatMap(w => Array.from({ length: w === 'n' ? ROOM_W : ROOM_D }, (_, i) => `${w}:${i}`)).filter(k => !WINDOW_SET.has(k));
     const [wall, s] = (slots.find(k => !L.furniture.some(f => f.wall && `${f.wall}:${f.slot}` === k)) ?? slots[0]).split(':');
     Object.assign(e, { wall, slot: Number(s) });
   }
@@ -1726,7 +1779,7 @@ plan.addEventListener('keydown', ev => {
     const p = L.furniture.find(f => f._id === selPiece);
     if (!p) return;
     if (step) {
-      if (p.wall) p.slot = clamp(p.slot + (p.wall === 'n' ? step[0] : step[1]), 0, 7);
+      if (p.wall) p.slot = clamp(p.slot + (p.wall === 'n' ? step[0] : step[1]), 0, (p.wall === 'n' ? ROOM_W : ROOM_D) - 1);
       else { const [w, d] = dims(resolveFurn(p).footprint, p.rot ?? 0); p.gx = clamp(p.gx + step[0], 0, ROOM_W - w); p.gz = clamp(p.gz + step[1], 0, ROOM_D - d); }
     } else if (ev.key === 'r' || ev.key === 'R') { if (p.wall) return; rotatePiece(p); }
     else if (ev.key === 'Delete' || ev.key === 'Backspace') removePiece(p);
@@ -1740,8 +1793,11 @@ plan.addEventListener('keydown', ev => {
 const where = e => e.wall ? `${WALL_LABEL[e.wall]} 벽 ${e.slot}번` : `(${e.gx}, ${e.gz}) ${ROT_LABEL[e.rot ?? 0]}`;
 function layoutJSON(L) {
   const head = cur.status === 'new' ? { id: cur.id, slug: cur.slug, kind: 'room', owner: cur.spec.owner, ownerName: cur.ownerName } : {};
-  return { ...head, name: L.name, ...(draft.prompt.concept ? { note: draft.prompt.concept } : {}), wallpaper: L.wallpaper, floor: L.floor, host: L.host, furniture: L.furniture.map(({ _id, ...f }) => f) };
+  const who = cur.isPlace ? { keeper: { slug: cur.spec.keeper?.slug, ...L.host } } : { host: L.host };
+  return { ...head, name: L.name, ...(draft.prompt.concept ? { note: draft.prompt.concept } : {}), wallpaper: L.wallpaper, floor: L.floor, ...who, furniture: L.furniture.map(({ _id, ...f }) => f) };
 }
+// 배치 JSON 이 들어갈 파일 (상점·박물관은 places/ — size·windows·door·talk·stock 은 그대로 두고 이 칸들만 바꾼다)
+const roomFile = () => cur.isPlace ? `places/${cur.slug}.json` : `rooms/${cur.slug}.json`;
 // 방 파일과 같은 모양(가구 한 줄에 하나)으로
 function roomJSON(j) {
   const { furniture, ...rest } = j;
@@ -1750,7 +1806,7 @@ function roomJSON(j) {
 }
 function roomRequest(refs) {
   const L = draft.layout, base = pick(spec), B = base.layout, isNewRoom = cur.status === 'new';
-  const out = [isNewRoom ? `[${cur.id} ${cur.ownerName} 방 새로 만들기 요청 · rooms/${cur.slug}.json]` : `[${cur.id} ${cur.ownerName} · ${spec.name} 배치 수정 요청 · 기준 방 v${spec.version}]`];
+  const out = [isNewRoom ? `[${cur.id} ${cur.ownerName} 방 새로 만들기 요청 · rooms/${cur.slug}.json]` : `[${cur.id} ${cur.ownerName} · ${spec.name} 배치 수정 요청 · 기준 ${roomFile()} v${spec.version}]`];
   const n0 = out.length;
   if (draft.request.trim()) out.push('', '■ 자유 요청', draft.request.trim());
   out.push(...refLines(refs));
@@ -1770,11 +1826,11 @@ function roomRequest(refs) {
   for (const b of B.furniture) if (!L.furniture.some(f => f._id === b._id)) fl.push(`- 뺌: ${label(b)} ${where(b)}`);
   if (fl.length) out.push('', '■ 가구', ...fl);
   const h0 = B.host, h = L.host;
-  if (h.lx !== h0.lx || h.lz !== h0.lz || h.face !== h0.face) out.push('', '■ 주민 자리', `(${h0.lx}, ${h0.lz}) ${FACE_LABEL[h0.face]} → (${h.lx}, ${h.lz}) ${FACE_LABEL[h.face]}`);
+  if (h.lx !== h0.lx || h.lz !== h0.lz || h.face !== h0.face) out.push('', `■ ${hostWord()}`, `(${h0.lx}, ${h0.lz}) ${FACE_LABEL[h0.face]} → (${h.lx}, ${h.lz}) ${FACE_LABEL[h.face]}`);
   if (out.length === n0 && !isNewRoom) { out.push('', `(바뀐 내용이 없어요. 이대로 확정이면 "${cur.id} 확정"이라고 보내주세요.)`); return out.join('\n'); }
   const chk = checkLayout(L);
-  out.push('', '■ 배치 검사', ...(chk.problems.length ? chk.problems.map(p => `- ${p}`) : ['- 문제 없음 (겹침·문 매트·창문 자리·주민 자리)']));
-  out.push('', `■ 배치 JSON (rooms/${cur.slug}.json 에 이 칸들을 그대로)`, roomJSON(layoutJSON(L)));
+  out.push('', '■ 배치 검사', ...(chk.problems.length ? chk.problems.map(p => `- ${p}`) : [`- 문제 없음 (겹침·문 매트·창문 자리·${hostWord()})`]));
+  out.push('', `■ 배치 JSON (${roomFile()} 에 이 칸들을 그대로)`, roomJSON(layoutJSON(L)));
   return out.join('\n');
 }
 

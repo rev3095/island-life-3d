@@ -2,7 +2,7 @@
 // - assets/env/editor-index.json · assets/furniture/editor-index.json: index.json 의 요소마다 스펙(specs/<slug>.json)과 통계(models/<slug>.stats.json)
 // - assets/items/editor-index.json: 아이템 모델 82개의 스펙·통계 + 아이콘 썸네일(items[].thumb, data: 주소) + 모델이 든 묶음 번호(bundle)
 //   assets/items/editor-models-<n>.json: { slug: glb base64 } — 하나에 MODEL_CHUNK 바이트 안쪽, 목록 순서(분류별)대로 나눈다
-// - assets/interior/editor-index.json: 벽지·바닥 스펙(models[].spec) + 방 틀(frame) + 주민 방 배치(rooms[].room)
+// - assets/interior/editor-index.json: 벽지·바닥 스펙(models[].spec) + 방 틀(frame) + 주민 방 배치(rooms[].room) + 상점·박물관(places[].room) + 붙박이 FU-35–42(fixtures[], 모델은 assets/furniture/fixtures/editor-models-<n>.json)
 // 배경 편집기를 게시하기 전에(스펙·모델을 고친 뒤) 한 번 돌린다: node tools/build-editor-index.mjs
 // 게임은 이 파일들을 쓰지 않는다 (index.json + 스펙을 따로 읽음). 만들어지는 파일은 저장소에 넣지 않는다 (.gitignore).
 import { readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -62,12 +62,20 @@ for (const dir of ["assets/env", "assets/furniture"]) {
   console.log(`${dir}/editor-models-1…${bundles.length}.json — ${sizes.map(mb).join(" · ")}`);
 }
 
-// 실내: 벽지·바닥 스펙 16 + 방 틀 + 주민 방 배치를 목록 하나에
+// 실내: 벽지·바닥 스펙 16 + 방 틀 + 주민 방 배치 + 상점·박물관 배치(places/) + 붙박이 목록(스펙·썸네일, 모델은 fixtures/editor-models-<n>.json)을 목록 하나에
 {
-  const dir = "assets/interior";
+  const dir = "assets/interior", fx = "assets/furniture/fixtures";
   const index = json(`${dir}/index.json`);
   const models = index.models.map(m => ({ ...m, spec: json(`${dir}/specs/${m.slug}.json`) }));
   const rooms = (index.rooms ?? []).map(r => ({ ...r, room: json(`${dir}/rooms/${r.slug}.json`) }));
-  write(`${dir}/editor-index.json`, { ...index, models, rooms, frame: json(`${dir}/specs/frame.json`) });
-  console.log(`${dir}/editor-index.json — 벽지·바닥·방 틀 ${models.length}개 · 방 ${rooms.length}개`);
+  const places = readdirSync(resolve(root, `${dir}/places`)).filter(f => f.endsWith(".json")).sort().map(f => {
+    const room = json(`${dir}/places/${f}`);
+    return { id: room.id, slug: room.slug, name: room.name, version: room.version, status: room.status, room };
+  });
+  const fxIndex = json(`${fx}/index.json`);
+  const { at } = bundleModels(fx, fxIndex.models.map(m => m.slug));
+  const fixtures = fxIndex.models.map(m => ({ ...m, bundle: at[m.slug], spec: json(`${fx}/specs/${m.slug}.json`),
+    thumb: "data:image/png;base64," + readFileSync(resolve(root, `${fx}/renders/${m.slug}_thumb.png`)).toString("base64") }));
+  const n = write(`${dir}/editor-index.json`, { ...index, models, rooms, places, fixtures, frame: json(`${dir}/specs/frame.json`) });
+  console.log(`${dir}/editor-index.json — 벽지·바닥·방 틀 ${models.length}개 · 방 ${rooms.length}개 · 상점·박물관 ${places.length}개 · 붙박이 ${fixtures.length}개 (${mb(n)})`);
 }

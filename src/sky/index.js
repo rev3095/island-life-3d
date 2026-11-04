@@ -6,10 +6,11 @@ import { computeNow, dayHour, msAtDayHour, nightFactorAt, FAST_SCALE } from './c
 import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
-import { createDome } from './dome.js';
+import { createDome, SKY_FX } from './dome.js';
 import { createClouds } from './clouds.js';
 import { createFlare, flareStrength } from './flare.js';
 import { QUALITY } from '../render/quality.js';
+import { SKY } from '../render/presets.js';
 import { createPrecip } from './precip.js';
 import { createSurfaces } from './surfaces.js';
 import { loadEnvSpecs, buildSeasonPalettes, fallbackPalettes } from './seasons.js';
@@ -27,7 +28,10 @@ const TAU = { overcast: 4, rain: 2.5, snow: 3, rainbow: 5, cover: 6 };   // 초
 const WET_IN = 25, WET_OUT = 60;                                         // 땅은 천천히 젖고 더 천천히 마른다
 const SCAN_EVERY = 3;                                                    // 밤 조명 재질 다시 훑기 (초)
 const SUN_DIST = 24;
-const CLOUD_SHADOW = 0.3;              // 구름 그림자 진하기 (해를 받은 곳에서 최대 30% 어둡게)
+// 하늘 값은 assets/style/presets.json 의 sky (스타일 편집기 「하늘」 → "스타일 반영"). 없는 값은 dome.js SKY_FX · 아래 기본값
+const { cloudShadow: SKY_CLOUD_SHADOW, ...SKY_FILE_FX } = SKY;
+Object.assign(SKY_FX, SKY_FILE_FX);
+let cloudShadow = SKY_CLOUD_SHADOW ?? 0.3;   // 구름 그림자 진하기 (해를 받은 곳에서 최대 30% 어둡게)
 const CLOUD_DRIFT = [0.0042, 0.0014];  // 구름 그림자 흐름 (무늬 좌표/초 ≈ 0.35칸/초 — 하늘 구름과 같은 쪽으로)
 
 const setSRGB = (color, a) => color.setRGB(a[0], a[1], a[2], THREE.SRGBColorSpace);
@@ -133,10 +137,11 @@ export function createSky(ctx) {
       step(0);
       events.emit('scene:indoor', { on });
     },
-    /** 하늘 셰이더 값 (src/sky/dome.js SKY_FX 이름) 바꾸기 → 지금 값. puffs = 북쪽 먼 하늘의 3D 솜구름 보이기. 하늘 검수 보드 미리 보기가 쓴다 */
+    /** 하늘 셰이더 값 (src/sky/dome.js SKY_FX 이름) + 땅 위 구름 그림자 cloudShadow 바꾸기 → 지금 값. puffs = 북쪽 먼 하늘의 3D 솜구름 보이기. 하늘 검수 보드·스타일 편집기가 쓴다 */
     skyFx(v = {}) {
       if (typeof v.puffs === 'boolean') { puffs = v.puffs; applyPuffs(); }
-      return { ...dome.setFx(v), puffs };
+      if (typeof v.cloudShadow === 'number') cloudShadow = v.cloudShadow;
+      return { ...dome.setFx(v), puffs, cloudShadow };
     },
   };
 
@@ -206,7 +211,7 @@ export function createSky(ctx) {
     // 하늘 → 땅·물 셰이더 (core/materials.js look): 구름 그림자는 해가 보일 때만, 흐를수록 짙게 · 물에 비칠 하늘 색 (선형)
     const L = ctx.materials?.look;
     if (L?.uCloudShadow) {
-      L.uCloudShadow.value = indoor ? 0 : CLOUD_SHADOW * look.sunVis * (1 - 0.75 * wx.overcast);
+      L.uCloudShadow.value = indoor ? 0 : cloudShadow * look.sunVis * (1 - 0.75 * wx.overcast);
       L.uCloudCover.value = wx.cover;
       L.uCloudOffset.value.x = (L.uCloudOffset.value.x + dt * CLOUD_DRIFT[0]) % 1;
       L.uCloudOffset.value.y = (L.uCloudOffset.value.y + dt * CLOUD_DRIFT[1]) % 1;
