@@ -9,15 +9,15 @@
 ## 현재 상태 (2026-11-04 기준)
 
 ### 한 줄 요약
-M0~M6 끝, **M7 출시 준비 — P1~P5 끝, 남은 것 P6 출시 + 사용자 결정(7차 보드 D49–D57·D41)**. 게임 **v20** (빌드 03e07cf, main bee5ec6, 테스트 356, 링크 공개). 10-31~11-04 에 더한 것: 기기 점검·시작 단추·휴대폰/접근성·저장 옮기기·문제 알리기(v12), 첫날 안내(v13), **그래픽 사양 4단계**(매우 낮음·낮음·적정·높음, v15), **마우스 걷기·하늘 셰이더**(v16), 하늘 확정 + 구름 그림자·물 하늘 반사·해 렌즈 빛·사양별 셰이더 끄기(v18), **시점 조작(올려다보기)·상점/박물관 실내·문 열고 들어가는 전환·단풍 방**(v19), 상점 진열 모델 고침(v20). 자동 플레이(게시본): 통과 21 · 어색함 2(QA-10·QA-18) · 막힘 0 · 큰 문제 0 · 콘솔 오류 0.
+M0~M6 끝, **M7 출시 준비 — P1~P5 끝, 남은 것 P6 출시 + 사용자 결정(7차 보드 D49–D57·D41)**. 게임 **v21** (빌드 3bca813, 테스트 358, 링크 공개). 10-31~11-04 에 더한 것: 기기 점검·시작 단추·휴대폰/접근성·저장 옮기기·문제 알리기(v12), 첫날 안내(v13), **그래픽 사양 4단계**(매우 낮음·낮음·적정·높음, v15), **마우스 걷기·하늘 셰이더**(v16), 하늘 확정 + 구름 그림자·물 하늘 반사·해 렌즈 빛·사양별 셰이더 끄기(v18), **시점 조작(올려다보기)·상점/박물관 실내·문 열고 들어가는 전환·단풍 방**(v19), 상점 진열 모델 고침(v20), 상점·박물관 붙박이 모델(v21). 자동 플레이(게시본): 통과 21 · 어색함 2(QA-10·QA-18) · 막힘 0 · 큰 문제 0 · 콘솔 오류 0.
 
 ### 게시물
 | 이름 | 링크 | 원본 파일 | 상태 |
 |---|---|---|---|
-| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 20 (빌드 03e07cf, 2026-11-04, 게시 파일 164, 링크 공개)** — v19(6e93992): 시점 조작(오른쪽 끌기·R/V·두 손가락) + 상점·박물관 실내·문 열고 걸어 들어가는 원형 전환·단풍 방 RM-07 합침. v20: 아이템 모델을 모두 묶음에(상점 진열 404 고침). 편집기: 배경 v9(RM-07)·스타일 v2(새 하늘)·홈 v8(실내 보드). 다음엔 packs hash 를 03e07cf 것과 비교 + `git diff --name-only 03e07cf HEAD -- src index.html` |
+| **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 21 (빌드 3bca813, 2026-11-04, 게시 파일 165, 링크 공개)** — 실내 세션 마지막 두 커밋 합침: 상점·박물관 붙박이 모델 FU-35–42(계산대·진열 받침·안내대·화석 받침·도구 받침·씨앗 진열대·긴 수조·곤충 유리 상자), 방 셋 RM-07–09 확정, 실내 보드 확정. v20 = 아이템 모델 모두 묶음. 다음엔 packs hash 를 3bca813 것과 비교 + `git diff --name-only 3bca813 HEAD -- src index.html` |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | **버전 8 (11-04): 하늘 보드·실내 보드 목록, `status/sky`·`status/interiors`, `catalog/decision` D49–D73 (66줄)**. 버전 6 (10-31: 게임 카드에 게임 저장소 문제 알리기 `reports`·기기 점검 `checks`). 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
 | **하늘 검수 보드 v0.1** | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `concept/sky-board.html` + `board-kit.js` + `concept/sky/*.jpg` | 버전 1 (2026-11-04): 결정 D58–D66 · 하늘 층 SK-01–08, 그림 29장 = 게임 v16 화면. **반영 v1 = 확정 (모두 A, 11-04 "하늘 구현 확정")** — `applied/sky` · `history/sky-v1`, 홈 `catalog/decision` 확정. 반영 값 표 `docs/notes/sky-board.md`. 홈 v7 목록·`status/sky`·`catalog/decision`(D49–D66 더함) |
-| **실내 검수 보드 v0.1** | https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh | `concept/interiors-board.html` (실내 세션) | 결정 D67–D73 · RM-07–09 · FU-35–42. 반영 v1 = 추천안 A (main 에 들어감). **v2 확정·붙박이 모델 FU-35–42 는 `p12-interiors` 브랜치(b1078a7·e4c0a51)에만 — 합치기 전** |
+| **실내 검수 보드 v0.1** | https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh | `concept/interiors-board.html` (실내 세션) | 결정 D67–D73 · RM-07–09 · FU-35–42. 반영 v1 = 추천안 A (main 에 들어감). **v2 확정·붙박이 모델 FU-35–42 — main 3bca813, 게임 v21** |
 | **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | **버전 3 (10-31): QA 칸 QA-01–19 (고침 10 · 고르기 9 → 결정 D49–D57), 목표 표 잰 값 — 사용자 선택 대기.** 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
 | 섬 지도 편집기 | https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST | `map-editor.html` (+ `assets/island/layout.json`) | 반영 v0. "지도 반영" |
@@ -25,7 +25,7 @@ M0~M6 끝, **M7 출시 준비 — P1~P5 끝, 남은 것 P6 출시 + 사용자 �
 | 스타일 편집기 | https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd | `style-editor.html` (+ `assets/style/`, 목록 `assets/style/editor-files.json`) | **버전 2 (11-04): 새 하늘·구름 그림자·렌즈 빛 모듈**. 반영 v0. "스타일 반영" |
 | 시나리오 편집기 | https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF | `story-editor.html` (+ `assets/story/`) | 반영 v1 (12장면 추천안 A 임시 확정). "시나리오 반영" (스토리 고정 세션) |
 | 캐릭터 편집기 | https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2 | `editor.html` (+ `assets/models`, `assets/specs`, `assets/renders`) | 버전 8 (M6-P3): 캐릭터 10 + **성격·대화 탭**(주민 9명 `assets/villagers/`, 이모티콘 반응 미리 보기, 주소 끝 `#coco.talk`). 단풍은 검수 대기. db `refs` / `requests` (`kind:'traits'`) |
-| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | **버전 9 (11-04): 방 배치 탭에 RM-07 단풍 방** (상점·박물관 RM-08·09 는 탭이 아직 못 고침). 버전 7 (M6-P2): 배경 35 · 가구 33 · 아이템 82 · 벽지/바닥 16 · 방 배치 탭. 게시 파일 408/511 (스펙·통계·아이템은 묶음 `editor-index.json`·`editor-models-<n>.json`) |
+| 배경 편집기 | https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh | `bg-editor.html` (+ `assets/env/*`, `assets/furniture/*`) | **버전 10 (11-04): 방 배치 탭에 RM-07 단풍 방 (확정)** (상점·박물관 RM-08·09 는 탭이 아직 못 고침). 버전 7 (M6-P2): 배경 35 · 가구 33 · 아이템 82 · 벽지/바닥 16 · 방 배치 탭. 게시 파일 408/511 (스펙·통계·아이템은 묶음 `editor-index.json`·`editor-models-<n>.json`) |
 | 컨셉 보드 v0.1 | https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM | `concept/concept-board.html` | 2D 계획 보드 |
 | **5차 검수 보드 v0.5** | https://claude.ai/artifact/QmguFLRgBq2FUa3RnD8RbT | `concept/wave5-board.html` + `concept/board-kit.js` | 버전 2: **선택 저장형** — 선택·의견이 보드 저장소(`boards/wave5`)에 바로 저장, 반영 기록(`applied`·`history`)·되돌리기·반영 요청 단추, D13 추가. **반영 v1** = D8-B · D9-A · D10-A · D11-A · D12-A · D13 단풍, 의견 없음. 사용자가 보드를 고치고 "검수 보드 반영" → `concept/README.md` 순서 |
 | **Z5 축제 검수 보드 v0.1** | https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS | `concept/z5-festival-board.html` + `concept/board-kit.js` | 버전 3 (SF-1–6 로 ID 바꿈, TK-07 좋아함 ✨→🤔). **반영 v1 (임시, 바뀔 수 있음)** = D14–D25 추천안 그대로(D20 만 B), 의견 없음 → **구현 끝 (`p8-festival`, M5-P2~P7, 합치기 대기)**: 이모티콘 대화·축제 광장 3D 17종·부품·부스 놀이 5·축제 날·단체 사진 엔딩·해마다 축제. 결정 갈래는 `assets/festival/config.json`, 약속 `docs/notes/z5-festival.md` |
@@ -33,7 +33,7 @@ M0~M6 끝, **M7 출시 준비 — P1~P5 끝, 남은 것 P6 출시 + 사용자 �
 
 ### 진행 중
 **2026-11-04 끝 무렵**: 돌고 있는 세션 없음 (모두 쉬는 중). 백그라운드 작업 없음.
-- **합치기 대기**: `p12-interiors` 브랜치의 b1078a7 (방 셋 RM-07·08·09 확정 + 상점·박물관 붙박이 모델 FU-35–42 — 가구 빌더 `--fixtures`, 웹 빌드 fixtures 묶음, 임시 상자 대체) · e4c0a51 (실내 보드 확정 applied v2). 사용자 확인 뒤 합치고 게임 다시 게시.
+- ~~합치기 대기~~ 끝: `p12-interiors` b1078a7 · e4c0a51 → main 3bca813 (테스트 358) → 게임 v21, 배경 편집기 v10 (RM-07 확정).
 - 「다음에 할 일」 대로: 사용자 결정(7차 보드 D49–D57·D41, 시점 선택지 7) → M7-P6 출시 점검.
 
 **10-31 합침 (main 8d1a943 · c93bfd3 · c657e79 · 41931f3 + 79a168f)**: 아래 4브랜치를 `--no-ff` 로 (시험 합치기 `_trial-m7` 에서 먼저: 충돌 0 · 테스트 308 · 섬폰 새 줄 셋). `build-web.test.mjs` `PENDING_MODULES` 비움. 로컬 `/artifact/` 자원 199개 4xx 0 · 시작 단추 둘 · 콘솔 오류 0 → 게임 v12, 홈 `status/game` v5. 남은 일: 홈 목록 `game` 에 `reads: ["reports","checks"]` (홈 세션) · "전체 요청 확인" 때 게임 저장소 `reports` 읽기 · `report.js` 의 `textFieldKeys` 우회는 빼도 됨(선택) · CONTRACTS 「7차」 설정 칸 제안(`docs/notes/p11-access.md`) · 사용자 RC-05–08(claude.ai·휴대폰·`#check` 결과 저장).
@@ -320,6 +320,7 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 | 15 | 지금 조사 (길 찾기 실패 4건) | 실패 9건의 출발 자리가 모두 (21.2, 3.9) = 초롱네 문 앞 틈(집·우편함·덤불) → 그 칸 가운데가 막혀 칸 격자 길찾기가 못 나감. 실내 문 전환이 문 앞 0.15칸에 세우며 드러남, 게임 문제 아님(사람은 연속 충돌로 나감) → 봇 `startOf`(걸을 수 있는 옆 칸에서 시작) 29d9bf8 → 3회 자동 플레이 | 통과 21 · 어색함 2 · 막힘 0 · 큰 문제 0 · 콘솔 오류 0 |
 | 16 | /init | CLAUDE.md 에 조작(마우스 걷기·시점)·「사양」·「하늘」 절·게시 묶음 함정·QA 봇 길찾기 메모·마일스톤 줄 (bee5ec6) | 커밋 |
 | 17 | devlog 에 대화 전부 기록 (/save-session) | 이 기록 — 현재 상태·게시물·진행 중·세션 3 전체 | 커밋 |
+| 18 | 합치고 게시 | `p12-interiors` 남은 두 커밋 합침(충돌 0, 테스트 358) → 게시본 조건에서 상점 실내 붙박이 모델(`shop-counter`·`display-stand`) 확인·요청 실패 0 → 게임 v21 · 배경 편집기 v10 · 홈 `status/game` | 끝 |
 
 #### 2. 합친 것
 | 브랜치 | 커밋 | 내용 |
@@ -390,5 +391,5 @@ CONTRACTS.md 에 W3(‘2차 준비’ 앞)·W1·W2·W4 절이 모두 들어감. 
 
 #### 10. 검증한 것 / 확인 못 한 것
 - 검증: `node --test tests/` 356/356 (main bee5ec6). 게시본 조건 `/artifact/` 에서 단계마다 요청 실패 0·콘솔 오류 0, 실제 마우스로 시작 단추·섬폰·땅 누르기 걷기, 사양 넷 전환·저장 뒤 다시 열기(매우 낮음 + MSAA 끔), 상점 문 Space → 실내·진열 8개. 자동 플레이 3회째: 통과 21 · 어색함 2 · 막힘 0 · 큰 문제 0 · 콘솔 오류 0.
-- 확인 못 함: claude.ai 에서 직접 열기(로그인 창), 실제 휴대폰, **렉이 났던 그 컴퓨터**, 실내 세션의 b1078a7·e4c0a51 (합치기 전), 30fps 상한을 실제 화면 갱신으로 재기(숨은 창 — 테스트로만), 스타일 편집기 v2 를 claude.ai 에서 열기.
+- 확인 못 함: claude.ai 에서 직접 열기(로그인 창), 실제 휴대폰, **렉이 났던 그 컴퓨터**, v21 박물관 실내 붙박이(실내 세션이 확인 — 조정 세션은 상점만), 30fps 상한을 실제 화면 갱신으로 재기(숨은 창 — 테스트로만), 스타일 편집기 v2 를 claude.ai 에서 열기.
 
