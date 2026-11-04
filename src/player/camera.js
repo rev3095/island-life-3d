@@ -34,6 +34,7 @@ export function portraitView(aspect) {
  * 끝까지 올려다보면: 카메라가 땅 가까이(upElev) 내려와 가까이 오고(upDist) 지평선 위로 upAim 도를 본다 + 시야각 upFov →
  * 지평선이 화면 아래 1/4 쯤, 하늘이 3/4 (플레이어는 화면 아래쪽에 남는다). 곡면도 upCurve 로 약하게 (땅이 덜 휘어 보이게).
  */
+// 시점 값은 M7-P9 (2026-11-05) 에 모두 지금 값으로 확정 — 선택지·확정 표는 docs/notes/p12-camera.md 「확정」
 export const LOOK = {
   upElev: 4,          // 끝까지 올려다볼 때 카메라 높이각 (도, 초점에서 본)
   upAim: 12,          // 그때 보는 방향: 지평선 위로 (도)
