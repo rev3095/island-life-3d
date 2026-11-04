@@ -345,6 +345,18 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
   }
 
   /**
+   * 길찾기 시작 칸: 선 자리 칸의 가운데가 막혀 있으면(예: 초롱네 문 앞 — 집·우편함·덤불 사이 틈) 바로 옆 걸을 수 있는 칸.
+   * 칸 가운데로만 길을 찾으므로, 틈에 서 있으면 대각선으로만 열린 이웃 칸으로는 못 나가 "길이 없어요"가 났다 (2026-11-04 실내 문 전환 뒤 —
+   * 문에서 걸어 나온 자리가 문 앞 0.15칸이라). → { tile, step: 먼저 걸어갈 그 칸 가운데 | null }
+   */
+  function startOf() {
+    const t = tileOf(bot.pos());
+    if (getNav().walkable(t.tx, t.tz)) return { tile: t, step: null };
+    const n = walkableNear(bot.pos(), 1);
+    return n ? { tile: n, step: world().island.toWorld(n.tx, n.tz) } : { tile: t, step: null };
+  }
+
+  /**
    * (x,z) 까지 걷는다. opts = { near = 0.35, run = true, timeout (게임 초), label }
    * 길이 없거나 오래 막히면 issue 로 남기고 false (allowTeleport 면 그 자리로 옮겨 계속)
    */
@@ -361,10 +373,11 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     if (goalT && !world().island.isWalkable(to.x, to.z)) { to = world().island.toWorld(goalT.tx, goalT.tz); near = Math.max(near, 0.3); }
     let pts = null, tries = 0;
     const plan = () => {
-      const a = tileOf(bot.pos());
+      const { tile: a, step } = startOf();
       const tiles = goalT && getNav().findPath(a, goalT, { maxNodes: 6000 });
       if (!tiles) return null;
-      const out = getNav().smooth(tiles.slice(1), bot.pos().x, bot.pos().z);
+      const from = step ?? bot.pos();
+      const out = [...(step ? [step] : []), ...getNav().smooth(tiles.slice(1), from.x, from.z)];
       out.push({ x: to.x, z: to.z });
       return out;
     };
@@ -507,7 +520,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     const isl = world().island;
     const objLv = (() => { const t = isl.toTile(obj.x, obj.z); return isl.levelAt(t.tx, t.tz); })();
     const n = getNav();
-    const me = tileOf(bot.pos());
+    const me = startOf().tile;   // 틈에 서 있어도 바로 옆 칸에서 찾는다 (walkTo 가 그 칸으로 먼저 걷는다)
     let best = null;
     for (let k = 0; k < angles; k++) {
       const a = (k / angles) * TAU;
