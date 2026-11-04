@@ -121,7 +121,7 @@ details summary { cursor: pointer; font-size: 14px; }
   <header class="top">
     <p class="id">ISLAND-LIFE-3D · 실내 · 검수 보드 v0.1 · 2026-11-04 · 트랙 p12-interiors</p>
     <h1>포근섬 실내 검수 보드</h1>
-    <p class="lede">집·주민 집·<b>도토리상점·박물관</b> 모두 문을 열고 걸어 들어가는 진짜 실내로 바꿔요. 지금은 집에 들어갈 때 화면만 어두워졌다 밝아지고, 상점·박물관은 실내가 없어 문 앞에서 바로 창이 열려요. 결정 D67–D73 을 골라 주세요. 추천안으로 <b>반영 v1 (임시)</b>을 먼저 만들어 두고, 다르게 고르면 채팅에 <b>"검수 보드 반영"</b>이라고 하면 바꿔요.</p>
+    <p class="lede">집·주민 집·<b>도토리상점·박물관</b> 모두 문을 열고 걸어 들어가는 진짜 실내로 바꿔요. 지금은 집에 들어갈 때 화면만 어두워졌다 밝아지고, 상점·박물관은 실내가 없어 문 앞에서 바로 창이 열려요. 결정 D67–D73 은 <b>추천안 그대로 확정</b>됐어요 (2026-11-04). 나중에 바꾸고 싶으면 선택을 고친 뒤 채팅에 <b>"검수 보드 반영"</b>이라고 하면 돼요.</p>
     <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v16, 실내 전)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈</a><a href="https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh">배경 편집기</a></p>
     <div class="status" id="pills"></div>
     <div id="boardPanel" class="out board" aria-live="polite"></div>
@@ -157,8 +157,8 @@ details summary { cursor: pointer; font-size: 14px; }
   </section>
 
   <section id="plan">
-    <div class="sec-head"><p class="id">PLAN · p12-interiors</p><h2>반영 v1 (임시) — 추천안 모두</h2>
-      <p class="muted">사용자 선택을 기다리지 않고 추천안으로 먼저 만들어 브랜치 <code>p12-interiors</code> 에 커밋해 둬요. main 합치기와 게임 링크 다시 게시는 확인 뒤 조정 세션이 해요.</p></div>
+    <div class="sec-head"><p class="id">PLAN · p12-interiors</p><h2>확정 — 추천안 모두 A (반영 v2)</h2>
+      <p class="muted">추천안으로 먼저 만든 반영 v1 을 사용자가 그대로 확정했어요. 아래가 들어간 것 전부예요 (브랜치 <code>p12-interiors</code>, 앞부분은 main 에 합쳐짐 — 남은 붙박이·확정 커밋 합치기와 게임 링크 다시 게시는 조정 세션).</p></div>
     <div class="tblwrap"><table class="tbl"><thead><tr><th>무엇</th><th>파일</th><th>결정</th></tr></thead><tbody id="planRows"></tbody></table></div>
   </section>
 
@@ -406,7 +406,7 @@ const PLAN = [
 $('planRows').innerHTML = PLAN.map(([a, b, c]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="id">${c}</td></tr>`).join('');
 
 /* ---------- 머리 숫자 ---------- */
-$('pills').innerHTML = ['<span class="pill wait">반영 v1 (임시) · 추천안 모두 A</span>', '결정 7 (D67–D73)', '방 셋 확정 (RM-07·08·09)', '붙박이 모델 8 (FU-35–42)', '새 리소스 14 (RM-07–09 · FU-35–42 · AN-06·07 · UI-12)', '장소 5 (내 집 · 주민 집 · 단풍 집 · 상점 · 박물관)', '사양 낮음·매우 낮음: 작은 소품 빼기']
+$('pills').innerHTML = ['<span class="pill wait">확정 · 추천안 모두 A</span>', '결정 7 (D67–D73)', '방 셋 확정 (RM-07·08·09)', '붙박이 모델 8 (FU-35–42)', '새 리소스 14 (RM-07–09 · FU-35–42 · AN-06·07 · UI-12)', '장소 5 (내 집 · 주민 집 · 단풍 집 · 상점 · 박물관)', '사양 낮음·매우 낮음: 작은 소품 빼기']
   .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
 
 /* ---------- 요청 글 ---------- */

@@ -3,6 +3,8 @@
 실내 검수 보드: https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh (`concept/interiors-board.html`, 보드 id `interiors`, 결정 **D67–D73**).
 사용자 요청: "각 집, 박물관, 가게 등 장소마다 들어갈 수 있게 실제 공간 구현 · space 로 문 열고 들어가는 모션 · fade in/out 애니메이션·모션 포함".
 
+**확정 (2026-11-04)**: 사용자가 "확정, 실내 검수 보드 내용대로 (추천안대로)" — 보드에 따로 고른 것·의견이 없어(저장소 `boards/interiors` 비어 있음) 아래 반영 v1 이 그대로 확정안. 보드 `applied/interiors` v2 · `history/interiors-v2` (commit b1078a7), 보드 v5 에 '확정' 표시.
+
 ## 반영 v1 (임시, 2026-11-04) — 보드 추천안 모두 A
 
 사용자 선택을 기다리지 않고 추천안으로 먼저 만들었다. 보드에서 다르게 고르면 "검수 보드 반영" 때 아래 「다르게 고르면」대로 고친다.
