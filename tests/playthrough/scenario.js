@@ -425,9 +425,9 @@ export function makeScenario(bot, sk, opts = {}) {
   });
 
   add('visit', '주민 집 들어가기 (방 구경)', async () => {
-    // 주민은 자는 시간(밤)엔 노크만 된다. 낮에 '자주 가는 곳 = 집'으로 잠깐 들어가 있을 때 찾아간다 (시각을 바꿔 가며)
+    // 주민은 자는 시간(밤)엔 노크만 된다. 낮에 '자주 가는 곳 = 집'으로 잠깐 들어가 있을 때, 또는 저녁에 잠들기 1~2시간 전 집에 들어와 있을 때(D57) 찾아간다 (시각을 바꿔 가며)
     let who = null, tried = [];
-    for (const hh of [10, 12, 14, 16, 18.5]) {
+    for (const hh of [10, 12, 14, 16, 18.5, 20.5, 21.5]) {
       if (who) break;
       await bot.setHour(hh);
       for (let k = 0; k < 3 && !who; k++) {
