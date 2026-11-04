@@ -61,6 +61,26 @@ export const PARAMS = [
   { key: 'vignetteSoft', label: '가장자리 퍼짐', group: '색 보정', type: 'range', min: 0.1, max: 1, step: 0.01 },
 ];
 
+/** 하늘 값 (프리셋 공통, presets.json 의 sky): 하늘 셰이더 src/sky/dome.js SKY_FX 이름 + 땅 위 구름 그림자 진하기 cloudShadow (src/sky/index.js).
+ *  cloudSpeed(구름 흐름 [x, z])는 파일에만 두고 슬라이더는 없다. 하늘 검수 보드(sky D58–D66) 반영 v1 = 지금 값 */
+export const SKY_PARAMS = [
+  { key: 'haze', label: '지평선 안개 띠', group: '하늘', type: 'range', min: 0, max: 0.6, step: 0.01 },
+  { key: 'sunGlow', label: '해 둘레 빛무리', group: '하늘', type: 'range', min: 0, max: 0.5, step: 0.01 },
+  { key: 'sunsetSide', label: '노을 쪽 지평선 빛', group: '하늘', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'rays', label: '해 빛살', group: '하늘', type: 'range', min: 0, max: 0.5, step: 0.01 },
+  { key: 'gradDeep', label: '하늘 파랑 진하기 (− 파스텔)', group: '하늘', type: 'range', min: -1, max: 1, step: 0.01 },
+  { key: 'milky', label: '은하수 밝기', group: '하늘', type: 'range', min: 0, max: 0.5, step: 0.01 },
+  { key: 'starBoost', label: '별 밝기 배율', group: '하늘', type: 'range', min: 0, max: 2, step: 0.01 },
+  { key: 'cloudScale', label: '구름 무늬 크기 (클수록 잘게)', group: '하늘 · 구름', type: 'range', min: 0.5, max: 4, step: 0.05 },
+  { key: 'cloudClear', label: '맑은 날 구름 문턱 (높을수록 적게)', group: '하늘 · 구름', type: 'range', min: 0.2, max: 0.9, step: 0.01 },
+  { key: 'cloudFull', label: '흐린 날 구름 문턱', group: '하늘 · 구름', type: 'range', min: 0, max: 0.7, step: 0.01 },
+  { key: 'cloudEdge', label: '구름 가장자리 부드러움', group: '하늘 · 구름', type: 'range', min: 0.01, max: 0.3, step: 0.005 },
+  { key: 'silver', label: '해 쪽 구름 가장자리 빛', group: '하늘 · 구름', type: 'range', min: 0, max: 1.5, step: 0.01 },
+  { key: 'shade', label: '구름 그늘 면 세기', group: '하늘 · 구름', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'shadeDeep', label: '구름 그늘 색 (0 라벤더 · 1 회청)', group: '하늘 · 구름', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'cloudShadow', label: '땅 위 구름 그림자 진하기', group: '하늘 · 구름', type: 'range', min: 0, max: 0.8, step: 0.01 },
+];
+
 /** 값 하나 검사: 맞으면 null, 아니면 이유 글 */
 export function checkValue(p, v) {
   if (p.type === 'range') {
@@ -104,6 +124,16 @@ export function checkStyle(data) {
       if (why) out.push(`indoor.${name}.${k} = ${JSON.stringify(x)}: ${why}`);
     }
   }
+  if (data.sky != null) {
+    const sky = data.sky, skyKeys = new Set([...SKY_PARAMS.map(p => p.key), 'cloudSpeed']);
+    for (const p of SKY_PARAMS) {
+      if (!(p.key in sky)) { out.push(`sky.${p.key} 값이 없어요`); continue; }
+      const why = checkValue(p, sky[p.key]);
+      if (why) out.push(`sky.${p.key} = ${JSON.stringify(sky[p.key])}: ${why}`);
+    }
+    if (!(Array.isArray(sky.cloudSpeed) && sky.cloudSpeed.length === 2 && sky.cloudSpeed.every(Number.isFinite))) out.push('sky.cloudSpeed 는 [x, z] 숫자 둘');
+    for (const k of Object.keys(sky)) if (!skyKeys.has(k)) out.push(`sky.${k}: 모르는 값`);
+  }
   return out;
 }
 
@@ -120,6 +150,8 @@ export const PRESETS = structuredClone(data?.presets ?? {});
 export const INDOOR = structuredClone(data?.indoor ?? {});
 export const DEFAULT_PRESET = data?.default ?? 'cozy';
 export const PRESET_LABELS = { ...(data?.labels ?? {}) };
+/** 하늘 값 { haze, …, cloudSpeed, cloudShadow } — sky 모듈이 처음에 SKY_FX 위에 얹는다 (없으면 코드 기본값) */
+export const SKY = structuredClone(data?.sky ?? {});
 /** 게임에 들어간 스타일 반영 버전 (편집기의 applied/style 과 같다) */
 export const STYLE_VERSION = data?.version ?? 0;
 

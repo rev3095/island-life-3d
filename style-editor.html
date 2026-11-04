@@ -198,7 +198,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--e-bg);
 //     applied/style       마지막 반영 { board:'style', version, style, notes, appliedAt, summary, commit }   ← Claude 가 씀
 //     history/style-v<n>  반영 기록 (applied 와 같은 모양)                                            ← Claude 가 씀
 //   채팅 "스타일 반영" → Claude 가 drafts/style 을 assets/style/presets.json 에 옮기고 테스트·스크린샷·커밋·다시 게시 (docs/SHADERS.md).
-import { PARAMS, STYLE_FILE, checkStyle, replaceIndoor } from './src/render/presets.js';
+import { PARAMS, SKY_PARAMS, STYLE_FILE, checkStyle, replaceIndoor } from './src/render/presets.js';
 import * as assets from './src/core/assets.js';
 
 const $ = s => document.querySelector(s);
@@ -487,6 +487,7 @@ function normalize(d) {
   st.presets = st.presets ?? {};
   for (const [k, v] of Object.entries(fileStyle.presets)) st.presets[k] = { ...v, ...(st.presets[k] ?? {}) };
   st.indoor = st.indoor ?? {};
+  st.sky = { ...(fileStyle.sky ?? {}), ...(st.sky ?? {}) };   // 하늘은 프리셋 공통 한 벌
   st.labels = { ...fileStyle.labels, ...(st.labels ?? {}) };
   if (!st.presets[st.default]) st.default = fileStyle.default;
   st.version = fileStyle.version;
@@ -509,6 +510,7 @@ const shownOf = (st, name) => (indoorOn() ? { ...st.presets[name], ...(st.indoor
 function applyDraft() {
   replaceIndoor(draft.style.indoor);
   style.set({ preset: cur, ...draft.style.presets[cur] });
+  time.skyFx?.(draft.style.sky);
   applySplit();
 }
 
@@ -572,6 +574,7 @@ function changes() {
   for (const name of PRESET_NAMES) for (const p of PARAMS) if (canon(a.presets[name]?.[p.key]) !== canon(b.presets[name]?.[p.key])) out.push(`${labelOf(name)} · ${p.label}`);
   for (const name of new Set([...Object.keys(a.indoor ?? {}), ...Object.keys(b.indoor ?? {})]))
     for (const p of PARAMS) if (canon(a.indoor?.[name]?.[p.key]) !== canon(b.indoor?.[name]?.[p.key])) out.push(`집 안 ${labelOf(name)} · ${p.label}`);
+  for (const p of SKY_PARAMS) if (canon(a.sky?.[p.key]) !== canon(b.sky?.[p.key])) out.push(`하늘 · ${p.label}`);
   const na = draft.notes ?? {}, nb = applied?.notes ?? {};
   for (const k of new Set([...Object.keys(na), ...Object.keys(nb)])) if ((na[k] ?? '').trim() !== (nb[k] ?? '').trim()) out.push(`의견 (${labelOf(k)})`);
   return out;
@@ -736,8 +739,35 @@ for (const p of PARAMS) {
   inputs.set(p.key, { p, el, val, row });
 }
 
+// 하늘 값 (SKY_PARAMS — 프리셋 공통 한 벌, presets.json 의 sky). 하늘 셰이더·구름 그림자는 time.skyFx 로 바로 바뀐다. 나눠 보기 양쪽에 같은 하늘
+const skyInputs = new Map();
+for (const p of SKY_PARAMS) {
+  if (!groups.has(p.group)) {
+    const d = document.createElement('details');
+    d.innerHTML = `<summary>${esc(p.group)} <small class="muted">· 프리셋 공통 · 나눠 보기 양쪽 같음</small></summary>`;
+    $('#params').append(d);
+    groups.set(p.group, d);
+  }
+  const row = document.createElement('div');
+  row.className = 'param';
+  const id = `sky-${p.key}`;
+  row.innerHTML = `<label for="${id}">${esc(p.label)}</label><span class="tools"><button type="button" data-act="reset" title="게임 값으로" hidden>↺</button></span><span class="val"></span><input id="${id}" type="range" min="${p.min}" max="${p.max}" step="${p.step}">`;
+  groups.get(p.group).append(row);
+  const el = row.querySelector('input'), val = row.querySelector('.val');
+  el.addEventListener('input', () => { val.textContent = fmt(p, Number(el.value)); draft.style.sky[p.key] = Number(el.value); touched(); });
+  row.querySelector('[data-act="reset"]').onclick = () => { draft.style.sky[p.key] = fileStyle.sky?.[p.key]; touched(); };
+  skyInputs.set(p.key, { p, el, val, row });
+}
+
 /** 슬라이더 값 바꾸지 않고 표시만 (바꾼 값 • · 되돌리기 ↺ · 집 안 덧씌우기) */
 function syncParams() {
+  for (const { p, el, val, row } of skyInputs.values()) {
+    const v = draft.style.sky?.[p.key];
+    if (document.activeElement !== el && v != null) { el.value = v; val.textContent = fmt(p, v); }
+    const changed = canon(v) !== canon(fileStyle.sky?.[p.key]);
+    row.classList.toggle('changed', changed);
+    row.querySelector('[data-act="reset"]').hidden = !changed;
+  }
   const now = shownOf(draft.style, cur), game = shownOf(fileStyle, cur);
   const over = indoorOn() ? draft.style.indoor?.[cur] ?? {} : {};
   for (const { p, el, val, row } of inputs.values()) {

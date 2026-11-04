@@ -18,7 +18,8 @@
 | `assets/env/editor-index.json` · `assets/furniture/editor-index.json` | 예전 그대로 (요소마다 spec·stats) | 52KB · 60KB |
 | `assets/items/editor-index.json` | 아이템 목록 + 요소마다 `spec`·`stats`·`bundle`(모델이 든 묶음 번호), `items[].thumb` = 아이콘 PNG data: 주소 (93장) | 2.3MB |
 | `assets/items/editor-models-<n>.json` | `{ slug: glb base64 }`, 목록 순서대로 1.6MB 안에서 나눔 → 지금 3개 | 1.53 · 1.49 · 1.13MB |
-| `assets/interior/editor-index.json` | 무늬 목록 + `models[].spec`(벽지·바닥·방 틀) + `frame` + `rooms[].room`(방 JSON 전체) | 14KB |
+| `assets/interior/editor-index.json` | 무늬 목록 + `models[].spec`(벽지·바닥·방 틀) + `frame` + `rooms[].room`(방 JSON 전체) + `places[].room`(상점·박물관, M7-P8) + `fixtures[]`(붙박이 FU-35–42 목록·스펙·`bundle`·썸네일 data:) | 14KB → 0.23MB (11-04) |
+| `assets/furniture/fixtures/editor-models-<n>.json` | 붙박이 모델 `{ slug: glb base64 }` (M7-P8) | 0.49MB · 1개 |
 
 - 편집기는 아이템 목록을 기다리지 않고 먼저 열린다 (아이콘 때문에 커서). 아이템 모델 묶음은 그 묶음의 아이템을 처음 고를 때 한 번만 받는다.
 - 묶음이 없으면(로컬에서 빌드 전) 예전 파일(`index.json` + `specs/`·`models/`, 실내는 스펙·방 파일 하나씩)을 읽는다. 아이템 큰 렌더(`_main.png`)는 파일 수 때문에 편집기에 올리지 않는다 — 아이콘만.
@@ -28,7 +29,8 @@
 
 편집기 게시본에는 `src/` 가 없어서 import 하지 않고 옮겨 왔다. 같은 스펙이면 게임과 같은 그림·같은 검사 결과가 나온다.
 - `src/gameplay/house/pattern.js` 의 `paint`·`patternCanvas`·`patternTexture`·`swatchURL`, `interior.js` 의 `resolveFill` — 무늬 그리기
-- `src/gameplay/house/room.js` 의 `buildRoom` 중 껍데기(벽·징두리·몰딩·걸레받이·창문·문 매트·벽지/바닥 판, UV = m) — 크기 상수 `WALL_H 2.6 · WAINSCOT_H 0.85 · WINDOWS n:1·n:6 · DOOR 3–4`
+- `src/gameplay/house/room.js` 의 `buildRoom` 중 껍데기(벽·징두리·몰딩·걸레받이·창문·문 매트·벽지/바닥 판, UV = m) — 크기 상수 `WALL_H 2.6 · WAINSCOT_H 0.85`, 주민 방 기본 `8×8 · WINDOWS n:1·n:6 · DOOR 3–4` (상점·박물관은 방 파일 값, `setRoomGeom`)
+- `places.js` 의 `caseFixture` 자리 (케이스 사각형 가운데에 붙박이 모델)
 - `grid.js` 의 `dims`·`cellsOf`·`boxOf`, `interior.js` 의 `resolveFurniture`·`checkRoom` 규칙 (편집기는 겹친 두 가구를 모두 빨갛게 표시만 다르게), `room.js` 의 `wallMount`, `visit.js` 의 가구 자리(`poseRoot`)
 
 제안 (house 트랙·조정 세션): `pattern.js` 의 그리기 부분을 import 없는 파일(예: `src/gameplay/house/pattern-paint.js`)로 나누면 편집기가 그 파일 하나만 같이 게시해 import 할 수 있다 — 지금은 `pattern.js` 가 `interior.js`(→ `data/rng.js`·`grid.js`)를 불러서 편집기에 그대로 올리기 어렵다.
@@ -44,6 +46,7 @@
 | 벽지·바닥 | `wp-0N` · `fl-0N` | `'wallpaper'` · `'floor'` | `assets/interior/specs/<slug>.json`: palette, `fields.params.sizeX/sizeY` → `pattern.size` (m). `version` +1, status `review` → `interior/index.json` 의 version·status 도 같게 (테스트). Blender 없음 |
 | 새 무늬 | `_new` | `'wallpaper'` · `'floor'` | 새 스펙 + `interior/index.json` + `interior.js` `WEB_FILES` |
 | 방 배치 | `rm-0N` | `'room'` | 아래 |
+| 상점·박물관 배치 (M7-P8) | `place-shop` · `place-museum` | `'room'` | 아래 — `assets/interior/places/<slug>.json` |
 
 **방 배치 요청**은 `layout` 과 `problems` 를 더 남긴다:
 ```js
@@ -56,6 +59,7 @@ problems: ['라디오: (0, 1) 소파와 겹쳐요', …]   // 편집기 배치 �
 ```
 반영 순서: `layout` 칸을 `assets/interior/rooms/<slug>.json` 에 덮어쓰고 `version` +1 · status `review` → `interior/index.json` rooms 줄(name·wallpaper·floor·version·status) 맞추기 → `problems` 가 있으면 가장 가까운 빈 칸으로 고치고 답글에 적기 → 벽지·바닥을 바꿨으면 `tests/interior.test.mjs` 의 '보드대로 벽지·바닥' 표도 같이 → `node --test tests/`.
 **RM-07 (단풍) 새 방**: `rooms/rm-07.json` 새로 + `interior/index.json` rooms + `src/gameplay/house/interior.js` `WEB_FILES` + `tests/interior.test.mjs`(방 수 6 → 7, 주인 표에 danpung) — house·town 트랙 파일이라 조정 세션과 같이. 그 전까지 게임은 단풍 방을 기본 방(WP-01·FL-01, 가구 없음)으로 연다 (z2-interior 노트).
+**상점·박물관 요청** (`place-shop`·`place-museum`, M7-P8): 같은 격자에 방 파일의 `size`(10×7 · 12×8)·`windows`·`door` 를 쓴다. `layout` 은 `host` 대신 주인 자리 `keeper: { slug, lx, lz, face }` 이고 붙박이는 `{ fu, name, box, color?, gx, gz, rot, role? }` (모델 = `assets/furniture/fixtures`). 진열 자리 `stock` · 박물관 케이스 `cases` · 화석 자리 `fossils` · 말 거는 자리 `talk` 는 편집기에서 보기만 (점선 점·파란 점선 상자·💬) — 요청 글에 적혀 오면 직접 고친다. 반영: `layout` 칸(name·note·wallpaper·floor·keeper·furniture)만 `places/<slug>.json` 에 덮어쓰고 `version` +1 · status `review` → 계산대(`role:'counter'`)를 옮겼으면 `keeper`·`talk`·`stock` 자리도 맞추기 → `node --test tests/` (`places.test.mjs`) → 게임에서 상점·박물관 들어가 보기.
 반영한 뒤 `node tools/build-editor-index.mjs` → 바뀐 묶음만 publish → 요청을 `done` + `reply` + `doneVersion`.
 
 ## 다른 트랙에

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { posix } from 'node:path';
-import { PARAMS, STYLE_FILE, checkStyle } from '../src/render/presets.js';
+import { PARAMS, SKY_PARAMS, STYLE_FILE, checkStyle } from '../src/render/presets.js';
 import { planWeb, scanModule } from '../tools/build-web.mjs';
 
 const ROOT = new URL('../', import.meta.url);
@@ -29,6 +29,19 @@ test('스타일: 검사가 틀린 값을 잡는다', () => {
   bad.default = 'nope';
   const out = checkStyle(bad).join('\n');
   for (const s of ['cozy.bands', 'cozy.outline', 'cozy.shadeTint', 'cozy.bloom', 'toon.fxaa', 'toon.foo', 'indoor.nope', "default 'nope'"]) assert.ok(out.includes(s), `못 잡음: ${s}`);
+});
+
+test('스타일: 하늘 값(sky)이 SKY_PARAMS 와 맞고, 처음 넣은 값은 코드 기본값(dome.js SKY_FX · 구름 그림자 0.3)과 같다', () => {
+  assert.deepEqual(Object.keys(style.sky).filter(k => k !== 'cloudSpeed').sort(), SKY_PARAMS.map(p => p.key).sort());
+  // dome.js 는 three 를 불러서 테스트에서 import 하지 않고 글자로 읽는다
+  const src = read('src/sky/dome.js').match(/export const SKY_FX = (\{[\s\S]*?\n\});/)[1];
+  const fx = Function(`return ${src}`)();
+  for (const [k, v] of Object.entries(fx)) assert.deepEqual(style.sky[k], v, `sky.${k}`);
+  assert.equal(style.sky.cloudShadow, 0.3);
+  const bad = structuredClone(style);
+  bad.sky.haze = 5; delete bad.sky.rays; bad.sky.foo = 1; bad.sky.cloudSpeed = [1];
+  const out = checkStyle(bad).join('\n');
+  for (const s of ['sky.haze', 'sky.rays', 'sky.foo', 'sky.cloudSpeed']) assert.ok(out.includes(s), `못 잡음: ${s}`);
 });
 
 test('스타일: 게임 웹 빌드에 presets.json 이 들어간다', () => {

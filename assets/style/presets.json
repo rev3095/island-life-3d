@@ -115,5 +115,26 @@
       "warmth": 0,
       "vignette": 0.3
     }
+  },
+  "sky": {
+    "haze": 0.22,
+    "sunGlow": 0.16,
+    "sunsetSide": 0.34,
+    "rays": 0.1,
+    "gradDeep": 0,
+    "milky": 0.12,
+    "starBoost": 1,
+    "cloudScale": 1.5,
+    "cloudSpeed": [
+      0.012,
+      0.004
+    ],
+    "cloudClear": 0.6,
+    "cloudFull": 0.3,
+    "cloudEdge": 0.07,
+    "silver": 0.55,
+    "shade": 0.75,
+    "shadeDeep": 0,
+    "cloudShadow": 0.3
   }
 }

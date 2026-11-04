@@ -37,6 +37,7 @@ capabilities: `{ db: { rules: [ {path:'applied', read:'view', write:'admin'}, {p
 1. ArtifactData `get drafts/style`, `get applied/style`, `list history` (로컬에서 고쳤다면 `assets/review/style-drafts.json`).
 2. `drafts/style.style` 을 `assets/style/presets.json` 과 비교 (프리셋 값 · 집 안 덧씌우기 · `default`), `notes` 를 `applied.notes` 와 비교. 바뀐 게 없으면 그렇게 알리고 끝.
    - **값**: `presets.json` 에 그대로 쓴다 (`version` = applied 버전 + 1, 키 순서는 PARAMS). `checkStyle` 로 검사 — 범위 밖이면 잘라 넣고 알린다.
+   - **하늘** (M7-P8): `drafts/style.style.sky` ↔ `presets.json` `sky` (프리셋 공통 한 벌, 표 `SKY_PARAMS` — 하늘 셰이더 `SKY_FX` 이름 + 땅 위 구름 그림자 `cloudShadow`, `cloudSpeed` 는 파일에만). 게임은 sky 모듈이 처음에 `SKY_FX` 위에 얹는다. 하늘 검수 보드(sky) 값 표 `docs/notes/sky-board.md` 도 같이 고친다. 화면 확인은 낮·노을·밤·흐림 (`time.setWeather('cloudy')`).
    - **되돌리기** (`rollback: n`): `history/style-v<n>.commit` 의 `assets/style/presets.json` 과 같은지 보고(`git show <commit>:assets/style/presets.json`) 그 값으로, `version` 은 새로 +1. 무엇을 되돌리는지 먼저 보여 준다.
    - **의견**: 그 프리셋 값을 의견대로 고친다. 새 효과(새 uniform·패스)가 필요하면 `docs/SHADERS.md` "새 재질 효과 더하기" — 셰이더 파일은 render 트랙 몫이라 따로 세션·승인.
 3. `node --test tests/` (`style.test.mjs`).
