@@ -122,6 +122,7 @@ export default {
       occlusion: {
         watch: fn => occlusion.watch(fn), add: item => occlusion.add(item),
         get enabled() { return occlusion.enabled; }, set enabled(v) { occlusion.enabled = v; }, list: () => occlusion.list(),
+        get bottom() { return occlusion.bottom; }, set bottom(v) { occlusion.bottom = v; }, bottomPoint: () => occlusion.bottomPoint(),
       },
       nativeFruit: gen.nativeFruit,
       /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */

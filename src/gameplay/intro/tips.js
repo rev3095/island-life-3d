@@ -3,6 +3,7 @@
 // 축제 준비물을 언제 묻나 · 축제 날 저녁을 놓침. 규칙(judge.js·주민 파일 emote)은 그대로 두고, 판정 결과(festival:emote)를 보고 알려 주기만 한다.
 // 본 힌트는 state.flags.tips 에 남아 섬폰 「안내」에서 다시 본다. 글의 {name:이} = 주민 이름 + 받침에 맞춘 조사.
 import { josa } from './rules.js';
+import { heartCount } from '../town/rules.js';
 
 /** 판정 순서 (festival/judge.js KINDS 와 같다) */
 export const KINDS = ['retreat', 'awkward', 'puzzled', 'okay', 'happy', 'delight'];
@@ -64,7 +65,8 @@ export const TIPS = {
   // ---- 첫날 ----
   night: {
     icon: '🌙', title: '밤에 시작했어요',
-    steps: [{ after: 1, text: '도토리상점은 아침 8시에 열어요. 그동안 박물관 기증·집 구경을 먼저 해도 되고, 곤충·화석을 모아 두었다가 아침에 팔아도 돼요.' }],
+    // 7차 D51-A: 첫날엔 문을 닫았어도 밤톨이 문 너머로 사 준다
+    steps: [{ after: 1, text: '도토리상점은 밤 10시~아침 8시엔 문을 닫아요. 그래도 첫날엔 상점 문 앞에서 밤톨을 부르면 문 너머로 사 줘요!' }],
   },
   skipped: {
     icon: '🎁', title: '환영 선물', again: false,
@@ -189,15 +191,23 @@ export function nextConv(conv, rule = {}, keys = [], kind = 'okay') {
  */
 export function heartProgress(v, open = { tier: 'friend', wins: 2 }, tiers = [['new', 0], ['known', 10], ['friend', 30]]) {
   const need = tiers.find(([id]) => id === open.tier)?.[1] ?? 30;
-  const friendship = Math.floor(v?.friendship ?? 0), wins = v?.emote?.wins ?? 0, needWins = open.wins ?? 2;
-  return { friendship, need, wins, needWins, open: friendship >= need && wins >= needWins };
+  // wins = 마음이 통한 일 (7차 D50-A: open.ways 가 이모티콘·선물·부탁이면 셋을 다 센다)
+  const friendship = Math.floor(v?.friendship ?? 0), wins = heartCount(v, open.ways), needWins = open.wins ?? 2;
+  return { friendship, need, wins, needWins, open: friendship >= need && wins >= needWins, ways: open.ways ?? ['emote'] };
 }
+
+/** 말풍선 아래 하트 칸 글 (7차 D54-A): ♥ 22/30 · 🙂 1/2 */
+export const heartMeter = p => `♥ ${Math.min(p.friendship, p.need)}/${p.need} · 🙂 ${Math.min(p.wins, p.needWins)}/${p.needWins}`;
+/** 마음이 통한 일의 이름 (ways 에 따라) */
+export const winsLabel = ways => (ways?.length > 1 ? '마음이 통한 일' : '이모티콘 대화 성공');
+const WAY_NAME = { emote: '이모티콘 대화 성공', gift: '좋아하는 선물', favor: '부탁 들어주기' };
 
 /** 진행 정도 알림 글 */
 export function heartText(name, p) {
   const left = [];
   if (p.friendship < p.need) left.push(`친밀도 ${p.friendship}/${p.need}`);
-  if (p.wins < p.needWins) left.push(`이모티콘 대화 성공 ${p.wins}/${p.needWins}`);
+  if (p.wins < p.needWins) left.push(`${winsLabel(p.ways)} ${p.wins}/${p.needWins}`);
   if (!left.length) return `${josa(name, '와')} 마음이 통했어요! 🎉 를 보내 축제 이야기를 들어 봐요.`;
-  return `${josa(name, '와')} 축제 이야기까지 — ${left.join(' · ')}. 이모티콘 대화는 하루 3번까지 친해지고, 선물도 도와줘요.`;
+  const how = (p.ways?.length ?? 1) > 1 ? ` (${p.ways.map(w => WAY_NAME[w] ?? w).join(' · ')} 모두 세요)` : '';
+  return `${josa(name, '와')} 축제 이야기까지 — ${left.join(' · ')}${how}. 이모티콘 대화는 하루 3번까지 친해지고, 선물도 도와줘요.`;
 }

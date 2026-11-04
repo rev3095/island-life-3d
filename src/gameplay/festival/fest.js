@@ -1,9 +1,10 @@
 // 축제 흐름 (검수 보드 z5 D20-B · D22-A · D23-A · D24-A · D25-A): 🎉 묻기 → 필요한 것 → 부품 → 부스가 선다 →
 // 다섯 다 모은 다음 날 저녁 6시 광장 가운데서 축제 → 단체 사진(스토리 s10·s11) → 사진 액자 → 엔딩 뒤에도 섬은 그대로, 해마다 축제.
 // 장면 연출은 스토리 세션 재생기가 이벤트를 듣고 튼다 (docs/notes/z5-festival.md). 재생기가 없으면 짧게 알림으로 넘긴다.
-import { makeParts, festState, partCount, allParts, festivalDueOn } from './parts.js';
+import { makeParts, festState, partCount, allParts, festivalDueOn, festivalYearOf } from './parts.js';
 import { partSvg } from './icons.js';
-import { villagerState, dayHour, josa } from '../town/rules.js';
+import { villagerState, dayHour, josa, TIERS } from '../town/rules.js';
+import { heartProgress, heartMeter } from '../intro/tips.js';
 import { giveItem } from '../town/talk.js';
 
 const STORY_PART = n => `s0${4 + n}-part${n}`;
@@ -79,9 +80,9 @@ export function createFestival(ctx, emo, cfg) {
     if (f.parts[P.id]) { E.gesture('happy'); await E.say(null, null, ['party', 'grin', 'sparkle']); return true; }
     const v = villagerState(ctx.state, slug);
     if (!heartOpen(v)) {
-      // 아직 마음을 덜 열었다: 💭 하트만 보여 주고 알림으로 길잡이
+      // 아직 마음을 덜 열었다: 💭 하트 + 말풍선 아래 하트 칸(7차 D54-A ♥ 22/30 · 🙂 1/2) + 알림으로 길잡이
       E.gesture('tilt');
-      await E.say(null, null, ['party', 'bubble', 'heart']);
+      await E.say(null, null, ['party', 'bubble', 'heart'], null, { meter: heartMeter(heartProgress(v, cfg.parts?.open, TIERS)) });
       toast(`${josa(V.person.name, '와')} 더 친해지면 축제 이야기를 들려줄 거예요`, '💭');
       return true;
     }
@@ -164,7 +165,7 @@ export function createFestival(ctx, emo, cfg) {
     const key = today();
     const first = !f.heldDay;
     if (first) f.heldDay = key;
-    f.lastYear = key.slice(0, 4);
+    f.lastYear = (first ? null : festivalYearOf(f, key)) ?? key.slice(0, 4);   // 연말 축제를 새해에 열어도 그 해 몫
     festivalOn = true;
     music(true);
     (f.festivals ??= []).push(key);
@@ -223,7 +224,8 @@ export function createFestival(ctx, emo, cfg) {
   // ---- 행동 키: 광장 가운데(모닥불)에서 축제 시작 ----
   function register(gp) {
     gp.add({
-      name: 'festival:start', intent: 'action', priority: 95, label: '축제 시작',
+      // 7차 D56-A: 축제 날 저녁 모닥불 앞에선 말 걸기(100)보다 먼저 (그때 그 자리에서만 잡히므로 다른 때는 그대로)
+      name: 'festival:start', intent: 'action', priority: 101, label: '축제 시작',
       test() {
         const P = places(), pl = S().player?.position;
         if (!P || !pl || !festivalDue() || !evening()) return null;

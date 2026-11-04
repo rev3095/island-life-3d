@@ -5,7 +5,7 @@ import { BIRTHDAY_GIFT_MULT } from '../../data/birthdays.js';
 import {
   villagerState, tierOf, dailyTalk, addFriendship, greetingLines, chatLines, pickLines, fill, slotOf,
   makeRequest, matchesRequest, currentRequest, requestReward, receiveGift, giftBack, surpriseGift,
-  REQUEST_POINTS, FRIEND_MAX, josa,
+  REQUEST_POINTS, FRIEND_MAX, josa, noteBond,
 } from './rules.js';
 
 export const MENU = ['잡담', '부탁 있어?', '선물 주기', '잘 가'];
@@ -218,6 +218,7 @@ export function createTalk(ctx, { lines, party = null }) {
       d.inventory.remove(slot, 1);
       v.request = null;
       v.doneDay = c.dayKey;
+      noteBond(v, 'favor', c.dayKey);
       note(addFriendship(v, REQUEST_POINTS).up);
       vars.item = item.name;
       V.happy();

@@ -13,22 +13,23 @@ const DECOR_JOSA = { wallpaper: { obj: '를', to: '로', is: '예요' }, floor: 
 export function createShop(ctx, panels, { bag, toast }) {
   let current = null;
 
-  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab } = {}) {
+  /** only = 'sell' 이면 팔기 탭만 (첫날 밤 문 너머 장사, 7차 D51-A), greet = 주인 한 줄 */
+  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab, only = null, greet = ' 어서 와요! 천천히 둘러봐요.' } = {}) {
     if (current) return current.p.result;
-    let p, tab = startTab === 'sell' ? 'sell' : 'buy';
+    let p, tab = only === 'sell' || startTab === 'sell' ? 'sell' : 'buy';
     const data = () => ctx.services.data;
     const shell = panelShell({ cls: 'pk-shop', title, tagColor: color, onClose: () => p.close(null), onOutside: () => p.close(null) });
     const wallet = h('span', { class: 'pk-wallet' });
     const tabs = h('div', { class: 'pk-tabs', role: 'tablist', 'aria-label': '사기 팔기' });
     const view = h('div', { class: 'pk-shop-view', role: 'tabpanel' });
-    shell.body.append(h('p', { class: 'pk-keeper' }, h('b', null, keeper), ' 어서 와요! 천천히 둘러봐요.'), tabs, view);
+    shell.body.append(h('p', { class: 'pk-keeper' }, h('b', null, keeper), greet), tabs, view);
     shell.foot.append(wallet);
 
     const acorns = () => data()?.wallet?.get?.() ?? ctx.state.wallet?.acorns ?? 0;
     function draw(focusSel) {
       wallet.textContent = `🌰 ${fmt(acorns())}`;
       wallet.setAttribute('aria-label', `가진 도토리 ${fmt(acorns())}개`);
-      tabs.replaceChildren(...[['buy', '사기'], ['sell', '팔기']].map(([id, t]) => h('button', {
+      tabs.replaceChildren(...[['buy', '사기'], ['sell', '팔기']].filter(([id]) => !only || id === only).map(([id, t]) => h('button', {
         type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(tab === id), tabindex: tab === id ? '0' : '-1',
         onclick: () => { tab = id; draw('[role="tab"][aria-selected="true"]'); },
       }, t)));

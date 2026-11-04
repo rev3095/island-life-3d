@@ -48,7 +48,9 @@ export function openTalkUI(ctx, emo, who) {
   const next = el('span', 'fe-next', { 'aria-hidden': 'true' });
   next.textContent = '▼';
   const live = el('p', 'fe-sr', { 'aria-live': 'polite' });
-  bubble.append(nameTag, emos, words, next, live);
+  const meter = el('p', 'fe-meter');   // 하트 칸 (7차 D54-A: 마음 열기까지 ♥ 22/30 · 🙂 1/2)
+  meter.hidden = true;
+  bubble.append(nameTag, emos, words, meter, next, live);
 
   const dock = el('div', 'fe-dock');
   const choices = el('div', 'fe-choices', { role: 'group', 'aria-label': '대답 고르기' });
@@ -71,12 +73,14 @@ export function openTalkUI(ctx, emo, who) {
   const finish = v => { const r = resolve; resolve = null; mode = null; r?.(v); };
 
   // ---- 말풍선 ----
-  function showBubble(toks, waiting) {
+  function showBubble(toks, waiting, extra = '') {
+    meter.textContent = extra;
+    meter.hidden = !extra;
     emos.innerHTML = toks.map(t => tok(t, true)).join('');
     bubble.classList.toggle('is-wait', !!waiting);
     bubble.hidden = !toks.length;
     const text = emo.say(toks, items());
-    live.textContent = `${who.name}: ${text}`;
+    live.textContent = `${who.name}: ${text}${extra ? ` (${extra})` : ''}`;
     words.textContent = text;
     if (toks.length) ctx.events.emit('dialog:line', { speaker: who.name, text: '♪'.repeat(Math.max(2, toks.length * 3)), voice: who.voice });
     bubble.classList.remove('is-pop'); void bubble.offsetWidth; bubble.classList.add('is-pop');
@@ -162,10 +166,10 @@ export function openTalkUI(ctx, emo, who) {
   picker.hidden = true; choices.hidden = true;
 
   return {
-    /** 주민 말풍선을 보여 주고 넘길 때까지 기다린다 */
-    say(toks) {
+    /** 주민 말풍선을 보여 주고 넘길 때까지 기다린다. meter = 말풍선 아래 작은 글 (하트 칸) */
+    say(toks, { meter: m = '' } = {}) {
       if (closed) return Promise.resolve(null);
-      showBubble(toks, true);
+      showBubble(toks, true, m);
       picker.hidden = true; choices.hidden = true;
       mode = 'say';
       bubble.focus({ preventScroll: true });

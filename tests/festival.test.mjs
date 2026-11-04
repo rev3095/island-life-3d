@@ -210,6 +210,10 @@ test('마음 열기·상태: 친구 단계 + 기쁨 두 번, 다섯 다 모으�
   assert.ok(!heartOpen({ friendship: 40, emote: { wins: 1 } }));
   assert.ok(!heartOpen({ friendship: 20, emote: { wins: 5 } }));
   assert.ok(heartOpen({ friendship: 30, emote: { wins: 2 } }));
+  // 7차 D50-A: 좋아하는 선물·부탁도 마음이 통한 일 (이모티콘이 서툴러도 엔딩까지)
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: 0 }, bonds: { gift: 1, favor: 1 } }));
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: 1 }, bonds: { gift: 1, favor: 0 } }));
+  assert.ok(!heartOpen({ friendship: 20, emote: { wins: 0 }, bonds: { gift: 3, favor: 3 } }), '친밀도는 그대로 필요');
   const st = {};
   const f = festState(st);
   assert.deepEqual([f.parts, f.booths, f.asked], [{}, {}, {}]);
@@ -248,6 +252,23 @@ test('축제 날: 다 모은 날은 아니고 다음 날부터, 연 뒤엔 해�
   assert.equal(F.festivalDue('2027-11-02'), true, '해마다 같은 날 (D25-A)');
   f.lastYear = '2027';
   assert.equal(F.festivalDue('2027-11-02'), false, '그해에 열었으면 끝');
+  // 7차 D55-A: 그 날부터 사흘 안 (한 해 한 번), 2월 29일은 없는 해엔 2월 28일, 연말이면 새해로 넘어가도 그 해 몫
+  f.lastYear = '2027';
+  assert.equal(F.festivalDue('2028-11-03'), true, '이틀째');
+  assert.equal(F.festivalDue('2028-11-04'), true, '사흘째');
+  assert.equal(F.festivalDue('2028-11-05'), false, '나흘째는 아니다');
+  assert.equal(F.festivalDue('2028-11-01'), false, '그 날 전은 아니다');
+  const { festivalYearOf, anniversary } = await import('../src/gameplay/festival/parts.js');
+  assert.equal(anniversary('2028-02-29', 2029), '2029-02-28');
+  assert.equal(anniversary('2028-02-29', 2032), '2032-02-29');
+  const leap = { heldDay: '2028-02-29', lastYear: '2028' };
+  assert.equal(festivalDueOn(leap, '2029-02-28'), true);
+  assert.equal(festivalDueOn(leap, '2029-03-02'), true, '평년엔 2/28 부터 사흘');
+  assert.equal(festivalDueOn(leap, '2029-03-03'), false);
+  const eve = { heldDay: '2026-12-30', lastYear: '2026' };
+  assert.equal(festivalDueOn(eve, '2028-01-01'), true, '12/30 축제의 사흘째 = 다음 해 1/1');
+  assert.equal(festivalYearOf(eve, '2028-01-01'), '2027');
+  assert.equal(festivalDueOn({ ...eve, lastYear: '2027' }, '2028-01-01'), false, '그 해 몫은 이미 열었다');
 });
 
 test('축제 설정 (assets/festival/config.json): 결정 D14–D25 가 다 있고, 부품·부스·광장 칸이 서로 맞고, 지금 설정은 만든 안만 쓴다', () => {

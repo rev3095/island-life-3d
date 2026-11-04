@@ -192,7 +192,7 @@ export function hintFor(id, { touch = false, shopOpen = true, canSell = true, ca
   if (!h) return '';
   let text = touch ? h.touch : h.keys;
   if (id === 'sell' && !canSell) text += ' (먼저 팔 걸 하나 구해요)';
-  else if (id === 'sell' && !shopOpen) text += ' (지금은 문을 닫았어요 · 아침 8시~밤 10시)';
+  else if (id === 'sell' && !shopOpen) text += ' (문을 닫았어도 오늘은 문 앞에서 밤톨이 사 줘요)';
   if (id === 'donate' && !canDonate) text += ' (기증할 게 없으면 하나 더 잡아 와요)';
   if (id === 'reward' && !inside && !shopOpen) text += ' (문을 닫았어도 문 앞에서 불러요)';
   return text;

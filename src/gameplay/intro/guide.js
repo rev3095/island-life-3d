@@ -80,13 +80,13 @@ export function openGuide(ctx, src) {
     const friends = src.friends();
     if (friends?.length) {
       kids.push(head('축제 준비 — 친해진 정도'),
-        el('p', { class: 'fd-guide-note' }, '친밀도와 이모티콘 대화 성공이 둘 다 차면 🎉 로 축제 준비물을 알려 줘요.'),
+        el('p', { class: 'fd-guide-note' }, '💗 친밀도와 🙂 마음이 통한 일(이모티콘 대화 성공 · 좋아하는 선물 · 부탁 들어주기)이 둘 다 차면 🎉 로 축제 준비물을 알려 줘요.'),
         el('ul', { class: 'fd-guide-friends' }, friends.map(f => el('li', { class: `fd-guide-friend${f.part ? ' is-part' : f.open ? ' is-open' : ''}` },
           el('b', null, f.name),
           f.part ? el('span', null, '✔ 부품 받음')
             : f.open ? el('span', null, '💗 마음이 통함 — 🎉 를 보내 봐요')
             : el('span', null, el('span', { class: 'fd-meter', role: 'img', 'aria-label': `친밀도 ${f.friendship}/${f.need}` }, el('i', { style: { width: `${Math.min(100, Math.round(f.friendship / f.need * 100))}%` } })),
-              ` 💗 ${f.friendship}/${f.need} · 💬 ${Math.min(f.wins, f.needWins)}/${f.needWins}`)))));
+              ` 💗 ${f.friendship}/${f.need} · 🙂 ${Math.min(f.wins, f.needWins)}/${f.needWins}`)))));
     }
     // 지난 힌트
     const tips = src.tips();

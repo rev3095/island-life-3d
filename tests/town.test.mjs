@@ -52,13 +52,33 @@ test('일과: 밤엔 집, 낮엔 밖, 비 오는 날 집에 있는 주민', () =
   assert.equal(R.shouldBeOut(coco, nowAt(2), 'clear'), false);       // 새벽 2시 = 26시
   assert.equal(R.shouldBeOut(bori, nowAt(14), 'rain'), false);
   assert.equal(R.shouldBeOut(coco, nowAt(14), 'rain'), true);
-  assert.equal(R.shouldBeOut(PEOPLE.pong, nowAt(23), 'clear'), true);  // 퐁은 밤늦게까지
+  assert.equal(R.shouldBeOut(PEOPLE.pong, nowAt(21), 'clear'), true);  // 퐁은 밤늦게까지
+  // 7차 D57-A: 잠들기 전 1~2시간은 집에 깨어 있다 (자는 때는 일과 그대로)
+  const from = R.homeFrom(coco, DAY), s0 = R.scheduleOf(coco, DAY);
+  assert.ok(s0.sleep - from >= 1 && s0.sleep - from <= 2, `집에 있는 시간 ${(s0.sleep - from).toFixed(2)}`);
+  const at = h => nowAt(h);
+  assert.equal(R.shouldBeOut(coco, at(from + 0.05), 'clear'), false, '잠들기 전엔 집에');
+  assert.equal(R.isAsleep(coco, at(from + 0.05)), false, '그때는 깨어 있다 (방에 들어갈 수 있음)');
+  assert.equal(R.isAsleep(coco, at(Math.min(s0.sleep + 0.1, 23.9))), true);
+  assert.equal(R.isAsleep(coco, nowAt(14)), false);
   const s1 = R.scheduleOf(coco, DAY), s2 = R.scheduleOf(coco, DAY);
   assert.deepEqual(s1, s2, '같은 날은 같은 일과');
   assert.ok(Math.abs(s1.wake - coco.wake) <= 0.5);
   assert.equal(R.slotOf(nowAt(6)), 'dawn');
   assert.equal(R.slotOf(nowAt(13)), 'afternoon');
   assert.equal(R.slotOf(nowAt(1)), 'night');
+});
+
+test('마음이 통한 일 (7차 D50-A): 좋아하는 선물은 하루 한 번, 부탁은 들어줄 때마다', () => {
+  const v = R.villagerState({}, 'coco');
+  assert.deepEqual(v.bonds, { gift: 0, favor: 0, giftDay: null });
+  assert.equal(R.noteBond(v, 'gift', DAY), true);
+  assert.equal(R.noteBond(v, 'gift', DAY), false, '같은 날 두 번째 선물은 세지 않는다');
+  R.noteBond(v, 'favor', DAY);
+  assert.equal(R.heartCount(v, ['emote', 'gift', 'favor']), 2);
+  assert.equal(R.heartCount(v), 0, '기본(ways 없음)은 이모티콘만');
+  v.emote = { wins: 1 };
+  assert.equal(R.heartCount(v, ['emote', 'gift', 'favor']), 3);
 });
 
 test('부탁: 같은 날엔 같은 부탁, 맞는 물건만 받는다', () => {

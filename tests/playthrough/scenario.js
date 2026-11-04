@@ -26,7 +26,8 @@ export function makeScenario(bot, sk, opts = {}) {
   const cfgParts = () => S().festival?.config?.parts?.list ?? [];
   const partOf = slug => cfgParts().find(p => p.who === slug);
   const hasPart = slug => !!fest().parts?.[partOf(slug)?.id];
-  const heartOpen = slug => { const v = S().town.state(slug); return v.friendship >= 30 && (v.emote?.wins ?? 0) >= 2; };
+  // 마음 열기 = 친구(30) + 마음이 통한 일 2번 (7차 D50-A: 이모티콘 성공 · 좋아하는 선물 · 부탁 — 말풍선 아래 하트 칸에 보이는 값)
+  const heartOpen = slug => { const v = S().town.state(slug); return v.friendship >= 30 && (v.emote?.wins ?? 0) + (v.bonds?.gift ?? 0) + (v.bonds?.favor ?? 0) >= 2; };
   const residents = () => S().town.residents();
 
   // ---------- 매일 하는 일 ----------
