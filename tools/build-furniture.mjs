@@ -2,7 +2,9 @@
 // 사용: node tools/build-furniture.mjs log-chair [sofa ...] [--no-render]
 //       node tools/build-furniture.mjs --all
 //       node tools/build-furniture.mjs --index            (Blender 없이 목록만 다시 씀: 스펙의 status·이름만 바꿨을 때)
-// 빌드가 끝나면 게임이 읽는 가구 목록(assets/furniture/index.json)을 다시 쓴다.
+//       node tools/build-furniture.mjs --fixtures shop-counter | --fixtures --all | --fixtures --index
+//            상점·박물관 붙박이 (assets/furniture/fixtures — 계산대·진열 받침·수조 등, 아이템 표 밖이라 가구 목록과 따로)
+// 빌드가 끝나면 게임이 읽는 가구 목록(assets/furniture/index.json, 붙박이는 assets/furniture/fixtures/index.json)을 다시 쓴다.
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -10,7 +12,8 @@ import { fileURLToPath } from "node:url";
 import { glbToJson } from "./glb-to-json.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const furnDir = resolve(root, "assets/furniture");
+const fixtures = process.argv.includes("--fixtures");
+const furnDir = resolve(root, fixtures ? "assets/furniture/fixtures" : "assets/furniture");
 const specDir = resolve(furnDir, "specs");
 const modelDir = resolve(furnDir, "models");
 const blender = process.env.BLENDER ?? "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe";
@@ -29,7 +32,7 @@ for (const slug of slugs) {
   const spec = resolve(specDir, `${slug}.json`);
   if (!existsSync(spec)) { console.error(`스펙 파일이 없음: ${spec}`); failed++; continue; }
   console.log(`\n=== ${slug} ===`);
-  const result = spawnSync(blender, ["-b", "--factory-startup", "--python", resolve(root, "assets/blender/build_furniture.py"), "--", spec, resolve(root, "assets"), ...flags], { stdio: "inherit" });
+  const result = spawnSync(blender, ["-b", "--factory-startup", "--python", resolve(root, "assets/blender/build_furniture.py"), "--", spec, resolve(root, "assets"), ...flags, ...(fixtures ? [`--out=${furnDir}`] : [])], { stdio: "inherit" });
   if (result.status !== 0) { console.error(`실패: ${slug}`); failed++; continue; }
   console.log("저장:", glbToJson(resolve(modelDir, `${slug}.glb`)));
 }
@@ -47,5 +50,5 @@ const index = readSpecs()
     };
   });
 writeFileSync(resolve(furnDir, "index.json"), JSON.stringify({ models: index }, null, 2) + "\n");
-console.log(`\n가구 목록 ${index.length}개 → assets/furniture/index.json`);
+console.log(`\n${fixtures ? "붙박이" : "가구"} 목록 ${index.length}개 → ${fixtures ? "assets/furniture/fixtures" : "assets/furniture"}/index.json`);
 process.exit(failed ? 1 : 0);

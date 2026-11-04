@@ -1,6 +1,7 @@
 // 가구 모델 불러오기·만들기. assets/furniture/index.json 이 아이템 id → 모델 slug·발자국·놓는 곳을 알려 준다.
 // 모델은 .glb.json (assets.loadModel), 재질은 materials.applyToonStyle(스펙 style 그대로).
-// 움직이는 부분: 벽시계 바늘(hourHand·minuteHand) = 게임 시각, 모닥불 불꽃(flicker) = 반복 동작, 어항 물 = 반투명.
+// 움직이는 부분: 벽시계 바늘(hourHand·minuteHand) = 게임 시각, 모닥불 불꽃(flicker) = 반복 동작, 어항 물·유리 선반(caseGlass) = 반투명.
+// base 를 주면 다른 폴더의 같은 모양 목록을 읽는다 — 상점·박물관 붙박이 assets/furniture/fixtures (places.js).
 // 어항·곤충 상자에 넣은 물고기·곤충은 그 아이템 id 로 정한 색으로 안의 물고기(fish)·풍뎅이(bug) 재질을 칠한다.
 
 const BASE = 'assets/furniture';
@@ -14,13 +15,13 @@ function holdColor(THREE, id, kind) {
   return `#${new THREE.Color().setHSL(hue, kind === 'fish' ? 0.7 : 0.45, kind === 'fish' ? 0.58 : 0.34).getHexString()}`;
 }
 
-export function createFurnitureKit(ctx) {
+export function createFurnitureKit(ctx, { base: dir = BASE } = {}) {
   const { THREE, assets, materials } = ctx;
   let index = null;
   const bySlug = new Map(), byItem = new Map(), specs = new Map();
 
   async function load() {
-    index = await assets.loadJSON(`${BASE}/index.json`);
+    index = await assets.loadJSON(`${dir}/index.json`);
     for (const m of index.models) { bySlug.set(m.slug, m); byItem.set(m.item, m); }
     return index;
   }
@@ -29,7 +30,7 @@ export function createFurnitureKit(ctx) {
   const info = item => byItem.get(item) ?? null;
 
   async function spec(slug) {
-    if (!specs.has(slug)) specs.set(slug, assets.loadJSON(`${BASE}/specs/${slug}.json`));
+    if (!specs.has(slug)) specs.set(slug, assets.loadJSON(`${dir}/specs/${slug}.json`));
     return specs.get(slug);
   }
 
@@ -37,7 +38,7 @@ export function createFurnitureKit(ctx) {
   function preload(items) {
     for (const it of items) {
       const m = info(it);
-      if (m) { assets.loadModel(`${BASE}/models/${m.slug}`).catch(() => {}); spec(m.slug).catch(() => {}); }
+      if (m) { assets.loadModel(`${dir}/models/${m.slug}`).catch(() => {}); spec(m.slug).catch(() => {}); }
     }
   }
 
@@ -45,7 +46,7 @@ export function createFurnitureKit(ctx) {
   async function make(item, { variant = null } = {}) {
     const m = info(item);
     if (!m) throw new Error(`가구 모델이 없어요: ${item}`);
-    const [gltf, sp] = await Promise.all([assets.loadModel(`${BASE}/models/${m.slug}`), spec(m.slug)]);
+    const [gltf, sp] = await Promise.all([assets.loadModel(`${dir}/models/${m.slug}`), spec(m.slug)]);
     const { scene: model, animations } = assets.instantiate(gltf);
     const toon = materials.applyToonStyle(model, { spec: sp });
     const root = new THREE.Group();
@@ -57,6 +58,7 @@ export function createFurnitureKit(ctx) {
     if (m.layer === 'rug') model.traverse(o => { if (o.isMesh) o.castShadow = false; });
     // 어항 물은 반투명 (외곽선은 스펙에서 뺐다)
     for (const mat of toon.materials.tankWater ?? []) { mat.transparent = true; mat.opacity = 0.55; mat.depthWrite = false; }
+    for (const mat of toon.materials.caseGlass ?? []) { mat.transparent = true; mat.opacity = 0.35; mat.depthWrite = false; }   // 곤충 유리 상자 위층 선반
 
     const hour = model.getObjectByName('hourHand'), minute = model.getObjectByName('minuteHand');
     let mixer = null;

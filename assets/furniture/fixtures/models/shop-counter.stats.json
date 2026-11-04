@@ -1,0 +1,57 @@
+{
+  "id": "FU-36",
+  "slug": "shop-counter",
+  "item": "fixture.shop-counter",
+  "name": "계산대",
+  "category": "fixture",
+  "kind": "shop-counter",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2644,
+  "parts": 2,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "body",
+    "book",
+    "brass",
+    "paper",
+    "plaque",
+    "top",
+    "trim"
+  ],
+  "objects": [
+    "counter",
+    "things"
+  ],
+  "animations": {},
+  "size": [
+    1.98,
+    0.81,
+    0.88
+  ],
+  "bounds": [
+    [
+      -0.99,
+      -0.422,
+      0.0
+    ],
+    [
+      0.99,
+      0.39,
+      0.878
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 54412,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shop-counter_front.png",
+    "shop-counter_main.png",
+    "shop-counter_thumb.png",
+    "shop-counter_top.png"
+  ]
+}

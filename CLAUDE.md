@@ -16,6 +16,7 @@ node --test tests/                  # 규칙 테스트 전체 (Node 22+: tests/p
 node --test tests/save.test.mjs     # 테스트 파일 하나
 node tools/build-character.mjs coco | --all [--no-render]        # 캐릭터 9종 Blender 재생성
 node tools/build-env.mjs tree | --all | --category nature [--no-render]   # 배경 32종 (nature|prop|building|tile)
+node tools/build-furniture.mjs sofa | --all [--no-render]   # 가구 34종 (--fixtures 를 붙이면 상점·박물관 붙박이 FU-35–42, assets/furniture/fixtures)
 node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용, 커밋 안 함)
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 ```

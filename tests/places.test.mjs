@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { checkPlace, exhibitPlan, stockPlan, caseSlots, blockersOf, boundsOf, doormatOf, sizeOf, reachable, PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS } from '../src/gameplay/house/placedata.js';
+import { checkPlace, exhibitPlan, stockPlan, caseSlots, blockersOf, boundsOf, doormatOf, sizeOf, reachable, PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, FIXTURE_BASE, FIXTURE_INDEX } from '../src/gameplay/house/placedata.js';
 import { resolveFurniture } from '../src/gameplay/house/interior.js';
 import { inBox } from '../src/gameplay/house/grid.js';
 import { leafLook, walkPlan, doorFront, TIMING, DOOR_STYLE, OPEN_ANGLE } from '../src/gameplay/house/door.js';
@@ -16,7 +16,9 @@ import { planWeb } from '../tools/build-web.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 const json = p => JSON.parse(readFileSync(new URL(p, ROOT), 'utf8'));
-const furn = json('assets/furniture/index.json');
+// 배치가 고르는 모델 = 가구 목록 + 상점·박물관 붙박이 목록 (places.js 와 같이)
+const furnOnly = json('assets/furniture/index.json'), fixtures = json('assets/furniture/fixtures/index.json');
+const furn = { models: [...furnOnly.models, ...fixtures.models] };
 const specs = Object.fromEntries(PLACE_KINDS.map((k, i) => [k, json(PLACE_FILES[i])]));
 const listOf = spec => (spec.furniture ?? []).map((e, i) => resolveFurniture(e, furn, i));
 
@@ -51,7 +53,7 @@ test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
   assert.ok(errs.some(e => e.includes('talk')), errs.join('\n'));
   // 문 매트에서 계산대 앞까지 길이 막히면
   const walled = structuredClone(specs.museum);
-  walled.furniture.push({ fu: 'FU-35', box: [12, 1, 0.5], gx: 0, gz: 6, rot: 0 });
+  walled.furniture.push({ fu: 'FU-99', box: [12, 1, 0.5], gx: 0, gz: 6, rot: 0 });   // 모델 없는 번호 = box 크기 임시 상자
   assert.ok(checkPlace(walled, furn).some(e => e.includes('걸어갈 수 없어요')));
 });
 
@@ -199,4 +201,50 @@ test('단풍 방 RM-07: 이사 온 단풍의 집이 빈 기본 방이 아니라 
   assert.ok(room.furniture.length >= 8, '가구가 채워져 있다');
   assert.ok(room.furniture.every(f => f.item && furn.models.some(m => m.item === f.item)), '모두 지금 가구 모델 (임시 상자 없음)');
   assert.ok(room.furniture.some(f => f.item === 'furn.bookshelf') && room.furniture.some(f => f.item === 'furn.dino-model'), '수집가 방 (책장 · 공룡 모형)');
+});
+
+test('붙박이 FU-35–42: 스펙 = 목록 = 모델, 아이템 표 밖, 크기가 발자국 안 · 배치의 box 와 같은 칸', () => {
+  assert.equal(FIXTURE_INDEX, `${FIXTURE_BASE}/index.json`);
+  const dir = `${FIXTURE_BASE}/specs/`;
+  const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
+  assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`));
+  const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
+  for (const m of fixtures.models) {
+    const sp = fspecs.find(x => x.slug === m.slug);
+    assert.equal(sp.category, 'fixture', m.slug);
+    assert.ok(m.item.startsWith('fixture.') && !itemIds.has(m.item), `${m.slug}: 아이템 표 밖 (사고팔지 않는다)`);
+    assert.ok(!furnIds.has(m.id), `${m.slug}: 가구 목록과 번호가 겹치지 않는다`);
+    assert.equal(sp.status, m.status, `${m.slug}: status`);
+    assert.ok(readFileSync(new URL(`${FIXTURE_BASE}/models/${m.slug}.glb.json`, ROOT)).length > 1000, `${m.slug}: 모델`);
+    assert.ok(m.size[0] <= m.footprint[0] + 0.05 && m.size[1] <= m.footprint[1] + 0.05, `${m.slug}: 모델이 칸보다 크다`);
+  }
+  // 배치가 고른 붙박이: 모델을 못 읽을 때의 임시 상자 칸 = 모델 칸, 케이스 모델 = 케이스 상자 크기
+  let used = 0;
+  for (const k of PLACE_KINDS) {
+    for (const e of specs[k].furniture) {
+      const m = fixtures.models.find(x => x.id === e.fu);
+      if (!m) continue;
+      used++;
+      assert.deepEqual(e.box.slice(0, 2), m.footprint, `${k} ${e.fu}: box 칸 = 모델 칸`);
+    }
+    for (const c of specs[k].cases ?? []) {
+      const m = fixtures.models.find(x => x.slug === c.fixture);
+      assert.ok(m, `${k} ${c.name}: 케이스 모델 ${c.fixture}`);
+      assert.ok(Math.abs(m.size[0] - (c.lx1 - c.lx0)) < 0.1 && Math.abs(m.size[1] - (c.lz1 - c.lz0)) < 0.1 && Math.abs(m.size[2] - c.h) < 0.05, `${k} ${c.fixture}: 모델 크기 = 케이스 상자`);
+      used++;
+    }
+  }
+  assert.equal(used, 1 + 2 + 1 + 1 + 1 + 8 + 2, '상점 계산대·진열 받침 둘·도구 받침·씨앗 진열대 · 박물관 안내대·화석 받침 여덟·케이스 둘');
+  // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
+  const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
+  assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');
+  for (const row of specs.shop.stock) if (row.group === 'tools') assert.ok(row.y >= 0.1 && row.y <= 0.14);
+});
+
+test('방 셋 확정: 단풍 방 RM-07 · 상점 RM-08 · 박물관 RM-09 status approved', () => {
+  const index = json('assets/interior/index.json');
+  assert.equal(index.rooms.find(r => r.id === 'RM-07').status, 'approved');
+  assert.equal(json('assets/interior/rooms/rm-07.json').status, 'approved');
+  for (const k of PLACE_KINDS) assert.equal(specs[k].status, 'approved', k);
 });

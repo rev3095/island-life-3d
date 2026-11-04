@@ -3,13 +3,16 @@
 //   size [가로, 깊이] 칸 · windows 북쪽 벽 창 자리 · door 문 매트 칸 { gx0, gx1 } · keeper 주인이 서는 곳 { slug, lx, lz, face } · talk 플레이어가 말 거는 곳 { lx, lz }
 //   furniture[].role 'counter' = 계산대·안내대 (FU-36 자리), furniture[].scale [x, y, z] = 모델 늘이기·줄이기 (계산대를 주인 키에 맞춰 낮출 때), furniture[].look [가로, 깊이] = 임시 상자가 보이는 크기 (발자국 box 보다 가늘게)
 //   상점 stock = [{ group: furniture|tools|seeds|saplings, from?, count, lx, lz, y, dz?, fit? }] — 오늘의 물건을 놓는 줄
-//   박물관 cases = [{ kind: tank|terrarium, cat, lx0, lz0, lx1, lz1, h, levels }] 긴 수조·유리 상자, fossils = [[lx, lz]] 받침 위 (fossilY 높이)
+//   박물관 cases = [{ kind: tank|terrarium, cat, lx0, lz0, lx1, lz1, h, levels, fixture? }] 긴 수조·유리 상자 (fixture = 붙박이 모델 slug), fossils = [[lx, lz]] 받침 위 (fossilY 높이)
 import { fits, boxOf, inBox } from './grid.js';
 import { resolveFurniture, FACE } from './interior.js';
 
 // 웹 빌드는 JS 안에 따옴표로 적힌 에셋 경로 글자로 넣을 파일을 찾는다 (interior.js WEB_FILES 와 같은 까닭)
 export const PLACE_FILES = ['assets/interior/places/shop.json', 'assets/interior/places/museum.json'];
 export const PLACE_KINDS = ['shop', 'museum'];
+/** 상점·박물관 붙박이 모델 (FU-35–42, tools/build-furniture.mjs --fixtures) — 가구 목록·아이템 표 밖 */
+export const FIXTURE_BASE = 'assets/furniture/fixtures';
+export const FIXTURE_INDEX = 'assets/furniture/fixtures/index.json';
 /** 섬 건물 모델 slug (door.js 가 문 크기를 읽는다) */
 export const PLACE_BUILDING = { shop: 'shop', museum: 'museum' };
 export const MUSEUM_CATS = ['fish', 'bug', 'fossil'];

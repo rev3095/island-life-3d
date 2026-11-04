@@ -1,0 +1,62 @@
+{
+  "id": "FU-35",
+  "slug": "display-stand",
+  "item": "fixture.display-stand",
+  "name": "진열 받침",
+  "category": "fixture",
+  "kind": "display-stand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "도토리상점 왼쪽에 오늘의 가구를 올려 두는 낮은 나무 단. 앞 널 무늬, 모서리에 도토리 값표.",
+    "keywords": [
+      "낮은 나무 단",
+      "값표"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99A63",
+    "woodDark": "#8C6440",
+    "top": "#D9B382",
+    "tag": "#FFF3DC",
+    "acorn": "#A8642E",
+    "acornCap": "#7F5636"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "top": "윗판",
+    "tag": "값표",
+    "acorn": "도토리",
+    "acornCap": "도토리 모자"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

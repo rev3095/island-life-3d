@@ -1,0 +1,50 @@
+{
+  "id": "FU-39",
+  "slug": "tool-stand",
+  "item": "fixture.tool-stand",
+  "name": "도구 받침",
+  "category": "fixture",
+  "kind": "tool-stand",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 836,
+  "parts": 1,
+  "materials": [
+    "brass",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    2.86,
+    0.62
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -1.43,
+      0.0
+    ],
+    [
+      0.42,
+      1.43,
+      0.62
+    ]
+  ],
+  "footprint": [
+    1,
+    3
+  ],
+  "glbBytes": 18204,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-stand_front.png",
+    "tool-stand_main.png",
+    "tool-stand_thumb.png",
+    "tool-stand_top.png"
+  ]
+}

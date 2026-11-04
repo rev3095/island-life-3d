@@ -3,6 +3,8 @@
 실내 검수 보드: https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh (`concept/interiors-board.html`, 보드 id `interiors`, 결정 **D67–D73**).
 사용자 요청: "각 집, 박물관, 가게 등 장소마다 들어갈 수 있게 실제 공간 구현 · space 로 문 열고 들어가는 모션 · fade in/out 애니메이션·모션 포함".
 
+**확정 (2026-11-04)**: 사용자가 "확정, 실내 검수 보드 내용대로 (추천안대로)" — 보드에 따로 고른 것·의견이 없어(저장소 `boards/interiors` 비어 있음) 아래 반영 v1 이 그대로 확정안. 보드 `applied/interiors` v2 · `history/interiors-v2` (commit b1078a7), 보드 v5 에 '확정' 표시.
+
 ## 반영 v1 (임시, 2026-11-04) — 보드 추천안 모두 A
 
 사용자 선택을 기다리지 않고 추천안으로 먼저 만들었다. 보드에서 다르게 고르면 "검수 보드 반영" 때 아래 「다르게 고르면」대로 고친다.
@@ -48,6 +50,18 @@
 - 실내 조명은 sky(`time.setIndoor`)가 맡는다 — 조정 세션이 `src/sky/` 사양별 최적화를 하고 있어서 고치지 않음. 제안: 실내(`time.indoor`)에선 구름 그림자·물 하늘 반사·해 렌즈 빛 같은 바깥 효과를 아예 건너뛰면 실내가 더 가볍다.
 - 배경 편집기 「방 배치」 탭이 방을 다시 저장할 때 `deco` 칸을 지우지 않는지 확인 필요 (지우면 그 방은 사양이 낮아도 소품을 다 그린다 — 틀리진 않음).
 
+## 3차 요청 (사용자, 2026-11-04): "방 확정, 방 이어서 진행 제작 (단풍 집, 도토리상점, 박물관)"
+
+| 무엇 | 내용 |
+|---|---|
+| 방 셋 확정 | RM-07 단풍 수집 서재 (`rooms/rm-07.json` + `interior/index.json`) · RM-08 상점 · RM-09 박물관 (`places/*.json`, 내용이 바뀌어 version 2) → status `approved`. 편집기 묶음 다시 만듦 (`node tools/build-editor-index.mjs`, gitignore). 홈 `catalog/*`·`marks` 와 배경 편집기 다시 게시는 합친 뒤 조정 세션 |
+| 붙박이 모델 8종 (새) | 임시였던 것(색 상자 · 0.6배 부엌 조리대 · 코드로 만든 반투명 상자)을 가구와 같은 Blender 빌더(`build_furniture.py`)로 만든 진짜 모델로: **FU-35 진열 받침** (2×2, 윗면 0.18, 값표) · **FU-36 계산대** (2×1, 높이 0.6, 도토리 패·도토리 저울·장부·종) · **FU-37 안내대** (돌빛, 소용돌이 패·방명록·종) · **FU-38 화석 받침** (1×1, 윗면 0.55, 이름판) · **FU-39 도구 받침** (1×3, 윗면 0.12, 가로대·못) · **FU-40 씨앗 진열대** (1×2, 윗면 0.6, 봉투 상자·꽃 팻말) · **FU-41 긴 수조** (1.38×5.95×1.5, 뚜껑 없이 테두리만, 자갈·물풀·돌·거품) · **FU-42 곤충 유리 상자** (흙·이끼·유리 선반 0.8·잔가지·낙엽). 삼각형 836~2,644 |
+| 붙박이 폴더 | `assets/furniture/fixtures/` (specs · models · renders · index.json) — 가구 목록·아이템 표 밖이라 사고팔지 않고 `tests/assets.test.mjs` 의 가구 34개 약속도 그대로. 만들기 `node tools/build-furniture.mjs --fixtures <slug> \| --all \| --index` (빌더 `--out=` 로 폴더만 바꿈). 웹 빌드 `FAMILIES.fixtures` — 목록은 처음 묶음(island), 모델은 가구 묶음(처음 들어갈 때) |
+| 게임 | `furniture.js` `createFurnitureKit(ctx, { base })` (다른 폴더의 같은 목록) + 유리 선반 `caseGlass` 반투명. `places.js` 가 가구 + 붙박이 목록에서 고르고(`fu`), 케이스는 `cases[].fixture`. 모델을 못 읽으면 예전처럼 box·color 임시 상자 / 코드 상자. 사양 낮음·매우 낮음이면 수조 물·물풀·돌·거품·잔가지·낙엽 재질을 숨긴다 |
+| 배치 | 상점: 계산대 FU-36 · 진열 받침 FU-35 ×2 · 도구 받침 FU-39 · 씨앗 진열대 FU-40 (계산대 0.6배 줄이기 `scale` 없앰). 박물관: 안내대 FU-37 · 화석 받침 FU-38 ×8 · 수조 `long-tank` · 곤충 상자 `long-terrarium`. 임시 상자 0개 (`house.places.placeholders()` 빈 목록) |
+| 보드 v4 | 방 셋 '확정' 표시, FU-35–42 카드에 실제 렌더 그림 (`renders/<slug>_thumb.png`), 지금 상태 표 갱신 |
+| 테스트 | `places.test.mjs` 붙박이 (스펙 = 목록 = 모델, 아이템 표 밖, 크기 ≤ 칸, 배치 box 칸 = 모델 칸, 케이스 모델 = 케이스 상자, 화석 받침 윗면 = fossilY) · 방 셋 approved |
+
 ## 확인
 
 - `node --test tests/` — 345개 통과 (places 13개 포함). 단풍 이사(개발용 단계 넘기기) → 단풍 집 문에서 Space → 단풍 수집 서재, 사양 낮음 ↔ 적정 바꾸기로 소품이 빠졌다 돌아옴, 콘솔 오류 0.
@@ -70,7 +84,7 @@
 
 - **main 합치기 · 게임 링크 다시 게시**는 확인 뒤 조정 세션이 한다. 편집기 홈 목록(`editors.html` 의 `editors-list`, group `board`)에 보드를 더하고 홈 `status/interiors` 를 쓰는 것도 조정 세션에 부탁 (하늘 보드와 같은 자리를 고치고 있어서 여기서는 안 건드림).
 - **배경 편집기 「방 배치」 탭**은 8×8 주민 방만 안다 → RM-07 은 보이지만 상점·박물관(RM-08·09, `assets/interior/places/`)은 아직 편집기에서 못 고친다. 고치려면 탭이 `size`·`cases`·`stock` 을 읽게 (M6-P2 노트 순서대로) — 따로 할 일.
-- **FU-35 진열 받침 · FU-36 계산대**는 v1 임시(색 상자 · 부엌 조리대 0.6배). 보드 의견이나 배경 편집기 「가구」 요청으로 Blender 모델을 만들면 방 배치의 `fu`/`item` 만 바꾸면 된다. 긴 수조·곤충 유리 상자도 지금은 코드로 만든 반투명 상자.
+- 붙박이(FU-35–42)는 배경 편집기 「가구」 탭에 아직 안 나온다 (편집기 묶음이 `assets/furniture` 만 읽음) — 고칠 때는 보드 의견 → 스펙 → `node tools/build-furniture.mjs --fixtures <slug>`. 편집기 탭에 붙이려면 `build-editor-index.mjs` 에 fixtures 묶음을 더하는 따로 할 일.
 - 상점 실내에 "오늘의 벽지·바닥" 견본을 거는 자리는 아직 없다 (창에서만).
 - 카메라: `camera.js` 는 고치지 않았다. 넓은 방(상점 10×7 · 박물관 12×8)은 `cameraBox(origin, w, d)` 로 카메라 중심 범위만 넓혔다 (8×8 방 값은 그대로). 시점 조작 세션(`p12-camera`)이 실내에서 오른쪽 버튼 올려다보기를 막거나 줄일지 정하면 좋겠다 — 실내는 하늘이 없다.
 - `player.walkTo` 를 `src/player/index.js` 에 더했다 (`p12-camera` 가 `camera.js` 를 고치는 중이라 그 파일은 안 건드림). 합칠 때 `player/index.js` 의 `update` 이동 부분이 부딪히면 이 노트의 「연출 걷기」만 다시 얹으면 된다.

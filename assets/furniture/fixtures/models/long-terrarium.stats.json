@@ -1,0 +1,56 @@
+{
+  "id": "FU-42",
+  "slug": "long-terrarium",
+  "item": "fixture.long-terrarium",
+  "name": "곤충 유리 상자",
+  "category": "fixture",
+  "kind": "long-terrarium",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4188,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "caseGlass",
+    "frame",
+    "leafDark",
+    "moss",
+    "soil",
+    "twig"
+  ],
+  "objects": [
+    "deco",
+    "frame",
+    "ground"
+  ],
+  "animations": {},
+  "size": [
+    1.42,
+    6.01,
+    1.5
+  ],
+  "bounds": [
+    [
+      -0.71,
+      -3.015,
+      0.0
+    ],
+    [
+      0.71,
+      2.995,
+      1.5
+    ]
+  ],
+  "footprint": [
+    2,
+    6
+  ],
+  "glbBytes": 80932,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "long-terrarium_front.png",
+    "long-terrarium_main.png",
+    "long-terrarium_thumb.png",
+    "long-terrarium_top.png"
+  ]
+}

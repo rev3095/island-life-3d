@@ -1,0 +1,68 @@
+{
+  "id": "FU-42",
+  "slug": "long-terrarium",
+  "item": "fixture.long-terrarium",
+  "name": "곤충 유리 상자",
+  "category": "fixture",
+  "kind": "long-terrarium",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "박물관 동쪽 벽의 긴 곤충 상자 (1.38×5.95, 높이 1.5). 흙·이끼 바닥, 위층 유리 선반, 잔가지·낙엽.",
+    "keywords": [
+      "긴 유리 상자",
+      "유리 선반",
+      "잔가지"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "caseGlass"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#7A5A3E",
+    "brass": "#D8A84B",
+    "soil": "#8B6B4A",
+    "moss": "#9CCB7A",
+    "caseGlass": "#DDEFE4",
+    "twig": "#8A6A4A",
+    "leafDark": "#C9773E"
+  },
+  "paletteLabels": {
+    "frame": "틀",
+    "brass": "놋쇠",
+    "soil": "흙",
+    "moss": "이끼",
+    "caseGlass": "유리 선반",
+    "twig": "잔가지",
+    "leafDark": "낙엽"
+  },
+  "footprint": [
+    2,
+    6
+  ],
+  "place": "floor",
+  "animations": []
+}

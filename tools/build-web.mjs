@@ -28,9 +28,9 @@ const TEXT_EXT = /\.(html|js|mjs|css|json|svg|txt|md)$/i;
 export const PACK_BYTES = 3 * MB;
 export const PACKS = [
   { name: 'icons', test: p => !!imageType(p) },                                     // 그림: 아이템 아이콘·가구 썸네일 (가방·상점·박물관을 처음 열 때)
-  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers)\//.test(p) || p === 'assets/furniture/index.json' },   // 섬 배경·집 안·장면·표 (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5)
+  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
-  { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때)
+  { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
   { name: 'items', test: p => p.startsWith('assets/items/') },                     // 들어 보이는 아이템 모델 (처음 잡았을 때)
   { name: 'more', test: () => true },                                              // 갈래 없는 새 에셋 → 표에 갈래를 더할 것 (빌드 표에 알림)
 ];
@@ -41,6 +41,7 @@ const packable = p => p.startsWith('assets/') && (p.endsWith('.json') || !!image
 //   env       — world·sky: assets.loadEnv / loadEnvSpec (src/core/assets.js PATHS)
 //   character — player·town: assets.loadCharacter / loadCharacterSpec (목록은 assets.loadCharacterIndex)
 //   furniture — house: src/gameplay/house/furniture.js, 썸네일 = data 아이템 icon (src/data/items.js)
+//   fixtures  — 상점·박물관 붙박이 (house/places.js, 계산대·진열 받침·수조): 모델·스펙만 (썸네일은 게임이 안 씀)
 //   items     — 가구를 뺀 아이템 아이콘 = data 아이템 icon (변형마다 하나) + 모델 .glb.json 모두
 //               (들어 보이기 gather/meshes.js heldModel · 상점 진열·박물관 전시 house/places.js itemModel — 실내가 생긴 뒤로 모든 아이템 모델을 쓴다)
 const itemFiles = slug => {
@@ -51,6 +52,7 @@ export const FAMILIES = [
   { name: 'env', index: 'assets/env/index.json', each: s => [`assets/env/models/${s}.glb.json`, `assets/env/specs/${s}.json`] },
   { name: 'character', index: 'assets/models/index.json', each: s => [`assets/models/${s}.glb.json`, `assets/specs/${s}.json`] },
   { name: 'furniture', index: 'assets/furniture/index.json', each: s => [`assets/furniture/models/${s}.glb.json`, `assets/furniture/specs/${s}.json`, `assets/furniture/renders/${s}_thumb.png`] },
+  { name: 'fixtures', index: 'assets/furniture/fixtures/index.json', each: s => [`assets/furniture/fixtures/models/${s}.glb.json`, `assets/furniture/fixtures/specs/${s}.json`] },
   { name: 'items', index: 'assets/items/index.json', each: itemFiles },
 ];
 

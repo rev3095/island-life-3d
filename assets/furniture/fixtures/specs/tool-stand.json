@@ -1,0 +1,57 @@
+{
+  "id": "FU-39",
+  "slug": "tool-stand",
+  "item": "fixture.tool-stand",
+  "name": "도구 받침",
+  "category": "fixture",
+  "kind": "tool-stand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "도토리상점 오른쪽 벽에 도구 다섯을 세워 두는 낮은 판과 가로대.",
+    "keywords": [
+      "낮은 판",
+      "가로대",
+      "못"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99A63",
+    "woodDark": "#8C6440",
+    "brass": "#D8A84B"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "brass": "놋쇠"
+  },
+  "footprint": [
+    1,
+    3
+  ],
+  "place": "floor",
+  "animations": []
+}

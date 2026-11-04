@@ -1,0 +1,65 @@
+{
+  "id": "FU-40",
+  "slug": "seed-shelf",
+  "item": "fixture.seed-shelf",
+  "name": "씨앗 진열대",
+  "category": "fixture",
+  "kind": "seed-shelf",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "꽃씨·묘목을 올리는 작은 탁자 (윗면 0.6). 아래 선반에 꽃씨 봉투 상자, 앞에 꽃 팻말.",
+    "keywords": [
+      "작은 탁자",
+      "꽃씨 봉투",
+      "꽃 팻말"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "top": "#D9B382",
+    "wood": "#C99A63",
+    "woodDark": "#8C6440",
+    "packRed": "#E8504F",
+    "packYellow": "#F2C94C",
+    "packPink": "#F29BB5",
+    "tag": "#FFF3DC"
+  },
+  "paletteLabels": {
+    "top": "윗판",
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "packRed": "빨강 봉투",
+    "packYellow": "노랑 봉투",
+    "packPink": "분홍 봉투",
+    "tag": "값표"
+  },
+  "footprint": [
+    1,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}
