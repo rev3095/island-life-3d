@@ -1,0 +1,70 @@
+{
+  "id": "FU-41",
+  "slug": "long-tank",
+  "item": "fixture.long-tank",
+  "name": "긴 수조",
+  "category": "fixture",
+  "kind": "long-tank",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "박물관 서쪽 벽의 긴 수조 (1.38×5.95, 높이 1.5). 뚜껑 없이 테두리만 — 위에서 내려다봐도 안의 물고기가 보인다. 자갈·물풀·돌·거품.",
+    "keywords": [
+      "긴 수조",
+      "테두리만",
+      "물풀"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "bubble",
+      "gravel",
+      "tankWater"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#7A5A3E",
+    "brass": "#D8A84B",
+    "gravel": "#E2D2AE",
+    "tankWater": "#9ED6E8",
+    "seaweed": "#5FAE5A",
+    "rock": "#9AA3A0",
+    "bubble": "#F2FBFF"
+  },
+  "paletteLabels": {
+    "frame": "틀",
+    "brass": "놋쇠",
+    "gravel": "자갈",
+    "tankWater": "물",
+    "seaweed": "물풀",
+    "rock": "돌",
+    "bubble": "거품"
+  },
+  "footprint": [
+    2,
+    6
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,58 @@
+{
+  "id": "FU-38",
+  "slug": "fossil-pedestal",
+  "item": "fixture.fossil-pedestal",
+  "name": "화석 받침",
+  "category": "fixture",
+  "kind": "fossil-pedestal",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "박물관 가운데 화석을 올리는 돌 받침 (윗면 0.55). 기둥에 세로 홈, 앞에 놋쇠 이름판.",
+    "keywords": [
+      "돌 받침",
+      "이름판"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#E9E2D2",
+    "stoneDark": "#C9C0AE",
+    "stoneTop": "#F4EFE3",
+    "brass": "#D8A84B"
+  },
+  "paletteLabels": {
+    "stone": "돌",
+    "stoneDark": "짙은 돌",
+    "stoneTop": "돌 윗판",
+    "brass": "놋쇠"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

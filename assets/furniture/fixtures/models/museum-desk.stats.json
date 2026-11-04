@@ -1,0 +1,56 @@
+{
+  "id": "FU-37",
+  "slug": "museum-desk",
+  "item": "fixture.museum-desk",
+  "name": "안내대",
+  "category": "fixture",
+  "kind": "museum-desk",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2124,
+  "parts": 2,
+  "materials": [
+    "book",
+    "brass",
+    "emblem",
+    "paper",
+    "plaque",
+    "stone",
+    "stoneTop",
+    "trim"
+  ],
+  "objects": [
+    "counter",
+    "things"
+  ],
+  "animations": {},
+  "size": [
+    1.98,
+    0.78,
+    0.72
+  ],
+  "bounds": [
+    [
+      -0.99,
+      -0.392,
+      0.0
+    ],
+    [
+      0.99,
+      0.39,
+      0.717
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 42052,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "museum-desk_front.png",
+    "museum-desk_main.png",
+    "museum-desk_thumb.png",
+    "museum-desk_top.png"
+  ]
+}

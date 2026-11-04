@@ -1,0 +1,54 @@
+{
+  "id": "FU-35",
+  "slug": "display-stand",
+  "item": "fixture.display-stand",
+  "name": "진열 받침",
+  "category": "fixture",
+  "kind": "display-stand",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1632,
+  "parts": 2,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "tag",
+    "top",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "stand",
+    "tag"
+  ],
+  "animations": {},
+  "size": [
+    1.9,
+    1.9,
+    0.48
+  ],
+  "bounds": [
+    [
+      -0.95,
+      -0.95,
+      0.0
+    ],
+    [
+      0.95,
+      0.95,
+      0.485
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 34156,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "display-stand_front.png",
+    "display-stand_main.png",
+    "display-stand_thumb.png",
+    "display-stand_top.png"
+  ]
+}

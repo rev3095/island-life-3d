@@ -1,0 +1,55 @@
+{
+  "id": "FU-40",
+  "slug": "seed-shelf",
+  "item": "fixture.seed-shelf",
+  "name": "씨앗 진열대",
+  "category": "fixture",
+  "kind": "seed-shelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2296,
+  "parts": 2,
+  "materials": [
+    "packPink",
+    "packRed",
+    "packYellow",
+    "tag",
+    "top",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "shelf",
+    "sign"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    1.86,
+    0.98
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -0.93,
+      0.0
+    ],
+    [
+      0.42,
+      0.93,
+      0.98
+    ]
+  ],
+  "footprint": [
+    1,
+    2
+  ],
+  "glbBytes": 42480,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "seed-shelf_front.png",
+    "seed-shelf_main.png",
+    "seed-shelf_thumb.png",
+    "seed-shelf_top.png"
+  ]
+}

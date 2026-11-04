@@ -4,18 +4,23 @@
 //    town.placeRule(kind) 이 'open' 일 때만. 나가기는 문 매트에서 행동 키(90) 또는 아래로 밀기. 드나드는 동작은 door.js (내 집·주민 집과 같다).
 //  - 상점: 진열 받침·진열대에 오늘의 물건(economy.stockGroups — 가구 2 · 도구 · 꽃씨 · 묘목)을 진짜 모델로. 날마다 들어갈 때 다시 놓는다.
 //  - 박물관: 긴 수조(물고기)·곤충 유리 상자·화석 받침. 아이템 표 순서로 자리가 정해져 있고, 기증한 것만 그 자리에 아이템 모델(assets/items)이 놓인다.
+//  - 계산대·진열 받침·수조 같은 붙박이는 가구와 같은 빌더로 만든 모델 assets/furniture/fixtures (FU-35–42, 아이템 표 밖). 배치의 fu 로 고르고,
+//    모델을 못 읽으면 배치의 box·color 로 임시 상자(케이스는 코드 상자)를 그린다.
 //  - 사양(ctx.quality)이 낮음·매우 낮음이면 배치의 deco 소품·수조 물·물풀 장식을 숨기고, 매우 낮음이면 전시 물고기가 움직이지 않는다 (그림자·외곽선은 render 가 사양대로 끈다).
 //  - 주인(밤톨·느루)을 계산대·안내대 뒤에 세우는 일은 town 이 한다 (keepers.js 가 info(kind).keeper 를 본다). 들고 날 때 place:enter / place:leave { place }.
 // 상태: state.house.place = 실내에서 저장했으면 'shop'|'museum' (이어하기).
 import { boxOf, moveCircle, inBox } from './grid.js';
 import { PLACE_ROOMS, buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } from './room.js';
 import { resolveFurniture, FACE, DEFAULT } from './interior.js';
-import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
+import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
+import { createFurnitureKit } from './furniture.js';
 
 const PUSH_TIME = 0.2;
 const WALL_Y = 1.15;                    // 임시 벽 가구 아래 끝 높이 (visit.js 와 같다)
 const ITEM_INDEX = 'assets/items/index.json';
 const EXHIBIT_MAX = { fish: 0.8, bug: 0.42, fossil: 0.58 };   // 전시 모델 가장 긴 변 (m) — 작으면 1.8배까지 키우고 넘으면 줄인다
+/** 붙박이 케이스 모델에서 사양 낮음·매우 낮음이면 숨기는 재질 (물·물풀·돌·거품·잔가지·낙엽) */
+const CASE_DECO = new Set(['tankWater', 'seaweed', 'rock', 'bubble', 'twig', 'leafDark']);
 const CASE_LOOK = {
   tank: { glass: '#CDEBF5', fill: '#7EC3DD', fillOpacity: 0.32, floor: '#E9D7A8', frame: '#7A5A3E' },
   terrarium: { glass: '#DDEFE4', fill: null, floor: '#9CCB7A', soil: '#8B6B4A', frame: '#7A5A3E' },
@@ -36,6 +41,12 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
   events.on('quality:changed', () => { for (const R of Object.values(rooms)) if (R.room) applyQuality(R); });
 
+  // 붙박이 모델 목록 (없거나 못 읽으면 임시 상자로)
+  const fixtures = createFurnitureKit(ctx, { base: FIXTURE_BASE });
+  await fixtures.load().catch(e => console.warn('[house] 붙박이 목록을 못 읽었어요 (임시 상자로)', e));
+  const models = () => [...kit.list, ...fixtures.list];
+  const makerOf = item => (fixtures.info(item) ? fixtures : kit);
+
   await Promise.all(PLACE_KINDS.map(async (kind, i) => {
     try { rooms[kind] = makePlace(kind, await ctx.assets.loadJSON(PLACE_FILES[i])); }
     catch (e) { console.warn('[house] 실내 배치를 못 읽었어요', kind, e); }
@@ -45,7 +56,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   function makePlace(kind, spec) {
     const origin = PLACE_ROOMS[kind], [w, d] = sizeOf(spec);
     const corner = cornerOf(origin, w, d);
-    const list = (spec.furniture ?? []).map((e, i) => resolveFurniture(e, { models: kit.list }, i));
+    const list = (spec.furniture ?? []).map((e, i) => resolveFurniture(e, { models: models() }, i));
     const R = { kind, spec, origin, w, d, corner, x0: corner.x0, z0: corner.z0, list, room: null, ready: null, objs: [], shown: [], shownKey: null, cases: [] };
     // 사양이 낮아 deco 소품을 숨기면 충돌에서도 뺀다 (보이지 않는 것에 부딪히지 않게)
     const all = blockersOf(spec, list), lite = blockersOf(spec, list.filter(r => !r.entry.deco)), bounds = boundsOf(spec);
@@ -92,11 +103,12 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     });
     R.room.group.visible = false;
     scene.add(R.room.group);
-    for (const c of R.spec.cases ?? []) R.cases.push(buildCase(R, c));
-    R.ready = Promise.all(R.list.map(async r => {
+    const cases = Promise.all((R.spec.cases ?? []).map(c => caseFixture(R, c).catch(e => { console.warn('[house] 케이스 모델을 못 만들었어요 → 코드 상자', c.fixture, e); return null; })
+      .then(made => made ?? buildCase(R, c)))).then(list => { R.cases = list; });
+    R.ready = Promise.all([cases, ...R.list.map(async r => {
       try { return r.real ? await realPiece(R, r) : placeholder(R, r); }
       catch (e) { console.warn('[house] 실내 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(R, r); }
-    })).then(objs => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); applyQuality(R); });
+    })]).then(([, ...objs]) => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); applyQuality(R); });
     return R.ready;
   }
   function poseRoot(R, root, r) {
@@ -112,10 +124,20 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     }
   }
   async function realPiece(R, r) {
-    const obj = await kit.make(r.item, { variant: r.entry.variant ?? null });
+    const obj = await makerOf(r.item).make(r.item, { variant: r.entry.variant ?? null });
     poseRoot(R, obj.root, r);
     obj.deco = !!r.entry.deco;
     return obj;
+  }
+  /** 긴 수조·곤충 유리 상자 붙박이 모델 (FU-41·42) → { group, dispose } | null (모델이 없으면 코드 상자로) */
+  async function caseFixture(R, c) {
+    const m = c.fixture && fixtures.list.find(x => x.slug === c.fixture);
+    if (!m) return null;
+    const obj = await fixtures.make(m.item);
+    obj.root.position.set(R.x0 + (c.lx0 + c.lx1) / 2, 0, R.z0 + (c.lz0 + c.lz1) / 2);
+    obj.root.traverse(o => { if (o.isMesh && !o.userData.outline && CASE_DECO.has(String(o.material?.name ?? '').split('@')[0])) o.userData.deco = true; });
+    R.room.group.add(obj.root);
+    return { group: obj.root, dispose: () => obj.dispose() };
   }
   /** 모델이 아직 없는 가구 (FU-35 받침 등): box [가로, 깊이, 높이] 색 상자 — visit.js 와 같은 모양 */
   function placeholder(R, r) {
@@ -230,7 +252,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     const groups = ctx.services.data?.economy?.stockGroups?.() ?? {};
     return stockPlan(R.spec, groups).map(async s => {
       try {
-        if (s.group === 'furniture' && kit.info(s.id)) {
+        if (s.group === 'furniture' && kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구)
           const obj = await kit.make(s.id);
           const fp = kit.info(s.id).footprint ?? [1, 1];
           obj.root.scale.setScalar(Math.min(1, (s.fit ?? 2) / Math.max(...fp)));
@@ -393,8 +415,9 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       const t = R.spec.talk, m = doormatOf(R.spec);
       return { keeper: keeperSpot(R), keeperSlug: R.spec.keeper?.slug ?? null, talk: t ? { x: R.x0 + t.lx, z: R.z0 + t.lz } : null, doormat: { x: R.x0 + m.lx, z: R.z0 + m.lz }, room: roomBox(R), name: R.spec.name ?? '' };
     },
-    /** 개발용: 지금 진열·전시된 것 수, 임시 상자 */
+    /** 개발용: 지금 진열·전시된 것 수, 임시 상자, 붙박이 모델 목록 */
     shown: kind => (rooms[kind]?.shown ?? []).length,
+    fixtures: () => fixtures.list.map(m => m.slug),
     placeholders: kind => (rooms[kind]?.list ?? []).filter(r => !r.real).map(r => r.fu ?? r.key),
   };
 

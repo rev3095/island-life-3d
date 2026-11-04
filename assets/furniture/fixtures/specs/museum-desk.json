@@ -1,0 +1,67 @@
+{
+  "id": "FU-37",
+  "slug": "museum-desk",
+  "item": "fixture.museum-desk",
+  "name": "안내대",
+  "category": "fixture",
+  "kind": "museum-desk",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "느루가 서는 박물관 안내대 (높이 0.6). 돌빛 몸통·양 끝 기둥, 앞에 박물관 지붕의 소용돌이 패, 위에 펼친 방명록·펜·종.",
+    "keywords": [
+      "돌빛 안내대",
+      "소용돌이 패",
+      "방명록"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#E9E2D2",
+    "stoneTop": "#F4EFE3",
+    "trim": "#9C8C74",
+    "plaque": "#6E8F7C",
+    "emblem": "#E8C26B",
+    "book": "#7A4E3A",
+    "paper": "#FFF8E6",
+    "brass": "#D8A84B"
+  },
+  "paletteLabels": {
+    "stone": "돌",
+    "stoneTop": "돌 윗판",
+    "trim": "테두리",
+    "plaque": "앞 패",
+    "emblem": "무늬",
+    "book": "장부·방명록",
+    "paper": "종이",
+    "brass": "놋쇠"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

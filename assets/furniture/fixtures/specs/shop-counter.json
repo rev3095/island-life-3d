@@ -1,0 +1,70 @@
+{
+  "id": "FU-36",
+  "slug": "shop-counter",
+  "item": "fixture.shop-counter",
+  "name": "계산대",
+  "category": "fixture",
+  "kind": "shop-counter",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤톨이 서는 낮은 나무 계산대 (높이 0.6 — 키 0.8 인 밤톨이 보이게). 앞에 도토리 패, 위에 도토리 저울·장부·손님 종.",
+    "keywords": [
+      "낮은 계산대",
+      "도토리 저울",
+      "장부",
+      "종"
+    ],
+    "references": [
+      "동네 잡화점·작은 박물관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 검수 보드 interiors — 상점·박물관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "body": "#D9B382",
+    "top": "#9A6B45",
+    "trim": "#7F5636",
+    "plaque": "#F7F1E4",
+    "acorn": "#A8642E",
+    "acornCap": "#7F5636",
+    "brass": "#D8A84B",
+    "book": "#5E8C61",
+    "paper": "#FFF8E6"
+  },
+  "paletteLabels": {
+    "body": "몸통",
+    "top": "윗판",
+    "trim": "테두리",
+    "plaque": "앞 패",
+    "acorn": "도토리",
+    "acornCap": "도토리 모자",
+    "brass": "놋쇠",
+    "book": "장부·방명록",
+    "paper": "종이"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

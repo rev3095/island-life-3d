@@ -1,0 +1,164 @@
+{
+  "models": [
+    {
+      "id": "FU-35",
+      "slug": "display-stand",
+      "item": "fixture.display-stand",
+      "name": "진열 받침",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.9,
+        1.9,
+        0.48
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-36",
+      "slug": "shop-counter",
+      "item": "fixture.shop-counter",
+      "name": "계산대",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.98,
+        0.81,
+        0.88
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-37",
+      "slug": "museum-desk",
+      "item": "fixture.museum-desk",
+      "name": "안내대",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.98,
+        0.78,
+        0.72
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-38",
+      "slug": "fossil-pedestal",
+      "item": "fixture.fossil-pedestal",
+      "name": "화석 받침",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.66,
+        0.66,
+        0.55
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-39",
+      "slug": "tool-stand",
+      "item": "fixture.tool-stand",
+      "name": "도구 받침",
+      "place": "floor",
+      "footprint": [
+        1,
+        3
+      ],
+      "size": [
+        0.84,
+        2.86,
+        0.62
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-40",
+      "slug": "seed-shelf",
+      "item": "fixture.seed-shelf",
+      "name": "씨앗 진열대",
+      "place": "floor",
+      "footprint": [
+        1,
+        2
+      ],
+      "size": [
+        0.84,
+        1.86,
+        0.98
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-41",
+      "slug": "long-tank",
+      "item": "fixture.long-tank",
+      "name": "긴 수조",
+      "place": "floor",
+      "footprint": [
+        2,
+        6
+      ],
+      "size": [
+        1.42,
+        6.01,
+        1.5
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-42",
+      "slug": "long-terrarium",
+      "item": "fixture.long-terrarium",
+      "name": "곤충 유리 상자",
+      "place": "floor",
+      "footprint": [
+        2,
+        6
+      ],
+      "size": [
+        1.42,
+        6.01,
+        1.5
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    }
+  ]
+}

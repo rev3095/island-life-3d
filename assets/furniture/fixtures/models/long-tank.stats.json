@@ -1,0 +1,56 @@
+{
+  "id": "FU-41",
+  "slug": "long-tank",
+  "item": "fixture.long-tank",
+  "name": "긴 수조",
+  "category": "fixture",
+  "kind": "long-tank",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4844,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "bubble",
+    "frame",
+    "gravel",
+    "rock",
+    "seaweed",
+    "tankWater"
+  ],
+  "objects": [
+    "deco",
+    "frame",
+    "water"
+  ],
+  "animations": {},
+  "size": [
+    1.42,
+    6.01,
+    1.5
+  ],
+  "bounds": [
+    [
+      -0.71,
+      -3.015,
+      0.0
+    ],
+    [
+      0.71,
+      2.995,
+      1.5
+    ]
+  ],
+  "footprint": [
+    2,
+    6
+  ],
+  "glbBytes": 93468,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "long-tank_front.png",
+    "long-tank_main.png",
+    "long-tank_thumb.png",
+    "long-tank_top.png"
+  ]
+}

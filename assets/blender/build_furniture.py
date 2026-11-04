@@ -22,7 +22,9 @@ spec = json.load(open(SPEC_PATH, encoding='utf-8'))
 SLUG, KIND = spec['slug'], spec['kind']
 P = {k: v['value'] for k, v in spec.get('params', {}).items()}
 PAL = spec['palette']
-OUT = {k: os.path.join(ASSETS, 'furniture', k) for k in ('models', 'renders', 'blender')}
+# --out=<폴더>: 상점·박물관 붙박이(assets/furniture/fixtures)처럼 가구 목록 밖에 둘 때 (기본 assets/furniture)
+OUT_BASE = next((a.split('=', 1)[1] for a in args if a.startswith('--out=')), os.path.join(ASSETS, 'furniture'))
+OUT = {k: os.path.join(OUT_BASE, k) for k in ('models', 'renders', 'blender')}
 for d in OUT.values():
     os.makedirs(d, exist_ok=True)
 TAU = math.pi * 2
@@ -977,6 +979,197 @@ def b_birthday_cake(M):
             flame.add(bm, mat)
 
 
+# ================================================================ 상점·박물관 붙박이 (실내 검수 보드 interiors, FU-35–42 · assets/furniture/fixtures)
+# 게임이 자리를 정해 그 위에 물건을 올린다: 진열 받침 윗면 0.18 · 도구 받침 0.12 · 씨앗 진열대 0.6 · 화석 받침 0.55 (assets/interior/places/*.json)
+def b_display_stand(M):
+    """FU-35 진열 받침 (2×2): 낮은 나무 단 + 앞 널 무늬 + 값표. 윗면 0.18 에 오늘의 가구가 놓인다"""
+    m = M.part('stand')
+    W = 1.86
+    m.add(box((0, 0, 0.03), (W - 0.1, W - 0.1, 0.06), bevel=0.012), 'woodDark')
+    m.add(box((0, 0, 0.1), (W, W, 0.1), bevel=0.03), 'wood')
+    m.add(box((0, 0, 0.165), (W + 0.04, W + 0.04, 0.03), bevel=0.012), 'top')
+    for k in range(-3, 4):   # 앞 널 무늬
+        m.add(box((k * 0.25, -W / 2 - 0.004, 0.1), (0.018, 0.01, 0.07), bevel=0.003), 'woodDark')
+    t = M.part('tag')
+    x, y = W / 2 - 0.16, -W / 2 + 0.12
+    t.add(cylinder((x, y, 0.18), (x, y, 0.36), 0.012, seg=8), 'woodDark')
+    t.add(box((x, y - 0.01, 0.42), (0.22, 0.02, 0.13), bevel=0.01), 'tag')
+    t.add(ellipsoid((x - 0.05, y - 0.024, 0.41), (0.028, 0.01, 0.034), seg=10, rings=6), 'acorn')
+    t.add(ellipsoid((x - 0.05, y - 0.024, 0.44), (0.032, 0.012, 0.016), seg=10, rings=6), 'acornCap')
+    for k in range(2):
+        t.add(box((x + 0.04, y - 0.022, 0.44 - k * 0.04), (0.08, 0.004, 0.012), bevel=0.002), 'woodDark')
+
+
+def counter_body(M, W, D, H, body, top, trim):
+    """계산대·안내대 몸통: 아래 받침 · 몸통 · 상판 · 앞 널 두 장"""
+    m = M.part('counter')
+    m.add(box((0, 0.01, 0.05), (W - 0.08, D - 0.08, 0.1), bevel=0.02), trim)
+    m.add(box((0, 0, H / 2 + 0.02), (W - 0.04, D - 0.04, H - 0.08), bevel=0.04), body)
+    m.add(box((0, 0, H), (W + 0.08, D + 0.08, 0.06), bevel=0.02), top)
+    for sx in (1, -1):
+        m.add(box((sx * 0.5, -D / 2, H * 0.48), (0.78, 0.02, H * 0.62), bevel=0.02), trim)
+        m.add(box((sx * 0.5, -D / 2 - 0.008, H * 0.48), (0.68, 0.012, H * 0.5), bevel=0.012), body)
+    return m
+
+
+def desk_bell(t, x, zt, base):
+    t.add(cylinder((x, 0, zt), (x, 0, zt + 0.02), 0.06, seg=16), base)
+    t.add(ellipsoid((x, 0, zt + 0.02), (0.05, 0.05, 0.05), seg=16, rings=8), 'brass')
+    t.add(ellipsoid((x, 0, zt + 0.075), (0.012, 0.012, 0.012), seg=8, rings=4), 'brass')
+
+
+def b_shop_counter(M):
+    """FU-36 계산대 (2×1, 높이 0.6): 밤톨(키 0.8)이 뒤에서 보이게 낮다. 앞에 도토리 패, 위에 도토리 저울·장부·종"""
+    W, D, H = 1.9, 0.7, 0.58
+    m = counter_body(M, W, D, H, 'body', 'top', 'trim')
+    m.add(ellipsoid((0, -D / 2 - 0.03, H * 0.5), (0.13, 0.03, 0.13), seg=20, rings=10), 'plaque')
+    m.add(ellipsoid((0, -D / 2 - 0.05, H * 0.46), (0.06, 0.02, 0.07), seg=14, rings=8), 'acorn')
+    m.add(ellipsoid((0, -D / 2 - 0.05, H * 0.53), (0.07, 0.022, 0.035), seg=14, rings=8), 'acornCap')
+    t = M.part('things')
+    zt = H + 0.03
+    sx = -0.55   # 저울: 받침 · 기둥 · 가로대 · 접시 둘 (한쪽에 도토리)
+    t.add(cylinder((sx, 0, zt), (sx, 0, zt + 0.03), 0.09, seg=16), 'brass')
+    t.add(cylinder((sx, 0, zt + 0.03), (sx, 0, zt + 0.26), 0.012, seg=8), 'brass')
+    t.add(box((sx, 0, zt + 0.26), (0.34, 0.02, 0.016), bevel=0.004), 'brass')
+    for k in (1, -1):
+        pz = zt + 0.12 + 0.02 * k
+        t.add(cylinder((sx + k * 0.16, 0, pz), (sx + k * 0.16, 0, pz + 0.01), 0.07, seg=16), 'brass')
+        for a in range(3):
+            ang = a * TAU / 3
+            t.add(cylinder((sx + k * 0.16, 0, zt + 0.26), (sx + k * 0.16 + 0.06 * math.cos(ang), 0.06 * math.sin(ang), pz), 0.003, seg=4), 'brass')
+    t.add(ellipsoid((sx + 0.16, 0, zt + 0.17), (0.03, 0.03, 0.036), seg=10, rings=6), 'acorn')
+    t.add(ellipsoid((sx + 0.16, 0, zt + 0.2), (0.034, 0.034, 0.016), seg=10, rings=6), 'acornCap')
+    t.add(box((0.15, 0.02, zt + 0.02), (0.36, 0.26, 0.04), bevel=0.01, rot=rot_xyz(z=0.12)), 'book')   # 장부
+    t.add(box((0.15, 0.02, zt + 0.042), (0.33, 0.23, 0.006), bevel=0.002, rot=rot_xyz(z=0.12)), 'paper')
+    desk_bell(t, 0.62, zt, 'trim')
+
+
+def b_museum_desk(M):
+    """FU-37 안내대 (2×1, 높이 0.6): 돌빛 몸통 · 양 끝 기둥, 앞에 소용돌이 패(박물관 지붕 무늬), 위에 펼친 방명록·펜·종"""
+    W, D, H = 1.9, 0.7, 0.6
+    m = counter_body(M, W, D, H, 'stone', 'stoneTop', 'trim')
+    for k in (-0.88, 0.88):
+        m.add(box((k, -D / 2 + 0.01, H / 2), (0.1, 0.06, H - 0.04), bevel=0.02), 'stoneTop')
+    m.add(cylinder((0, -D / 2 - 0.005, H * 0.5), (0, -D / 2 - 0.035, H * 0.5), 0.13, seg=24), 'plaque')
+    for r0, r1 in ((0.03, 0.05), (0.075, 0.095)):
+        m.add(annulus((0, -D / 2 - 0.036, H * 0.5), r0, r1, axis=(0, -1, 0), thick=0.006, seg=24), 'emblem')
+    t = M.part('things')
+    zt = H + 0.03
+    t.add(box((-0.1, 0, zt + 0.006), (0.54, 0.33, 0.014), bevel=0.004), 'book')
+    for k in (1, -1):   # 펼친 장 (가운데로 살짝 들림)
+        t.add(box((-0.1 + k * 0.13, 0, zt + 0.022), (0.25, 0.3, 0.012), bevel=0.004, rot=rot_xyz(y=-k * 0.1)), 'paper')
+    t.add(cylinder((0.05, -0.08, zt + 0.035), (0.13, 0.06, zt + 0.045), 0.008, seg=6), 'trim')   # 펜
+    desk_bell(t, 0.6, zt, 'trim')
+
+
+def b_fossil_pedestal(M):
+    """FU-38 화석 받침 (1×1, 높이 0.55): 돌 받침 · 기둥(세로 홈) · 윗판 + 앞 놋쇠 이름판. 윗면 0.55 에 기증한 화석"""
+    m = M.part('pedestal')
+    m.add(box((0, 0, 0.04), (0.66, 0.66, 0.08), bevel=0.02), 'stoneDark')
+    m.add(box((0, 0, 0.1), (0.58, 0.58, 0.04), bevel=0.012), 'stone')
+    m.add(box((0, 0, 0.31), (0.46, 0.46, 0.38), bevel=0.03), 'stone')
+    for k in (-1, 0, 1):
+        m.add(box((k * 0.12, -0.232, 0.31), (0.03, 0.006, 0.3), bevel=0.003), 'stoneDark')
+    m.add(box((0, 0, 0.525), (0.6, 0.6, 0.05), bevel=0.016), 'stoneTop')
+    m.add(box((0, -0.305, 0.42), (0.22, 0.02, 0.07), bevel=0.008, rot=rot_xyz(x=0.35)), 'brass')
+
+
+def b_tool_stand(M):
+    """FU-39 도구 받침 (1×3): 낮은 판 (윗면 0.12) + 벽 쪽(+X) 기둥·가로대·못. 도구 다섯이 그 앞에 세워진다"""
+    m = M.part('stand')
+    W, D = 0.84, 2.86
+    m.add(box((0, 0, 0.04), (W - 0.06, D - 0.06, 0.08), bevel=0.012), 'woodDark')
+    m.add(box((0, 0, 0.1), (W, D, 0.04), bevel=0.012), 'wood')
+    for y in (-D / 2 + 0.12, 0, D / 2 - 0.12):
+        m.add(box((W / 2 - 0.08, y, 0.37), (0.06, 0.06, 0.5), bevel=0.01), 'wood')
+    for z in (0.36, 0.58):
+        m.add(box((W / 2 - 0.08, 0, z), (0.05, D - 0.14, 0.05), bevel=0.01), 'woodDark')
+    for k in range(4):   # 도구 사이 못
+        y = -1.1 + k * 0.55 + 0.27
+        m.add(cylinder((W / 2 - 0.11, y, 0.58), (W / 2 - 0.2, y, 0.6), 0.012, seg=6), 'brass')
+
+
+def b_seed_shelf(M):
+    """FU-40 씨앗 진열대 (1×2): 작은 탁자 (윗면 0.6) + 아래 선반 꽃씨 봉투 상자 셋 + 앞 꽃 팻말"""
+    m = M.part('shelf')
+    W, D, H = 0.84, 1.86, 0.6
+    m.add(box((0, 0, H - 0.025), (W, D, 0.05), bevel=0.015), 'top')
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(box((sx * (W / 2 - 0.06), sy * (D / 2 - 0.06), (H - 0.05) / 2), (0.06, 0.06, H - 0.05), bevel=0.012), 'woodDark')
+    m.add(box((0, 0, 0.18), (W - 0.1, D - 0.1, 0.03), bevel=0.01), 'wood')
+    for k, c in enumerate(('packRed', 'packYellow', 'packPink')):
+        y = -0.55 + k * 0.55
+        m.add(box((0, y, 0.24), (0.5, 0.42, 0.09), bevel=0.012), 'wood')
+        for j in range(3):
+            m.add(box((-0.12 + j * 0.12, y, 0.33), (0.1, 0.02, 0.13), bevel=0.006, rot=rot_xyz(x=-0.25)), c)
+    s = M.part('sign')
+    s.add(cylinder((0, -D / 2 + 0.08, H), (0, -D / 2 + 0.08, H + 0.22), 0.012, seg=8), 'woodDark')
+    s.add(box((0, -D / 2 + 0.07, H + 0.3), (0.26, 0.02, 0.16), bevel=0.012), 'tag')
+    petal_flower(s, (0, -D / 2 + 0.055, H + 0.3), 0.05, 'packPink', 'packYellow', normal=(0, -1, 0.0), n=5)
+
+
+def long_case(M, W, D, H, posts):
+    """긴 유리 상자 틀: 받침 · 모서리·중간 기둥 · 위아래 테두리 · 위 가로 살 (뚜껑으로 덮지 않는다 — 위에서 보는 카메라에 안이 보이게) · 앞 이름판"""
+    m = M.part('frame')
+    m.add(box((0, 0, 0.05), (W, D, 0.1), bevel=0.02), 'frame')
+    t = 0.04
+    for sx in (1, -1):
+        for y in posts:
+            m.add(box((sx * W / 2, y, (H + 0.1) / 2), (t, t, H - 0.1), bevel=0.008), 'frame')
+        for z in (0.1 + t / 2, H - t / 2):
+            m.add(box((sx * W / 2, 0, z), (t, D + t, t), bevel=0.008), 'frame')
+    for sy in (1, -1):
+        for z in (0.1 + t / 2, H - t / 2):
+            m.add(box((0, sy * D / 2, z), (W + t, t, t), bevel=0.008), 'frame')
+    for y in posts[1:-1]:
+        m.add(box((0, y, H - t / 2), (W, t * 0.8, t * 0.8), bevel=0.006), 'frame')
+    m.add(box((0, -D / 2 - 0.03, 0.06), (0.3, 0.02, 0.06), bevel=0.006), 'brass')
+    return m
+
+
+def b_long_tank(M):
+    """FU-41 긴 수조 (1.38×5.95, 높이 1.5): 틀 · 자갈 · 물(반투명) · 물풀 · 돌 · 거품. 물고기는 게임이 넣는다 (층 0.45 · 0.95)"""
+    W, D, H = 1.38, 5.95, 1.5
+    long_case(M, W, D, H, [-D / 2, -D / 6, D / 6, D / 2])
+    w = M.part('water')
+    w.add(box((0, 0, 0.13), (W - 0.06, D - 0.06, 0.05), bevel=0.01), 'gravel')
+    w.add(box((0, 0, 0.15 + (H - 0.35) / 2), (W - 0.08, D - 0.08, H - 0.35), bevel=0.01), 'tankWater')
+    d = M.part('deco')
+    rnd = random.Random(7)
+    for k in range(9):   # 물풀: 벽 쪽(-X)에 줄지어
+        y = -D / 2 + 0.35 + k * (D - 0.7) / 8
+        x = -W / 2 + 0.16 + rnd.uniform(-0.04, 0.06)
+        hgt, ph = rnd.uniform(0.35, 0.6), rnd.uniform(0, TAU)
+        pts = [V((x + 0.04 * math.sin(ph + i * 1.3), y, 0.15 + i * hgt / 6)) for i in range(7)]
+        d.add(rail(pts, [0.022 * (1 - i / 7) + 0.006 for i in range(7)], seg=8, flat=0.5), 'seaweed')
+    for k in range(6):
+        y = -D / 2 + 0.6 + k * (D - 1.2) / 5
+        d.add(ellipsoid((rnd.uniform(-0.3, 0.3), y, 0.17), (rnd.uniform(0.08, 0.13), rnd.uniform(0.07, 0.11), 0.06), seg=14, rings=8), 'rock')
+    for k in range(5):
+        d.add(ellipsoid((W / 2 - 0.25, -D / 2 + 0.5 + k * 0.14, 0.5 + k * 0.17), (0.018 + 0.004 * k,) * 3, seg=8, rings=5), 'bubble')
+
+
+def b_long_terrarium(M):
+    """FU-42 곤충 유리 상자 (1.38×5.95, 높이 1.5): 틀 · 흙 · 이끼 · 위층 유리 선반(0.8) · 잔가지 · 잎. 곤충은 게임이 넣는다 (층 0.16 · 0.86)"""
+    W, D, H = 1.38, 5.95, 1.5
+    long_case(M, W, D, H, [-D / 2, -D / 6, D / 6, D / 2])
+    g = M.part('ground')
+    g.add(box((0, 0, 0.115), (W - 0.06, D - 0.06, 0.03), bevel=0.008), 'soil')
+    g.add(box((0, 0, 0.145), (W - 0.08, D - 0.08, 0.03), bevel=0.01), 'moss')
+    g.add(box((0, 0, 0.8), (W - 0.06, D - 0.06, 0.025), bevel=0.006), 'caseGlass')
+    d = M.part('deco')
+    rnd = random.Random(11)
+    for k in range(6):   # 벽 쪽(+X) 잔가지 + 잎
+        y = -D / 2 + 0.45 + k * (D - 0.9) / 5
+        a = V((W / 2 - 0.14, y, 0.16))
+        b = a + V((-0.18, rnd.uniform(-0.15, 0.15), rnd.uniform(0.35, 0.55)))
+        d.add(rail(bezier(a, a + V((0, 0, 0.2)), b + V((0.06, 0, -0.1)), b, 8), [0.026 - 0.016 * i / 8 for i in range(9)], seg=6), 'twig')
+        d.add(ellipsoid(b + V((-0.04, 0, 0.02)), (0.07, 0.02, 0.035), rot=rot_xyz(y=0.5), seg=10, rings=6), 'leafDark')
+    for k in range(8):   # 바닥 낙엽
+        d.add(ellipsoid((rnd.uniform(-0.45, 0.35), -D / 2 + 0.3 + k * (D - 0.6) / 7, 0.165), (0.07, 0.05, 0.012), rot=rot_xyz(z=rnd.uniform(0, TAU)), seg=10, rings=4), 'leafDark')
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,
@@ -987,6 +1180,9 @@ BUILDERS = {
     'flower-shelf': b_flower_shelf, 'terrarium': b_terrarium, 'rod-rack': b_rod_rack, 'wood-stove': b_wood_stove,
     'kitchen-counter': b_kitchen_counter, 'fruit-basket': b_fruit_basket, 'umbrella-stand': b_umbrella_stand,
     'lotus-chair': b_lotus_chair, 'birthday-cake': b_birthday_cake,
+    # 상점·박물관 붙박이 (assets/furniture/fixtures, --out)
+    'display-stand': b_display_stand, 'shop-counter': b_shop_counter, 'museum-desk': b_museum_desk, 'fossil-pedestal': b_fossil_pedestal,
+    'tool-stand': b_tool_stand, 'seed-shelf': b_seed_shelf, 'long-tank': b_long_tank, 'long-terrarium': b_long_terrarium,
 }
 
 
