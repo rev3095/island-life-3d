@@ -20,7 +20,7 @@ node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 ```
 
-- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=min|low|mid|high` 그래픽 사양 매우 낮음·낮음·적정·높음 (게시본은 링크 끝 `#low` 등, 처음은 적정 + 느리면 자동으로 한 칸씩, 섬폰 설정·로딩 화면에서 고르면 `state.settings.spec` — 값은 `src/render/quality.js` `QUALITY`), `?story=<장면 id>` 장면 재생), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
+- 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=min|low|mid|high` 그래픽 사양 (게시본은 링크 끝 `#low` 등 — 아래 「사양」), `?check` 기기 점검 30초 (게시본 `#check`), `?story=<장면 id>` 장면 재생), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
 - Blender 5.2 경로 기본값 `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe` (`BLENDER` 환경변수로 변경). 빌더는 `.glb`·`.glb.json`·렌더·`stats.json`·`index.json` 을 다시 쓴다. `.blend` 는 gitignore (스크립트로 재생성).
 - lint·빌드 단계는 없다. 브라우저 확인은 dev-server 로 연 주소에서 한다 (`file://` 로는 모듈·fetch 가 안 된다).
 
@@ -32,11 +32,21 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 - `src/gameplay/index.js` 는 `gather/`(P2)·`town/`(P3)·`house/`(P4) 하위 모듈을 불러오고, **Space/F 행동 키를 우선순위 디스패처**(`ctx.services.gameplay.interactions.add({name, intent, priority, test, run})`)로 나눠 준다. 말 걸기 100 · 문 90 · 가구 80 · 나무 흔들기 60 · 줍기 50 · 도구 10. `input:press` 를 직접 처리하지 말 것 (UI 창이 열려 있으면 `ui.isBlocking()` 으로 막힘).
 - 섬 밖 공간(집 실내 등)은 `world.addZone({contains, collide, heightAt, groundAt, isWalkable})` 로 바닥·벽을 바꿔 끼운다. 플레이어 이동은 `world.collide` / `island.heightAt` 만 쓴다.
 - 실내는 내 집(x 500) · 주민 방(540) · 도토리상점(580) · 박물관(620). 드나들기(문 열기·걸어 들어가기·원형 전환)는 모두 `src/gameplay/house/door.js` 의 `through()` 하나, 상점·박물관 실내는 `places.js` + 방 배치 `assets/interior/places/*.json` (실내 검수 보드 interiors D67–D73, `docs/notes/p12-interiors.md`).
-- 저장되는 상태는 `ctx.state` (`src/core/state.js`), 칸마다 주인 모듈이 정해져 있다. 저장·하루 리셋(05:00 경계)은 data 모듈.
+- 저장되는 상태는 `ctx.state` (`src/core/state.js`), 칸마다 주인 모듈이 정해져 있다. 저장·하루 리셋(05:00 경계)은 data 모듈 (`localStorage` `island-life-save-v1`, 내보내기·불러오기 `save.exportText/importText`).
+- 조작은 `src/core/input.js` 가 의도(`input.move`·`input:press`)로 바꾼다. 이동 우선순위 = 키보드·터치 패드 > **마우스 왼쪽 버튼 걷기** (`src/player/mouse.js`: 땅 누르기 = 그 자리로, 꾹 = 커서 따라가기 — `input.pointerMove`, 화면 → 땅은 곡면 월드까지 푼 `groundPick`). **오른쪽·가운데 버튼 끌기 · R/V 키 · 두 손가락 = 시점 올려다보기** (`src/player/camera.js` `LOOK`, 놓으면 돌아옴). 장면·창이 열려 있으면(`ui.isBlocking`) 둘 다 쉰다.
 
 ### 렌더링 규칙 (`src/core/materials.js`)
 - 모든 3D 모델은 `applyToonStyle(root, {spec})` / `toonMaterial` / `outlineMaterial` 을 거친다. 여기 들어 있는 **곡면 월드 패치**(`project_vertex` 대체, 중심 = `ctx.focus`, 세기 `curve.uCurve`)와 외곽선(뒤집은 껍데기, `userData.outline = true`)이 모든 메시·인스턴스·스킨 메시에 맞게 걸려야 한다. 그림자는 휘기 전 좌표로 조회해 어긋나지 않지만, 깊이·법선을 다시 그리는 후처리(SSAO 등)의 override 재질에는 곡면 패치가 없다.
 - **재질 이름 = 스펙 팔레트 키**이고 의미가 있다: `glow`·`window` 밤에 켜짐, `ground grass sand …` 비에 젖음, 일부 이름은 외곽선 제외·평면(flat) 처리. world 는 합친 땅 재질 이름을 `ground` 로 둔다.
+- 스타일 셰이더 값은 모두 `materials.look` uniform 이라 바꿔도 셰이더를 다시 만들지 않는다. 0 이면 그 갈래를 통째로 건너뛰므로, 사양별 끄기도 uniform 으로 한다 (구름 그림자 `uCloudShadow × uCloudGate`, 물 하늘 반사 `uSkyReflect` — sky 가 세기·색을, render 가 켜기를 넣는다). 구조는 `docs/SHADERS.md`.
+
+### 사양(그래픽 품질, `src/render/quality.js`)
+- 넷: `high` 높음 · `mid` 적정(처음) · `low` 낮음 · `min` 매우 낮음 (예전 `lite` = mid). `QUALITY[q]` 가 화소 배율(`maxRatio`·`maxPixels` → `ratioFor`) · 그림자 · 화면 효과(post 5단계) · 외곽선 · 초당 장수(`fps`, main.js `createFrameGate`) · 계단 무늬 줄이기(`aa`) · 셰이더 켜고 끄기(`fx`: 구름 그림자·하늘 반사·렌즈 빛·하이라이트·림·접촉 그늘·물결·솜구름)를 정한다. 사양마다 다른 곳: world 묶음 그리는 거리(`kit.js` `DRAW_FAR`), 하늘 셰이더(`sky/dome.js` `SKY_QUALITY`), 실내 작은 소품(`deco: true`).
+- 정하는 순서: 주소 > 저장된 섬폰 「그래픽 사양」(`state.settings.spec` — MSAA 는 렌더러를 만들 때만 정해져서 main.js 가 저장 글을 미리 엿본다 `savedSpec`) > 적정 + 자동(처음 몇 초·광장 평균 33ms 넘으면 한 칸씩 낮춤). 바꾸면 `quality:changed`. 로딩 화면(`tools/web-loader.html`)에도 네 단추.
+- 성능은 GPU 시간으로 잰다 (`EXT_disjoint_timer_query_webgl2` — 이 개발 컴퓨터는 Intel UHD 내장 그래픽이라 느린 기기 기준으로 쓸 만하다). 2026-11-04 광장 1280×800: 높음 9.9 · 적정 5.1 · 낮음 3.7 · 매우 낮음 2.5ms.
+
+### 하늘 (`src/sky/`)
+- `index.js` 가 시각·날씨로 `look.js` 팔레트를 섞어 조명·안개·하늘을 맞춘다. 하늘은 `dome.js` 한 셰이더(세 단 그라데이션·해 빛무리·노을빛·빛살·툰 구름층·은하수, 값 `SKY_FX`, 게임 안에서 `time.skyFx({...})`)이고 **불투명 물체를 다 그린 뒤 빈 화소에만** 칠한다(`renderOrder 1000`, `gl_Position.z *= 0.99999`). 해 렌즈 빛은 `flare.js` (three.js 예제 `Lensflare`), 북쪽 3D 솜구름은 `clouds.js`. 하늘 검수 보드(sky, D58–D66) 반영 v1 = 지금 값, 값 표는 `docs/notes/sky-board.md`.
 
 ### 에셋 파이프라인 (`assets/`, `tools/`)
 - 스펙 JSON → Blender 헤드리스 빌더 → 모델·렌더. 캐릭터: `assets/specs/*.json` + `assets/blender/build_character.py` (종족별 `FEATURES` 표). 배경: `assets/env/specs/*.json` + `assets/blender/build_env.py` (`kind` → `BUILDERS` 함수) + 공용 `toonkit.py`. 좌표는 Blender Z-up·정면 -Y, **타일 1칸 = 1.0**, 캐릭터 키 ≈ 1.0.
@@ -80,13 +90,15 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 ### 웹 배포 (게임 링크)
 - 게임은 claude.ai 아티팩트 https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ 로 게시돼 있다. `node tools/build-web.mjs` → `dist/web/index.html`(뼈대 없는 페이지 + 로딩 화면 + 묶음 목록) · `packs/<갈래>-<n>.json` · `files.json` · 255개가 넘으면 `files-1.json`, `files-2.json` … (`dist/` 는 커밋하지 않는다). 게시는 `file_path: dist/web/index.html` + `files` 에 묶음 하나씩, 같은 file_path 로 차례로. 로컬 확인은 dev-server `/artifact/`. 자세한 순서는 `docs/notes/deploy.md`.
 - 아티팩트는 한 버전에 파일 511개까지라 **에셋(assets/ 의 JSON·.glb.json·그림)은 묶음 파일**로 올라간다 (M6-P0, 게시 파일 145개). 갈래는 `tools/build-web.mjs` `PACKS` (boot = 열자마자 받음). 게시본에서는 `src/core/packs.js` 가 묶음에서 꺼내고, 개발 서버(`/index.html`)는 파일을 하나씩 — 그래서 에셋은 `ctx.assets.loadJSON`·`loadModel` 로 읽고, `<img>` 그림은 `iconEl`/`ctx.assets.url(path)` (blob URL) 로 건다. 직접 `fetch('assets/…')` 는 게시본의 fetch 덮개로만 돈다. 설계는 `docs/notes/m6-p0-pack.md`.
+- 새 에셋 폴더·새 모듈이 게임 코드에서 읽히면 묶음·파일 목록에 들어가는지 `build-web.mjs` 를 확인한다 (경로는 JS 안 따옴표 글자로 찾는다). 예: 상점 진열이 손에 들지 않는 아이템 모델까지 읽어서 `items` 갈래가 모든 아이템 모델을 담게 바꿨다 — 빠지면 게시본에서만 404 (로컬 `/index.html` 은 파일을 하나씩 읽어 안 보인다). 새 모듈이 three 예제(`three/addons/…`)를 부르면 외부 모듈 목록에 저절로 잡힌다.
 - 다시 게시는 바뀐 것만: 빌드 전에 `dist/web/build.json` 을 따로 두고 → 새로 빌드 → `packs[].hash` 가 바뀐 묶음 + `git diff --name-only <지난 build 해시> HEAD -- src index.html` 의 모듈 + 페이지. 새 `files.json` 에 없는 예전 경로는 `files` 에 `null`. 다른 대화에서 올린 파일은 먼저 `list_files`(또는 `read_file`)로 본 뒤 같은 `url` 로 publish (같은 링크 = 플레이어 저장이 남는다). 게시 버전·빌드 해시는 devlog 「게시물」과 홈 `status/game` 에 적는다.
 
 ### QA · 자동 플레이 점검 (`docs/qa/`)
 - 봇이 사람처럼 키·창 단추·가상 조이스틱으로만 처음부터 엔딩(그리고 1년 뒤 축제)까지 플레이한다: `tests/playthrough/` (`bot.js` 본체 — 게임 rAF 를 멈추고 `ctx.step(dt)` 를 직접 돌림, `skills.js` 사람 행동 단위, `scenario.js` 단계 목록), 실행기 `tools/playtest.mjs` (CDP). 지름길(`festival.debug` 등)·상태 직접 고치기 금지, 시계만 `time.setHour` 로 당긴다. 결과 `docs/qa/runs/` (커밋 안 함), 보고서 `docs/qa/playthrough-<날짜>.md` (버그 ID `QA-NN`, 크기 치명·큼·작음·다듬기). 새 흐름이 합쳐지면 `scenario.js` 에 단계를 더한다 — `docs/qa/README.md`.
 - QA 결과의 처리(보드 wave7 D47-A): 막힘·저장 깨짐·오류는 그 자리에서 고쳐 합치기 승인만, 밸런스·불편·보기는 7차 보드 QA 칸(`concept/wave7-board.html` 의 `QA` 표)에 선택지로.
+- 봇 길찾기는 칸 가운데 격자(`town/path.js` `createNav`)라, 선 칸 가운데가 막힌 틈(문 앞 우편함·덤불 사이 등)에서는 걸을 수 있는 옆 칸에서 시작한다(`bot.js` `startOf`). "길이 없어요"가 몰려 나오면 출발 자리(`issues[].from`)부터 본다 — 게임 쪽이 아니라 봇 쪽일 때가 많다. 시나리오는 날짜를 박지 않는다 (새 게임 = 실제 오늘).
 
 ### 병렬 개발 방식
-- 지금 마일스톤은 **M7 출시 준비** (보드 wave7 반영 v1, 트랙 M7-P1–P6 표는 `docs/PLAN.md` 「7차」, 결정·근거 `docs/notes/board7.md`), 다음은 M8 계절 행사.
+- 지금 마일스톤은 **M7 출시 준비** (보드 wave7 반영 v1, 트랙 M7-P1–P6 표는 `docs/PLAN.md` 「7차」, 결정·근거 `docs/notes/board7.md`), 다음은 M8 계절 행사. P1–P5 와 하늘·시점(`p12-camera`)·실내(`p12-interiors`)는 합쳐졌고, 남은 것·사용자 결정 대기 목록은 devlog 「다음에 할 일」.
 - 단계 P1~P6 과 트랙 표는 `docs/PLAN.md`. 트랙마다 브랜치 + git worktree(`../island-worktrees/<브랜치>`)에서 **자기 폴더만** 고치고, 계약 변경은 `docs/notes/<트랙>.md` 에 제안한다. `main` 합치기는 사용자 승인 뒤 조정 세션이 한다 (합치기 전 `git merge-tree --write-tree main <branch>` 로 충돌 확인).
 - 미리보기 브라우저 창이 숨겨져 있으면 `requestAnimationFrame` 이 느려져 fps 값이 의미 없다 — 성능은 `renderer.render` + `gl.finish()` 시간으로 잰다.
