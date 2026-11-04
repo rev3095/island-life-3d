@@ -136,9 +136,9 @@ test('안내 문구: 단계마다 키보드·터치가 다르고, 형편에 맞�
   assert.match(R.hintFor('tool'), /숫자키 1·2/);
   assert.match(R.hintFor('tool', { touch: true }), /도구 단추/);
   assert.match(R.hintFor('gather', { touch: true }), /A를 누르면.*B로 주워요/);
-  assert.match(R.hintFor('sell', { shopOpen: false }), /문을 닫았어요/);
+  assert.match(R.hintFor('sell', { shopOpen: false }), /문을 닫았어도 오늘은 문 앞에서 밤톨이/);   // 7차 D51-A
   assert.match(R.hintFor('sell', { canSell: false, shopOpen: false }), /먼저 팔 걸/);
-  assert.doesNotMatch(R.hintFor('sell', { canSell: false, shopOpen: false }), /문을 닫았어요/);
+  assert.doesNotMatch(R.hintFor('sell', { canSell: false, shopOpen: false }), /문을 닫았어도/);
   assert.match(R.hintFor('donate', { canDonate: false }), /하나 더 잡아 와요/);
   assert.match(R.hintFor('reward', { inside: true }), /집에서 나와 보면/);
   assert.equal(R.hintFor('nope'), '');

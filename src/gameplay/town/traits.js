@@ -48,7 +48,7 @@ export const LINE_LABELS = {
   love: '아주 좋아함', like: '좋아함', normal: '보통', dislike: '싫어함', many: '너무 많이', back: '답례', surprise: '먼저 주기', pending: '못 준 것', full: '가방 꽉 참', cancel: '안 줄 때',
   day: '낮', sleep: '잘 때', gift_: '선물 동봉', moving: '이사 전날', movein: '이사 온 날', playerBirthday: '내 생일', self: '자기 생일', door: '생일 문 너머', cake: '케이크', player: '내 생일 축하',
   // 가게 주인 (밤톨 · 느루)
-  hello: '인사', keys: '키보드 안내', touch: '터치 안내', after: '그다음', list: '할 일 목록', firstday: '첫날', sell: '팔기', visit: '찾아가기', again: '다시',
+  hello: '인사', keys: '키보드 안내', touch: '터치 안내', after: '그다음', list: '할 일 목록', firstday: '첫날', sell: '팔기', visit: '찾아가기', again: '다시', nightAfter: '밤 첫날 판 뒤',
   today: '오늘 들어온 가구', closed: '문 닫은 때', early: '이른 아침', welcome: '환영 편지', lot: '집터 편지',
   firstVisit: '처음 왔을 때', none: '기증할 게 없을 때', firstDonation: '첫 기증', thanksMany: '여러 개 기증', fossil: '화석', milestone: '기증 수 이정표', milestoneAny: '이정표 (그 밖)',
   complete: '한 분류 다 모음', fish: '물고기', bug: '곤충', allComplete: '모두 모음', appraise: '화석 감정', notice: '감정할 것 알아챔', noticeMany: '여러 개 알아챔', later: '나중에',

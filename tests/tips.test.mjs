@@ -101,11 +101,16 @@ test('친해지기 정도 (QA-13): 축제 설정 parts.open · rules.json tiers 
   const open = FEST.parts.open;
   const need = TIERS.find(([id]) => id === open.tier)[1];
   let p = T.heartProgress({ friendship: 22.6, emote: { wins: 1 } }, open, TIERS);
-  assert.deepEqual(p, { friendship: 22, need, wins: 1, needWins: open.wins, open: false });
-  assert.match(T.heartText('두부', p), new RegExp(`두부와 .*친밀도 22/${need} · 이모티콘 대화 성공 1/${open.wins}`));
+  assert.deepEqual(p, { friendship: 22, need, wins: 1, needWins: open.wins, open: false, ways: open.ways });
+  assert.match(T.heartText('두부', p), new RegExp(`두부와 .*친밀도 22/${need} · 마음이 통한 일 1/${open.wins}`));
+  assert.equal(T.heartMeter(p), `♥ 22/${need} · 🙂 1/${open.wins}`, '말풍선 아래 하트 칸 (D54-A)');
+  // 7차 D50-A: 좋아하는 선물·부탁도 마음이 통한 일로 센다
+  assert.deepEqual(open.ways, ['emote', 'gift', 'favor']);
+  assert.equal(T.heartProgress({ friendship: need, emote: { wins: 0 }, bonds: { gift: 1, favor: 1 } }, open, TIERS).open, true);
+  assert.equal(T.heartProgress({ friendship: need, emote: { wins: 0 }, bonds: { gift: 1, favor: 1 } }, { ...open, ways: ['emote'] }, TIERS).open, false, 'ways 를 emote 로 두면 예전 규칙');
   p = T.heartProgress({ friendship: need, emote: { wins: 0 } }, open, TIERS);
   assert.doesNotMatch(T.heartText('코코', p), /친밀도/);
-  assert.match(T.heartText('코코', p), /코코와 .*성공 0\//);
+  assert.match(T.heartText('코코', p), /코코와 .*마음이 통한 일 0\//);
   p = T.heartProgress({ friendship: need + 5, emote: { wins: 9 } }, open, TIERS);
   assert.equal(p.open, true);
   assert.match(T.heartText('퐁', p), /마음이 통했어요/);

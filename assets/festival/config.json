@@ -64,7 +64,13 @@
     "method": "heart+gather",
     "open": {
       "tier": "friend",
-      "wins": 2
+      "wins": 2,
+      "ways": [
+        "emote",
+        "gift",
+        "favor"
+      ],
+      "note": "7차 보드 wave7 D50-A: 마음이 통한 일 = 이모티콘 대화 성공 · 좋아하는 선물(하루 한 번) · 부탁 들어주기. ways 를 [\"emote\"] 로 두면 예전 규칙"
     },
     "list": [
       {

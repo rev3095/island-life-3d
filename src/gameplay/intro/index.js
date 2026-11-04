@@ -342,8 +342,9 @@ export default {
       list.direction(Math.atan2(dx * -fz + dz * fx, dx * fx + dz * fz), dist);
     }
 
-    /** 지금은 못 하는 단계: 밤에 상점이 닫혔으면 '팔기' 는 미루고 다음 할 일부터 (QA-09) */
-    const blocked = (o = hintOpts()) => (o.shopOpen ? [] : ['sell']);
+    /** 지금은 못 하는 단계. 예전(QA-09)엔 밤에 '팔기' 를 미뤘지만, 7차 D51-A 로 첫날엔 밤톨이 문 너머로 사 줘서 막힌 단계가 없다 */
+    const NIGHT_DOOR_SELL = true;
+    const blocked = (o = hintOpts()) => (o.shopOpen || NIGHT_DOOR_SELL ? [] : ['sell']);
     function refresh() {
       const on = listOn() && !panels.some(n => n !== 'dialog');
       list.show(on);
@@ -351,7 +352,7 @@ export default {
       if (!listOn()) return;
       const o = hintOpts();
       const view = R.viewOf(rec(), { blocked: blocked(o) });
-      if (view.ahead && on) tip('night');
+      if (on && (view.ahead || (!o.shopOpen && view.current === 'sell'))) tip('night');
       list.render({ ...view, hint: R.hintFor(view.current, o), collapsed: collapsed() && !view.finished });
       arrow(view.current);
     }
@@ -397,6 +398,8 @@ export default {
       /** 지금 할 일 id ('reward' = 밤톨에게 알려 주기) 또는 null (목록이 없을 때) */
       current: () => (listOn() ? R.viewOf(rec(), { blocked: blocked() }).current : null),
       rewardPending: () => R.rewardPending(rec()),
+      /** 첫날 '팔기' 를 아직 안 했나 — 상점이 닫혀도 밤톨이 문 너머로 사 준다 (7차 D51-A) */
+      doorSell: () => NIGHT_DOOR_SELL && !!state.player.name && !!rec().done.intro && !rec().done.sell && !rec().finished,
       reward: { ...R.REWARD },
       claimReward,
       /** 첫날 할 일 건너뛰기 (묻지 않고) */

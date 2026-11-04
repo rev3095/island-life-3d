@@ -5,7 +5,8 @@
 // 묶음 밖 모델(주민·가게 주인·가구·배경 단독 물체 등 applyToonStyle 로 칠한 것)은 root.userData.toonFade(재질 uniform)를 단다 →
 // 1초마다 장면에서 찾아 감싸는 상자로 같은 광선 시험을 하고, 모델 통째로 디더한다 (materials 공용 디더).
 // 바깥 모듈이 직접 넣을 수도 있다: add({ box(out: Box3) → Box3|null, setFade(v) }) — 공유 재질 인스턴스(채집 물체) 같은 것.
-import { Box3, Matrix4 } from 'three';
+// 7차 D49-A (QA-03): 화면 아래 끝 가운데가 닿는 땅 점도 대상으로 본다 — 카메라 바로 밑 키 큰 것(무대 지붕·부스·집·나무)이 화면 아래를 덮지 않게.
+import { Box3, Matrix4, Vector3 } from 'three';
 
 // 가리는 물체 종류 → 모양. 키 작은 것(꽃·바위·덤불·울타리)과 밟고 서는 것(다리·선착장)은 빼고, 가는 가로등도 뺀다
 const OCCLUDERS = {
@@ -22,6 +23,8 @@ const AHEAD = 3.2, RADIUS = 4.6;   // 물체를 찾는 범위: 대상에서 카�
 const MODEL_NEAR = 14;         // 묶음 밖 모델: 대상에서 이 거리 안만 본다
 const MODEL_MIN_H = 0.45;      // 이보다 낮은 모델(러그·작은 물건)은 가리지 않는 것으로 친다
 const SELF_PAD = 0.15;         // 대상 발밑이 상자 안(+여유)이면 그 대상 자신(대화 상대)이나 대상이 들어가 선 것 → 뺀다
+const BOTTOM_NDC = -0.9;       // 화면 아래 끝 땅 점: 화면 높이 아래쪽 5% 자리 (NDC y)
+const BOTTOM_FAR = 14;         // 그 점이 카메라에서 이보다 멀면(거의 수평으로 볼 때) 보지 않는다
 
 export function createOcclusion(ctx, objects) {
   const shapes = new Map();    // 판 → 모양
@@ -34,6 +37,18 @@ export function createOcclusion(ctx, objects) {
   const models = new Map();
   let scanIn = 0;
   const wb = new Box3(), inv = new Matrix4(), mm = new Matrix4(), bb = new Box3();
+  const ndc = new Vector3(), bottom = { x: 0, y: 0, z: 0 };
+  let watchBottom = true;
+  /** 화면 아래 끝 가운데 광선이 발 높이(y)의 땅에 닿는 점 → bottom | null */
+  function bottomPoint(y) {
+    ndc.set(0, BOTTOM_NDC, 0.5).unproject(ctx.camera);
+    const dx = ndc.x - C.x, dy = ndc.y - C.y, dz = ndc.z - C.z;
+    if (dy > -1e-4) return null;
+    const t = (y - C.y) / dy;
+    if (!(t > 0) || Math.hypot(dx * t, dz * t) > BOTTOM_FAR) return null;
+    bottom.x = C.x + dx * t; bottom.y = y; bottom.z = C.z + dz * t;
+    return bottom;
+  }
 
   /** 판 꼭짓점으로 모양 재기 (판마다 한 번) */
   function shapeOf(tpl, type) {
@@ -178,6 +193,7 @@ export function createOcclusion(ctx, objects) {
       targets.push(player.position);
       for (const fn of watchers) { const p = fn(); if (p) targets.push(p); }
       C.x = ctx.camera.position.x; C.y = ctx.camera.position.y; C.z = ctx.camera.position.z;
+      if (watchBottom && !ctx.services.house?.inside) { const b = bottomPoint(player.position.y); if (b) targets.push(b); }
       const k = ctx.materials.curve.uCurve.value, fz = ctx.focus.z;
       for (const T of targets) {
         // 대상에서 카메라 쪽으로 조금 간 곳 둘레의 물체만 본다 (보통 카메라는 남쪽 위. 시점 조작으로 둘레를 돌면 그쪽으로).
@@ -237,6 +253,10 @@ export function createOcclusion(ctx, objects) {
     },
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; },
+    /** 화면 아래 끝 땅 점도 볼지 (7차 D49-A, 기본 켬) · 지금 그 점 (확인용) */
+    get bottom() { return watchBottom; },
+    set bottom(v) { watchBottom = !!v; },
+    bottomPoint: () => { C.x = ctx.camera.position.x; C.y = ctx.camera.position.y; C.z = ctx.camera.position.z; const p = ctx.services.player?.position; return p ? { ...(bottomPoint(p.y) ?? {}) } : null; },
     /** 지금 비치는 물체 { id 또는 모델 이름: 정도 } (확인용) */
     list() {
       const out = Object.fromEntries(fades);

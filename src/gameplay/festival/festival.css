@@ -17,6 +17,9 @@
 .fe-bubble-emos .fe-emo { width: 44px; height: 44px; }
 .fe-bubble-emos .fe-glyph { font-size: 36px; line-height: 44px; }
 .fe-name { position: absolute; left: 12px; top: -14px; font-size: calc(13px * var(--pk-fs, 1)); font-weight: 700; color: #4A3B32; padding: 1px 10px; border-radius: 999px; border: 2px solid #4A3B32; }
+.fe-meter { flex-basis: 100%; margin: 4px 0 0; font-size: calc(13px * var(--pk-fs, 1)); font-weight: 700; color: #A8642E; text-align: center; letter-spacing: .02em; }
+.fe-meter[hidden] { display: none; }
+.fe-bubble:has(.fe-meter:not([hidden])) { flex-wrap: wrap; justify-content: center; }
 .fe-next { position: absolute; right: 8px; bottom: 2px; font-size: calc(11px * var(--pk-fs, 1)); color: #A8642E; opacity: 0; }
 .fe-bubble.is-wait .fe-next { opacity: 1; }
 .fe-bubble.is-pop .fe-bubble-emos { animation: fe-pop .28s ease-out; }

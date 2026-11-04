@@ -36,6 +36,24 @@
 | D56 | QA-17 | 모닥불·문 앞 주민 | 둘 다: 축제 날 모닥불 앞은 축제 시작 먼저 + 주민이 문 앞·둘레에서 비켜 섬 | B 축제 시작만 먼저 · C 그대로 | `src/gameplay/festival/fest.js register` · `src/gameplay/town/` |
 | D57 | QA-18 | 맑은 날 주민 방 | 잠들기 전 1~2시간은 집에 | B 주민마다 집에 있는 시간 (성격·대화 탭) · C 그대로 | `src/gameplay/town/villager.js shouldBeOut` · 주민 파일 `schedule` |
 
+## 반영 v2 (2026-11-04, 확정) — 사용자 "이어서 진행, 보드 확정된대로 개발 진행"
+- 보드 저장소 `boards/wave7` 에 D49–D57 고른 기록이 없음 = 보드가 미리 골라 둔 추천안 그대로 → **D49–D57 모두 A** 로 확정. D36–D48 은 v1 그대로 (D37-B · D41-B, 의견 D41 "추후 D41-A 방향" 유지 → `docs/PLAN.md` 「앞으로 일정」 보류 줄).
+- 만든 곳: **M7-P7** (브랜치 `p13-qa-picks`, main 20b52a0 에서). `applied/wave7` v2 · `history/wave7-v2` (`commit` 20b52a0).
+
+| 결정 | 한 것 | 파일 | 확인 |
+|---|---|---|---|
+| D49-A | 가림 투명 대상에 **화면 아래 끝 가운데 땅 점**(NDC y −0.9, 카메라에서 14칸 안, 실내 빼고). `world.occlusion.bottom` 으로 끄고 켬, `bottomPoint()` 확인용 | `src/world/occlusion.js` · `index.js` | 박물관 문 앞(QA-03 자리) 끄면 무대 지붕이 화면 아래를 덮고, 켜면 `festival-stage@BD-06` 1 (디더) |
+| D50-A | 마음 열기 = 친구(30) + **마음이 통한 일** 2번. 통한 일 = 이모티콘 대화 성공 · 좋아하는 선물(좋아함·아주 좋아함, 친밀도가 오른 것만, 하루 한 번) · 부탁 들어주기. 축제 설정 `parts.open.ways` (`["emote"]` 로 두면 예전 규칙). 주민 상태 `bonds {gift, favor, giftDay}` | `town/rules.js` `noteBond`·`heartCount` · `town/talk.js` · `festival/parts.js` · `assets/festival/config.json` · 봇 `scenario.js` | `festival.test` · `town.test` · `tips.test` |
+| D51-A | 첫날 '팔기' 전이면(`intro.doorSell()`) 상점이 닫혀도 밤톨이 문을 빼꼼 열고 **팔기 탭만** 연다 (`ui.shop.open({ only: 'sell', greet })`). 첫날 목록은 밤에 팔기를 더는 미루지 않고(`NIGHT_DOOR_SELL`), 힌트 night·팔기 안내 글을 바꿈 | `town/keepers.js` · `intro/index.js`·`rules.js`·`tips.js` · `ui/shop.js` · `bamtol.json` `firstday.night`·`nightAfter` | 23시 상점 문 앞 Space → 밤톨 말 → 팔기 탭 하나 |
+| D52-A | 숫자 그대로, 밤톨 첫날 끝 말 "삽이나 도끼 하나 먼저 … 벽지·바닥은 내일 사도 늦지 않아요" | `bamtol.json` `firstday.after` (v2) | 주민 파일 검사 |
+| D53-A | 감정 알림 "호박으로 밝혀졌어요!" (받침 ㄹ 은 '로') | `town/keepers.js` `appraiseToast` | — |
+| D54-A | 마음이 덜 열린 주민에게 🎉 → **말풍선 아래 하트 칸** `♥ 22/30 · 🙂 1/2` (talk UI `say(toks, { meter })`). 섬폰 「안내」 친구 줄도 🙂 | `festival/fest.js`·`talk.js`·`talkui.js`·`festival.css` · `intro/tips.js` `heartMeter` · `guide.js` | 두부 22/30 · 선물 1 → "♥ 22/30 · 🙂 1/2" |
+| D55-A | 해마다 축제 = 처음 연 날의 월·일부터 **사흘 안** 저녁 6시(한 해 한 번), 2월 29일은 평년 2월 28일, 연말 축제는 새해로 넘어가도 그 해 몫 (`festivalYearOf`) | `festival/parts.js` · `fest.js` | `festival.test` |
+| D56-A | 축제 시작 우선순위 95 → **101** (그날 저녁 모닥불 2.4칸 안에서만 잡히므로 다른 때는 그대로) + 주민이 상점·박물관 문 앞 1.6칸 · 모닥불 2.8칸 안을 목표로 고르지 않음 (`town.blocksAction`) | `festival/fest.js` · `town/index.js` | — |
+| D57-A | 잠들기 전 **1~2시간**(날마다 다름, `homeFrom`)은 집에 깨어 있음 → `town.atHome` 은 일과의 잠자는 때(`isAsleep`)만 'sleep' (예전엔 밤·새벽 시간대 전부) | `town/rules.js` · `town/index.js` | 20.6시: 보리·모찌·두부·초롱·단풍 home, 코코·퐁 out |
+
+- 주민 지문(`tests/villagers.test.mjs` `PINS`)의 주민 play 값은 D50·D57 로 일부러 다시 뜸. 밤톨 v2 라 공통 지문은 건너뜀.
+
 ## 결정과 추천안
 
 "지금" 은 main 0c14b41 을 재 보고 노트에서 모은 것 (아래 「근거」).

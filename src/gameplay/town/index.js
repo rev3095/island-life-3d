@@ -10,7 +10,7 @@ import { createLabels } from './labels.js';
 import { createTalk, context } from './talk.js';
 import { createChatter } from './chatter.js';
 import { createMail } from './mail.js';
-import { villagerState, pickWeighted, ownerOf } from './rules.js';
+import { villagerState, pickWeighted, ownerOf, isAsleep } from './rules.js';
 import { createMovein, livesHere } from './movein.js';
 import { createParty } from './party.js';
 import LINES from './lines/index.js';
@@ -36,6 +36,13 @@ export default {
     let party = null;         // 생일 (아래에서 만든다 — town.staysIn 이 쓴다)
     let actors = [];          // 비켜 가기·몸 밀기용 (주민 + 가게 주인)
     let villagers = [];
+    // 7차 D56-A: 주민이 서지 않는 자리 — 상점·박물관 문 앞(1.6칸) · 광장 모닥불 둘레(2.8칸, 축제 시작 자리 2.4 + 몸)
+    const keepClear = () => [
+      world.places.shop?.door && { x: world.places.shop.door.x, z: world.places.shop.door.z, r: 1.6 },
+      world.places.museum?.door && { x: world.places.museum.door.x, z: world.places.museum.door.z, r: 1.6 },
+      world.places.festival && { x: world.places.festival.x, z: world.places.festival.z, r: 2.8 },
+    ].filter(Boolean);
+    const blocksAction = (x, z) => keepClear().some(c => Math.hypot(x - c.x, z - c.z) < c.r);
 
     const town = {
       houseOf: slug => world.places.villagerHouses?.find(h => h.slug === slug) ?? null,
@@ -46,6 +53,8 @@ export default {
       /** 생일엔 하루 종일 집에 */
       staysIn: V => !!party?.staysIn(V.slug),
       /** 자주 가는 곳 하나 → {x, z} (다른 주민이 가려는 곳과 겹치지 않게) */
+      /** 이 자리에 서면 행동 키를 가로막나: 상점·박물관 문 앞 · 광장 모닥불 둘레 (7차 D56-A — 주민이 비켜 선다) */
+      blocksAction,
       pickSpot(person, V) {
         const haunts = Object.entries(person.haunts).map(([k, w]) => ({ k, w }));
         for (let i = 0; i < 8; i++) {
@@ -59,6 +68,7 @@ export default {
           const home = V?.door;
           if (home && person.range && k !== 'home' && Math.hypot(x - home.x, z - home.z) > person.range) continue;
           if (villagers.some(o => o !== V && o.goal && Math.hypot(o.goal.x - x, o.goal.z - z) < 1.5)) continue;
+          if (blocksAction(x, z)) continue;
           if (V) V.goal = { x, z };
           return { x, z };
         }
@@ -246,8 +256,8 @@ export default {
         if (!V) return null;
         if (V.inRoom) return 'room';
         if (V.out) return 'out';
-        const slot = context(ctx).slot;
-        return (slot === 'night' || slot === 'dawn') && !party.isBirthday(slug) ? 'sleep' : 'home';
+        // 7차 D57-A: 잠들기 전 1~2시간은 집에 깨어 있다 → 자는 때는 그 주민 일과로 (예전엔 밤·새벽 시간대 전부)
+        return isAsleep(V.person, context(ctx).now) && !party.isBirthday(slug) ? 'sleep' : 'home';
       },
       /** 생일: of(slug) 'MM-DD', today() 오늘 생일인 주민, player() 플레이어 생일, setPlayer(달, 날 | null) — 섬폰이 쓴다 */
       birthday: {

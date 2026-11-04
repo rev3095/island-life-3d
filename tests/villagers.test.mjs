@@ -153,14 +153,15 @@ test('몸짓·읽는 법 이름표가 판정·연출 코드와 맞는다', () =>
 
 // 6차 전(코드에 박혀 있던 때) 결과와 같은지: 주민마다 데이터·결과 지문. 바꾸기 전 HEAD(21f7b80)와 바꾼 뒤를 같은 함수로 떠서 같음을 확인한 값.
 // 주민 파일을 "요청 확인" 으로 고치면 version 이 올라가 그 주민은 건너뛴다 (일부러 바꾼 것). 공통은 모든 주민 v1 · rules.json v0 · talk.json v2 일 때만.
+// 2026-11-04 7차 QA 결정(보드 wave7 D50-A 선물·부탁도 마음 열기 · D57-A 잠들기 전 1~2시간은 집에)으로 주민 play 지문을 일부러 다시 뜸 (data 는 그대로).
 const PINS = {
-  coco: { data: "b5f61fd127d20641", play: "8a2a76e9c51f5b1a" },
-  bori: { data: "0f11c1eec440e4b5", play: "2300e3729a71bba6" },
-  mochi: { data: "93a55bd09a94abca", play: "ba25926292f6ef31" },
-  dubu: { data: "ac459043ce862379", play: "1a2c06cdf8f4a25b" },
-  pong: { data: "a65bf742e97b8e87", play: "a62f6e9aaa5e4662" },
-  chorong: { data: "551266b60426cf68", play: "d615fb95a62a6e9a" },
-  danpung: { data: "b21d0219f0fc1341", play: "86f78bd37ee2d5be" },
+  coco: { data: "b5f61fd127d20641", play: "d85af81b3405045a" },
+  bori: { data: "0f11c1eec440e4b5", play: "b839d3cb9097b65b" },
+  mochi: { data: "93a55bd09a94abca", play: "e9a56330621808eb" },
+  dubu: { data: "ac459043ce862379", play: "9e8a4f2536f2b5af" },
+  pong: { data: "a65bf742e97b8e87", play: "c7e0118e0cbefc88" },
+  chorong: { data: "551266b60426cf68", play: "5aff53d1af974f00" },
+  danpung: { data: "b21d0219f0fc1341", play: "0af0c32483a5e1de" },
   bamtol: { data: "3db0c3d7509f6f73", play: "e3b0c44298fc1c14" },
   neuru: { data: "2cd6cddef9148de0", play: "e3b0c44298fc1c14" },
   shared: "58e06ad451d54e5b",

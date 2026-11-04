@@ -58,7 +58,26 @@ export function villagerState(state, slug) {
   v.thankedDay ??= null;   // 고맙다는 편지를 보낸 부탁의 날
   v.cakeDay ??= null;      // 생일 케이크를 나눠 준 날 (5차)
   v.cheerDay ??= null;     // 플레이어 생일을 축하한 날 (5차)
+  v.bonds ??= { gift: 0, favor: 0, giftDay: null };   // 마음이 통한 일: 좋아하는 선물(하루 한 번)·부탁 (7차 D50-A)
   return v;
+}
+
+/** 마음이 통한 일 하나 기록 (way = 'gift' 하루 한 번 · 'favor') */
+export function noteBond(v, way, dayKey) {
+  const b = (v.bonds ??= { gift: 0, favor: 0, giftDay: null });
+  if (way === 'gift') { if (b.giftDay === dayKey) return false; b.giftDay = dayKey; }
+  b[way] = (b[way] ?? 0) + 1;
+  return true;
+}
+
+/**
+ * 축제 마음 열기에 세는 "마음이 통한 일" 수. ways = 축제 설정 parts.open.ways
+ * (emote = 이모티콘 대화 성공 · gift = 좋아하는 선물 · favor = 부탁 들어주기, 7차 D50-A — 없으면 이모티콘만)
+ */
+export const HEART_WAYS = ['emote'];
+export function heartCount(v, ways = HEART_WAYS) {
+  const of = { emote: v?.emote?.wins ?? 0, gift: v?.bonds?.gift ?? 0, favor: v?.bonds?.favor ?? 0 };
+  return ways.reduce((s, w) => s + (of[w] ?? 0), 0);
 }
 
 export const tierOf = f => TIERS.reduce((t, [id, min]) => (f >= min ? id : t), 'new');
@@ -106,11 +125,25 @@ export function scheduleOf(person, dayKey) {
   return { wake: person.wake + (r() - 0.5), sleep: person.sleep + (r() - 0.5) };
 }
 
-/** 지금 밖에 있어야 하나 */
-export function shouldBeOut(person, now, weather) {
+/** 잠들기 전 집에 깨어 있는 시간 (7차 D57-A: 날마다 1~2시간 — 맑은 날에도 저녁에 찾아가 방 구경·대화) */
+export const HOME_BEFORE_SLEEP = T.homeBeforeSleep ?? [1, 2];
+export function homeFrom(person, dayKey) {
+  const { sleep } = scheduleOf(person, dayKey);
+  const [lo, hi] = HOME_BEFORE_SLEEP;
+  return sleep - (lo + rngOf(dayKey, person.slug, 'home')() * (hi - lo));
+}
+/** 자는 시간인가 (일과 그대로) */
+export function isAsleep(person, now) {
   const h = dayHour(now);
   const { wake, sleep } = scheduleOf(person, now.dayKey);
-  if (h < wake || h >= sleep) return false;
+  return h < wake || h >= sleep;
+}
+
+/** 지금 밖에 있어야 하나 (잠들기 전 1~2시간은 집에) */
+export function shouldBeOut(person, now, weather) {
+  const h = dayHour(now);
+  const { wake } = scheduleOf(person, now.dayKey);
+  if (h < wake || h >= homeFrom(person, now.dayKey)) return false;
   if (weather === 'rain' && person.rainStay) return false;
   if (weather === 'snow' && person.snowStay) return false;
   return true;
@@ -234,7 +267,8 @@ export function receiveGift(v, person, item, dayKey, mult = 1) {
   v.giftsToday++;
   const reaction = giftReaction(person, item);
   const points = v.giftsToday <= GIFTS_COUNTED_PER_DAY ? GIFT_POINTS[reaction] * mult : 0;
-  return { reaction, points, up: addFriendship(v, points).up };
+  const bond = points > 0 && (reaction === 'love' || reaction === 'like') && noteBond(v, 'gift', dayKey);
+  return { reaction, points, bond, up: addFriendship(v, points).up };
 }
 
 /** 답례 선물 (하루 한 번, 친할수록·좋아하는 걸 받을수록 잘 준다) → 아이템 id | null */

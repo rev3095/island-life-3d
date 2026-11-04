@@ -51,15 +51,15 @@ export function createEmoteTalk(ctx, emo, cfg = {}) {
     const st = { greeted: false, waited: false, lastSaid: [] };
 
     const S = {
-      /** 글 대화의 say 자리: lines 는 무시하고 emotes 를 말풍선으로. choices 가 있으면 choiceEmotes 로 고르기 */
-      say(lines, choices, emotes, choiceEmotes) {
+      /** 글 대화의 say 자리: lines 는 무시하고 emotes 를 말풍선으로. choices 가 있으면 choiceEmotes 로 고르기. opts.meter = 말풍선 아래 하트 칸 */
+      say(lines, choices, emotes, choiceEmotes, opts) {
         const toks = emotes?.length ? emotes : ['dots'];
         st.lastSaid = toks.filter(t => !String(t).startsWith('item:'));
         if (Array.isArray(choices) && choices.length) {
           const opts = choiceEmotes?.length === choices.length ? choiceEmotes : choices.map((_, i) => [['good', 'wait', 'sad', 'wave'][i] ?? 'dots']);
           return ui.choose(toks, opts);
         }
-        return ui.say(toks);
+        return ui.say(toks, opts);
       },
       /** 인사 말풍선 낱말 */
       greet({ first, bday } = {}) {

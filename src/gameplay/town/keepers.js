@@ -7,7 +7,7 @@
 import { createActor } from './actor.js';
 import { KEEPERS } from './people.js';
 import { context, speaker, giveItem } from './talk.js';
-import { pickLines } from './rules.js';
+import { pickLines, josa } from './rules.js';
 
 const DOOR_DIST = 1.5, KEEPER_DIST = 1.5, LOOK_DIST = 3;
 const DESK_DIST = 2.6;      // 실내: 계산대 너머 주인까지 (계산대 앞 말 거는 자리에서 2칸 안팎)
@@ -261,6 +261,12 @@ export async function createKeepers(ctx, town, lines) {
     const say = speaker(ctx, B.person, { furn: furn.join('랑 ') || '가구' });
     if ((!isOpen(c.now.hour) && where() !== 'shop') || B.mode === 'inside') {   // 상점 안에 있는 동안은 문 닫을 시간이 지나도 판다
       ctx.events.emit('sfx', { name: 'door', volume: 0.5 });
+      if (firstday()?.doorSell?.() && LB.firstday.night) {   // 7차 D51-A: 첫날 '팔기' 전이면 밤에도 문 너머로 사 준다
+        await say(pickLines(LB.firstday.night, r, B.recent));
+        await ui.shop.open({ stock: [], only: 'sell', keeper: B.person.name, color: B.person.color, greet: ' (문 너머에서) 팔 걸 골라 줘요!' });
+        await say(pickLines(LB.firstday.nightAfter ?? LB.after, r, B.recent));
+        return;
+      }
       await say(pickLines(c.slot === 'dawn' || c.now.hour < 8 && c.now.hour >= 5 ? LB.closed.early : LB.closed.night, r, B.recent));
       return;
     }
@@ -314,6 +320,8 @@ export async function createKeepers(ctx, town, lines) {
     const slots = ctx.services.data?.inventory?.slots ?? [];
     return slots.map((s, i) => (s && ctx.services.data.items.get(s.id)?.unknown ? i : -1)).filter(i => i >= 0);
   };
+  /** 감정 알림 (7차 D53-A): "호박으로 밝혀졌어요!" */
+  const appraiseToast = (name, owned) => `${josa(name ?? '화석', '으로')} 밝혀졌어요!${owned ? ' (이미 기증함)' : ''}`;
   async function appraiseTalk(say, vars) {
     const d = ctx.services.data, inv = d.inventory;
     const ids = [];
@@ -328,7 +336,7 @@ export async function createKeepers(ctx, town, lines) {
       const owned = d.museum.has(id);
       if (!owned) fresh++;
       ctx.events.emit('sfx', { name: 'fossil' });
-      ctx.services.ui?.toast?.(`${it?.name ?? '화석'}${owned ? ' (이미 기증함)' : ''}`, it?.icon);
+      ctx.services.ui?.toast?.(appraiseToast(it?.name, owned), it?.icon);
       if (!owned) N.happy();
       await say(pickLines(owned ? LN.appraise.owned : it?.rare ? LN.appraise.rare : LN.appraise.result, r, N.recent));
     }
