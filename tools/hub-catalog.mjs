@@ -107,6 +107,9 @@ function rowsFor(g, R, ctx) {
         id: r.slug, ref: r.id, name: r.name, sub: `${r.ownerName ?? r.owner} 방`, state: stateOf(r.status), version: version(r.version), hash: r.slug, file }));
       for (const p of PENDING_ROOMS) if (!rows.some(r => r.id === p.slug)) rows.push({
         id: p.slug, ref: p.id, name: p.name, sub: `${p.ownerName} 방 · 파일 없음 (배경 편집기에서 배치하고 요청)`, state: 'new', version: null, hash: p.slug, file: null });
+      // 상점·박물관 (RM-08·09, M7-P8): 배경 편집기 방 배치 격자 #place-<slug>
+      for (const { file, data: r } of R.dir('assets/interior/places')) rows.push({
+        id: `place-${r.slug}`, ref: r.id, name: r.name, sub: `${r.size?.join('×') ?? ''} 실내`, state: stateOf(r.status), version: version(r.version), hash: `place-${r.slug}`, file });
       return rows;
     }
     case 'scene': {
