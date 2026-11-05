@@ -1,0 +1,50 @@
+# M8 계절 행사 (8차 검수 보드 wave8)
+
+보드 https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T (`concept/wave8-board.html`). **반영 v1 (2026-11-05)** = 보드 저장소 `boards/wave8` 에 고른 기록이 없음 → 미리 골라 둔 추천안 그대로 **D74–D85 모두 A**, 의견 없음 (7차 D49–D57 과 같은 규칙). `applied/wave8` v1 · `history/wave8-v1` (`commit` b87b247).
+
+## M8-P1 행사 틀 (브랜치 `p19-events`)
+
+| 파일 | 하는 일 |
+|---|---|
+| `assets/events/events.json` | 결정 갈래(D74–D85) · 날짜 규칙 `dates` · 열리는 때 `open` · 날씨 `weather` · 행사 넷 `list` (id·이름·이모지·계절·시작 날·시간 `hours`(게임 하루 시각 5~29)·장소·주인공·소품·할 것 `todo`·보상·행사 채집·장면·맡는 트랙). 웹 빌드는 `island` 묶음(boot) |
+| `src/gameplay/events/calendar.js` | 순수 함수: 그 해 기간 `windowOf` (2/29 → 평년 2/28) · 오늘 기간 `windowOn` (해 넘김) · `activeOn` · 다음 차례 `upcoming` · 한 해 `yearCalendar` · 행사 시간 `inHours`/`hoursOn` (섬 축제 날은 17시까지) · 열리는 때 `isOpen` |
+| `src/gameplay/events/index.js` | 모듈: 알림·도장·진행 기록·비 막기, 서비스 `ctx.services.events` |
+| `src/gameplay/events/eventsui.js` | UI-14 오른쪽 아래 칸(휴대폰 세로는 시계 밑 왼쪽) · UI-13 섬폰 「📅 달력」 창 · UI-15 도장 (CSS 는 이 파일 안 글자) |
+| `src/core/preview.js` | D85-A 날짜 흉내: 주소 끝 `#date=2027-04-02` (사양과 같이 `#low&date=…`, 개발판 `?date=`) → `ctx.preview = { date, saveKey }`. sky 가 시계를 그 날짜의 지금 시각으로 옮기고(`baseShift` — 실제 시계로 돌아가도 그 날짜), data 가 저장 칸을 `island-life-save-v1-preview` 로 |
+| `src/ui/phone.js` | APPS 에 `calendar` 줄 (창이 있을 때만 보임) |
+| `tests/events.test.mjs` | 설정 모양 · 날짜 · 시간 · 열리는 때 · 날짜 흉내 · 섬폰 줄 · 빌드 묶음 (8개) |
+
+확인 (11-05, 개발판): `#date=2027-04-02` → 꽃놀이 2일째·남은 날 6, 진짜 저장 그대로·미리 보기 칸에만 저장(새로고침해도 이어짐), 첫 축제 전엔 밤톨 한 줄만, 엔딩 뒤 10시 → 알림·칸 「🌸 봄 꽃놀이 · 6일」, 달력 창(할 것 3/10 · 했어요, 다음 행사 셋, 도장 1/4), 섬폰 줄 「📅 달력」, 휴대폰 375×812 가로 넘침 0. `#date` 없이 열면 오늘(11/5) 행사 없음·칸 숨김. 콘솔 오류 0. 테스트 368.
+
+## 약속 (CONTRACTS 「8차」)
+- **상태** `ctx.state.events` (주인: gameplay/events) = `{ told: {"EV-01:2027": dayKey}, before: {…}, runs: {"EV-01:2027": { first, days: [dayKey], todo: { <할 것 id>: { n, day } } }}, stamps: { "EV-01": ["2027"] } }`.
+- **서비스** `ctx.services.events` = `{ config, today(), active(dayKey?) → [{ev, year, from, to, day, left}], live() (지금 행사 시간인 것), isOpen(), progress(id, todo, n=1) → {n, goal, done} | null, todo(id), stamp(id) → 새로 찍었나, stamps(), calendar(year), debug: { check, openCalendar } }`.
+- **이벤트 (보냄)** `events:start { id, year, first, dayKey }` (그날 처음 행사 시간에) · `events:todo { id, todo, n, goal, done }` · `events:stamp { id, year }`. **들음** `time:tick` · `time:newday` · `data:loaded` · `festival:end` · `story:start/end` (칸 숨김).
+- **ui** `ctx.services.ui.calendar = { open() }` (섬폰 줄이 부른다).
+- `ctx.preview` = `{ date, saveKey } | null` (main.js).
+
+## 놀이 트랙(M8-P3–P6)에 — 이 틀 위에서
+- 행사 놀이는 `src/gameplay/events/<slug>.js` (spring·summer·autumn·winter) 하나씩, `index.js` 에서 불러 `events:start`·`live()` 로 켜고 끈다. 할 것이 하나 되면 `progress(id, todoId)`, 보상을 줄 때 `stamp(id)` + 보상 가구 (FU-43–46, M8-P2 모델) + 그날 사진(FU-34 다시 씀).
+- 행사 시간은 `events.json` `hours` 만 고치면 된다. 섬 축제 날은 17시에 끊긴다 (불꽃놀이는 그날 쉼).
+- 행사 채집(IC-EV-01–04)은 아이템 표(`assets/data/items.json` 등)에 넣고, 나오는 때는 `live()` 로 거른다.
+- 미리 해 보기: 개발판 `/index.html?date=2027-08-01`, 게시본 링크 끝 `#date=2027-08-01`. 시각은 `time.setHour` 로.
+
+## 바꿀 자리 (보드 결정이 바뀌면)
+| 결정 | 설정 칸 (지금 값) | 다른 안으로 바꾸면 할 일 |
+|---|---|---|
+| D74 크기 | `list` 넷 · `todo` 2~3 개 | B 큰 행사 = 행사마다 부품·부스 놀이 (P3–P6 일이 두 배) · C 둘만 = `list` 에서 EV-02·03 빼기 |
+| D75 날짜 | `dates.mode` `week` · `days` 7 · `festivalFirst` | B 하루 = `days` 1 + 날짜 바꿈 · C 처음 들어온 날부터 = `calendar.js` 에 `firstVisit` 갈래 (state.events.runs[].first 기준) |
+| D76–D77 · D82 | `todo` · `gather` | 할 것 글·수만 바꾸면 달력이 따른다. 놀이는 P3·P4 |
+| D78 장소 | `place` (plaza·beach·anywhere) | B = 지도 편집기 `layout.json` 에 행사 자리 + world 배치 |
+| D79 주민 | `host` · `props` | B·C = `host` 비움 (장면·대사가 줄어듦, P7) |
+| D80 날씨 | `weather.mode` `noRain` | B 실제 날씨 = `"real"` (index.js `weather()` 가 건너뜀) · C 실내판 = 놀이 트랙 일 |
+| D81 보상 | `rewards.mode` · `reward` | B·C = 놀이 트랙이 가구 대신 도토리·레시피·사진 |
+| D83 열리는 때 | `open.after` `ending` | B = `"always"` · C = `"always"` + 놀이 트랙이 `isOpen()` 으로 할 것·보상만 막기 |
+| D84 리소스 | — | M8-P2 범위 |
+| D85 미리 보기 | `preview.mode` `hash` | B 개발판만 = `core/preview.js` `urlDate` 가 `hash` 를 안 보게 · C 섬폰 다시 하기 = 달력 창에 단추 |
+
+## 남은 것 · 못 한 것
+- 도장(UI-15)은 보드에선 도감 탭이지만 도감 창을 건드리지 않게 달력 창 아래 칸에 넣었다. 도감 탭으로 옮기려면 `src/ui/phone.js` 도감 화면에 칸 하나.
+- 휴대폰 세로에서 칸은 시계 밑 왼쪽 — 섬 축제 진행판도 600px 아래에선 그 자리라, 축제 날이 행사 주간과 겹치면 겹칠 수 있다 (축제 날 저녁만). 놀이 트랙에서 확인.
+- 편집기 홈 「미리 해 보기」 링크(D85-A)는 게임을 다시 게시한 뒤 (M8-P8).
+- 게시본에서는 아직 안 봤다 (게임 다시 게시 전).

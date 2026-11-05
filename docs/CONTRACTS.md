@@ -400,3 +400,11 @@ stats() → { ms, passes }
 - **배경 `world` 칸** (게임 배치 정보, 빌더는 읽지 않는다): `collider` (충돌, 모델 원점 기준: `r` 원 · `box [가로, 세로]` · `boxes [[x0,z0,x1,z1]…]` · `circles [[x,z,r]…]`), `extent` (query 반너비 `[x, z, _, z중심이동]`), 건물 4종은 `lot` (집터 칸 수 `[가로, 세로]`, 섬 만들기가 씀). 모델 크기를 바꾸면 같은 파일의 world 값을 맞춘다 — 상자 충돌 가로가 모델 가로의 88%~+0.1, 건물 모델이 집터 안이어야 테스트가 통과한다.
 - **가구**: 배치는 스펙 `footprint`·`place`·`layer` 만 쓴다. `src/data/items.js` FURN 표의 칸 글자('2×1', '벽', '창문')는 화면 표시용이라 footprint 를 바꾸면 같이 고친다 (테스트가 어긋남을 잡는다). 벽시계 바늘 노드 `hourHand`·`minuteHand`.
 - **그대로 코드에 있는 것**: 해안선·바다·강 둑 모양(절차 생성, 색만 타일 팔레트), 집 안 작업대 칸 `[2, 1]`(house/index.js), 흔들림·그림자 제외 종류 표(world/objects.js `SWAY`·`NO_SHADOW`).
+
+
+## 8차 계절 행사 (M8-P1, 보드 wave8 반영 v1) — 자세히는 `docs/notes/m8-events.md`
+- **상태** `ctx.state.events` (주인: gameplay/events): `{ told, before, runs: {"<EV-id>:<해>": { first, days, todo: {<id>: {n, day}} }}, stamps: {<EV-id>: ["<해>"]} }`.
+- **서비스** `ctx.services.events = { config, today(), active(), live(), isOpen(), progress(id, todo, n), todo(id), stamp(id), stamps(), calendar(year) }` — 행사 놀이(M8-P3–P6)는 할 것이 되면 `progress`, 보상 때 `stamp`.
+- **이벤트** `events:start {id, year, first, dayKey}` · `events:todo {id, todo, n, goal, done}` · `events:stamp {id, year}`.
+- **ui** `ctx.services.ui.calendar = { open() }` (섬폰 「📅 달력」 줄). **날짜 흉내** `ctx.preview = { date, saveKey } | null` — 주소 `#date=YYYY-MM-DD` · `?date=`, sky 가 시계를, data 가 저장 칸(`island-life-save-v1-preview`)을 바꾼다.
+- 행사 시간 `hours` 는 게임 하루 시각 5~29. 섬 축제 날은 17시에서 끊긴다 (섬 축제 먼저, D75-A). 첫 섬 축제(엔딩) 전엔 열리지 않는다 (D83-A).

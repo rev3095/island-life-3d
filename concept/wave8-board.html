@@ -486,8 +486,8 @@ $('uiCards').innerHTML = UIS.map(([id, name, kind, what, dec]) => `
 
 /* ---------- 계획 ---------- */
 const PLAN = [
-  ['M8-P0', '8차 검수 보드 (<b>이 보드</b>) → 사용자 선택 → "검수 보드 반영"', '<code>concept/wave8-board.html</code> · <code>docs/notes/board8.md</code>', '—'],
-  ['M8-P1', '행사 틀 — 날짜 판정(D75 · D83, 섬 축제와 겹치는 날), 설정 파일 <code>assets/events/events.json</code>(결정 갈래·날짜·장소·할 것·보상), 상태 <code>state.events</code>, 섬폰 달력 UI-13 · 알림 UI-14 · 도감 칸 UI-15, 날짜 흉내 <code>#date=</code>(D85, 저장 칸 따로), 테스트', '<code>src/gameplay/events/</code> (새) · <code>assets/events/</code> (새) · <code>src/ui/</code> 의 새 창 셋 (섬폰 메뉴 줄 하나) · <code>src/sky/clock.js</code> (날짜 흉내 한 곳)', '이 보드 반영'],
+  ['M8-P0', '8차 검수 보드 (<b>이 보드</b>) → 사용자 선택 → "검수 보드 반영" (<b>✅ 11-05 반영 v1</b>)', '<code>concept/wave8-board.html</code> · <code>docs/notes/board8.md</code>', '—'],
+  ['M8-P1', '(<b>11-05 만듦 · 합치기 대기</b>, 브랜치 <code>p19-events</code>) 행사 틀 — 날짜 판정(D75 · D83, 섬 축제와 겹치는 날), 설정 파일 <code>assets/events/events.json</code>(결정 갈래·날짜·장소·할 것·보상), 상태 <code>state.events</code>, 섬폰 달력 UI-13 · 알림 UI-14 · 도감 칸 UI-15, 날짜 흉내 <code>#date=</code>(D85, 저장 칸 따로), 테스트', '<code>src/gameplay/events/</code> (새) · <code>assets/events/</code> (새) · <code>src/ui/</code> 의 새 창 셋 (섬폰 메뉴 줄 하나) · <code>src/sky/clock.js</code> (날짜 흉내 한 곳)', '이 보드 반영'],
   ['M8-P2', '리소스 컨셉 → 모델 (한 행사씩, 행사마다 편집기에서 검수 뒤 다음) — 벚나무 · 소품 7 · 가구 4 · 아이템 4 · 동작 2, 부스 덮개·등불 색 변형', '<code>assets/env/specs/</code> · <code>assets/furniture/specs/</code> · <code>assets/items/specs/</code> · <code>assets/blender/</code> 빌더 · 배경·캐릭터 편집기 다시 게시', '이 보드 반영 (P1 과 동시에)'],
   ['M8-P3', '봄 꽃놀이 EV-01 — 꽃잎 줍기·돗자리 도시락·벚꽃 등 (D76)', '<code>src/gameplay/events/spring.js</code> · 벚나무 자리는 지도 편집기 <code>layout.json</code>', 'P1 · P2 의 EN-12·PR-17'],
   ['M8-P4', '여름 불꽃놀이 EV-02 — 불꽃 셰이더 FX-01(사양별 수), 손 불꽃, 소원 (D77)', '<code>src/gameplay/events/summer.js</code> · <code>src/render/fireworks.js</code> (새)', 'P1 · P2 의 PR-18'],
@@ -500,7 +500,7 @@ $('planRows').innerHTML = PLAN.map(([id, what, files, need]) => `<tr><td class="
 
 /* ---------- 머리 숫자 ---------- */
 const newCount = RES.filter(r => r[4]).length;
-$('pills').innerHTML = ['<span class="pill wait">고르는 중 · 추천안이 미리 골라져 있음</span>', '행사 4 (EV-01–04)', `결정 ${DECISIONS.length} (D74–D85)`, `리소스 ${RES.length} (새 ${newCount})`, `새 화면 ${UIS.length} (UI-13–15)`, `트랙 ${PLAN.length} (M8-P0–P8)`]
+$('pills').innerHTML = ['<span class="pill ok">반영 v1 (11-05) · D74–D85 모두 추천안 A</span>', '행사 4 (EV-01–04)', `결정 ${DECISIONS.length} (D74–D85)`, `리소스 ${RES.length} (새 ${newCount})`, `새 화면 ${UIS.length} (UI-13–15)`, `트랙 ${PLAN.length} (M8-P0–P8)`]
   .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
 
 /* ---------- 요청 글 ---------- */

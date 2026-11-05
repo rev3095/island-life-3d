@@ -10,6 +10,7 @@ import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
 import { QUALITY, DEFAULT_QUALITY, urlQuality, ratioFor, createFrameGate, savedSpec } from './render/quality.js';
+import { previewOf } from './core/preview.js';
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
 const errors = installErrors();
@@ -70,6 +71,7 @@ async function boot() {
     focus: new THREE.Vector3(),         // 카메라가 따라가는 지점 (보통 플레이어). 곡면 월드 중심이기도 하다.
     debug: params.has('debug'),
     quality,                            // 'high' | 'mid' | 'low' | 'min' (render 가 바꾼다)
+    preview: previewOf(location),       // 8차 D85-A 날짜 흉내 #date=YYYY-MM-DD → { date, saveKey } | null (core/preview.js)
   };
   window.__island = ctx;                // 개발용: 콘솔에서 상태 확인
 
