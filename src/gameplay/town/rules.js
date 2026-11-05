@@ -188,7 +188,7 @@ export function pickLines(pool, r, recent = null) {
 
 /**
  * 인사 고르기: 시간대 인사 한 줄 + (날씨·계절·친밀도 가운데) 한 줄.
- * L = 주민 대사 묶음, c = { now, weather, season, tier, r, recent }
+ * L = 주민 대사 묶음, c = { now, weather, season, tier, r, recent, event? (오늘 계절 행사 id) }
  */
 export function greetingLines(L, c) {
   const slot = slotOf(c.now);
@@ -196,7 +196,9 @@ export function greetingLines(L, c) {
   const roll = c.r();
   const notable = c.weather === 'rain' || c.weather === 'snow' || c.weather === 'rainbow';
   let extra = null;
-  if (notable && roll < 0.7) extra = L.weather?.[c.weather];
+  const ev = c.event ? L.event?.[c.event] : null;   // 8차: 계절 행사 기간엔 반쯤 그 행사 얘기 (행사가 없으면 예전과 똑같이 고른다)
+  if (ev?.length && roll < 0.5) extra = ev;
+  else if (notable && roll < 0.7) extra = L.weather?.[c.weather];
   else if (roll < 0.4) extra = L.season?.[c.season];
   else if (roll < 0.75) extra = L.tier?.[c.tier];
   if (extra) out.push(...pickLines(extra, c.r, c.recent));
@@ -206,7 +208,7 @@ export function greetingLines(L, c) {
 /** 잡담 하나: 보통 잡담 + 친밀도·계절·날씨·시간대 묶음을 섞어서 */
 export function chatLines(L, c) {
   const slot = slotOf(c.now);
-  const pools = [[L.chat, 5], [L.tier?.[c.tier], 2], [L.season?.[c.season], 1.5], [L.weather?.[c.weather], 1.2], [L.time?.[slot], 1.2]]
+  const pools = [[L.chat, 5], [c.event ? L.event?.[c.event] : null, 3], [L.tier?.[c.tier], 2], [L.season?.[c.season], 1.5], [L.weather?.[c.weather], 1.2], [L.time?.[slot], 1.2]]
     .filter(([p]) => p?.length).map(([p, w]) => ({ p, w }));
   if (!pools.length) return [];
   return pickLines(pickWeighted(pools, c.r).p, c.r, c.recent);

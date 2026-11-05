@@ -16,6 +16,7 @@ import { createParty } from './party.js';
 import LINES from './lines/index.js';
 
 const TALK_DIST = 1.3;
+const EVENT_CLEAR = 3.2;   // 행사 자리에서 주민이 비켜 서는 거리 (솥 1.9 + 말 걸기 1.3)
 const ANIM_DIST = 30;        // 이보다 멀면 동작을 멈춘다 (화면 밖)
 const PLAYER_RADIUS = 0.26; // player 모듈의 충돌 원
 const BODY = RADIUS + PLAYER_RADIUS;
@@ -41,7 +42,15 @@ export default {
       world.places.shop?.door && { x: world.places.shop.door.x, z: world.places.shop.door.z, r: 1.6 },
       world.places.museum?.door && { x: world.places.museum.door.x, z: world.places.museum.door.z, r: 1.6 },
       world.places.festival && { x: world.places.festival.x, z: world.places.festival.z, r: 2.8 },
+      ...eventSpots(),
     ].filter(Boolean);
+    // 8차 행사 시간엔 그 행사 자리(간판·돗자리·솥·눈덩이)도 — 행동 거리(1.4~1.9) + 말 걸기 거리(1.3). 주인공이 1.4칸 둘레에 서서
+    // 간판 앞 Space 가 「소원 빌기」 대신 말 걸기로 가던 것 (M8-P8 행사 점검 EV-02, 가끔)
+    function eventSpots() {
+      const E = ctx.services.events;
+      if (!E?.live || !E.hostSpot) return [];
+      return E.live().map(r => r.ev.host && E.hostSpot(r.ev.host)).filter(Boolean).map(p => ({ x: p.x, z: p.z, r: EVENT_CLEAR }));
+    }
     const blocksAction = (x, z) => keepClear().some(c => Math.hypot(x - c.x, z - c.z) < c.r);
 
     const town = {
@@ -60,7 +69,7 @@ export default {
         const ev = ctx.services.events?.hostSpot?.(person.slug);
         if (ev && Math.random() < 0.75) {
           for (let i = 0; i < 16; i++) {   // 무대·모닥불 둘레(blocksAction)에 걸리는 자리가 많아 넉넉히
-            const a = Math.random() * Math.PI * 2, r = 1.4 + Math.random() * 2.2;
+            const a = Math.random() * Math.PI * 2, r = EVENT_CLEAR + 0.2 + Math.random() * 1.6;   // 행사 자리 바로 앞(EVENT_CLEAR)은 비워 둔다
             const x = ev.x + Math.cos(a) * r, z = ev.z + Math.sin(a) * r, t = world.island.toTile(x, z);
             if (!nav.walkable(t.tx, t.tz) || blocksAction(x, z)) continue;
             if (V) V.goal = { x, z };

@@ -110,12 +110,25 @@ export function createWinter(ctx, events) {
       const f = front(pl, BALL_R * pushing.s + 0.35);
       const onSnow = isl().tileAt(...Object.values(isl().toTile(f.x, f.z))) === 'grass' && isl().isWalkable(f.x, f.z);
       if (d > 0 && d < 1 && onSnow) pushing.s = grown(pushing.s, d);
+      roll(pushing, f.x - pushing.x, f.z - pushing.z);
       Object.assign(pushing, f);
       setBall(pushing);
     }
     last = { x: p.x, z: p.z };
   }
   function drop() { pushing = null; last = null; }
+  // 굴러가기: 모델의 'ball' 부품(가운데가 공 중심, build_env.py b_snowball pivot)을 간 방향에 맞게 돌린다 — 축 = 위 × 간 방향, 각 = 거리 / 반지름
+  const spin = { axis: null, q: null };
+  function roll(b, dx, dz) {
+    const d = Math.hypot(dx, dz);
+    if (!(d > 1e-4 && d < 1)) return;
+    const node = (b.ball ??= b.mesh.getObjectByName?.('ball') ?? null);
+    if (!node) return;
+    spin.axis ??= new ctx.THREE.Vector3(); spin.q ??= new ctx.THREE.Quaternion();
+    const a = d / (BALL_R * b.s);
+    node.quaternion.premultiply(spin.q.setFromAxisAngle(spin.axis.set(dz / d, 0, -dx / d), a));
+    b.rolled = (b.rolled ?? 0) + a;   // 돈 각 합 (확인용)
+  }
 
   function build(body, head) {
     const face = faceOf(body.s, head.s);

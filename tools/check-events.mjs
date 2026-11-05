@@ -2,10 +2,11 @@
 // 처음부터 엔딩까지 하는 자동 플레이(tools/playtest.mjs)는 엔딩까지 20분이 걸리고 시계를 시각만 옮길 수 있어서, 행사는 이 도구로 따로 본다.
 // 준비만 직접 고친다: 미리 보기 저장(진짜 저장과 따로)에 "첫 섬 축제를 마침"(state.festival.endedDay) · 재료(꽃잎 20·나무·과일 — 모으는 건 놀이마다 한 번은 직접).
 // 사용: node tools/check-events.mjs [--target=dev|artifact|both] [--only=EV-01,EV-03] [--headed] [--port=4233] [--build]
+// 게시본(artifact)은 dist/web 이 지금 코드보다 오래됐으면 저절로 다시 빌드한다 (--build = 늘 다시)
 // 결과: docs/qa/runs/<날짜>-events/report.md · report.json (종료 코드: 막힌 것이 있으면 1)
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
 import { mkdir, writeFile, readFile, rm, mkdtemp } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -41,6 +42,9 @@ async function driver({ id, hour }) {
   const c = window.__island;
   if (!c?.services?.events) { ok('게임이 열림', false); return out; }
   await wait(1500);
+  const openPanels = [];   // 막힌 까닭을 적으려고: 지금 열린 창 이름들
+  c.events.on('ui:open', e => openPanels.push(e?.panel));
+  c.events.on('ui:close', e => { const i = openPanels.lastIndexOf(e?.panel); if (i >= 0) openPanels.splice(i, 1); });
   const step = n => { for (let j = 0; j < n; j++) c.step(0.05); };
   const key = (k, code, down) => window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { key: k, code, bubbles: true }));
   const press = async (code = 'Space') => { const k = code === 'Space' ? ' ' : code === 'KeyF' ? 'f' : code === 'Escape' ? 'Escape' : code; key(k, code, true); key(k, code, false); step(6); await wait(120); };
@@ -108,9 +112,13 @@ async function driver({ id, hour }) {
       ok('1분 보기', E.todo(id).find(t => t.id === 'watch')?.done);
       c.services.time.setHour(20.3); c.events.emit('time:tick', { now: c.services.time.now() }); step(6);
       ok('「소원 빌기」', label() === '소원 빌기', label());
-      await press(); await wait(1200);
+      await press();
+      // 대사가 한 글자씩 다 나온 뒤에 고르기가 뜬다 — 기다리는 동안 게임 시계도 돌린다 (컴퓨터가 바쁘면 1.2초로는 모자랐다, 2026-11-06)
+      for (let i = 0; i < 60 && !document.querySelector('.pk-choice'); i++) { step(2); await wait(100); }
+      const choiceSeen = !!document.querySelector('.pk-choice');
       document.querySelector('.pk-choice')?.click(); await wait(600);
-      ok('소원 · 도장 · 풍경 대기', !!c.state.events.summer?.wish && E.stamps()[id]?.includes('2027') && c.state.events.summer.chimePending === 1);
+      ok('소원 · 도장 · 풍경 대기', !!c.state.events.summer?.wish && E.stamps()[id]?.includes('2027') && c.state.events.summer.chimePending === 1,
+        `고르기 ${choiceSeen} · 소원 ${JSON.stringify(c.state.events.summer?.wish ?? null)} · 도장 ${JSON.stringify(E.stamps()[id] ?? null)} · 풍경 ${c.state.events.summer?.chimePending} · 할 것 ${JSON.stringify(E.todo(id))} · 창 ${c.services.ui.isBlocking()} [${openPanels.join(',')}] 장면 ${c.services.story?.playing?.id ?? '-'} ${[...document.querySelectorAll('.pk-dlg-box')].map(e => e.textContent.trim().slice(0, 40)).join(' / ')}`);
     } else if (id === 'EV-03') {
       const au = plays.autumn; await au.debug.refresh();
       ok('솥 · 허수아비 · 버섯 다섯', au.debug.placed?.ids.length === 2 && au.debug.shrooms.length === 5, au.debug.shrooms.length);
@@ -135,6 +143,7 @@ async function driver({ id, hour }) {
       ok('「눈덩이 밀기」', label() === '눈덩이 밀기', label());
       await press(); walk('a', 'KeyA', 2.5); walk('s', 'KeyS', 2.5); walk('d', 'KeyD', 2);
       ok('걸은 만큼 커짐', A.s > 1.1, A.s.toFixed(2));
+      ok('굴러감 (공이 돎)', (A.rolled ?? 0) > 1, `${(A.rolled ?? 0).toFixed(1)} rad`);
       ok('「놓기」', label() === '놓기', label());
       await press();
       P.teleport(B.x, B.z + 1.3); walk('w', 'KeyW', 0.15); await press(); walk('s', 'KeyS', 1.0);
@@ -155,7 +164,8 @@ async function main() {
     server = spawn(process.execPath, ['dev-server.mjs', `--port=${port}`], { cwd: root, stdio: 'ignore' });
     for (let i = 0; i < 50 && !(await up(`http://localhost:${port}/api/ping`)); i++) await sleep(200);
   }
-  if (targets.includes('artifact') && (arg('build') || !existsSync(join(root, 'dist/web/index.html')))) { say('게시본 만들기: node tools/build-web.mjs'); await run(process.execPath, ['tools/build-web.mjs']); }
+  const stale = targets.includes('artifact') && (arg('build') ? '--build' : staleWeb());
+  if (stale) { say(`게시본 만들기 (${stale}): node tools/build-web.mjs`); await run(process.execPath, ['tools/build-web.mjs']); }
   const exe = BROWSERS.find(p => existsSync(p));
   if (!exe) throw new Error('Chrome·Edge 를 못 찾았어요');
   const results = [];
@@ -201,6 +211,30 @@ async function main() {
   const bad = results.filter(r => !r.checks.every(k => k.ok) || r.console.length);
   say(`\n${results.length}개 중 통과 ${results.length - bad.length} · 결과 ${outDir}`);
   process.exit(bad.length ? 1 : 0);
+}
+
+/**
+ * dist/web 이 지금 코드보다 오래됐나 → 까닭 글 | '' (새것). 예전엔 있기만 하면 그대로 써서, 고치기 전 빌드로 게시본을 보고
+ * 개발판과 다르다고 착각할 수 있었다 (2026-11-05 EV-02). src·assets·index.html 가운데 build.json 보다 새로 바뀐 파일이 있거나 빌드 커밋이 HEAD 와 다르면.
+ */
+function staleWeb() {
+  const stamp = join(root, 'dist/web/build.json');
+  if (!existsSync(join(root, 'dist/web/index.html')) || !existsSync(stamp)) return '빌드 없음';
+  const built = statSync(stamp).mtimeMs;
+  let head = '';
+  try { head = execSync('git rev-parse --short HEAD', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { /* git 없음 */ }
+  try { const b = JSON.parse(readFileSync(stamp, 'utf8')).build ?? ''; if (head && !b.startsWith(head)) return `빌드 ${b.split(' ')[0]} ≠ HEAD ${head}`; } catch { return 'build.json 을 못 읽음'; }
+  const SKIP = new Set(['review', 'references']);   // dev-server 저장소 흉내 (게임 파일 아님)
+  const newer = dir => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const f = join(dir, e.name);
+      if (e.isDirectory()) { if (!SKIP.has(e.name) && newer(f)) return f; }
+      else if (statSync(f).mtimeMs > built) return f;
+    }
+    return null;
+  };
+  const f = newer(join(root, 'src')) ?? newer(join(root, 'assets')) ?? (statSync(join(root, 'index.html')).mtimeMs > built ? 'index.html' : null);
+  return f ? `빌드 뒤 바뀜: ${f.slice(root.length)}` : '';
 }
 
 function connect(wsUrl) {
