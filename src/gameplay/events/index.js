@@ -8,6 +8,7 @@
 import { activeOn, upcoming, yearCalendar, inHours, isOpen as openRule, runKey } from './calendar.js';
 import { createChip, openCalendar, ensureEventsCss } from './eventsui.js';
 import { createSpring } from './spring.js';
+import { createSummer } from './summer.js';
 
 export const CONFIG_FILE = 'assets/events/events.json';
 let E = null;
@@ -137,11 +138,14 @@ export default {
     ctx.events.on('story:end', () => E.chip.hide(false));
     // 행사 놀이 (M8-P3–P6): 행사마다 파일 하나 — 행동 키를 디스패처에 단다
     const gp = ctx.services.gameplay?.interactions;
-    E.plays = { spring: createSpring(ctx, E.service) };
+    E.plays = { spring: createSpring(ctx, E.service), summer: createSummer(ctx, E.service) };
     if (gp) for (const p of Object.values(E.plays)) p.register(gp);
     E.service.debug.plays = E.plays;
     E.check();
   },
 
-  update() {},
+  update(dt) {
+    if (!E?.plays) return;
+    for (const p of Object.values(E.plays)) p.update?.(dt);
+  },
 };

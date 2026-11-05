@@ -140,3 +140,36 @@ test('봄 꽃놀이: 벚나무 8그루는 광장 밖 풀밭 빈 칸에 서로 �
   assert.deepEqual(a, b);
   assert.notDeepEqual(a.map(p => [p.x, p.z]), c.map(p => [p.x, p.z]));
 });
+
+// ---- M8-P4 여름 불꽃놀이: 쇼 계획 · 해변 자리 ----
+import { showPlan, FIREWORK_QUALITY } from '../src/render/fireworks.js';
+import { summerSpots, WISHES } from '../src/gameplay/events/summer.js';
+
+test('불꽃 쇼 계획: 사양마다 발 수, 10분 안에 고르게, 같은 날은 같은 쇼', () => {
+  for (const [q, Q] of Object.entries(FIREWORK_QUALITY)) {
+    const p = showPlan(q, 600, 20270801);
+    assert.equal(p.length, Q.shots, q);
+    assert.ok(p.every(s => s.t >= 0 && s.t <= 600), `${q}: 10분 안`);
+    assert.ok(p.every((s, i) => !i || s.t >= p[i - 1].t), `${q}: 차례대로`);
+    const halves = [p.filter(s => s.t < 300).length, p.filter(s => s.t >= 300).length];
+    assert.ok(Math.abs(halves[0] - halves[1]) <= Math.max(2, Q.shots * 0.1), `${q}: 앞뒤 반이 비슷`);
+  }
+  assert.ok(FIREWORK_QUALITY.high.shots > FIREWORK_QUALITY.mid.shots && FIREWORK_QUALITY.mid.shots > FIREWORK_QUALITY.low.shots && FIREWORK_QUALITY.low.shots > FIREWORK_QUALITY.min.shots);
+  assert.deepEqual(showPlan('mid', 600, 7), showPlan('mid', 600, 7));
+  assert.notDeepEqual(showPlan('mid', 600, 7), showPlan('mid', 600, 8));
+  assert.equal(WISHES.length, 3);
+});
+
+test('여름 불꽃놀이: 북쪽 해변 모래에 간판, 그 앞 바다에 발사대 (카메라가 북쪽을 봄)', () => {
+  const spec = slug => JSON.parse(readFileSync(resolve(root, `assets/env/specs/${slug}.json`), 'utf8'));
+  const gen = generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)]))) });
+  const isl = createIslandApi(gen);
+  const s = summerSpots(isl);
+  assert.ok(s, '해변을 찾음');
+  assert.equal(isl.tileAt(s.beach.tx, s.beach.tz), 'sand');
+  const r = isl.toTile(s.raft.x, s.raft.z), g = isl.toTile(s.sign.x, s.sign.z);
+  assert.equal(isl.tileAt(r.tx, r.tz), 'sea', '발사대는 바다 위');
+  assert.notEqual(isl.tileAt(g.tx, g.tz), 'sea', '간판은 땅 위');
+  assert.ok(s.raft.z < s.sign.z - 2, '발사대가 간판보다 북쪽(바다 쪽)');
+  assert.ok(Math.abs(s.raft.x) < 8, '섬 가운데 세로줄 근처');
+});
