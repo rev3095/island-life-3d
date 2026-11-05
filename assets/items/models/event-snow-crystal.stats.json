@@ -1,0 +1,44 @@
+{
+  "id": "IC-EV-04",
+  "slug": "event-snow-crystal",
+  "name": "눈 결정",
+  "group": "event",
+  "kind": "snow-crystal",
+  "version": "0.1",
+  "items": [
+    "event.snow-crystal"
+  ],
+  "hold": false,
+  "triangles": 3548,
+  "parts": 1,
+  "materials": [
+    "ice",
+    "iceLight"
+  ],
+  "objects": [
+    "crystal"
+  ],
+  "size": [
+    0.438,
+    0.383,
+    0.02
+  ],
+  "bounds": [
+    [
+      -0.219,
+      -0.192,
+      0.0
+    ],
+    [
+      0.219,
+      0.192,
+      0.02
+    ]
+  ],
+  "glbBytes": 67516,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-snow-crystal_main.png",
+    "event-snow-crystal_thumb.png"
+  ]
+}

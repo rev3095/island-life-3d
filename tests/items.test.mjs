@@ -7,7 +7,7 @@ test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화�
   assert.equal(items.list('bug').length, 22);
   assert.equal(items.list('fossil').length, 8);
   assert.equal(items.list('tool').length, 5);
-  assert.equal(items.list('furn').length, 37);   // + 5차 Z5 축제 단체 사진 (FU-34) + 8차 벚꽃 등 (FU-43) · 여름밤 풍경 (FU-44) · 수확 바구니 (FU-45)
+  assert.equal(items.list('furn').length, 38);   // + 5차 Z5 축제 단체 사진 (FU-34) + 8차 행사 보상 넷 (FU-43–46)
   assert.equal(items.list('festival').length, 4);   // 5차 Z5 축제 부스에서 만드는 것 (IC-FE-01–04)
   assert.equal(items.list('fruit').length, 6);
   assert.equal(items.list('shell').length, 6);

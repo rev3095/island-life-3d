@@ -1,0 +1,80 @@
+{
+  "id": "FU-46",
+  "slug": "snowman-lamp",
+  "item": "furn.snowman-lamp",
+  "name": "눈사람 등",
+  "category": "furniture",
+  "kind": "snowman-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "겨울 눈사람 날에 눈사람 셋을 만든 날 두부가 주는 작은 등. 아래 눈 몸이 반투명하게 빛나고, 털모자·목도리를 썼다.",
+    "keywords": [
+      "빛나는 눈 몸",
+      "털모자",
+      "당근 코"
+    ],
+    "references": [],
+    "avoid": [
+      "차가운 빛"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "base": "#8C6440",
+    "glow": "#FFF3D6",
+    "snow": "#F7FAFB",
+    "coal": "#2E2A27",
+    "carrot": "#F28C38",
+    "scarf": "#D9443A",
+    "cap": "#4C86C6",
+    "pompom": "#FBFDF8"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "glow": "빛나는 몸",
+    "snow": "머리",
+    "coal": "눈",
+    "carrot": "코",
+    "scarf": "목도리",
+    "cap": "털모자",
+    "pompom": "방울"
+  },
+  "variants": {
+    "blue": {
+      "label": "파랑 모자 (기본)",
+      "palette": {}
+    },
+    "red": {
+      "label": "빨강 모자",
+      "palette": {
+        "cap": "#D9443A",
+        "scarf": "#4C86C6"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

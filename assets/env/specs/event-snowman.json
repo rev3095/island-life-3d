@@ -1,0 +1,93 @@
+{
+  "id": "PR-22",
+  "slug": "event-snowman",
+  "name": "눈사람",
+  "category": "prop",
+  "kind": "snowman",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "겨울 눈사람 날에 큰 눈덩이(몸) 위에 작은 눈덩이(머리)를 얹어 만드는 눈사람. 숯 눈·입, 당근 코, 나뭇가지 팔, 목도리. 크기 비율로 표정이 넷 (딱 맞음 😊 · 머리 큼 😮 · 몸 큼 😌 · 비슷 🙂). 행사가 끝날 때까지 섬에 남는다.",
+    "keywords": [
+      "두 덩이",
+      "당근 코",
+      "나뭇가지 팔",
+      "목도리"
+    ],
+    "references": [],
+    "avoid": [
+      "무서운 얼굴"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "snow": "#F7FAFB",
+    "coal": "#2E2A27",
+    "carrot": "#F28C38",
+    "twig": "#7A5236",
+    "scarf": "#D9443A",
+    "scarfStripe": "#FBFDF8"
+  },
+  "paletteLabels": {
+    "snow": "눈",
+    "coal": "숯 (눈·입·단추)",
+    "carrot": "당근 코",
+    "twig": "나뭇가지 팔",
+    "scarf": "목도리",
+    "scarfStripe": "목도리 줄"
+  },
+  "variants": {
+    "red": {
+      "label": "빨강 목도리 (기본)",
+      "palette": {}
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "scarf": "#4C86C6"
+      }
+    },
+    "green": {
+      "label": "초록",
+      "palette": {
+        "scarf": "#5FA866"
+      }
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "scarf": "#F2C14E",
+        "scarfStripe": "#C9583B"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.38
+    },
+    "extent": [
+      0.75,
+      0.4
+    ]
+  }
+}

@@ -340,6 +340,24 @@
       "status": "review"
     },
     {
+      "id": "PR-21",
+      "slug": "event-snowball",
+      "name": "눈덩이",
+      "category": "prop",
+      "kind": "snowball",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-22",
+      "slug": "event-snowman",
+      "name": "눈사람",
+      "category": "prop",
+      "kind": "snowman",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "PR-23",
       "slug": "event-sign",
       "name": "행사 간판",

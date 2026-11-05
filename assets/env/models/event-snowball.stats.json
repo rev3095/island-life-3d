@@ -1,0 +1,34 @@
+{
+  "id": "PR-21",
+  "slug": "event-snowball",
+  "name": "눈덩이",
+  "category": "prop",
+  "kind": "snowball",
+  "version": "0.1",
+  "triangles": 1776,
+  "parts": 1,
+  "materials": [
+    "grass",
+    "snow",
+    "snowShade"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.82,
+    0.8
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 35052,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-snowball_front.png",
+    "event-snowball_hero.jpg",
+    "event-snowball_main.png",
+    "event-snowball_thumb.png",
+    "event-snowball_top.png"
+  ]
+}

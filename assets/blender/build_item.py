@@ -1423,7 +1423,23 @@ def b_mushroom(M):
     m.add(ellipsoid((0.12, 0.05, 0.075), (0.065, 0.065, 0.04), seg=16, rings=8), 'cap')
 
 
+def b_snow_crystal(M):
+    """IC-EV-04 눈 결정 (8차 겨울 눈사람 날): 여섯 갈래 눈 결정, 갈래마다 잔가지 둘. 가운데 육각 판. 얼음빛."""
+    m = M.part('crystal')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.02), 0.045, seg=6), 'ice')
+    for k in range(6):
+        a = TAU * k / 6
+        d, s = V((math.cos(a), math.sin(a), 0)), V((-math.sin(a), math.cos(a), 0))
+        m.add(box(d * 0.1 + V((0, 0, 0.01)), (0.2, 0.022, 0.016), bevel=0.004, rot=rot_xyz(z=a)), 'ice')
+        for t, ln in ((0.09, 0.05), (0.15, 0.035)):
+            for sg in (1, -1):
+                c = d * t + (d * 0.5 + s * sg * 0.87) * ln * 0.5
+                m.add(box(c + V((0, 0, 0.01)), (ln, 0.016, 0.014), bevel=0.003, rot=rot_xyz(z=a + sg * 1.05)), 'iceLight')
+        m.add(ellipsoid(d * 0.205 + V((0, 0, 0.01)), (0.014, 0.014, 0.01), seg=8, rings=4), 'iceLight', outline=False)
+
+
 BUILDERS = {
+    'snow-crystal': b_snow_crystal,
     'mushroom': b_mushroom,
     'sparkler': b_sparkler,
     'petal': b_petal,
