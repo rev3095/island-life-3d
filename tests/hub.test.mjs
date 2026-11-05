@@ -147,7 +147,8 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
   assert.equal(docs.character.count, files('assets/specs').length);
   assert.equal(docs.villager.count, specCount('assets/villagers', v => v.slug));
   assert.equal(docs.env.count, files('assets/env/specs').length);
-  assert.equal(docs.furniture.count, files('assets/furniture/specs').length);
+  assert.equal(docs.furniture.count, files('assets/furniture/specs').length + files('assets/furniture/fixtures/specs').length, '가구 + 상점·박물관 붙박이');
+  assert.ok(docs.furniture.items.filter(i => i.id.startsWith('fix-')).every(i => /#place-(shop|museum)$/.test(i.link ?? '')), '붙박이는 그 실내 방 배치로');
   assert.equal(docs.item.count, files('assets/items/specs').length);
   assert.equal(docs.item.icons, files('assets/items/specs').reduce((n, f) => n + (JSON.parse(read(`assets/items/specs/${f}`)).items?.length ?? 1), 0));
   assert.equal(docs.interior.count, specCount('assets/interior/specs', s => s.kind === 'wallpaper' || s.kind === 'floor'));
@@ -178,7 +179,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
       const hash = it.link.split('#')[1];
       if (!hash) continue;
       // 그 편집기가 주소 끝 # 를 읽는 방식과 맞는지
-      if (d.editor === 'env') assert.ok(d.group === 'furniture' ? hash === `furn-${it.id}` && bg.includes("'furn-' + m.slug")
+      if (d.editor === 'env') assert.ok(d.group === 'furniture' ? (it.id.startsWith('fix-') ? /^place-(shop|museum)$/.test(hash) && bg.includes("'place-' + p.slug") : hash === `furn-${it.id}` && bg.includes("'furn-' + m.slug"))
         : d.group === 'item' ? hash === `item-${it.id}` && bg.includes("'item-' + m.slug") : hash === it.id, `${d.group}/${it.id}: 배경 편집기 #${hash}`);
       if (d.editor === 'character') assert.ok(hash === it.id || (hash === `${it.id}.talk` && ch.includes(".replace(/\\.talk$/, '')")), `캐릭터 편집기 #${hash}`);
       if (d.editor === 'data') assert.ok(dataEd.includes(`{ id: '${hash}', name:`), `숫자 표 #${hash}`);
