@@ -40,7 +40,7 @@ export function summerSpots(isl) {
 export function createSummer(ctx, events) {
   const S = () => ctx.services;
   const cfg = events.config.list.find(e => e.id === EV);
-  const st = () => ((ctx.state.events.summer ||= { watched: {}, wish: null, chimePending: 0 }));
+  const st = () => (((ctx.state.events ||= {}).summer ||= { watched: {}, wish: null, chimePending: 0 }));
   const fx = createFireworks(ctx);
   let placed = null, watchSec = 0;
 

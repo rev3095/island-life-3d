@@ -48,7 +48,7 @@ export function createAutumn(ctx, events) {
   const cfg = events.config.list.find(e => e.id === EV);
   const year = () => (events.active().find(r => r.ev.id === EV)?.year ?? events.today()?.slice(0, 4));
   const st = () => {
-    const s = (ctx.state.events.autumn ||= { pot: {}, villagerDay: {}, picked: {} });
+    const s = ((ctx.state.events ||= {}).autumn ||= { pot: {}, villagerDay: {}, picked: {} });
     return s;
   };
   const potCount = () => st().pot[year()] ?? 0;
@@ -120,13 +120,16 @@ export function createAutumn(ctx, events) {
     });
     return mesh;
   }
+  let gen = 0;   // 다시 그리기가 겹치면 마지막 것만
   async function refreshShrooms() {
+    const my = ++gen;
     for (const m of shrooms) group.remove(m.mesh);
     shrooms = [];
     if (!placed || !live()) return;
     const W = S().world, isl = W.island, key = events.today(), picked = st().picked[key] ?? [];
     const trees = W.objects.list('tree').map(o => ({ x: o.x, z: o.z }));
     const m = await model();
+    if (my !== gen) return;
     for (const s of mushroomSpots(trees, key, (x, z) => isl.isWalkable(x, z))) {
       if (picked.includes(s.id)) continue;
       const mesh = m ? tint(m.clone(), s.kind) : new ctx.THREE.Object3D();
