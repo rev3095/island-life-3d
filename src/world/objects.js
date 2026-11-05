@@ -12,8 +12,9 @@ import { CHUNK } from './terrain.js';
 export const SEASONAL = {
   tree: s => s,
   cedar: s => (s === 'winter' ? 'snow' : 'green'),
+  'cherry-tree': s => s,   // 8차 EN-12 벚나무 (봄 꽃놀이 동안 광장 둘레에 놓임)
 };
-const SWAY = new Set(['tree', 'fruit-tree', 'cedar', 'palm', 'bush', 'tulip', 'cosmos', 'pansy', 'weed']);
+const SWAY = new Set(['tree', 'fruit-tree', 'cedar', 'palm', 'cherry-tree', 'bush', 'tulip', 'cosmos', 'pansy', 'weed']);
 const SINGLE = new Set(['campfire']);       // 따로 애니메이션을 돌리는 물체 (하나뿐)
 const NO_SHADOW = new Set(['tulip', 'cosmos', 'pansy', 'weed', 'shell', 'fossil-spot']);   // 작은 것은 그림자를 드리우지 않는다 (그림자 계산 절약)
 

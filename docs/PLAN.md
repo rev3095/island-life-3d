@@ -34,7 +34,7 @@
 | 6 | **M8-P0** 8차 검수 보드 | 계절 행사 결정·리소스 ID (꽃놀이·불꽃·수확·눈사람, 날짜 규칙, 광장·부스 다시 쓰기, 새 모델 컨셉) | 사용자 선택 → M8-P1… | ✅ 11-05 보드 v1 게시 → 반영 v1 = D74–D85 모두 A (`docs/notes/m8-events.md`) |
 | 7 | **M8-P1** 행사 틀 | `assets/events/events.json` · `src/gameplay/events/` (날짜·시간·알림·진행·도장·비 막기) · 섬폰 달력 UI-13 · 칸 UI-14 · 도장 UI-15 · 날짜 흉내 `#date=` (저장 칸 따로) | 합치기 | 🔶 11-05 브랜치 `p19-events`, 합치기 승인 대기 |
 | 8 | **M8-P2** 리소스 | 한 행사씩 컨셉 → Blender 모델 → 편집기 검수: EN-12 · PR-17–23 · FU-43–46 · IC-EV-01–04 · AN-08–09 · 부스 덮개·등불 색 변형 | 편집기 다시 게시 | ✅ 11-05 모델 16 (봄 5·여름 3·가을 4·겨울 4) 모두 검수 대기, 배경 편집기 v15. FX-01·AN-08·AN-09·부스 덮개 색 변형은 놀이 트랙(P3–P6) |
-| 9 | **M8-P3–P6** 행사 놀이 | 봄 `events/spring.js` · 여름 `summer.js` + 불꽃 셰이더 `src/render/fireworks.js` · 가을 `autumn.js` · 겨울 `winter.js` (파일이 안 겹쳐 동시에) | 합치기 | P1 · P2 의 그 행사 모델 |
+| 9 | **M8-P3–P6** 행사 놀이 (P3 봄 ✅ 11-05 `p24-spring-play`) | 봄 `events/spring.js` · 여름 `summer.js` + 불꽃 셰이더 `src/render/fireworks.js` · 가을 `autumn.js` · 겨울 `winter.js` (파일이 안 겹쳐 동시에) | 합치기 | P1 · P2 의 그 행사 모델 |
 | 10 | **M8-P7–P8** 장면·QA·게시 | 장면 s13–s16 · 행사 대사·소품 → 자동 플레이(날짜 흉내) → 게임 다시 게시 · 홈 「미리 해 보기」 링크 | M8 끝 | P3–P6 |
 | 보류 | D41-A 밸런스 | 축제까지 5~7일 (사용자 의견 "추후 D41-A 방향"). 보드에서 D41 을 A 로 바꾸고 "검수 보드 반영" 하면 그때 P 번호를 붙여 넣는다 (`assets/festival/config.json` `parts` · `assets/data/rules.json` `town` → "숫자 반영") | — | 사용자 |
 
