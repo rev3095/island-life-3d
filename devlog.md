@@ -2,7 +2,7 @@
 
 이 문서는 세션이 끝나거나 `/clear` 하기 전에 대화와 작업을 보고서로 남긴 기록이다. 새 세션은 **「현재 상태」부터 읽고**, 자세한 경위는 「세션 기록」을 본다. 구조·명령어는 [CLAUDE.md](CLAUDE.md), 개발 단계는 [docs/PLAN.md](docs/PLAN.md), 모듈 약속은 [docs/CONTRACTS.md](docs/CONTRACTS.md), 실행법은 [README.md](README.md).
 
-마지막 갱신: 2026-11-05 (세션 4 — 7차 보드 반영 v2 M7-P7 · 편집기 맞추기 M7-P8 · 시점 확정 M7-P9)
+마지막 갱신: 2026-11-05 (세션 4 — 7차 보드 반영 v2 M7-P7 · 편집기 맞추기 M7-P8 · 시점 확정 M7-P9 · M8-P0 8차 검수 보드 게시)
 
 ---
 
@@ -17,6 +17,7 @@ M0~M6 끝, **M7 출시 준비 — P1~P5 끝 · 7차 보드 반영 v2 확정(D49�
 | **게임 「포근섬 이야기」** | https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ | `dist/web/index.html` + `dist/web/files.json` (`node tools/build-web.mjs` 로 만든다, `dist/` 는 커밋 안 함) | **버전 23 (빌드 8cf042c, 2026-11-05, 게시 파일 165, 링크 공개)** — M7-P8 하늘 값 데이터로 (바뀐 묶음 island-1 + `render/presets.js`·`sky/index.js` + 페이지, 화면은 v22 와 같음). 다음엔 packs hash 를 8cf042c 것과 비교. 버전 22 (빌드 bf53798) — M7-P7 7차 보드 반영 v2 (바뀐 묶음 island-1 + 모듈 17 + 페이지). 다음엔 packs hash 를 bf53798 것과 비교. 버전 21 (빌드 3bca813) — 실내 세션 마지막 두 커밋 합침: 상점·박물관 붙박이 모델 FU-35–42(계산대·진열 받침·안내대·화석 받침·도구 받침·씨앗 진열대·긴 수조·곤충 유리 상자), 방 셋 RM-07–09 확정, 실내 보드 확정. v20 = 아이템 모델 모두 묶음. 다음엔 packs hash 를 3bca813 것과 비교 + `git diff --name-only 3bca813 HEAD -- src index.html` |
 | **편집기 홈** | https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv | `editors.html` | **버전 8 (11-04): 하늘 보드·실내 보드 목록, `status/sky`·`status/interiors`, `catalog/decision` D49–D73 (66줄)**. 버전 6 (10-31: 게임 카드에 게임 저장소 문제 알리기 `reports`·기기 점검 `checks`). 버전 5 (`p10-hub`): 열리게 고침(맨 위 실패 상자·스크립트 없이 보이는 바로 가기) + **「전체 관리」 표**(모든 리소스 340줄, 골라서 다시 열기·고쳐 주세요·확정 → 홈 `manage/*`) + wave7. **"전체 요청 확인"**. claude.ai 에서 실제로 열리는지는 사용자 확인 필요 (로그인 창이 필요해 Claude 는 못 봄) |
 | **하늘 검수 보드 v0.1** | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `concept/sky-board.html` + `board-kit.js` + `concept/sky/*.jpg` | 버전 1 (2026-11-04): 결정 D58–D66 · 하늘 층 SK-01–08, 그림 29장 = 게임 v16 화면. **반영 v1 = 확정 (모두 A, 11-04 "하늘 구현 확정")** — `applied/sky` · `history/sky-v1`, 홈 `catalog/decision` 확정. 반영 값 표 `docs/notes/sky-board.md`. 홈 v7 목록·`status/sky`·`catalog/decision`(D49–D66 더함) |
+| **8차 검수 보드 v0.8** | https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T | `concept/wave8-board.html` + `board-kit.js` (보드 id `wave8`) | M8 계절 행사 EV-01–04 · 결정 D74–D85 · 리소스 22 (새 20) · UI-13–15 · 계획 M8-P1–P8. **게시 v1 (11-05), 사용자 선택 대기** |
 | **실내 검수 보드 v0.1** | https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh | `concept/interiors-board.html` (실내 세션) | 결정 D67–D73 · RM-07–09 · FU-35–42. 반영 v1 = 추천안 A (main 에 들어감). **v2 확정·붙박이 모델 FU-35–42 — main 3bca813, 게임 v21** |
 | **7차 검수 보드 v0.7** | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `concept/wave7-board.html` + `board-kit.js` | **버전 5 (11-05): 계획 표 P7·P8·P9 끝 표시** (홈 `status/wave7` v5). 버전 4 (11-04): 반영 v2 확정 — D49–D57 모두 A, QA 표 19건 모두 고침, 계획 표에 M7-P7–P10·M8-P0·보류(D41-A)** (`applied/wave7` v2 · `history/wave7-v2`, commit 20b52a0, 홈 `status/wave7` v3). 버전 3 (10-31): QA 칸 QA-01–19 (고침 10 · 고르기 9 → 결정 D49–D57), 목표 표 잰 값. 버전 2. **반영 v1 (임시)** = D37-B · D41-B(의견: 나중에 D41-A 로) · 나머지 A → M7 계획 (`docs/PLAN.md` 「7차」, `docs/notes/board7.md`). QA 결과 칸은 아직 비어 있음 |
 | 곡 편집기 | https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2 | `sound-editor.html` (+ `assets/sound/`) | 반영 v0. "소리 반영" |
@@ -36,6 +37,8 @@ M0~M6 끝, **M7 출시 준비 — P1~P5 끝 · 7차 보드 반영 v2 확정(D49�
 **2026-11-05 M7-P8 편집기 맞추기** (브랜치 `p14-editors` ed43f37 → main 8cf042c, 테스트 360): 배경 편집기 「방 배치」에 도토리상점·박물관(`place-shop`·`place-museum`, 방 크기·창문·문은 방 파일, 주인 자리 `keeper`, 붙박이 FU-35–42 진짜 모델, 진열·케이스·화석·말 거는 자리 보기, 요청 글 `places/<slug>.json`), 방 3D 가구를 게시본 묶음에서 읽게 고침(전엔 게시본에서 상자로 보였음), 하늘 값을 `presets.json` `sky` 로(지금 값 그대로) + 스타일 편집기 「하늘」 슬라이더 15개, 홈 「전체 관리」 방 목록에 상점·박물관. 게시: **배경 편집기 v11 · 캐릭터 편집기 v10 (밤톨 v2 · rules.js·traits.js·assets.js·packs.js) · 스타일 편집기 v3 · 게임 v23**, 홈 `catalog/room` v3·`status/env·character·style·game·wave7`.
 **2026-11-05 M7-P9 시점 조작 마무리** (브랜치 `p15-camera-final`): `docs/notes/p12-camera.md` 선택지 7개를 모두 지금 값으로 확정 (1 놓으면 돌아오기 · 2 약 1초 · 3 지평선 위 12°+시야 16° · 4 ±60° · 5 위로 끌면 올려다보기 · 6 섬폰 설정에 넣지 않음 · 7 틸트 흐림 그대로) — 노트 「확정」 표, `camera.js` `LOOK` 위 한 줄 주석, PLAN, 7차 보드 v5. 게임 동작은 그대로라 게임은 다시 게시하지 않음 (다음 게임 빌드에 주석이 같이 들어감). main 5b45c75.
 **2026-11-05 M7-P6 출시 점검** (브랜치 `p16-release`): 자동 플레이 개발판 `--yearly` 22·2·0 · 게시본 조건 21·2·0 · 휴대폰 21·2·0 (통과·어색함·막힘, 콘솔 오류 0, 게시 목록 밖 요청 0). 어색함 = decor(QA-10, 예상) · visit(봇이 낮만 봄 → `scenario.js` 에 저녁 20.5·21.5시 더함, 다시 돌린 개발판 22·1·0). RC-03 진행된 저장 새로고침 · RC-10 「아주 크게」 창 넘침 0 · RC-11 다른 저장소에서 불러오기 — 모두 state 다른 곳 0. 점검표 `docs/notes/release.md` (사용자 손 점검 순서 포함), 7차 보드 v6 (RC 칸), 홈 `status/wave7` v6.
+
+**2026-11-05 M8-P0 8차 검수 보드** (브랜치 `p18-board8`, main 58a5f8c 에서): `concept/wave8-board.html` — 계절 행사 넷(봄 꽃놀이 4/1–7 · 여름 불꽃놀이 8/1–7 밤 · 가을 수확 잔치 10/15–21 · 겨울 눈사람 날 12/20–26), 결정 D74–D85(크기·날짜·행사별 할 것·장소·주민·날씨·보상·행사 채집·엔딩 전·리소스 양·미리 해 보기, 추천 모두 A), 새 리소스 EN-12 · PR-17–23 · FU-43–46 · IC-EV-01–04 · FX-01 · AN-08–09 · s13–s16, 새 화면 UI-13–15, 계획 M8-P1–P8. 로컬 확인: 콘솔 오류 0, 375·1200px 가로 넘침 0. 게시 **보드 v1** https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T · **홈 v9** (목록·바로 가기에 wave8) · 홈 `status/wave8`. README 보드 표·ID 표 (D74–D85, EV·FX 새 접두사). 다음: 사용자 선택 → "검수 보드 반영" → M8-P1.
 
 - ~~합치기 대기~~ 끝: `p12-interiors` b1078a7 · e4c0a51 → main 3bca813 (테스트 358) → 게임 v21, 배경 편집기 v10 (RM-07 확정).
 - 「다음에 할 일」 대로: 사용자 결정(7차 보드 D49–D57·D41, 시점 선택지 7) → M7-P6 출시 점검.
@@ -123,7 +126,7 @@ M5(Z5, `local_a4293983-fb69-490e-811d-32a97ceb52f4`, `p8-festival`) **구현 중
 | 3 | **M7-P9** 시점 조작 마무리 | `docs/notes/p12-camera.md` 선택지 7개 = 지금 값 그대로 확정 (바꾸려면 작은 보드) | ✅ 11-05 확정 (1–5 A · 6 넣지 않음 · 7 B, 「확정」 표) |
 | 4 | **M7-P6** 출시 | 자동 플레이(개발판·게시본·휴대폰 RC-01–04) → `docs/notes/release.md` → 사용자 손 점검 RC-05–08·12 → 공유는 사용자 | 🔶 11-05 Claude 몫 끝 (RC-01–04·09·10 · RC-11 일부), **사용자 손 점검 대기** |
 | 5 | **M7-P10** 정리 | 합친 작업 폴더·브랜치 20여 개·끝난 세션 보관 | P6 · 사용자 확인 |
-| 6 | **M8-P0** 8차 검수 보드 | 계절 행사(D48-A) 결정·리소스 ID → 고른 뒤 M8-P1… | M7 끝 |
+| 6 | **M8-P0** 8차 검수 보드 | 계절 행사(D48-A) 결정 D74–D85·리소스 ID → 고른 뒤 M8-P1… | 🔶 11-05 보드 v1 게시 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T), **사용자 선택 대기** |
 | 보류 | D41-A 밸런스 | 축제까지 5~7일 — 보드에서 D41 을 A 로 바꾸고 "검수 보드 반영" 하면 P 번호를 붙여 넣음 | 사용자 |
 
 **추천 사항**
