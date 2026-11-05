@@ -1035,6 +1035,44 @@ def b_scarecrow(M):
     m.add(cylinder((0, 0, 1.5), (0, 0, 1.55), 0.175, seg=24), 'hatBand')
 
 
+def b_snowball(M):
+    """PR-21 눈덩이 (8차 겨울 눈사람 날): 굴리면 커지는 눈덩이. 살짝 울퉁불퉁한 공 + 붙은 눈 뭉치·풀잎 조각. 크기는 게임이 모델 하나를 늘린다 (지름 0.4 → 1.6칸)."""
+    m = M.part('ball', pivot=(0, 0, 0.4))
+    m.add(ellipsoid((0, 0, 0.4), (0.4, 0.4, 0.39), seg=28, rings=16), 'snow')
+    for k, (a, z, r) in enumerate(((0.3, 0.55, 0.1), (2.1, 0.3, 0.09), (3.9, 0.66, 0.08), (5.2, 0.22, 0.11), (1.2, 0.74, 0.07))):
+        d = V((math.cos(a), math.sin(a), 0))
+        hr = math.sqrt(max(0.0, 0.4 ** 2 - (z - 0.4) ** 2))   # 그 높이의 공 겉면
+        m.add(ellipsoid(V((0, 0, z)) + d * hr * 0.96, (r, r, r * 0.8), seg=12, rings=8), 'snowShade')
+    for k, a in enumerate((1.0, 4.4)):
+        d = V((math.cos(a), math.sin(a), 0))
+        m.add(ellipsoid(V((0, 0, 0.45)) + d * 0.39, (0.05, 0.012, 0.018), rot=rot_xyz(z=a + 1.2), seg=8, rings=4), 'grass', outline=False)
+
+
+def b_snowman(M):
+    """PR-22 눈사람 (8차 겨울 눈사람 날): 몸·머리 두 덩이(따로 된 덩어리 'body'·'head' — 게임이 굴린 크기대로 늘리고 비율로 표정을 고른다),
+    숯 눈·입, 당근 코, 나뭇가지 팔, 목도리. 기본 표정은 웃음 (나머지 셋 😮·😌·🙂 은 M8-P6 놀이에서 입 모양을 바꿔 끼움)."""
+    b = M.part('body', pivot=(0, 0, 0))
+    b.add(jitter(ellipsoid((0, 0, 0.36), (0.38, 0.38, 0.36), seg=28, rings=16), 0.008, 3), 'snow')
+    for k, z in enumerate((0.45, 0.3)):
+        b.add(ellipsoid((0, -0.36 + 0.02 * k, z), (0.03, 0.02, 0.03), seg=8, rings=5), 'coal', outline=False)
+    for sx in (1, -1):   # 나뭇가지 팔
+        a = V((sx * 0.3, 0, 0.55))
+        b.add(cylinder(a, a + V((sx * 0.38, -0.02, 0.22)), 0.022, 0.012, seg=6), 'twig')
+        b.add(cylinder(a + V((sx * 0.26, -0.01, 0.15)), a + V((sx * 0.34, -0.02, 0.3)), 0.012, 0.006, seg=5), 'twig')
+    h = M.part('head', pivot=(0, 0, 0.68))
+    h.add(jitter(ellipsoid((0, 0, 0.9), (0.25, 0.25, 0.24), seg=24, rings=14), 0.006, 5), 'snow')
+    for sx in (1, -1):
+        h.add(ellipsoid((sx * 0.085, -0.225, 0.96), (0.028, 0.018, 0.03), seg=8, rings=5), 'coal', outline=False)
+    h.add(cone(V((0, -0.23, 0.9)), V((0.02, -0.42, 0.88)), 0.035, 0.004, seg=10), 'carrot')
+    for k in range(5):   # 웃는 입
+        t = (k - 2) / 2
+        h.add(ellipsoid((t * 0.08, -0.215 - 0.01 * (1 - abs(t)), 0.83 - 0.03 * (1 - t * t)), (0.016, 0.012, 0.016), seg=6, rings=4), 'coal', outline=False)
+    ring = [V((math.cos(TAU * i / 24) * 0.24, math.sin(TAU * i / 24) * 0.24, 0.7)) for i in range(24)]
+    h.add(tube(ring, [0.06] * 24, seg=10, closed=True), 'scarf')
+    h.add(box((0.14, -0.22, 0.6), (0.1, 0.04, 0.2), bevel=0.02, rot=rot_xyz(y=-0.15)), 'scarf')
+    h.add(box((0.14, -0.235, 0.52), (0.1, 0.03, 0.03), bevel=0.01, rot=rot_xyz(y=-0.15)), 'scarfStripe', outline=False)
+
+
 BUILDERS = {
     'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
     'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
@@ -1044,6 +1082,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'snowball': b_snowball, 'snowman': b_snowman,
     'harvest-pot': b_harvest_pot, 'scarecrow': b_scarecrow,
     'fireworks-raft': b_fireworks_raft,
     'cherry-tree': b_cherry_tree, 'picnic-mat': b_picnic_mat, 'event-sign': b_event_sign,

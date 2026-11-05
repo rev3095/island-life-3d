@@ -1,0 +1,38 @@
+{
+  "id": "PR-22",
+  "slug": "event-snowman",
+  "name": "눈사람",
+  "category": "prop",
+  "kind": "snowman",
+  "version": "0.1",
+  "triangles": 2704,
+  "parts": 2,
+  "materials": [
+    "carrot",
+    "coal",
+    "scarf",
+    "scarfStripe",
+    "snow",
+    "twig"
+  ],
+  "animations": {},
+  "size": [
+    1.37,
+    0.8,
+    1.14
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 55804,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-snowman_front.png",
+    "event-snowman_hero.jpg",
+    "event-snowman_main.png",
+    "event-snowman_thumb.png",
+    "event-snowman_top.png",
+    "event-snowman_variants.png"
+  ]
+}

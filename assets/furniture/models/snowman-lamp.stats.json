@@ -1,0 +1,56 @@
+{
+  "id": "FU-46",
+  "slug": "snowman-lamp",
+  "item": "furn.snowman-lamp",
+  "name": "눈사람 등",
+  "category": "furniture",
+  "kind": "snowman-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2076,
+  "parts": 1,
+  "materials": [
+    "base",
+    "cap",
+    "carrot",
+    "coal",
+    "glow",
+    "pompom",
+    "scarf",
+    "snow"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.4,
+    0.42,
+    0.74
+  ],
+  "bounds": [
+    [
+      -0.2,
+      -0.22,
+      0.0
+    ],
+    [
+      0.2,
+      0.2,
+      0.74
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 44304,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "snowman-lamp_front.png",
+    "snowman-lamp_main.png",
+    "snowman-lamp_thumb.png",
+    "snowman-lamp_top.png",
+    "snowman-lamp_variants.png"
+  ]
+}

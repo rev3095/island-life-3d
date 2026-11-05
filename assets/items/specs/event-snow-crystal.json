@@ -1,0 +1,56 @@
+{
+  "id": "IC-EV-04",
+  "slug": "event-snow-crystal",
+  "name": "눈 결정",
+  "group": "event",
+  "category": "item",
+  "kind": "snow-crystal",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "event.snow-crystal",
+      "code": "IC-EV-04"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "겨울 눈사람 날에 눈사람을 하나 만들 때마다 셋, 눈 오는 날 하늘에서 가끔 받는 눈 결정. 눈사람 등 같은 레시피 재료.",
+    "keywords": [
+      "여섯 갈래",
+      "잔가지",
+      "얼음빛"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "render": {
+    "yaw": -15,
+    "pitch": 70
+  },
+  "palette": {
+    "ice": "#9CCBE8",
+    "iceLight": "#D6ECF7"
+  },
+  "paletteLabels": {
+    "ice": "결정",
+    "iceLight": "잔가지"
+  }
+}

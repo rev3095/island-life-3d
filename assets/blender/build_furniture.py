@@ -1225,8 +1225,25 @@ def b_harvest_basket(M):
     m.add(ellipsoid((0.05, -0.3, 0.2), (0.07, 0.012, 0.06), rot=rot_xyz(y=0.3), seg=10, rings=5), 'leaf', outline=False)
 
 
+def b_snowman_lamp(M):
+    """FU-46 눈사람 등 (8차 겨울 눈사람 날 보상): 눈사람 셋을 만든 날 두부가 주는 작은 등. 반투명 눈 몸 안에 불빛, 털모자·목도리. 밤엔 몸이 빛난다."""
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.05), 0.2, 0.19, seg=24), 'base')
+    m.add(ellipsoid((0, 0, 0.22), (0.19, 0.19, 0.18), seg=24, rings=14), 'glow', outline=False)
+    m.add(ellipsoid((0, 0, 0.47), (0.13, 0.13, 0.12), seg=22, rings=12), 'snow')
+    for sx in (1, -1):
+        m.add(ellipsoid((sx * 0.045, -0.115, 0.5), (0.016, 0.01, 0.018), seg=8, rings=5), 'coal', outline=False)
+    m.add(cone(V((0, -0.12, 0.47)), V((0.01, -0.22, 0.46)), 0.018, 0.002, seg=8), 'carrot')
+    ring = [V((math.cos(TAU * i / 20) * 0.13, math.sin(TAU * i / 20) * 0.13, 0.37)) for i in range(20)]
+    m.add(tube(ring, [0.03] * 20, seg=8, closed=True), 'scarf')
+    m.add(cylinder((0, 0, 0.55), (0, 0, 0.62), 0.12, 0.1, seg=20), 'cap')
+    m.add(ellipsoid((0, 0, 0.64), (0.1, 0.1, 0.06), seg=16, rings=8), 'cap')
+    m.add(ellipsoid((0, 0, 0.7), (0.04, 0.04, 0.04), seg=10, rings=6), 'pompom')
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
+    'snowman-lamp': b_snowman_lamp,
     'harvest-basket': b_harvest_basket,
     'wind-chime': b_wind_chime,
     'cherry-lamp': b_cherry_lamp,

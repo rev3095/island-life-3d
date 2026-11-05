@@ -1,0 +1,59 @@
+{
+  "id": "PR-21",
+  "slug": "event-snowball",
+  "name": "눈덩이",
+  "category": "prop",
+  "kind": "snowball",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "겨울 눈사람 날, 눈 덮인 풀밭에서 밀면 굴러가며 커지는 눈덩이 (지름 0.4 → 1.6칸, 게임이 크기를 늘린다). 물·길·절벽에 닿으면 멈춘다.",
+    "keywords": [
+      "울퉁불퉁한 공",
+      "붙은 눈 뭉치",
+      "풀잎 조각"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.4,
+      "max": 2,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "snow": "#F7FAFB",
+    "snowShade": "#DCE8F0",
+    "grass": "#8CB070"
+  },
+  "paletteLabels": {
+    "snow": "눈",
+    "snowShade": "눈 뭉치",
+    "grass": "붙은 풀"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.4
+    },
+    "extent": [
+      0.42,
+      0.42
+    ]
+  }
+}
