@@ -1,0 +1,87 @@
+{
+  "id": "FU-44",
+  "slug": "wind-chime",
+  "item": "furn.wind-chime",
+  "name": "여름밤 풍경",
+  "category": "furniture",
+  "kind": "wind-chime",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "여름 불꽃놀이에서 소원을 빈 다음 날 우편함으로 오는 벽걸이 풍경. 유리 종에 금붕어 무늬, 아래로 소원 종이. 바람에 살랑 흔들린다.",
+    "keywords": [
+      "유리 종",
+      "금붕어 무늬",
+      "소원 종이"
+    ],
+    "references": [],
+    "avoid": [
+      "쇠 종"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 여름 불꽃놀이 EV-02"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "string",
+      "mark"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#8C6440",
+    "glass": "#CFE8F2",
+    "glassRim": "#9CC9DE",
+    "mark": "#E8504F",
+    "string": "#C9583B",
+    "paper": "#FBF4EC"
+  },
+  "paletteLabels": {
+    "wood": "나무 팔",
+    "glass": "유리 종",
+    "glassRim": "종 아래·추",
+    "mark": "금붕어 무늬",
+    "string": "끈",
+    "paper": "소원 종이"
+  },
+  "variants": {
+    "blue": {
+      "label": "물빛 (기본)",
+      "palette": {}
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "glass": "#F7D3DF",
+        "glassRim": "#E8A9BE"
+      }
+    },
+    "night": {
+      "label": "밤하늘",
+      "palette": {
+        "glass": "#3E4C7A",
+        "glassRim": "#2E3A5C",
+        "mark": "#F2C14E"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": [
+    "sway"
+  ]
+}

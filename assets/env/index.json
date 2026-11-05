@@ -313,6 +313,15 @@
       "status": "review"
     },
     {
+      "id": "PR-18",
+      "slug": "event-raft",
+      "name": "불꽃 발사대",
+      "category": "prop",
+      "kind": "fireworks-raft",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "PR-23",
       "slug": "event-sign",
       "name": "행사 간판",

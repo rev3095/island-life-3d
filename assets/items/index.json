@@ -600,6 +600,33 @@
       "status": "review"
     },
     {
+      "id": "IC-EV-02",
+      "slug": "event-sparkler",
+      "name": "손 불꽃",
+      "group": "event",
+      "kind": "sparkler",
+      "hold": false,
+      "items": [
+        {
+          "item": "event.sparkler",
+          "code": "IC-EV-02",
+          "icon": "assets/items/renders/event-sparkler_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.21,
+        0.159,
+        0.436
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-FE-01",
       "slug": "festival-pie",
       "name": "과일 파이",

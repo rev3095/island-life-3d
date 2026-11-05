@@ -1,0 +1,67 @@
+{
+  "id": "PR-18",
+  "slug": "event-raft",
+  "name": "불꽃 발사대",
+  "category": "prop",
+  "kind": "fireworks-raft",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "여름 불꽃놀이 밤에 남쪽 바다 위에 떠 있는 나무 뗏목. 발사 통 셋에서 불꽃(FX-01)이 올라간다. 불꽃놀이 밤에만 보인다.",
+    "keywords": [
+      "나무 뗏목",
+      "발사 통 셋",
+      "밧줄 테두리"
+    ],
+    "references": [],
+    "avoid": [
+      "진짜 화약·위험해 보이는 것"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 여름 불꽃놀이 EV-02"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#A77B52",
+    "woodDark": "#7F5636",
+    "tube": "#C9583B",
+    "band": "#F2C14E",
+    "hole": "#2B2420",
+    "rope": "#D9C49A",
+    "flag": "#4C86C6"
+  },
+  "paletteLabels": {
+    "wood": "뗏목",
+    "woodDark": "받침·깃대",
+    "tube": "발사 통",
+    "band": "통 띠",
+    "hole": "통 구멍",
+    "rope": "밧줄",
+    "flag": "깃발"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "extent": [
+      0.85,
+      0.65
+    ],
+    "note": "물 위에 놓는다 — 충돌 없음 (걸어서 닿지 않음)"
+  }
+}

@@ -762,6 +762,32 @@
       "animations": [],
       "version": "0.1",
       "status": "review"
+    },
+    {
+      "id": "FU-44",
+      "slug": "wind-chime",
+      "item": "furn.wind-chime",
+      "name": "여름밤 풍경",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.22,
+        0.39,
+        1.8
+      ],
+      "variants": [
+        "blue",
+        "pink",
+        "night"
+      ],
+      "animations": [
+        "sway"
+      ],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

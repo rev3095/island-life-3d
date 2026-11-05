@@ -1,0 +1,60 @@
+{
+  "id": "FU-44",
+  "slug": "wind-chime",
+  "item": "furn.wind-chime",
+  "name": "여름밤 풍경",
+  "category": "furniture",
+  "kind": "wind-chime",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 1192,
+  "parts": 2,
+  "materials": [
+    "glass",
+    "glassRim",
+    "mark",
+    "paper",
+    "string",
+    "wood"
+  ],
+  "objects": [
+    "bracket",
+    "chime"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    }
+  },
+  "size": [
+    0.22,
+    0.39,
+    1.8
+  ],
+  "bounds": [
+    [
+      -0.11,
+      -0.386,
+      1.2
+    ],
+    [
+      0.11,
+      0.0,
+      1.8
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 28944,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wind-chime_front.png",
+    "wind-chime_main.png",
+    "wind-chime_thumb.png",
+    "wind-chime_top.png",
+    "wind-chime_variants.png"
+  ]
+}
