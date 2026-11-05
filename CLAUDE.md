@@ -22,6 +22,7 @@ node tools/build-env.mjs --index    # Blender 없이 목록만 (status·이름�
 node tools/build-editor-index.mjs   # 배경 편집기 게시용 묶음 (editor-index.json · editor-models-<n>.json, gitignore)
 node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용, 커밋 안 함)
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
+node tools/check-events.mjs [--target=dev|artifact|both] [--only=EV-01,EV-03]   # 계절 행사 넷을 날짜 흉내로 실제 키 점검 (행사마다 새 브라우저, 하나 20초 안팎)
 ```
 
 - 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=min|low|mid|high` 그래픽 사양 (게시본은 링크 끝 `#low` 등 — 아래 「사양」), `?check` 기기 점검 30초 (게시본 `#check`), `?story=<장면 id>` 장면 재생, `?date=2027-04-02` 날짜 흉내 (게시본 `#date=…`, 사양과 같이 `#low&date=…`) — 진짜 저장과 안 섞이게 저장 칸 `island-life-save-v1-preview`), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/editor.html` 캐릭터 편집기, `/bg-editor.html` 배경 편집기, `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.
@@ -34,7 +35,7 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 ### 게임 런타임 (`index.html` → `src/main.js`)
 - `main.js` 가 렌더러·장면·카메라·기본 조명(`ctx.lights = {hemi, sun, sunOffset}`)과 공용 `ctx` 를 만들고, 모듈을 **`data → sky → world → player → ui → audio → gameplay`** 순서로 동적 import 한다. 파일이 없는 모듈은 건너뛰므로 어느 브랜치에서든 열린다 (world 가 없으면 core-check 장면).
 - 모듈 모양: `export default { name, async init(ctx), update(dt, ctx) }`. 기능은 `ctx.services.<이름>` 에 올리고, 모듈끼리는 **이벤트(`ctx.events`)와 서비스로만** 주고받는다. 약속은 `docs/CONTRACTS.md` 가 기준이며 뒤쪽 "1차 합친 뒤 추가된 약속"·"2차 준비" 절이 앞 내용보다 우선한다. 각 모듈의 설계 결정은 `docs/notes/<트랙>.md`.
-- `src/gameplay/index.js` 는 `gather/`(P2)·`town/`(P3)·`house/`(P4)·`intro/`·`story/`·`festival/`·`events/`(M8) 하위 모듈을 차례로 불러오고, **Space/F 행동 키를 우선순위 디스패처**(`ctx.services.gameplay.interactions.add({name, intent, priority, test, run})`)로 나눠 준다. 축제 시작 101 (축제 날 저녁 모닥불 앞에서만) · 말 걸기 100 · 문 90 · 가구 80 · 나무 흔들기 60 · 줍기 50 · 도구 10. `input:press` 를 직접 처리하지 말 것 (UI 창이 열려 있으면 `ui.isBlocking()` 으로 막힘).
+- `src/gameplay/index.js` 는 `gather/`(P2)·`town/`(P3)·`house/`(P4)·`intro/`·`story/`·`festival/`·`events/`(M8) 하위 모듈을 차례로 불러오고, **Space/F 행동 키를 우선순위 디스패처**(`ctx.services.gameplay.interactions.add({name, intent, priority, test, run})`)로 나눠 준다. 눈덩이를 밀고 있을 때 놓기·머리 얹기 102 · 축제 시작 101 (축제 날 저녁 모닥불 앞에서만) · 말 걸기 100 · 눈덩이 밀기 97 · 행사 간판·돗자리·솥·허수아비 96 · 문 90 · 가구 80 · 나무 흔들기 60 · 꽃잎·버섯 줍기 52 · 줍기 50 · 도구 10. 행사 주인공 주민이 행사 자리 둘레에 서 있으므로, 행사 물건 처리기가 말 걸기에 밀리지 않는지 볼 것. `input:press` 를 직접 처리하지 말 것 (UI 창이 열려 있으면 `ui.isBlocking()` 으로 막힘).
 - 섬 밖 공간(집 실내 등)은 `world.addZone({contains, collide, heightAt, groundAt, isWalkable})` 로 바닥·벽을 바꿔 끼운다. 플레이어 이동은 `world.collide` / `island.heightAt` 만 쓴다.
 - 실내는 내 집(x 500) · 주민 방(540) · 도토리상점(580) · 박물관(620). 드나들기(문 열기·걸어 들어가기·원형 전환)는 모두 `src/gameplay/house/door.js` 의 `through()` 하나, 상점·박물관 실내는 `places.js` + 방 배치 `assets/interior/places/*.json` (실내 검수 보드 interiors D67–D73, `docs/notes/p12-interiors.md`).
 - 저장되는 상태는 `ctx.state` (`src/core/state.js`), 칸마다 주인 모듈이 정해져 있다. 저장·하루 리셋(05:00 경계)은 data 모듈 (`localStorage` `island-life-save-v1`, 내보내기·불러오기 `save.exportText/importText`).
@@ -43,7 +44,10 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 ### 계절 행사 (M8, `src/gameplay/events/`)
 - 8차 보드 wave8 (D74–D85, 반영 v1 = 모두 A). 행사 넷(봄 꽃놀이·여름 불꽃놀이·가을 수확 잔치·겨울 눈사람 날, EV-01–04)의 날짜·시간·주인공·할 것·보상·결정 갈래는 **설정 파일 하나 `assets/events/events.json`** — 결정이 바뀌면 이 파일부터 (바꿀 자리 표는 `docs/notes/m8-events.md`). 날짜 계산은 순수 함수 `calendar.js` (정한 날부터 7일, 해 넘김·2/29, 시간 `hours` 는 게임 하루 시각 5~29, 섬 축제 날은 17시에 끊김, 첫 섬 축제(엔딩) 뒤부터 열림). 모듈 `index.js` 가 알림·오른쪽 아래 칸·섬폰 「📅 달력」(`ui.calendar`)·도장·진행 기록(`state.events`)·행사 시간 비 막기를 맡고, 놀이 트랙은 `ctx.services.events.progress(id, todo)`·`stamp(id)`·`live()` 를 쓴다 (`events:start`·`events:todo`·`events:stamp`).
 - 날짜 흉내 `ctx.preview` (`src/core/preview.js`): main.js 가 주소에서 읽고, sky 가 실제 시계를 그 날짜로 옮기고(`baseShift`), data 가 저장 키를 바꾼다.
-- 행사 아이템·보상 가구는 `src/data/event-items.js` (`festival-items.js` 와 같은 모양, `items.js` 가 붙임). 분류 `event` 「행사」, 가구 `code` 는 순번이 아니라 보드 ID(FU-43–46), 색 변형 아이템은 줄 끝 `{ model, variant }`. 행사 모델 16개(EN-12 · PR-17–23 · FU-43–46 · IC-EV-01–04)는 M8-P2 에서 검수 대기로 만들었고, 섬에 놓기·놀이·불꽃 셰이더 FX-01·캐릭터 동작 AN-08·09 는 M8-P3–P6.
+- 행사 아이템·보상 가구는 `src/data/event-items.js` (`festival-items.js` 와 같은 모양, `items.js` 가 붙임). 분류 `event` 「행사」, 가구 `code` 는 순번이 아니라 보드 ID(FU-43–46), 색 변형 아이템은 줄 끝 `{ model, variant }`. 행사 모델 16개(EN-12 · PR-17–23 · FU-43–46 · IC-EV-01–04)는 검수 대기.
+- 놀이는 행사마다 파일 하나(`spring.js` 꽃잎·도시락·벚꽃 등 · `summer.js` 손 불꽃·불꽃 쇼·소원 · `autumn.js` 버섯·큰 솥·잔치 · `winter.js` 눈덩이 밀기·눈사람), `events/index.js` 가 `E.plays` 로 만들고 행동 키를 달고 `update(dt)` 를 부른다. 공통 모양: 행사 기간 물건은 `world.objects.add(…, { persist: false })` 로 **저장하지 않고** 들어올 때마다 다시 놓는다 · 날마다 바뀌거나 움직이는 것(꽃잎·버섯·눈덩이)은 world 물체가 아니라 그 놀이의 메시 · 자리 고르기(`springSpots`·`summerSpots`·`mushroomSpots`·`ballSpots`)는 순수 함수라 `tests/events.test.mjs` 가 섬 생성기로 돌린다 · 놀이 상태는 `(ctx.state.events ||= {}).<slug>` 처럼 **없으면 만든다**(새 저장엔 `state.events` 가 없어 모듈이 통째로 죽은 적 있음) · 모델을 기다리는 다시 그리기는 세대 번호로 겹침을 막는다(겹치면 두 번 놓임). world 는 `objects.js` `SEASONAL`·`SWAY` 목록에 종류를 더해야 계절 색·흔들림이 걸린다.
+- `events.spot(id, fn)` 로 놀이가 그 행사 자리를 알려 주면 `events:start` 에 x·z 가 실리고(장면 `place: "event"`), `events.hostSpot(slug)` → `town/index.js pickSpot` 이 주인공 주민을 행사 시간에 그 둘레로 보낸다. 장면 s13–s16 은 트리거 `event-start` (`story/rules.js`, 그 행사를 처음 할 때 한 번).
+- 불꽃(`src/render/fireworks.js`, FX-01)은 `THREE.Points` + `materials.curved`, 사양별 발 수 `FIREWORK_QUALITY`. 게임 카메라가 남쪽에서 내려다보며 플레이어를 따라가서 **터질 높이를 발마다 지금 카메라로 계산**(`aimHeight`)하고, 불꽃놀이는 북쪽 해변에서 한다(남쪽 바다는 카메라 뒤).
 
 ### 렌더링 규칙 (`src/core/materials.js`)
 - 모든 3D 모델은 `applyToonStyle(root, {spec})` / `toonMaterial` / `outlineMaterial` 을 거친다. 여기 들어 있는 **곡면 월드 패치**(`project_vertex` 대체, 중심 = `ctx.focus`, 세기 `curve.uCurve`)와 외곽선(뒤집은 껍데기, `userData.outline = true`)이 모든 메시·인스턴스·스킨 메시에 맞게 걸려야 한다. 그림자는 휘기 전 좌표로 조회해 어긋나지 않지만, 깊이·법선을 다시 그리는 후처리(SSAO 등)의 override 재질에는 곡면 패치가 없다.
@@ -105,10 +109,12 @@ node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--onl
 
 ### QA · 자동 플레이 점검 (`docs/qa/`)
 - 봇이 사람처럼 키·창 단추·가상 조이스틱으로만 처음부터 엔딩(그리고 1년 뒤 축제)까지 플레이한다: `tests/playthrough/` (`bot.js` 본체 — 게임 rAF 를 멈추고 `ctx.step(dt)` 를 직접 돌림, `skills.js` 사람 행동 단위, `scenario.js` 단계 목록), 실행기 `tools/playtest.mjs` (CDP). 지름길(`festival.debug` 등)·상태 직접 고치기 금지, 시계만 `time.setHour` 로 당긴다. 결과 `docs/qa/runs/` (커밋 안 함), 보고서 `docs/qa/playthrough-<날짜>.md` (버그 ID `QA-NN`, 크기 치명·큼·작음·다듬기). 새 흐름이 합쳐지면 `scenario.js` 에 단계를 더한다 — `docs/qa/README.md`.
+- 계절 행사는 엔딩 뒤에만 열리고 날짜가 달라야 해서 위 봇 대신 `tools/check-events.mjs` 로 본다: 행사마다 새 프로필로 `?date=`(게시본 `#date=`)를 열어 이름·첫 장면은 실제 단추·Esc·Space 로 넘기고, **준비만** 미리 보기 저장에 직접 넣는다(`state.festival.endedDay`, 재료) — 나머지는 실제 키. 콘솔 오류·4xx 가 하나라도 있으면 실패. 결과 `docs/qa/runs/<날짜>-events/`. 같은 포트에 다른 점검이 돌고 있으면 그쪽이 개발 서버를 끄니 하나씩.
+- 미리보기 창(Browser pane)이 숨겨져 있으면 rAF 가 거의 안 돌아 화면이 옛 장면에 멈춘다 → 확인할 때는 `__island.step(dt)` 로 프레임을 직접 돌린 뒤 스크린샷.
 - QA 결과의 처리(보드 wave7 D47-A): 막힘·저장 깨짐·오류는 그 자리에서 고쳐 합치기 승인만, 밸런스·불편·보기는 7차 보드 QA 칸(`concept/wave7-board.html` 의 `QA` 표)에 선택지로.
 - 봇 길찾기는 칸 가운데 격자(`town/path.js` `createNav`)라, 선 칸 가운데가 막힌 틈(문 앞 우편함·덤불 사이 등)에서는 걸을 수 있는 옆 칸에서 시작한다(`bot.js` `startOf`). "길이 없어요"가 몰려 나오면 출발 자리(`issues[].from`)부터 본다 — 게임 쪽이 아니라 봇 쪽일 때가 많다. 시나리오는 날짜를 박지 않는다 (새 게임 = 실제 오늘).
 
 ### 병렬 개발 방식
-- 지금 마일스톤은 **M8 계절 행사** (보드 wave8 반영 v1, P0 보드 · P1 행사 틀 · P2 모델 16 끝 → 다음 P3–P6 행사 놀이(파일이 안 겹쳐 동시에 가능) → P7 장면 s13–s16 → P8 QA·게시). M7 은 사용자 손 점검(RC-05–08·12)과 P10 정리(작업 폴더·브랜치)만 남았다. **앞으로 할 일은 모두 P 번호로 부른다** — 순서 표는 `docs/PLAN.md` 「앞으로 일정」, 진행 상황은 devlog 「현재 상태」·「다음에 할 일」.
+- 지금 마일스톤은 **M8 계절 행사** (보드 wave8 반영 v1, P0 보드 · P1 행사 틀 · P2 모델 16 · P3–P6 놀이 넷 · P7 장면 s13–s16·주인공 주민 끝 → P8 행사 점검·게임 다시 게시 중). 남은 것: 주민 행사 소품·행사 대사·눈사람 표정 모델·AN-08·09 동작 (`docs/notes/m8-events.md`). M7 은 사용자 손 점검(RC-05–08·12)과 P10 정리(작업 폴더·브랜치)만 남았다. **앞으로 할 일은 모두 P 번호로 부른다** — 순서 표는 `docs/PLAN.md` 「앞으로 일정」, 진행 상황은 devlog 「현재 상태」·「다음에 할 일」.
 - 단계 P1~P6 과 트랙 표는 `docs/PLAN.md`. 트랙마다 브랜치 + git worktree(`../island-worktrees/<브랜치>`)에서 **자기 폴더만** 고치고, 계약 변경은 `docs/notes/<트랙>.md` 에 제안한다. `main` 합치기는 사용자 승인 뒤 조정 세션이 한다 (합치기 전 `git merge-tree --write-tree main <branch>` 로 충돌 확인).
 - 미리보기 브라우저 창이 숨겨져 있으면 `requestAnimationFrame` 이 느려져 fps 값이 의미 없다 — 성능은 `renderer.render` + `gl.finish()` 시간으로 잰다.
