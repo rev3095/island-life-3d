@@ -18,6 +18,10 @@
     {"scene":"s10-festival"},
     {"scene":"s11-ending-photo"},
     {"scene":"s12-life-goes-on"},
-    {"fixed":"free-play","title":"엔딩 뒤 섬 생활","owner":"all","note":"채집·탐험·수집·꾸미기가 그대로 이어진다"}
+    {"fixed":"free-play","title":"엔딩 뒤 섬 생활","owner":"all","note":"채집·탐험·수집·꾸미기가 그대로 이어진다"},
+    {"scene":"s13-spring-blossom"},
+    {"scene":"s14-summer-fireworks"},
+    {"scene":"s15-autumn-harvest"},
+    {"scene":"s16-winter-snowman"}
   ]
 }

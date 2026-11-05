@@ -1,0 +1,150 @@
+{
+  "id": "s13-spring-blossom",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절 행사",
+  "title": "봄 꽃놀이",
+  "summary": "봄 꽃놀이 첫날. 광장 둘레 벚나무가 피고, 모찌가 돗자리에서 손짓한다. 꽃잎 줍기·도시락·벚꽃 등을 알려 준다.",
+  "trigger": {
+    "on": "event-start",
+    "event": "EV-01"
+  },
+  "place": "plaza",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "벚나무 훑고 돗자리로",
+      "recommended": true,
+      "desc": "광장 둘레 벚나무를 한 바퀴 → 돗자리의 모찌가 손짓 → 주인공이 다가가 끄덕인다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "벚나무가 핀 광장",
+          "dur": 3,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "place": "plaza",
+            "angle": 20,
+            "move": "orbit"
+          },
+          "transition": "fade",
+          "actors": [],
+          "music": "auto"
+        },
+        {
+          "id": "c2",
+          "note": "모찌가 돗자리에서 손짓",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "mochi",
+              "at": [
+                0,
+                -2.6
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🌸",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0.6
+              ],
+              "face": "mochi",
+              "emote": "😊",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "꽃잎을 함께 줍자",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "mochi",
+            "angle": -15,
+            "move": "static"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "mochi",
+              "face": "player",
+              "emote": "🍱",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "mochi",
+              "do": "happy",
+              "emote": "👍",
+              "text": ""
+            }
+          ],
+          "caption": "봄 꽃놀이 주간이에요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "모찌가 꽃잎을 날리며 인사, 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "모찌가 꽃잎 인사",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "mochi",
+              "at": [
+                1.2,
+                -1
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🌸",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0.6
+              ],
+              "face": "mochi",
+              "emote": "😊",
+              "text": ""
+            }
+          ],
+          "music": "auto",
+          "caption": "봄 꽃놀이 주간이에요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

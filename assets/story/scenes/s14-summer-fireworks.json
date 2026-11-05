@@ -1,0 +1,150 @@
+{
+  "id": "s14-summer-fireworks",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절 행사",
+  "title": "여름 불꽃놀이",
+  "summary": "여름 불꽃놀이 첫날 저녁. 북쪽 해변 간판 앞에서 코코가 손 불꽃을 건네고, 바다 쪽 발사대를 가리킨다.",
+  "trigger": {
+    "on": "event-start",
+    "event": "EV-02"
+  },
+  "place": "event",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "해변에서 손 불꽃",
+      "recommended": true,
+      "desc": "밤바다를 넓게 → 코코가 손 불꽃을 건넴 → 둘이 바다 쪽을 본다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "저녁 바다와 발사대",
+          "dur": 3,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "place": "event",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "actors": [],
+          "music": "evening"
+        },
+        {
+          "id": "c2",
+          "note": "코코가 손 불꽃을 건넨다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                1.2,
+                0.4
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🎇",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.4,
+                0.8
+              ],
+              "face": "coco",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "둘이 바다를 본다 — 20시에 불꽃",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": 20,
+            "move": "static"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "coco",
+              "face": 0,
+              "emote": "🎆",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            }
+          ],
+          "caption": "저녁 8시, 바다 위로 불꽃이 올라가요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "코코가 손 불꽃을 흔들며 인사, 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "코코가 손 불꽃 인사",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                1.2,
+                0.4
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🎇",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.4,
+                0.8
+              ],
+              "face": "coco",
+              "emote": "😊",
+              "text": ""
+            }
+          ],
+          "music": "evening",
+          "caption": "여름 불꽃놀이 주간이에요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

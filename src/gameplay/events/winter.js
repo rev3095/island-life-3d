@@ -158,6 +158,7 @@ export function createWinter(ctx, events) {
   ctx.events.on('time:newday', sync);
   ctx.events.on('time:tick', () => { if (ballsLive !== (!!S().world?.objects && live())) refresh(); });   // 행사 시간이 시작·끝날 때
   ctx.events.on('festival:end', sync);
+  events.spot?.(EV, () => balls[0] ? { x: balls[0].x, z: balls[0].z } : (S().world?.places?.festival ?? null));
   sync();
 
   return { register, update, sync, debug: { get balls() { return balls; }, get pushing() { return pushing; }, get snowIds() { return snowIds; }, refresh } };

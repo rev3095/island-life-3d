@@ -27,6 +27,9 @@ export function createEventsService(ctx, cfg) {
   const toast = (t, icon) => S().ui?.toast?.(t, icon);
   const festivalToday = () => { try { return !!S().festival?.due?.(); } catch { return false; } };
   const open = () => openRule(cfg, ctx.state.festival);
+  /** 놀이마다 그 행사 자리 (장면 place 'event' · 주인공 주민이 서성일 곳) — 놀이가 spot(id, () => {x, z}) 로 단다 */
+  const spots = {};
+  const spotOf = id => { try { return spots[id]?.() ?? null; } catch { return null; } };
 
   /** 오늘 기간 안인 행사 (시간과 상관없이) */
   const active = (key = today()) => (key ? activeOn(cfg, key) : []);
@@ -96,7 +99,8 @@ export function createEventsService(ctx, cfg) {
       const rec = run(r);
       if (!rec.days.includes(key)) rec.days.push(key);
       toast(first ? `${r.ev.emoji} ${r.ev.name} 주간이 시작됐어요! (${r.left}일 남음) 섬폰 📅 달력에서 오늘 할 것을 볼 수 있어요` : `${r.ev.emoji} ${r.ev.name} ${r.day}일째예요`, r.ev.emoji);
-      ctx.events.emit('events:start', { id: r.ev.id, year: r.year, first, dayKey: key });
+      const at = spotOf(r.ev.id);
+      ctx.events.emit('events:start', { id: r.ev.id, year: r.year, first, dayKey: key, ...(at ? { x: at.x, z: at.z } : {}) });
     }
     weather();
   }
@@ -120,6 +124,9 @@ export function createEventsService(ctx, cfg) {
     service: {
       config: cfg, today, active, live, isOpen: open, progress, todo: id => { const r = active().find(x => x.ev.id === id); return r ? todo(r) : []; },
       stamp, stamps: () => st().stamps, calendar: year => yearCalendar(cfg, year),
+      spot: (id, fn) => { spots[id] = fn; },
+      /** D79-A: 지금 행사 시간인 행사의 주인공이면 그 행사 자리 {x, z} (town.pickSpot 이 묻는다), 아니면 null */
+      hostSpot(slug) { if (!open()) return null; const r = live().find(x => x.ev.host === slug); return r ? spotOf(r.ev.id) : null; },
       debug: { check, openCalendar: () => openCal() },
     },
   };
