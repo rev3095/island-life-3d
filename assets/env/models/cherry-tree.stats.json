@@ -1,0 +1,44 @@
+{
+  "id": "EN-12",
+  "slug": "cherry-tree",
+  "name": "벚나무",
+  "category": "nature",
+  "kind": "cherry-tree",
+  "version": "0.1",
+  "triangles": 6484,
+  "parts": 3,
+  "materials": [
+    "bloom",
+    "leaf",
+    "trunk"
+  ],
+  "animations": {
+    "sway": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "shake": {
+      "frames": 18,
+      "seconds": 0.75
+    }
+  },
+  "size": [
+    2.89,
+    2.58,
+    1.88
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 124264,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-tree_front.png",
+    "cherry-tree_hero.jpg",
+    "cherry-tree_main.png",
+    "cherry-tree_thumb.png",
+    "cherry-tree_top.png",
+    "cherry-tree_variants.png"
+  ]
+}

@@ -43,6 +43,22 @@
 | D84 리소스 | — | M8-P2 범위 |
 | D85 미리 보기 | `preview.mode` `hash` | B 개발판만 = `core/preview.js` `urlDate` 가 `hash` 를 안 보게 · C 섬폰 다시 하기 = 달력 창에 단추 |
 
+## M8-P2 리소스 — 봄 꽃놀이 (EV-01) 2026-11-05, 브랜치 `p20-spring-assets`
+행사 하나씩 컨셉 → 모델 → 편집기 검수. 봄 꽃놀이 다섯을 만들어 모두 status `review` (사용자 검수 대기).
+
+| ID | 이름 | 스펙 | 빌더 | 비고 |
+|---|---|---|---|---|
+| EN-12 | 벚나무 | `assets/env/specs/cherry-tree.json` (nature) | `build_env.py` `b_cherry_tree` | 굽은 줄기 + 가지 넷이 옆으로, 가지 끝마다 납작한 꽃 구름(가지가 사이로 보임) + 떨어진 꽃잎. 활엽수(EN-01, 봄엔 분홍 동그라미)와 모양으로 갈림. 변형 봄(기본)·여름·가을·겨울(눈 덮인 흰색 — 빈 가지는 모양이 달라 색 변형으로 못 함). 흔들기 sway·shake, 충돌 r 0.34 |
+| PR-17 | 꽃놀이 돗자리 | `event-picnic.json` (prop) | `b_picnic_mat` | 1.8칸 체크 돗자리 + 3단 도시락·보자기·찻잔 둘. 돗자리 위는 걷고 도시락만 막음 (충돌 r 0.22). 변형 빨강·파랑·초록 |
+| PR-23 | 행사 간판 | `event-sign.json` (prop) | `b_event_sign` | 세움 간판 + 지붕, 그림판 색 변형 넷 = 행사 넷 (꽃놀이·불꽃·수확·눈사람) |
+| FU-43 | 벚꽃 등 | `assets/furniture/specs/cherry-lamp.json` | `build_furniture.py` `b_cherry_lamp` | 벌어진 꽃잎 다섯 + 가운데 불빛(glow, 밤에 켜짐) + 꽃술. 아이템 `furn.cherry-lamp` (code FU-43, `src/data/event-items.js` EVENT_FURN) |
+| IC-EV-01 | 벚꽃잎 | `assets/items/specs/event-petal.json` (group event) | `build_item.py` `b_petal` | 홈 파인 꽃잎 석 장, 위에서 보는 렌더(pitch 74). 아이템 `event.petal` (분류 `event` 「행사」, 30개씩) |
+
+- 아이템 표: `src/data/event-items.js` (festival-items.js 와 같은 모양) → `items.js` 가 붙임. 가구 code 는 보드 ID 를 그대로 (순번 FU-35 이 아니라 FU-43).
+- 테스트: 개수 표 +1 (배경 55 · 가구 35 · 아이콘 98 · 아이템 스펙 87), 아이템 ID 규칙에 EV, `villagers.test.mjs` 지문은 행사 아이템을 빼고 뜸 (목록 순번으로 고르는 칸이 많아 아이템이 늘면 모든 주민 지문이 바뀌므로 — 행동은 그대로라 핀 값 그대로 통과), 캐릭터 편집기 파일 목록에 event-items.js.
+- 배경 편집기 v12 (아이템 탭에 「행사」 분류, 게시 파일 435 → 459/511).
+- **아직 게임에는 안 놓였다** — 벚나무 자리·돗자리·간판 배치와 꽃잎 줍기는 M8-P3 (봄 놀이). 게임 다시 게시도 그때.
+
 ## 남은 것 · 못 한 것
 - 도장(UI-15)은 보드에선 도감 탭이지만 도감 창을 건드리지 않게 달력 창 아래 칸에 넣었다. 도감 탭으로 옮기려면 `src/ui/phone.js` 도감 화면에 칸 하나.
 - 휴대폰 세로에서 칸은 시계 밑 왼쪽 — 섬 축제 진행판도 600px 아래에선 그 자리라, 축제 날이 행사 주간과 겹치면 겹칠 수 있다 (축제 날 저녁만). 놀이 트랙에서 확인.

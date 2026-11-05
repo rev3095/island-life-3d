@@ -573,6 +573,33 @@
       "status": "approved"
     },
     {
+      "id": "IC-EV-01",
+      "slug": "event-petal",
+      "name": "벚꽃잎",
+      "group": "event",
+      "kind": "petal",
+      "hold": false,
+      "items": [
+        {
+          "item": "event.petal",
+          "code": "IC-EV-01",
+          "icon": "assets/items/renders/event-petal_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.239,
+        0.175,
+        0.047
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-FE-01",
       "slug": "festival-pie",
       "name": "과일 파이",

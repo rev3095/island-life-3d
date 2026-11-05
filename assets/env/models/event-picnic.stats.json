@@ -1,0 +1,38 @@
+{
+  "id": "PR-17",
+  "slug": "event-picnic",
+  "name": "꽃놀이 돗자리",
+  "category": "prop",
+  "kind": "picnic-mat",
+  "version": "0.1",
+  "triangles": 4832,
+  "parts": 2,
+  "materials": [
+    "cloth",
+    "cup",
+    "lunch",
+    "lunchDark",
+    "matA",
+    "matB"
+  ],
+  "animations": {},
+  "size": [
+    1.83,
+    1.83,
+    0.45
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 92868,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-picnic_front.png",
+    "event-picnic_hero.jpg",
+    "event-picnic_main.png",
+    "event-picnic_thumb.png",
+    "event-picnic_top.png",
+    "event-picnic_variants.png"
+  ]
+}

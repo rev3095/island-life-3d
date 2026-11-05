@@ -2,7 +2,7 @@
 
 이 문서는 세션이 끝나거나 `/clear` 하기 전에 대화와 작업을 보고서로 남긴 기록이다. 새 세션은 **「현재 상태」부터 읽고**, 자세한 경위는 「세션 기록」을 본다. 구조·명령어는 [CLAUDE.md](CLAUDE.md), 개발 단계는 [docs/PLAN.md](docs/PLAN.md), 모듈 약속은 [docs/CONTRACTS.md](docs/CONTRACTS.md), 실행법은 [README.md](README.md).
 
-마지막 갱신: 2026-11-05 (세션 4 — 7차 보드 반영 v2 M7-P7 · 편집기 맞추기 M7-P8 · 시점 확정 M7-P9 · M8-P0 8차 검수 보드 게시 · 8차 반영 v1 · M8-P1 행사 틀)
+마지막 갱신: 2026-11-05 (세션 4 — 7차 보드 반영 v2 M7-P7 · 편집기 맞추기 M7-P8 · 시점 확정 M7-P9 · M8-P0 8차 검수 보드 게시 · 8차 반영 v1 · M8-P1 행사 틀 · M8-P2 봄 리소스)
 
 ---
 
@@ -41,6 +41,8 @@ M0~M6 끝, **M7 출시 준비 — P1~P5 끝 · 7차 보드 반영 v2 확정(D49�
 **2026-11-05 M8-P0 8차 검수 보드** (브랜치 `p18-board8`, main 58a5f8c 에서): `concept/wave8-board.html` — 계절 행사 넷(봄 꽃놀이 4/1–7 · 여름 불꽃놀이 8/1–7 밤 · 가을 수확 잔치 10/15–21 · 겨울 눈사람 날 12/20–26), 결정 D74–D85(크기·날짜·행사별 할 것·장소·주민·날씨·보상·행사 채집·엔딩 전·리소스 양·미리 해 보기, 추천 모두 A), 새 리소스 EN-12 · PR-17–23 · FU-43–46 · IC-EV-01–04 · FX-01 · AN-08–09 · s13–s16, 새 화면 UI-13–15, 계획 M8-P1–P8. 로컬 확인: 콘솔 오류 0, 375·1200px 가로 넘침 0. 게시 **보드 v1** https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T · **홈 v9** (목록·바로 가기에 wave8) · 홈 `status/wave8`. README 보드 표·ID 표 (D74–D85, EV·FX 새 접두사). 사용자 승인 "main 에 합치기" → main `--no-ff` 98bd57b (충돌 0, 테스트 360). 다음: 사용자 선택 → "검수 보드 반영" → M8-P1.
 
 **2026-11-05 8차 검수 보드 반영 v1 → M8-P1 행사 틀** (사용자 "8차 보드 검수 보드 반영, 제작"): `boards/wave8` 에 고른 기록 없음 = 추천안 그대로 → **D74–D85 모두 A**, `applied/wave8` v1 · `history/wave8-v1` (commit b87b247), 보드 v2 · 홈 `status/wave8`. 브랜치 `p19-events` (main b87b247 에서, main 작업 트리): 설정 `assets/events/events.json`, `src/gameplay/events/` (calendar.js 날짜·시간 순수 함수 · index.js 알림·진행·도장·행사 시간 비 막기 · eventsui.js 칸 UI-14 · 섬폰 달력 UI-13 · 도장 UI-15), 날짜 흉내 `src/core/preview.js` (`#date=2027-04-02`, 저장 칸 `island-life-save-v1-preview` — sky 시계·data 저장 키), 섬폰 「📅 달력」, 빌드 `island` 묶음에 events, 스타일 편집기 파일 목록에 preview.js. 테스트 368 (events 8 새로). 개발판 확인: 꽃놀이 2일째·진짜 저장 그대로·엔딩 전 밤톨 한 줄·엔딩 뒤 알림·칸·달력 창·휴대폰 375 넘침 0·콘솔 오류 0. 노트 `docs/notes/m8-events.md`, CONTRACTS 「8차」, PLAN M8 줄. **합치기 승인 대기.** 다음: M8-P2 리소스(컨셉 → 모델) · P3–P6 행사 놀이.
+
+**2026-11-05 M8-P1 합침 → M8-P2 봄 꽃놀이 리소스** (사용자 "합치고 P2 시작"): p19-events → main 3c8235f (충돌 0, 테스트 368). 브랜치 `p20-spring-assets`: Blender 새 모델 다섯 — EN-12 벚나무(가지가 퍼진 납작한 꽃 구름, 두 번 고쳐 활엽수와 다르게) · PR-17 꽃놀이 돗자리 · PR-23 행사 간판(색 변형 넷 = 행사 넷) · FU-43 벚꽃 등(꽃잎을 벌려 불빛이 보이게 고침) · IC-EV-01 벚꽃잎(홈 파인 꽃잎으로 고침), 모두 **검수 대기**. 아이템 `src/data/event-items.js` (분류 「행사」, 가구 code = 보드 ID). 테스트 368 (개수 +1 · EV ID · 주민 지문은 행사 아이템 빼고). **배경 편집기 v12** (아이템 탭 「행사」, 459/511), 홈 `status/env`. 표·설명 `docs/notes/m8-events.md` 「M8-P2」. 게임에는 아직 안 놓임 (M8-P3). **합치기 승인 대기.**
 
 - ~~합치기 대기~~ 끝: `p12-interiors` b1078a7 · e4c0a51 → main 3bca813 (테스트 358) → 게임 v21, 배경 편집기 v10 (RM-07 확정).
 - 「다음에 할 일」 대로: 사용자 결정(7차 보드 D49–D57·D41, 시점 선택지 7) → M7-P6 출시 점검.

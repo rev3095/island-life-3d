@@ -1,0 +1,102 @@
+{
+  "id": "EN-12",
+  "slug": "cherry-tree",
+  "name": "벚나무",
+  "category": "nature",
+  "kind": "cherry-tree",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "봄 꽃놀이 때 섬 둘레 길에 피는 벚나무. 굽은 줄기에서 가지가 옆으로 퍼지고 넓고 납작한 꽃 뭉치가 얹힌다. 봄엔 꽃잎이 날리고 나무 밑에 떨어져 있다.",
+    "keywords": [
+      "옆으로 퍼진 가지",
+      "납작한 꽃 뭉치",
+      "떨어진 꽃잎"
+    ],
+    "references": [],
+    "avoid": [
+      "사실적인 꽃송이",
+      "곧은 줄기"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 봄 꽃놀이 EV-01"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "trunkHeight": {
+      "label": "줄기 높이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "canopySize": {
+      "label": "꽃 뭉치 크기",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.3,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "trunk": "#7A5236",
+    "leaf": "#F4B6C8",
+    "bloom": "#FBDDE6"
+  },
+  "paletteLabels": {
+    "trunk": "줄기·가지",
+    "leaf": "꽃·잎 뭉치",
+    "bloom": "꽃송이·꽃잎"
+  },
+  "variants": {
+    "spring": {
+      "label": "봄 (기본)",
+      "palette": {}
+    },
+    "summer": {
+      "label": "여름",
+      "palette": {
+        "leaf": "#6CB565",
+        "bloom": "#8ACB7E"
+      }
+    },
+    "autumn": {
+      "label": "가을",
+      "palette": {
+        "leaf": "#E07B45",
+        "bloom": "#F0A066"
+      }
+    },
+    "winter": {
+      "label": "겨울",
+      "palette": {
+        "leaf": "#E4ECEF",
+        "bloom": "#F7FAFB"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [
+    "sway",
+    "shake"
+  ],
+  "world": {
+    "collider": {
+      "r": 0.34
+    }
+  }
+}

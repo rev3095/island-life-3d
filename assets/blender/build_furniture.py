@@ -1170,8 +1170,27 @@ def b_long_terrarium(M):
         d.add(ellipsoid((rnd.uniform(-0.45, 0.35), -D / 2 + 0.3 + k * (D - 0.6) / 7, 0.165), (0.07, 0.05, 0.012), rot=rot_xyz(z=rnd.uniform(0, TAU)), seg=10, rings=4), 'leafDark')
 
 
+def b_cherry_lamp(M):
+    """FU-43 벚꽃 등 (8차 봄 꽃놀이 보상): 나무 받침·가는 기둥 위에 활짝 벌어진 꽃잎 다섯 장, 가운데 둥근 불빛이 보인다. 밤엔 불빛이 켜진다."""
+    h = P.get('height', 1)
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.06), 0.18, 0.16, seg=20), 'base')
+    m.add(cylinder((0, 0, 0.06), (0, 0, 0.6 * h), 0.025, seg=10), 'base')
+    zc = 0.68 * h
+    m.add(cone((0, 0, zc - 0.1), (0, 0, zc - 0.02), 0.03, 0.09, seg=16), 'base')   # 꽃받침
+    for k in range(5):   # 바깥으로 벌어진 꽃잎 (끝이 위로)
+        a = TAU * k / 5
+        d = V((math.cos(a), math.sin(a), 0))
+        m.add(ellipsoid(V((0, 0, zc + 0.05)) + d * 0.13, (0.15, 0.085, 0.022), rot=rot_xyz(y=-0.55, z=a), seg=18, rings=8), 'petal')
+    m.add(ellipsoid((0, 0, zc + 0.09), (0.1, 0.1, 0.09), seg=20, rings=12), 'glow', outline=False)
+    for k in range(5):   # 꽃술
+        a = TAU * k / 5 + 0.6
+        m.add(ellipsoid((math.cos(a) * 0.05, math.sin(a) * 0.05, zc + 0.19), (0.016, 0.016, 0.016), seg=8, rings=5), 'base', outline=False)
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
+    'cherry-lamp': b_cherry_lamp,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,
     'sofa': b_sofa, 'wardrobe': b_wardrobe, 'wall-clock': b_wall_clock, 'fish-tank': b_fish_tank, 'bug-case': b_bug_case,
     'picture-frame': b_picture_frame, 'villager-photo': b_villager_photo, 'festival-photo': b_festival_photo, 'shell-curtain': b_shell_curtain,

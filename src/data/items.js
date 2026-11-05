@@ -5,13 +5,15 @@
 import { ITEM_TABLE as T } from './tables.js';
 // 5차 Z5 축제 분류·아이템·가구는 festival-items.js 에서 붙인다 (분류는 아래 CATEGORIES, 가구 FU-34 는 가구 줄, 아이템 IC-FE 는 ITEMS 뒤)
 import { FESTIVAL_CATEGORY as FC, FESTIVAL_FURN, festivalItems } from './festival-items.js';
+// 8차 계절 행사 분류·채집·보상 가구는 event-items.js 에서 (가구는 보드 ID FU-43– 를 code 로 그대로)
+import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
-CATEGORIES.push(FC.key); CATEGORY_NAMES[FC.key] = FC.name;
+CATEGORIES.push(FC.key, EC.key); CATEGORY_NAMES[FC.key] = FC.name; CATEGORY_NAMES[EC.key] = EC.name;
 
 /** 한 칸에 쌓이는 최대 개수 (아이템에 stack 이 있으면 그 값) */
-export const STACK = { ...T.stack, [FC.key]: FC.stack };
+export const STACK = { ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack };
 /** 계절 표기 → 달 목록 */
 export const SEASON_MONTHS = T.seasons;
 /** 시간 표기 → [시작, 끝) 시각 구간. 낮 = 새벽~저녁(5~19시), 밤 = 저녁~새벽(17~5시). 저녁엔 둘 다 나온다 */
@@ -85,9 +87,11 @@ export const ITEMS = [
   // 가구 (FU-01 ~ FU-33): 아이콘 = 가구 모델 썸네일 그림 (assets/furniture, W3). 크기 '가로×세로' · '벽' · '창문'
   // 얻는 법(source): craft 제작, shop 상점, gift 주민 선물, friend 친밀도, museum 박물관 보상, birthday 생일 선물
   // FU-34 축제 단체 사진은 festival-items.js 의 FESTIVAL_FURN (표와 같은 순서의 줄)
-  ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source }))]
-    .map(({ slug, name, emoji, price, buy, size, source, from }, i) => ({
-    id: `furn.${slug}`, category: 'furn', code: code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
+  // FU-43– 행사 보상 가구는 event-items.js 의 EVENT_FURN (줄 끝의 보드 ID 가 code)
+  ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
+    ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    .map(({ slug, name, emoji, price, buy, size, source, from, id }, i) => ({
+    id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,
     ...(slug === 'campfire' ? { outdoor: true } : {}), ...(slug === 'radio' ? { plays: 'bgm' } : {}),
     ...(slug === 'fish-tank' ? { holds: 'fish' } : {}), ...(slug === 'bug-case' ? { holds: 'bug' } : {}),
@@ -98,6 +102,7 @@ export const ITEMS = [
   })),
 ];
 ITEMS.push(...festivalItems(itemIcon));   // IC-FE-01–04 축제 부스에서 만드는 것 (5차 Z5)
+ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8차 M8)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {

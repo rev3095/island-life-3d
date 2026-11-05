@@ -891,6 +891,72 @@ def b_festival_part(M):
     PART_SHAPES[spec['festival']['part']](M.part('part'))
 
 
+# ================================================================ 8차 M8 계절 행사 (보드 wave8)
+def b_cherry_tree(M):
+    """EN-12 벚나무: 굽은 줄기 위에서 가지 넷이 옆으로 길게 퍼지고, 가지 끝마다 납작한 꽃 구름이 따로 떠 있다 (가지가 사이로 보임).
+    봄엔 분홍 꽃 + 나무 밑에 떨어진 꽃잎. 동글동글한 활엽수(EN-01)와 달리 옆으로 넓고 낮다."""
+    th, cs = P.get('trunkHeight', 1), P.get('canopySize', 1)
+    trunk = M.part('trunk')
+    pts = bezier((0, 0, 0), (0.03, 0, 0.35 * th), (-0.1, 0.03, 0.62 * th), (0.02, 0, 0.82 * th), 8)
+    trunk.add(tube(pts, [0.17 - 0.06 * i / 8 for i in range(len(pts))], seg=14), 'trunk')
+    trunk.add(ellipsoid((0, 0, 0.04), (0.25, 0.25, 0.1), seg=16, rings=8), 'trunk')
+    top = pts[-1]
+    tips = []
+    for yaw, out, up in ((0.25, 0.95, 0.42), (1.85, 0.85, 0.55), (3.4, 0.98, 0.38), (4.9, 0.8, 0.6)):
+        d = V((math.cos(yaw), math.sin(yaw), 0))
+        br = bezier(top - V((0, 0, 0.08)), top + d * out * 0.35 + V((0, 0, up * 0.55)), top + d * out * 0.75 + V((0, 0, up * 0.85)), top + d * out * cs + V((0, 0, up)), 7)
+        trunk.add(tube(br, [0.085 - 0.05 * i / 7 for i in range(len(br))], seg=10), 'trunk')
+        tips.append(br[-1])
+    can = M.part('canopy', pivot=(0, 0, top.z))
+    can.add(ellipsoid(top + V((0, 0, 0.8)), (0.42 * cs, 0.42 * cs, 0.26 * cs), seg=22, rings=10), 'leaf')
+    for i, t in enumerate(tips):
+        can.add(ellipsoid(t + V((0, 0, 0.1)), (0.46 * cs, 0.42 * cs, 0.24 * cs), rot=rot_xyz(z=i * 0.8), seg=22, rings=10), 'leaf')
+        side = V((math.cos(i * 1.7), math.sin(i * 1.7), 0)) * 0.24 * cs   # 옆에 붙은 작은 뭉치 (구름처럼 울퉁불퉁)
+        can.add(ellipsoid(t + side + V((0, 0, 0.2 * cs)), (0.28 * cs, 0.26 * cs, 0.2 * cs), seg=18, rings=10), 'leaf')
+        for j in range(3):   # 꽃 구름 위 밝은 꽃송이
+            a = TAU * j / 3 + i
+            can.add(ellipsoid(t + V((math.cos(a) * 0.22 * cs, math.sin(a) * 0.22 * cs, 0.27 * cs)), (0.12 * cs, 0.12 * cs, 0.07 * cs), seg=12, rings=6), 'bloom', outline=False)
+    ground = M.part('petals')   # 나무 밑에 떨어진 꽃잎 (땅에 붙은 얇은 조각, 외곽선 없음)
+    for k in range(14):
+        a, r = TAU * k / 14 + 0.3 * (k % 3), 0.35 + 0.22 * ((k * 7) % 5)
+        ground.add(ellipsoid((math.cos(a) * r, math.sin(a) * r, 0.012), (0.055, 0.032, 0.008), rot=rot_xyz(z=a * 1.7), seg=8, rings=4), 'bloom', outline=False)
+
+
+def b_picnic_mat(M):
+    """PR-17 꽃놀이 돗자리·도시락: 2×2칸 체크 돗자리(칸마다 두 색) + 가운데 3단 도시락과 보자기."""
+    W = 1.8 * P.get('size', 1)
+    m = M.part('mat')
+    n = 6
+    for i in range(n):
+        for j in range(n):
+            x, y = -W / 2 + (i + 0.5) * W / n, -W / 2 + (j + 0.5) * W / n
+            m.add(box((x, y, 0.012), (W / n, W / n, 0.024), bevel=0.004), 'matA' if (i + j) % 2 else 'matB', outline=False)
+    m.add(box((0, 0, 0.004), (W + 0.03, W + 0.03, 0.008), bevel=0.004), 'matB')
+    box_ = M.part('lunch', pivot=(0.15, 0.1, 0.03))
+    for k, z in enumerate((0.03, 0.13, 0.23)):
+        box_.add(box((0.15, 0.1, z + 0.05), (0.34, 0.34, 0.1), bevel=0.02), 'lunch' if k % 2 == 0 else 'lunchDark')
+    box_.add(box((0.15, 0.1, 0.345), (0.36, 0.36, 0.03), bevel=0.012), 'lunchDark')
+    box_.add(ellipsoid((0.15, 0.1, 0.38), (0.09, 0.06, 0.05), seg=10, rings=6), 'cloth')
+    for sx in (1, -1):
+        box_.add(ellipsoid((0.15 + sx * 0.07, 0.1, 0.41), (0.05, 0.03, 0.04), rot=rot_xyz(y=sx * 0.6), seg=10, rings=6), 'cloth')
+    for x, y in ((-0.45, -0.35), (-0.25, 0.45)):   # 작은 찻잔 둘
+        box_.add(cylinder((x, y, 0.024), (x, y, 0.1), 0.05, 0.06, seg=14), 'cup')
+
+
+def b_event_sign(M):
+    """PR-23 행사 간판: 나무 받침에 선 세움 간판. 가운데 그림판(plate)은 행사마다 색 변형 넷 + 위에 작은 지붕."""
+    m = M.part('sign')
+    for sx in (1, -1):
+        m.add(box((sx * 0.42, 0, 0.55), (0.07, 0.07, 1.1), bevel=0.015), 'wood')
+        m.add(box((sx * 0.42, 0, 0.03), (0.2, 0.3, 0.06), bevel=0.015), 'wood')
+    m.add(box((0, 0, 0.82), (0.96, 0.08, 0.62), bevel=0.04), 'board')
+    m.add(box((0, -0.045, 0.86), (0.74, 0.01, 0.44), bevel=0.01), 'plate', outline=False)
+    m.add(ellipsoid((0, -0.055, 0.9), (0.12, 0.01, 0.12), seg=16, rings=6), 'mark', outline=False)
+    for k in range(4):
+        m.add(box((-0.2 + k * 0.13, -0.052, 0.7), (0.09, 0.01, 0.03), bevel=0.004), 'mark', outline=False)
+    m.add(prism((0, 0, 1.13), 1.08, 0.22, 0.14, overhang=0.02), 'roof')
+
+
 BUILDERS = {
     'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
     'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
@@ -900,6 +966,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'cherry-tree': b_cherry_tree, 'picnic-mat': b_picnic_mat, 'event-sign': b_event_sign,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
 

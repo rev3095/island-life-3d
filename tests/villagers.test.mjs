@@ -1,5 +1,6 @@
 // 주민 데이터 (6차 M6-P3): assets/villagers/<slug>.json ↔ town 이 읽는 모양 · 이모티콘 규칙 · 생일 · 반영 도구 · 편집기 게시 목록
 import { test } from 'node:test';
+import { EVENT_GOODS, EVENT_FURN } from '../src/data/event-items.js';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -27,13 +28,15 @@ const J = { ...J0, keys: EM.emotes.map(e => e.key), player: EM.emotes.filter(e =
 const ENV = await checkEnv();
 
 // ---------- 지문 (주민마다 데이터·결과를 한 줄 글로 → sha256 앞 16자) ----------
+const EVENT_IDS = new Set([...EVENT_GOODS.map(([slug]) => `event.${slug}`), ...EVENT_FURN.map(([slug]) => `furn.${slug}`)]);
 const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
 const sha = s => createHash('sha256').update(s).digest('hex').slice(0, 16);
 const dayOf = d => new Date(Date.UTC(2026, 0, 1) + d * 86400000).toISOString().slice(0, 10);
 
 /** 주민 한 명의 결과 기록: 선물 반응 · 부탁 · 보상 · 답례 · 일과 · 인사/잡담 고르기 · 이모티콘 판정 */
 function playLog(slug, { P, L, T, R, J, items }) {
-  const out = [], all = items.ITEMS, n = all.length;
+  // 8차 행사 아이템(event-items.js — 행사 채집·보상 가구)은 빼고 뜬다: 목록 순번으로 고르는 칸이 많아 아이템이 늘면 모든 지문이 바뀌기 때문 (행동은 그대로)
+  const out = [], all = items.ITEMS.filter(it => !EVENT_IDS.has(it.id)), n = all.length;
   if (!P.wants) return '';   // 가게 주인: 데이터 지문만
   out.push(all.map(it => R.giftReaction(P, it)).join(','));
   for (let d = 0; d < 120; d++) out.push(canon(R.makeRequest(P, { dayKey: dayOf(d * 3), items, nativeFruit: d % 2 ? 'fruit.peach' : 'fruit.pear' })));

@@ -365,17 +365,17 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const CAT_LABEL = { nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구',
-  fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃',
+  fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃', event: '행사',
   wallpaper: '벽지', floor: '바닥', room: '방 배치' };
 const CAT_NOTE = { nature: '나무·꽃·바위처럼 섬에 자라고 놓이는 것', prop: '길가와 광장에 놓는 물건', building: '들어가거나 이용하는 건물', tile: '섬 땅을 이루는 1칸 단위 조각', furniture: '집 안에 놓는 가구 (작업대에서 만들거나 선물로 받음)',
   fish: '강·바다·연못에서 낚아 손에 들어 보이는 것', bug: '꽃·나무·바위 둘레에서 잡아 들어 보이는 것', fossil: '땅을 파면 나오고, 느루가 감정해 줘요', tool: '채집에 쓰는 도구', mat: '제작에 쓰는 재료',
-  seed: '심는 것 (꽃 씨앗 봉투는 색마다 변형)', fruit: '과일나무 열매', shell: '바닷가에서 줍는 것', flower: '꽃 아이템 (모델 하나에 색 변형)',
+  seed: '심는 것 (꽃 씨앗 봉투는 색마다 변형)', fruit: '과일나무 열매', shell: '바닷가에서 줍는 것', flower: '꽃 아이템 (모델 하나에 색 변형)', event: '계절 행사 동안만 나는 것 (8차 — 봄 꽃놀이 꽃잎부터)',
   wallpaper: '집 안 벽 무늬 — 상점에서 하루 하나', floor: '집 안 바닥 무늬 — 상점에서 하루 하나', room: '주민 집 안 8×8 칸 방과 도토리상점(10×7)·박물관(12×8). 가구를 끌어 놓고 돌려요' };
 // 영역 → 분류. 아이템 분류는 index.json 의 group, 실내 무늬는 kind
 const AREAS = [
   { key: 'env', label: '배경', cats: ['nature', 'prop', 'building', 'tile'] },
   { key: 'furniture', label: '가구', cats: ['furniture'] },
-  { key: 'item', label: '아이템', cats: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower'] },
+  { key: 'item', label: '아이템', cats: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower', 'event'] },
   { key: 'interior', label: '실내 무늬', cats: ['wallpaper', 'floor'] },
   { key: 'room', label: '방 배치', cats: ['room'] },
 ];
