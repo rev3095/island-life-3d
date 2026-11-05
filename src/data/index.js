@@ -47,6 +47,7 @@ export function createDataService(ctx, opts = {}) {
   const save = createSave({
     state,
     ...(opts.storage !== undefined ? { storage: opts.storage } : {}),
+    ...(ctx.preview?.saveKey ? { key: ctx.preview.saveKey } : {}),   // 8차 D85-A: 날짜 흉내는 저장 칸을 따로 (진짜 섬과 안 섞임)
     onDone: ({ ok }) => emit('save:done', { ok }),
     onLoad: () => emit('data:loaded', {}),
     onReset: () => { giveStarter(); announceAll(); },

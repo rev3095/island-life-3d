@@ -3,6 +3,7 @@
 // 약속은 docs/CONTRACTS.md 의 time 항목.
 import * as THREE from 'three';
 import { computeNow, dayHour, msAtDayHour, nightFactorAt, FAST_SCALE } from './clock.js';
+import { shiftedMs } from '../core/preview.js';
 import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
@@ -38,7 +39,9 @@ const setSRGB = (color, a) => color.setRGB(a[0], a[1], a[2], THREE.SRGBColorSpac
 
 export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
-  let realShift = 0, pausedMs = null, weatherOverride = null, seasonOverride = null;
+  // 8차 D85-A: 날짜 흉내(#date=)면 실제 시계를 그 날짜의 지금 시각으로 옮겨 둔다 (실제 시계로 돌아가도 이 날짜)
+  const baseShift = ctx.preview?.date ? shiftedMs(ctx.preview.date) - Date.now() : 0;
+  let realShift = baseShift, pausedMs = null, weatherOverride = null, seasonOverride = null;
   let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs })) — 매우 낮음 사양은 늘 숨김 (applyPuffs)
   let flare = null;                 // 해 렌즈 빛 (flare.js, 불러온 뒤)
   let indoor = false;               // 집 안: 하늘·구름·비·눈을 숨기고 실내 조명 (setIndoor)
@@ -99,7 +102,7 @@ export function createSky(ctx) {
       const cur = clockMs();
       t.mode = mode;
       if (mode === 'fast') t.fastOffset = cur - Date.now() * FAST_SCALE;   // 지금 시각에서 이어서 빨리 간다
-      else { realShift = 0; if (pausedMs != null) pausedMs = Date.now(); } // 실제 시계로 돌아간다
+      else { realShift = baseShift; if (pausedMs != null) pausedMs = Date.now() + baseShift; } // 실제 시계로 돌아간다
     },
     get weather() { return currentWeather(); },
     /** w: WEATHERS 중 하나. null 이면 예보대로. 다음 날이 되면 풀린다. { instant: true } 면 섞지 않고 바로 */

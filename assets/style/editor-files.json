@@ -7,6 +7,7 @@
     "src/core/constants.js",
     "src/core/events.js",
     "src/core/packs.js",
+    "src/core/preview.js",
     "src/core/materials.js",
     "src/core/state.js",
     "src/render/check.js",
