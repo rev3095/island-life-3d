@@ -249,6 +249,10 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <a href="https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM" target="_blank" rel="noopener">컨셉 보드 ↗</a>
       <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ" target="_blank" rel="noopener">게임 ↗</a>
       <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#check" target="_blank" rel="noopener">기기 점검 ↗</a>
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#date=2027-04-02" target="_blank" rel="noopener">🌸 꽃놀이 미리 해 보기 ↗</a>
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#date=2027-08-03" target="_blank" rel="noopener">🎆 불꽃놀이 ↗</a>
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#date=2027-10-16" target="_blank" rel="noopener">🍂 수확 잔치 ↗</a>
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ#date=2027-12-21" target="_blank" rel="noopener">⛄ 눈사람 날 ↗</a>
     </nav>
   </header>
 
@@ -372,7 +376,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "game", "group": "game", "name": "게임 「포근섬 이야기」", "url": "https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ", "file": "dist/web/index.html",
     "edits": "편집기에서 반영한 것이 모두 들어가는 게임. 휴대폰에서도 열려요. 섬폰 「문제 알리기」로 남긴 글과 기기 점검(링크 끝 #check) 결과가 게임 저장소에 쌓여요.",
     "command": "전체 요청 확인", "openLabel": "새 문제", "reads": ["reports", "checks"],
-    "links": [{ "label": "기기 점검 열기", "hash": "check" }] },
+    "links": [{ "label": "기기 점검 열기", "hash": "check" }, { "label": "🌸 꽃놀이 미리 해 보기", "hash": "date=2027-04-02" }, { "label": "🎆 불꽃놀이", "hash": "date=2027-08-03" }, { "label": "🍂 수확 잔치", "hash": "date=2027-10-16" }, { "label": "⛄ 눈사람 날", "hash": "date=2027-12-21" }] },
   { "id": "sound", "group": "editor", "name": "곡 편집기 · 효과음 표", "url": "https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2", "file": "sound-editor.html", "et": "ET-06 · ET-07", "track": "M6-P4",
     "edits": "장소·시간대·날씨별 곡 10 (박자·악기·음)과 선곡 표, 효과음 24 · 목소리 9 의 높이·길이·크기. 미리 듣기.",
     "command": "소리 반영", "openLabel": "새 요청", "reads": ["drafts/*", "requests/sound", "applied/sound"] },
@@ -605,8 +609,8 @@ function card(e) {
     e.et ? ['ID · 트랙', `<span class="id">${esc(e.et)}</span> · ${esc(e.track ?? '')}`] : null,
   ].filter(Boolean);
   const recent = Array.isArray(s?.recent) ? AL.list(s.recent.slice(0, 3), { title: n => `최근 반영 기록 ${n}개 (되돌리기는 편집기에서)` }) : '';
-  // 같은 링크 끝 #… 로 여는 곳 (게임 #check = 기기 점검). 목록의 links: [{ label, hash }]
-  const more = url && Array.isArray(e.links) ? e.links.filter(l => /^[\w.~-]+$/.test(l?.hash ?? '')).map(l =>
+  // 같은 링크 끝 #… 로 여는 곳 (게임 #check = 기기 점검, 8차 #date=YYYY-MM-DD = 행사 미리 해 보기 — 저장 칸 따로). 목록의 links: [{ label, hash }]
+  const more = url && Array.isArray(e.links) ? e.links.filter(l => /^[\w.~=&-]+$/.test(l?.hash ?? '')).map(l =>
     `<a class="btn ghost" href="${esc(url)}#${esc(l.hash)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('') : '';
   const link = url
     ? `<span class="btns"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">열기 ↗</a>${more}</span>`
