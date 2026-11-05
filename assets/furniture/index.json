@@ -788,6 +788,26 @@
       ],
       "version": "0.1",
       "status": "review"
+    },
+    {
+      "id": "FU-45",
+      "slug": "harvest-basket",
+      "item": "furn.harvest-basket",
+      "name": "수확 바구니",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.75,
+        0.75,
+        0.64
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

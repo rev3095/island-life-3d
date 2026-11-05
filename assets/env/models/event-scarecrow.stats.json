@@ -1,0 +1,40 @@
+{
+  "id": "PR-20",
+  "slug": "event-scarecrow",
+  "name": "허수아비",
+  "category": "prop",
+  "kind": "scarecrow",
+  "version": "0.1",
+  "triangles": 1736,
+  "parts": 1,
+  "materials": [
+    "face",
+    "hat",
+    "hatBand",
+    "patch",
+    "sack",
+    "shirt",
+    "straw",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    1.24,
+    0.68,
+    1.64
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 38892,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-scarecrow_front.png",
+    "event-scarecrow_hero.jpg",
+    "event-scarecrow_main.png",
+    "event-scarecrow_thumb.png",
+    "event-scarecrow_top.png",
+    "event-scarecrow_variants.png"
+  ]
+}

@@ -1410,7 +1410,21 @@ def b_sparkler(M):
         m.add(ellipsoid(c + d * (0.085 + 0.02 * (k % 2)), (0.007, 0.007, 0.007), seg=6, rings=4), 'sparkTip', outline=False)
 
 
+def b_mushroom(M):
+    """IC-EV-03 버섯 (8차 가을 수확 잔치 채집): 통통한 대에 둥근 갓, 갓 위 점. 모양 하나에 색 변형 셋 = 표고 · 꾀꼬리 · 빨간 버섯."""
+    m = M.part('mushroom')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.13), 0.055, 0.045, seg=14), 'stem')
+    m.add(ellipsoid((0, 0, 0.14), (0.13, 0.13, 0.08), seg=22, rings=12), lambda c, n: 'cap' if n.z > -0.2 else 'gill')
+    for k in range(5):
+        a = TAU * k / 5 + 0.3
+        r = 0.07 if k else 0.0
+        m.add(ellipsoid((math.cos(a) * r, math.sin(a) * r, 0.212 - (0.012 if k else 0)), (0.022, 0.022, 0.008), seg=8, rings=4), 'dot', outline=False)
+    m.add(cylinder((0.12, 0.05, 0), (0.12, 0.05, 0.07), 0.03, 0.025, seg=10), 'stem')
+    m.add(ellipsoid((0.12, 0.05, 0.075), (0.065, 0.065, 0.04), seg=16, rings=8), 'cap')
+
+
 BUILDERS = {
+    'mushroom': b_mushroom,
     'sparkler': b_sparkler,
     'petal': b_petal,
     'pie': b_pie, 'juice': b_juice, 'wreath': b_wreath, 'medal': b_medal,

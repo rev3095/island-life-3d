@@ -627,6 +627,50 @@
       "status": "review"
     },
     {
+      "id": "IC-EV-03",
+      "slug": "event-mushroom",
+      "name": "버섯",
+      "group": "event",
+      "kind": "mushroom",
+      "hold": false,
+      "items": [
+        {
+          "item": "event.mushroom-shiitake",
+          "code": "IC-EV-03",
+          "variant": "shiitake",
+          "icon": "assets/items/renders/event-mushroom_shiitake_thumb.png"
+        },
+        {
+          "item": "event.mushroom-chanterelle",
+          "code": "IC-EV-03",
+          "variant": "chanterelle",
+          "icon": "assets/items/renders/event-mushroom_chanterelle_thumb.png"
+        },
+        {
+          "item": "event.mushroom-red",
+          "code": "IC-EV-03",
+          "variant": "red",
+          "icon": "assets/items/renders/event-mushroom_red_thumb.png"
+        }
+      ],
+      "variants": [
+        "shiitake",
+        "chanterelle",
+        "red"
+      ],
+      "size": [
+        0.314,
+        0.26,
+        0.22
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": []
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-FE-01",
       "slug": "festival-pie",
       "name": "과일 파이",

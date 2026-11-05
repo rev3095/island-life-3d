@@ -1,0 +1,94 @@
+{
+  "id": "PR-20",
+  "slug": "event-scarecrow",
+  "name": "허수아비",
+  "category": "prop",
+  "kind": "scarecrow",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "가을 수확 잔치 동안 광장 동쪽에 서는 허수아비. 퐁을 닮은 노란 옷, 자루 얼굴, 밀짚모자. 말 걸면 잔치 진행을 한 줄 알려 준다.",
+    "keywords": [
+      "밀짚모자",
+      "자루 얼굴",
+      "노란 옷",
+      "삐져나온 밀짚"
+    ],
+    "references": [],
+    "avoid": [
+      "무서운 얼굴"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 가을 수확 잔치 EV-03"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#7F5636",
+    "shirt": "#F2C14E",
+    "patch": "#C9583B",
+    "sack": "#E3C99A",
+    "face": "#4A3B32",
+    "straw": "#E8C66A",
+    "hat": "#D9B36A",
+    "hatBand": "#C9583B"
+  },
+  "paletteLabels": {
+    "wood": "기둥·가로대",
+    "shirt": "옷",
+    "patch": "옷 기운 데",
+    "sack": "자루 얼굴",
+    "face": "눈·입",
+    "straw": "밀짚",
+    "hat": "밀짚모자",
+    "hatBand": "모자 띠"
+  },
+  "variants": {
+    "yellow": {
+      "label": "노랑 (기본)",
+      "palette": {}
+    },
+    "blue": {
+      "label": "파랑 옷",
+      "palette": {
+        "shirt": "#6C9BD2"
+      }
+    },
+    "check": {
+      "label": "빨강 옷",
+      "palette": {
+        "shirt": "#D9544A",
+        "patch": "#F2C14E"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.15,
+        0.22
+      ]
+    },
+    "extent": [
+      0.6,
+      0.12
+    ]
+  }
+}

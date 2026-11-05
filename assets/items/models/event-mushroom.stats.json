@@ -1,0 +1,54 @@
+{
+  "id": "IC-EV-03",
+  "slug": "event-mushroom",
+  "name": "버섯",
+  "group": "event",
+  "kind": "mushroom",
+  "version": "0.1",
+  "items": [
+    "event.mushroom-shiitake",
+    "event.mushroom-chanterelle",
+    "event.mushroom-red"
+  ],
+  "hold": false,
+  "triangles": 1036,
+  "parts": 1,
+  "materials": [
+    "cap",
+    "dot",
+    "gill",
+    "stem"
+  ],
+  "objects": [
+    "mushroom"
+  ],
+  "size": [
+    0.314,
+    0.26,
+    0.22
+  ],
+  "bounds": [
+    [
+      -0.157,
+      -0.13,
+      0.0
+    ],
+    [
+      0.157,
+      0.13,
+      0.22
+    ]
+  ],
+  "glbBytes": 23072,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-mushroom_chanterelle_main.png",
+    "event-mushroom_chanterelle_thumb.png",
+    "event-mushroom_main.png",
+    "event-mushroom_red_main.png",
+    "event-mushroom_red_thumb.png",
+    "event-mushroom_shiitake_main.png",
+    "event-mushroom_shiitake_thumb.png",
+    "event-mushroom_thumb.png"
+  ]
+}

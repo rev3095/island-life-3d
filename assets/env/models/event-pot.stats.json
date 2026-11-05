@@ -1,0 +1,48 @@
+{
+  "id": "PR-19",
+  "slug": "event-pot",
+  "name": "수확 큰 솥",
+  "category": "prop",
+  "kind": "harvest-pot",
+  "version": "0.1",
+  "triangles": 4384,
+  "parts": 3,
+  "materials": [
+    "flame",
+    "flameCore",
+    "fruitA",
+    "fruitB",
+    "iron",
+    "ironDark",
+    "rim",
+    "shroom",
+    "soup",
+    "steam",
+    "stone",
+    "wood"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    1.95,
+    1.76,
+    1.69
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 127168,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-pot_front.png",
+    "event-pot_hero.jpg",
+    "event-pot_main.png",
+    "event-pot_thumb.png",
+    "event-pot_top.png"
+  ]
+}

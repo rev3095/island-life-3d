@@ -1,0 +1,66 @@
+{
+  "id": "FU-45",
+  "slug": "harvest-basket",
+  "item": "furn.harvest-basket",
+  "name": "수확 바구니",
+  "category": "furniture",
+  "kind": "harvest-basket",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "가을 수확 잔치 보상 가구. 손잡이 달린 엮은 바구니에 호박·사과·버섯이 수북이 담겨 있다.",
+    "keywords": [
+      "엮은 바구니",
+      "호박",
+      "사과·버섯",
+      "단풍잎"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 가을 수확 잔치 EV-03"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "leaf"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "weave": "#C99B68",
+    "weaveDark": "#9A6B45",
+    "pumpkin": "#E8913A",
+    "stem": "#6B8F3A",
+    "apple": "#D9544A",
+    "shroomStem": "#F3E7D3",
+    "shroomCap": "#A9774E",
+    "leaf": "#E07B45"
+  },
+  "paletteLabels": {
+    "weave": "바구니",
+    "weaveDark": "바구니 띠·손잡이",
+    "pumpkin": "호박",
+    "stem": "호박 꼭지",
+    "apple": "사과",
+    "shroomStem": "버섯 대",
+    "shroomCap": "버섯 갓",
+    "leaf": "단풍잎"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

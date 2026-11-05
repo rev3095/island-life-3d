@@ -1,0 +1,82 @@
+{
+  "id": "PR-19",
+  "slug": "event-pot",
+  "name": "수확 큰 솥",
+  "category": "prop",
+  "kind": "harvest-pot",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "가을 수확 잔치 동안 광장 무대 앞에 거는 지름 2칸 무쇠 솥. 섬 모두가 과일·버섯을 넣고, 18시 잔치에 나눠 먹는다. 넣은 만큼 김이 커진다.",
+    "keywords": [
+      "무쇠 솥",
+      "장작불",
+      "떠 있는 과일·버섯",
+      "김"
+    ],
+    "references": [],
+    "avoid": [
+      "축제 과일 솥(FP-04)과 같은 모양"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 가을 수확 잔치 EV-03"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#9C968C",
+    "wood": "#8A5A3B",
+    "iron": "#4A4440",
+    "ironDark": "#2E2A27",
+    "rim": "#5E5650",
+    "soup": "#E8A93A",
+    "fruitA": "#D9544A",
+    "fruitB": "#F2A65A",
+    "shroom": "#A9774E",
+    "flame": "#F28C38",
+    "flameCore": "#FFD866",
+    "steam": "#F3F3F0"
+  },
+  "paletteLabels": {
+    "stone": "돌 받침",
+    "wood": "장작",
+    "iron": "솥",
+    "ironDark": "손잡이",
+    "rim": "솥 테두리",
+    "soup": "국물",
+    "fruitA": "과일 (빨강)",
+    "fruitB": "과일 (주황)",
+    "shroom": "버섯",
+    "flame": "불꽃",
+    "flameCore": "불꽃 속",
+    "steam": "김"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "animations": [
+    "flicker"
+  ],
+  "world": {
+    "collider": {
+      "r": 0.86
+    },
+    "extent": [
+      0.95,
+      0.95
+    ]
+  }
+}
