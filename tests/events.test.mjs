@@ -173,3 +173,27 @@ test('여름 불꽃놀이: 북쪽 해변 모래에 간판, 그 앞 바다에 발
   assert.ok(s.raft.z < s.sign.z - 2, '발사대가 간판보다 북쪽(바다 쪽)');
   assert.ok(Math.abs(s.raft.x) < 8, '섬 가운데 세로줄 근처');
 });
+
+// ---- M8-P5 가을 수확 잔치: 버섯 자리 ----
+import { mushroomSpots, MUSHROOM_KINDS } from '../src/gameplay/events/autumn.js';
+
+test('가을 수확 잔치: 버섯 다섯은 서로 다른 나무 밑 걸을 수 있는 곳에, 같은 날 같고 셋 다 나온다', () => {
+  const spec = slug => JSON.parse(readFileSync(resolve(root, `assets/env/specs/${slug}.json`), 'utf8'));
+  const gen = generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)]))) });
+  const isl = createIslandApi(gen);
+  const trees = gen.objects.filter(o => o.kind === 'tree').map(o => ({ x: o.x, z: o.z }));
+  assert.ok(trees.length > 10);
+  const isFree = (x, z) => { const t = isl.toTile(x, z); return isl.isWalkableTile(t.tx, t.tz); };
+  const a = mushroomSpots(trees, '2027-10-16', isFree);
+  assert.equal(a.length, 5);
+  assert.equal(new Set(a.map(s => s.id)).size, 5, '나무마다 하나');
+  for (const s of a) {
+    assert.ok(isFree(s.x, s.z));
+    assert.ok(trees.some(t => Math.hypot(t.x - s.x, t.z - s.z) < 0.85), '나무 밑');
+  }
+  assert.deepEqual(a, mushroomSpots(trees, '2027-10-16', isFree));
+  const kinds = new Set();
+  for (let d = 15; d <= 21; d++) for (const s of mushroomSpots(trees, `2027-10-${d}`, isFree)) kinds.add(s.kind);
+  assert.equal(kinds.size, MUSHROOM_KINDS.length, '일주일이면 버섯 셋이 다 나옴');
+  for (const k of MUSHROOM_KINDS) assert.ok(k.id.startsWith('event.mushroom-'));
+});
