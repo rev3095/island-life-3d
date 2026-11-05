@@ -1,0 +1,45 @@
+{
+  "id": "IC-EV-01",
+  "slug": "event-petal",
+  "name": "벚꽃잎",
+  "group": "event",
+  "kind": "petal",
+  "version": "0.1",
+  "items": [
+    "event.petal"
+  ],
+  "hold": false,
+  "triangles": 1104,
+  "parts": 1,
+  "materials": [
+    "notch",
+    "petal",
+    "petalLight"
+  ],
+  "objects": [
+    "petal"
+  ],
+  "size": [
+    0.239,
+    0.175,
+    0.047
+  ],
+  "bounds": [
+    [
+      -0.12,
+      -0.087,
+      0.0
+    ],
+    [
+      0.12,
+      0.087,
+      0.047
+    ]
+  ],
+  "glbBytes": 23060,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-petal_main.png",
+    "event-petal_thumb.png"
+  ]
+}

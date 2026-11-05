@@ -1,0 +1,58 @@
+{
+  "id": "IC-EV-01",
+  "slug": "event-petal",
+  "name": "벚꽃잎",
+  "group": "event",
+  "category": "item",
+  "kind": "petal",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "event.petal",
+      "code": "IC-EV-01"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "봄 꽃놀이 때 벚나무 아래에서 줍는 꽃잎. 끝이 살짝 갈라진 꽃잎 석 장이 겹쳐 놓인 모습.",
+    "keywords": [
+      "꽃잎 석 장",
+      "갈라진 끝",
+      "연분홍"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 봄 꽃놀이 EV-01"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "petal": "#F4B6C8",
+    "petalLight": "#FBDDE6",
+    "notch": "#E58FA8"
+  },
+  "paletteLabels": {
+    "petal": "꽃잎",
+    "petalLight": "밝은 꽃잎",
+    "notch": "꽃잎 끝"
+  },
+  "render": {
+    "yaw": -20,
+    "pitch": 74
+  }
+}

@@ -739,6 +739,29 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-43",
+      "slug": "cherry-lamp",
+      "item": "furn.cherry-lamp",
+      "name": "벚꽃 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.48,
+        0.5,
+        0.89
+      ],
+      "variants": [
+        "pink",
+        "white"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

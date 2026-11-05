@@ -1,0 +1,51 @@
+{
+  "id": "FU-43",
+  "slug": "cherry-lamp",
+  "item": "furn.cherry-lamp",
+  "name": "벚꽃 등",
+  "category": "furniture",
+  "kind": "cherry-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2192,
+  "parts": 1,
+  "materials": [
+    "base",
+    "glow",
+    "petal"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.48,
+    0.5,
+    0.89
+  ],
+  "bounds": [
+    [
+      -0.22,
+      -0.248,
+      0.0
+    ],
+    [
+      0.256,
+      0.248,
+      0.886
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 42748,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-lamp_front.png",
+    "cherry-lamp_main.png",
+    "cherry-lamp_thumb.png",
+    "cherry-lamp_top.png",
+    "cherry-lamp_variants.png"
+  ]
+}

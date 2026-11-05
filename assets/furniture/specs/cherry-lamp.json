@@ -1,0 +1,76 @@
+{
+  "id": "FU-43",
+  "slug": "cherry-lamp",
+  "item": "furn.cherry-lamp",
+  "name": "벚꽃 등",
+  "category": "furniture",
+  "kind": "cherry-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "봄 꽃놀이 보상으로 만드는 바닥 등. 꽃잎 다섯 장이 감싼 둥근 등이고 밤엔 안쪽이 분홍빛으로 빛난다.",
+    "keywords": [
+      "꽃잎 다섯 장",
+      "둥근 등",
+      "가는 나무 기둥"
+    ],
+    "references": [],
+    "avoid": [
+      "차가운 빛"
+    ],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 봄 꽃놀이 EV-01"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이",
+      "value": 1,
+      "min": 0.85,
+      "max": 1.15,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "base": "#8C6440",
+    "petal": "#F4B6C8",
+    "glow": "#FFE3EC"
+  },
+  "paletteLabels": {
+    "base": "받침·기둥",
+    "petal": "꽃잎",
+    "glow": "불빛"
+  },
+  "variants": {
+    "pink": {
+      "label": "분홍 (기본)",
+      "palette": {}
+    },
+    "white": {
+      "label": "하양",
+      "palette": {
+        "petal": "#FBF4F6"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

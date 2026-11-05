@@ -1,0 +1,91 @@
+{
+  "id": "PR-17",
+  "slug": "event-picnic",
+  "name": "꽃놀이 돗자리",
+  "category": "prop",
+  "kind": "picnic-mat",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "봄 꽃놀이 동안 광장 무대 앞에 펴 두는 체크 돗자리와 3단 도시락. 주민과 앉아서 도시락을 먹는 자리.",
+    "keywords": [
+      "빨강·하양 체크",
+      "3단 도시락",
+      "보자기 매듭"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 봄 꽃놀이 EV-01"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "size": {
+      "label": "돗자리 크기",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.2,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "matA": "#D9544A",
+    "matB": "#FBF4EC",
+    "lunch": "#3E5A8A",
+    "lunchDark": "#2C3F63",
+    "cloth": "#F2C14E",
+    "cup": "#FBFDF8"
+  },
+  "paletteLabels": {
+    "matA": "체크 (진한 칸)",
+    "matB": "체크 (밝은 칸)",
+    "lunch": "도시락",
+    "lunchDark": "도시락 뚜껑",
+    "cloth": "보자기",
+    "cup": "찻잔"
+  },
+  "variants": {
+    "red": {
+      "label": "빨강 (기본)",
+      "palette": {}
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "matA": "#4C86C6"
+      }
+    },
+    "green": {
+      "label": "초록",
+      "palette": {
+        "matA": "#5FA866"
+      }
+    }
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.22
+    },
+    "extent": [
+      0.9,
+      0.9
+    ],
+    "note": "돗자리 위는 걸을 수 있고 가운데 도시락만 막는다"
+  }
+}

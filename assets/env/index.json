@@ -106,6 +106,15 @@
       "status": "approved"
     },
     {
+      "id": "EN-12",
+      "slug": "cherry-tree",
+      "name": "벚나무",
+      "category": "nature",
+      "kind": "cherry-tree",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FP-01",
       "slug": "festival-part-lantern",
       "name": "반딧불 등불",
@@ -293,6 +302,24 @@
       "kind": "festival-cover",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "PR-17",
+      "slug": "event-picnic",
+      "name": "꽃놀이 돗자리",
+      "category": "prop",
+      "kind": "picnic-mat",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-23",
+      "slug": "event-sign",
+      "name": "행사 간판",
+      "category": "prop",
+      "kind": "event-sign",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "BD-01",

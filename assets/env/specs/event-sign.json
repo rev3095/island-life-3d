@@ -1,0 +1,93 @@
+{
+  "id": "PR-23",
+  "slug": "event-sign",
+  "name": "행사 간판",
+  "category": "prop",
+  "kind": "event-sign",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "계절 행사 동안 축제 진행판 옆에 서는 세움 간판. 모델 하나에 그림판 색만 행사마다 바꾼다 (꽃놀이·불꽃놀이·수확 잔치·눈사람 날).",
+    "keywords": [
+      "세움 간판",
+      "작은 지붕",
+      "행사 색 그림판"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 봄 꽃놀이 EV-01"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#7F5636",
+    "board": "#E8D5A8",
+    "plate": "#F4B6C8",
+    "mark": "#C9583B",
+    "roof": "#A8642E"
+  },
+  "paletteLabels": {
+    "wood": "기둥·받침",
+    "board": "판",
+    "plate": "그림판",
+    "mark": "그림판 무늬",
+    "roof": "지붕"
+  },
+  "variants": {
+    "spring": {
+      "label": "꽃놀이 (기본)",
+      "palette": {}
+    },
+    "summer": {
+      "label": "불꽃놀이",
+      "palette": {
+        "plate": "#2E3A5C",
+        "mark": "#F2C14E"
+      }
+    },
+    "autumn": {
+      "label": "수확 잔치",
+      "palette": {
+        "plate": "#E8913A",
+        "mark": "#7A4A22"
+      }
+    },
+    "winter": {
+      "label": "눈사람 날",
+      "palette": {
+        "plate": "#CFE3F2",
+        "mark": "#4C86C6"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1,
+        0.3
+      ]
+    },
+    "extent": [
+      0.55,
+      0.2
+    ]
+  }
+}

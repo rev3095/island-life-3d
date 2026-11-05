@@ -1384,7 +1384,20 @@ def b_medal(M):
     m.add(cone((0.03, -0.038, 0.0), (0.06, -0.038, 0.0), 0.02, 0.0, squash=0.3, seg=6), 'fish')
 
 
+def b_petal(M):
+    """IC-EV-01 벚꽃잎 (8차 봄 꽃놀이 채집): 바닥에 겹쳐 놓인 꽃잎 석 장. 꽃잎 하나 = 살짝 벌어진 두 갈래 (끝에 벚꽃잎 홈) + 뿌리 쪽 진한 점."""
+    m = M.part('petal')
+    for k, (x, y, a, z) in enumerate(((0, 0, 0.3, 0.01), (0.075, 0.05, 1.5, 0.024), (-0.07, 0.04, -1.1, 0.038))):
+        d, side = V((math.cos(a), math.sin(a), 0)), V((-math.sin(a), math.cos(a), 0))
+        col = 'petalLight' if k == 1 else 'petal'
+        for sgn in (1, -1):   # 두 갈래: 끝으로 갈수록 벌어진다
+            c = V((x, y, z)) + d * 0.018 + side * sgn * 0.018
+            m.add(ellipsoid(c, (0.062, 0.03, 0.009), rot=rot_xyz(z=a + sgn * 0.32), seg=16, rings=6), col)
+        m.add(ellipsoid(V((x, y, z + 0.006)) - d * 0.03, (0.016, 0.012, 0.004), rot=rot_xyz(z=a), seg=8, rings=4), 'notch', outline=False)
+
+
 BUILDERS = {
+    'petal': b_petal,
     'pie': b_pie, 'juice': b_juice, 'wreath': b_wreath, 'medal': b_medal,
     'fish': b_fish, 'flatfish': b_flatfish, 'squid': b_squid, 'octopus': b_octopus, 'seahorse': b_seahorse,
     'butterfly': b_butterfly, 'dragonfly': b_dragonfly, 'bee': b_bee, 'firefly': b_firefly, 'beetle': b_beetle, 'cicada': b_cicada,
@@ -1401,7 +1414,7 @@ BUILDERS = {
 
 # 렌더 방향 (스펙 render 칸이 없을 때): 물고기는 옆모습(머리 왼쪽), 곤충은 위에서 비스듬히
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
-          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32)}
+          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50)}
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
 
 

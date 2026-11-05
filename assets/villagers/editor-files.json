@@ -8,6 +8,7 @@
     "src/core/packs.js",
     "src/data/birthdays.js",
     "src/data/festival-items.js",
+    "src/data/event-items.js",
     "src/data/items.js",
     "src/data/tables.js",
     "src/gameplay/festival/emotes.js",
