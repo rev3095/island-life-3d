@@ -197,3 +197,29 @@ test('가을 수확 잔치: 버섯 다섯은 서로 다른 나무 밑 걸을 수
   assert.equal(kinds.size, MUSHROOM_KINDS.length, '일주일이면 버섯 셋이 다 나옴');
   for (const k of MUSHROOM_KINDS) assert.ok(k.id.startsWith('event.mushroom-'));
 });
+
+// ---- M8-P6 겨울 눈사람 날: 표정 · 커지기 · 눈덩이 자리 ----
+import { faceOf, grown, ballSpots } from '../src/gameplay/events/winter.js';
+
+test('겨울 눈사람 날: 몸·머리 비율 표정 넷 · 걸은 만큼 커지고 1.6칸에서 멈춤 · 광장 남쪽 눈덩이 둘', () => {
+  assert.equal(faceOf(1.6, 1.0).key, 'smile');   // 0.625
+  assert.equal(faceOf(1.0, 0.95).key, 'wow');
+  assert.equal(faceOf(2.0, 0.8).key, 'calm');
+  assert.equal(faceOf(1.0, 0.82).key, 'plain');
+  assert.equal(new Set([faceOf(1.6, 1).emoji, faceOf(1, 0.95).emoji, faceOf(2, 0.8).emoji, faceOf(1, 0.82).emoji]).size, 4);
+  assert.equal(grown(0.5, 0), 0.5);
+  assert.ok(grown(0.5, 5) > 0.9 && grown(0.5, 5) < 1);
+  assert.equal(grown(0.5, 100), 2.0);
+  assert.equal(grown(0.5, -3), 0.5);
+  const spec = slug => JSON.parse(readFileSync(resolve(root, `assets/env/specs/${slug}.json`), 'utf8'));
+  const festCfg = JSON.parse(readFileSync(resolve(root, 'assets/festival/config.json'), 'utf8'));
+  const gen = generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)]))) });
+  const F = carveFestival(gen, { config: festCfg, specs: { 'festival-stage': spec('festival-stage') } });
+  const isl = createIslandApi(gen);
+  const isFree = (x, z) => { const t = isl.toTile(x, z); return isl.isWalkableTile(t.tx, t.tz) && isl.tileAt(t.tx, t.tz) === 'grass'; };
+  const a = ballSpots(F, '2027-12-21', isFree);
+  assert.equal(a.length, 2);
+  for (const p of a) { assert.ok(isFree(p.x, p.z)); assert.ok(p.z > F.center.z, '광장 남쪽'); }
+  assert.ok(Math.hypot(a[0].x - a[1].x, a[0].z - a[1].z) > 2.5);
+  assert.deepEqual(a, ballSpots(F, '2027-12-21', isFree));
+});
