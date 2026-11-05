@@ -4,6 +4,7 @@ import { LoopOnce, LoopRepeat } from 'three';
 
 const FADE = 0.2;           // 동작 섞는 시간
 const TURN = 7;             // 라디안/초
+const LAG_MAX = 0.5;        // 화면 밖 주민도 이만큼(초)마다는 동작을 맞춘다 (한 번 하는 동작이 끝나야 다음으로 넘어가니까)
 export const RADIUS = 0.24; // 충돌 원 반지름
 export const facingOf = (dx, dz) => Math.atan2(-dx, -dz);
 const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
@@ -24,6 +25,7 @@ export async function createActor(ctx, slug) {
   const height = Number.isFinite(box.max.y) && box.max.y > 0.3 ? box.max.y : (spec?.proportions?.height ?? 1);
 
   const mixer = new THREE.AnimationMixer(model);
+  let lag = 0;
   const actions = Object.fromEntries(animations.map(c => [c.name, mixer.clipAction(c)]));
   const mats = [];
   root.traverse(o => { if (o.isMesh) for (const m of [o.material].flat()) if (!mats.includes(m)) mats.push(m); });
@@ -138,7 +140,11 @@ export async function createActor(ctx, slug) {
         const a = actions[A.oneShot];
         if (!a.isRunning() || a.time >= a.getClip().duration - 0.02) A.play('idle');
       }
-      if (animate && root.visible) mixer.update(dt);
+      // 화면·그림자 밖이면 동작 계산을 쉬고 밀린 시간만 모아 둔다 (render/cull.js offscreen — 주민 9명 중 보통 6~7명이 밖)
+      if (animate && root.visible) {
+        lag += dt;
+        if (!ctx.services.style?.culler?.offscreen?.(root) || lag > LAG_MAX) { mixer.update(lag); lag = 0; }
+      }
     },
     /** 걷는 빠르기에 맞춰 걷기·달리기 동작 고르기 (플레이어와 같은 비율) */
     animateMove(speed, run = false) {

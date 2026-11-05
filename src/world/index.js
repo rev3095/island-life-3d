@@ -10,6 +10,12 @@ import { carveFestival } from './festival.js';
 
 let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
 
+/** 계절 행사에만 놓는 배경 종류 (assets/events/events.json list[].assets.env) — 처음에 받지 않는다 */
+async function eventKinds(assets) {
+  const cfg = await assets.loadJSON('assets/events/events.json').catch(() => null);
+  return new Set((cfg?.list ?? []).flatMap(ev => ev.assets?.env ?? []));
+}
+
 export default {
   name: 'world',
 
@@ -20,10 +26,12 @@ export default {
     const data = ctx.services.data;
     const fruitId = data?.economy?.nativeFruit?.();
     const nativeFruit = fruitId ? (data.items?.get?.(fruitId)?.variant ?? String(fruitId).split('.')[1]) : null;
-    // 배경 모델 32종을 한꺼번에 불러온다 (같은 모델은 assets 가 캐시). 건물 집터(world.lot)가 스펙에 있어서 섬 만들기보다 먼저
+    // 배경 모델을 한꺼번에 불러온다 (같은 모델은 assets 가 캐시). 건물 집터(world.lot)가 스펙에 있어서 섬 만들기보다 먼저.
+    // 계절 행사 모델(events.json 의 assets.env)은 빼 두고 행사 때 놓일 때 받는다 — 게시본에서는 그 계절 묶음(packs/season-*)째로
     const index = await assets.loadEnvIndex();
-    const models = Object.fromEntries(await Promise.all(index.models.map(async m =>
-      [m.slug, { gltf: await assets.loadEnv(m.slug), spec: await assets.loadEnvSpec(m.slug) }])));
+    const lazy = await eventKinds(assets);
+    const load = async slug => ({ gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
+    const models = Object.fromEntries(await Promise.all(index.models.filter(m => !lazy.has(m.slug)).map(async m => [m.slug, await load(m.slug)])));
     // 지도 자리·시드·밀도 (섬 지도 편집기 → "지도 반영"). 없으면 island.js 기본값 = 지금 섬. layout.seed 가 null 이면 저장의 섬 시드
     const layout = resolveLayout(await assets.loadJSON('assets/island/layout.json').catch(e => (console.warn('[world] layout.json 없음 — 기본 지도', e), null)));
     const gen = generateIsland(layout.seed ?? state.island.seed, { ...constants.ISLAND, villagers: constants.VILLAGERS, nativeFruit, layout,
@@ -36,7 +44,7 @@ export default {
     kit = createKit(ctx);
     const collision = createCollision(base);
     terrain = buildTerrain(ctx, gen, base, kit, models);
-    objects = createObjects(ctx, base, kit, models, collision);
+    objects = createObjects(ctx, base, kit, models, collision, { lazy, loadKind: load });
     objects.populate(gen.objects);
     occlusion = createOcclusion(ctx, objects);
 

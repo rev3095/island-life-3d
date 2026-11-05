@@ -18,15 +18,40 @@ const SWAY = new Set(['tree', 'fruit-tree', 'cedar', 'palm', 'cherry-tree', 'bus
 const SINGLE = new Set(['campfire']);       // 따로 애니메이션을 돌리는 물체 (하나뿐)
 const NO_SHADOW = new Set(['tulip', 'cosmos', 'pansy', 'weed', 'shell', 'fossil-spot']);   // 작은 것은 그림자를 드리우지 않는다 (그림자 계산 절약)
 
-export function createObjects(ctx, island, kit, models, collision) {
+// lazy = 처음에 안 읽고 놓일 때 받는 종류 (계절 행사 모델 — assets/events/events.json 의 assets.env), loadKind(kind) → { gltf, spec }
+export function createObjects(ctx, island, kit, models, collision, { lazy = new Set(), loadKind = null } = {}) {
   const { THREE: T, state, events } = ctx;
   const { w, h } = island;
   const COLLIDERS = {}, EXTENT = {};
-  for (const [kind, { spec }] of Object.entries(models)) {
+  const learn = (kind, spec) => {
     const wd = spec.world ?? {};
     if (wd.collider) COLLIDERS[kind] = wd.collider;
     const e = wd.extent ?? (wd.lot && [wd.lot[0] / 2, wd.lot[1] / 2]);
     if (e) EXTENT[kind] = e;
+  };
+  for (const [kind, { spec }] of Object.entries(models)) learn(kind, spec);
+  // 행사 모델 받기: 같은 종류는 한 번만. 받는 동안 놓인 물체는 waiting 에 두었다가 다 받으면 놓는다 (그 사이 remove 되면 버림)
+  const loading = new Map();
+  const waiting = new Map();
+  function ensure(kind) {
+    if (models[kind]) return Promise.resolve(true);
+    if (!lazy.has(kind) || !loadKind) return Promise.resolve(false);
+    if (!loading.has(kind)) {
+      const job = loadKind(kind).then(m => { models[kind] = m; learn(kind, m.spec); return true; });
+      job.catch(e => { loading.delete(kind); console.warn(`[world] 행사 모델을 못 받았어요: ${kind}`, e); });
+      loading.set(kind, job);
+    }
+    return loading.get(kind);
+  }
+  function wait(o, emit) {
+    waiting.set(o.id, o);
+    ensure(o.kind).then(ok => {
+      if (waiting.get(o.id) !== o) return;
+      waiting.delete(o.id);
+      if (!ok) return;
+      insert(o);
+      if (emit) events.emit('world:object', { type: 'add', id: o.id, kind: o.kind });
+    }, () => waiting.delete(o.id));
   }
   const group = new T.Group();
   group.name = 'objects';
@@ -176,9 +201,10 @@ export function createObjects(ctx, island, kit, models, collision) {
     at(tx, tz) { const s = tileIndex.get(tz * w + tx); return s?.size ? publicOf(byId.get([...s][0])) : null; },
     list(kind) { return [...byId.values()].filter(o => !kind || o.kind === kind).map(publicOf); },
     remove(id) {
-      const o = byId.get(id);
+      const o = byId.get(id) ?? waiting.get(id);
       if (!o) return false;
-      erase(o);
+      if (waiting.get(id) === o) waiting.delete(id);
+      else erase(o);
       const isl = state.island;
       const ai = isl.added.findIndex(a => a.id === id);
       if (ai >= 0) isl.added.splice(ai, 1);
@@ -188,15 +214,16 @@ export function createObjects(ctx, island, kit, models, collision) {
     },
     /** 칸 가운데에 물체를 놓는다. data: { rot, scale, variant, persist=true, at: {x, z, y}?, ... } → id (at = 칸 가운데 대신 그 자리, 5차 Z5 축제 부스) */
     add(kind, tx, tz, data = {}) {
-      if (!models[kind]) { console.warn(`[world] 모르는 배경 종류: ${kind}`); return null; }
+      if (!models[kind] && !lazy.has(kind)) { console.warn(`[world] 모르는 배경 종류: ${kind}`); return null; }
       const { rot = 0, scale = 1, variant = null, persist = true, id: wantId, at = null, ...rest } = data;
       let id = wantId ?? `${kind}@${tx},${tz}`;
-      for (let n = 2; byId.has(id); n++) id = `${kind}@${tx},${tz}~${n}`;
+      for (let n = 2; byId.has(id) || waiting.has(id); n++) id = `${kind}@${tx},${tz}~${n}`;
       const c = at ?? island.toWorld(tx, tz);
       const lvl = island.levelAt(tx, tz);
       const o = { id, kind, tx, tz, x: c.x, z: c.z, y: at?.y ?? lvl * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false };
-      insert(o);
       if (persist) state.island.added.push({ id, kind, tx, tz, data: { rot, scale, variant, ...(at ? { at } : {}), ...rest } });
+      if (!models[kind]) { wait(o, true); return id; }   // 행사 모델: 받은 뒤 놓고 그때 알림
+      insert(o);
       events.emit('world:object', { type: 'add', id, kind });
       return id;
     },
@@ -228,6 +255,8 @@ export function createObjects(ctx, island, kit, models, collision) {
       if (a) { if (scale != null) a.data.scale = scale; if (data) merge(a.data, data); }
       return true;
     },
+    /** 행사 모델을 미리 받아 둔다 (놓기 전에 부르면 놓을 때 멈칫하지 않는다) → Promise<boolean> */
+    ensure: kinds => Promise.all([].concat(kinds).map(ensure)).then(r => r.every(Boolean)),
     /** 흔들기 연출 (나무·덤불). P2 채집에서 쓴다 */
     shake(id) { const o = byId.get(id); if (o?.batch) o.batch.shakeAt(o.slot); return !!o; },
   };
@@ -249,7 +278,8 @@ export function createObjects(ctx, island, kit, models, collision) {
         if (byId.has(a.id)) continue;
         const { rot = 0, scale = 1, variant = null, at = null, ...rest } = a.data ?? {};
         const c = at ?? island.toWorld(a.tx, a.tz);
-        insert({ id: a.id, kind: a.kind, tx: a.tx, tz: a.tz, x: c.x, z: c.z, y: at?.y ?? island.levelAt(a.tx, a.tz) * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false });
+        const o = { id: a.id, kind: a.kind, tx: a.tx, tz: a.tz, x: c.x, z: c.z, y: at?.y ?? island.levelAt(a.tx, a.tz) * LEVEL_HEIGHT, rot, scale, variant, data: rest, generated: false };
+        if (models[a.kind]) insert(o); else if (lazy.has(a.kind)) wait(o, true);
       }
     },
     setSeason(s) {

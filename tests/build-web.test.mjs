@@ -39,7 +39,7 @@ test('build-web: .glb·렌더·stats 는 빠지고 모델은 .glb.json 만', () 
 
 test('build-web: 게시 파일은 모듈·css + 에셋 묶음 몇 개 (에셋을 따로 올리지 않는다)', () => {
   for (const f of plan.publish) {
-    if (f.path.startsWith('packs/')) { assert.match(f.path, /^packs\/[a-z]+-\d+\.json$/); assert.equal(f.src, `dist/web/${f.path}`); continue; }
+    if (f.path.startsWith('packs/')) { assert.match(f.path, /^packs\/[a-z]+(-[a-z]+)?-\d+\.json$/); assert.equal(f.src, `dist/web/${f.path}`); continue; }
     assert.match(f.path, /\.(m?js|css)$/, `따로 올라가는 에셋: ${f.path}`);
     assert.equal(f.path, f.src);
   }

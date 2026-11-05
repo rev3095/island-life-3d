@@ -13,6 +13,7 @@ import { createAutumn } from './autumn.js';
 import { createWinter } from './winter.js';
 
 export const CONFIG_FILE = 'assets/events/events.json';
+const SOON_DAYS = 2;   // 행사 시작 며칠 전부터 그 계절 묶음을 미리 받을까
 let E = null;
 
 export function createEventsService(ctx, cfg) {
@@ -81,9 +82,21 @@ export function createEventsService(ctx, cfg) {
 
   // ---- 알림 (UI-14) ----
   const chip = createChip(ctx.uiRoot, { onOpen: () => openCal() });
+  // ---- 계절 행사 모델 미리 받기 (최적화): 처음엔 안 받고, 열린 행사는 모델까지 풀어 두고 곧(SOON_DAYS 안) 열릴 행사는 묶음만 받는다 ----
+  const soon = (key = today()) => (!key || !open() ? [] : [...active(key).map(r => r.ev), ...upcoming(cfg, key).filter(u => u.until <= SOON_DAYS).map(u => u.ev)]);
+  let warmed = null;
+  function warm(key) {
+    if (warmed === key) return;
+    warmed = key;
+    const evs = soon(key);
+    if (!evs.length) return;
+    ctx.assets?.prefetchPacks?.({ seasons: evs.map(ev => ev.slug), gapMs: 400 });
+    for (const r of active(key)) S().world?.objects?.ensure?.(r.ev.assets?.env ?? []);
+  }
   function check() {
     const key = today();
     if (!key) return;
+    warm(key);
     const e = st(), runs = active(key);
     chip.show(open() ? runs[0] ?? null : null);
     for (const r of runs) {
@@ -124,6 +137,8 @@ export function createEventsService(ctx, cfg) {
     service: {
       config: cfg, today, active, live, isOpen: open, progress, todo: id => { const r = active().find(x => x.ev.id === id); return r ? todo(r) : []; },
       stamp, stamps: () => st().stamps, calendar: year => yearCalendar(cfg, year),
+      /** 지금 열렸거나 SOON_DAYS 일 안에 열릴 행사 slug (게시본 묶음 미리 받기용) */
+      soon: () => soon().map(ev => ev.slug),
       spot: (id, fn) => { spots[id] = fn; },
       /** D79-A: 지금 행사 시간인 행사의 주인공이면 그 행사 자리 {x, z} (town.pickSpot 이 묻는다), 아니면 null */
       hostSpot(slug) { if (!open()) return null; const r = live().find(x => x.ev.host === slug); return r ? spotOf(r.ev.id) : null; },

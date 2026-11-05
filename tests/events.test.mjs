@@ -105,6 +105,26 @@ test('웹 빌드: 행사 설정이 열자마자 받는 묶음에', async () => {
   assert.ok(existsSync(resolve(root, 'src/gameplay/events/index.js')));
 });
 
+test('웹 빌드: 행사 하나에만 쓰는 모델은 그 계절 묶음 (처음엔 안 받음), 같이 쓰는 간판은 섬 묶음', async () => {
+  const { PACKS } = await import('../tools/build-web.mjs');
+  const packOf = p => PACKS.find(g => g.test(p));
+  const env = JSON.parse(readFileSync(resolve(root, 'assets/env/index.json'), 'utf8')).models.map(m => m.slug);
+  for (const ev of CFG.list) {
+    assert.ok(ev.assets?.env?.length, `${ev.id} assets.env`);
+    for (const k of ev.assets.env) {
+      assert.ok(env.includes(k), `${ev.id}: 배경 목록에 없음 ${k}`);
+      const shared = CFG.list.filter(x => x.assets.env.includes(k)).length > 1;
+      const g = packOf(`assets/env/models/${k}.glb.json`);
+      assert.equal(g.name, shared ? 'island' : `season-${ev.slug}`, k);
+      if (!shared) assert.ok(!g.boot);
+    }
+    for (const k of ev.assets.items ?? []) {
+      assert.ok(existsSync(resolve(root, `assets/items/models/${k}.glb.json`)), k);
+      assert.equal(packOf(`assets/items/models/${k}.glb.json`).name, `season-${ev.slug}`);
+    }
+  }
+});
+
 // ---- M8-P3 봄 꽃놀이: 자리 고르기 (섬 생성기 + 축제 광장 그대로) ----
 import { generateIsland, createIslandApi, lotsOf, BUILDING_KINDS } from '../src/world/island.js';
 import { carveFestival } from '../src/world/festival.js';

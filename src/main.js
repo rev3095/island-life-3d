@@ -95,7 +95,7 @@ async function boot() {
   }
   if (!ctx.services.world) await coreCheck(ctx);
   events.emit('game:ready', { modules: loaded.map(([n]) => n) });
-  setTimeout(() => assets.prefetchPacks?.(), 3000);   // 게시본: 나머지 묶음을 쉬엄쉬엄 미리 받기 (처음 로딩 크기는 그대로)
+  setTimeout(() => assets.prefetchPacks?.({ seasons: ctx.services.events?.soon?.() ?? [] }), 3000);   // 게시본: 나머지 묶음을 쉬엄쉬엄 미리 받기 (계절 행사 묶음은 그 행사 무렵만)
 
   const resize = () => {
     const w = innerWidth, h = innerHeight;
