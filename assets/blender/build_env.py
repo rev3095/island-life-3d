@@ -957,6 +957,26 @@ def b_event_sign(M):
     m.add(prism((0, 0, 1.13), 1.08, 0.22, 0.14, overhang=0.02), 'roof')
 
 
+def b_fireworks_raft(M):
+    """PR-18 불꽃 발사대 (8차 여름 불꽃놀이): 남쪽 바다 위 나무 뗏목에 발사 통 셋. 통마다 띠, 가장자리 밧줄과 작은 깃발. 불꽃놀이 밤에만 보인다."""
+    m = M.part('raft')
+    L, W = 1.6, 1.2
+    for i in range(6):   # 통나무 판
+        y = -W / 2 + (i + 0.5) * W / 6
+        m.add(cylinder((-L / 2, y, 0.08), (L / 2, y, 0.08), W / 12 * 0.95, seg=12), 'wood' if i % 2 else 'woodDark')
+    for x in (-0.6, 0.6):
+        m.add(box((x, 0, 0.17), (0.12, W + 0.04, 0.05), bevel=0.015), 'woodDark')
+    for k, (x, y, h) in enumerate(((-0.35, -0.15, 0.42), (0.05, 0.2, 0.52), (0.42, -0.12, 0.36))):
+        m.add(cylinder((x, y, 0.15), (x, y, 0.15 + h), 0.12, 0.11, seg=18), 'tube')
+        m.add(cylinder((x, y, 0.15 + h - 0.02), (x, y, 0.15 + h + 0.01), 0.13, seg=18), 'band')
+        m.add(cylinder((x, y, 0.15 + h * 0.4), (x, y, 0.15 + h * 0.4 + 0.05), 0.125, seg=18), 'band')
+        m.add(cylinder((x, y, 0.15 + h + 0.005), (x, y, 0.15 + h + 0.012), 0.085, seg=14), 'hole', outline=False)
+    pts = [V((-L / 2 - 0.02, -W / 2, 0.2)), V((L / 2 + 0.02, -W / 2, 0.2)), V((L / 2 + 0.02, W / 2, 0.2)), V((-L / 2 - 0.02, W / 2, 0.2))]
+    m.add(tube(pts, [0.025] * 4, seg=8, closed=True), 'rope')
+    m.add(cylinder((0.7, 0.5, 0.15), (0.7, 0.5, 0.75), 0.018, seg=8), 'woodDark')
+    m.add(box((0.79, 0.5, 0.66), (0.18, 0.012, 0.12), bevel=0.004), 'flag')
+
+
 BUILDERS = {
     'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
     'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
@@ -966,6 +986,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'fireworks-raft': b_fireworks_raft,
     'cherry-tree': b_cherry_tree, 'picnic-mat': b_picnic_mat, 'event-sign': b_event_sign,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }

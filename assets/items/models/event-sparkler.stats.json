@@ -1,0 +1,46 @@
+{
+  "id": "IC-EV-02",
+  "slug": "event-sparkler",
+  "name": "손 불꽃",
+  "group": "event",
+  "kind": "sparkler",
+  "version": "0.1",
+  "items": [
+    "event.sparkler"
+  ],
+  "hold": false,
+  "triangles": 780,
+  "parts": 1,
+  "materials": [
+    "coat",
+    "spark",
+    "sparkTip",
+    "wire"
+  ],
+  "objects": [
+    "sparkler"
+  ],
+  "size": [
+    0.21,
+    0.159,
+    0.436
+  ],
+  "bounds": [
+    [
+      -0.105,
+      -0.079,
+      0.0
+    ],
+    [
+      0.105,
+      0.079,
+      0.436
+    ]
+  ],
+  "glbBytes": 18596,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-sparkler_main.png",
+    "event-sparkler_thumb.png"
+  ]
+}

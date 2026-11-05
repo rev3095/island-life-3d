@@ -1,0 +1,60 @@
+{
+  "id": "IC-EV-02",
+  "slug": "event-sparkler",
+  "name": "손 불꽃",
+  "group": "event",
+  "category": "item",
+  "kind": "sparkler",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "event.sparkler",
+      "code": "IC-EV-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "여름 불꽃놀이 저녁에 코코에게 하루 한 번 받는 손 불꽃. 끝에서 별 모양 불티가 튄다 (들고 흔드는 동작 AN-08 은 M8-P4).",
+    "keywords": [
+      "가는 철사",
+      "회색 화약",
+      "별 불티"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 여름 불꽃놀이 EV-02"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "render": {
+    "yaw": -25,
+    "pitch": 18
+  },
+  "palette": {
+    "wire": "#8A8F96",
+    "coat": "#6B6560",
+    "spark": "#FFD866",
+    "sparkTip": "#FF9F43"
+  },
+  "paletteLabels": {
+    "wire": "철사 손잡이",
+    "coat": "화약",
+    "spark": "불티",
+    "sparkTip": "불티 끝"
+  }
+}

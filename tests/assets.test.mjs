@@ -20,8 +20,8 @@ const gltfOf = p => {
 
 const SETS = [
   { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 10 },
-  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 55 },   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23,
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 35 },   // + 8차 FU-43,
+  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 56 },   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18,
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 36 },   // + 8차 FU-43·FU-44,
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;

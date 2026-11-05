@@ -1188,8 +1188,26 @@ def b_cherry_lamp(M):
         m.add(ellipsoid((math.cos(a) * 0.05, math.sin(a) * 0.05, zc + 0.19), (0.016, 0.016, 0.016), seg=8, rings=5), 'base', outline=False)
 
 
+def b_wind_chime(M):
+    """FU-44 여름밤 풍경 (8차 여름 불꽃놀이 보상): 벽에서 나온 작은 나무 팔에 매단 유리 종. 종에 붉은 금붕어 무늬, 아래로 소원 종이 한 장.
+    종·추·종이는 'chime' 한 덩어리라 sway 로 함께 흔들린다."""
+    m = M.part('bracket')
+    zt = 1.72
+    m.add(box((0, -0.03, zt + 0.02), (0.1, 0.06, 0.12), bevel=0.015), 'wood')
+    m.add(box((0, -0.16, zt + 0.06), (0.04, 0.26, 0.035), bevel=0.008), 'wood')
+    ch = M.part('chime', pivot=(0, -0.27, zt + 0.05))
+    ch.add(cylinder((0, -0.27, zt + 0.05), (0, -0.27, zt - 0.02), 0.004, seg=6), 'string', outline=False)
+    ch.add(ellipsoid((0, -0.27, zt - 0.1), (0.11, 0.11, 0.1), seg=24, rings=12), lambda c, n: 'glass' if c.z > zt - 0.105 else 'glassRim')
+    for sx in (1, -1):   # 금붕어 무늬 둘
+        ch.add(ellipsoid((sx * 0.05, -0.37, zt - 0.08), (0.03, 0.012, 0.018), rot=rot_xyz(y=sx * 0.3, z=sx * 0.4), seg=10, rings=6), 'mark', outline=False)
+    ch.add(cylinder((0, -0.27, zt - 0.12), (0, -0.27, zt - 0.32), 0.003, seg=6), 'string', outline=False)
+    ch.add(ellipsoid((0, -0.27, zt - 0.2), (0.022, 0.022, 0.018), seg=10, rings=6), 'glassRim')
+    ch.add(box((0, -0.27, zt - 0.42), (0.08, 0.006, 0.2), bevel=0.003), 'paper')
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
+    'wind-chime': b_wind_chime,
     'cherry-lamp': b_cherry_lamp,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,
     'sofa': b_sofa, 'wardrobe': b_wardrobe, 'wall-clock': b_wall_clock, 'fish-tank': b_fish_tank, 'bug-case': b_bug_case,
@@ -1219,9 +1237,10 @@ main = build(PAL)
 objects = list(main.objects.values())
 
 ANIMS = {
+    'sway': (48, lambda t: ((0.09 * math.sin(TAU * t), 0.05 * math.sin(TAU * t + 1.3), 0), None)),   # 8차 풍경 (FU-44)
     'flicker': (24, lambda t: ((0, 0, 0.1 * math.sin(TAU * t)), (1 + 0.08 * math.sin(TAU * 2 * t), 1 + 0.08 * math.sin(TAU * 2 * t), 1 + 0.15 * math.sin(TAU * 3 * t + 1)))),
 }
-ANIM_TARGET = {'flicker': ('flame',)}
+ANIM_TARGET = {'flicker': ('flame',), 'sway': ('chime',)}
 anim_names = []
 for name in spec.get('animations', []):
     target = next((main.objects[t] for t in ANIM_TARGET.get(name, ()) if t in main.objects), None)

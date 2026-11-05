@@ -1,0 +1,38 @@
+{
+  "id": "PR-18",
+  "slug": "event-raft",
+  "name": "불꽃 발사대",
+  "category": "prop",
+  "kind": "fireworks-raft",
+  "version": "0.1",
+  "triangles": 1448,
+  "parts": 1,
+  "materials": [
+    "band",
+    "flag",
+    "hole",
+    "rope",
+    "tube",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    1.71,
+    1.24,
+    0.75
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 32852,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-raft_front.png",
+    "event-raft_hero.jpg",
+    "event-raft_main.png",
+    "event-raft_thumb.png",
+    "event-raft_top.png"
+  ]
+}

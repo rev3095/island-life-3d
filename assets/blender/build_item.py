@@ -1396,7 +1396,22 @@ def b_petal(M):
         m.add(ellipsoid(V((x, y, z + 0.006)) - d * 0.03, (0.016, 0.012, 0.004), rot=rot_xyz(z=a), seg=8, rings=4), 'notch', outline=False)
 
 
+def b_sparkler(M):
+    """IC-EV-02 손 불꽃 (8차 여름 불꽃놀이): 손잡이 쪽은 맨 철사, 위쪽은 회색 화약이 입혀진 가는 막대. 끝에서 별 모양 불티가 튄다."""
+    m = M.part('sparkler')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.16), 0.006, seg=8), 'wire')
+    m.add(cylinder((0, 0, 0.16), (0, 0, 0.36), 0.012, 0.01, seg=10), 'coat')
+    m.add(ellipsoid((0, 0, 0.375), (0.03, 0.03, 0.03), seg=14, rings=8), 'spark', outline=False)
+    for k in range(10):   # 불티 가지
+        a, up = TAU * k / 10, 0.4 * ((k % 3) - 1)
+        d = V((math.cos(a), math.sin(a) * 0.4, up)).normalized()
+        c = V((0, 0, 0.375))
+        m.add(cylinder(c + d * 0.03, c + d * (0.075 + 0.02 * (k % 2)), 0.004, 0.0015, seg=5), 'spark', outline=False)
+        m.add(ellipsoid(c + d * (0.085 + 0.02 * (k % 2)), (0.007, 0.007, 0.007), seg=6, rings=4), 'sparkTip', outline=False)
+
+
 BUILDERS = {
+    'sparkler': b_sparkler,
     'petal': b_petal,
     'pie': b_pie, 'juice': b_juice, 'wreath': b_wreath, 'medal': b_medal,
     'fish': b_fish, 'flatfish': b_flatfish, 'squid': b_squid, 'octopus': b_octopus, 'seahorse': b_seahorse,
