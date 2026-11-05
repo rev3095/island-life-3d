@@ -205,7 +205,7 @@ details summary { cursor: pointer; font-size: 14px; }
       <tr><td class="id">M7-P7</td><td>QA 결정 반영 (<b>✅ 11-04 끝</b> · main bf53798 · 게임 v22) — D49 화면 아래 가림 투명 · D50 마음 열기에 선물·부탁 · D51 첫날 밤 문 너머 팔기 · D52 밤톨 말 · D53 감정 알림 문장 · D54 하트 칸 · D55 축제 사흘 · D56 축제 시작 먼저·주민 비켜 서기 · D57 잠들기 전 집에</td><td><code>src/world/occlusion.js</code> · <code>src/gameplay/festival/</code> · <code>src/gameplay/town/</code> · <code>src/gameplay/intro/</code> · <code>src/ui/shop.js</code> · 주민 파일 <code>bamtol.json</code> v2 · 축제 설정 <code>parts.open.ways</code></td><td>D49–D57</td></tr>
       <tr><td class="id">M7-P8</td><td>편집기 맞추기 (<b>✅ 11-05 끝</b> · main 8cf042c · 배경 편집기 v11 · 캐릭터 v10 · 스타일 v3 · 게임 v23) — 배경 편집기 「방 배치」 탭에 상점·박물관(RM-08·09), 캐릭터 편집기에 밤톨 v2 대사, 스타일 편집기에 하늘 값, 편집기 홈 현황</td><td><code>bg-editor.html</code> · <code>editor.html</code> 게시 · 홈 <code>status/*</code></td><td>P7 합친 뒤</td></tr>
       <tr><td class="id">M7-P9</td><td>시점 조작 마무리 (<b>✅ 11-05 확정</b>) — 선택지 7개(놓으면 돌아오기·빠르기·올려다보기 각·좌우 돌기·끌기 방향·섬폰 설정·높음 틸트 흐림)는 <b>지금 값 그대로</b> (1–5 A · 6 넣지 않음 · 7 B), 고치고 싶으면 작은 보드</td><td><code>src/player/camera.js</code> <code>LOOK</code> · <code>docs/notes/p12-camera.md</code></td><td>—</td></tr>
-      <tr><td class="id">M7-P6</td><td>출시 (조정 세션, <b>P7–P9 뒤</b>) — 합치기 → 게임 링크 다시 게시 → 자동 플레이(RC-01–04) → 사용자 손 점검(RC-05–08·12: claude.ai·iPhone·Android·다른 GPU·휴대폰 데이터·다른 계정) → 공유(사용자가 claude.ai 공유 단추)</td><td><code>README.md</code> · <code>docs/notes/release.md</code> (새) · <code>devlog.md</code></td><td>P1–P5 · P7–P9 · D36 · D47</td></tr>
+      <tr><td class="id">M7-P6</td><td>출시 (<b>11-05 진행 중</b> — 자동 플레이·Claude 몫 RC-01–04·09·10·11 끝, 사용자 손 점검 대기, 점검표 <code>docs/notes/release.md</code>) — 합치기 → 게임 링크 다시 게시 → 자동 플레이(RC-01–04) → 사용자 손 점검(RC-05–08·12: claude.ai·iPhone·Android·다른 GPU·휴대폰 데이터·다른 계정) → 공유(사용자가 claude.ai 공유 단추)</td><td><code>README.md</code> · <code>docs/notes/release.md</code> (새) · <code>devlog.md</code></td><td>P1–P5 · P7–P9 · D36 · D47</td></tr>
       <tr><td class="id">M7-P10</td><td>정리 (사용자 확인 뒤) — 합친 작업 폴더·브랜치(p8-*·p9-*·p10-*·p11-*·p12-*·qa·story 등)와 끝난 세션 보관</td><td><code>../island-worktrees/</code></td><td>P6</td></tr>
       <tr><td class="id">M8-P0</td><td>다음 콘텐츠 — D48-A <b>계절 행사</b>(봄 꽃놀이·여름 불꽃·가을 수확·겨울 눈사람) <b>8차 검수 보드</b>부터. M8-P1 이후는 보드에서 정해요</td><td><code>concept/wave8-board.html</code> (새)</td><td>D48 · M7 끝</td></tr>
       <tr><td class="id">보류</td><td>D41-A 밸런스(축제까지 5~7일) — 의견대로 나중에. 보드에서 D41 을 A 로 바꾸고 "검수 보드 반영"하면 P 하나로 넣어요</td><td><code>assets/festival/config.json</code> <code>parts</code> · <code>assets/data/rules.json</code> <code>town</code></td><td>사용자</td></tr>
@@ -590,17 +590,17 @@ $('uiCards').innerHTML = UI.map(([id, name, kind, dec, what, where, track]) => `
 /* ---------- 출시 점검표 ---------- */
 const ST = { done: ['✅', '됨'], run: ['⏳', '도는 중'], part: ['△', '일부'], todo: ['❌', '아직'] };
 const RC = [
-  ['RC-01', '새 게임 → 첫날 → 부품 다섯 → 축제 → 사진 엔딩까지 막힘 없음 — 10-30 개발판·게시본 조건·휴대폰 375 셋 다 막힘 0', '🤖 QA 자동', 'done', 'M7-P1'],
+  ['RC-01', '새 게임 → 첫날 → 부품 다섯 → 축제 → 사진 엔딩까지 막힘 없음 — 10-30 · 11-05(v23) 개발판·게시본 조건·휴대폰 375 셋 다 막힘 0', '🤖 QA 자동', 'done', 'M7-P1'],
   ['RC-02', '엔딩 뒤: 다음 날·다음 해 축제, 채집·상점·박물관 계속 — 다음 해 축제는 개발판 실행에서', '🤖 QA 자동', 'done', 'M7-P1'],
-  ['RC-03', '저장 → 새로고침 → 가방·집·주민·축제 진행이 그대로 — 새로고침 이어 하기는 첫날에만 봄', '🤖 QA 자동', 'part', 'M7-P1'],
+  ['RC-03', '저장 → 새로고침 → 가방·집·주민·축제 진행이 그대로 — 새로고침 이어 하기는 첫날에만 봄 → 11-05 진행된 저장(부품 5·부스 5·가방·친밀도)도 새로고침 전후 같음', '🤖 QA 자동 + 🛠 Claude', 'done', 'M7-P6'],
   ['RC-04', '자동 플레이 내내 콘솔 오류 0 · 게시 목록 밖 요청 0 (로컬 /artifact/) — 셋 다 0', '🤖 QA 자동', 'done', 'M7-P1'],
   ['RC-05', 'claude.ai 게시본을 직접 열어 로딩 → 섬 → 소리·키보드', '🧑 사용자', 'todo', 'M7-P6'],
   ['RC-06', '휴대폰 iPhone 한 대 · Android 한 대, 세로·가로', '🧑 사용자 + UI-07', 'todo', 'M7-P2 · P3'],
   ['RC-07', '다른 GPU 한 대 더 (외장 GPU 나 Mac)', '🧑 사용자 + UI-07', 'todo', 'M7-P2'],
   ['RC-08', '처음 로딩: 휴대폰 데이터로 섬까지 걸리는 시간 (D37-B: 지금 8.4 MB 그대로, 시간만 재기)', '🧑 사용자 + UI-07', 'todo', 'M7-P2'],
-  ['RC-09', '광장 프레임 시간이 목표 안 (D38 · D39)', '🛠 Claude + UI-07', 'part', 'M7-P2'],
-  ['RC-10', '가장 큰 글자에서 창이 넘치지 않음 · 색만으로 구분하는 곳 0', '🛠 Claude', 'todo', 'M7-P3'],
-  ['RC-11', '내보낸 저장 파일을 다른 브라우저에서 불러와 이어 하기', '🛠 Claude + 🧑 사용자', 'todo', 'M7-P4'],
+  ['RC-09', '광장 프레임 시간이 목표 안 (D38 · D39) — 11-04 높음 9.9 · 적정 5.1 · 낮음 3.7 · 매우 낮음 2.5ms (목표 33ms), 다른 기기는 RC-07', '🛠 Claude + UI-07', 'done', 'M7-P6'],
+  ['RC-10', '가장 큰 글자에서 창이 넘치지 않음 · 색만으로 구분하는 곳 0 — 11-05 「아주 크게」 1280×800 · 375×812 창 8개 넘침 0, 색은 「모양으로도 보기」', '🛠 Claude', 'done', 'M7-P6'],
+  ['RC-11', '내보낸 저장 파일을 다른 브라우저에서 불러와 이어 하기 — 11-05 Claude: 저장소가 따로인 주소에서 불러와 같음, 실제 다른 기기는 사용자', '🛠 Claude + 🧑 사용자', 'part', 'M7-P6'],
   ['RC-12', '다른 계정·다른 브라우저에서 공유 링크 열기 — 저장이 서로 안 섞임', '🧑 사용자', 'todo', 'M7-P6'],
 ];
 $('rcCards').innerHTML = RC.map(([id, what, who, st, track]) => `
