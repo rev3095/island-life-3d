@@ -977,6 +977,64 @@ def b_fireworks_raft(M):
     m.add(box((0.79, 0.5, 0.66), (0.18, 0.012, 0.12), bevel=0.004), 'flag')
 
 
+def b_harvest_pot(M):
+    """PR-19 수확 큰 솥 (8차 가을 수확 잔치): 장작불 위 돌 받침에 얹힌 지름 2칸 무쇠 솥. 국물 위에 과일·버섯이 떠 있고 김이 오른다.
+    축제 과일 솥(FP-04)보다 크고 낮다. 불꽃은 'flame' 덩어리라 flicker 로 일렁인다."""
+    m = M.part('pot')
+    for k in range(10):   # 돌 받침
+        a = TAU * k / 10
+        m.add(jitter(ellipsoid((math.cos(a) * 0.78, math.sin(a) * 0.78, 0.07), (0.15, 0.13, 0.1), seg=8, rings=5), 0.015, k, keep_bottom=0.0), 'stone', smooth=False)
+    for k in range(4):   # 장작
+        a = TAU * k / 4 + 0.4
+        d = V((math.cos(a), math.sin(a), 0))
+        m.add(capsule(d * 0.55 + V((0, 0, 0.06)), -d * 0.1 + V((0, 0, 0.12)), 0.06, seg=10, rings=6), 'wood')
+    zb = 0.48   # 솥 밑 — 돌 받침 위로 띄워 아래 불이 보이게
+    for k in range(3):   # 솥을 받치는 돌 기둥 셋
+        a = TAU * k / 3 + 0.2
+        m.add(jitter(box((math.cos(a) * 0.6, math.sin(a) * 0.6, zb / 2), (0.2, 0.2, zb), bevel=0.04), 0.01, k + 20, keep_bottom=0.0), 'stone', smooth=False)
+    m.add(cylinder((0, 0, zb + 0.1), (0, 0, zb + 0.5), 0.7, 0.8, seg=32), 'iron')
+    m.add(ellipsoid((0, 0, zb + 0.12), (0.7, 0.7, 0.16), seg=32, rings=10), 'iron')
+    ring = [V((math.cos(TAU * i / 32) * 0.8, math.sin(TAU * i / 32) * 0.8, zb + 0.52)) for i in range(32)]
+    m.add(tube(ring, [0.05] * 32, seg=10, closed=True), 'rim')
+    m.add(cylinder((0, 0, zb + 0.5), (0, 0, zb + 0.515), 0.77, seg=32), 'soup', outline=False)   # 솥 몸통 윗면 바로 위
+    for sx in (1, -1):   # 손잡이
+        m.add(tube([V((sx * 0.8, -0.12, zb + 0.4)), V((sx * 0.95, 0, zb + 0.46)), V((sx * 0.8, 0.12, zb + 0.4))], [0.025] * 3, seg=8), 'ironDark')
+    for k, (x, y, c, r) in enumerate(((-0.3, 0.1, 'fruitA', 0.11), (0.2, -0.25, 'fruitB', 0.1), (0.25, 0.3, 'shroom', 0.08), (-0.1, -0.35, 'fruitA', 0.09))):
+        m.add(ellipsoid((x, y, zb + 0.53), (r, r, r * 0.7), seg=14, rings=8), c)
+    fl = M.part('flame', pivot=(0, 0, 0.1))
+    for k in range(3):
+        a = TAU * k / 3 + 0.9
+        p = V((math.cos(a) * 0.22, math.sin(a) * 0.22, 0.1))
+        fl.add(cone(p, p + V((0, 0, 0.34)), 0.13, 0.0, seg=10), 'flame', outline=False)
+        fl.add(cone(p + V((0, -0.03, 0)), p + V((0, -0.03, 0.2)), 0.07, 0.0, seg=8), 'flameCore', outline=False)
+    st = M.part('steam')
+    for k, (x, y, z, r) in enumerate(((-0.15, 0.05, 1.2, 0.14), (0.12, -0.05, 1.42, 0.11), (-0.05, 0.1, 1.62, 0.08))):
+        st.add(ellipsoid((x, y, z), (r, r, r * 0.85), seg=14, rings=8), 'steam', outline=False)
+
+
+def b_scarecrow(M):
+    """PR-20 허수아비 (8차 가을 수확 잔치): 나무 기둥·가로대에 퐁을 닮은 노란 옷, 자루 얼굴, 밀짚모자. 소매 끝과 목에 밀짚이 삐져나온다."""
+    m = M.part('scarecrow')
+    m.add(box((0, 0, 0.7), (0.07, 0.07, 1.4), bevel=0.015), 'wood')
+    m.add(box((0, 0, 1.02), (1.0, 0.06, 0.06), bevel=0.015), 'wood')
+    m.add(box((0, 0, 0.88), (0.5, 0.2, 0.42), bevel=0.06), 'shirt')
+    for sx in (1, -1):
+        m.add(box((sx * 0.37, 0, 1.02), (0.26, 0.16, 0.16), bevel=0.05), 'shirt')
+        for k in range(3):
+            m.add(cone(V((sx * 0.5, 0, 1.02)), V((sx * 0.62, (k - 1) * 0.05, 0.98 + 0.03 * k)), 0.03, 0.0, seg=6), 'straw', outline=False)
+    m.add(box((0, -0.105, 0.82), (0.12, 0.01, 0.1), bevel=0.01), 'patch', outline=False)
+    m.add(ellipsoid((0, 0, 1.33), (0.19, 0.17, 0.2), seg=20, rings=12), 'sack')
+    for sx in (1, -1):
+        m.add(ellipsoid((sx * 0.07, -0.16, 1.36), (0.025, 0.01, 0.025), seg=8, rings=5), 'face', outline=False)
+    m.add(box((0, -0.165, 1.27), (0.1, 0.008, 0.015), bevel=0.003), 'face', outline=False)
+    for k in range(6):   # 목 밀짚
+        a = TAU * k / 6
+        m.add(cone(V((math.cos(a) * 0.08, math.sin(a) * 0.08, 1.14)), V((math.cos(a) * 0.15, math.sin(a) * 0.15, 1.1)), 0.025, 0.0, seg=6), 'straw', outline=False)
+    m.add(cylinder((0, 0, 1.46), (0, 0, 1.49), 0.34, 0.32, seg=28), 'hat')
+    m.add(cylinder((0, 0, 1.49), (0, 0, 1.64), 0.17, 0.15, seg=24), 'hat')
+    m.add(cylinder((0, 0, 1.5), (0, 0, 1.55), 0.175, seg=24), 'hatBand')
+
+
 BUILDERS = {
     'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
     'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
@@ -986,6 +1044,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'harvest-pot': b_harvest_pot, 'scarecrow': b_scarecrow,
     'fireworks-raft': b_fireworks_raft,
     'cherry-tree': b_cherry_tree, 'picnic-mat': b_picnic_mat, 'event-sign': b_event_sign,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,

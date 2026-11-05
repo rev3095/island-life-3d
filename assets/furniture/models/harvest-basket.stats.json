@@ -1,0 +1,55 @@
+{
+  "id": "FU-45",
+  "slug": "harvest-basket",
+  "item": "furn.harvest-basket",
+  "name": "수확 바구니",
+  "category": "furniture",
+  "kind": "harvest-basket",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3116,
+  "parts": 1,
+  "materials": [
+    "apple",
+    "leaf",
+    "pumpkin",
+    "shroomCap",
+    "shroomStem",
+    "stem",
+    "weave",
+    "weaveDark"
+  ],
+  "objects": [
+    "basket"
+  ],
+  "animations": {},
+  "size": [
+    0.75,
+    0.75,
+    0.64
+  ],
+  "bounds": [
+    [
+      -0.375,
+      -0.375,
+      0.0
+    ],
+    [
+      0.375,
+      0.375,
+      0.641
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 63112,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "harvest-basket_front.png",
+    "harvest-basket_main.png",
+    "harvest-basket_thumb.png",
+    "harvest-basket_top.png"
+  ]
+}

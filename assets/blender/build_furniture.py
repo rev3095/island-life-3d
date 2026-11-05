@@ -13,7 +13,7 @@ import bpy, bmesh, json, math, os, random, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import toonkit
 from toonkit import (V, Model, add_outlines, aim, align_z, bezier, box, capsule, cone, cylinder, ellipsoid, jitter,
-                     reset_scene, rot_xyz, setup_render, shot, thumbnail, toonify, world_bounds)
+                     reset_scene, rot_xyz, setup_render, shot, thumbnail, toonify, tube, world_bounds)
 
 args = sys.argv[sys.argv.index('--') + 1:]
 SPEC_PATH, ASSETS = os.path.abspath(args[0]), os.path.abspath(args[1])
@@ -1205,8 +1205,29 @@ def b_wind_chime(M):
     ch.add(box((0, -0.27, zt - 0.42), (0.08, 0.006, 0.2), bevel=0.003), 'paper')
 
 
+def b_harvest_basket(M):
+    """FU-45 수확 바구니 (8차 가을 수확 잔치 보상): 손잡이 달린 엮은 바구니에 호박·사과·버섯이 수북이. 앞에 단풍잎 하나."""
+    m = M.part('basket')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.3), 0.26, 0.34, seg=28), 'weave')
+    for z in (0.06, 0.15, 0.24):
+        m.add(cylinder((0, 0, z), (0, 0, z + 0.025), 0.27 + z * 0.27, seg=28), 'weaveDark')
+    m.add(tube([V((math.cos(TAU * i / 28) * 0.345, math.sin(TAU * i / 28) * 0.345, 0.3)) for i in range(28)], [0.03] * 28, seg=8, closed=True), 'weaveDark')
+    m.add(cylinder((0, 0, 0.26), (0, 0, 0.28), 0.33, seg=28), 'weaveDark')   # 담긴 것 밑 (바구니 속)
+    m.add(tube([V((-0.3, 0, 0.3)), V((-0.22, 0, 0.62)), V((0.22, 0, 0.62)), V((0.3, 0, 0.3))], [0.025] * 4, seg=8), 'weaveDark')
+    m.add(ellipsoid((-0.08, 0.04, 0.38), (0.17, 0.17, 0.13), seg=20, rings=12), 'pumpkin')
+    for k in range(6):
+        a = TAU * k / 6
+        m.add(ellipsoid((-0.08 + math.cos(a) * 0.1, 0.04 + math.sin(a) * 0.1, 0.38), (0.1, 0.1, 0.12), rot=rot_xyz(z=a), seg=12, rings=8), 'pumpkin')
+    m.add(cylinder((-0.08, 0.04, 0.5), (-0.06, 0.04, 0.57), 0.02, seg=8), 'stem')
+    m.add(ellipsoid((0.15, -0.1, 0.38), (0.09, 0.09, 0.085), seg=16, rings=10), 'apple')
+    m.add(cylinder((0.16, 0.13, 0.33), (0.16, 0.13, 0.4), 0.025, seg=8), 'shroomStem')
+    m.add(ellipsoid((0.16, 0.13, 0.42), (0.08, 0.08, 0.045), seg=14, rings=8), 'shroomCap')
+    m.add(ellipsoid((0.05, -0.3, 0.2), (0.07, 0.012, 0.06), rot=rot_xyz(y=0.3), seg=10, rings=5), 'leaf', outline=False)
+
+
 BUILDERS = {
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
+    'harvest-basket': b_harvest_basket,
     'wind-chime': b_wind_chime,
     'cherry-lamp': b_cherry_lamp,
     'floor-lamp': b_floor_lamp, 'plant-pot': b_plant_pot, 'round-rug': b_round_rug, 'bookshelf': b_bookshelf, 'radio': b_radio,

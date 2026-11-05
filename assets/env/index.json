@@ -322,6 +322,24 @@
       "status": "review"
     },
     {
+      "id": "PR-19",
+      "slug": "event-pot",
+      "name": "수확 큰 솥",
+      "category": "prop",
+      "kind": "harvest-pot",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-20",
+      "slug": "event-scarecrow",
+      "name": "허수아비",
+      "category": "prop",
+      "kind": "scarecrow",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "PR-23",
       "slug": "event-sign",
       "name": "행사 간판",
