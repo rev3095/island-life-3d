@@ -13,4 +13,8 @@ export const SCENE_FILES = [
   'assets/story/scenes/s10-festival.json',
   'assets/story/scenes/s11-ending-photo.json',
   'assets/story/scenes/s12-life-goes-on.json',
+  'assets/story/scenes/s13-spring-blossom.json',   // 8차 계절 행사 (trigger event-start)
+  'assets/story/scenes/s14-summer-fireworks.json',   // 8차 계절 행사 (trigger event-start)
+  'assets/story/scenes/s15-autumn-harvest.json',   // 8차 계절 행사 (trigger event-start)
+  'assets/story/scenes/s16-winter-snowman.json',   // 8차 계절 행사 (trigger event-start)
 ];

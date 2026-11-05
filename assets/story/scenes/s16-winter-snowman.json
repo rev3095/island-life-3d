@@ -1,0 +1,150 @@
+{
+  "id": "s16-winter-snowman",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절 행사",
+  "title": "겨울 눈사람 날",
+  "summary": "겨울 눈사람 날 첫날. 눈 덮인 광장 남쪽에서 두부가 눈덩이 옆에 서서, 같이 눈사람을 만들자고 한다.",
+  "trigger": {
+    "on": "event-start",
+    "event": "EV-04"
+  },
+  "place": "event",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "눈밭에서 눈덩이",
+      "recommended": true,
+      "desc": "눈 덮인 섬 → 두부가 눈덩이 옆에서 손짓 → 둘이 눈덩이를 본다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "눈 덮인 섬",
+          "dur": 3,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "place": "event",
+            "angle": 10,
+            "move": "orbit"
+          },
+          "transition": "fade",
+          "actors": [],
+          "music": "auto"
+        },
+        {
+          "id": "c2",
+          "note": "두부가 눈덩이 옆에서",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dubu",
+              "at": [
+                1.2,
+                -0.6
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "⛄",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.6,
+                0.8
+              ],
+              "face": "dubu",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "크게 굴려 보자",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "dubu",
+            "angle": -15,
+            "move": "static"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dubu",
+              "face": "player",
+              "emote": "❄️",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dubu",
+              "do": "happy",
+              "emote": "👍",
+              "text": ""
+            }
+          ],
+          "caption": "눈덩이를 밀면 걸은 만큼 커져요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "두부가 눈사람 손짓, 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "두부가 손짓",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dubu",
+              "at": [
+                1.2,
+                -0.6
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "⛄",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.6,
+                0.8
+              ],
+              "face": "dubu",
+              "emote": "😊",
+              "text": ""
+            }
+          ],
+          "music": "auto",
+          "caption": "겨울 눈사람 날 주간이에요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

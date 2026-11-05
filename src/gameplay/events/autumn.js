@@ -198,6 +198,7 @@ export function createAutumn(ctx, events) {
   ctx.events.on('time:newday', () => { clear(); sync(); });
   ctx.events.on('time:part', () => refreshShrooms());
   ctx.events.on('festival:end', sync);
+  events.spot?.(EV, () => placed?.pot ?? null);
   sync();
 
   return { register, sync, debug: { get placed() { return placed; }, get shrooms() { return shrooms; }, potCount, place, clear, refresh: refreshShrooms } };

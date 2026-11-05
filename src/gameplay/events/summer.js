@@ -133,6 +133,7 @@ export function createSummer(ctx, events) {
   ctx.events.on('time:newday', () => { clear(); sync(); });
   ctx.events.on('data:loaded', deliver);
   ctx.events.on('festival:end', sync);
+  events.spot?.(EV, () => placed?.spots.sign ?? null);
   sync();
 
   return { register, update, sync, debug: { fx, get placed() { return placed; }, place, clear, inShow, showOver, get watchSec() { return watchSec; } } };

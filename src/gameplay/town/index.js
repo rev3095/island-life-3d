@@ -56,6 +56,17 @@ export default {
       /** 이 자리에 서면 행동 키를 가로막나: 상점·박물관 문 앞 · 광장 모닥불 둘레 (7차 D56-A — 주민이 비켜 선다) */
       blocksAction,
       pickSpot(person, V) {
+        // 8차 D79-A: 계절 행사 주인공은 행사 시간 동안 대개 그 행사 자리 둘레에 (gameplay/events hostSpot)
+        const ev = ctx.services.events?.hostSpot?.(person.slug);
+        if (ev && Math.random() < 0.75) {
+          for (let i = 0; i < 16; i++) {   // 무대·모닥불 둘레(blocksAction)에 걸리는 자리가 많아 넉넉히
+            const a = Math.random() * Math.PI * 2, r = 1.4 + Math.random() * 2.2;
+            const x = ev.x + Math.cos(a) * r, z = ev.z + Math.sin(a) * r, t = world.island.toTile(x, z);
+            if (!nav.walkable(t.tx, t.tz) || blocksAction(x, z)) continue;
+            if (V) V.goal = { x, z };
+            return { x, z };
+          }
+        }
         const haunts = Object.entries(person.haunts).map(([k, w]) => ({ k, w }));
         for (let i = 0; i < 8; i++) {
           const k = pickWeighted(haunts, Math.random).k;

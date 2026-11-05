@@ -201,6 +201,7 @@ export function createSpring(ctx, events) {
   ctx.events.on('time:part', () => refreshPetals());
   ctx.events.on('time:tick', () => { if (petalsLive !== (!!placed && live())) refreshPetals(); });   // 행사 시간이 시작·끝날 때
   ctx.events.on('festival:end', sync);
+  events.spot?.(EV, () => placed?.spots.picnic ?? null);
   sync();
 
   return { register, sync, debug: { get placed() { return placed; }, get petals() { return petals; }, place, clear } };

@@ -10,6 +10,7 @@ export const TRIGGERS = {
   newday: { label: '다른 장면을 본 다음 날', event: 'data:newday' },
   'festival-part': { label: '축제 부품 n개째', event: 'festival:part', test: (p, t) => Number(p?.n) === Number(t.n) },
   festival: { label: '축제 시작', event: 'festival:start' },
+  'event-start': { label: '계절 행사를 처음 할 때 (8차 — trigger.event = EV-01…)', event: 'events:start', test: (p, t) => p?.id === t.event && !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
@@ -234,6 +235,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if ((t.on === 'after' || t.on === 'newday') && !t.scene) err.push(at(`trigger ${t.on} 에 scene 이 없어요`));
     if ((t.on === 'after' || t.on === 'newday') && ids && !ids.includes(t.scene)) err.push(at(`trigger.scene ${t.scene} 장면이 없어요`));
     if (t.on === 'festival-part' && !(Number.isInteger(t.n) && t.n >= 1 && t.n <= 5)) err.push(at('festival-part 의 n 은 1~5'));
+    if (t.on === 'event-start' && !/^EV-0[1-4]$/.test(t.event ?? '')) err.push(at('event-start 의 event 는 EV-01~04'));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];
