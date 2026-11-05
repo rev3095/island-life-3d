@@ -104,3 +104,39 @@ test('웹 빌드: 행사 설정이 열자마자 받는 묶음에', async () => {
   assert.ok(pack.boot);
   assert.ok(existsSync(resolve(root, 'src/gameplay/events/index.js')));
 });
+
+// ---- M8-P3 봄 꽃놀이: 자리 고르기 (섬 생성기 + 축제 광장 그대로) ----
+import { generateIsland, createIslandApi, lotsOf, BUILDING_KINDS } from '../src/world/island.js';
+import { carveFestival } from '../src/world/festival.js';
+import { springSpots, petalSpots } from '../src/gameplay/events/spring.js';
+
+test('봄 꽃놀이: 벚나무 8그루는 광장 밖 풀밭 빈 칸에 서로 떨어져, 돗자리·간판은 광장 안 땅에', () => {
+  const spec = slug => JSON.parse(readFileSync(resolve(root, `assets/env/specs/${slug}.json`), 'utf8'));
+  const festCfg = JSON.parse(readFileSync(resolve(root, 'assets/festival/config.json'), 'utf8'));
+  const gen = generateIsland(20261028, { lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)]))) });
+  const F = carveFestival(gen, { config: festCfg, specs: { 'festival-stage': spec('festival-stage') } });
+  const isl = createIslandApi(gen);
+  const taken = new Set(gen.objects.map(o => `${o.tx},${o.tz}`));
+  const isFree = (tx, tz) => isl.isWalkableTile(tx, tz) && isl.tileAt(tx, tz) === 'grass' && !taken.has(`${tx},${tz}`);
+  const s = springSpots(F, { isFree, toTile: isl.toTile, toWorld: isl.toWorld });
+  assert.equal(s.trees.length, 8);
+  const C = F.center;
+  for (const [i, t] of s.trees.entries()) {
+    assert.ok(isFree(t.tx, t.tz), `나무 ${i} 칸이 비지 않음`);
+    const w = isl.toWorld(t.tx, t.tz);
+    assert.ok(Math.hypot(w.x - C.x, w.z - C.z) > F.radius + 1, `나무 ${i} 가 광장 안`);
+    for (const u of s.trees.slice(i + 1)) { const q = isl.toWorld(u.tx, u.tz); assert.ok(Math.hypot(q.x - w.x, q.z - w.z) >= 3.2, '나무끼리 너무 가까움'); }
+  }
+  for (const k of ['picnic', 'sign']) {
+    assert.ok(s[k], k);
+    assert.ok(!isl.isWater(s[k].x, s[k].z), `${k} 가 물 위`);
+    assert.ok(Math.hypot(s[k].x - C.x, s[k].z - C.z) < F.radius + 2, `${k} 가 광장에서 멂`);
+  }
+  // 돗자리는 모닥불(가운데)·무대에서 떨어져 있다
+  assert.ok(Math.hypot(s.picnic.x - C.x, s.picnic.z - C.z) > 1.5);
+  // 꽃잎: 나무마다 둘, 같은 날엔 같은 자리, 다른 날엔 바뀜
+  const a = petalSpots(s.trees, '2027-04-02', isl.toWorld), b = petalSpots(s.trees, '2027-04-02', isl.toWorld), c = petalSpots(s.trees, '2027-04-03', isl.toWorld);
+  assert.equal(a.length, 16);
+  assert.deepEqual(a, b);
+  assert.notDeepEqual(a.map(p => [p.x, p.z]), c.map(p => [p.x, p.z]));
+});
