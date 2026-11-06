@@ -261,3 +261,22 @@ test('상점 값: ui 는 data.economy 값을 쓴다 (사는 값, 섬 특산 과�
   // data 가 없어도 아이템 칸으로
   assert.equal(itemInfo({ services: {} }, 'tool.rod').name, 'tool.rod');
 });
+
+test('행사 대사 (8차 M8): 주민마다 행사 넷 갈래가 있고, 행사 기간엔 인사·잡담에 섞이며 없는 날은 고르지 않는다', () => {
+  const evLines = L => new Set(Object.values(L.event ?? {}).flat(2));
+  for (const slug of ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'danpung']) {
+    const L = LINES[slug];
+    for (const id of ['EV-01', 'EV-02', 'EV-03', 'EV-04']) assert.ok(L.event?.[id]?.length >= 2, `${slug}.event.${id}`);
+    const mine = evLines(L);
+    let greetHits = 0, chatHits = 0, stray = 0;
+    for (let i = 0; i < 200; i++) {
+      const c = { now: nowAt(14), weather: 'clear', season: 'summer', tier: 'friend', r: R.rngOf('ev', slug, i), recent: [] };
+      if (R.greetingLines(L, { ...c, event: 'EV-02' }).some(s => L.event['EV-02'].flat().includes(s))) greetHits++;
+      if (R.chatLines(L, { ...c, event: 'EV-02', r: R.rngOf('evc', slug, i) }).some(s => L.event['EV-02'].flat().includes(s))) chatHits++;
+      if ([...R.greetingLines(L, c), ...R.chatLines(L, { ...c, r: R.rngOf('evc', slug, i) })].some(s => mine.has(s))) stray++;
+    }
+    assert.ok(greetHits > 50 && greetHits < 150, `${slug} 인사에 행사 얘기 ${greetHits}/200`);
+    assert.ok(chatHits > 10, `${slug} 잡담에 행사 얘기 ${chatHits}/200`);
+    assert.equal(stray, 0, `${slug}: 행사가 없는 날 행사 대사가 나왔다`);
+  }
+});

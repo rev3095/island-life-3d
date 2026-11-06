@@ -152,12 +152,9 @@ export function createSpring(ctx, events) {
         if (r?.done) toast(`오늘 꽃잎 ${r.goal}장을 다 모았어요!`, '🌸');
       },
     });
-    gp.add({
-      name: 'events:spring-picnic', intent: 'action', priority: 96, label: '도시락 먹기',
-      test() {
-        const p = placed?.spots.picnic;
-        return live() && near(player(), p, 1.5) ? p : null;
-      },
+    const atPicnic = () => { const p = placed?.spots.picnic; return live() && near(player(), p, 1.5) ? p : null; };
+    const picnic = {
+      intent: 'action', label: '도시락 먹기',
       run() {
         const host = S().town?.villagers?.find(v => v.slug === cfg.host)?.person ?? null;
         const done = todo('picnic')?.done;
@@ -167,14 +164,14 @@ export function createSpring(ctx, events) {
         });
         if (!done) events.progress(EV, 'picnic');
       },
-    });
-    gp.add({
-      name: 'events:spring-sign', intent: 'action', priority: 96,
+    };
+    // 할 수 있는 행사 행동은 101 로 한 번 더 — 말 걸기(100)보다 먼저 (7차 D56-A 축제 시작과 같은 까닭: 주인공 주민이 자리 옆에 서 있으면 Space 가 말 걸기로 갔다, M8-P8)
+    gp.add({ ...picnic, name: 'events:spring-picnic-do', priority: 101, test: () => (!todo('picnic')?.done ? atPicnic() : null) });
+    gp.add({ ...picnic, name: 'events:spring-picnic', priority: 96, test: atPicnic });
+    const atSign = () => { const p = placed?.spots.sign; return events.isOpen() && active() && near(player(), p, 1.4) ? p : null; };
+    const sign = {
+      intent: 'action',
       label: () => (canLamp() ? '벚꽃 등 만들기' : '행사 안내'),
-      test() {
-        const p = placed?.spots.sign;
-        return events.isOpen() && active() && near(player(), p, 1.4) ? p : null;
-      },
       run() {
         if (canLamp() && live()) return makeLamp();
         const inv = S().data?.inventory;
@@ -183,7 +180,9 @@ export function createSpring(ctx, events) {
         if (!live()) lines.push(`행사 시간은 ${cfg.hours[0]}시부터 ${cfg.hours[1]}시까지예요.`);
         S().ui?.dialog?.open({ speaker: '행사 간판', lines });
       },
-    });
+    };
+    gp.add({ ...sign, name: 'events:spring-sign-do', priority: 101, test: () => (canLamp() && live() ? atSign() : null) });
+    gp.add({ ...sign, name: 'events:spring-sign', priority: 96, test: atSign });
   }
   function canLamp() {
     const inv = S().data?.inventory;

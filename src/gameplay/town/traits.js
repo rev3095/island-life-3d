@@ -41,7 +41,7 @@ export const RULE_FLAGS = [
 export const LINE_LABELS = {
   intro: '처음 만남', greet: '인사', weather: '날씨', season: '계절', tier: '친한 정도', time: '시간대 한마디', chat: '잡담', menu: '메뉴 물을 때',
   goingHome: '집에 갈 때', request: '부탁', gift: '선물', bye: '잘 가', tierUp: '더 친해졌을 때', photo: '사진 줄 때', home: '문 너머', chatting: '수다 중 말 걸 때',
-  banter: '주민끼리 수다', letters: '편지', birthday: '생일',
+  banter: '주민끼리 수다', letters: '편지', birthday: '생일', event: '계절 행사 기간', 'EV-01': '봄 꽃놀이', 'EV-02': '여름 불꽃놀이', 'EV-03': '가을 수확 잔치', 'EV-04': '겨울 눈사람 날',
   dawn: '새벽', morning: '아침', afternoon: '낮', evening: '저녁', night: '밤', clear: '맑음', cloudy: '흐림', rain: '비', snow: '눈', rainbow: '무지개',
   spring: '봄', summer: '여름', autumn: '가을', winter: '겨울', new: '처음', known: '아는 사이', friend: '친구', close: '단짝', best: '절친',
   ask: '부탁하기', accept: '들어줄게', decline: '다음에', remind: '다시 물을 때', notYet: '아직', thanks: '고마워', reward: '보상', done: '오늘은 끝',

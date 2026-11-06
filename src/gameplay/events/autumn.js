@@ -155,10 +155,10 @@ export function createAutumn(ctx, events) {
         events.progress(EV, 'mushroom');
       },
     });
-    gp.add({
-      name: 'events:autumn-pot', intent: 'action', priority: 96,
+    const atPot = () => (live() && placed && near(player(), placed.pot, 1.9) ? placed.pot : null);
+    const pot = {
+      intent: 'action',
       label: () => (canFeast() ? '잔치 하기' : foodInBag().length && potCount() < POT_GOAL ? '큰 솥에 넣기' : '큰 솥'),
-      test() { return live() && placed && near(player(), placed.pot, 1.9) ? placed.pot : null; },
       run() {
         if (canFeast()) return feast();
         const food = foodInBag();
@@ -180,7 +180,10 @@ export function createAutumn(ctx, events) {
         ctx.events.emit('sfx', { name: 'water' });
         toast(`큰 솥에 ${put}개를 넣었어요 (${potCount()}/${POT_GOAL})`, '🍲');
       },
-    });
+    };
+    // 할 수 있는 행사 행동은 101 로 한 번 더 — 말 걸기(100)보다 먼저 (7차 D56-A 축제 시작과 같은 까닭: 주인공 주민이 자리 옆에 서 있으면 Space 가 말 걸기로 갔다, M8-P8)
+    gp.add({ ...pot, name: 'events:autumn-pot-do', priority: 101, test: () => (canFeast() || (foodInBag().length && potCount() < POT_GOAL) ? atPot() : null) });
+    gp.add({ ...pot, name: 'events:autumn-pot', priority: 96, test: atPot });
     gp.add({
       name: 'events:autumn-scarecrow', intent: 'action', priority: 96, label: '허수아비',
       test() { return events.isOpen() && active() && placed && near(player(), placed.crow, 1.3) ? placed.crow : null; },

@@ -7,6 +7,7 @@
 import { createNav } from '../../src/gameplay/town/path.js';
 
 const TAU = Math.PI * 2;
+const BODY = [[0.3, 0], [-0.3, 0], [0, 0.3], [0, -0.3]];   // 다가설 자리 둘레 (플레이어 충돌 원 0.26 + 조금)
 const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 const facingOf = (dx, dz) => Math.atan2(-dx, -dz);
 
@@ -526,6 +527,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
       const a = (k / angles) * TAU;
       const x = obj.x + Math.sin(a) * dist, z = obj.z + Math.cos(a) * dist;
       if (!isl.isWalkable(x, z)) continue;
+      // 몸(반지름 0.26)이 들어갈 틈: 물가 끝에 딱 붙은 점은 몸이 0.2칸 앞에서 멈춰 "걷다가 막혔어요: 물가"가 났다 (2026-11-05 fd-catch)
+      if (BODY.some(([ox, oz]) => !isl.isWalkable(x + ox, z + oz))) continue;
       const t = isl.toTile(x, z);
       if (!n.walkable(t.tx, t.tz)) continue;
       if (level && isl.levelAt(t.tx, t.tz) !== objLv && isl.tileAt(t.tx, t.tz) !== 'ramp') continue;

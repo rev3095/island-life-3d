@@ -78,6 +78,9 @@ function playLog(slug, { P, L, T, R, J, items }) {
   return out.join('\n');
 }
 
+// 8차 행사 대사(lines.event — 행사 기간에만 고른다)도 빼고 뜬다: 행사가 없는 날의 대사 고르기는 그대로라 (playLog 는 event 없이 고른다)
+const withoutEvent = L => { if (!L?.event) return L; const { event, ...rest } = L; return rest; };
+
 /** D = { PEOPLE, KEEPERS, LINES, T(이모티콘 규칙: talk.json + 주민 규칙), R(town/rules.js), J({judge, wantOf, greetOf, tutorialOk, keys, player}), items(data/items.js), BD(data/birthdays.js) } */
 function fingerprint(D) {
   const { PEOPLE, KEEPERS, LINES, T, R, J, BD } = D;
@@ -85,7 +88,7 @@ function fingerprint(D) {
   for (const [slug, P] of [...Object.entries(PEOPLE), ...Object.entries(KEEPERS)]) {
     const L = LINES[slug];
     out[slug] = {
-      data: sha([canon(P), JSON.stringify(Object.keys(P.haunts ?? {})), canon(L), canon(T.villagers[slug] ?? null)].join('|')),
+      data: sha([canon(P), JSON.stringify(Object.keys(P.haunts ?? {})), canon(withoutEvent(L)), canon(T.villagers[slug] ?? null)].join('|')),
       play: sha(playLog(slug, { ...D, P, L })),
     };
   }

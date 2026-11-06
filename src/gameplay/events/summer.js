@@ -110,10 +110,10 @@ export function createSummer(ctx, events) {
   }
 
   function register(gp) {
-    gp.add({
-      name: 'events:summer-sign', intent: 'action', priority: 96,
+    const atSign = () => { const p = placed?.spots.sign; return events.isOpen() && active() && near(player(), p, 1.4) ? p : null; };
+    const sign = {
+      intent: 'action',
       label: () => (canWish() ? '소원 빌기' : live() && !todo('sparkler')?.done ? '손 불꽃 받기' : '행사 안내'),
-      test() { const p = placed?.spots.sign; return events.isOpen() && active() && near(player(), p, 1.4) ? p : null; },
       run() {
         if (canWish()) return wish();
         if (live() && !todo('sparkler')?.done) {
@@ -126,7 +126,10 @@ export function createSummer(ctx, events) {
         else if (todo('wish')?.done) lines.push('소원을 빌었어요. 내일 아침 선물을 기다려요!');
         S().ui?.dialog?.open({ speaker: '행사 간판', lines });
       },
-    });
+    };
+    // 할 수 있는 행사 행동은 101 로 한 번 더 — 말 걸기(100)보다 먼저 (7차 D56-A 축제 시작과 같은 까닭: 주인공 주민이 자리 옆에 서 있으면 Space 가 말 걸기로 갔다, M8-P8)
+    gp.add({ ...sign, name: 'events:summer-sign-do', priority: 101, test: () => (canWish() || (live() && !todo('sparkler')?.done) ? atSign() : null) });
+    gp.add({ ...sign, name: 'events:summer-sign', priority: 96, test: atSign });
   }
   const canWish = () => live() && todo('watch')?.done && !todo('wish')?.done && !fx.running;
 

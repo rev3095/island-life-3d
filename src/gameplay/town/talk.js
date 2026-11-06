@@ -22,7 +22,14 @@ export function context(ctx) {
     season: now.season ?? ctx.constants.seasonOf(now.month),
     dayKey: now.dayKey ?? ctx.services.data?.day?.key?.(),
     slot: slotOf(now),
+    event: eventToday(ctx),
   };
+}
+
+/** 오늘 열린 계절 행사 id (행사 기간 안 · 첫 섬 축제 뒤, 8차 M8) — 주민 대사 lines.event[id] 를 고른다. 없으면 null */
+function eventToday(ctx) {
+  const E = ctx.services.events;
+  try { return E?.isOpen?.() ? E.active?.()[0]?.ev.id ?? null : null; } catch { return null; }
 }
 
 /** 말하는 사람 하나에 묶인 대화창 열기 */
