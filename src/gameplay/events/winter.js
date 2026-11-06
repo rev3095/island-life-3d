@@ -42,7 +42,7 @@ export function ballSpots(F, dayKey, isFree, n = BALLS_PER_DAY) {
 export function createWinter(ctx, events) {
   const S = () => ctx.services;
   const cfg = events.config.list.find(e => e.id === EV);
-  const st = () => ((ctx.state.events.winter ||= { snowmen: {}, ballsDay: null }));
+  const st = () => (((ctx.state.events ||= {}).winter ||= { snowmen: {}, ballsDay: null }));
   const year = () => String(events.active().find(r => r.ev.id === EV)?.year ?? events.today()?.slice(0, 4));
   const group = new ctx.THREE.Group();
   group.name = 'events:winter-balls';
@@ -71,13 +71,16 @@ export function createWinter(ctx, events) {
   function setBall(b) { b.mesh.scale.setScalar(b.s); b.mesh.position.set(b.x, isl().heightAt(b.x, b.z), b.z); }
 
   // ---- 눈덩이 · 눈사람 놓기 ----
+  let gen = 0;   // 다시 그리기가 겹치면 마지막 것만
   async function refresh() {
+    const my = ++gen;
     for (const b of balls) group.remove(b.mesh);
     balls = []; pushing = null;
     const W = S().world;
     ballsLive = !!W?.objects && live();
     if (!ballsLive) return;
     const m = await model();
+    if (my !== gen) return;
     for (const p of ballSpots(W.places?.festival, events.today(), (x, z) => isl().isWalkable(x, z) && isl().tileAt(...Object.values(isl().toTile(x, z))) === 'grass')) {
       const b = { x: p.x, z: p.z, s: MIN_S, mesh: m ? m.clone() : new ctx.THREE.Object3D() };
       setBall(b); group.add(b.mesh); balls.push(b);
@@ -132,26 +135,28 @@ export function createWinter(ctx, events) {
   }
 
   function register(gp) {
+    // 밀고 있을 때 (놓기·머리 얹기): 말 걸기(100)·축제 시작(101)보다 먼저 — 주인공 두부가 눈덩이 둘레에 서 있어서 (M8-P8 점검에서 찾음)
     gp.add({
-      name: 'events:winter-ball', priority: 97,   // 밀고 있거나 눈덩이 바로 앞이면 문·우편함(90)보다 먼저, 말 걸기(100)보다는 뒤
-      label: t => (t.kind === 'stack' ? '머리 얹기' : t.kind === 'drop' ? '놓기' : '눈덩이 밀기'),
+      name: 'events:winter-carry', priority: 102,
+      label: t => (t.kind === 'stack' ? '머리 얹기' : '놓기'),
       test() {
-        if (!live()) return null;
+        if (!pushing || !live()) return null;
+        const base = balls.find(b => b !== pushing && b.s > pushing.s && near(b, pushing, BALL_R * (b.s + pushing.s) + 0.5));
+        return base ? { kind: 'stack', base } : { kind: 'drop' };
+      },
+      run(t) { if (t.kind === 'stack') build(t.base, pushing); else drop(); },
+    });
+    // 눈덩이 바로 앞: 문·우편함(90)보다 먼저, 말 걸기(100)보다는 뒤
+    gp.add({
+      name: 'events:winter-ball', priority: 97, label: '눈덩이 밀기',
+      test() {
+        if (pushing || !live()) return null;
         const pl = player();
         if (!pl?.position) return null;
-        if (pushing) {
-          const base = balls.find(b => b !== pushing && b.s > pushing.s && near(b, pushing, BALL_R * (b.s + pushing.s) + 0.5));
-          return base ? { kind: 'stack', base } : { kind: 'drop' };
-        }
         const f = front(pl, 0.5);
-        const b = balls.find(x => near(x, f, BALL_R * x.s + 0.6));
-        return b ? { kind: 'push', b } : null;
+        return balls.find(x => near(x, f, BALL_R * x.s + 0.6)) ?? null;
       },
-      run(t) {
-        if (t.kind === 'push') { pushing = t.b; last = null; toast('걸으면 눈덩이가 커져요. 눈 덮인 풀밭에서만!', '❄️'); return; }
-        if (t.kind === 'drop') return drop();
-        if (t.kind === 'stack') build(t.base, pushing);
-      },
+      run(b) { pushing = b; last = null; toast('걸으면 눈덩이가 커져요. 눈 덮인 풀밭에서만!', '❄️'); },
     });
   }
 

@@ -188,6 +188,17 @@ export function createCuller(ctx) {
     },
     get rect() { return rect; },
     get tracked() { return tracked.length; },
+    /** 지난 프레임에 이 모델(주민 등)의 뼈대가 본 카메라·그림자 카메라 어디에도 안 걸렸으면 true
+     *  → town/actor.js 가 그동안 동작(AnimationMixer) 계산을 쉬고, 다시 보일 때 밀린 시간을 한 번에 넣는다 */
+    offscreen(root) {
+      let sk = root.userData.cullSkeletons;
+      if (!sk) {
+        sk = [];
+        root.traverse(o => { if (o.isSkinnedMesh && o.skeleton && !sk.includes(o.skeleton)) sk.push(o.skeleton); });
+        root.userData.cullSkeletons = sk;
+      }
+      return sk.length > 0 && sk.every(s => skip.has(s));
+    },
     /** 그림자 범위를 보이는 땅에 맞출지 (false = 예전 ±18 고정) */
     get fitShadow() { return fit; },
     set fitShadow(v) { fit = !!v; rectIn = 0; },

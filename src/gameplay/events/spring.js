@@ -58,7 +58,7 @@ export function petalSpots(trees, dayKey, toWorld) {
 export function createSpring(ctx, events) {
   const S = () => ctx.services;
   const cfg = events.config.list.find(e => e.id === EV);
-  const st = () => ((ctx.state.events.spring ||= { picked: {} }));
+  const st = () => (((ctx.state.events ||= {}).spring ||= { picked: {} }));
   let placed = null;          // { ids: [world 물체 id], spots }
   let petals = [];            // [{ id, x, z, mesh }]
   let petalModel = null;
@@ -110,7 +110,9 @@ export function createSpring(ctx, events) {
     } catch (e) { console.warn('[events] 꽃잎 모델을 못 받았어요', e); }
     return petalModel;
   }
+  let gen = 0;   // 다시 그리기가 겹치면(모델을 기다리는 사이 또 불림) 마지막 것만 그린다
   async function refreshPetals() {
+    const my = ++gen;
     for (const p of petals) group.remove(p.mesh);
     petals = [];
     petalsLive = !!placed && live();
@@ -118,6 +120,7 @@ export function createSpring(ctx, events) {
     const key = today(), picked = st().picked[key] ?? [];
     const W = S().world, isl = W.island;
     const tpl = await model();
+    if (my !== gen) return;
     for (const s of petalSpots(placed.spots.trees, key, isl.toWorld)) {
       if (picked.includes(s.id)) continue;
       const mesh = tpl ? tpl.clone() : new ctx.THREE.Object3D();

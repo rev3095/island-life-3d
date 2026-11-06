@@ -26,8 +26,23 @@ const TEXT_EXT = /\.(html|js|mjs|css|json|svg|txt|md)$/i;
 // 나머지는 그 안의 파일을 처음 읽을 때 받는다. 갈래 하나가 PACK_BYTES 를 넘으면 고른 크기로 <갈래>-1, -2 … 로 나눈다.
 // 시작할 때 읽는 것 (개발 서버에서 잰 것, 새 게임): 배경 목록·모델·스펙 전부, 주인공·주민 8 모델·스펙, 가구 목록, 집 안 목록·스펙 17, 장면 13.
 export const PACK_BYTES = 3 * MB;
+// 계절 행사 묶음 (최적화, p29-perf): 행사 하나에만 쓰는 배경·아이템 모델 (assets/events/events.json list[].assets) → season-<slug>.
+// 처음에 받지 않고, 미리 받기(prefetchPacks)도 그 행사가 열렸거나 곧 열릴 때만. 여럿이 같이 쓰는 것(행사 간판)은 섬 묶음에 남는다.
+// 보상 가구·아이템 아이콘은 행사가 끝나도 집·가방에 남아서 가구·아이콘 묶음 그대로.
+export const SEASON_FILES = (() => {
+  const list = JSON.parse(readFileSync(join(ROOT, 'assets/events/events.json'), 'utf8')).list ?? [];
+  const uses = new Map();   // 경로 → [행사 slug]
+  const use = (path, slug) => uses.set(path, [...(uses.get(path) ?? []), slug]);
+  for (const ev of list) {
+    for (const k of ev.assets?.env ?? []) { use(`assets/env/models/${k}.glb.json`, ev.slug); use(`assets/env/specs/${k}.json`, ev.slug); }
+    for (const k of ev.assets?.items ?? []) use(`assets/items/models/${k}.glb.json`, ev.slug);
+  }
+  return new Map([...uses].filter(([, s]) => s.length === 1).map(([p, [slug]]) => [p, slug]));
+})();
+const seasonPacks = [...new Set(SEASON_FILES.values())].map(slug => ({ name: `season-${slug}`, season: slug, test: p => SEASON_FILES.get(p) === slug }));
 export const PACKS = [
   { name: 'icons', test: p => !!imageType(p) },                                     // 그림: 아이템 아이콘·가구 썸네일 (가방·상점·박물관을 처음 열 때)
+  ...seasonPacks,                                                                   // 계절 행사 모델 (그 행사 때)
   { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
   { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
@@ -185,7 +200,7 @@ export function planWeb() {
   if (more) notes.push(`묶음 갈래가 없는 에셋 ${more}개 → more 묶음 (필요할 때 받음). 시작할 때 읽는 것이면 PACKS 표에 boot 갈래를 더해 주세요`);
   for (const p of packs) if (p.bytes > LIMITS.textBytes) errors.push(`묶음이 너무 커요 (${fmt(p.bytes)} > ${fmt(LIMITS.textBytes)}): ${p.path}`);
   const published = [...loose, ...packs.map(p => ({ path: p.path, src: `dist/web/${p.path}`, bytes: p.bytes, group: '묶음 (packs)' }))];
-  const manifest = { v: 1, packs: packs.map(p => ({ path: p.path, boot: p.boot, bytes: p.bytes, hash: p.hash, files: p.files.map(f => f.path) })) };
+  const manifest = { v: 1, packs: packs.map(p => ({ path: p.path, boot: p.boot, ...(p.season ? { season: p.season } : {}), bytes: p.bytes, hash: p.hash, files: p.files.map(f => f.path) })) };
 
   // 5) 페이지
   const modules = readModules();
@@ -221,7 +236,7 @@ export function makePacks(assets, errors = []) {
       const name = `${g.name}-${i + 1}`;
       const text = `{"pack":${JSON.stringify(name)},"files":{${part.map(x => `${JSON.stringify(x.f.path)}:${x.value}`).join(',')}}}`;
       out.push({
-        name, group: g.name, boot: !!g.boot, path: `packs/${name}.json`, text,
+        name, group: g.name, boot: !!g.boot, ...(g.season ? { season: g.season } : {}), path: `packs/${name}.json`, text,
         files: part.map(x => x.f),
         bytes: Buffer.byteLength(text),
         hash: createHash('sha256').update(text).digest('hex').slice(0, 12),

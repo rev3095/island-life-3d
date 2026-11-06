@@ -205,10 +205,18 @@ test('홈 목록 game: 게임 저장소 reports·checks 를 읽고, 기기 점�
   const { checkRequested, CHECK_STORE } = await import('../src/render/check.js');
   assert.equal(CHECK_STORE.collection, g.reads[1], '기기 점검 컬렉션');
   assert.ok(read('src/ui/report.js').includes('db.doc(`reports/${id}`)'), '문제 알리기는 reports/<id> 에 쓴다');
+  // 8차 D85-A: 행사 미리 해 보기 링크 #date=… 는 게임이 그 날짜로 연다 (기기 점검 링크는 그대로 기기 점검)
+  const { urlDate } = await import('../src/core/preview.js');
+  const { CASES } = await import('../tools/check-events.mjs');
   for (const l of g.links) {
-    assert.match(l.hash, /^[\w.~-]+$/);
-    assert.ok(checkRequested({ hash: `#${l.hash}` }), `게임이 #${l.hash} 로 기기 점검을 켠다`);
+    assert.match(l.hash, /^[\w.~=&-]+$/);
+    if (l.hash.startsWith('date=')) {
+      assert.ok(urlDate({ hash: `#${l.hash}` }), `게임이 #${l.hash} 를 날짜로 읽는다`);
+      assert.ok(!checkRequested({ hash: `#${l.hash}` }), `#${l.hash} 는 기기 점검이 아니다`);
+      assert.ok(CASES.some(c => `date=${c.date}` === l.hash), `${l.hash} 는 행사 점검 도구(tools/check-events.mjs)와 같은 날짜`);
+    } else assert.ok(checkRequested({ hash: `#${l.hash}` }), `게임이 #${l.hash} 로 기기 점검을 켠다`);
   }
+  assert.equal(g.links.filter(l => l.hash.startsWith('date=')).length, 4, '행사 넷');
 });
 
 test('게임 카드 요약 (HubLogic.game · tools/hub-game.mjs): 게임이 쓰는 문서 모양 그대로 → 새 문제 수·최근 점검', async () => {
