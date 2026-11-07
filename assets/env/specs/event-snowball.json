@@ -5,7 +5,7 @@
   "category": "prop",
   "kind": "snowball",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "겨울 눈사람 날, 눈 덮인 풀밭에서 밀면 굴러가며 커지는 눈덩이 (지름 0.4 → 1.6칸, 게임이 크기를 늘린다). 물·길·절벽에 닿으면 멈춘다.",
     "keywords": [

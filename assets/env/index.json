@@ -112,7 +112,7 @@
       "category": "nature",
       "kind": "cherry-tree",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-01",
@@ -310,7 +310,7 @@
       "category": "prop",
       "kind": "picnic-mat",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-18",
@@ -319,7 +319,7 @@
       "category": "prop",
       "kind": "fireworks-raft",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-19",
@@ -328,7 +328,7 @@
       "category": "prop",
       "kind": "harvest-pot",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-20",
@@ -337,7 +337,7 @@
       "category": "prop",
       "kind": "scarecrow",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-21",
@@ -346,7 +346,7 @@
       "category": "prop",
       "kind": "snowball",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-22",
@@ -355,7 +355,7 @@
       "category": "prop",
       "kind": "snowman",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-23",
@@ -364,7 +364,7 @@
       "category": "prop",
       "kind": "event-sign",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
