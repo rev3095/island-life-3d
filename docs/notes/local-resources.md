@@ -101,3 +101,17 @@
 - 모델을 **meshopt 로 압축**하면 원본 크기가 반(15.3 → 7.5MB), 전송(gzip) 기준 약 −31% 이다. 그러나 풀 때 WebAssembly 가 필요한데 **아티팩트 CSP 에 `wasm-unsafe-eval` 이 없어** 게시본에서는 못 쓴다 → 나중에 자체 웹 서비스로 옮기면 1순위.
 - 양자화만(WASM 필요 없음)은 gzip 뒤 크기가 거의 같아서 안 함.
 - 새로 만드는 모델이 위 삼각형 예산을 넘으면 게임 전체가 느려진다 — C 갈래의 줄이기 단계가 가장 중요하다.
+
+---
+
+## 7. M9-P4 시험 결과 — 무늬 하나 로컬 그림 비교 (9차 보드 D88-A, 2026-11-08)
+
+![WP-04 스크립트 무늬 vs ComfyUI](img/wp04-compare.jpg)
+
+- **대상**: WP-04 연보라 꽃무늬 (`assets/interior/specs/wp-04.json`, 원 9개로 그린 한 칸 26×26 → 0.55m).
+- **로컬 그림**: 이미 깔린 ComfyUI 0.42.1 (`../_tools/ComfyUI_windows_portable`) + `sd_xl_base_1.0` + `ComfyUI-seamless-tiling` (`SeamlessTile` 모델 타일링 + `CircularVAEDecode`). **새로 받은 모델 없음**. RTX 4080 Laptop 12GB 에서 1024², 28단계 dpmpp_2m karras, cfg 6.5 — 한 장 약 14초 (처음 한 장은 모델 올리기 포함 32초). 프롬프트: "seamless repeating wallpaper pattern, small cute lavender five-petal flowers with yellow round centers, … flat vector, simple shapes, evenly spaced, cozy children picture book style". 시드 404 · 4040 · 40404 · 404040.
+- **색 줄이기**: 256px 로 줄인 뒤 무늬 팔레트 넷(base `#EFE8FA` · petal `#B9A6E0` · petalLight `#D7CCF0` · heart `#F6C84C`)의 가장 가까운 색으로, 디더 없이 (PIL quantize). 결과 PNG 11–17KB (스크립트 무늬는 그림 파일 없이 캔버스로 그려 0KB).
+- **이음매**: 네 장 모두 2×2 로 이어 붙여도 이음매가 보이지 않는다 (타일링 노드는 잘 된다).
+- **그림체**: 스크립트 무늬보다 **훨씬 빽빽하고 노랑이 많으며**, 색을 넷으로 줄이면 꽃 가장자리·외곽선이 자글자글한 점으로 남는다(4040·40404). 404 (흰 꽃잎 테두리)가 가장 가깝지만 그래도 방 안에서 보면 무늬가 시끄럽다. 게임의 다른 것(단색 툰·큰 덩어리)과 나란히 두면 스크립트 무늬 쪽이 어울린다.
+- **결론 (추천)**: 실내 무늬는 **지금처럼 스크립트(스펙 도형)로** 둔다. 로컬 그림은 (1) 검수 보드 선택지·레퍼런스 그림, (2) 사람이 보고 도형 좌표로 옮겨 그릴 밑그림으로 쓴다. 텍스처로 직접 넣으려면 SDXL 기본 모델 대신 납작한 벡터 그림체 LoRA 가 필요하고(큰 내려받기 → 사용자 승인), 무늬 칸 크기를 2–3배 크게 잡아야 한다.
+- 다시 해 보기: 그리기 스크립트·색 줄이기 스크립트는 저장소에 넣지 않았다 (위 조건으로 ComfyUI API `/prompt` 에 노드 8개 — CheckpointLoaderSimple → SeamlessTile → CLIPTextEncode×2 → EmptyLatentImage → KSampler → CircularVAEDecode → SaveImage).

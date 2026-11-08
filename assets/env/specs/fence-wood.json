@@ -1,0 +1,63 @@
+{
+  "id": "PR-24",
+  "slug": "fence-wood",
+  "name": "나무 울타리",
+  "category": "prop",
+  "kind": "fence-wood",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "1칸 나무 울타리. 이웃 울타리 쪽으로 가로대가 뻗어 이어진다 (지금 울타리 PR-06 의 이어지는 판).",
+    "keywords": [
+      "가운데 기둥",
+      "가로대 둘",
+      "이어짐"
+    ],
+    "references": [],
+    "avoid": [
+      "철망"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 울타리"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodLight": "#D6B07E"
+  },
+  "paletteLabels": {
+    "wood": "기둥",
+    "woodLight": "가로대"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "connect": "fence",
+    "layer": "top",
+    "collider": {
+      "r": 0.09,
+      "links": 0.06
+    },
+    "render": [
+      "core",
+      "link_e",
+      "link_w"
+    ]
+  }
+}

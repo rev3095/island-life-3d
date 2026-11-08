@@ -354,8 +354,8 @@
       "name": "눈사람",
       "category": "prop",
       "kind": "snowman",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.2",
+      "status": "review"
     },
     {
       "id": "PR-23",
@@ -365,6 +365,60 @@
       "kind": "event-sign",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "PR-24",
+      "slug": "fence-wood",
+      "name": "나무 울타리",
+      "category": "prop",
+      "kind": "fence-wood",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-25",
+      "slug": "fence-picket",
+      "name": "흰 말뚝 울타리",
+      "category": "prop",
+      "kind": "fence-picket",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-26",
+      "slug": "event-flower-crown",
+      "name": "꽃 머리띠",
+      "category": "prop",
+      "kind": "flower-crown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-27",
+      "slug": "event-fan",
+      "name": "부채",
+      "category": "prop",
+      "kind": "fan",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-28",
+      "slug": "event-scarf",
+      "name": "스카프",
+      "category": "prop",
+      "kind": "scarf",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-29",
+      "slug": "event-muffler",
+      "name": "목도리",
+      "category": "prop",
+      "kind": "muffler",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "BD-01",
@@ -545,6 +599,42 @@
       "kind": "festival-floor",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "TI-09",
+      "slug": "path-stone",
+      "name": "돌길",
+      "category": "tile",
+      "kind": "path-stone",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-10",
+      "slug": "path-brick",
+      "name": "벽돌길",
+      "category": "tile",
+      "kind": "path-brick",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-11",
+      "slug": "path-plank",
+      "name": "나무판 길",
+      "category": "tile",
+      "kind": "path-plank",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-12",
+      "slug": "path-flower",
+      "name": "꽃길",
+      "category": "tile",
+      "kind": "path-flower",
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

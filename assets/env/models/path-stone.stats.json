@@ -1,0 +1,34 @@
+{
+  "id": "TI-09",
+  "slug": "path-stone",
+  "name": "돌길",
+  "category": "tile",
+  "kind": "path-stone",
+  "version": "0.1",
+  "triangles": 4608,
+  "parts": 9,
+  "materials": [
+    "gravel",
+    "stone",
+    "stoneLight"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.04
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 80296,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "path-stone_front.png",
+    "path-stone_hero.jpg",
+    "path-stone_main.png",
+    "path-stone_thumb.png",
+    "path-stone_top.png"
+  ]
+}

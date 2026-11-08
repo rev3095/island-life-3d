@@ -1,0 +1,33 @@
+{
+  "id": "PR-24",
+  "slug": "fence-wood",
+  "name": "나무 울타리",
+  "category": "prop",
+  "kind": "fence-wood",
+  "version": "0.1",
+  "triangles": 978,
+  "parts": 5,
+  "materials": [
+    "wood",
+    "woodLight"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.86
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 17892,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fence-wood_front.png",
+    "fence-wood_hero.jpg",
+    "fence-wood_main.png",
+    "fence-wood_thumb.png",
+    "fence-wood_top.png"
+  ]
+}

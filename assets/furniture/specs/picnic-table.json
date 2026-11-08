@@ -1,0 +1,63 @@
+{
+  "id": "FU-50",
+  "slug": "picnic-table",
+  "item": "furn.picnic-table",
+  "name": "피크닉 탁자",
+  "category": "furniture",
+  "kind": "picnic-table",
+  "version": "0.1",
+  "status": "review",
+  "outdoor": true,
+  "prompt": {
+    "concept": "2×2칸 나무 피크닉 탁자. 탁자 양옆에 붙은 긴 의자 둘. 주민 둘이 앉아 이야기한다.",
+    "keywords": [
+      "나무 탁자",
+      "붙은 의자",
+      "엑스자 다리"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 야외 가구"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C79A66",
+    "woodDark": "#9A7048",
+    "cloth": "#E2574C",
+    "clothLight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "wood": "판",
+    "woodDark": "다리",
+    "cloth": "체크 천",
+    "clothLight": "체크 천 (흰)"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.7,
+        1.5
+      ]
+    }
+  }
+}

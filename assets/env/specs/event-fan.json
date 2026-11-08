@@ -1,0 +1,53 @@
+{
+  "id": "PR-27",
+  "slug": "event-fan",
+  "name": "부채",
+  "category": "prop",
+  "kind": "fan",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "여름 불꽃놀이 동안 코코가 손에 드는 둥근 종이 부채. 대나무 살, 금붕어 무늬.",
+    "keywords": [
+      "둥근 부채",
+      "대나무 손잡이",
+      "금붕어"
+    ],
+    "references": [],
+    "avoid": [
+      "무거워 보임"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P1 주민 행사 소품 (EV-02 코코)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.005
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "bamboo": "#C9A86A",
+    "fanPaper": "#F3F0E4",
+    "fanPattern": "#E2574C"
+  },
+  "paletteLabels": {
+    "bamboo": "대나무",
+    "fanPaper": "부채 종이",
+    "fanPattern": "금붕어 무늬"
+  },
+  "heroGround": "none",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

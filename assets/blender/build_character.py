@@ -629,7 +629,56 @@ def happy(t):
     }
 
 
-ANIMS = {'idle': (48, idle), 'walk': (24, walk), 'run': (16, run), 'happy': (36, happy)}
+# 9차 M9-P1 (보드 wave9 D87-A) 사람 뼈대 동작 — 스펙 animations 에 이름이 있는 캐릭터만 (지금 주인공)
+def sparkler(t):
+    """AN-08 손 불꽃 흔들기 (반복): 오른팔을 앞으로 들고 손목으로 작은 원을 그린다. 고개는 살짝 들어 불꽃을 본다."""
+    f = TAU * t
+    s = sin(f)
+    return {
+        'hips': ((0, 0, 0), (0, 0.006 * (sin(2 * f) + 1), 0)),
+        'spine': ((-0.04, 0.12 * s, 0), None),
+        'head': ((-0.18, 0.08 * s, 0.06 * cos(f)), None),
+        'arm.R': ((1.25 + 0.3 * s, 0.25 * cos(f), -0.2 - 0.3 * cos(f)), None),
+        'arm.L': ((0.1, 0, 0.12 + 0.04 * s), None),
+        'ear.L': ((0.1 * s, 0, 0), None), 'ear.R': ((0.1 * s, 0, 0), None),
+        'tail.1': ((0.1, 0, 0.3 * s), None),
+        'tail.2': ((0, 0, 0.35 * sin(f - 0.8)), None),
+    }
+
+
+def push(t):
+    """AN-09 눈덩이 밀기 (반복, 걷기 대신): 몸을 앞으로 기울이고 두 팔을 앞으로 뻗어 밀며 무겁게 걷는다."""
+    f = TAU * t
+    s = sin(f)
+    return {
+        'hips': ((0, 0.06 * s, 0), (0, -0.01 + 0.01 * cos(2 * f), 0)),
+        'spine': ((0.38, -0.05 * s, 0), None),
+        'head': ((-0.3, 0, 0.03 * s), None),
+        'leg.L': ((0.45 * s - 0.15, 0, 0), None), 'leg.R': ((-0.45 * s - 0.15, 0, 0), None),
+        'arm.L': ((1.3 + 0.06 * s, 0, 0.18), None), 'arm.R': ((1.3 - 0.06 * s, 0, -0.18), None),
+        'ear.L': ((-0.15, 0, 0), None), 'ear.R': ((-0.15, 0, 0), None),
+        'tail.1': ((0.2, 0, 0.2 * s), None),
+        'tail.2': ((0, 0, 0.3 * sin(f - 0.8)), None),
+    }
+
+
+def place(t):
+    """AN-10 놓기 (한 번): 두 손으로 앞에 들고 있던 것을 허리를 굽혀 내려놓고 다시 선다 (섬 꾸미기·집 가구·눈덩이)."""
+    k = sin(math.pi * min(1.0, t / 0.8)) if t < 0.8 else 0.0   # 0 → 1(굽힘) → 0
+    lift = sin(math.pi * min(1.0, t / 0.35)) if t < 0.35 else 0.0
+    return {
+        'hips': ((0, 0, 0), (0, -0.05 * k, 0)),
+        'spine': ((0.6 * k, 0, 0), None),
+        'head': ((-0.25 * k + 0.1 * lift, 0, 0), None),
+        'leg.L': ((-0.35 * k, 0, 0), None), 'leg.R': ((-0.35 * k, 0, 0), None),
+        'arm.L': ((1.15 * max(k, lift) - 0.15 * k, 0, 0.15), None),
+        'arm.R': ((1.15 * max(k, lift) - 0.15 * k, 0, -0.15), None),
+        'tail.1': ((0.2 * k, 0, 0), None),
+    }
+
+
+ANIMS = {'idle': (48, idle), 'walk': (24, walk), 'run': (16, run), 'happy': (36, happy),
+         'sparkler': (36, sparkler), 'push': (28, push), 'place': (30, place)}
 ANIMS = {k: v for k, v in ANIMS.items() if k in spec.get('animations', ANIMS)}
 
 
@@ -834,7 +883,7 @@ if DO_RENDER:
 
     # 포즈: 3/4 각도
     rig.rotation_euler = (0, 0, math.radians(30))
-    for fname, action, frame in (('walk', 'walk', 6), ('run', 'run', 4), ('happy', 'happy', 4)):
+    for fname, action, frame in (('walk', 'walk', 6), ('run', 'run', 4), ('happy', 'happy', 4), ('sparkler', 'sparkler', 9), ('push', 'push', 7), ('place', 'place', 12)):
         if action in ANIMS:
             set_pose(action, frame)
             shot(fname, 800, 860)

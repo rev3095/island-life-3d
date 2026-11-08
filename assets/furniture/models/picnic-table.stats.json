@@ -1,0 +1,51 @@
+{
+  "id": "FU-50",
+  "slug": "picnic-table",
+  "item": "furn.picnic-table",
+  "name": "피크닉 탁자",
+  "category": "furniture",
+  "kind": "picnic-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2484,
+  "parts": 1,
+  "materials": [
+    "cloth",
+    "clothLight",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    1.6,
+    1.58,
+    0.79
+  ],
+  "bounds": [
+    [
+      -0.8,
+      -0.79,
+      -0.021
+    ],
+    [
+      0.8,
+      0.79,
+      0.786
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 43804,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "picnic-table_front.png",
+    "picnic-table_main.png",
+    "picnic-table_thumb.png",
+    "picnic-table_top.png"
+  ]
+}

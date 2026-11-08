@@ -7,6 +7,7 @@ import { createCollision } from './collision.js';
 import { createDaily } from './daily.js';
 import { createOcclusion } from './occlusion.js';
 import { carveFestival } from './festival.js';
+import { FURN_KIND, furnitureWorld } from './variants.js';
 
 let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
 
@@ -15,6 +16,15 @@ async function eventKinds(assets) {
   const cfg = await assets.loadJSON('assets/events/events.json').catch(() => null);
   return new Set((cfg?.list ?? []).flatMap(ev => ev.assets?.env ?? []));
 }
+/** 9차 섬 꾸미기로 놓는 것 — 처음에 받지 않고 놓일 때(저장에 있으면 시작할 때) 받는다:
+ *  길·울타리 (assets/decor/decor.json, 배경 모델) + 야외 가구 'fu:<가구 slug>' (아이템 outdoor: true, 가구 모델) */
+async function decorKinds(assets, data) {
+  const cfg = await assets.loadJSON('assets/decor/decor.json').catch(() => null);
+  const env = [...(cfg?.paths ?? []), ...(cfg?.fences ?? [])].map(d => d.kind);
+  const furn = (data?.items?.list?.('furn') ?? []).filter(it => it.outdoor).map(it => FURN_KIND + it.id.slice(5));
+  return [...env, ...furn];
+}
+
 
 export default {
   name: 'world',
@@ -30,7 +40,10 @@ export default {
     // 계절 행사 모델(events.json 의 assets.env)은 빼 두고 행사 때 놓일 때 받는다 — 게시본에서는 그 계절 묶음(packs/season-*)째로
     const index = await assets.loadEnvIndex();
     const lazy = await eventKinds(assets);
-    const load = async slug => ({ gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
+    for (const k of await decorKinds(assets, data)) lazy.add(k);
+    const load = async slug => (slug.startsWith(FURN_KIND)
+      ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
+      : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
     const models = Object.fromEntries(await Promise.all(index.models.filter(m => !lazy.has(m.slug)).map(async m => [m.slug, await load(m.slug)])));
     // 지도 자리·시드·밀도 (섬 지도 편집기 → "지도 반영"). 없으면 island.js 기본값 = 지금 섬. layout.seed 가 null 이면 저장의 섬 시드
     const layout = resolveLayout(await assets.loadJSON('assets/island/layout.json').catch(e => (console.warn('[world] layout.json 없음 — 기본 지도', e), null)));
@@ -65,7 +78,12 @@ export default {
         return base.isWalkableTile(tx, tz) && !collision.blockedAt(x, z, base.heightAt(x, z));
       },
       passable: base.passable, rampAt: base.rampAt, flagsAt: base.flagsAt,
-      groundAt: (x, z) => zoneAt(x, z)?.groundAt?.(x, z) ?? base.groundAt(x, z),
+      groundAt: (x, z) => {
+        const zn = zoneAt(x, z);
+        if (zn?.groundAt) return zn.groundAt(x, z);
+        const t = base.toTile(x, z);
+        return objects.api.groundAt(t.tx, t.tz) ?? base.groundAt(x, z);   // 9차 길 (돌·나무판 발소리)
+      },
     };
 
     let season = null;

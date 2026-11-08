@@ -1,0 +1,33 @@
+{
+  "id": "PR-29",
+  "slug": "event-muffler",
+  "name": "목도리",
+  "category": "prop",
+  "kind": "muffler",
+  "version": "0.1",
+  "triangles": 2352,
+  "parts": 1,
+  "materials": [
+    "cloth",
+    "stripe"
+  ],
+  "animations": {},
+  "size": [
+    0.44,
+    0.44,
+    0.05
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 44808,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-muffler_front.png",
+    "event-muffler_hero.jpg",
+    "event-muffler_main.png",
+    "event-muffler_thumb.png",
+    "event-muffler_top.png"
+  ]
+}

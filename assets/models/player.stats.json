@@ -32,18 +32,33 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sparkler": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "push": {
+      "frames": 28,
+      "seconds": 1.17
+    },
+    "place": {
+      "frames": 30,
+      "seconds": 1.25
     }
   },
   "height": 1,
-  "glbBytes": 344500,
+  "glbBytes": 366328,
   "blender": "5.2.3 LTS",
   "renders": [
     "player_back.png",
     "player_front.png",
     "player_happy.png",
     "player_hero.png",
+    "player_place.png",
+    "player_push.png",
     "player_run.png",
     "player_side.png",
+    "player_sparkler.png",
     "player_three_quarter.png",
     "player_thumb.png",
     "player_walk.png"

@@ -4,8 +4,8 @@
   "name": "눈사람",
   "category": "prop",
   "kind": "snowman",
-  "version": "0.1",
-  "status": "approved",
+  "version": "0.2",
+  "status": "review",
   "prompt": {
     "concept": "겨울 눈사람 날에 큰 눈덩이(몸) 위에 작은 눈덩이(머리)를 얹어 만드는 눈사람. 숯 눈·입, 당근 코, 나뭇가지 팔, 목도리. 크기 비율로 표정이 넷 (딱 맞음 😊 · 머리 큼 😮 · 몸 큼 😌 · 비슷 🙂). 행사가 끝날 때까지 섬에 남는다.",
     "keywords": [
@@ -18,7 +18,7 @@
     "avoid": [
       "무서운 얼굴"
     ],
-    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04"
+    "notes": "8차 검수 보드 wave8 (https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T) 반영 v1 · M8-P2 겨울 눈사람 날 EV-04 · 9차 M9-P1 표정 넷 (입 부품 opt_face_*, 변형 줄 = 빨강 웃음 · 파랑 놀람 · 초록 든든 · 노랑 일자)"
   },
   "style": {
     "shading": "toon",
@@ -88,6 +88,14 @@
     "extent": [
       0.75,
       0.4
-    ]
+    ],
+    "options": {
+      "face": [
+        "smile",
+        "wow",
+        "calm",
+        "plain"
+      ]
+    }
   }
 }

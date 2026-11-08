@@ -502,6 +502,76 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`부스 ${Object.keys(booths).length}곳 놀이 · 액자 걸음`);
   });
 
+  // 9차 M9 섬 꾸미기 (보드 wave9 D86-A): 섬폰 앱 단추 → 아래 칸에서 고르기 → Space 로 놓기 · X 로 고치기 → Space 로 치우기 → Esc.
+  // 빈 칸 찾기는 읽기만 (world.objects.on), 놓기·치우기는 모두 키·단추로.
+  add('island-decor', '섬 꾸미기: 섬폰 → 돌길 셋 · 나무 울타리 둘 놓기 · 하나 치우기 (이어짐·저장 기록)', async () => {
+    if (S().house?.inside) await sk.leaveHome();
+    await bot.settle(30);
+    const isl = S().world.island, O = S().world.objects, dec = () => S().decor;
+    if (!dec()) return block('섬 꾸미기 모듈이 없어요');
+    const before = dec().list().length;
+    // 집 둘레 빈 땅(풀밭·모래): 가로 3 × 세로 5 칸이 비고 같은 높이 (문 앞 자리 빼고), 가까운 곳부터
+    const home = S().world.places.playerHouse ?? { tx: Math.floor(isl.w / 2), tz: Math.floor(isl.h / 2) };
+    const free = (x, z, lv) => ['grass', 'sand'].includes(isl.tileAt(x, z)) && !O.on(x, z).length && !isl.flagsAt(x, z) && isl.levelAt(x, z) === lv && !dec().debug.reservedSet.has(`${x},${z}`);
+    let spot = null;
+    for (let r = 2; r < 48 && !spot; r++) for (let dz = -r; dz <= r && !spot; dz++) for (let dx = -r; dx <= r && !spot; dx++) {
+      if (Math.max(Math.abs(dx), Math.abs(dz)) !== r) continue;
+      const tx = home.tx + dx, tz = home.tz + dz, lv = isl.levelAt(tx, tz);
+      let ok = true;
+      for (let z = tz - 1; z <= tz + 3 && ok; z++) for (let x = tx - 1; x <= tx + 1 && ok; x++) ok = free(x, z, lv);
+      if (ok) spot = { tx, tz };
+    }
+    if (!spot) return awk('섬에 빈 땅(3×5)을 못 찾음');
+    const stand = (tx, tz) => isl.toWorld(tx, tz + 1);   // 그 칸 바로 남쪽에 서서 북쪽(앞)을 본다
+    const goTo = async (tx, tz) => { await bot.walkTo(stand(tx, tz), { near: 0.25, label: '섬 꾸미기 자리' }); await bot.faceDir(0); };
+    await goTo(spot.tx, spot.tz + 2);
+    // 섬폰 → 🪴 섬 꾸미기
+    bot.press('phone');
+    await bot.until(() => bot.$('.pk-app[data-app="decor"]'), { timeout: 5, ui: false });
+    await bot.click(bot.$('.pk-app[data-app="decor"]'));
+    if (!await bot.until(() => dec().active, { timeout: 5, ui: false })) return block('섬폰 「섬 꾸미기」를 눌러도 놓기 모드가 안 켜짐');
+    const pick = async kind => { await bot.click(bot.$(`.pk-decor-item[data-decor="${kind}"]`)); await bot.frames(3); return dec().pick?.kind === kind; };
+    const why = [];
+    // 미리 보기 칸(앞 칸)이 목표 칸이 될 때까지 다시 서 본다 (칸 가운데에서 조금 어긋나면 앞 칸이 옆으로 갈 수 있다)
+    const placeAt = async (tx, tz) => {
+      for (let k = 0; k < 3; k++) {
+        await goTo(tx, tz); await bot.frames(3);
+        const a = dec().view?.anchor;
+        if (a?.tx === tx && a?.tz === tz) break;
+      }
+      const n = dec().list().length;
+      bot.press('action'); await bot.frames(4);
+      const ok = dec().list().length > n;
+      if (!ok) why.push(`${tx},${tz}: ${dec().view?.why ?? '?'} (앞 칸 ${dec().view?.anchor?.tx},${dec().view?.anchor?.tz})`);
+      return ok;
+    };
+    const res = { path: 0, fence: 0, removed: false };
+    if (await pick('path-stone')) for (const z of [2, 1, 0]) if (await placeAt(spot.tx, spot.tz + z)) res.path++;
+    if (await pick('fence-wood')) for (const x of [0, 1]) if (await placeAt(spot.tx + x, spot.tz - 1)) res.fence++;
+    await bot.shot('11-island-decor', '섬 꾸미기: 돌길 셋 · 울타리 둘');
+    const link = O.on(spot.tx, spot.tz + 1).find(o => o.kind === 'path-stone')?.variant ?? '';
+    const fenceLink = O.on(spot.tx, spot.tz - 1).find(o => o.kind === 'fence-wood')?.variant ?? '';
+    // 고치기(X) → 앞의 돌길 하나 치우기 (Space)
+    bot.key('KeyX'); await bot.frames(3);
+    await goTo(spot.tx, spot.tz);
+    const n = dec().list().length;
+    bot.press('action'); await bot.frames(4);
+    res.removed = dec().list().length === n - 1;
+    bot.press('esc'); await bot.frames(3);
+    const saved = st().island.added.filter(a => a.data?.decor).length;
+    note('islandDecor', { ...res, link, fenceLink, saved, before, after: dec().list().length, open: dec().active, why });
+    await bot.settle(10);
+    const odd = [];
+    if (res.path < 3) odd.push(`돌길 ${res.path}/3 ${why.join(' / ')}`);
+    if (res.fence < 2) odd.push(`울타리 ${res.fence}/2`);
+    if (!/\+n/.test(link) || !/\+s/.test(link)) odd.push(`돌길이 안 이어짐 (${link || '없음'})`);
+    if (!/\+e/.test(fenceLink)) odd.push(`울타리가 안 이어짐 (${fenceLink || '없음'})`);
+    if (!res.removed) odd.push('치우기 안 됨');
+    if (dec().active) odd.push('Esc 로 안 꺼짐');
+    if (saved !== dec().list().length) odd.push(`저장 기록 ${saved} ≠ 놓인 것 ${dec().list().length}`);
+    return odd.length ? awk(odd.join(' · ')) : pass(`돌길 3 · 울타리 2 이어짐 · 하나 치움 · 저장 기록 ${saved}`);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;

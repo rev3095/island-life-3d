@@ -2,6 +2,7 @@
 // 그리기는 (종류 · 변형 · 구역) 별 인스턴스 묶음, 충돌은 collision.js, 저장은 state.island.removed / added.
 import { LEVEL_HEIGHT } from './island.js';
 import { CHUNK } from './terrain.js';
+import { splitVariant } from './variants.js';
 
 // 충돌 모양·차지하는 칸은 배경 스펙의 world 칸에 있다 (assets/env/specs/<slug>.json → world.collider · extent · lot).
 // 모델을 고칠 때 같은 파일에서 함께 고친다. collider (모델 원점 기준): r = 원, box = [가로, 세로] 가운데 정렬,
@@ -13,18 +14,24 @@ export const SEASONAL = {
   tree: s => s,
   cedar: s => (s === 'winter' ? 'snow' : 'green'),
   'cherry-tree': s => s,   // 8차 EN-12 벚나무 (봄 꽃놀이 동안 광장 둘레에 놓임)
+  'path-flower': s => s,   // 9차 TI-12 꽃길 (꽃 색)
 };
 const SWAY = new Set(['tree', 'fruit-tree', 'cedar', 'palm', 'cherry-tree', 'bush', 'tulip', 'cosmos', 'pansy', 'weed']);
 const SINGLE = new Set(['campfire']);       // 따로 애니메이션을 돌리는 물체 (하나뿐)
-const NO_SHADOW = new Set(['tulip', 'cosmos', 'pansy', 'weed', 'shell', 'fossil-spot']);   // 작은 것은 그림자를 드리우지 않는다 (그림자 계산 절약)
+const NO_SHADOW = new Set(['tulip', 'cosmos', 'pansy', 'weed', 'shell', 'fossil-spot', 'path-stone', 'path-brick', 'path-plank', 'path-flower']);   // 작은 것·바닥 길은 그림자를 드리우지 않는다 (그림자 계산 절약)
+
+// 9차 M9 고르는 부품: 변형 이름 = '<색 변형>+<꼬리표>+…' → variants.js splitVariant (이어지는 팔 link_* · 표정 opt_*)
+const LINK_DIR = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0] };   // 북 = -Z
 
 // lazy = 처음에 안 읽고 놓일 때 받는 종류 (계절 행사 모델 — assets/events/events.json 의 assets.env), loadKind(kind) → { gltf, spec }
 export function createObjects(ctx, island, kit, models, collision, { lazy = new Set(), loadKind = null } = {}) {
   const { THREE: T, state, events } = ctx;
   const { w, h } = island;
-  const COLLIDERS = {}, EXTENT = {};
+  const COLLIDERS = {}, EXTENT = {}, GROUND = {}, SPECS = {};
   const learn = (kind, spec) => {
     const wd = spec.world ?? {};
+    SPECS[kind] = spec;
+    if (wd.ground) GROUND[kind] = wd.ground;
     if (wd.collider) COLLIDERS[kind] = wd.collider;
     const e = wd.extent ?? (wd.lot && [wd.lot[0] / 2, wd.lot[1] / 2]);
     if (e) EXTENT[kind] = e;
@@ -64,26 +71,43 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
   const singles = [];
   let season = 'autumn';
 
-  const tplKey = (kind, variant) => (SEASONAL[kind] && !variant ? `${kind}|*` : `${kind}|${variant ?? ''}`);
+  const tplKey = (kind, variant) => {
+    const { pal, tags } = splitVariant(variant);
+    return SEASONAL[kind] && !pal ? `${kind}|*${tags.map(t => `+${t}`).join('')}` : `${kind}|${variant ?? ''}`;
+  };
   function template(kind, variant) {
     const key = tplKey(kind, variant);
     if (templates.has(key)) return templates.get(key);
     const { gltf, spec } = models[kind];
-    const v = variant ?? (SEASONAL[kind] ? SEASONAL[kind](season) : null);
+    const { pal } = splitVariant(variant);
+    const v = pal ?? (SEASONAL[kind] ? SEASONAL[kind](season) : null);
     const palette = { ...spec.palette, ...(spec.variants?.[v]?.palette ?? {}) };
     const tpl = kit.buildTemplate(prune(gltf, kind, variant), spec, { palette, sway: SWAY.has(kind), castShadow: !NO_SHADOW.has(kind) });
-    tpl.kind = kind; tpl.variant = variant;
+    tpl.kind = kind; tpl.variant = variant; tpl.pal = pal;
     templates.set(key, tpl);
     return tpl;
   }
   // 열매를 딴 과일나무·야자수('picked')처럼 일부 재질을 빼는 변형
   const PICKED = { 'fruit-tree': 'fruit', palm: 'coconut' };
   function prune(gltf, kind, variant) {
-    if (!(PICKED[kind] && variant === 'picked')) return gltf;
+    const wd = models[kind].spec.world ?? {};
+    const picked = PICKED[kind] && variant === 'picked';
+    if (!picked && !wd.connect && !wd.options) return gltf;
     const scene = gltf.scene.clone(true);
+    const { tags } = splitVariant(variant);
+    const keep = name => {
+      if (name.startsWith('link_')) return tags.includes(name.slice(5));
+      const m = /^opt_([a-z]+)_([a-z]+)$/.exec(name);
+      if (!m) return true;
+      const opts = wd.options?.[m[1]] ?? [];
+      return m[2] === (opts.find(o => tags.includes(o)) ?? opts[0]);
+    };
     const drop = [];
-    scene.traverse(o => { if (o.isMesh && o.material.name === PICKED[kind]) drop.push(o); });
-    for (const o of drop) o.parent.remove(o);
+    scene.traverse(o => {
+      if (picked && o.isMesh && o.material.name === PICKED[kind]) drop.push(o);
+      else if (o.name && !keep(o.name)) drop.push(o);
+    });
+    for (const o of drop) o.parent?.remove(o);
     return { scene, animations: gltf.animations };
   }
   function batch(kind, variant, tx, tz) {
@@ -139,6 +163,14 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
     // 원은 아무 각도로나 돌 수 있다 (5차 Z5: 축제 광장 둘레 부스)
     const fc = Math.cos(o.rot), fs = Math.sin(o.rot);
     for (const [cx, cz, r] of c.circles ?? []) out.push({ type: 'circle', x: o.x + (cx * fc + cz * fs) * s, z: o.z + (-cx * fs + cz * fc) * s, r: r * s, y: o.y, id: o.id });
+    // 이어지는 울타리 (9차): 이웃 쪽 팔마다 가운데에서 칸 끝까지 가는 상자 (반두께 links)
+    if (c.links) for (const t of splitVariant(o.variant).tags) {
+      const d = LINK_DIR[t];
+      if (!d) continue;
+      const hw = c.links, ex = d[0] * 0.5, ez = d[1] * 0.5;
+      out.push({ type: 'box', x0: o.x + Math.min(0, ex) - (d[0] ? 0 : hw), x1: o.x + Math.max(0, ex) + (d[0] ? 0 : hw),
+        z0: o.z + Math.min(0, ez) - (d[1] ? 0 : hw), z1: o.z + Math.max(0, ez) + (d[1] ? 0 : hw), y: o.y, id: o.id });
+    }
     return out;
   }
 
@@ -169,7 +201,7 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
     byId.delete(o.id);
   }
 
-  const publicOf = o => ({ id: o.id, kind: o.kind, x: o.x, z: o.z, y: o.y, tile: { tx: o.tx, tz: o.tz }, variant: o.variant, scale: o.scale, data: o.data });
+  const publicOf = o => ({ id: o.id, kind: o.kind, x: o.x, z: o.z, y: o.y, rot: o.rot, tile: { tx: o.tx, tz: o.tz }, variant: o.variant, scale: o.scale, data: o.data });
 
   const api = {
     /** (x, z) 에서 radius 안의 물체. 여러 칸 물체는 가장 가까운 테두리까지 거리로 잰다. */
@@ -199,6 +231,19 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
     get(id) { const o = byId.get(id); return o ? publicOf(o) : null; },
     /** 칸 위의 물체 (없으면 null) */
     at(tx, tz) { const s = tileIndex.get(tz * w + tx); return s?.size ? publicOf(byId.get([...s][0])) : null; },
+    /** 칸 위의 물체 모두 (9차 섬 꾸미기: 길 위 가구처럼 한 칸에 둘) */
+    on(tx, tz) {
+      const out = [...(tileIndex.get(tz * w + tx) ?? [])].map(id => publicOf(byId.get(id)));
+      for (const o of waiting.values()) if (o.tx === tx && o.tz === tz) out.push(publicOf(o));   // 모델을 받는 중인 것도 (이어짐 계산)
+      return out;
+    },
+    /** 칸의 바닥 소리 (9차 길: spec.world.ground — 'stone'·'wood'·'path'), 없으면 null */
+    groundAt(tx, tz) {
+      for (const id of tileIndex.get(tz * w + tx) ?? []) { const g = GROUND[byId.get(id).kind]; if (g) return g; }
+      return null;
+    },
+    /** 종류의 스펙 (받은 것만) */
+    spec: kind => SPECS[kind] ?? null,
     list(kind) { return [...byId.values()].filter(o => !kind || o.kind === kind).map(publicOf); },
     remove(id) {
       const o = byId.get(id) ?? waiting.get(id);
@@ -228,10 +273,21 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
       return id;
     },
     setVariant(id, variant) {
+      const wo = waiting.get(id);
+      if (wo) {   // 아직 모델을 받는 중: 놓일 때 이 변형으로
+        wo.variant = variant;
+        const a = state.island.added.find(x => x.id === id);
+        if (a) a.data.variant = variant;
+        return true;
+      }
       const o = byId.get(id);
       if (!o || o.variant === variant) return false;
       undraw(o);
       o.variant = variant;
+      if (COLLIDERS[o.kind]?.links) {   // 이어지는 울타리: 팔이 바뀌면 충돌도
+        for (const c of o.colliders) collision.remove(c);
+        o.colliders = collidersOf(o).map(collision.add);
+      }
       draw(o);
       const a = state.island.added.find(x => x.id === id);
       if (a) a.data.variant = variant;
@@ -286,7 +342,7 @@ export function createObjects(ctx, island, kit, models, collision, { lazy = new 
       season = s;
       for (const tpl of templates.values()) {
         const fn = SEASONAL[tpl.kind];
-        if (!fn || tpl.variant) continue;
+        if (!fn || tpl.pal) continue;
         const spec = models[tpl.kind].spec;
         tpl.recolor({ ...spec.palette, ...(spec.variants?.[fn(s)]?.palette ?? {}) });
       }

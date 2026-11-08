@@ -81,8 +81,24 @@ export function createSummer(ctx, events) {
     if (giveItem(ctx, CHIME, 1) === 0) { s.chimePending = 0; toast('우편함에 「여름밤 풍경」이 왔어요. 코코가 보냈대요!', '🎐'); }
   }
 
+  // ---- 손 불꽃 흔들기 (9차 M9-P1 AN-08): 행사 시간에 손 불꽃을 갖고 해변에 서 있으면 들고 흔든다 + 손끝 불티 ----
+  let waving = false, sparkT = 0;
+  const hp = new ctx.THREE.Vector3();
+  function wave(dt) {
+    const pl = S().player;
+    const want = !!placed && live() && (S().data?.inventory?.count?.(SPARKLER) ?? 0) > 0 && near(pl?.position, placed.spots.raft, WATCH_RANGE)
+      && !S().ui?.isBlocking?.();
+    if (want !== waving) { waving = want; pl?.setStance?.(want ? 'sparkler' : null); }
+    if (!waving || pl?.speed > 0.25 || !pl?.handPoint) return;
+    sparkT -= dt;
+    if (sparkT > 0) return;
+    sparkT = 0.09;
+    S().gather?.fx?.sparkle?.(pl.handPoint(hp), 1, Math.random() < 0.5 ? '#FFD27A' : '#FFF6D8');
+  }
+
   // ---- 쇼: 시계를 따라 켜고 끈다 (도중에 들어오면 지난 만큼 건너뛴다) ----
   function update(dt) {
+    wave(dt);
     if (!placed) return fx.update(dt);
     if (inShow() && !fx.running) {
       const startAt = (hour() - showAt) * 3600;
@@ -139,5 +155,5 @@ export function createSummer(ctx, events) {
   events.spot?.(EV, () => placed?.spots.sign ?? null);
   sync();
 
-  return { register, update, sync, debug: { fx, get placed() { return placed; }, place, clear, inShow, showOver, get watchSec() { return watchSec; } } };
+  return { register, update, sync, debug: { fx, get waving() { return waving; }, get placed() { return placed; }, place, clear, inShow, showOver, get watchSec() { return watchSec; } } };
 }

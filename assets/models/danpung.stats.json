@@ -8,9 +8,9 @@
   "vertices": 5176,
   "bones": 12,
   "materials": [
+    "stripe",
     "shirt",
     "pants",
-    "stripe",
     "fur",
     "muzzle",
     "nose",
@@ -41,7 +41,7 @@
     }
   },
   "height": 1,
-  "glbBytes": 360448,
+  "glbBytes": 360444,
   "blender": "5.2.3 LTS",
   "renders": [
     "danpung_back.png",

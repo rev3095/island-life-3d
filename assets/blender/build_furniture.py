@@ -1241,7 +1241,77 @@ def b_snowman_lamp(M):
     m.add(ellipsoid((0, 0, 0.7), (0.04, 0.04, 0.04), seg=10, rings=6), 'pompom')
 
 
+# ================================================================ 9차 M9-P3 야외 가구 (보드 wave9 D86-A): 섬에 놓는다 (스펙 outdoor: true, 충돌은 world.collider)
+def b_outdoor_bench(M):
+    """FU-47 야외 벤치 (2×1): 나무 널빤지 앉는 판 셋 + 등받이 둘, 검은 철 다리 둘."""
+    m = M.part('bench')
+    for y in (-0.13, 0.0, 0.13):
+        m.add(box((0, y, 0.43), (1.7, 0.12, 0.05), bevel=0.02), 'wood')
+    for z in (0.63, 0.8):
+        m.add(box((0, 0.22, z), (1.7, 0.05, 0.12), bevel=0.02, rot=rot_xyz(x=-0.2)), 'wood')
+    for sx in (1, -1):
+        x = sx * 0.72
+        m.add(box((x, -0.15, 0.21), (0.06, 0.06, 0.42), bevel=0.015), 'metal')
+        m.add(box((x, 0.19, 0.42), (0.06, 0.06, 0.86), bevel=0.015, rot=rot_xyz(x=-0.2)), 'metal')
+        m.add(box((x, 0.0, 0.4), (0.07, 0.42, 0.05), bevel=0.015), 'metal')
+        m.add(box((x, -0.02, 0.6), (0.06, 0.36, 0.04), bevel=0.015), 'metal')   # 팔걸이
+    m.add(box((0, 0.0, 0.38), (1.4, 0.05, 0.04), bevel=0.01), 'woodDark')
+
+
+def b_garden_lamp(M):
+    """FU-48 정원 등: 가는 철 기둥 + 네모 등갓 속 불빛 (밤에 켜짐 — 재질 glow)."""
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.08), 0.13, 0.11, seg=16), 'metal')
+    m.add(cylinder((0, 0, 0.08), (0, 0, 1.05), 0.03, seg=10), 'metal')
+    m.add(box((0, 0, 1.17), (0.2, 0.2, 0.22), bevel=0.02), 'glow', outline=False)
+    for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+        m.add(box((sx * 0.1, sy * 0.1, 1.17), (0.03, 0.03, 0.24), bevel=0.008), 'metal')
+    m.add(box((0, 0, 1.05), (0.24, 0.24, 0.04), bevel=0.012), 'metal')
+    m.add(cone((0, 0, 1.28), (0, 0, 1.42), 0.2, 0.02, seg=4), 'cap', smooth=False)
+    m.add(ellipsoid((0, 0, 1.44), (0.03, 0.03, 0.03), seg=8, rings=5), 'cap')
+
+
+def b_flower_pots(M):
+    """FU-49 화분 셋: 크기 다른 토분 셋에 동그란 꽃 무더기 (꽃 색 = 변형)."""
+    m = M.part('pots')
+    for i, (x, y, s) in enumerate(((-0.17, 0.08, 1.0), (0.17, 0.12, 0.8), (0.0, -0.17, 0.65))):
+        h, r = 0.3 * s, 0.14 * s
+        m.add(cylinder((x, y, 0), (x, y, h), r * 0.75, r, seg=20), 'pot')
+        m.add(cylinder((x, y, h - 0.03 * s), (x, y, h + 0.01), r * 1.08, seg=20), 'potRim')
+        m.add(cylinder((x, y, h - 0.005), (x, y, h + 0.012), r * 0.95, seg=20), 'soil', outline=False)
+        rnd = random.Random(i)
+        for k in range(7):
+            a = TAU * k / 7 + rnd.uniform(0, 0.5)
+            d = r * 0.55 if k else 0
+            c = V((x + math.cos(a) * d, y + math.sin(a) * d, h + 0.08 * s + (0.05 * s if not k else 0)))
+            m.add(ellipsoid(c + V((0, 0, -0.03 * s)), (0.05 * s, 0.05 * s, 0.035 * s), seg=10, rings=6), 'leaf')
+            m.add(ellipsoid(c, (0.04 * s, 0.04 * s, 0.025 * s), seg=10, rings=6), 'flower')
+            m.add(ellipsoid(c + V((0, 0, 0.02 * s)), (0.013 * s, 0.013 * s, 0.01 * s), seg=6, rings=4), 'center', outline=False)
+
+
+def b_picnic_table(M):
+    """FU-50 피크닉 탁자 (2×2): 탁자 판 + 양옆에 붙은 긴 의자 둘, 엑스자 다리, 가운데 체크 천."""
+    m = M.part('table')
+    for k in range(4):
+        m.add(box((0, -0.27 + k * 0.18, 0.74), (1.6, 0.16, 0.05), bevel=0.02), 'wood')
+    for sy in (1, -1):
+        for k in range(2):
+            m.add(box((0, sy * (0.6 + k * 0.13), 0.44), (1.6, 0.12, 0.05), bevel=0.02), 'wood')
+    for sx in (1, -1):
+        x = sx * 0.62
+        for a in (0.62, -0.62):
+            m.add(box((x, 0, 0.38), (0.07, 0.07, 0.95), bevel=0.015, rot=rot_xyz(x=a)), 'woodDark')
+        m.add(box((x, 0, 0.4), (0.07, 1.5, 0.06), bevel=0.015), 'woodDark')
+        m.add(box((x, 0, 0.69), (0.07, 0.7, 0.06), bevel=0.015), 'woodDark')
+    m.add(box((0, 0, 0.775), (0.7, 0.5, 0.012), bevel=0.004), 'cloth')
+    for i in range(4):
+        for j in range(3):
+            if (i + j) % 2:
+                m.add(box((-0.2625 + i * 0.175, -0.167 + j * 0.167, 0.783), (0.17, 0.16, 0.006), bevel=0.002), 'clothLight', outline=False)
+
+
 BUILDERS = {
+    'outdoor-bench': b_outdoor_bench, 'garden-lamp': b_garden_lamp, 'flower-pots': b_flower_pots, 'picnic-table': b_picnic_table,
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
     'snowman-lamp': b_snowman_lamp,
     'harvest-basket': b_harvest_basket,

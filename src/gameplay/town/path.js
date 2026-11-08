@@ -4,7 +4,8 @@
 const SQRT2 = Math.SQRT2;
 const ROAD = { path: 0.75, plaza: 0.75 };
 
-export function createNav(island) {
+/** roadAt(tx, tz) → true 면 길로 친다 (9차 섬 꾸미기로 깐 길, decor.isRoad) */
+export function createNav(island, { roadAt = null } = {}) {
   const { w, h } = island;
   const N = w * h;
   const inside = (tx, tz) => tx >= 0 && tz >= 0 && tx < w && tz < h;
@@ -54,7 +55,7 @@ export function createNav(island) {
         if (!inside(nx, nz)) continue;
         const j = nz * w + nx;
         if (closed[j] === stamp || !step(tx, tz, nx, nz)) continue;
-        const cost = (dx && dz ? SQRT2 : 1) * (ROAD[island.tileAt(nx, nz)] ?? 1);
+        const cost = (dx && dz ? SQRT2 : 1) * (ROAD[island.tileAt(nx, nz)] ?? (roadAt?.(nx, nz) ? ROAD.path : 1));
         const ng = g[i] + cost;
         if (seen[j] === stamp && ng >= g[j]) continue;
         seen[j] = stamp; g[j] = ng; from[j] = i;

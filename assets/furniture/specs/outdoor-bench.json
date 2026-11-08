@@ -1,0 +1,61 @@
+{
+  "id": "FU-47",
+  "slug": "outdoor-bench",
+  "item": "furn.outdoor-bench",
+  "name": "야외 벤치",
+  "category": "furniture",
+  "kind": "outdoor-bench",
+  "version": "0.1",
+  "status": "review",
+  "outdoor": true,
+  "prompt": {
+    "concept": "2칸 나무 벤치. 등받이 널빤지, 검은 철 다리. 공원·광장 둘레에.",
+    "keywords": [
+      "나무 널빤지",
+      "철 다리",
+      "등받이"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 야외 가구"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C79A66",
+    "woodDark": "#9A7048",
+    "metal": "#4A4A50"
+  },
+  "paletteLabels": {
+    "wood": "널빤지",
+    "woodDark": "받침",
+    "metal": "철 다리"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.8,
+        0.5
+      ]
+    }
+  }
+}

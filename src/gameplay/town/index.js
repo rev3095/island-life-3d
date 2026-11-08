@@ -31,7 +31,7 @@ export default {
     const world = ctx.services.world, player = ctx.services.player;
     if (!world || !player || !ctx.services.gameplay) { console.warn('[town] world·player 가 없어 주민을 놓지 않아요'); return; }
     const t0 = performance.now();
-    const nav = createNav(world.island);
+    const nav = createNav(world.island, { roadAt: (tx, tz) => !!ctx.services.decor?.isRoad?.(tx, tz) });   // 9차: 깐 길도 싸게
     const spots = buildSpots(ctx, nav);
     let busy = false;
     let party = null;         // 생일 (아래에서 만든다 — town.staysIn 이 쓴다)
@@ -74,6 +74,15 @@ export default {
             if (!nav.walkable(t.tx, t.tz) || blocksAction(x, z)) continue;
             if (V) V.goal = { x, z };
             return { x, z };
+          }
+        }
+        // 9차 D86-A: 섬에 놓은 벤치·피크닉 탁자 앞에서 쉬기 (가끔, 다른 주민이 안 가 있는 곳)
+        const hang = ctx.services.decor?.hangouts?.() ?? [];
+        if (hang.length && Math.random() < 0.2) {
+          const s = hang[Math.floor(Math.random() * hang.length)], t = world.island.toTile(s.x, s.z);
+          if (nav.walkable(t.tx, t.tz) && !blocksAction(s.x, s.z) && !villagers.some(o => o !== V && o.goal && Math.hypot(o.goal.x - s.x, o.goal.z - s.z) < 1)) {
+            if (V) V.goal = { x: s.x, z: s.z };
+            return { x: s.x, z: s.z };
           }
         }
         const haunts = Object.entries(person.haunts).map(([k, w]) => ({ k, w }));

@@ -1,0 +1,33 @@
+{
+  "id": "TI-10",
+  "slug": "path-brick",
+  "name": "벽돌길",
+  "category": "tile",
+  "kind": "path-brick",
+  "version": "0.1",
+  "triangles": 3312,
+  "parts": 9,
+  "materials": [
+    "brick",
+    "grout"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.04
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 64560,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "path-brick_front.png",
+    "path-brick_hero.jpg",
+    "path-brick_main.png",
+    "path-brick_thumb.png",
+    "path-brick_top.png"
+  ]
+}

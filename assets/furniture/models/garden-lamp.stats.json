@@ -1,0 +1,50 @@
+{
+  "id": "FU-48",
+  "slug": "garden-lamp",
+  "item": "furn.garden-lamp",
+  "name": "정원 등",
+  "category": "furniture",
+  "kind": "garden-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 820,
+  "parts": 1,
+  "materials": [
+    "cap",
+    "glow",
+    "metal"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.4,
+    0.4,
+    1.47
+  ],
+  "bounds": [
+    [
+      -0.2,
+      -0.2,
+      0.0
+    ],
+    [
+      0.2,
+      0.2,
+      1.47
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 18244,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "garden-lamp_front.png",
+    "garden-lamp_main.png",
+    "garden-lamp_thumb.png",
+    "garden-lamp_top.png"
+  ]
+}

@@ -13,6 +13,7 @@ export const APPS = [
   { id: 'settings', name: '설정', icon: '⚙️', color: '#D8D0BE' },
   { id: 'save', name: '저장', icon: '💾', color: '#C8B6E2' },
   { id: 'access', name: '보기 편하게', icon: '👓', color: '#BFE0D8' },   // 7차 UI-10
+  { id: 'decor', name: '섬 꾸미기', icon: '🪴', color: '#BFDDA4', panel: 'decor', closes: true },   // 9차 UI-16 (밖에서 놓기 모드 — gameplay/decor 가 ui.decor 로 채운다, 섬폰은 닫는다)
   { id: 'calendar', name: '달력', icon: '📅', color: '#F4C9D6', panel: 'calendar' },   // 8차 UI-13 (창은 gameplay/events 가 ui.calendar 로 채운다)
   { id: 'guide', name: '안내', icon: '💡', color: '#F6E3A1', panel: 'guide' },   // 7차 M7-P5: 첫날 할 일·조작·지난 힌트 (창은 intro 가 ui.guide 로 채운다)
   { id: 'transfer', name: '저장 옮기기', icon: '📦', color: '#E8C9A0', panel: 'transfer' },   // 7차 UI-09 (M7-P4)
@@ -80,6 +81,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       if (id === 'map') return void openMap();
       if (id === 'bag') return void openBag({ mode: 'view' });
       const app = APPS.find(a => a.id === id);
+      if (app?.closes) { p.close(null); Promise.resolve().then(() => ctx.services.ui?.[app.panel]?.open?.()); return; }   // 섬 꾸미기: 섬폰을 닫고 밖에서
       if (app?.panel) {
         // P4 창은 섬폰 위에 쌓아 연다 (닫으면 섬폰으로 돌아온다). 실패해도 섬폰은 그대로
         try { Promise.resolve(ctx.services.ui?.[app.panel]?.open?.()).catch(e => console.error(`[ui] ${app.panel}`, e)); }

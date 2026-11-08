@@ -1,0 +1,90 @@
+{
+  "id": "FU-49",
+  "slug": "flower-pots",
+  "item": "furn.flower-pots",
+  "name": "화분 셋",
+  "category": "furniture",
+  "kind": "flower-pots",
+  "version": "0.1",
+  "status": "review",
+  "outdoor": true,
+  "prompt": {
+    "concept": "1칸에 크기 다른 토분 셋, 동그란 꽃 무더기. 꽃 색 변형 넷.",
+    "keywords": [
+      "토분 셋",
+      "꽃 무더기",
+      "크기 차이"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 야외 가구"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "pot": "#C27A5A",
+    "potRim": "#D9906E",
+    "soil": "#6B4A33",
+    "leaf": "#6FAE57",
+    "flower": "#F2A6C0",
+    "center": "#F7D35B"
+  },
+  "paletteLabels": {
+    "pot": "토분",
+    "potRim": "테두리",
+    "soil": "흙",
+    "leaf": "잎",
+    "flower": "꽃",
+    "center": "꽃술"
+  },
+  "variants": {
+    "pink": {
+      "label": "분홍 (기본)",
+      "palette": {}
+    },
+    "yellow": {
+      "label": "노랑",
+      "palette": {
+        "flower": "#F7D35B",
+        "center": "#E9883A"
+      }
+    },
+    "red": {
+      "label": "빨강",
+      "palette": {
+        "flower": "#E2574C"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "flower": "#7FA8E0",
+        "center": "#FFFFFF"
+      }
+    }
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.38
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "TI-11",
+  "slug": "path-plank",
+  "name": "나무판 길",
+  "category": "tile",
+  "kind": "path-plank",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "널빤지를 깐 길 1칸 (해변·물가). 걸으면 나무 발소리가 난다.",
+    "keywords": [
+      "널빤지",
+      "틈",
+      "해변 산책로"
+    ],
+    "references": [],
+    "avoid": [
+      "썩은 나무"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 길"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "woodDark"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "woodDark": "#8A6542",
+    "wood": "#C79A66",
+    "woodLight": "#D9B27F"
+  },
+  "paletteLabels": {
+    "woodDark": "밑판",
+    "wood": "널빤지",
+    "woodLight": "밝은 널빤지"
+  },
+  "heroGround": "grass",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "connect": "path",
+    "layer": "ground",
+    "ground": "wood",
+    "render": [
+      "core",
+      "link_n",
+      "link_s",
+      "link_e",
+      "link_w",
+      "link_ne",
+      "link_nw",
+      "link_se",
+      "link_sw"
+    ]
+  }
+}

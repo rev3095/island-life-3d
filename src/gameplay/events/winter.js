@@ -3,7 +3,7 @@
 // 「놓기」로 내려놓고, 다른 눈덩이를 밀고 와서 더 큰 눈덩이 옆에서 「머리 얹기」 → 눈사람(PR-22) — 몸·머리 비율로 표정 넷(faceOf).
 // 하루 하나 · 눈사람마다 눈 결정(IC-EV-04) 셋 · 셋째 눈사람에 「눈사람 등」(FU-46) + 도장. 만든 눈사람은 그 해 행사가 끝날 때까지 남는다 (state.events.winter.snowmen).
 // 눈덩이는 움직이고 커져야 해서 world 물체가 아니라 이 모듈이 그리는 메시, 다 만든 눈사람만 world 물체(persist: false, 들어올 때마다 다시 놓음).
-// 눈사람 모델은 묶음(instanced)이라 머리·몸을 따로 늘릴 수 없어 크기 하나(몸 기준)로 놓고 표정은 알림 이모지로 — M8-P7/P8 에서 모델 표정 넷 제안.
+// 눈사람 모델은 묶음(instanced)이라 머리·몸을 따로 늘릴 수 없어 크기 하나(몸 기준)로 놓고, 표정은 입 모양 부품 넷 중 하나 (9차 M9-P1, 변형 꼬리표 +smile·+wow·+calm·+plain).
 import { giveItem } from '../town/talk.js';
 
 export const EV = 'EV-04';
@@ -75,7 +75,8 @@ export function createWinter(ctx, events) {
   async function refresh() {
     const my = ++gen;
     for (const b of balls) group.remove(b.mesh);
-    balls = []; pushing = null;
+    balls = [];
+    if (pushing) drop(false);
     const W = S().world;
     ballsLive = !!W?.objects && live();
     if (!ballsLive) return;
@@ -93,7 +94,8 @@ export function createWinter(ctx, events) {
     if (!W?.objects || !active()) return;
     for (const sm of st().snowmen[year()] ?? []) {
       const t = W.island.toTile(sm.x, sm.z);
-      const id = W.objects.add('event-snowman', t.tx, t.tz, { persist: false, at: { x: sm.x, z: sm.z }, scale: sm.scale, variant: sm.variant, rot: sm.rot });
+      // 표정 넷 (9차 M9-P1): 변형 꼬리표로 입 모양 부품을 고른다 ('red+wow', world/objects.js opt_face_*)
+      const id = W.objects.add('event-snowman', t.tx, t.tz, { persist: false, at: { x: sm.x, z: sm.z }, scale: sm.scale, variant: sm.face ? `${sm.variant ?? ''}+${sm.face}` : sm.variant, rot: sm.rot });
       if (id) snowIds.push(id);
     }
   }
@@ -103,7 +105,7 @@ export function createWinter(ctx, events) {
   function update() {
     const pl = player();
     if (!pushing || !pl?.position) { last = null; return; }
-    if (!live()) { drop(); return; }
+    if (!live()) { drop(false); return; }
     const p = pl.position;
     if (last) {
       const d = Math.hypot(p.x - last.x, p.z - last.z);
@@ -116,7 +118,12 @@ export function createWinter(ctx, events) {
     }
     last = { x: p.x, z: p.z };
   }
-  function drop() { pushing = null; last = null; }
+  // 9차 M9-P1: 미는 동안 걸음 = 밀기 동작 AN-09, 내려놓을 때 놓기 동작 AN-10
+  function drop(anim = true) {
+    if (pushing && anim) player()?.play?.('place');
+    pushing = null; last = null;
+    player()?.setGait?.(null);
+  }
   // 굴러가기: 모델의 'ball' 부품(가운데가 공 중심, build_env.py b_snowball pivot)을 간 방향에 맞게 돌린다 — 축 = 위 × 간 방향, 각 = 거리 / 반지름
   const spin = { axis: null, q: null };
   function roll(b, dx, dz) {
@@ -135,7 +142,7 @@ export function createWinter(ctx, events) {
     const sm = { x: body.x, z: body.z, scale: +(body.s * BALL_R / 0.38).toFixed(3), face: face.key, variant: ['red', 'blue', 'green', 'yellow'][(st().snowmen[year()]?.length ?? 0) % 4], rot: 0, day: events.today() };
     ((st().snowmen[year()] ||= [])).push(sm);
     for (const b of [body, head]) { group.remove(b.mesh); balls = balls.filter(x => x !== b); }
-    pushing = null;
+    drop();
     placeSnowmen();
     const daily = todo('snowman');
     if (!daily?.done) {
@@ -169,7 +176,7 @@ export function createWinter(ctx, events) {
         const f = front(pl, 0.5);
         return balls.find(x => near(x, f, BALL_R * x.s + 0.6)) ?? null;
       },
-      run(b) { pushing = b; last = null; toast('걸으면 눈덩이가 커져요. 눈 덮인 풀밭에서만!', '❄️'); },
+      run(b) { pushing = b; last = null; player()?.setGait?.('push'); toast('걸으면 눈덩이가 커져요. 눈 덮인 풀밭에서만!', '❄️'); },
     });
   }
 

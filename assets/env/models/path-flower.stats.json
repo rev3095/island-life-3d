@@ -1,0 +1,38 @@
+{
+  "id": "TI-12",
+  "slug": "path-flower",
+  "name": "꽃길",
+  "category": "tile",
+  "kind": "path-flower",
+  "version": "0.1",
+  "triangles": 4948,
+  "parts": 9,
+  "materials": [
+    "center",
+    "flower",
+    "flowerAlt",
+    "leaf",
+    "path",
+    "pebble"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.09
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 109148,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "path-flower_front.png",
+    "path-flower_hero.jpg",
+    "path-flower_main.png",
+    "path-flower_thumb.png",
+    "path-flower_top.png",
+    "path-flower_variants.png"
+  ]
+}
