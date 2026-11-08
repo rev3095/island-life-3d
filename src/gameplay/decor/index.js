@@ -232,7 +232,7 @@ export default {
       }
       objs.remove(o.id);
       if (o.data.decor !== 'furn') relink(o.tile.tx, o.tile.tz, [o.kind]);
-      events.emit('sfx', { name: 'pickup' });
+      events.emit('sfx', { name: 'step-wood', volume: 0.6 });   // 'pickup' 은 첫날 안내가 「줍기」로 센다 (intro)
       events.emit('decor:remove', { kind: o.kind, group: o.data.decor, item: o.data.item ?? null, tx: o.tile.tx, tz: o.tile.tz });
       toast(o.data.decor === 'furn' ? `${S().data?.items?.get?.(o.data.item)?.name ?? '가구'}를 가방에 넣었어요` : '치웠어요', '🧹');
       saveSoon();

@@ -510,18 +510,18 @@ export function makeScenario(bot, sk, opts = {}) {
     const isl = S().world.island, O = S().world.objects, dec = () => S().decor;
     if (!dec()) return block('섬 꾸미기 모듈이 없어요');
     const before = dec().list().length;
-    // 집 둘레 빈 풀밭: 가로 3 × 세로 4 칸이 비고 같은 높이 (문 앞 자리 빼고)
+    // 집 둘레 빈 땅(풀밭·모래): 가로 3 × 세로 5 칸이 비고 같은 높이 (문 앞 자리 빼고), 가까운 곳부터
     const home = S().world.places.playerHouse ?? { tx: Math.floor(isl.w / 2), tz: Math.floor(isl.h / 2) };
-    const free = (x, z, lv) => isl.tileAt(x, z) === 'grass' && !O.on(x, z).length && !isl.flagsAt(x, z) && isl.levelAt(x, z) === lv && !dec().debug.reservedSet.has(`${x},${z}`);
+    const free = (x, z, lv) => ['grass', 'sand'].includes(isl.tileAt(x, z)) && !O.on(x, z).length && !isl.flagsAt(x, z) && isl.levelAt(x, z) === lv && !dec().debug.reservedSet.has(`${x},${z}`);
     let spot = null;
-    for (let r = 2; r < 24 && !spot; r++) for (let dz = -r; dz <= r && !spot; dz++) for (let dx = -r; dx <= r && !spot; dx++) {
+    for (let r = 2; r < 48 && !spot; r++) for (let dz = -r; dz <= r && !spot; dz++) for (let dx = -r; dx <= r && !spot; dx++) {
       if (Math.max(Math.abs(dx), Math.abs(dz)) !== r) continue;
       const tx = home.tx + dx, tz = home.tz + dz, lv = isl.levelAt(tx, tz);
       let ok = true;
-      for (let z = tz - 1; z <= tz + 3 && ok; z++) for (let x = tx - 1; x <= tx + 2 && ok; x++) ok = free(x, z, lv);
+      for (let z = tz - 1; z <= tz + 3 && ok; z++) for (let x = tx - 1; x <= tx + 1 && ok; x++) ok = free(x, z, lv);
       if (ok) spot = { tx, tz };
     }
-    if (!spot) return awk('집 둘레에 빈 풀밭을 못 찾음');
+    if (!spot) return awk('섬에 빈 땅(3×5)을 못 찾음');
     const stand = (tx, tz) => isl.toWorld(tx, tz + 1);   // 그 칸 바로 남쪽에 서서 북쪽(앞)을 본다
     const goTo = async (tx, tz) => { await bot.walkTo(stand(tx, tz), { near: 0.25, label: '섬 꾸미기 자리' }); await bot.faceDir(0); };
     await goTo(spot.tx, spot.tz + 2);
@@ -531,7 +531,20 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.click(bot.$('.pk-app[data-app="decor"]'));
     if (!await bot.until(() => dec().active, { timeout: 5, ui: false })) return block('섬폰 「섬 꾸미기」를 눌러도 놓기 모드가 안 켜짐');
     const pick = async kind => { await bot.click(bot.$(`.pk-decor-item[data-decor="${kind}"]`)); await bot.frames(3); return dec().pick?.kind === kind; };
-    const placeAt = async (tx, tz) => { await goTo(tx, tz); await bot.frames(3); const n = dec().list().length; bot.press('action'); await bot.frames(4); return dec().list().length > n; };
+    const why = [];
+    // 미리 보기 칸(앞 칸)이 목표 칸이 될 때까지 다시 서 본다 (칸 가운데에서 조금 어긋나면 앞 칸이 옆으로 갈 수 있다)
+    const placeAt = async (tx, tz) => {
+      for (let k = 0; k < 3; k++) {
+        await goTo(tx, tz); await bot.frames(3);
+        const a = dec().view?.anchor;
+        if (a?.tx === tx && a?.tz === tz) break;
+      }
+      const n = dec().list().length;
+      bot.press('action'); await bot.frames(4);
+      const ok = dec().list().length > n;
+      if (!ok) why.push(`${tx},${tz}: ${dec().view?.why ?? '?'} (앞 칸 ${dec().view?.anchor?.tx},${dec().view?.anchor?.tz})`);
+      return ok;
+    };
     const res = { path: 0, fence: 0, removed: false };
     if (await pick('path-stone')) for (const z of [2, 1, 0]) if (await placeAt(spot.tx, spot.tz + z)) res.path++;
     if (await pick('fence-wood')) for (const x of [0, 1]) if (await placeAt(spot.tx + x, spot.tz - 1)) res.fence++;
@@ -546,10 +559,10 @@ export function makeScenario(bot, sk, opts = {}) {
     res.removed = dec().list().length === n - 1;
     bot.press('esc'); await bot.frames(3);
     const saved = st().island.added.filter(a => a.data?.decor).length;
-    note('islandDecor', { ...res, link, fenceLink, saved, before, after: dec().list().length, open: dec().active });
+    note('islandDecor', { ...res, link, fenceLink, saved, before, after: dec().list().length, open: dec().active, why });
     await bot.settle(10);
     const odd = [];
-    if (res.path < 3) odd.push(`돌길 ${res.path}/3`);
+    if (res.path < 3) odd.push(`돌길 ${res.path}/3 ${why.join(' / ')}`);
     if (res.fence < 2) odd.push(`울타리 ${res.fence}/2`);
     if (!/\+n/.test(link) || !/\+s/.test(link)) odd.push(`돌길이 안 이어짐 (${link || '없음'})`);
     if (!/\+e/.test(fenceLink)) odd.push(`울타리가 안 이어짐 (${fenceLink || '없음'})`);
