@@ -408,3 +408,14 @@ stats() → { ms, passes }
 - **이벤트** `events:start {id, year, first, dayKey}` · `events:todo {id, todo, n, goal, done}` · `events:stamp {id, year}`.
 - **ui** `ctx.services.ui.calendar = { open() }` (섬폰 「📅 달력」 줄). **날짜 흉내** `ctx.preview = { date, saveKey } | null` — 주소 `#date=YYYY-MM-DD` · `?date=`, sky 가 시계를, data 가 저장 칸(`island-life-save-v1-preview`)을 바꾼다.
 - 행사 시간 `hours` 는 게임 하루 시각 5~29. 섬 축제 날은 17시에서 끊긴다 (섬 축제 먼저, D75-A). 첫 섬 축제(엔딩) 전엔 열리지 않는다 (D83-A).
+
+## 9차 섬 꾸미기 · M8 남은 것 (M9-P1–P3, 보드 wave9 반영 v1 = D86–D92 모두 A) — 자세히는 `docs/notes/m9-decor.md`
+- **상태**: 새 칸 없음. 밖에 놓은 길·울타리·야외 가구는 `state.island.added` (주인 world) 에 `data: { decor: 'path'|'fence'|'furn', item?, rot, variant, at? }` 로 남는다. 야외 가구는 놓을 때 가방에서 빠지고 치우면 돌아온다.
+- **서비스** `ctx.services.decor = { open(), close(), place(), remove(), rotate(step), choose(pick), setMode('place'|'edit'), catalog(), active, mode, pick, view, list(), isRoad(tx, tz), hangouts() → [{x, z, face, id}] }` (gameplay/decor). `ctx.services.ui.decor = { open() }` — 섬폰 APPS `decor` 줄 (`closes: true` = 섬폰을 닫고 연다).
+- **이벤트** `decor:mode {active}` · `decor:place {kind, group, item, tx, tz}` · `decor:remove {kind, group, item, tx, tz}`. 꾸미는 동안 행동 키 처리기 `decor:place`(action)·`decor:rotate`(pickup) 110, 키 Q/E·Tab·X·Esc 는 decor 가 먼저 받는다(창이 아니라 걷기는 그대로).
+- **world.objects 추가**: `on(tx, tz)` (한 칸의 모든 물체 — 모델을 받는 중인 것 포함) · `groundAt(tx, tz)` (spec `world.ground` → 발소리) · `spec(kind)` · 공개 모양에 `rot`. **변형 이름 = `<색 변형>+<꼬리표>…`** (`src/world/variants.js` `splitVariant`): 모델 부품 `link_<n|e|s|w|ne|nw|se|sw>` 은 그 꼬리표가 있을 때만, `opt_<묶음>_<값>` 은 `spec.world.options[묶음]` 중 꼬리표 값 하나만(없으면 첫 값) 남는다. 스펙 `world.connect`('path'|'fence') · `world.layer`('ground' = 길 위에 다른 것을 놓을 수 있음) · `world.collider.links`(이어진 쪽마다 반두께 상자) · `world.render`(렌더에 보일 팔). `setVariant` 는 받는 중인 물체에도 먹고, 울타리면 충돌도 다시 만든다.
+- **야외 가구 = world 물체 `fu:<가구 slug>`**: 아이템 `outdoor: true` (`src/data/decor-items.js` `OUTDOOR`) 인 가구는 world 가 lazy 종류로 알고 가구 모델·스펙을 받아 `furnitureWorld(spec)` (extent = 발자국 반, 충돌 없으면 발자국 90% 상자) 로 놓는다. 가구 스펙 `outdoor: true` → 가구 목록 `index.json` 에도.
+- **player 추가**: `setGait(name|null)` (걸을 때 걷기 대신 — 'push') · `setStance(name|null)` (서 있을 때 서기 대신 — 'sparkler') · `hasClip(name)` · `handPoint(out)`. 주인공 클립에 `sparkler`(AN-08) · `push`(AN-09) · `place`(AN-10) — 스펙 `animations` 에 이름이 있는 캐릭터만 빌드된다 (지금 주인공).
+- **행사 소품**: events.json `props[0]` → 배경 모델 `event-<이름>` 을 그 행사 주간 동안 주인공 주민 뼈에 단다 (`events/props.js` `PROP_MOUNT`, 소품 모델은 그 행사 `assets.env` 에 적어 계절 묶음으로). 주민 가림 투명·나타나기를 따라간다.
+- **town**: `createNav(island, { roadAt })` — 깐 길(`decor.isRoad`)은 흙길처럼 싸게. 주민 `pickSpot` 이 가끔 `decor.hangouts()` (벤치·피크닉 탁자 앞)로 간다.
+- **웹 빌드**: 묶음 `decor` (길·울타리 모델·스펙, 처음에 안 받음 — `tools/build-web.mjs` `DECOR_FILES`), `assets/decor/decor.json` 은 island 묶음.
