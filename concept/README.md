@@ -22,14 +22,14 @@
 |---|---|---|
 | D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) |
 | CH | 캐릭터 | CH-01–10 (CH-11·12 는 후보만) |
-| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) · BD-01–05 (+z5 BD-06–07) · TI-01–07 (+z5 TI-08) (+wave9 계획 PR-24–25 · TI-09–12) |
-| FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 계획 FU-47–50 야외) |
+| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) · BD-01–05 (+z5 BD-06–07) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) |
+| FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) |
 | IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 (wave8 EV: IC-EV-01–04) |
 | WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 (+interiors RM-08 상점 · RM-09 박물관) |
-| EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 (+interiors AN-06 문 열기 · AN-07 걸어 들어가기) (+wave8 AN-08 손 불꽃 흔들기 · AN-09 눈덩이 밀기) (+wave9 계획 AN-10 놓기) · ED-01–06 · SF-1–6 · UI-04–05 |
-| s01– | 장면 (시나리오 편집기) | s01–s12 (+wave8 s13–s16 행사 장면 계획) |
+| EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 (+interiors AN-06 문 열기 · AN-07 걸어 들어가기) (+wave8 AN-08 손 불꽃 흔들기 · AN-09 눈덩이 밀기) (+wave9 AN-10 놓기 — AN-08–10 은 주인공 동작으로 M9-P1 에서 만듦) · ED-01–06 · SF-1–6 · UI-04–05 |
+| s01– | 장면 (시나리오 편집기) | s01–s12 (+wave8 s13–s16 행사 장면) |
 | ET | 편집기 (wave6) | ET-01– |
-| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 계획 UI-16–17) · RC-01–12 · QA-01–19 |
+| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) · RC-01–12 · QA-01–19 |
 | SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
 | EV · FX | wave8: 계절 행사 · 효과 셰이더 | EV-01–04 · FX-01 (불꽃) |
 
