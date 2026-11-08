@@ -474,7 +474,14 @@ function thumbOf(m) {
   if (m.type === 'pattern') return m.thumb ??= swatchURL(m.spec, { px: 152, meters: 1.2 });
   if (m.type === 'room') return m.thumb ??= roomThumb(m.spec);
   if (m.category === 'item') return m.items?.[0]?.thumb ?? m.items?.[0]?.icon;
-  return `${m.base}renders/${m.slug}_thumb.png`;
+  return m.thumb ?? `${m.base}renders/${m.slug}_thumb.png`;   // 9차부터 더한 요소는 묶음 목록의 data: 썸네일
+}
+// 9차 M9: 게시 파일 501/511 뒤로 더한 요소는 렌더 그림도 묶음(editor-renders-<n>.json = { 파일 이름: data: 주소 }) — tools/build-editor-index.mjs
+const renderPacks = new Map();
+function renderPack(base, n) {
+  const k = `${base}|${n}`;
+  if (!renderPacks.has(k)) renderPacks.set(k, loadJSON(`${base}editor-renders-${n}.json`).catch(e => { renderPacks.delete(k); throw e; }));
+  return renderPacks.get(k);
 }
 function renderGroups() {
   const cats = tab === 'all' ? AREAS.find(a => a.key === area).cats : [tab];
@@ -613,14 +620,22 @@ function renderSheet() {
   }
   $('renderTag').textContent = 'RENDER'; $('renderTitle').textContent = 'Blender 렌더';
   $('renderNote').textContent = '정사영 카메라, 툰 셰이딩 + 외곽선. 게임 안에서는 같은 모델이 실시간으로 그려져요.';
-  const img = (name, ext = 'png') => `<figure><div class="ph"><img src="${B}renders/${file}_${name}.${ext}" alt="${esc(spec.name)} ${VIEW_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${VIEW_LABEL[name] ?? ''}</figcaption></figure>`;
+  if (cur.renders && !cur.renderMap) {   // 묶음 렌더: 받은 뒤 다시 그린다
+    const me = cur;
+    $('views').innerHTML = '<p class="small muted">렌더 그림을 불러오는 중…</p>';
+    $('variantsImg').hidden = true; $('hero').hidden = true;
+    renderPack(B, cur.renders).then(map => { me.renderMap = map; if (cur === me) renderSheet(); }, () => { $('views').innerHTML = '<p class="small muted">렌더 그림을 불러오지 못했어요.</p>'; });
+    return;
+  }
+  const R = f => cur.renderMap?.[f] ?? `${B}renders/${f}`;
+  const img = (name, ext = 'png') => `<figure><div class="ph"><img src="${R(`${file}_${name}.${ext}`)}" alt="${esc(spec.name)} ${VIEW_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${VIEW_LABEL[name] ?? ''}</figcaption></figure>`;
   $('views').innerHTML = ['main', 'front', 'top'].map(n => img(n)).join('');
   const hasVariants = stats.renders.includes(`${file}_variants.png`);
-  $('variantsImg').innerHTML = hasVariants ? `<img src="${B}renders/${file}_variants.png" alt="${esc(spec.name)} 변형 모음" loading="lazy"><figcaption><span class="id">VARIANTS</span>${Object.values(spec.variants ?? {}).map(v => esc(v.label)).join(' · ')}</figcaption>` : '';
+  $('variantsImg').innerHTML = hasVariants ? `<img src="${R(`${file}_variants.png`)}" alt="${esc(spec.name)} 변형 모음" loading="lazy"><figcaption><span class="id">VARIANTS</span>${Object.values(spec.variants ?? {}).map(v => esc(v.label)).join(' · ')}</figcaption>` : '';
   $('variantsImg').hidden = !hasVariants;
   const hasHero = stats.renders.includes(`${file}_hero.jpg`) || B === BASE;
   $('hero').hidden = !hasHero;
-  $('hero').innerHTML = !hasHero ? '' : `<img src="${B}renders/${file}_hero.jpg" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
+  $('hero').innerHTML = !hasHero ? '' : `<img src="${R(`${file}_hero.jpg`)}" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
 }
 
 /* ---------- 보기 바꾸기: 3D · 무늬 크게(2D) · 배치 격자 ---------- */

@@ -32,13 +32,43 @@ function bundleModels(dir, slugs) {
   return { at, count: bundles.length };
 }
 
+// 렌더 그림 묶음 (9차 M9, 게시 파일 501/511): tools/editor-loose-renders.json 에 없는 요소(M9 부터 더한 것)는 렌더·썸네일을
+// 낱개 파일 대신 editor-renders-<n>.json ({ 파일 이름: data: 주소 }, RENDER_CHUNK 안쪽)에 넣고, 목록에 thumb(data:)·renders(묶음 번호)를 단다
+const LOOSE = json("tools/editor-loose-renders.json");
+const RENDER_CHUNK = 6 * 1048576;
+const MIME = { png: "image/png", jpg: "image/jpeg" };
+function bundleRenders(dir, models) {
+  const loose = new Set(LOOSE[dir] ?? []);
+  const bundles = [{}], at = {}, thumbs = {};
+  let size = 0;
+  for (const m of models) {
+    if (loose.has(m.slug)) continue;
+    const files = m.stats.renders ?? [];
+    for (const f of files) {
+      const url = `data:${MIME[f.split(".").pop()]};base64,` + readFileSync(resolve(root, dir, "renders", f)).toString("base64");
+      if (f === `${m.slug}_thumb.png`) { thumbs[m.slug] = url; continue; }
+      if (size && size + url.length > RENDER_CHUNK) { bundles.push({}); size = 0; }
+      bundles.at(-1)[f] = url;
+      size += url.length;
+      at[m.slug] = bundles.length;
+    }
+  }
+  for (const f of readdirSync(resolve(root, dir))) if (/^editor-renders-\d+\.json$/.test(f)) rmSync(resolve(root, dir, f));
+  const used = Object.keys(bundles[0]).length ? bundles : [];
+  const sizes = used.map((b, i) => write(`${dir}/editor-renders-${i + 1}.json`, b));
+  if (used.length) console.log(`${dir}/editor-renders-1…${used.length}.json (요소 ${Object.keys(thumbs).length}) — ${sizes.map(mb).join(" · ")}`);
+  return { at, thumbs, count: used.length };
+}
+
 // 배경·가구: 스펙·통계는 목록에, 모델은 묶음에 (요소마다 .glb.json 을 따로 올리면 파일 수가 511 을 넘어서 — 2026-10-30 축제 17개를 더할 때)
 for (const dir of ["assets/env", "assets/furniture"]) {
   const index = json(`${dir}/index.json`);
   const { at, count } = bundleModels(dir, index.models.map(m => m.slug));
-  const models = index.models.map(m => ({ ...m, bundle: at[m.slug], spec: json(`${dir}/specs/${m.slug}.json`), stats: json(`${dir}/models/${m.slug}.stats.json`) }));
-  write(`${dir}/editor-index.json`, { ...index, bundles: count, models });
-  console.log(`${dir}/editor-index.json — 요소 ${models.length}개`);
+  let models = index.models.map(m => ({ ...m, bundle: at[m.slug], spec: json(`${dir}/specs/${m.slug}.json`), stats: json(`${dir}/models/${m.slug}.stats.json`) }));
+  const rp = bundleRenders(dir, models);
+  models = models.map(m => (rp.thumbs[m.slug] ? { ...m, thumb: rp.thumbs[m.slug], renders: rp.at[m.slug] ?? null } : m));
+  write(`${dir}/editor-index.json`, { ...index, bundles: count, renderBundles: rp.count, models });
+  console.log(`${dir}/editor-index.json — 요소 ${models.length}개 (렌더 묶음 요소 ${Object.keys(rp.thumbs).length})`);
 }
 
 // 아이템: 아이콘은 그림 파일 대신 data: 주소로, 모델은 몇 MB 묶음으로
