@@ -1,0 +1,54 @@
+{
+  "id": "FU-49",
+  "slug": "flower-pots",
+  "item": "furn.flower-pots",
+  "name": "화분 셋",
+  "category": "furniture",
+  "kind": "flower-pots",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 5640,
+  "parts": 1,
+  "materials": [
+    "center",
+    "flower",
+    "leaf",
+    "pot",
+    "potRim",
+    "soil"
+  ],
+  "objects": [
+    "pots"
+  ],
+  "animations": {},
+  "size": [
+    0.61,
+    0.51,
+    0.46
+  ],
+  "bounds": [
+    [
+      -0.321,
+      -0.268,
+      0.0
+    ],
+    [
+      0.291,
+      0.241,
+      0.46
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 106964,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-pots_front.png",
+    "flower-pots_main.png",
+    "flower-pots_thumb.png",
+    "flower-pots_top.png",
+    "flower-pots_variants.png"
+  ]
+}

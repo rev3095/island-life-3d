@@ -1064,16 +1064,196 @@ def b_snowman(M):
     for sx in (1, -1):
         h.add(ellipsoid((sx * 0.085, -0.225, 0.96), (0.028, 0.018, 0.03), seg=8, rings=5), 'coal', outline=False)
     h.add(cone(V((0, -0.23, 0.9)), V((0.02, -0.42, 0.88)), 0.035, 0.004, seg=10), 'carrot')
-    for k in range(5):   # 웃는 입
+    # 표정 넷 (9차 M9-P1, D87-A): 입 모양 부품 'opt_face_<표정>' — 게임이 변형 끝 '+<표정>' 으로 하나만 남긴다 (world/objects.js, 없으면 smile)
+    # 표정은 게임 winter.js faceOf: 딱 맞음 smile 😊 · 머리 큼 wow 😮 · 몸 큼 calm 😌 · 비슷 plain 🙂
+    coal = lambda part, x, z, r=0.016: part.add(ellipsoid((x, -0.215 - 0.012 * (1 - min(1, abs(x) / 0.08)), z), (r, 0.012, r), seg=6, rings=4), 'coal', outline=False)
+    f = M.part('opt_face_smile', parent='head', pivot=(0, 0, 0.68))
+    for k in range(5):   # 활짝 웃는 입
         t = (k - 2) / 2
-        h.add(ellipsoid((t * 0.08, -0.215 - 0.01 * (1 - abs(t)), 0.83 - 0.03 * (1 - t * t)), (0.016, 0.012, 0.016), seg=6, rings=4), 'coal', outline=False)
+        coal(f, t * 0.08, 0.83 - 0.03 * (1 - t * t))
+    f = M.part('opt_face_wow', parent='head', pivot=(0, 0, 0.68))
+    f.add(ellipsoid((0, -0.222, 0.8), (0.04, 0.02, 0.048), seg=14, rings=8), 'coal', outline=False)   # 동그랗게 벌린 입
+    f = M.part('opt_face_calm', parent='head', pivot=(0, 0, 0.68))
+    for k in range(3):   # 작게 미소 짓는 입
+        t = k - 1
+        coal(f, t * 0.04, 0.82 - 0.012 * (1 - t * t), 0.013)
+    f = M.part('opt_face_plain', parent='head', pivot=(0, 0, 0.68))
+    for k in range(4):   # 일자 입
+        coal(f, (k - 1.5) * 0.035, 0.815, 0.013)
     ring = [V((math.cos(TAU * i / 24) * 0.24, math.sin(TAU * i / 24) * 0.24, 0.7)) for i in range(24)]
     h.add(tube(ring, [0.06] * 24, seg=10, closed=True), 'scarf')
     h.add(box((0.14, -0.22, 0.6), (0.1, 0.04, 0.2), bevel=0.02, rot=rot_xyz(y=-0.15)), 'scarf')
     h.add(box((0.14, -0.235, 0.52), (0.1, 0.03, 0.03), bevel=0.01, rot=rot_xyz(y=-0.15)), 'scarfStripe', outline=False)
 
 
+# ================================================================ 9차 M9 섬 꾸미기 (보드 wave9 D86-A): 길 TI-09–12 · 울타리 PR-24–25
+# 이어지는 모양: 가운데 'core' + 이웃 쪽 팔 'link_n·e·s·w' (+ 길은 모서리 'link_ne·nw·se·sw'). 모두 내보내고,
+# 게임(src/world/objects.js)이 이웃에 맞춰 안 쓰는 팔을 뺀다. Blender +Y = 북쪽(게임 -Z), +X = 동쪽.
+# 무늬(벽돌·널빤지·돌)는 칸 전체 격자로 놓고 조각마다 잘라서, 팔이 이어지면 이음매 없이 한 판처럼 보인다.
+PIECES = {'core': (-0.32, -0.32, 0.32, 0.32),
+          'link_n': (-0.32, 0.32, 0.32, 0.5), 'link_s': (-0.32, -0.5, 0.32, -0.32),
+          'link_e': (0.32, -0.32, 0.5, 0.32), 'link_w': (-0.5, -0.32, -0.32, 0.32),
+          'link_ne': (0.32, 0.32, 0.5, 0.5), 'link_nw': (-0.5, 0.32, -0.32, 0.5),
+          'link_se': (0.32, -0.5, 0.5, -0.32), 'link_sw': (-0.5, -0.5, -0.32, -0.32)}
+
+
+def _hash(*k):
+    h = 2166136261
+    for v in k:
+        for ch in str(v):
+            h = ((h ^ ord(ch)) * 16777619) & 0xFFFFFFFF
+    return h / 0xFFFFFFFF
+
+
+def lay(part, rect, course, length, gap, z0, height, mats, bevel=0.012, along='x', jitter_h=0.0):
+    """rect 안을 벽돌 쌓기처럼 덮는다: 줄(course) 폭마다 한 줄, 줄마다 반 칸 엇갈림.
+    격자는 칸 전체(-0.5 ~ 0.5) 기준이라 조각을 나눠도 같은 자리에 같은 벽돌. 틈(gap)은 진짜 벽돌 끝에만."""
+    x0, y0, x1, y1 = rect
+    a0, a1, b0, b1 = (x0, x1, y0, y1) if along == 'x' else (y0, y1, x0, x1)
+    r = math.floor((b0 + 0.5) / course + 1e-6)
+    while -0.5 + r * course < b1 - 1e-6:
+        rb0, rb1 = -0.5 + r * course + gap / 2, -0.5 + (r + 1) * course - gap / 2
+        cb0, cb1 = max(rb0, b0), min(rb1, b1)
+        if cb1 - cb0 > 0.01:
+            shift = (r % 2) * length / 2
+            k = math.floor((a0 + 0.5 + shift) / length + 1e-6)
+            while -0.5 - shift + k * length < a1 - 1e-6:
+                ra0, ra1 = -0.5 - shift + k * length + gap / 2, -0.5 - shift + (k + 1) * length - gap / 2
+                ca0, ca1 = max(ra0, a0), min(ra1, a1)
+                if ca1 - ca0 > 0.01:
+                    hsh = _hash(r, k)
+                    h = height + jitter_h * (hsh - 0.5)
+                    mat = mats[int(hsh * len(mats)) % len(mats)]
+                    cx, cy, sx, sy = ((ca0 + ca1) / 2, (cb0 + cb1) / 2, ca1 - ca0, cb1 - cb0) if along == 'x' else ((cb0 + cb1) / 2, (ca0 + ca1) / 2, cb1 - cb0, ca1 - ca0)
+                    part.add(box((cx, cy, z0 + h / 2), (sx, sy, h), bevel=bevel), mat)
+                k += 1
+        r += 1
+
+
+def slab(part, rect, z1, mat):
+    """조각 밑판 (윗면 z1, 외곽선은 스펙 noOutline 으로 뺀다)"""
+    x0, y0, x1, y1 = rect
+    part.add(box(((x0 + x1) / 2, (y0 + y1) / 2, z1 / 2), (x1 - x0, y1 - y0, z1), bevel=0.004, segments=1), mat, outline=False)
+
+
+def b_deco_path(M):
+    """TI-09 돌길 · TI-10 벽돌길 · TI-11 나무판 길 · TI-12 꽃길 (kind 로 무늬를 고른다). 높이 약 0.04 — 풀 위에 살짝 얹힌다."""
+    for name, rect in PIECES.items():
+        p = M.part(name)
+        if KIND == 'path-stone':
+            slab(p, rect, 0.012, 'gravel')
+            lay(p, rect, 0.25, 0.25, 0.05, 0.008, 0.03, ['stone', 'stoneLight', 'stone'], bevel=0.018, jitter_h=0.012)
+        elif KIND == 'path-brick':
+            slab(p, rect, 0.014, 'grout')
+            lay(p, rect, 1 / 6, 1 / 3, 0.018, 0.01, 0.028, ['brick', 'brick', 'brickDark'], bevel=0.008)
+        elif KIND == 'path-plank':
+            slab(p, rect, 0.012, 'woodDark')
+            lay(p, rect, 0.125, 1.0, 0.02, 0.012, 0.03, ['wood', 'woodLight'], bevel=0.008)
+        else:   # path-flower: 다진 흙길 + 자갈 + 가장자리 작은 꽃 (꽃 색은 계절 변형)
+            slab(p, rect, 0.022, 'path')
+            rnd = random.Random(name)
+            x0, y0, x1, y1 = rect
+            for k in range(2 if name == 'core' else 1):
+                x, y, r = rnd.uniform(x0 + 0.05, x1 - 0.05), rnd.uniform(y0 + 0.05, y1 - 0.05), rnd.uniform(0.02, 0.035)
+                p.add(ellipsoid((x, y, 0.022), (r, r * 0.8, r * 0.35), seg=10, rings=6), 'pebble', outline=False)
+            if len(name) == 6:   # 팔: 양옆 가장자리에 꽃 하나씩
+                d = name[-1]
+                spots = [(sx * 0.29, 0.42 if d == 'n' else -0.42) for sx in (1, -1)] if d in 'ns' else [(0.42 if d == 'e' else -0.42, sy * 0.29) for sy in (1, -1)]
+            elif name == 'core':   # 가운데: 네 귀퉁이
+                spots = [(sx * 0.27, sy * 0.27) for sx in (1, -1) for sy in (1, -1)]
+            else:
+                spots = []
+            for i, (x, y) in enumerate(spots):
+                p.add(cone((x, y, 0.02), (x, y, 0.07), 0.02, 0.008, seg=6), 'leaf', outline=False)
+                for k in range(5):
+                    a = TAU * k / 5 + i
+                    p.add(ellipsoid((x + math.cos(a) * 0.022, y + math.sin(a) * 0.022, 0.075), (0.02, 0.014, 0.008), rot=rot_xyz(z=a), seg=8, rings=4), 'flower' if i % 2 == 0 else 'flowerAlt', outline=False)
+                p.add(ellipsoid((x, y, 0.08), (0.01, 0.01, 0.008), seg=6, rings=4), 'center', outline=False)
+
+
+def b_deco_fence(M):
+    """PR-24 나무 울타리 · PR-25 흰 말뚝 울타리: 가운데 기둥 + 이웃 쪽으로 가로대 (팔 하나 = 반 칸)."""
+    picket = KIND == 'fence-picket'
+    post, rail = ('paint', 'paintShade') if picket else ('wood', 'woodLight')
+    c = M.part('core')
+    c.add(box((0, 0, 0.38), (0.13, 0.13, 0.76), bevel=0.025), post)
+    c.add(cone((0, 0, 0.76), (0, 0, 0.86), 0.09, 0.0, seg=4), post, smooth=False)
+    for d, (dx, dy) in {'n': (0, 1), 's': (0, -1), 'e': (1, 0), 'w': (-1, 0)}.items():
+        p = M.part('link_' + d)
+        for z in ((0.24, 0.5) if picket else (0.3, 0.56)):
+            cx, cy = dx * 0.28, dy * 0.28
+            p.add(box((cx, cy, z), (0.44 if dx else 0.05, 0.44 if dy else 0.05, 0.07 if picket else 0.09), bevel=0.018), rail)
+        if picket:   # 반 칸마다 말뚝 둘 (뾰족 머리)
+            for t in (0.2, 0.38):
+                x, y = dx * t, dy * t
+                p.add(box((x, y, 0.33), (0.07, 0.07, 0.6), bevel=0.012), post)
+                p.add(cone((x, y, 0.63), (x, y, 0.71), 0.05, 0.0, seg=4), post, smooth=False)
+
+
+# ================================================================ 9차 M9-P1 주민 행사 소품 (보드 wave9 D87-A · 8차 events.json props)
+# 게임(src/gameplay/events/props.js)이 행사 주인공 주민 뼈에 붙인다. 크기는 키 1.0 캐릭터 기준 (게임이 키 비율로 늘린다).
+# 원점: 머리띠 = 머리 위 고리 가운데 · 목도리·스카프 = 목 고리 가운데 · 부채 = 손잡이 끝(손).
+def b_flower_crown(M):
+    """꽃 머리띠 (EV-01 모찌): 푸른 덩굴 고리에 작은 꽃 여덟 송이."""
+    m = M.part('crown')
+    R = 0.18
+    ring = [V((math.cos(TAU * i / 24) * R, math.sin(TAU * i / 24) * R, 0.008 * math.sin(TAU * i / 8))) for i in range(24)]
+    m.add(tube(ring, [0.016] * 24, seg=8, closed=True), 'vine')
+    for k in range(8):
+        a = TAU * k / 8 + 0.2
+        c = V((math.cos(a) * R, math.sin(a) * R, 0.02))
+        for j in range(5):
+            b = TAU * j / 5
+            d = V((math.cos(b), math.sin(b), 0)) * 0.026
+            m.add(ellipsoid(c + d, (0.026, 0.018, 0.01), rot=rot_xyz(z=b), seg=8, rings=5), 'flower' if k % 2 == 0 else 'flowerAlt')
+        m.add(ellipsoid(c + V((0, 0, 0.008)), (0.012, 0.012, 0.01), seg=8, rings=5), 'center', outline=False)
+        e = V((math.cos(a + 0.4) * R, math.sin(a + 0.4) * R, 0.0))
+        m.add(ellipsoid(e, (0.024, 0.01, 0.006), rot=rot_xyz(z=a + 0.4 + math.pi / 2), seg=8, rings=4), 'leaf', outline=False)
+
+
+def b_fan(M):
+    """부채 (EV-02 코코): 대나무 손잡이에 둥근 종이 부채, 금붕어 무늬."""
+    m = M.part('fan')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.13), 0.012, 0.01, seg=8), 'bamboo')
+    m.add(cylinder((0, -0.006, 0.23), (0, 0.006, 0.23), 0.105, seg=28), 'fanPaper')
+    ring = [V((math.cos(TAU * i / 28) * 0.105, 0, 0.23 + math.sin(TAU * i / 28) * 0.105)) for i in range(28)]
+    m.add(tube(ring, [0.007] * 28, seg=6, closed=True), 'bamboo')
+    for k in range(5):   # 살
+        a = math.pi / 2 + (k - 2) * 0.45
+        m.add(cylinder((0, 0, 0.13), (math.cos(a) * 0.1, 0, 0.23 + math.sin(a) * 0.1 - 0.1), 0.003, seg=4), 'bamboo', outline=False)
+    for sx, z in ((-0.03, 0.25), (0.035, 0.2)):   # 금붕어 둘
+        m.add(ellipsoid((sx, -0.008, z), (0.028, 0.004, 0.016), rot=rot_xyz(y=sx * 6), seg=10, rings=5), 'fanPattern', outline=False)
+        m.add(cone((sx + (0.03 if sx < 0 else -0.03), -0.008, z), (sx + (0.05 if sx < 0 else -0.05), -0.008, z + 0.01), 0.012, 0.0, squash=0.3, seg=6), 'fanPattern', outline=False)
+
+
+def b_neck_wrap(M):
+    """스카프 (EV-03 퐁, 가볍게 한 바퀴 + 리본 매듭) · 목도리 (EV-04 두부, 두툼한 뜨개 + 줄무늬 + 술)."""
+    thick = KIND == 'muffler'
+    m = M.part('wrap')
+    R, r = (0.17, 0.05) if thick else (0.16, 0.032)
+    ring = [V((math.cos(TAU * i / 28) * R, math.sin(TAU * i / 28) * R, 0.012 * math.sin(TAU * i / 28 * 2))) for i in range(28)]
+    m.add(tube(ring, [r] * 28, seg=12, closed=True, flat=0.75), 'cloth')
+    if thick:
+        for z in (-0.025, 0.025):   # 줄무늬 두 줄
+            m.add(tube([p + V((0, 0, z)) for p in ring], [r * 0.6] * 28, seg=10, closed=True, flat=0.25), 'stripe', outline=False)
+        for sx, tilt in ((0.05, 0.12), (0.12, -0.08)):   # 앞으로 늘어진 두 끝 + 술
+            top = V((sx, -R - 0.02, -0.02))
+            m.add(box(top + V((0, 0, -0.1)), (0.075, 0.035, 0.2), bevel=0.02, rot=rot_xyz(y=tilt)), 'cloth')
+            m.add(box(top + V((0, -0.004, -0.12)), (0.078, 0.03, 0.025), bevel=0.008, rot=rot_xyz(y=tilt)), 'stripe', outline=False)
+            for k in range(4):
+                m.add(cylinder(top + V((-0.027 + k * 0.018, 0, -0.2)), top + V((-0.027 + k * 0.018, 0, -0.245)), 0.006, seg=5), 'stripe', outline=False)
+    else:
+        knot = V((0.07, -R - 0.01, -0.01))
+        m.add(ellipsoid(knot, (0.035, 0.025, 0.03), seg=12, rings=8), 'cloth')
+        for sx in (1, -1):   # 리본 두 날개 + 늘어진 끝
+            m.add(ellipsoid(knot + V((sx * 0.045, -0.005, 0.01)), (0.045, 0.012, 0.028), rot=rot_xyz(y=sx * 0.4), seg=12, rings=6), 'cloth')
+            m.add(box(knot + V((sx * 0.02, 0, -0.07)), (0.03, 0.01, 0.1), bevel=0.008, rot=rot_xyz(y=sx * 0.25)), 'stripe')
+
+
 BUILDERS = {
+    'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
+    'fence-wood': b_deco_fence, 'fence-picket': b_deco_fence,
+    'flower-crown': b_flower_crown, 'fan': b_fan, 'scarf': b_neck_wrap, 'muffler': b_neck_wrap,
     'festival-stage': b_festival_stage, 'festival-arch': b_festival_arch, 'festival-floor': b_festival_floor,
     'festival-booth': b_festival_booth, 'festival-cover': b_festival_cover, 'festival-lantern': b_festival_lantern,
     'festival-garland': b_festival_garland, 'festival-board': b_festival_board, 'festival-part': b_festival_part,
@@ -1177,6 +1357,21 @@ if DO_RENDER:
         if 'hex' in m:
             toonify(m, flat=m.name.split('@')[0] in FLAT)
     add_outlines(scene, objects, width)
+    # 고르는 부품 (9차): 이어짐 팔 'link_*' 는 스펙 world.render 에 적은 것만 (없으면 다), 'opt_<묶음>_<값>' 은
+    # 기본 모델 = world.options 첫 값, 변형 i = i 번째 값 (눈사람 표정 넷을 변형 줄에 나란히)
+    W = spec.get('world', {})
+    def show_parts(model, idx=None):
+        for name, obj in model.objects.items():
+            hide = False
+            if name.startswith('link_') and 'render' in W:
+                hide = name not in W['render']
+            elif name.startswith('opt_'):
+                group, val = name[4:].split('_', 1)
+                opts = W.get('options', {}).get(group, [val])
+                hide = val != opts[(idx or 0) % len(opts)]
+            for o in [obj] + list(obj.children_recursive):
+                o.hide_render = hide
+    show_parts(main)
     cam, target = setup_render(scene)
     center = (lo + hi) / 2
     radius = max(size.length / 2, 0.25)
@@ -1201,8 +1396,9 @@ if DO_RENDER:
         for m in bpy.data.materials:
             if '@' in m.name and 'hex' in m:
                 toonify(m, flat=m.name.split('@')[0] in FLAT)
-        for vm in extras:
+        for i, vm in enumerate(extras):
             add_outlines(scene, list(vm.objects.values()), width)
+            show_parts(vm, i)
         span = gap * (len(variants) - 1) + max(size.x, size.y)
         aim(cam, target, center, 30, 22, ortho_scale=max(span * 1.05, radius * 2.2))
         shot(scene, R('variants'), 1280, 560)
@@ -1223,6 +1419,11 @@ if DO_RENDER:
         hero_r = 2.2 * max(fx, fy)
         aim(cam, target, V((0, 0, hi.z * 0.4)), 30, 38, dist=hero_r * 2.6 + hi.z, lens=40)
     else:
+        if W.get('connect'):   # 이어지는 길·울타리: 양옆에 하나씩 더 놓아 이어진 모습
+            for ix in (-1, 1):
+                tm = build(PAL, suffix='', offset=(ix, 0, 0))
+                add_outlines(scene, list(tm.objects.values()), width)
+                show_parts(tm)
         colors = {'grass': '#A9C46A', 'sand': '#F1DFAE', 'water': '#6BB8D6'}
         if ground_kind in colors:
             from toonkit import principled

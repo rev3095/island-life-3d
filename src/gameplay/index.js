@@ -9,6 +9,7 @@ const PARTS = [
   ['story', './story/index.js'],   // 5차 스토리 장면 재생기 (assets/story/)
   ['festival', './festival/index.js'],   // 5차 Z5 축제·이모티콘 대화·엔딩
   ['events', './events/index.js'],       // 8차 M8 계절 행사 (assets/events/, 보드 wave8)
+  ['decor', './decor/index.js'],         // 9차 M9 섬 꾸미기 (assets/decor/, 보드 wave9 D86-A)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */
@@ -42,6 +43,7 @@ export const LABELS = {
   'house-furniture': t => (t?.kind === 'workbench' ? '만들기' : '살피기'),
   'house-furniture-store': '넣기',
   'house-place': '가구 놓기',
+  'decor:rotate': '돌리기',
 };
 /** test() 에 부작용이 있어 peek 가 부르지 않는 처리기 (docs/notes/ux.md 표). 처리기에 pure: false 를 달아도 같다 */
 export const IMPURE = new Set();

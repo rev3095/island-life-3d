@@ -8,8 +8,8 @@
   "vertices": 4510,
   "bones": 9,
   "materials": [
-    "pants",
     "shirt",
+    "pants",
     "feet",
     "fur",
     "beak",

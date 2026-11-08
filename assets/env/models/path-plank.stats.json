@@ -1,0 +1,34 @@
+{
+  "id": "TI-11",
+  "slug": "path-plank",
+  "name": "나무판 길",
+  "category": "tile",
+  "kind": "path-plank",
+  "version": "0.1",
+  "triangles": 4176,
+  "parts": 9,
+  "materials": [
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.04
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 75668,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "path-plank_front.png",
+    "path-plank_hero.jpg",
+    "path-plank_main.png",
+    "path-plank_thumb.png",
+    "path-plank_top.png"
+  ]
+}

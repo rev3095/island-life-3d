@@ -4,9 +4,9 @@
   "name": "눈사람",
   "category": "prop",
   "kind": "snowman",
-  "version": "0.1",
-  "triangles": 2704,
-  "parts": 2,
+  "version": "0.2",
+  "triangles": 3152,
+  "parts": 6,
   "materials": [
     "carrot",
     "coal",
@@ -25,7 +25,7 @@
     1,
     1
   ],
-  "glbBytes": 55804,
+  "glbBytes": 66936,
   "blender": "5.2.3 LTS",
   "renders": [
     "event-snowman_front.png",

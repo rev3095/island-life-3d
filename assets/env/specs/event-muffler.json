@@ -1,0 +1,51 @@
+{
+  "id": "PR-29",
+  "slug": "event-muffler",
+  "name": "목도리",
+  "category": "prop",
+  "kind": "muffler",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "겨울 눈사람 날 동안 두부가 두르는 두툼한 뜨개 목도리. 줄무늬 두 줄, 앞으로 늘어진 두 끝에 술.",
+    "keywords": [
+      "두툼한 뜨개",
+      "줄무늬",
+      "술"
+    ],
+    "references": [],
+    "avoid": [
+      "무거워 보임"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P1 주민 행사 소품 (EV-04 두부)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.005
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "cloth": "#4C86C6",
+    "stripe": "#FBFDF8"
+  },
+  "paletteLabels": {
+    "cloth": "목도리",
+    "stripe": "줄무늬·술"
+  },
+  "heroGround": "none",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

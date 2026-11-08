@@ -1,0 +1,63 @@
+{
+  "id": "PR-25",
+  "slug": "fence-picket",
+  "name": "흰 말뚝 울타리",
+  "category": "prop",
+  "kind": "fence-picket",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "흰 페인트 말뚝 울타리 1칸. 반 칸마다 뾰족 머리 말뚝 둘, 이웃과 이어진다.",
+    "keywords": [
+      "흰 페인트",
+      "뾰족 말뚝",
+      "이어짐"
+    ],
+    "references": [],
+    "avoid": [
+      "날카로움"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 울타리"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "paint": "#F6F2EA",
+    "paintShade": "#E2DACB"
+  },
+  "paletteLabels": {
+    "paint": "말뚝",
+    "paintShade": "가로대"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "connect": "fence",
+    "layer": "top",
+    "collider": {
+      "r": 0.09,
+      "links": 0.06
+    },
+    "render": [
+      "core",
+      "link_e",
+      "link_w"
+    ]
+  }
+}

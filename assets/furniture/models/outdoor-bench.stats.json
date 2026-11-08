@@ -1,0 +1,50 @@
+{
+  "id": "FU-47",
+  "slug": "outdoor-bench",
+  "item": "furn.outdoor-bench",
+  "name": "야외 벤치",
+  "category": "furniture",
+  "kind": "outdoor-bench",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1512,
+  "parts": 1,
+  "materials": [
+    "metal",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "bench"
+  ],
+  "animations": {},
+  "size": [
+    1.7,
+    0.51,
+    0.86
+  ],
+  "bounds": [
+    [
+      -0.85,
+      -0.21,
+      -0.004
+    ],
+    [
+      0.85,
+      0.302,
+      0.86
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 30548,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "outdoor-bench_front.png",
+    "outdoor-bench_main.png",
+    "outdoor-bench_thumb.png",
+    "outdoor-bench_top.png"
+  ]
+}

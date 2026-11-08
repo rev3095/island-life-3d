@@ -15,7 +15,7 @@
       "id": "EV-01", "slug": "spring", "name": "봄 꽃놀이", "emoji": "🌸", "season": "spring",
       "start": { "month": 4, "day": 1 }, "hours": [9, 17],
       "place": "plaza", "host": "mochi", "props": ["flower-crown"],
-      "assets": { "env": ["cherry-tree", "event-picnic", "event-sign"], "items": ["event-petal"] },
+      "assets": { "env": ["cherry-tree", "event-picnic", "event-sign", "event-flower-crown"], "items": ["event-petal"] },
       "todo": [
         { "id": "petals", "label": "꽃잎 줍기", "goal": 10, "daily": true },
         { "id": "picnic", "label": "돗자리 도시락", "goal": 1, "daily": true },
@@ -27,7 +27,7 @@
       "id": "EV-02", "slug": "summer", "name": "여름 불꽃놀이", "emoji": "🎆", "season": "summer",
       "start": { "month": 8, "day": 1 }, "hours": [20, 22], "showAt": 20,
       "place": "beach", "host": "coco", "props": ["fan"],
-      "assets": { "env": ["event-raft", "event-sign"], "items": ["event-sparkler"] },
+      "assets": { "env": ["event-raft", "event-sign", "event-fan"], "items": ["event-sparkler"] },
       "todo": [
         { "id": "sparkler", "label": "손 불꽃 받기", "goal": 1, "daily": true },
         { "id": "watch", "label": "불꽃 보기", "goal": 1, "daily": true },
@@ -39,7 +39,7 @@
       "id": "EV-03", "slug": "autumn", "name": "가을 수확 잔치", "emoji": "🍂", "season": "autumn",
       "start": { "month": 10, "day": 15 }, "hours": [5, 29], "feastAt": 18,
       "place": "plaza", "host": "pong", "props": ["scarf"],
-      "assets": { "env": ["event-pot", "event-scarecrow", "event-sign"], "items": ["event-mushroom"] },
+      "assets": { "env": ["event-pot", "event-scarecrow", "event-sign", "event-scarf"], "items": ["event-mushroom"] },
       "todo": [
         { "id": "mushroom", "label": "버섯 찾기", "goal": 5, "daily": true },
         { "id": "pot", "label": "큰 솥에 넣기 (섬 모두)", "goal": 30 },
@@ -51,7 +51,7 @@
       "id": "EV-04", "slug": "winter", "name": "겨울 눈사람 날", "emoji": "⛄", "season": "winter",
       "start": { "month": 12, "day": 20 }, "hours": [9, 17], "snowCover": true,
       "place": "anywhere", "host": "dubu", "props": ["muffler"],
-      "assets": { "env": ["event-snowball", "event-snowman", "event-sign"], "items": ["event-snow-crystal"] },
+      "assets": { "env": ["event-snowball", "event-snowman", "event-sign", "event-muffler"], "items": ["event-snow-crystal"] },
       "todo": [
         { "id": "snowman", "label": "눈사람 만들기", "goal": 1, "daily": true },
         { "id": "three", "label": "눈사람 셋", "goal": 3 }

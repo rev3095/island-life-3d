@@ -10,7 +10,7 @@ const RADIUS = 0.26;                  // 충돌 원 반지름
 const ACCEL = 14;                     // 속도 따라가기 (1/초)
 const TURN = 13;                      // 최대 회전 (라디안/초)
 const FADE = 0.18;                    // 동작 바꿀 때 섞는 시간
-const STEP_SFX = { sand: 'step-sand', wood: 'step-wood', ramp: 'step-wood' };
+const STEP_SFX = { sand: 'step-sand', wood: 'step-wood', ramp: 'step-wood', stone: 'step-sand' };   // stone = 9차 돌길·벽돌길
 // facing = three 의 rotation.y 와 같은 뜻: 0 = 북쪽(-Z), +π/2 = 서쪽(-X), π = 남쪽, -π/2 = 동쪽.
 // 모델 정면은 +Z 라서 모델 rotation.y = facing + π.
 const facingOf = (dx, dz) => Math.atan2(-dx, -dz);
@@ -44,7 +44,7 @@ export default {
     P = {
       root, model, mixer, actions, toolMount, toolModels: {},
       position: root.position, facing: 0, vx: 0, vz: 0, speed: 0,
-      frozen: false, anim: null, oneShot: null, tool: null, toolKeys: true,
+      frozen: false, anim: null, oneShot: null, tool: null, toolKeys: true, gait: null, stance: null,
       tile: { tx: -1, tz: -1 }, stepPhase: 0, rig: createCameraRig(ctx),
       motions: createMotions(model, toolMount),
     };
@@ -73,6 +73,13 @@ export default {
       pointInFront(dist = 0.75) { return { x: P.position.x - Math.sin(P.facing) * dist, z: P.position.z - Math.cos(P.facing) * dist }; },
       setTool,
       play(name) { playOnce(name); },
+      /** 9차 M9-P1: 걸을 때 걷기·달리기 대신 쓸 동작 ('push' 눈덩이 밀기 AN-09, null = 보통). 클립이 없으면 보통 걷기 */
+      setGait(name) { P.gait = name || null; },
+      /** 서 있을 때 서기 대신 되풀이할 동작 ('sparkler' 손 불꽃 흔들기 AN-08, null = 보통) */
+      setStance(name) { P.stance = name || null; },
+      get gait() { return P.gait; }, get stance() { return P.stance; },
+      /** 동작 클립이 있나 ('place' 놓기 AN-10 등) */
+      hasClip: name => !!P.actions[name],
       /**
        * 도구 동작 (절차적): 'swing' 'cast' 'reel' 'dig' 'chop' 'water' 'shake' 'pickup' 'ouch'.
        * opts: { onHit() 효과 나는 순간, speed, lock=true 동작 중 못 움직임 } → Promise<bool> (끝까지 하면 true)
@@ -89,6 +96,12 @@ export default {
         if (!m) return null;
         P.root.updateMatrixWorld(true);
         return (m.userData.tip ?? m).getWorldPosition(out);
+      },
+      /** 오른손 자리 (9차 손 불꽃 불티) */
+      handPoint(out = new Vector3()) {
+        P.root.updateMatrixWorld(true);
+        if (hand) return hand.localToWorld(out.set(0, 0.13, 0.02));
+        return out.copy(P.position).setY(P.position.y + 0.4);
       },
       /** 머리 위 (잡은 것을 들어 보일 때) */
       headTop(out = new Vector3()) {
@@ -212,9 +225,10 @@ export default {
     const moving = P.speed > 0.25 && (mag > 0.05 || !!sc);
     if (sc && !P.vx && !P.vz) sc.done(true);
     if (!P.oneShot) {
-      const want = !moving ? 'idle' : P.speed > (WALK + RUN) / 2 - 0.3 ? 'run' : 'walk';
+      const gait = P.gait && P.actions[P.gait] ? P.gait : null, stance = P.stance && P.actions[P.stance] ? P.stance : null;
+      const want = !moving ? stance ?? 'idle' : gait ?? (P.speed > (WALK + RUN) / 2 - 0.3 ? 'run' : 'walk');
       play(want);
-      if (want === 'walk') P.actions.walk.timeScale = Math.max(0.6, P.speed / WALK) * 1.45;
+      if (want === 'walk' || want === gait) P.actions[want].timeScale = Math.max(0.6, P.speed / WALK) * (want === 'walk' ? 1.45 : 1.1);
       if (want === 'run') P.actions.run.timeScale = Math.max(0.7, P.speed / RUN) * 1.2;
     }
     P.mixer.update(dt);

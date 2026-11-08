@@ -1,0 +1,108 @@
+{
+  "id": "TI-12",
+  "slug": "path-flower",
+  "name": "꽃길",
+  "category": "tile",
+  "kind": "path-flower",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "다진 흙길 가장자리에 작은 꽃. 꽃 색은 계절마다 바뀐다 (봄 분홍·여름 노랑·가을 주황·겨울 흰).",
+    "keywords": [
+      "흙길",
+      "가장자리 꽃",
+      "계절 색"
+    ],
+    "references": [],
+    "avoid": [
+      "꽃밭처럼 빽빽함"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 길"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "path"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "path": "#D8B98A",
+    "pebble": "#B8B2A6",
+    "leaf": "#6FAE57",
+    "flower": "#F2A6C0",
+    "flowerAlt": "#FFFFFF",
+    "center": "#F7D35B"
+  },
+  "paletteLabels": {
+    "path": "흙길",
+    "pebble": "자갈",
+    "leaf": "잎",
+    "flower": "꽃",
+    "flowerAlt": "꽃 (둘째)",
+    "center": "꽃술"
+  },
+  "variants": {
+    "spring": {
+      "label": "봄 분홍",
+      "palette": {}
+    },
+    "summer": {
+      "label": "여름 노랑",
+      "palette": {
+        "flower": "#F7D35B",
+        "center": "#E9883A"
+      }
+    },
+    "autumn": {
+      "label": "가을 주황",
+      "palette": {
+        "flower": "#EE8B45",
+        "flowerAlt": "#F6C35A",
+        "leaf": "#9A9B4B"
+      }
+    },
+    "winter": {
+      "label": "겨울 흰",
+      "palette": {
+        "flower": "#F7FAFB",
+        "flowerAlt": "#DDE8F2",
+        "leaf": "#7E9C86",
+        "path": "#D9CDB8"
+      }
+    }
+  },
+  "heroGround": "grass",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "connect": "path",
+    "layer": "ground",
+    "ground": "path",
+    "render": [
+      "core",
+      "link_n",
+      "link_s",
+      "link_e",
+      "link_w",
+      "link_ne",
+      "link_nw",
+      "link_se",
+      "link_sw"
+    ]
+  }
+}

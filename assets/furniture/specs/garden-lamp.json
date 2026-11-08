@@ -1,0 +1,61 @@
+{
+  "id": "FU-48",
+  "slug": "garden-lamp",
+  "item": "furn.garden-lamp",
+  "name": "정원 등",
+  "category": "furniture",
+  "kind": "garden-lamp",
+  "version": "0.1",
+  "status": "review",
+  "outdoor": true,
+  "prompt": {
+    "concept": "1칸 세움 등. 가는 철 기둥 위 등갓 속 불빛, 밤에 빛난다.",
+    "keywords": [
+      "철 기둥",
+      "등갓",
+      "밤 불빛"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 야외 가구"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#3F4A45",
+    "glow": "#FFE7A8",
+    "cap": "#2F3834"
+  },
+  "paletteLabels": {
+    "metal": "기둥",
+    "glow": "불빛",
+    "cap": "등갓"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.14
+    }
+  }
+}

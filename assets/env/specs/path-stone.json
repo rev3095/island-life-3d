@@ -1,0 +1,72 @@
+{
+  "id": "TI-09",
+  "slug": "path-stone",
+  "name": "돌길",
+  "category": "tile",
+  "kind": "path-stone",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "납작한 돌 판이 박힌 길 1칸. 이웃 칸과 이어지면 한 판처럼 이어지고, 혼자면 가장자리가 둥글다.",
+    "keywords": [
+      "납작한 판석",
+      "자갈 틈",
+      "이어지는 길"
+    ],
+    "references": [],
+    "avoid": [
+      "아스팔트"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P3 섬 꾸미기 길"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "gravel"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "gravel": "#C9BFA9",
+    "stone": "#A9A39A",
+    "stoneLight": "#C4BEB3"
+  },
+  "paletteLabels": {
+    "gravel": "틈 자갈",
+    "stone": "돌",
+    "stoneLight": "밝은 돌"
+  },
+  "heroGround": "grass",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "connect": "path",
+    "layer": "ground",
+    "ground": "stone",
+    "render": [
+      "core",
+      "link_n",
+      "link_s",
+      "link_e",
+      "link_w",
+      "link_ne",
+      "link_nw",
+      "link_se",
+      "link_sw"
+    ]
+  }
+}

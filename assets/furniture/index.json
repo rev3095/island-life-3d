@@ -831,6 +831,95 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-47",
+      "slug": "outdoor-bench",
+      "item": "furn.outdoor-bench",
+      "name": "야외 벤치",
+      "place": "floor",
+      "outdoor": true,
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.7,
+        0.51,
+        0.86
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-48",
+      "slug": "garden-lamp",
+      "item": "furn.garden-lamp",
+      "name": "정원 등",
+      "place": "floor",
+      "outdoor": true,
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.4,
+        0.4,
+        1.47
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-49",
+      "slug": "flower-pots",
+      "item": "furn.flower-pots",
+      "name": "화분 셋",
+      "place": "floor",
+      "outdoor": true,
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.61,
+        0.51,
+        0.46
+      ],
+      "variants": [
+        "pink",
+        "yellow",
+        "red",
+        "blue"
+      ],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-50",
+      "slug": "picnic-table",
+      "item": "furn.picnic-table",
+      "name": "피크닉 탁자",
+      "place": "floor",
+      "outdoor": true,
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.6,
+        1.58,
+        0.79
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

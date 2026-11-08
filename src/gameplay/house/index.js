@@ -488,6 +488,7 @@ export default {
         }
         if (data.inventory.remove(slot, 1) !== 1) return;
         placeRec(item, spot, { variant });
+        player.play?.('place');   // 9차 AN-10 놓기 동작
         toast(`${josa(name, '을/를')} 놓았어요`, data.items.get(item)?.icon);
       } finally { H.busy = false; }
     }
@@ -644,6 +645,7 @@ export default {
       if (!m) return;
       H.moving = null;
       pose(m.rec);
+      player.play?.('place');
       events.emit('sfx', { name: 'step-wood', volume: 1 });
       saveSoon();
     }

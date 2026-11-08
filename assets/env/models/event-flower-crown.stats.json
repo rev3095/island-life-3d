@@ -1,0 +1,36 @@
+{
+  "id": "PR-26",
+  "slug": "event-flower-crown",
+  "name": "꽃 머리띠",
+  "category": "prop",
+  "kind": "flower-crown",
+  "version": "0.1",
+  "triangles": 3840,
+  "parts": 1,
+  "materials": [
+    "center",
+    "flower",
+    "flowerAlt",
+    "leaf",
+    "vine"
+  ],
+  "animations": {},
+  "size": [
+    0.45,
+    0.45,
+    0.04
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 75980,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "event-flower-crown_front.png",
+    "event-flower-crown_hero.jpg",
+    "event-flower-crown_main.png",
+    "event-flower-crown_thumb.png",
+    "event-flower-crown_top.png"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "PR-25",
+  "slug": "fence-picket",
+  "name": "흰 말뚝 울타리",
+  "category": "prop",
+  "kind": "fence-picket",
+  "version": "0.1",
+  "triangles": 1890,
+  "parts": 5,
+  "materials": [
+    "paint",
+    "paintShade"
+  ],
+  "animations": {},
+  "size": [
+    1.0,
+    1.0,
+    0.86
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 35080,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fence-picket_front.png",
+    "fence-picket_hero.jpg",
+    "fence-picket_main.png",
+    "fence-picket_thumb.png",
+    "fence-picket_top.png"
+  ]
+}

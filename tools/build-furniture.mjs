@@ -44,7 +44,7 @@ const index = readSpecs()
   .map(s => {
     const st = JSON.parse(readFileSync(resolve(modelDir, `${s.slug}.stats.json`), "utf8"));
     return {
-      id: s.id, slug: s.slug, item: s.item, name: s.name, place: s.place ?? "floor", ...(s.layer ? { layer: s.layer } : {}),
+      id: s.id, slug: s.slug, item: s.item, name: s.name, place: s.place ?? "floor", ...(s.layer ? { layer: s.layer } : {}), ...(s.outdoor ? { outdoor: true } : {}),
       footprint: s.footprint, size: st.size, variants: Object.keys(s.variants ?? {}), animations: s.animations ?? [],
       version: s.version, status: s.status ?? "review",
     };

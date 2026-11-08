@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "note": "9차 M9 섬 꾸미기 (보드 wave9 D86-A). 섬폰 「섬 꾸미기」에서 거저 까는 길·울타리 (배경 모델 = assets/env/specs/<kind>.json, 이어짐 = spec.world.connect). 야외 가구는 가방의 가구 중 아이템 outdoor: true (src/data/items.js). 모델은 놓일 때 받는다 (world lazy, 게시본 묶음 decor).",
+  "paths": [
+    { "kind": "path-stone", "id": "TI-09", "name": "돌길", "icon": "🪨" },
+    { "kind": "path-brick", "id": "TI-10", "name": "벽돌길", "icon": "🧱" },
+    { "kind": "path-plank", "id": "TI-11", "name": "나무판 길", "icon": "🪵" },
+    { "kind": "path-flower", "id": "TI-12", "name": "꽃길", "icon": "🌼" }
+  ],
+  "fences": [
+    { "kind": "fence-wood", "id": "PR-24", "name": "나무 울타리", "icon": "🪵" },
+    { "kind": "fence-picket", "id": "PR-25", "name": "흰 말뚝 울타리", "icon": "🤍" }
+  ],
+  "limit": 400
+}

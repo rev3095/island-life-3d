@@ -1,0 +1,57 @@
+{
+  "id": "PR-26",
+  "slug": "event-flower-crown",
+  "name": "꽃 머리띠",
+  "category": "prop",
+  "kind": "flower-crown",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "봄 꽃놀이 동안 모찌가 머리에 쓰는 꽃 머리띠. 푸른 덩굴 고리에 분홍·흰 꽃 여덟 송이.",
+    "keywords": [
+      "덩굴 고리",
+      "작은 꽃",
+      "머리 위"
+    ],
+    "references": [],
+    "avoid": [
+      "무거워 보임"
+    ],
+    "notes": "9차 검수 보드 wave9 (https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc) 반영 v1 · M9-P1 주민 행사 소품 (EV-01 모찌)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.005
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "vine": "#6FAE57",
+    "flower": "#F2A6C0",
+    "flowerAlt": "#FFFFFF",
+    "center": "#F7D35B",
+    "leaf": "#8CC56C"
+  },
+  "paletteLabels": {
+    "vine": "덩굴",
+    "flower": "꽃",
+    "flowerAlt": "흰 꽃",
+    "center": "꽃술",
+    "leaf": "잎"
+  },
+  "heroGround": "none",
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": []
+}

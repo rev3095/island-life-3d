@@ -8,8 +8,8 @@
   "vertices": 5490,
   "bones": 11,
   "materials": [
-    "shirt",
     "pants",
+    "shirt",
     "fur",
     "muzzle",
     "nose",

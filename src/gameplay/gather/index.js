@@ -116,7 +116,7 @@ export default {
     // 확인·다른 트랙용 (계약 밖): 지금 낚시·곤충 상태, 강제로 놓기
     ctx.services.gather = {
       get busy() { return isBusy(); },
-      drops, bugs, fishing, trees, work, toolbelt, results, garden,
+      drops, bugs, fishing, trees, work, toolbelt, results, garden, fx,   // fx: 반짝이 (9차 손 불꽃 불티가 같이 씀)
       habitatAt: (x, z) => fishing.habitatAt(x, z),
       spawnBug: (id, place = 'flower', dist = 1.2) => { const f = kit.player.pointInFront(dist); return bugs.debugSpawn(id, place, f.x, f.z); },
     };
