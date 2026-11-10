@@ -6,7 +6,7 @@
 //   node tools/playtest.mjs --mobile              # 375×812 터치 (A·B 단추)
 //   node tools/playtest.mjs --only=boot,naming,arrival,clock,fd-tool   # 단계 몇 개만
 //   node tools/playtest.mjs --novice             # 처음 하는 사람 흉내 (좋아함·축제 설정을 모르고 💭 힌트만, 최대 20일)
-//   옵션: --port=4232 --days=10 --speed=4 --yearly --headed --browser=edge --out=<폴더> --build
+//   옵션: --port=4232 --days=10 --speed=4 --yearly --headed --browser=edge --out=<폴더> --build --date=2026-11-10 (시작 날짜 흉내)
 // 결과: docs/qa/runs/<날짜>-<대상>[-mobile]/report.json · report.md · shots/*.jpg  (종료 코드: 막힌 단계가 있으면 1)
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile, readFile, rm, mkdtemp } from 'node:fs/promises';
@@ -72,6 +72,7 @@ async function main() {
   if (mobile) params.set('touch', '1');
   if (arg('only')) params.set('only', arg('only'));
   if (arg('from')) params.set('from', arg('from'));
+  if (arg('date')) params.set('date', arg('date'));   // 시작 날짜 흉내 (게임 ?date=) — 그날 실패한 실행을 같은 날씨로 다시
   if (arg('yearly')) params.set('yearly', '1');
   if (arg('novice')) { params.set('novice', '1'); if (!arg('days')) params.set('days', '20'); }
   const url = `http://localhost:${port}/tests/playthrough/index.html?${params}`;
