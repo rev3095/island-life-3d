@@ -1,6 +1,6 @@
 // P35 무인도 투어 (보드 tour, 반영 v1 = D120–D128 모두 A). 설정 assets/tour/tour.json, 약속 docs/CONTRACTS.md 「투어」, 노트 docs/notes/p35-tour.md.
 //  - 본섬 선착장(BD-05) 끝 동쪽 바다에 작은 배(BD-10)를 놓는다 (저장 안 함). Space → 여행 묻기 창(UI-22) → 표 한 장(없으면 1,000 도토리) → 원형 전환
-//  - 투어 섬: 그날 날짜·횟수로 모양 틀(TO-01–04)·시드를 정해 gameplay/tour/islet.js 로 만들고 world.islet.enter 로 x 700 에 세운다.
+//  - 투어 섬: 그날 날짜·횟수로 모양 틀(TO-01–04)·시드를 정해 gameplay/tour/islet.js 로 만들고 world.islet.enter 로 x 900 에 세운다.
 //    world 의 칸 질문이 그 섬으로 가서 나무 흔들기·낚시·곤충·바위 치기·꽃 꺾기가 그대로 돈다. 광석 바위(EN-13)만 여기서 (삽·도끼, 우선순위 11).
 //  - 다른 섬 주민: 다섯 번에 한 번쯤 아직 안 온 이사 주민이 놀러 와 있다 → 말 걸면 초대 → town.moving.invite(slug) (다음 이사 주민)
 //  - 돌아오기: 투어 섬 배에서 Space, 또는 05:00 (data:newday) 에 저절로. 섬에서 끄면 다음엔 본섬 선착장에서 시작.
@@ -131,7 +131,7 @@ export default {
       if (current?.guest?.actor) { ctx.scene.remove(current.guest.actor.root); }
       // 투어 섬에 떨어진 것·곤충은 치운다 (본섬 저장에 남지 않게)
       const g = gather();
-      if (g?.drops) for (const d of [...g.drops.list]) if (d.x > cfg.ox - 200) g.drops.remove(d);
+      if (g?.drops) for (const d of [...g.drops.list]) if (d.x > cfg.ox - 100) g.drops.remove(d);
       // 그날 기록 중 투어 섬 물체(id 'tour:') 것은 지운다
       const isl = ctx.state.island ?? {};
       for (const k of Object.keys(isl.fruit ?? {})) if (k.startsWith('tour:')) delete isl.fruit[k];
@@ -251,7 +251,7 @@ export default {
     // 투어 섬에서 끈 저장: 다음엔 본섬 선착장에서 (섬 x 자리에 서 있으면)
     events.on('game:ready', () => {
       const p = player.position;
-      if (!current && p.x > cfg.ox - 200 && standAt) player.teleport(standAt.x, standAt.z - 0.4, 0);
+      if (!current && p.x > cfg.ox - 100 && standAt) player.teleport(standAt.x, standAt.z - 0.4, 0);
     });
 
     T = { update(dt) { current?.guest?.actor?.update?.(dt); } };

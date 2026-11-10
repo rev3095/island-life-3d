@@ -151,7 +151,7 @@ export default {
       islet: {
         get active() { return !!islet; },
         get current() { return islet; },
-        async enter(g, ox = 700) {
+        async enter(g, ox = 900) {
           this.leave();
           // 처음 받는 모델(투어 묶음)을 먼저 받는다
           const need = [...new Set(g.objects.map(o => o.kind))].filter(k => !models[k] && lazy.has(k));
