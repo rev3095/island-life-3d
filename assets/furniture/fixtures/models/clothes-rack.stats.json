@@ -1,0 +1,55 @@
+{
+  "id": "FU-54",
+  "slug": "clothes-rack",
+  "item": "fixture.clothes-rack",
+  "name": "옷 진열대",
+  "category": "fixture",
+  "kind": "clothes-rack",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1188,
+  "parts": 2,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "brass",
+    "hanger",
+    "tag",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "rack",
+    "tag"
+  ],
+  "animations": {},
+  "size": [
+    1.86,
+    0.84,
+    1.23
+  ],
+  "bounds": [
+    [
+      -0.93,
+      -0.42,
+      0.0
+    ],
+    [
+      0.93,
+      0.42,
+      1.225
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 26576,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "clothes-rack_front.png",
+    "clothes-rack_main.png",
+    "clothes-rack_thumb.png",
+    "clothes-rack_top.png"
+  ]
+}

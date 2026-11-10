@@ -159,6 +159,26 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-54",
+      "slug": "clothes-rack",
+      "item": "fixture.clothes-rack",
+      "name": "옷 진열대",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.86,
+        0.84,
+        1.23
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

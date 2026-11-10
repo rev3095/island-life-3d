@@ -1,0 +1,58 @@
+{
+  "id": "CL-07",
+  "slug": "wool-sweater",
+  "name": "털 스웨터",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "sweater",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 2400,
+  "sell": 600,
+  "prompt": {
+    "concept": "긴소매 털 스웨터, 가슴에 밝은 띠 하나, 목·밑단·소맷부리에 골지.",
+    "keywords": [
+      "긴소매",
+      "가슴 띠",
+      "골지"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "hemDrop": {
+      "value": 0.035,
+      "min": 0.0,
+      "max": 0.06,
+      "label": "밑단 내림"
+    }
+  },
+  "palette": {
+    "knit": "#C96E4E",
+    "knitBand": "#F1E3C8",
+    "rib": "#A8553B"
+  },
+  "variants": {
+    "maple": {
+      "label": "단풍 스웨터 (기본)",
+      "palette": {}
+    },
+    "mint": {
+      "label": "민트 스웨터",
+      "palette": {
+        "knit": "#7DB7A0",
+        "rib": "#5E9884"
+      }
+    }
+  }
+}

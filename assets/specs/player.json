@@ -4,8 +4,8 @@
   "name": "플레이어",
   "species": "human",
   "role": "주인공",
-  "version": "0.1.1",
-  "status": "approved",
+  "version": "0.2.0",
+  "status": "review",
   "prompt": {
     "concept": "섬에 막 이사 온 주인공. 담백하게 웃는 얼굴로, 누구나 자기라고 느낄 수 있는 평범하고 귀여운 모습.",
     "keywords": [
@@ -56,6 +56,11 @@
     "stripes": 0,
     "bottom": "shorts"
   },
+  "clothes": {
+    "split": true,
+    "top": "basic-tee",
+    "note": "11차 M11-P2: 윗옷(shirt·stripe 면)을 따로 된 메시 player_top = 기본 옷 CL-00 으로 뗀다. 다른 옷은 assets/clothes/specs (build_clothes.py)"
+  },
   "markings": "none",
   "animations": [
     "idle",
@@ -67,6 +72,7 @@
     "place",
     "sit_down",
     "sit",
-    "stand_up"
+    "stand_up",
+    "spin"
   ]
 }

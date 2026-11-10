@@ -10,7 +10,13 @@ export const CLIPS = ['idle', 'walk', 'run', 'happy'];               // player/i
 export const SIT_CLIPS = ['sit_down', 'sit', 'stand_up'];            // 10차 AN-11 (없으면 앉지 않고 서기만)
 export const BONES = ['arm.L', 'arm.R', 'spine', 'head'];            // player/motions.js
 // 삼각형 예산 (docs/notes/local-resources.md 1절 — 지금 가장 큰 것 근처, Intel UHD 기준). 넘으면 warn
-export const BUDGET = { character: 12500, env: 8000, furniture: 8000, fixture: 8000, item: 6000 };
+export const BUDGET = { character: 12500, env: 8000, furniture: 8000, fixture: 8000, item: 6000, clothes: 3000 };   // 옷은 한 벌 (주인공 몸 10.6k 위에 얹힘)
+// 11차 옷 (assets/clothes): src/player/wear.js 와 같은 값 — 게시본에 src/ 를 import 하지 않으려고 옮겨 둔다 (tests/res-editor.test.mjs 가 둘이 같은지 본다)
+export const SLOT_BONES = { hat: ['head'], top: ['hips', 'spine', 'arm.L', 'arm.R'], shoes: ['shin.L', 'shin.R', 'leg.L', 'leg.R'] };
+export const SLOT_LABEL = { hat: '모자', top: '윗옷', shoes: '신발' };
+export const PLAYER_BONES = ['root', 'hips', 'spine', 'head', 'arm.L', 'arm.R', 'leg.L', 'leg.R', 'shin.L', 'shin.R'];   // 주인공 뼈대 (player.glb) — 옷 뼈대가 이름으로 다시 묶인다
+// 주인공 몸 재질 이름 (assets/specs/player.json palette 키 + 빌더 고정 eyeHighlight·외곽선) — 옷 재질이 같은 이름이면 몸 색 바꾸기에 같이 칠해진다
+export const BODY_MATERIALS = ['fur', 'hair', 'shirt', 'pants', 'eye', 'blush', 'outline', 'eyeHighlight'];
 // 코드가 이름으로 찾는 재질 (world/objects.js PICKED · terrain.js)
 export const NAMED_MATERIALS = { 'fruit-tree': ['fruit'], palm: ['coconut'], 'tile-grass': ['grass', 'dirt'], 'tile-sand': ['sand'], 'tile-path': ['path'], 'tile-plaza': ['stone'] };
 export const NAMED_NODES = { 'wall-clock': ['hourHand', 'minuteHand'] };   // house/furniture.js 벽시계 바늘
@@ -19,6 +25,7 @@ export const LABEL = {
   named: '코드가 이름으로 찾는 재질·노드', clips: '동작 idle·walk·run·happy', sit: '앉기 동작 (AN-11)', bones: '뼈 arm.L·arm.R·spine·head', skin: '뼈대(skin) 하나',
   height: '키 ≈ 1.0 (캐릭터)', collider: '충돌 world.collider ↔ 모델 크기', lot: '집터 world.lot ↔ 건물 크기', footprint: '칸 footprint ↔ 모델 크기',
   item: '가구 표(items.js) 놓는 곳·칸 수', budget: '삼각형 예산', pattern: '무늬 한 칸 크기 pattern.size',
+  body: '몸 재질과 이름 안 겹침', wear: '칸(slot)에 맞는 뼈만', skeleton: '뼈대 이름 = 주인공 뼈대',
 };
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
@@ -31,10 +38,27 @@ export function glbInfo(bytes) {
   if (bytes.byteLength < 20 || dv.getUint32(0, true) !== 0x46546c67) throw new Error('glb 파일이 아니에요 (머리 글자 glTF 가 없어요)');
   const len = dv.getUint32(12, true);
   const gltf = JSON.parse(new TextDecoder().decode(bytes.subarray(20, 20 + len)));
-  return infoOf(gltf);
+  const at = 20 + len, bin = bytes.byteLength >= at + 8 && dv.getUint32(at + 4, true) === 0x004E4942 ? bytes.subarray(at + 8, at + 8 + dv.getUint32(at, true)) : null;
+  return infoOf(gltf, bin);
 }
-/** glTF JSON → { materials, nodes, clips, skins, triangles? } */
-export function infoOf(gltf) {
+// 접근자 하나를 숫자 배열로 (JOINTS_0 · WEIGHTS_0 만 쓰니 성분 형식 넷만)
+function readAccessor(gltf, bin, i) {
+  const a = gltf.accessors?.[i], bv = gltf.bufferViews?.[a?.bufferView];
+  if (!a || !bv || !bin) return null;
+  const n = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[a.type] ?? 1, size = { 5121: 1, 5123: 2, 5125: 4, 5126: 4 }[a.componentType];
+  if (!size) return null;
+  const stride = bv.byteStride || n * size, base = (bv.byteOffset ?? 0) + (a.byteOffset ?? 0);
+  const dv = new DataView(bin.buffer, bin.byteOffset, bin.byteLength), out = new Float32Array(a.count * n);
+  const norm = a.normalized ? { 5121: 255, 5123: 65535 }[a.componentType] ?? 1 : 1;
+  for (let k = 0; k < a.count; k++) for (let c = 0; c < n; c++) {
+    const o = base + k * stride + c * size;
+    const v = a.componentType === 5126 ? dv.getFloat32(o, true) : a.componentType === 5121 ? dv.getUint8(o) : a.componentType === 5123 ? dv.getUint16(o, true) : dv.getUint32(o, true);
+    out[k * n + c] = v / norm;
+  }
+  return out;
+}
+/** glTF JSON (+ BIN 덩어리) → { materials, nodes, clips, skins, triangles, joints, weighted? } — weighted = 무게가 실린 뼈 이름 (BIN 이 있을 때만) */
+export function infoOf(gltf, bin = null) {
   let triangles = 0;
   for (const m of gltf.meshes ?? []) for (const p of m.primitives ?? []) {
     const acc = gltf.accessors?.[p.indices ?? p.attributes?.POSITION];
@@ -46,7 +70,22 @@ export function infoOf(gltf) {
     clips: (gltf.animations ?? []).map(a => a.name ?? ''),
     skins: gltf.skins?.length ?? 0,
     triangles,
+    joints: (gltf.skins?.[0]?.joints ?? []).map(j => gltf.nodes?.[j]?.name ?? ''),
+    ...(bin ? { weighted: weightedJoints(gltf, bin) } : {}),
   };
+}
+function weightedJoints(gltf, bin) {
+  const used = new Set();
+  for (const node of gltf.nodes ?? []) {
+    const skin = gltf.skins?.[node.skin], mesh = gltf.meshes?.[node.mesh];
+    if (!skin || !mesh) continue;
+    for (const p of mesh.primitives ?? []) {
+      const J = readAccessor(gltf, bin, p.attributes?.JOINTS_0), W = readAccessor(gltf, bin, p.attributes?.WEIGHTS_0);
+      if (!J || !W) continue;
+      for (let k = 0; k < J.length; k++) if (W[k] > 1e-3) used.add(gltf.nodes?.[skin.joints[J[k]]]?.name ?? '');
+    }
+  }
+  return [...used].sort();
 }
 
 /** 스펙 팔레트 키 (+ 변형 팔레트) */
@@ -73,8 +112,12 @@ export function checkResource({ area, spec, row: r, stats, info, extra = {} }) {
   }
   out.push(row('status', ['review', 'approved'].includes(spec.status ?? 'review') ? 'ok' : 'fail', spec.status ?? 'review'));
   const pal = Object.entries(spec.palette ?? {});
-  const badHex = pal.filter(([, v]) => !HEX.test(v ?? '')).map(([k]) => k);
+  const vpal = Object.entries(spec.variants ?? {}).flatMap(([v, d]) => Object.entries(d?.palette ?? {}).map(([k, c]) => [`${v}.${k}`, c]));   // 변형 팔레트 색도
+  const badHex = [...pal, ...vpal].filter(([, v]) => !HEX.test(v ?? '')).map(([k]) => k);
   out.push(row('palette', badHex.length ? 'fail' : 'ok', badHex.length ? `색 글자가 이상해요: ${badHex.join(', ')}` : `색 ${pal.length}개`));
+
+  // 옷 (11차): 기본 윗옷(CL-00, 몸 모델 안의 player_top)은 모델이 따로 없어 목록·상태·색만
+  if (area === 'clothes') return [...out, ...checkClothes(spec, info, stats)];
 
   if (area === 'pattern') {
     const s = spec.pattern?.size;
@@ -159,6 +202,35 @@ export function checkResource({ area, spec, row: r, stats, info, extra = {} }) {
   const tri = stats?.triangles ?? info?.triangles;
   const budget = BUDGET[area];
   if (budget && tri) out.push(row('budget', tri <= budget ? 'ok' : 'warn', `삼각형 ${tri.toLocaleString('en-US')} / ${budget.toLocaleString('en-US')}`));
+  return out;
+}
+
+/** 옷 한 벌: 재질 이름 · 몸 재질과 안 겹침 · 칸에 맞는 뼈 · 뼈대(skin) · 뼈대 이름 · 삼각형 예산 */
+function checkClothes(spec, info, stats) {
+  if (spec.builtin) return [];
+  const out = [], keys = paletteKeys(spec), allowed = SLOT_BONES[spec.slot];
+  if (!allowed) return [row('wear', 'fail', `칸 slot 이 이상해요: ${spec.slot} (hat · top · shoes)`)];
+  const mats = info ? [...new Set(info.materials)] : [];
+  if (info) {
+    const extra = mats.filter(m => !keys.has(m));
+    out.push(row('materials', !mats.length || extra.length ? 'fail' : 'ok',
+      !mats.length ? '재질이 없어요' : extra.length ? `팔레트에 없는 재질: ${extra.join(', ')} → 재질 이름을 팔레트 키로` : `재질 ${mats.length}개 모두 팔레트 키`));
+  } else out.push(row('materials', 'skip', '모델 정보 없음'));
+  const clash = [...new Set([...keys, ...mats])].filter(k => BODY_MATERIALS.includes(k));
+  out.push(row('body', clash.length ? 'fail' : 'ok', clash.length ? `몸과 같은 이름: ${clash.join(', ')} → 옷만의 이름으로 (예: tee · hatBand)` : '몸 재질(fur·hair·shirt·pants…)과 다름'));
+  if (info) {
+    out.push(row('skin', info.skins >= 1 ? 'ok' : 'fail', info.skins >= 1 ? `뼈대 ${info.skins}개` : '뼈대(skin)가 없어요 — 주인공을 따라 움직이지 않아요'));
+    const joints = new Set(info.joints ?? []), miss = PLAYER_BONES.filter(b => !joints.has(b)), more = [...joints].filter(b => !PLAYER_BONES.includes(b));
+    if (info.skins >= 1) out.push(row('skeleton', miss.length || more.length ? 'fail' : 'ok',
+      miss.length || more.length ? [miss.length ? `없는 뼈: ${miss.join(', ')}` : '', more.length ? `주인공에 없는 뼈: ${more.join(', ')}` : ''].filter(Boolean).join(' · ') + ' → 주인공 뼈대(player_rig)로' : `뼈 ${joints.size}개 = 주인공`));
+  }
+  const used = info?.weighted ?? stats?.bones;
+  if (used) {
+    const bad = used.filter(b => !allowed.includes(b));
+    out.push(row('wear', !used.length || bad.length ? 'fail' : 'ok', !used.length ? '무게가 실린 뼈가 없어요' : bad.length ? `${SLOT_LABEL[spec.slot]} 칸에 안 맞는 뼈: ${bad.join(', ')} (써도 되는 뼈 ${allowed.join('·')})` : `${SLOT_LABEL[spec.slot]} · ${used.join('·')}`));
+  }
+  const tri = stats?.triangles ?? info?.triangles;
+  if (tri) out.push(row('budget', tri <= BUDGET.clothes ? 'ok' : 'warn', `삼각형 ${tri.toLocaleString('en-US')} / ${BUDGET.clothes.toLocaleString('en-US')}`));
   return out;
 }
 

@@ -1,0 +1,44 @@
+{
+  "id": "CL-03",
+  "slug": "flower-pin",
+  "name": "꽃 머리핀",
+  "category": "clothes",
+  "slot": "hat",
+  "kind": "flower-pin",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 900,
+  "sell": 225,
+  "prompt": {
+    "concept": "머리 옆에 꽂는 다섯 잎 꽃 핀과 작은 잎 하나. 봄 꽃놀이에 어울린다.",
+    "keywords": [
+      "다섯 잎",
+      "옆머리"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "yaw": {
+      "value": 0.62,
+      "min": 0.4,
+      "max": 1.3,
+      "label": "자리 (옆)"
+    }
+  },
+  "palette": {
+    "pinPetal": "#F49AB8",
+    "pinCenter": "#F7D45B",
+    "pinLeaf": "#6FAE5B"
+  }
+}

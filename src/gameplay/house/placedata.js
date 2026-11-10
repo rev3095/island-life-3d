@@ -2,7 +2,7 @@
 // 방 배치 = assets/interior/places/<shop|museum>.json (실내 검수 보드 RM-08 · RM-09). 주민 방(RM-01–06) 모양에 더해:
 //   size [가로, 깊이] 칸 · windows 북쪽 벽 창 자리 · door 문 매트 칸 { gx0, gx1 } · keeper 주인이 서는 곳 { slug, lx, lz, face } · talk 플레이어가 말 거는 곳 { lx, lz }
 //   furniture[].role 'counter' = 계산대·안내대 (FU-36 자리), furniture[].scale [x, y, z] = 모델 늘이기·줄이기 (계산대를 주인 키에 맞춰 낮출 때), furniture[].look [가로, 깊이] = 임시 상자가 보이는 크기 (발자국 box 보다 가늘게)
-//   상점 stock = [{ group: furniture|tools|seeds|saplings, from?, count, lx, lz, y, dz?, fit? }] — 오늘의 물건을 놓는 줄
+//   상점 stock = [{ group: furniture|tools|seeds|saplings|clothes, from?, count, lx, lz, y, dx?, dz?, fit?, hang? }] — 오늘의 물건을 놓는 줄 (11차 clothes: 윗옷은 hang 높이 가로대에 건다)
 //   박물관 cases = [{ kind: tank|terrarium, cat, lx0, lz0, lx1, lz1, h, levels, fixture? }] 긴 수조·유리 상자 (fixture = 붙박이 모델 slug), fossils = [[lx, lz]] 받침 위 (fossilY 높이)
 import { fits, boxOf, inBox } from './grid.js';
 import { resolveFurniture, FACE } from './interior.js';
@@ -83,7 +83,7 @@ export function stockPlan(spec, groups) {
   const out = [];
   for (const row of spec.stock ?? []) {
     const ids = (groups?.[row.group] ?? []).slice(row.from ?? 0, (row.from ?? 0) + (row.count ?? 1));
-    ids.forEach((id, i) => out.push({ id, group: row.group, lx: row.lx + (row.dx ?? 0) * i, lz: row.lz + (row.dz ?? 0) * i, y: row.y ?? 0, fit: row.fit ?? null }));
+    ids.forEach((id, i) => out.push({ id, group: row.group, lx: row.lx + (row.dx ?? 0) * i, lz: row.lz + (row.dz ?? 0) * i, y: row.y ?? 0, fit: row.fit ?? null, ...(row.hang != null ? { hang: row.hang } : {}) }));
   }
   return out;
 }

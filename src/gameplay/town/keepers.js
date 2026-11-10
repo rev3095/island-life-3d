@@ -276,7 +276,7 @@ export async function createKeepers(ctx, town, lines) {
     else if (r() < 0.3) greet.push(...pickLines(LB.chat, r, B.recent));
     const a = await say(greet, ['살래요', '팔래요', '그냥 구경할게요']);
     if (a === 0 || a === 1) {
-      await ui.shop.open({ stock: d.economy.stock(), tab: a === 1 ? 'sell' : 'buy', keeper: B.person.name, color: B.person.color });
+      await ui.shop.open({ stock: d.economy.stock(), tab: a === 1 ? 'sell' : 'buy', keeper: B.person.name, color: B.person.color, clothes: true });   // 11차 D102-A 옷 진열대
       await say(pickLines(LB.after, r, B.recent));
     } else await say(pickLines(LB.bye, r, B.recent));
   }

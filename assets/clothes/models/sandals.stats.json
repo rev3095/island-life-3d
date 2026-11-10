@@ -1,0 +1,29 @@
+{
+  "id": "CL-12",
+  "slug": "sandals",
+  "name": "샌들",
+  "slot": "shoes",
+  "version": "0.1",
+  "triangles": 844,
+  "vertices": 532,
+  "bones": [
+    "shin.L",
+    "shin.R"
+  ],
+  "materials": [
+    "sandalSole",
+    "sandalStrap"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 33136,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sandals_back.png",
+    "sandals_front.png",
+    "sandals_side.png",
+    "sandals_three_quarter.png",
+    "sandals_thumb.png",
+    "sandals_walk.png"
+  ]
+}

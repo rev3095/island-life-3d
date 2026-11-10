@@ -1,0 +1,31 @@
+{
+  "id": "CL-08",
+  "slug": "raincoat",
+  "name": "비옷",
+  "slot": "top",
+  "version": "0.1",
+  "triangles": 3048,
+  "vertices": 1565,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "hips",
+    "spine"
+  ],
+  "materials": [
+    "button",
+    "coat"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 91804,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "raincoat_back.png",
+    "raincoat_front.png",
+    "raincoat_side.png",
+    "raincoat_three_quarter.png",
+    "raincoat_thumb.png",
+    "raincoat_walk.png"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "CL-01",
+  "slug": "straw-hat",
+  "name": "밀짚모자",
+  "category": "clothes",
+  "slot": "hat",
+  "kind": "straw-hat",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1400,
+  "sell": 350,
+  "prompt": {
+    "concept": "챙이 넓은 밀짚모자. 빨간 띠를 둘렀다. 여름 바닷가 산책용.",
+    "keywords": [
+      "넓은 챙",
+      "빨간 띠"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "brim": {
+      "value": 1.55,
+      "min": 1.2,
+      "max": 1.9,
+      "label": "챙 넓이"
+    },
+    "brimHeight": {
+      "value": 0.38,
+      "min": 0.25,
+      "max": 0.5,
+      "label": "챙 높이"
+    }
+  },
+  "palette": {
+    "straw": "#E8C77A",
+    "hatBand": "#C2523F"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "id": "CL-09",
+  "slug": "festival-vest",
+  "name": "축제 조끼",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "vest",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 2600,
+  "sell": 650,
+  "prompt": {
+    "concept": "흰 티 위에 앞이 트인 짧은 조끼, 깃·밑단에 금빛 선, 가슴에 리본 매듭(고름 느낌). 섬 축제용 오리지널 디자인.",
+    "keywords": [
+      "앞트임 조끼",
+      "금빛 선",
+      "리본 매듭"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "opening": {
+      "value": 0.03,
+      "min": 0.015,
+      "max": 0.05,
+      "label": "앞트임 폭"
+    }
+  },
+  "palette": {
+    "vestShirt": "#F6EFE0",
+    "vest": "#3C8C7A",
+    "vestTrim": "#E8B84A",
+    "ribbon": "#D9534F"
+  },
+  "variants": {
+    "pine": {
+      "label": "솔잎 조끼 (기본)",
+      "palette": {}
+    },
+    "plum": {
+      "label": "자두 조끼",
+      "palette": {
+        "vest": "#8E4F8C"
+      }
+    }
+  }
+}

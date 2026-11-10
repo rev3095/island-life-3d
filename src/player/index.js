@@ -1,4 +1,5 @@
 // 트랙 T1: 플레이어 — 걷기·달리기·충돌·높이 따라가기·발소리, 도구 들기·도구 동작, 카메라. ctx.services.player 를 올린다.
+// 11차: 옷 갈아입기 ctx.services.outfit (outfit.js — 옷 모델을 주인공 뼈대에 끼운다, 빙글 동작 spin AN-12)
 import { LoopOnce, LoopRepeat, Vector3 } from 'three';
 import { createCameraRig } from './camera.js';
 import { buildTool } from './tools.js';
@@ -183,6 +184,11 @@ export default {
       set toolKeys(v) { P.toolKeys = v; }, get toolKeys() { return P.toolKeys; },
     };
     ctx.services.player = api;
+    // 11차 M11-P4 옷 갈아입기 (D100-A): 저장된 옷을 입힌다 (옷 모델은 따로 받는 묶음이라 기다리지 않는다 — 그동안 기본 모습)
+    try {
+      const { createOutfit } = await import('./outfit.js');
+      ctx.services.outfit = await createOutfit(ctx, { model, outlineWidth: 0.006 });
+    } catch (e) { console.warn('[player] 옷 갈아입기를 못 켰어요', e); }
     function endSeat() {
       const st = P.seat;
       if (!st) return;

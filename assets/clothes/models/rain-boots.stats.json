@@ -1,0 +1,31 @@
+{
+  "id": "CL-11",
+  "slug": "rain-boots",
+  "name": "장화",
+  "slot": "shoes",
+  "version": "0.1",
+  "triangles": 1904,
+  "vertices": 960,
+  "bones": [
+    "leg.L",
+    "leg.R",
+    "shin.L",
+    "shin.R"
+  ],
+  "materials": [
+    "boot",
+    "bootRim"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 58320,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "rain-boots_back.png",
+    "rain-boots_front.png",
+    "rain-boots_side.png",
+    "rain-boots_three_quarter.png",
+    "rain-boots_thumb.png",
+    "rain-boots_walk.png"
+  ]
+}

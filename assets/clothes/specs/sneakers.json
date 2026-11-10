@@ -1,0 +1,37 @@
+{
+  "id": "CL-10",
+  "slug": "sneakers",
+  "name": "운동화",
+  "category": "clothes",
+  "slot": "shoes",
+  "kind": "sneakers",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1200,
+  "sell": 300,
+  "prompt": {
+    "concept": "빨간 운동화, 흰 밑창과 끈 세 줄.",
+    "keywords": [
+      "흰 밑창",
+      "끈"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {},
+  "palette": {
+    "shoe": "#E5584F",
+    "sole": "#F4F1EA",
+    "lace": "#FFFFFF"
+  }
+}

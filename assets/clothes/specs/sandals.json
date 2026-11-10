@@ -1,0 +1,36 @@
+{
+  "id": "CL-12",
+  "slug": "sandals",
+  "name": "샌들",
+  "category": "clothes",
+  "slot": "shoes",
+  "kind": "sandals",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1000,
+  "sell": 250,
+  "prompt": {
+    "concept": "나무색 밑창에 갈색 끈 두 줄, 발이 보이는 샌들. 여름용.",
+    "keywords": [
+      "끈 둘",
+      "맨발"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {},
+  "palette": {
+    "sandalSole": "#B98957",
+    "sandalStrap": "#6B4A33"
+  }
+}

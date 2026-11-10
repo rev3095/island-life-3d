@@ -8,6 +8,7 @@ import { createBag } from './bag.js';
 import { createPhone } from './phone.js';
 import { createMap } from './map.js';
 import { createShop } from './shop.js';
+import { createCloset } from './closet.js';   // 11차 UI-19 옷장 창
 import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
 import { createToolRing } from './toolring.js';
@@ -85,6 +86,7 @@ export default {
     const map = createMap(ctx, panels);
     const phone = createPhone(ctx, panels, { openBag: o => bag.open(o), openMap: () => map.open(), toast, setSetting });
     const shop = createShop(ctx, panels, { bag, toast });
+    const closet = createCloset(ctx, panels, { toast });
     const museum = createMuseum(ctx, panels, { bag, toast });
     const craft = createCraft(ctx, panels, { toast });
     const tools = createToolRing(ctx, panels);
@@ -198,6 +200,7 @@ export default {
       phone: { open: () => phone.open() },
       map: { open: () => map.open() },
       shop: { open: opts => shop.open(opts) },
+      closet: { open: opts => closet.open(opts) },   // 11차 UI-19 옷장 창 → Promise<입었나>
       museum: { open: opts => museum.open(opts) },
       craft: { open: opts => craft.open(opts) },   // 작업대 창 → Promise<만든 레시피 id 들>
       tools: { open: () => tools.open() },         // 도구 고르기 고리 → Promise<{tool} | null>

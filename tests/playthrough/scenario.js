@@ -848,6 +848,30 @@ export function makeScenario(bot, sk, opts = {}) {
     return bad.length ? awk(`${bad.join(', ')} — ${msg}`) : pass(msg);
   });
 
+  // 11차 M11-P5 옷 (보드 wave11 D100-A · D102-A): 도토리상점 「오늘의 옷」에서 하나 사기만 → (첫 옷이면 옷장을 덤으로) → 집에 옷장 놓기 → 「갈아입기」 → 입기.
+  add('clothes', '옷 사기 · 갈아입기: 상점 옷 진열대 → 집 옷장 「갈아입기」 → 입기 (저장 칸)', async () => {
+    const O = S().outfit;
+    if (!O) return block('옷 서비스(outfit)가 없어요');
+    if (S().house?.inside) await sk.leaveHome();
+    if ((S().time.now().hour ?? 10) < 9 || S().time.now().hour >= 21) await clockTo(10);
+    const today = O.today().filter(c => !c.owned);
+    if (!today.length) return awk('오늘 살 옷이 없어요');
+    const price = Math.min(...today.map(c => c.buy));
+    if (bot.acorns() < price) await sellSurplus();
+    const cheap = today.filter(c => c.buy <= bot.acorns()).sort((a, b) => a.buy - b.buy)[0];
+    if (!cheap) return awk(`도토리가 모자라요 (🌰 ${bot.acorns()} < ${price})`);
+    const w0 = bot.acorns();
+    const r = await sk.shop({ clothes: cheap.id });
+    const bought = O.owns(cheap.id);
+    if (S().house?.places?.where === 'shop') await sk.leavePlace();
+    const ch = bought ? await sk.changeClothes(cheap.id) : null;
+    note('clothes', { today: O.today().map(c => c.id), pick: cheap.id, price: cheap.buy, spent: w0 - bot.acorns(), shop: r?.clothes, gift: st().flags?.wardrobeGift ?? null, change: ch, worn: O.worn() });
+    const msg = `${cheap.name} 🌰${w0 - bot.acorns()} · 옷장 ${ch?.placed ? '받아서 놓음' : '있음'} · 입은 옷 ${Object.values(O.worn()).filter(Boolean).join(', ')}`;
+    if (!bought) return awk(`못 삼 — ${msg}`);
+    if (!ch?.wore) return awk(`갈아입기 못 함 (창 ${ch?.opened ? '열림' : '안 열림'}) — ${msg}`);
+    return pass(msg);
+  });
+
   // P35 무인도 투어 (보드 tour D120–D128): 선착장 끝 배 → 여행 묻기 창(첫 여행은 표 선물) → 무인도 → 과일 흔들기·광석 캐기·줍기 → 배로 돌아오기.
   // 투어 섬은 x 900 이라 봇은 섬 밖 좌표처럼 walkLocal(구역 isWalkable 로 0.25칸 길찾기)로 걷는다.
   add('tour', '무인도 투어: 선착장 배 → 표 → 무인도 → 과일·광석 캐기 → 배로 돌아오기', async () => {
