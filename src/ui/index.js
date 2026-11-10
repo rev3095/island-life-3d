@@ -18,7 +18,7 @@ import { ACCESS_KEYS, resolveAccess, applyAccess, captionFor, createCaptions } f
  * 모듈 모양: `export function open(ctx, opts) → Promise` (또는 `export default { open(ctx, opts) }`).
  * 창은 ctx.services.ui.panel 로 연다. 모듈이 스스로 ctx.services.ui.<이름> 을 채워도 된다 (그때는 그것을 쓴다)
  */
-export const EXTRA_PANELS = [['transfer', './transfer.js'], ['report', './report.js']];
+export const EXTRA_PANELS = [['transfer', './transfer.js'], ['report', './report.js'], ['clock', './clock.js']];   // clock: 11차 시계 (p33-clock)
 
 let dialog = null, hud = null, uiCtx = null;
 const PEEK_EVERY = 0.2;    // 행동 안내(A·B 글자, Space·F) 갱신 간격 (초)

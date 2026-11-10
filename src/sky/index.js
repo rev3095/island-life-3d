@@ -2,7 +2,7 @@
 // ctx.services.time 을 올리고, 매 프레임 하늘 돔·조명(ctx.lights)·안개·구름·비/눈·밤 조명을 시각과 날씨에 맞춘다.
 // 약속은 docs/CONTRACTS.md 의 time 항목.
 import * as THREE from 'three';
-import { computeNow, dayHour, msAtDayHour, nightFactorAt, FAST_SCALE } from './clock.js';
+import { computeNow, dayHour, msAtDayHour, nightFactorAt, msAtClock, dayDiff, dayKeyOf, createTimeline } from './clock.js';
 import { shiftedMs } from '../core/preview.js';
 import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
@@ -41,7 +41,9 @@ export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
   // 8차 D85-A: 날짜 흉내(#date=)면 실제 시계를 그 날짜의 지금 시각으로 옮겨 둔다 (실제 시계로 돌아가도 이 날짜)
   const baseShift = ctx.preview?.date ? shiftedMs(ctx.preview.date) - Date.now() : 0;
-  let realShift = baseShift, pausedMs = null, weatherOverride = null, seasonOverride = null;
+  // 11차 시계: 실제 시계 = Date.now() + baseShift + state.time.offset (offset 은 섬폰 시계·setHour 가 바꾸고 저장된다) — 몸통은 clock.js createTimeline
+  const tl = createTimeline({ getTime: () => (ctx.state.time ||= {}), baseShift, extraDay: () => (ctx.preview ? null : ctx.state.island?.dayKey ?? null) });
+  let weatherOverride = null, seasonOverride = null;
   let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs })) — 매우 낮음 사양은 늘 숨김 (applyPuffs)
   let flare = null;                 // 해 렌즈 빛 (flare.js, 불러온 뒤)
   let indoor = false;               // 집 안: 하늘·구름·비·눈을 숨기고 실내 조명 (setIndoor)
@@ -52,18 +54,9 @@ export function createSky(ctx) {
   const wx = { ...WX.clear };
   let elapsed = 0, scanIn = 0;
 
-  const tstate = () => {
-    const t = (ctx.state.time ||= {});
-    if (t.mode !== 'fast') t.mode = 'real';
-    if (typeof t.fastOffset !== 'number') t.fastOffset = 0;
-    return t;
-  };
-
-  function clockMs() {
-    if (pausedMs != null) return pausedMs;
-    const t = tstate();
-    return t.mode === 'fast' ? Date.now() * FAST_SCALE + t.fastOffset : Date.now() + realShift;
-  }
+  const tstate = tl.state;
+  const clockMs = tl.clockMs;
+  const catchUp = tl.catchUp;
 
   function now() {
     const ms = clockMs();
@@ -83,26 +76,57 @@ export function createSky(ctx) {
   const autoWeather = n => weatherAt(forecastFor(n.dayKey, seasonOfDay(n)), dayHour(n.hourF));
   const currentWeather = () => weatherOverride ?? autoWeather(now());
 
-  /** 같은 흐름을 유지한 채 시계를 target(ms) 으로 옮긴다 */
-  function shiftTo(target) {
-    if (pausedMs != null) { pausedMs = target; return; }
-    const t = tstate();
-    const d = target - clockMs();
-    if (t.mode === 'fast') t.fastOffset += d;
-    else realShift += d;
+  /**
+   * 11차 시계: 시계를 옮기고(move) 바로 하늘·조명·이벤트를 맞춘 뒤 time:shift 를 보낸다.
+   * → { ok, now, prevMs, offset, days(바뀐 날 수), back(과거로), clamped, reason }
+   */
+  function jump(move, { reason = 'clock', clamped = null } = {}) {
+    const prev = now();
+    move();
+    memo.ms = NaN;
+    const n = now();
+    const days = dayDiff(prev.dayKey, n.dayKey);
+    // 시간을 건너뛴 것이라 날씨 섞기도 새 날씨로 바로 (비 그친 하늘이 몇 초 동안 남지 않게)
+    Object.assign(wx, WX[currentWeather()]);
+    scanIn = 0;
+    step(0);
+    const info = { now: n, prevMs: prev.ms, offset: tstate().offset, days, back: n.ms < prev.ms, clamped, reason };
+    events.emit('time:shift', info);
+    return { ok: true, ...info };
   }
+  /** 갈 시각(ms) 으로 — 가 본 날 아침 5시보다 앞(floor)·SHIFT_MAX_DAYS 일 뒤(ceil)는 그 끝으로 붙인다 */
+  const jumpClamped = (target, reason) => { const r = tl.clamp(target); return jump(() => tl.shiftTo(r.ms), { clamped: r.clamped, reason }); };
 
   const service = {
     now,
     get mode() { return tstate().mode; },
-    setMode(mode) {
-      if (mode !== 'real' && mode !== 'fast') return;
-      const t = tstate();
-      if (t.mode === mode) return;
-      const cur = clockMs();
-      t.mode = mode;
-      if (mode === 'fast') t.fastOffset = cur - Date.now() * FAST_SCALE;   // 지금 시각에서 이어서 빨리 간다
-      else { realShift = baseShift; if (pausedMs != null) pausedMs = Date.now() + baseShift; } // 실제 시계로 돌아간다
+    setMode(mode) { tl.setMode(mode); memo.ms = NaN; },
+
+    // ── 11차 시계 (섬폰 「🕰 시계」 · docs/CONTRACTS.md 「11차 시계」) ──
+    /** 실제 시계에서 떨어진 정도 (ms, state.time.offset). 0 = 실제 시각 */
+    get offset() { return tstate().offset; },
+    /** 가 본 가장 늦은 날 — 이 날 아침 5시보다 앞으로는 못 돌린다 */
+    get maxDay() { return tl.maxDay(); },
+    /** 돌릴 수 있는 범위 { floor, ceil } (ms) */
+    range: () => tl.range(),
+    /** offset 을 바로 정한다 (범위 밖은 끝에 붙음, 빠른 시간이면 실제 시간으로) → jump 결과 */
+    setOffset(ms) {
+      if (!Number.isFinite(ms)) return { ok: false };
+      tl.setMode('real');
+      memo.ms = NaN;
+      return jumpClamped(Date.now() + baseShift + ms, 'offset');
+    },
+    /** 갈 시각(ms) 으로 → jump 결과 */
+    jumpTo: ms => (Number.isFinite(ms) ? jumpClamped(ms, 'clock') : { ok: false }),
+    /** 오늘(dayKey)+days 날의 hour:minute 으로 (0~5시는 그날 밤, 5시 경계) → jump 결과 */
+    shiftTo(hour, minute = 0, { days = 0 } = {}) {
+      if (!Number.isFinite(hour)) return { ok: false };
+      return jumpClamped(msAtClock(now().dayKey, hour, minute, days), 'clock');
+    },
+    /** 「지금 시각으로 돌아가기」: offset 0 (빠른 시간이면 실제 시간으로). 가 본 날보다 앞이면 그 날 같은 시각 → jump 결과 + caught(더한 날 수) */
+    resetOffset() {
+      const r = tl.resetTarget();
+      return { ...jump(() => { const t = tstate(); t.mode = 'real'; t.offset = r.offset; }, { reason: 'reset' }), caught: r.caught };
     },
     get weather() { return currentWeather(); },
     /** w: WEATHERS 중 하나. null 이면 예보대로. 다음 날이 되면 풀린다. { instant: true } 면 섞지 않고 바로 */
@@ -118,12 +142,9 @@ export function createSky(ctx) {
     /** 오늘(dayKey) 예보 [{from, weather}] — from 은 5~29시 */
     forecast(dayKey = now().dayKey) { return forecastFor(dayKey, seasonOverride ?? constants.seasonOf(Number(dayKey.slice(5, 7)))).map(s => ({ ...s })); },
     /** 오늘 안에서 시각 옮기기. hh: 5~29 (0~5 를 주면 그날 밤으로) */
-    setHour(hh) { if (hh < 5) hh += 24; shiftTo(msAtDayHour(now().dayKey, hh)); },
-    get paused() { return pausedMs != null; },
-    setPaused(on) {
-      if (on && pausedMs == null) pausedMs = clockMs();
-      else if (!on && pausedMs != null) { const t = pausedMs; pausedMs = null; shiftTo(t); }
-    },
+    setHour(hh) { if (hh < 5) hh += 24; tl.shiftTo(msAtDayHour(now().dayKey, hh)); },   // 조용히 (time:shift 없음 — 봇·점검이 쓴다)
+    get paused() { return tl.paused; },
+    setPaused(on) { tl.setPaused(on); },
     get weatherOverride() { return weatherOverride; },
     get seasonOverride() { return seasonOverride; },
     setSeasonOverride(s) { seasonOverride = constants.SEASONS.includes(s) ? s : null; memo.ms = NaN; },
@@ -174,6 +195,7 @@ export function createSky(ctx) {
     if (n.part !== last.part) { last.part = n.part; events.emit('time:part', { part: n.part }); }
     if (n.dayKey !== last.dayKey) {
       last.dayKey = n.dayKey;
+      tl.mark(n.dayKey);   // 11차 시계: 가 본 가장 늦은 날
       weatherOverride = null;
       events.emit('time:newday', { dayKey: n.dayKey });
     }
@@ -234,7 +256,12 @@ export function createSky(ctx) {
     stats: () => ({ wx: { ...wx }, ...surfaces.counts() }),
     async init() {
       ctx.services.time = service;
-      tstate();
+      const t0 = tstate();
+      // 11차 시계: 날짜 흉내는 시험 칸이라 그 날짜에서 새로 센다. 진짜 섬은 가 본 날보다 앞이면 그날로 맞춘다
+      if (ctx.preview) { t0.maxDay = null; t0.offset = 0; }
+      else catchUp();
+      if (!t0.maxDay) t0.maxDay = dayKeyOf(clockMs());
+      events.on('data:loaded', () => { tstate(); if (!ctx.preview) catchUp(); memo.ms = NaN; });
       try { palettes = buildSeasonPalettes(await loadEnvSpecs(ctx.assets)); }
       catch (e) { console.warn('[sky] 배경 스펙을 못 읽어 기본 계절 팔레트를 씁니다', e); }
       scene.add(dome.group, clouds.group, precip.group, surfaces.group);

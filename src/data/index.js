@@ -32,7 +32,7 @@ export function createDataService(ctx, opts = {}) {
   const wallet = createWallet(state, { onChange: acorns => emit('wallet:changed', { acorns }) });
   const museum = createMuseum(state, { onChange: id => emit('museum:changed', { id }) });
   const recipes = createRecipes(inventory);
-  const day = createDay({ state, getNow, onNewDay: summary => emit('data:newday', summary) });
+  const day = createDay({ state, getNow, onNewDay: summary => emit('data:newday', summary), allowBack: !!ctx.preview });
   const harvest = createHarvest({ state, day });
   const economy = createEconomy({ inventory, wallet, getSeed: () => state.island.seed, getDayKey: () => day.key() });
 

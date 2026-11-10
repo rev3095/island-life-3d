@@ -74,7 +74,7 @@ test('섬폰: 보기 편하게 앱 + P4 창 두 줄은 ui.transfer / ui.report �
   assert.deepEqual(ids({ transfer: { open() {} }, report: { open() {} } }).slice(-3), ['access', 'transfer', 'report']);
   assert.deepEqual(ids({ report: {} }).includes('report'), false, 'open 이 없으면 숨김');
   const { EXTRA_PANELS } = await import('../src/ui/index.js');
-  assert.deepEqual(EXTRA_PANELS, [['transfer', './transfer.js'], ['report', './report.js']]);
+  assert.deepEqual(EXTRA_PANELS, [['transfer', './transfer.js'], ['report', './report.js'], ['clock', './clock.js']]);
   for (const [name] of EXTRA_PANELS) assert.ok(APPS.some(a => a.panel === name), name);
 });
 

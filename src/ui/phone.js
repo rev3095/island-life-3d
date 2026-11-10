@@ -14,7 +14,8 @@ export const APPS = [
   { id: 'save', name: '저장', icon: '💾', color: '#C8B6E2' },
   { id: 'access', name: '보기 편하게', icon: '👓', color: '#BFE0D8' },   // 7차 UI-10
   { id: 'decor', name: '섬 꾸미기', icon: '🪴', color: '#BFDDA4', panel: 'decor', closes: true },   // 9차 UI-16 (밖에서 놓기 모드 — gameplay/decor 가 ui.decor 로 채운다, 섬폰은 닫는다)
-  { id: 'calendar', name: '달력', icon: '📅', color: '#F4C9D6', panel: 'calendar' },   // 8차 UI-13 (창은 gameplay/events 가 ui.calendar 로 채운다)
+  { id: 'calendar', name: '달력', icon: '📅', color: '#F4C9D6', panel: 'calendar' },
+  { id: 'clock', name: '시계', icon: '🕰️', color: '#E9D3A8', panel: 'clock' },   // 11차 시계 (p33-clock): 바늘을 돌려 게임 시각 바꾸기 (창은 ui/clock.js → ui.clock)   // 8차 UI-13 (창은 gameplay/events 가 ui.calendar 로 채운다)
   { id: 'guide', name: '안내', icon: '💡', color: '#F6E3A1', panel: 'guide' },   // 7차 M7-P5: 첫날 할 일·조작·지난 힌트 (창은 intro 가 ui.guide 로 채운다)
   { id: 'transfer', name: '저장 옮기기', icon: '📦', color: '#E8C9A0', panel: 'transfer' },   // 7차 UI-09 (M7-P4)
   { id: 'report', name: '문제 알리기', icon: '📮', color: '#F0B8B0', panel: 'report' },       // 7차 UI-08 (M7-P4)
