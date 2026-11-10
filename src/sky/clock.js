@@ -113,25 +113,60 @@ export function clampShift(target, { floor = -Infinity, ceil = Infinity } = {}) 
   return { ms: target, clamped: null };
 }
 
+// ── 시간 빠르기 (p41-fast-time, docs/notes/p41-fast-time.md) ──
+// 값은 assets/data/rules.json time (요소 편집기 「규칙 숫자」 → 시간 빠르기): speed = 처음 빠르기 키, speeds = 키 → 배수, whenClosed = 'pause'|'catchUp'.
+export const SPEED_KEYS = ['real', 'fast', 'faster'];
+export const SPEED_NAME = { real: '실제와 같게', fast: '빠르게', faster: '아주 빠르게' };
+export const DEFAULT_TIME_RULES = Object.freeze({ speed: 'fast', speeds: Object.freeze({ real: 1, fast: 12, faster: 30 }), whenClosed: 'pause' });
+export const GAP_MS = 1500;            // 프레임 사이가 이보다 길면(탭 숨김·창 닫힘·멈춤) 그동안은 안 흐른 것으로 ('pause')
+/** rules.time → 빠진 칸은 기본값 */
+export function timeRules(r = {}) {
+  const speeds = { ...DEFAULT_TIME_RULES.speeds, ...(r?.speeds ?? {}), real: 1 };
+  for (const k of SPEED_KEYS) if (!(Number.isFinite(speeds[k]) && speeds[k] >= 1)) speeds[k] = DEFAULT_TIME_RULES.speeds[k];
+  return {
+    speed: SPEED_KEYS.includes(r?.speed) ? r.speed : DEFAULT_TIME_RULES.speed,
+    speeds,
+    whenClosed: r?.whenClosed === 'catchUp' ? 'catchUp' : 'pause',
+  };
+}
+/** 배수 → '게임 하루 = 실제 2시간' 같은 글 */
+export function dayLengthText(mult) {
+  if (!(mult > 1)) return '실제 시계와 같아요';
+  const m = Math.round(1440 / mult);
+  return `게임 하루 = 실제 ${m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ` ${m % 60}분` : ''}` : `${m}분`}`;
+}
+
 /**
  * 시계 몸통 (sky/index.js 가 쓴다 · 테스트는 realNow 를 바꿔 끼운다).
- * getTime() → state.time ({ mode, fastOffset, offset, maxDay }), baseShift = 날짜 흉내로 옮긴 정도,
- * extraDay() → 함께 볼 '가 본 날' (진짜 섬은 data 의 island.dayKey, 날짜 흉내는 null).
+ * getTime() → state.time ({ speed, offset, game, realAt, maxDay }), baseShift = 날짜 흉내로 옮긴 정도,
+ * extraDay() → 함께 볼 '가 본 날' (진짜 섬은 data 의 island.dayKey, 날짜 흉내는 null), rules = timeRules().
+ * - 「실제와 같게」(배수 1): 시각 = 실제 시계 + baseShift + offset — 닫아 둔 동안에도 실제 시계대로 흐른다.
+ * - 「빠르게」(배수 > 1): 시각 = state.time.game, advance() 가 실제로 흐른 만큼 × 배수를 더한다.
+ *   프레임 사이가 GAP_MS 보다 길면(숨김·닫힘) 'pause' 는 그동안 멈춘 것으로, 'catchUp' 은 흐른 만큼 더한다.
  */
-export function createTimeline({ getTime, baseShift = 0, extraDay = () => null, realNow = () => Date.now() }) {
-  let pausedMs = null;
+export function createTimeline({ getTime, baseShift = 0, extraDay = () => null, realNow = () => Date.now(), rules = timeRules({ speed: 'real' }) }) {
+  let pausedMs = null, lastReal = null;
+  const R = rules;
   const t = () => {
     const s = getTime();
-    if (s.mode !== 'fast') s.mode = 'real';
-    if (typeof s.fastOffset !== 'number') s.fastOffset = 0;
+    // 예전 저장: mode 'fast' (실제 1분 = 1시간) → 그 시각에서 「아주 빠르게」로 이어서
+    if (s.mode === 'fast' && !SPEED_KEYS.includes(s.speed)) { s.game = realNow() * FAST_SCALE + (Number(s.fastOffset) || 0); s.speed = 'faster'; }
+    delete s.mode; delete s.fastOffset;
+    if (s.speed != null && !SPEED_KEYS.includes(s.speed)) s.speed = null;
     if (!Number.isFinite(s.offset)) s.offset = 0;
+    if (s.game != null && !Number.isFinite(s.game)) s.game = null;
     if (s.maxDay != null && !/^\d{4}-\d{2}-\d{2}$/.test(s.maxDay)) s.maxDay = null;
     return s;
   };
+  const key = () => t().speed ?? R.speed;
+  const mult = () => R.speeds[key()] ?? 1;
+  const scaled = () => mult() > 1;
+  const realMs = () => realNow() + baseShift;
+  const ensureGame = s => { if (!Number.isFinite(s.game)) s.game = realMs() + s.offset; return s.game; };
   const clockMs = () => {
     if (pausedMs != null) return pausedMs;
     const s = t();
-    return s.mode === 'fast' ? realNow() * FAST_SCALE + s.fastOffset : realNow() + baseShift + s.offset;
+    return scaled() ? ensureGame(s) : realMs() + s.offset;
   };
   const maxDay = () => laterDay(t().maxDay, extraDay());
   const floorMs = () => floorMsOf(maxDay());
@@ -139,49 +174,74 @@ export function createTimeline({ getTime, baseShift = 0, extraDay = () => null, 
   function shiftTo(target) {
     if (pausedMs != null) { pausedMs = target; return; }
     const s = t();
-    const d = target - clockMs();
-    if (s.mode === 'fast') s.fastOffset += d;
-    else s.offset += d;
+    if (scaled()) s.game = target;
+    else s.offset += target - clockMs();
   }
   /** 날짜가 가 본 날보다 앞이면 하루씩 더해 맞춘다 → 더한 날 수 */
   function catchUp() {
-    const s = t(), md = maxDay();
+    const md = maxDay();
     if (!md || pausedMs != null) return 0;
-    const fast = s.mode === 'fast';
-    const r = catchUpOffset(fast ? realNow() * FAST_SCALE : realNow() + baseShift, fast ? s.fastOffset : s.offset, md);
-    if (fast) s.fastOffset = r.offset; else s.offset = r.offset;
+    const s = t();
+    if (scaled()) { const r = catchUpOffset(0, ensureGame(s), md); s.game = r.offset; return r.days; }
+    const r = catchUpOffset(realMs(), s.offset, md);
+    s.offset = r.offset;
     return r.days;
   }
   /** 지금 날이 가 본 날보다 늦으면 적어 둔다 */
   function mark(dayKey) { const s = t(); if (!s.maxDay || dayKey > s.maxDay) s.maxDay = dayKey; }
+  /** 매 프레임: 빠르게일 때 실제로 흐른 만큼 × 배수 → 이번에 더한 게임 ms */
+  function advance() {
+    const now = realNow(), s = t();
+    let d = lastReal == null ? 0 : now - lastReal;
+    lastReal = now;
+    if (d < 0 || (d > GAP_MS && R.whenClosed === 'pause')) d = 0;
+    s.realAt = now;
+    if (pausedMs != null || !scaled()) return 0;
+    ensureGame(s);
+    s.game += d * mult();
+    return d * mult();
+  }
+  /** 게임을 열 때 (fresh = 날짜 흉내라 저장 시각을 안 씀) */
+  function start({ fresh = false } = {}) {
+    const s = t(), now = realNow();
+    if (fresh) { s.game = realMs(); s.offset = 0; }
+    else if (scaled()) ensureGame(s);
+    if (!fresh && scaled() && R.whenClosed === 'catchUp' && Number.isFinite(s.realAt) && now > s.realAt) s.game += (now - s.realAt) * mult();
+    lastReal = now;
+    s.realAt = now;
+  }
   return {
-    state: t, clockMs, maxDay, floorMs, shiftTo, catchUp, mark,
+    state: t, clockMs, maxDay, floorMs, shiftTo, catchUp, mark, advance, start,
+    get speed() { return key(); }, get mult() { return mult(); },
+    /** 실제 시계(날짜 흉내 포함)에서 떨어진 정도 */
+    offset: () => clockMs() - realMs(),
     range: () => ({ floor: floorMs(), ceil: clockMs() + SHIFT_MAX_DAYS * DAY_MS }),
     /** 갈 시각을 범위 안으로 → { ms, clamped } */
     clamp: target => clampShift(target, { floor: floorMs(), ceil: clockMs() + SHIFT_MAX_DAYS * DAY_MS }),
-    setMode(mode) {
+    /** 빠르기 바꾸기 — 지금 시각에서 끊김 없이 이어서 (그 순간 시계는 그대로) → 바뀌었으면 true */
+    setSpeed(k) {
+      if (!SPEED_KEYS.includes(k)) return false;
       const s = t();
-      if ((mode !== 'real' && mode !== 'fast') || s.mode === mode) return;
+      if (s.speed === k) return false;
       const cur = clockMs();
-      s.mode = mode;
-      if (mode === 'fast') s.fastOffset = cur - realNow() * FAST_SCALE;
-      else { s.offset = 0; if (pausedMs != null) pausedMs = realNow() + baseShift; catchUp(); }
+      s.speed = k;
+      if (pausedMs != null) return true;
+      if (scaled()) s.game = cur;
+      else s.offset = cur - realMs();
+      return true;
     },
-    /** offset 0 (빠른 시간이면 실제로) + 가 본 날 맞추기 → { target(ms), caught } — 시계는 옮기지 않는다 */
+    /** 예전 이름 (debug 패널·옛 코드): 'real' = 실제와 같게, 'fast' = 빠르게 */
+    setMode(mode) { this.setSpeed(mode === 'real' ? 'real' : 'fast'); },
+    /** 「지금 시각으로 돌아가기」 갈 곳: 실제 시각 (가 본 날보다 앞이면 그 날 같은 시각) → { target(ms), caught, offset } — 시계는 옮기지 않는다 */
     resetTarget() {
-      const s = t(), prev = clockMs();
-      const save = { mode: s.mode, offset: s.offset, fastOffset: s.fastOffset };
-      s.mode = 'real'; s.offset = 0;
-      const caught = catchUp();
-      const target = clockMs();
-      Object.assign(s, save);
-      if (pausedMs != null) pausedMs = prev;
-      return { target, caught, offset: target - realNow() - baseShift };
+      const md = maxDay();
+      const r = md ? catchUpOffset(realMs(), 0, md) : { offset: 0, days: 0 };
+      return { target: realMs() + r.offset, caught: r.days, offset: r.offset };
     },
     get paused() { return pausedMs != null; },
     setPaused(on) {
       if (on && pausedMs == null) pausedMs = clockMs();
-      else if (!on && pausedMs != null) { const v = pausedMs; pausedMs = null; shiftTo(v); }
+      else if (!on && pausedMs != null) { const v = pausedMs; pausedMs = null; lastReal = realNow(); shiftTo(v); }
     },
   };
 }

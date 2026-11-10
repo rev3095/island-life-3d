@@ -61,7 +61,7 @@ export function placeInfo(ctx) {
     z: round(pos?.z ?? ctx.state?.player?.z, 10),
     indoor: safe(() => !!(s.house?.inside ?? s.time?.indoor)) ?? false,
     time: now ? `${now.year}-${p2(now.month)}-${p2(now.day)} ${p2(now.hour)}:${p2(now.minute)}` : null,
-    timeMode: ctx.state?.time?.mode ?? null,
+    timeMode: safe(() => s.time?.speed) ?? ctx.state?.time?.speed ?? null,   // p41: 시간 빠르기 real|fast|faster
     weather: safe(() => s.time?.weather) ?? null,
     story: safe(() => s.story?.playing?.id) ?? null,
     tool: safe(() => s.player?.tool) ?? ctx.state?.player?.tool ?? null,

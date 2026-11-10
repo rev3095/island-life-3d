@@ -82,7 +82,7 @@
 
 /* ---------- 첫날 할 일 목록 (왼쪽 위 시계 아래) ---------- */
 .fd-list {
-  position: absolute; left: calc(14px + var(--sal)); top: calc(96px + var(--sat)); width: 248px; max-width: calc(100% - 28px - var(--sal) - var(--sar));
+  position: absolute; left: calc(14px + var(--sal)); top: calc(96px + var(--sat) + var(--pk-clock-extra, 0px)); width: 248px; max-width: calc(100% - 28px - var(--sal) - var(--sar));
   background: rgba(255, 248, 230, .94); border-radius: 18px; box-shadow: var(--fd-shadow);
   pointer-events: auto; transition: opacity .25s, transform .25s, visibility .25s; animation: fd-slide .4s cubic-bezier(.2, 1.3, .4, 1);
 }
@@ -115,7 +115,7 @@
 .fd-touch .fd-list { width: 216px; }
 /* 휴대폰 세로: 오른쪽 위 메뉴 단추(가방·섬폰·지도)에 닿지 않게 좁게 */
 @media (max-width: 640px) {
-  .fd-list, .fd-touch .fd-list { top: calc(84px + var(--sat)); width: 184px; }
+  .fd-list, .fd-touch .fd-list { top: calc(84px + var(--sat) + var(--pk-clock-extra, 0px)); width: 184px; }
   .fd-head { min-height: 38px; padding: 6px 10px 4px 12px; font-size: 16px; }
   .fd-step { font-size: 14px; }
   .fd-hint { font-size: 12.5px; }
@@ -124,7 +124,7 @@
   .fd-list, .fd-touch .fd-list { top: calc(112px + var(--sat)); }
 }
 @media (orientation: landscape) and (max-height: 560px) {
-  .fd-list { top: calc(80px + var(--sat)); width: 220px; }
+  .fd-list { top: calc(80px + var(--sat) + var(--pk-clock-extra, 0px)); width: 220px; }
 }
 
 /* ---------- 힌트 카드 (7차 M7-P5: 오른쪽 위 메뉴 단추 아래, 잠깐 떴다 사라짐) ---------- */

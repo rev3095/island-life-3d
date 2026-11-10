@@ -808,12 +808,46 @@ export function makeScenario(bot, sk, opts = {}) {
     return { ok: true, from, to, hour: bot.hour(), day: bot.day() };
   };
 
-  add('clock-phone', '섬폰 시계 바늘로 밤 → 밤 곤충 잡기 · 낮으로 → 상점에서 사기', async () => {
+  // p41: 화면 왼쪽 위 원형 시계(HUD) — 시침을 끌어 놓으면 바로 그 시각, 남은 끝은 ←→ 미리 보기 + Enter
+  const hudClockTo = async hh => {
+    if (bot.blocking()) await bot.settle(10);
+    const dial = bot.$('.pk-hclock-dial');
+    if (!dial) return { ok: false, why: 'HUD 원형 시계가 없어요' };
+    const from = Number(dial.getAttribute('aria-valuenow'));
+    const want = (((hh * 60 - from) % 1440) + 1440) % 1440;
+    const r = dial.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width * 0.25;
+    const at = deg => ({ clientX: cx + Math.sin(deg * Math.PI / 180) * R, clientY: cy - Math.cos(deg * Math.PI / 180) * R });
+    const pe = (el, type, deg) => el.dispatchEvent(new bot.win.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 9, pointerType: 'mouse', button: 0, buttons: 1, ...at(deg) }));
+    let a = ((from / 60) % 12) / 12 * 360;
+    pe(bot.$('.pk-hclock-dial .h-hour .hit'), 'pointerdown', a);
+    for (let left = want / 2; left > 0; left -= 10) { a += Math.min(10, left); pe(dial, 'pointermove', a); await bot.stepFrame(); }
+    pe(dial, 'pointerup', a);                                                     // 놓으면 바로 적용
+    await bot.stepFrame();
+    for (let k = 0; k < 8; k++) {
+      const cur = Number(dial.getAttribute('aria-valuenow')), diff = ((((hh * 60 - cur) % 1440) + 1440 + 720) % 1440) - 720;
+      if (Math.abs(diff) < 8) break;
+      dial.focus(); bot.key(diff > 0 ? 'ArrowRight' : 'ArrowLeft'); await bot.stepFrame();
+    }
+    if (bot.$('.pk-hclock-dial.is-preview')) { dial.focus(); bot.key('Enter'); }
+    await bot.frames(4);
+    return { ok: true, from, to: S().time.now().hour * 60 + S().time.now().minute, hour: bot.hour(), day: bot.day() };
+  };
+
+  add('clock-phone', '시계로 밤 → 밤 곤충 잡기 · 낮으로 → 상점에서 사기 (HUD 원형 시계 · 섬폰 시계 창 · ±1시간 · 빠르기)', async () => {
     if (S().house?.inside) await sk.leaveHome();
     await bot.settle(20);
     if (!S().ui?.clock) return block('섬폰 시계 창(ui.clock)이 없어요');
+    const wasPaused = !!S().time.paused;
     S().time.setPaused?.(false);
-    const night = await clockTo(21);
+    // p41 HUD 조정 칸: 빠르기 단추(한 바퀴 돌려 제자리) · +1시간 단추
+    const strip = bot.$('.pk-hclock-strip');
+    if (strip?.hidden) await bot.click(bot.$('.pk-hclock-dial'));             // 좁은 화면은 접혀 있다 → 시계를 눌러 펼침
+    const sp0 = S().time.speed, seen = [];
+    for (let k = 0; k < 3; k++) { await bot.click(bot.$('.pk-hclock-speed')); seen.push(S().time.speed); }
+    const h0 = S().time.now().ms;
+    await bot.click([...bot.$$('.pk-hclock-strip button')].find(b => /\+1/.test(b.textContent)));
+    const plusMin = Math.round((S().time.now().ms - h0) / 60000);
+    const night = await hudClockTo(21);
     if (!night.ok) return block(night.why);
     const n1 = S().time.now();
     if (n1.part !== 'night') return block(`밤으로 안 바뀜 (${n1.hour}:${n1.minute}, ${n1.part})`);
@@ -838,8 +872,11 @@ export function makeScenario(bot, sk, opts = {}) {
     }
     const w0 = bot.acorns();
     if (cheap) await sk.shop({ buy: [cheap.id] });
-    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay });
+    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay, speeds: seen, speed: S().time.speed, plusMin });
+    if (wasPaused) S().time.setPaused?.(true);   // 다음 단계도 봇 시계(setHour)로
     const bad = [];
+    if (new Set(seen).size !== 3 || seen.at(-1) !== sp0) bad.push(`빠르기 단추 ${sp0} → ${seen.join('→')}`);
+    if (Math.abs(plusMin - 60) > 2) bad.push(`+1시간 단추 ${plusMin}분`);
     if (lit < 0.9) bad.push(`밤 불빛 ${lit.toFixed(2)}`);
     if (!bug) bad.push('밤 곤충을 못 잡음');
     if (!cheap) bad.push('살 수 있는 물건 없음');

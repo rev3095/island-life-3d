@@ -14,7 +14,7 @@ export function createState() {
     island: { seed: 20261028, dayKey: null, removed: [], added: [], dug: [], fruit: {} },   // world + data(하루 리셋)
     villagers: {},                               // 주민별 { friendship, lastTalk, request }
     house: { furniture: [] },                    // 실내 가구 배치
-    time: { mode: 'real', fastOffset: 0 },       // sky: 'real' 실제 시계, 'fast' 1분 = 1시간
+    time: { speed: null, offset: 0, game: null, maxDay: null },   // sky: speed null = rules.json time.speed (p41 시간 빠르기), 실제와 같게 = 실제 시계 + offset, 빠르게 = game
     settings: { bgm: 0.6, sfx: 0.8, voice: 0.7, outline: true },
     flags: {},                                   // 튜토리얼 등 한 번만 일어나는 일
   };

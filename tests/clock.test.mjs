@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   createTimeline, catchUpOffset, msAtClock, clampShift, floorMsOf, laterDay, dayKeyOf, dayStartMs, DAY_MS, SHIFT_MAX_DAYS,
+  timeRules, dayLengthText, GAP_MS, SPEED_KEYS,
 } from '../src/sky/clock.js';
 import { wrapDeg, handAngles, pointAngle, dragMinutes, clampDelta, labelOf, offsetText, activityHints, KEY_STEP } from '../src/ui/clock.js';
 import { isStarTime } from '../src/gameplay/decor/telescope.js';
@@ -14,10 +15,10 @@ const at = (y, mo, d, h = 0, mi = 0) => new Date(y, mo - 1, d, h, mi).getTime();
 const HOUR = 3600e3;
 
 /** 가짜 실제 시계로 timeline 만들기 */
-function fake({ real = at(2026, 11, 10, 14, 0), time = {}, island = null, baseShift = 0 } = {}) {
+function fake({ real = at(2026, 11, 10, 14, 0), time = {}, island = null, baseShift = 0, rules } = {}) {
   const clock = { real };
-  const state = { time: { mode: 'real', fastOffset: 0, ...time } };
-  const tl = createTimeline({ getTime: () => state.time, baseShift, extraDay: () => island, realNow: () => clock.real });
+  const state = { time: { offset: 0, ...time } };
+  const tl = createTimeline({ getTime: () => state.time, baseShift, extraDay: () => island, realNow: () => clock.real, ...(rules ? { rules } : {}) });
   return { tl, state, clock };
 }
 
@@ -94,11 +95,18 @@ test('시계: PC 시계를 되돌리거나 빠른 시간 → 실제 시간이면
   assert.equal(r.days, 2);
   assert.equal(dayKeyOf(at(2026, 11, 8, 10) + r.offset), '2026-11-10');
   assert.deepEqual(catchUpOffset(at(2026, 11, 10, 10), 0, '2026-11-10'), { offset: 0, days: 0 });
-  // 빠른 시간으로 사흘 앞서 가 놓고 실제 시간으로
-  const { tl, state } = fake({ time: { maxDay: '2026-11-13', mode: 'fast', fastOffset: 0 } });
-  tl.setMode('real');
-  assert.equal(state.time.mode, 'real');
+  // p41: 빠르게로 사흘 앞서 간 섬을 실제와 같게로 — 시각이 끊기지 않고 이어진다 (offset = 앞선 만큼), 날짜가 뒤로 가지 않는다
+  const { tl, state } = fake({ time: { maxDay: '2026-11-13', speed: 'fast', game: at(2026, 11, 13, 9) }, rules: timeRules({}) });
+  assert.equal(tl.speed, 'fast');
+  tl.setSpeed('real');
+  assert.equal(state.time.speed, 'real');
+  assert.equal(tl.clockMs(), at(2026, 11, 13, 9));
   assert.equal(dayKeyOf(tl.clockMs()), '2026-11-13');
+  // 예전 저장 mode 'fast' (실제 1분 = 1시간) 는 그 시각에서 「아주 빠르게」로 이어진다
+  const old = fake({ time: { mode: 'fast', fastOffset: -at(2026, 11, 10, 14) * 59 } });
+  assert.equal(old.tl.speed, 'faster');
+  assert.equal(old.state.time.mode, undefined);
+  assert.equal(old.tl.clockMs(), at(2026, 11, 10, 14));
 });
 
 test('시계: 바늘 각도 — 시침 한 바퀴 12시간, 분침 한 바퀴 1시간, 12를 넘으면 오전·오후가 바뀐다', () => {
@@ -179,4 +187,107 @@ test('상점: 가방이 꽉 차도 같은 물건 칸에 겹쳐 담을 수 있으
   assert.equal(inv.canFit('seed.pansy', 1), 0, '없는 씨앗은 못 담는다');
   const shop = readFileSync(new URL('../src/ui/shop.js', import.meta.url), 'utf8');
   assert.match(shop, /canFit\(id, 1\) > 0/, '상점 사기는 빈칸이 아니라 canFit 으로 본다');
+});
+
+// ── p41 시간 빠르기 ──
+const R12 = timeRules({ speed: 'fast', speeds: { fast: 12, faster: 30 }, whenClosed: 'pause' });
+/** 프레임을 n 번, 한 번에 ms 씩 돌리기 */
+const frames = (f, n, ms = 100) => { for (let i = 0; i < n; i++) { f.clock.real += ms; f.tl.advance(); } };
+
+test('시간 빠르기: rules.json time 값 · 빠진 칸은 기본값 · 실제와 같게는 언제나 1배', () => {
+  const rules = JSON.parse(readFileSync(new URL('../assets/data/rules.json', import.meta.url), 'utf8'));
+  const R = timeRules(rules.time);
+  assert.ok(SPEED_KEYS.includes(R.speed));
+  assert.equal(R.speeds.real, 1);
+  assert.ok(R.speeds.fast > 1 && R.speeds.faster >= R.speeds.fast);
+  assert.deepEqual(timeRules({ speeds: { real: 5, fast: -1 } }).speeds, { real: 1, fast: 12, faster: 30 });
+  assert.equal(timeRules({ whenClosed: 'x' }).whenClosed, 'pause');
+  assert.equal(dayLengthText(12), '게임 하루 = 실제 2시간');
+  assert.equal(dayLengthText(30), '게임 하루 = 실제 48분');
+  assert.equal(dayLengthText(1), '실제 시계와 같아요');
+});
+
+test('시간 빠르기: 빠르게(×12) — 실제 1분에 게임 12분, 새 게임은 실제 시각에서 시작', () => {
+  const f = fake({ rules: R12 });
+  f.tl.start();
+  assert.equal(f.tl.clockMs(), at(2026, 11, 10, 14));
+  frames(f, 600);                                      // 실제 60초
+  assert.equal(f.tl.clockMs(), at(2026, 11, 10, 14, 12));
+  assert.equal(f.state.time.game, at(2026, 11, 10, 14, 12), '게임 시각은 state.time.game 에 저장');
+});
+
+test('시간 빠르기: 닫아 둔 동안 — pause 는 멈춰 있다가 이어서, catchUp 은 흐른 만큼 (실제와 같게는 언제나 실제 시계)', () => {
+  const saved = { speed: 'fast', game: at(2026, 11, 10, 20), realAt: at(2026, 11, 10, 14) };
+  const a = fake({ real: at(2026, 11, 10, 15), time: { ...saved }, rules: R12 });   // 실제 1시간 뒤에 다시 염
+  a.tl.start();
+  assert.equal(a.tl.clockMs(), at(2026, 11, 10, 20), 'pause: 저장한 시각 그대로');
+  const b = fake({ real: at(2026, 11, 10, 15), time: { ...saved }, rules: timeRules({ ...R12, whenClosed: 'catchUp' }) });
+  b.tl.start();
+  assert.equal(b.tl.clockMs(), at(2026, 11, 11, 8), 'catchUp: 실제 1시간 × 12 = 게임 12시간');
+  // 탭을 숨겼다가(프레임 사이 GAP_MS 넘게) 돌아와도 pause 면 그동안 안 흐른다
+  const c = fake({ rules: R12 }); c.tl.start();
+  c.clock.real += GAP_MS * 10; c.tl.advance();
+  assert.equal(c.tl.clockMs(), at(2026, 11, 10, 14));
+  const r = fake({ time: { speed: 'real', offset: HOUR } , rules: R12 }); r.tl.start();
+  r.clock.real += 3 * HOUR;
+  assert.equal(r.tl.clockMs(), at(2026, 11, 10, 18), '실제와 같게: 닫아 둔 동안에도 실제 시계대로');
+});
+
+test('시간 빠르기: 빠르기를 바꿔도 그 순간 시각은 끊기지 않는다 (실제와 같게 ↔ 빠르게 ↔ 아주 빠르게)', () => {
+  const f = fake({ rules: R12 }); f.tl.start();
+  frames(f, 300);                                      // 30초 × 12 = 6분
+  const t1 = f.tl.clockMs();
+  assert.equal(f.tl.setSpeed('faster'), true);
+  assert.equal(f.tl.clockMs(), t1);
+  frames(f, 20);                                       // 2초 × 30 = 1분
+  assert.equal(f.tl.clockMs(), t1 + 60e3);
+  f.tl.setSpeed('real');
+  assert.equal(f.tl.clockMs(), t1 + 60e3);
+  f.clock.real += 60e3;
+  assert.equal(f.tl.clockMs(), t1 + 120e3, '실제와 같게: 1분에 1분');
+  assert.equal(f.tl.setSpeed('nope'), false);
+});
+
+test('시간 빠르기: 빠르게 흐르다 새벽 5시를 넘으면 날짜가 넘어가고, 가 본 날 아래로는 못 돌린다', () => {
+  const f = fake({ rules: R12, time: { speed: 'fast', game: at(2026, 11, 10, 4, 30), maxDay: '2026-11-09' } });
+  f.tl.start();
+  assert.equal(dayKeyOf(f.tl.clockMs()), '2026-11-09', '새벽 4시 반은 아직 어제');
+  frames(f, 160, 1000);                                // 실제 160초 × 12 = 32분 → 5:02
+  const key = dayKeyOf(f.tl.clockMs());
+  assert.equal(key, '2026-11-10');
+  f.tl.mark(key);
+  assert.equal(f.tl.clamp(at(2026, 11, 10, 4)).clamped, 'floor', '어제로 되돌리기는 막힘');
+  // 돌아가기 = 실제 시각 (가 본 날보다 앞이면 그 날 같은 시각)
+  const g = fake({ rules: R12, real: at(2026, 11, 10, 14), time: { speed: 'fast', game: at(2026, 11, 12, 9), maxDay: '2026-11-12' } });
+  g.tl.start();
+  const r = g.tl.resetTarget();
+  assert.equal(r.caught, 2);
+  assert.equal(r.target, at(2026, 11, 12, 14));
+});
+
+test('시간 빠르기: 멈춤(봇·점검)이면 흐르지 않고, 풀면 그 시각에서 이어서', () => {
+  const f = fake({ rules: R12 }); f.tl.start();
+  f.tl.setPaused(true);
+  frames(f, 100);
+  assert.equal(f.tl.clockMs(), at(2026, 11, 10, 14));
+  f.tl.shiftTo(at(2026, 11, 10, 9));                  // setHour
+  f.tl.setPaused(false);
+  frames(f, 50);                                       // 5초 × 12 = 1분
+  assert.equal(f.tl.clockMs(), at(2026, 11, 10, 9, 1));
+});
+
+test('p41 화면: HUD 원형 시계 + 조정 칸 · 섬폰 「시간 빠르기」 · 요소 편집기 칸이 이어져 있다', async () => {
+  const hud = read('src/ui/hudclock.js');
+  assert.match(hud, /createDial\(\{\s*\n?\s*cls: 'pk-hclock-dial', compact: true/, 'HUD 는 섬폰 시계 창과 같은 판 부품');
+  for (const k of ['step(-1)', 'step(1)', 'cycleSpeed()', "ui?.clock?.open"]) assert.ok(hud.includes(k), k);
+  assert.match(hud, /--pk-clock-extra/, '펼친 조정 칸만큼 밑의 칸이 내려간다');
+  assert.match(hud, /release\(\)/, '끌기·적용 뒤 포커스를 놓아 Space 가 게임으로');
+  const ui = read('src/ui/index.js');
+  assert.match(ui, /hudClock\.mount\(hud\.root\.querySelector\('\.pk-clock'\)\)/);
+  for (const name of ['time:shift', 'time:speed', 'time:newday']) assert.ok(ui.includes(`'${name}'`), name);
+  assert.match(read('src/ui/phone.js'), /time\.setSpeed\(sp\.key\)/);
+  assert.match(read('src/sky/index.js'), /tl\.advance\(\)/);
+  const sheets = read('elem-editor/sheets.js');
+  for (const p of ['rules/time/speed', 'rules/time/speeds/fast', 'rules/time/speeds/faster', 'rules/time/whenClosed']) assert.ok(sheets.includes(`'${p}'`), p);
+  for (const f of ['src/gameplay/intro/intro.css', 'src/gameplay/festival/festival.css']) assert.match(read(f), /var\(--pk-clock-extra, 0px\)/, f);
 });

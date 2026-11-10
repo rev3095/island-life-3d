@@ -100,7 +100,7 @@
 body.story-on .fe-hud { visibility: hidden; }
 /* 좁은 화면(휴대폰 세로): 위 가운데에 두면 시계·도토리 수를 덮는다 (판 폭 ≈ 258px) → 시계 밑 왼쪽에 작게 (QA-16) */
 @media (max-width: 600px) {
-  .fe-hud { left: calc(14px + env(safe-area-inset-left, 0px)); top: calc(76px + env(safe-area-inset-top, 0px)); transform: none; gap: 2px; padding: 3px 8px; }
+  .fe-hud { left: calc(14px + env(safe-area-inset-left, 0px)); top: calc(76px + env(safe-area-inset-top, 0px) + var(--pk-clock-extra, 0px)); transform: none; gap: 2px; padding: 3px 8px; }
   .fe-hud .fe-emo { width: 18px; height: 18px; }
   .fe-part { width: 22px; height: 18px; }
 }
