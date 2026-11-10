@@ -17,7 +17,7 @@ export const DMAX = 12;             // 텍스처에 담는 거리 한계 (칸)
 export function coastField(gen) {
   const { w, h } = gen;
   const NX = (w + 2 * M) * R, NZ = (h + 2 * M) * R, N = NX * NZ;
-  const x0 = -w / 2 - M, z0 = -h / 2 - M;          // 격자 왼쪽 위 (월드)
+  const x0 = -w / 2 - M + (gen.ox ?? 0), z0 = -h / 2 - M;          // 격자 왼쪽 위 (월드). gen.ox = 떨어뜨려 세운 섬(투어 섬)의 x 자리
   const kindAt = (tx, tz) => (tx < 0 || tz < 0 || tx >= w || tz >= h ? KIND.SEA : gen.kind[tz * w + tx]);
   // 칸 가운데 표본: 땅 = 바다·강물이 아님, 강 = 강물
   const land = new Float32Array(N), river = new Float32Array(N);

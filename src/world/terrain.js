@@ -94,7 +94,7 @@ export function buildTerrain(ctx, gen, island, kit, models) {
 
 /** 섬 둘레 바다: 꼭짓점 색은 중간 → 깊은 색, 바닷가 얕은 물빛·거품·물결은 해안 셰이더(coast.js). 곡면 월드가 휘도록 잘게 나눈다. */
 function buildSea(ctx, gen, island, waterSpec, coast) {
-  const { w, h } = gen;
+  const { w, h } = gen, ox = gen.ox ?? 0;
   // 땅에서의 거리 (타일)
   const N = w * h, d = new Float32Array(N).fill(1e9);
   for (let i = 0; i < N; i++) if (gen.kind[i] !== KIND.SEA) d[i] = 0;
@@ -114,7 +114,8 @@ function buildSea(ctx, gen, island, waterSpec, coast) {
   const distAt = (x, z) => {
     const { tx, tz } = island.toTile(x, z);
     if (tx < 0 || tz < 0 || tx >= w || tz >= h) {
-      const ex = Math.max(0, -x - w / 2, x - w / 2), ez = Math.max(0, -z - h / 2, z - h / 2);
+      const lx = x - ox;
+      const ex = Math.max(0, -lx - w / 2, lx - w / 2), ez = Math.max(0, -z - h / 2, z - h / 2);
       const cx = Math.min(w - 1, Math.max(0, tx)), cz = Math.min(h - 1, Math.max(0, tz));
       return d[cz * w + cx] + Math.hypot(ex, ez);
     }
@@ -123,6 +124,7 @@ function buildSea(ctx, gen, island, waterSpec, coast) {
   const SIZE = 360, SEG = 180;
   const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
   geo.rotateX(-Math.PI / 2);
+  if (ox) geo.translate(ox, 0, 0);   // 투어 섬: 바다 판도 그 섬 둘레로
   const pos = geo.attributes.position;
   const col = new Float32Array(pos.count * 3);
   const mid = new THREE.Color(waterSpec.variants?.sea?.palette?.water ?? '#5BAFD0'), deep = new THREE.Color('#4C9CC4');

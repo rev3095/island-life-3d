@@ -1,5 +1,5 @@
 {
-  "version": 0,
+  "version": 1,
   "about": "아이템 사전 — 이름·파는 값(price)·사는 값(buy)·출현(장소·시간·계절·희귀). 표 편집기(data-editor.html)에서 고치고 채팅 \"숫자 반영\" 으로 들어온다. 읽는 곳 src/data/items.js. 모양: docs/notes/m6-p5-mapdata.md",
   "stack": {
     "fish": 1,
@@ -33,7 +33,8 @@
     "강 · 연못": ["river", "pond"],
     "하구": ["river", "mouth"],
     "바다": ["sea"],
-    "선착장": ["pier"]
+    "선착장": ["pier"],
+    "무인도 바다": ["islet"]
   },
   "bugPlaces": {
     "꽃 주변": ["flower"],
@@ -48,7 +49,9 @@
     "바위": ["rock"],
     "바위 밑": ["under"],
     "강 위": ["water"],
-    "가로등·창문": ["lamp"]
+    "가로등·창문": ["lamp"],
+    "무인도 바위": ["islet-rock"],
+    "무인도 공중": ["islet-air"]
   },
   "weight": { "rare": 1, "byPrice": [[1000, 3], [400, 6]], "base": 10 },
   "fish": [
@@ -71,7 +74,9 @@
     { "slug": "seahorse", "name": "해마", "place": "바다", "time": "종일", "season": "봄~가을", "shadow": 1, "price": 1100, "rare": false, "emoji": "🐟", "colors": ["#F2B262", "#D88E3E", "#F8D69C", "#E8A050"], "desc": "말을 닮은 얼굴로 꼿꼿이 서서 헤엄친다. 알은 아빠가 배 주머니에 품는다." },
     { "slug": "sea-bream", "name": "도미", "place": "바다", "time": "종일", "season": "연중", "shadow": 4, "price": 3000, "rare": false, "emoji": "🐟", "colors": ["#F2A2AA", "#E07A86", "#FBE4E2", "#E88A94"], "desc": "분홍빛 몸이 고운 바다의 귀한 손님. 잔칫날이면 꼭 찾는 물고기다." },
     { "slug": "tuna", "name": "참치", "place": "선착장", "time": "종일", "season": "겨울", "shadow": 6, "price": 7000, "rare": true, "emoji": "🐟", "colors": ["#4F6C8C", "#2E4560", "#DCE4EA", "#E8C04A"], "desc": "쉬지 않고 바다를 가로지르는 커다란 물고기. 선착장 끝에서 운이 좋아야 만난다." },
-    { "slug": "shark", "name": "상어", "place": "바다", "time": "밤", "season": "여름", "shadow": 6, "price": 15000, "rare": true, "emoji": "🦈", "colors": ["#7E8F9C", "#5E6E7C", "#EEF0EE", "#6E808E"], "desc": "여름밤 바다에 커다란 등지느러미가 보이면 이 녀석이다. 낚싯줄을 꽉 잡자!" }
+    { "slug": "shark", "name": "상어", "place": "바다", "time": "밤", "season": "여름", "shadow": 6, "price": 15000, "rare": true, "emoji": "🦈", "colors": ["#7E8F9C", "#5E6E7C", "#EEF0EE", "#6E808E"], "desc": "여름밤 바다에 커다란 등지느러미가 보이면 이 녀석이다. 낚싯줄을 꽉 잡자!" },
+    { "slug": "rainbow-wrasse", "name": "무지개놀래기", "place": "무인도 바다", "time": "낮", "season": "연중", "shadow": 2, "price": 2500, "rare": false, "emoji": "🐠", "colors": ["#5FB7D4", "#3F8FB0", "#F7E7A6", "#E8913A"], "desc": "무인도 바닷가 바위 틈을 누비는 알록달록한 물고기. 본섬 바다에서는 보이지 않는다." },
+    { "slug": "flower-scorpionfish", "name": "꽃쏨뱅이", "place": "무인도 바다", "time": "종일", "season": "연중", "shadow": 3, "price": 4000, "rare": true, "emoji": "🐡", "colors": ["#E07A6A", "#B9574B", "#F6D8C8", "#F2A65A"], "desc": "꽃잎 같은 지느러미를 펼친 무인도의 보물. 가시가 있으니 조심해서 잡자." }
   ],
   "bugs": [
     { "slug": "cabbage-white", "name": "배추흰나비", "place": "꽃 주변", "time": "낮", "season": "봄~가을", "price": 160, "rare": false, "flying": true, "emoji": "🦋", "desc": "하얀 날개에 까만 점 몇 개. 봄 들판을 가장 먼저 날아다닌다." },
@@ -95,7 +100,9 @@
     { "slug": "pond-skater", "name": "소금쟁이", "place": "강 위", "time": "낮", "season": "여름", "price": 130, "rare": false, "flying": false, "emoji": "🦟", "desc": "긴 다리로 물 위를 미끄러지듯 걷는다. 물에 빠지지 않는 신기한 곤충이다." },
     { "slug": "moth", "name": "나방", "place": "가로등·창문", "time": "밤", "season": "연중", "price": 130, "rare": false, "flying": true, "emoji": "🦋", "desc": "밤이면 가로등과 창문 불빛으로 모여든다. 날개에 고운 가루가 묻어 있다." },
     { "slug": "caterpillar", "name": "송충이", "place": "나무 흔들기", "time": "종일", "season": "봄~가을", "price": 300, "rare": false, "flying": false, "emoji": "🐛", "desc": "나뭇잎을 갉아 먹다가 흔들리면 실을 타고 툭 떨어진다. 언젠가 날개를 달 날을 꿈꾼다." },
-    { "slug": "earwig", "name": "집게벌레", "place": "바위 밑", "time": "밤", "season": "봄~가을", "price": 450, "rare": false, "flying": false, "emoji": "🪲", "desc": "꽁무니에 작은 집게를 단 밤 손님. 무섭게 생겼지만 사실은 겁이 많다." }
+    { "slug": "earwig", "name": "집게벌레", "place": "바위 밑", "time": "밤", "season": "봄~가을", "price": 450, "rare": false, "flying": false, "emoji": "🪲", "desc": "꽁무니에 작은 집게를 단 밤 손님. 무섭게 생겼지만 사실은 겁이 많다." },
+    { "slug": "jewel-beetle", "name": "보석풍뎅이", "place": "무인도 바위", "time": "낮", "season": "연중", "price": 3000, "rare": true, "flying": false, "emoji": "🪲", "desc": "광석 바위 둘레에 사는 반짝이는 풍뎅이. 등딱지가 결정처럼 빛난다." },
+    { "slug": "moon-moth", "name": "달빛나방", "place": "무인도 공중", "time": "밤", "season": "연중", "price": 2800, "rare": true, "flying": true, "emoji": "🦋", "desc": "무인도의 밤하늘을 하얗게 날아다니는 나방. 날개에 달빛이 고인 것 같다." }
   ],
   "fossils": [
     { "slug": "ammonite", "name": "암모나이트", "price": 1100, "rare": false, "emoji": "🐚", "desc": "소용돌이 껍데기를 가진 옛 바다 생물. 공룡보다도 먼저 바다를 누볐다." },
@@ -114,6 +121,8 @@
     { "slug": "peach", "name": "복숭아", "emoji": "🍑", "price": 500, "nativePrice": 100, "variant": "peach" },
     { "slug": "cherry", "name": "체리", "emoji": "🍒", "price": 500, "nativePrice": 100, "variant": "cherry" },
     { "slug": "orange", "name": "오렌지", "emoji": "🍊", "price": 500, "nativePrice": 100, "variant": "orange" },
+    { "slug": "mango", "name": "망고", "emoji": "🥭", "price": 600, "nativePrice": 600, "variant": "mango", "islet": true },
+    { "slug": "lychee", "name": "리치", "emoji": "🍓", "price": 600, "nativePrice": 600, "variant": "lychee", "islet": true },
     { "slug": "coconut", "name": "야자열매", "emoji": "🥥", "price": 250, "nativePrice": 250, "variant": null }
   ],
   "shells": [
@@ -136,7 +145,10 @@
     { "slug": "stone", "name": "돌", "emoji": "🪨", "price": 75, "from": "바위를 도끼로", "code": "MA-05" },
     { "slug": "iron", "name": "철광석", "emoji": "⛓️", "price": 375, "from": "바위를 도끼로", "code": "MA-05" },
     { "slug": "clay", "name": "점토", "emoji": "🟤", "price": 100, "from": "바위를 도끼로", "code": "MA-05" },
-    { "slug": "weed", "name": "잡초", "emoji": "🌱", "price": 10, "from": "뽑기", "code": "MA-06" }
+    { "slug": "weed", "name": "잡초", "emoji": "🌱", "price": 10, "from": "뽑기", "code": "MA-06" },
+    { "slug": "gold-ore", "name": "금광석", "emoji": "🪙", "price": 6000, "from": "무인도 광석 바위를 삽·도끼로", "code": "MA-05" },
+    { "slug": "crystal", "name": "수정", "emoji": "💎", "price": 3000, "from": "무인도 광석 바위를 삽·도끼로", "code": "MA-05" },
+    { "slug": "tour-ticket", "name": "섬 여행 표", "emoji": "🎫", "price": 250, "from": "선착장 배에서 1,000 도토리", "code": "MA-09" }
   ],
   "acornBag": { "name": "도토리 주머니", "emoji": "💰", "price": 100, "acorns": 100, "stack": 10, "from": "나무·바위에서 가끔" },
   "tools": [

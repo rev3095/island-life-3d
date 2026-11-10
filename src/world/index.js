@@ -8,8 +8,10 @@ import { createDaily } from './daily.js';
 import { createOcclusion } from './occlusion.js';
 import { carveFestival } from './festival.js';
 import { FURN_KIND, furnitureWorld } from './variants.js';
+import { buildIslet } from './islets.js';
 
 let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
+let islet = null;          // P35 투어 섬 (buildIslet 결과) — 있으면 world.island·objects·places 의 칸 질문이 그 섬으로 간다
 
 /** 계절 행사에만 놓는 배경 종류 (assets/events/events.json list[].assets.env) — 처음에 받지 않는다 */
 async function eventKinds(assets) {
@@ -25,6 +27,11 @@ async function decorKinds(assets, data) {
   return [...env, ...furn];
 }
 
+/** P35 무인도 투어 모델 (배·광석 바위, assets/tour/tour.json env) — 처음에 받지 않고 선착장에 배를 놓을 때·투어 섬을 세울 때 */
+async function tourKinds(assets) {
+  const cfg = await assets.loadJSON('assets/tour/tour.json').catch(() => null);
+  return cfg?.env ?? [];
+}
 
 export default {
   name: 'world',
@@ -41,6 +48,7 @@ export default {
     const index = await assets.loadEnvIndex();
     const lazy = await eventKinds(assets);
     for (const k of await decorKinds(assets, data)) lazy.add(k);
+    for (const k of await tourKinds(assets)) lazy.add(k);
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
@@ -65,11 +73,14 @@ export default {
     // zone = { contains(x, z), collide(fx, fz, nx, nz, r, y) → {x, z}, heightAt?(x, z), groundAt?(x, z), isWalkable?(x, z) }
     const zones = [];
     const zoneAt = (x, z) => zones.find(zn => zn.contains(x, z));
+    // 칸 질문(tileAt·toTile …)은 투어 중이면 투어 섬이 받는다 (채집·낚시·곤충이 그 섬에서 그대로 돈다). 월드 좌표 질문은 자리로 고른다
+    const cur = () => islet?.api ?? base;
+    const at = (x, z) => (islet?.contains(x, z) ? islet.api : base);
     const island = {
-      w: base.w, h: base.h,
-      tileAt: base.tileAt, levelAt: base.levelAt, isWater: base.isWater,
+      get w() { return cur().w; }, get h() { return cur().h; },
+      tileAt: (tx, tz) => cur().tileAt(tx, tz), levelAt: (tx, tz) => cur().levelAt(tx, tz), isWater: (x, z) => at(x, z).isWater(x, z),
       heightAt: (x, z) => zoneAt(x, z)?.heightAt?.(x, z) ?? base.heightAt(x, z),
-      toTile: base.toTile, toWorld: base.toWorld,
+      toTile: (x, z) => cur().toTile(x, z), toWorld: (tx, tz) => cur().toWorld(tx, tz),
       /** 땅이 걸을 수 있고 물체 충돌체 안이 아니면 true */
       isWalkable(x, z) {
         const zn = zoneAt(x, z);
@@ -77,7 +88,8 @@ export default {
         const { tx, tz } = base.toTile(x, z);
         return base.isWalkableTile(tx, tz) && !collision.blockedAt(x, z, base.heightAt(x, z));
       },
-      passable: base.passable, rampAt: base.rampAt, flagsAt: base.flagsAt,
+      passable: (...a) => cur().passable(...a), rampAt: (tx, tz) => cur().rampAt(tx, tz), flagsAt: (tx, tz) => cur().flagsAt(tx, tz),
+      isWalkableTile: (tx, tz) => cur().isWalkableTile(tx, tz),
       groundAt: (x, z) => {
         const zn = zoneAt(x, z);
         if (zn?.groundAt) return zn.groundAt(x, z);
@@ -87,15 +99,19 @@ export default {
     };
 
     let season = null;
+    function recolor(ter, objs) {
+      const g = models['tile-grass'].spec;
+      const pal = { ...g.palette, ...(g.variants?.[season]?.palette ?? {}) };
+      ter.templates[KIND.GRASS].recolor(pal);
+      ter.templates[KIND.CLIFF].recolor({ grass: pal.grass });
+      ter.banks.setGrass(pal.grass);
+      objs.setSeason(season);
+    }
     function setSeason(s) {
       if (!s || s === season) return;
       season = s;
-      const g = models['tile-grass'].spec;
-      const pal = { ...g.palette, ...(g.variants?.[s]?.palette ?? {}) };
-      terrain.templates[KIND.GRASS].recolor(pal);
-      terrain.templates[KIND.CLIFF].recolor({ grass: pal.grass });
-      terrain.banks.setGrass(pal.grass);
-      objects.setSeason(s);
+      recolor(terrain, objects);
+      if (islet) recolor(islet.terrain, islet.objects);
       events.emit('world:season', { season: s });
     }
     const month = ctx.services.time?.now?.().month ?? new Date().getMonth() + 1;
@@ -109,21 +125,62 @@ export default {
       const out = [];
       const wantSand = kind === 'shell';
       for (let tz = 0; tz < gen.h; tz++) for (let tx = 0; tx < gen.w; tx++) {
-        const k = island.tileAt(tx, tz);
+        const k = base.tileAt(tx, tz);   // 본섬만 (투어 섬에 가 있어도 날마다 놓는 것은 본섬에)
         if (wantSand ? k !== 'sand' : k !== 'grass') continue;
         if (base.flagsAt(tx, tz) || objects.api.at(tx, tz)) continue;
-        if (wantSand && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => island.tileAt(tx + a, tz + b) === 'sea')) continue;   // 조개는 물가 모래
-        const { x, z } = island.toWorld(tx, tz);
+        if (wantSand && ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => base.tileAt(tx + a, tz + b) === 'sea')) continue;   // 조개는 물가 모래
+        const { x, z } = base.toWorld(tx, tz);
         if (collision.blockedAt(x, z)) continue;
-        out.push({ tx, tz, x, z, level: island.levelAt(tx, tz) });
+        out.push({ tx, tz, x, z, level: base.levelAt(tx, tz) });
       }
       return out;
     };
     // 날마다 조개·잡초·화석 자리 다시 놓기, 열매 다시 열기 (data:newday · game:ready 때)
     const daily = createDaily(ctx, { objects: objects.api, spawnTiles, nativeFruit: gen.nativeFruit });
 
+    // 물체 api: 투어 중이면 투어 섬 물체 (나무 흔들기·꽃 꺾기·바위 치기가 그 섬 물체로)
+    const objectsApi = new Proxy({}, { get: (_, k) => { const a = islet ? islet.objects.api : objects.api; const v = a[k]; return typeof v === 'function' ? v.bind(a) : v; } });
+    const env = { models, lazy, load };
+    let isletZone = null;
     ctx.services.world = {
-      island, places: gen.places, objects: objects.api, setSeason, daily,
+      island, objects: objectsApi, setSeason, daily,
+      get places() { return islet ? islet.gen.places : gen.places; },
+      /** 본섬 물체·자리 (투어 중에도 본섬을 봐야 하는 곳) */
+      home: { objects: objects.api, places: gen.places, island: base },
+      /** P35 투어 섬: enter(gen, ox) → 세우고 들어가기 (칸 질문이 그 섬으로), leave() → 치우고 본섬으로. gen = gameplay/tour/islet.js */
+      islet: {
+        get active() { return !!islet; },
+        get current() { return islet; },
+        async enter(g, ox = 700) {
+          this.leave();
+          // 처음 받는 모델(투어 묶음)을 먼저 받는다
+          const need = [...new Set(g.objects.map(o => o.kind))].filter(k => !models[k] && lazy.has(k));
+          await Promise.all(need.map(async k => { models[k] = await load(k); }));
+          const unknown = g.objects.filter(o => !models[o.kind]).map(o => o.kind);
+          if (unknown.length) { console.warn('[world] 투어 섬: 모르는 물체 종류는 뺀다', [...new Set(unknown)]); g.objects = g.objects.filter(o => models[o.kind]); }
+          islet = buildIslet(ctx, g, ox, env);
+          if (season) recolor(islet.terrain, islet.objects);
+          const it = islet;
+          isletZone = this.zone = ctx.services.world.addZone({
+            contains: (x, z) => it.contains(x, z),
+            collide: (fx, fz, nx, nz, r, y) => it.collision.move(fx, fz, nx, nz, r, y),
+            heightAt: (x, z) => it.api.heightAt(x, z),
+            groundAt: (x, z) => { const t = it.api.toTile(x, z); return it.objects.api.groundAt(t.tx, t.tz) ?? it.api.groundAt(x, z); },
+            isWalkable: (x, z) => { const t = it.api.toTile(x, z); return it.api.isWalkableTile(t.tx, t.tz) && !it.collision.blockedAt(x, z, it.api.heightAt(x, z)); },
+          });
+          events.emit('world:islet', { active: true, shape: g.shape, seed: g.seed });
+          return islet;
+        },
+        leave() {
+          if (!islet) return false;
+          isletZone?.();
+          isletZone = null;
+          islet.dispose();
+          islet = null;
+          events.emit('world:islet', { active: false });
+          return true;
+        },
+      },
       get season() { return season; },
       /** 원(반지름 r)을 (fx,fz) → (nx,nz) 로 옮긴다. 막히면 미끄러진 자리 {x, z} */
       collide: (fx, fz, nx, nz, r, y) => {
@@ -134,15 +191,15 @@ export default {
       addZone(zone) { zones.push(zone); return () => { const i = zones.indexOf(zone); if (i >= 0) zones.splice(i, 1); }; },
       /** 움직이는 충돌체 (주민·플레이어): m = { x, z, r, y?, active? } (getter 가능) → 해제 함수. 섬 위 collide 가 원으로 밀어낸다 (자기 자신은 빼고) */
       addMover: m => collision.addMover(m),
-      setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); },
+      setOutlineVisible(v) { terrain.setOutlineVisible(v); objects.setOutlineVisible(v); if (islet) { islet.terrain.setOutlineVisible(v); islet.objects.setOutlineVisible(v); } },
       /** 그리기 직전에 render 가 부른다: 배경 묶음마다 본 카메라·그림자 카메라에 걸리는 칸만 GPU 에 담기 (곡면 월드 반영) */
-      prepareFrame: () => kit.prepareFrame(),
+      prepareFrame: () => { kit.prepareFrame(); islet?.kit.prepareFrame(); },
       /** 부드러운 해안선에서 바다 쪽으로의 거리 (칸, 땅 안쪽 ≤ 0). 이 값이 coastWaterline 보다 작으면 모래 비탈 위라 물이 안 보인다 */
-      coastDistance: (x, z) => terrain.coast.field.at(x, z),
+      coastDistance: (x, z) => (islet?.contains(x, z) ? islet.terrain : terrain).coast.field.at(x, z),
       coastWaterline: terrain.coast.waterline,
       /** 강물 칸이면 둥근 둑의 물가 선에서 물 쪽으로의 거리 (칸, 둑 위로 보이는 곳은 < 0), 강물 칸이 아니면 null.
        *  둑이 칸 경계보다 0.2칸쯤 물 쪽으로 나와 있다 → 낚시찌·물고기 그림자는 이 값 > 0.15 인 곳에 */
-      riverDistance: (x, z) => terrain.banks.riverDistance(x, z),
+      riverDistance: (x, z) => (islet?.contains(x, z) ? islet.terrain : terrain).banks.riverDistance(x, z),
       /** 가림 투명: 카메라와 플레이어(·대화 상대) 사이 나무·건물·주민·가구를 비치게. watch(getPoint) → 해제 함수 로 보이게 할 점을 더한다.
        *  applyToonStyle 로 칠한 모델(root.userData.toonFade)은 저절로 대상, 그 밖의 것은 add({ box(out), setFade(v) }) → 해제 함수 */
       occlusion: {
@@ -150,7 +207,7 @@ export default {
         get enabled() { return occlusion.enabled; }, set enabled(v) { occlusion.enabled = v; }, list: () => occlusion.list(),
         get bottom() { return occlusion.bottom; }, set bottom(v) { occlusion.bottom = v; }, bottomPoint: () => occlusion.bottomPoint(),
       },
-      nativeFruit: gen.nativeFruit,
+      get nativeFruit() { return islet ? islet.gen.nativeFruit : gen.nativeFruit; },
       /** 배경 스펙 팔레트 + 변형 (+ 계절이 있는 종류는 지금 계절) → { 재질 이름: 색 } (부스러기·잎 색 맞추기) */
       palette(kind, variant = null) {
         const spec = models[kind]?.spec;
@@ -172,6 +229,7 @@ export default {
     kit.uTime.value = elapsed;
     terrain.update(dt, elapsed);
     objects.update(dt);
+    if (islet) { islet.kit.uTime.value = elapsed; islet.terrain.update(dt, elapsed); islet.objects.update(dt); islet.kit.updateCulling(); }
     occlusion.update(dt);
     kit.updateCulling();
     stats?.update(dt);

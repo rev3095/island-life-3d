@@ -88,6 +88,18 @@
       "palette": {
         "fruit": "#F39A3B"
       }
+    },
+    "mango": {
+      "label": "망고",
+      "palette": {
+        "fruit": "#F2B33D"
+      }
+    },
+    "lychee": {
+      "label": "리치",
+      "palette": {
+        "fruit": "#D9455F"
+      }
     }
   },
   "footprint": [

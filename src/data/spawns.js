@@ -8,6 +8,8 @@ const G = RULES.gather;
 
 /** 낚시 자리 → 잡히는 서식지. 선착장은 바다 물고기도, 하구는 강 물고기도 잡힌다 */
 export const HABITAT_POOLS = { river: ['river'], pond: ['pond'], sea: ['sea'], pier: ['sea', 'pier'], mouth: ['river', 'mouth'] };
+// P35 무인도 투어: 투어 섬(opts.islet)에서는 바다에 'islet' 물고기가, 곤충 자리마다 'islet-<자리>' 곤충이 더 나온다 (본섬에선 안 나온다)
+const isletPool = (pool, islet) => (islet ? [...pool, ...pool.filter(p => p === 'sea' || p === 'pier').map(() => 'islet')] : pool);
 export const BUG_PLACES = ['flower', 'tree', 'ground', 'air', 'rock', 'water', 'lamp', 'fruit', 'palm', 'shake', 'under'];
 
 export const FRUIT_PER_TREE = G.fruitPerTree;         // 과일나무 한 그루 열매 수 (배경 스펙: 열매 5개)
@@ -21,8 +23,8 @@ const WET = new Set(['rain', 'snow']);
 export const inHours = (hours, hour) => hours.some(([a, b]) => hour >= a && hour < b);
 
 /** 지금 이 낚시 자리에서 잡힐 수 있는 물고기와 가중치 */
-export function fishPool({ habitat = 'river', hour = 12, month = 1, weather = 'clear' } = {}) {
-  const pool = HABITAT_POOLS[habitat];
+export function fishPool({ habitat = 'river', hour = 12, month = 1, weather = 'clear', islet = false } = {}) {
+  const pool = HABITAT_POOLS[habitat] && isletPool(HABITAT_POOLS[habitat], islet);
   if (!pool) return [];
   const out = [];
   for (const it of items.list('fish')) {
@@ -45,8 +47,9 @@ export function fish({ rng = Math.random, ...opts } = {}) {
 export const shadowOf = id => items.get(id)?.shadow ?? 0;
 
 /** 지금 이 장소에 나올 수 있는 곤충과 가중치. place 는 하나 또는 배열 (예: 물가 꽃밭 ['flower', 'water']) */
-export function bugPool({ place = 'flower', hour = 12, month = 1, weather = 'clear' } = {}) {
-  const places = Array.isArray(place) ? place : [place];
+export function bugPool({ place = 'flower', hour = 12, month = 1, weather = 'clear', islet = false } = {}) {
+  const base = Array.isArray(place) ? place : [place];
+  const places = islet ? [...base, ...base.map(p => `islet-${p}`)] : base;
   const wet = WET.has(weather);
   const out = [];
   for (const it of items.list('bug')) {

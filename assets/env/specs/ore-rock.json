@@ -1,0 +1,77 @@
+{
+  "id": "EN-13",
+  "slug": "ore-rock",
+  "name": "광석 바위",
+  "category": "nature",
+  "kind": "ore-rock",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "무인도 투어 섬에만 있는 바위. 삽·도끼로 치면 금광석·수정·철광석이 나온다 (보드 tour D123-A).",
+    "keywords": [
+      "푸른 결정 다발",
+      "금빛 줄무늬",
+      "본섬 바위와 같은 몸"
+    ],
+    "references": [
+      "본섬 바위 EN-05"
+    ],
+    "avoid": [
+      "날카롭게 큰 수정 기둥"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "size": {
+      "label": "크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01
+    },
+    "seed": {
+      "label": "모양 번호",
+      "value": 5,
+      "min": 1,
+      "max": 9,
+      "step": 1
+    }
+  },
+  "palette": {
+    "rock": "#A9A49C",
+    "rockDark": "#8E897F",
+    "crystal": "#7FD4E0",
+    "crystalLight": "#D8F6FA",
+    "gold": "#F2C14E"
+  },
+  "paletteLabels": {
+    "rock": "바위",
+    "rockDark": "얼룩",
+    "crystal": "결정",
+    "crystalLight": "결정 빛",
+    "gold": "금 줄무늬"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.46
+    }
+  }
+}

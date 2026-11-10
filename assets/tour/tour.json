@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "about": "P35 무인도 투어 설정 (보드 tour D120–D128 반영 v1 = 모두 A). 읽는 곳 src/gameplay/tour/index.js · src/world/index.js(env) · tools/build-web.mjs(env → tour 묶음). 약속 docs/CONTRACTS.md 「투어」, 노트 docs/notes/p35-tour.md",
+  "env": ["tour-boat", "ore-rock"],
+  "ox": 700,
+  "ticket": { "item": "mat.tour-ticket", "price": 1000, "perDay": 1, "firstFree": true },
+  "ore": { "maxHits": 6, "table": [["mat.gold-ore", 0.07], ["mat.crystal", 0.16], ["mat.iron", 0.3], ["mat.clay", 0.12]], "rest": "mat.stone" },
+  "guest": { "every": 5, "firstTrip": 2 },
+  "rare": { "bugs": ["bug.jewel-beetle", "bug.moon-moth"], "fish": ["fish.rainbow-wrasse", "fish.flower-scorpionfish"] },
+  "returnHour": 5,
+  "boat": { "sail": 3.2 }
+}

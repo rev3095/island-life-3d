@@ -1,0 +1,39 @@
+{
+  "id": "BD-08",
+  "slug": "tour-boat",
+  "name": "여행 배",
+  "category": "building",
+  "kind": "tour-boat",
+  "version": "0.1",
+  "triangles": 1752,
+  "parts": 3,
+  "materials": [
+    "deck",
+    "flag",
+    "hull",
+    "hullDark",
+    "mast",
+    "rope",
+    "sail",
+    "stripe"
+  ],
+  "animations": {},
+  "size": [
+    1.5,
+    2.22,
+    1.98
+  ],
+  "footprint": [
+    1,
+    2
+  ],
+  "glbBytes": 38704,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tour-boat_front.png",
+    "tour-boat_hero.jpg",
+    "tour-boat_main.png",
+    "tour-boat_thumb.png",
+    "tour-boat_top.png"
+  ]
+}

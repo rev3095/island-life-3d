@@ -1,0 +1,48 @@
+{
+  "id": "IC-BG-23",
+  "slug": "bug-jewel-beetle",
+  "name": "보석풍뎅이",
+  "group": "bug",
+  "kind": "beetle",
+  "version": "0.1",
+  "items": [
+    "bug.jewel-beetle"
+  ],
+  "hold": true,
+  "triangles": 2104,
+  "parts": 1,
+  "materials": [
+    "body",
+    "eye",
+    "eyeHighlight",
+    "head",
+    "leg",
+    "shell"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.211,
+    0.329,
+    0.099
+  ],
+  "bounds": [
+    [
+      -0.106,
+      -0.165,
+      -0.049
+    ],
+    [
+      0.106,
+      0.165,
+      0.049
+    ]
+  ],
+  "glbBytes": 44312,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-jewel-beetle_main.png",
+    "bug-jewel-beetle_thumb.png"
+  ]
+}

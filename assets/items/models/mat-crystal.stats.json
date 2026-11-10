@@ -1,0 +1,45 @@
+{
+  "id": "IC-MA-10",
+  "slug": "mat-crystal",
+  "name": "수정",
+  "group": "mat",
+  "kind": "crystal",
+  "version": "0.1",
+  "items": [
+    "mat.crystal"
+  ],
+  "hold": false,
+  "triangles": 240,
+  "parts": 1,
+  "materials": [
+    "crystal",
+    "crystalLight",
+    "stone"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.297,
+    0.27,
+    0.33
+  ],
+  "bounds": [
+    [
+      -0.149,
+      -0.135,
+      0.0
+    ],
+    [
+      0.149,
+      0.135,
+      0.33
+    ]
+  ],
+  "glbBytes": 16004,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-crystal_main.png",
+    "mat-crystal_thumb.png"
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "id": "IC-BG-23",
+  "slug": "bug-jewel-beetle",
+  "name": "보석풍뎅이",
+  "group": "bug",
+  "category": "item",
+  "kind": "beetle",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.jewel-beetle",
+      "code": "IC-BG-23"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "결정처럼 빛나는 청록 등딱지의 풍뎅이",
+    "keywords": [
+      "둥근 등딱지",
+      "청록 금속빛"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "P35 무인도 투어 (보드 tour)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.32,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (크기 비)",
+      "value": 0.42,
+      "min": 0.2,
+      "max": 0.9,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "몸 너비 (크기 비)",
+      "value": 0.34,
+      "min": 0.05,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "몸 높이 (크기 비)",
+      "value": 0.22,
+      "min": 0.1,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "jaws": {
+      "label": "큰 턱",
+      "value": false
+    }
+  },
+  "palette": {
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF",
+    "shell": "#3FB8A8",
+    "body": "#1F4E5A",
+    "head": "#1F4E5A",
+    "leg": "#1F4E5A"
+  },
+  "paletteLabels": {
+    "eye": "눈",
+    "eyeHighlight": "눈 빛",
+    "shell": "껍데기",
+    "body": "몸",
+    "head": "머리",
+    "leg": "다리"
+  }
+}

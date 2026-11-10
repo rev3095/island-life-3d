@@ -1438,6 +1438,29 @@ def b_snow_crystal(M):
         m.add(ellipsoid(d * 0.205 + V((0, 0, 0.01)), (0.014, 0.014, 0.01), seg=8, rings=4), 'iceLight', outline=False)
 
 
+def b_crystal(M):
+    """IC-MA-10 수정 (P35 무인도 광석 바위): 돌 받침에 육각 결정 다발."""
+    m = M.part('mat')
+    m.add(jitter(ellipsoid((0, 0, 0.04), (0.15, 0.12, 0.05), seg=9, rings=5), 0.012, 5, keep_bottom=0.0), 'stone', smooth=False)
+    for x, y, h, r, lx, ly in ((0, 0, 0.28, 0.06, 0.0, 0.0), (0.07, 0.03, 0.2, 0.045, 0.35, 0.1), (-0.06, 0.04, 0.18, 0.045, -0.3, 0.2), (0.02, -0.07, 0.15, 0.04, 0.1, -0.4)):
+        base = V((x, y, 0.05))
+        tip = base + V((lx * h, ly * h, h))
+        m.add(cylinder(base, base + (tip - base) * 0.75, r, r * 0.95, seg=6), 'crystal', smooth=False)
+        m.add(cone(base + (tip - base) * 0.75, tip, r * 0.95, 0.0, seg=6), 'crystal', smooth=False)
+        m.add(cylinder(base + V((r * 0.3, -r * 0.6, 0.02)), base + (tip - base) * 0.6 + V((r * 0.3, -r * 0.6, 0)), r * 0.25, seg=4), 'crystalLight', outline=False, smooth=False)
+
+
+def b_ticket(M):
+    """IC-TR-01 섬 여행 표 (P35): 노란 표 한 장, 가운데 점선과 섬·배 그림."""
+    m = M.part('mat')
+    m.add(box((0, 0, 0.012), (0.36, 0.2, 0.02), bevel=0.006), 'paper')
+    m.add(box((0.07, 0, 0.024), (0.008, 0.18, 0.004), bevel=0.001), 'line', outline=False)
+    m.add(ellipsoid((-0.06, 0.02, 0.024), (0.06, 0.035, 0.004), seg=14, rings=4), 'island', outline=False)
+    m.add(cone((-0.07, 0.025, 0.024), (-0.07, 0.025, 0.06), 0.012, 0.0, seg=8), 'tree', outline=False)
+    m.add(box((0.13, -0.03, 0.026), (0.07, 0.02, 0.006), bevel=0.003), 'boat', outline=False)
+    m.add(box((0.13, 0.0, 0.028), (0.004, 0.003, 0.05), bevel=0.001, rot=rot_xyz(x=math.pi / 2)), 'boat', outline=False)
+
+
 BUILDERS = {
     'snow-crystal': b_snow_crystal,
     'mushroom': b_mushroom,
@@ -1452,7 +1475,7 @@ BUILDERS = {
     'rod': b_rod, 'net': b_net, 'shovel': b_shovel, 'axe': b_axe, 'can': b_can,
     'wood': b_wood, 'hardwood': b_hardwood, 'branch': b_branch, 'stone': b_stone, 'iron': b_iron, 'clay': b_clay, 'weed': b_weed, 'acorn-bag': b_acorn_bag,
     'seed-bag': b_seed_bag, 'sapling': b_sapling, 'cedar-sapling': b_cedar_sapling,
-    'fruit': b_fruit, 'coconut': b_coconut,
+    'fruit': b_fruit, 'coconut': b_coconut, 'crystal': b_crystal, 'ticket': b_ticket,
     'clam': b_clam, 'cowrie': b_cowrie, 'scallop': b_scallop, 'whelk': b_whelk, 'turban': b_turban, 'coral': b_coral,
     'tulip': b_tulip, 'cosmos': b_cosmos, 'pansy': b_pansy,
 }

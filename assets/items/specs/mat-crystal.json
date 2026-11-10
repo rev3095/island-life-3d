@@ -1,0 +1,52 @@
+{
+  "id": "IC-MA-10",
+  "slug": "mat-crystal",
+  "name": "수정",
+  "group": "mat",
+  "category": "item",
+  "kind": "crystal",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.crystal",
+      "code": "IC-MA-10"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "돌 받침에 솟은 하늘색 육각 결정 (무인도 광석 바위)",
+    "keywords": [
+      "육각 결정",
+      "하늘색"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "P35 무인도 투어 (보드 tour)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "stone": "#8E897F",
+    "crystal": "#7FD4E0",
+    "crystalLight": "#E4FAFC"
+  },
+  "paletteLabels": {
+    "stone": "받침 돌",
+    "crystal": "결정",
+    "crystalLight": "결정 빛"
+  }
+}

@@ -46,11 +46,17 @@ export const DECOR_FILES = (() => {
   const cfg = JSON.parse(readFileSync(join(ROOT, 'assets/decor/decor.json'), 'utf8'));
   return new Set([...(cfg.paths ?? []), ...(cfg.fences ?? [])].flatMap(d => [`assets/env/models/${d.kind}.glb.json`, `assets/env/specs/${d.kind}.json`]));
 })();
+// P35 무인도 투어 묶음: 배·광석 바위 배경 모델 (assets/tour/tour.json env) — 처음에 받지 않고 선착장에 다가가거나 배를 놓을 때 (보드 tour D127-A)
+export const TOUR_FILES = (() => {
+  const cfg = JSON.parse(readFileSync(join(ROOT, 'assets/tour/tour.json'), 'utf8'));
+  return new Set((cfg.env ?? []).flatMap(k => [`assets/env/models/${k}.glb.json`, `assets/env/specs/${k}.json`]));
+})();
 export const PACKS = [
   { name: 'icons', test: p => !!imageType(p) },                                     // 그림: 아이템 아이콘·가구 썸네일 (가방·상점·박물관을 처음 열 때)
   ...seasonPacks,                                                                   // 계절 행사 모델 (그 행사 때)
   { name: 'decor', test: p => DECOR_FILES.has(p) },                                 // 9차 섬 꾸미기 길·울타리 (놓을 때)
-  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
+  { name: 'tour', test: p => TOUR_FILES.has(p) },                                   // P35 무인도 투어 배·광석 바위 (배를 놓을 때)
+  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|tour)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
   { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
   { name: 'items', test: p => p.startsWith('assets/items/') },                     // 들어 보이는 아이템 모델 (처음 잡았을 때)

@@ -1,0 +1,47 @@
+{
+  "id": "IC-TR-01",
+  "slug": "mat-tour-ticket",
+  "name": "섬 여행 표",
+  "group": "mat",
+  "kind": "ticket",
+  "version": "0.1",
+  "items": [
+    "mat.tour-ticket"
+  ],
+  "hold": false,
+  "triangles": 530,
+  "parts": 1,
+  "materials": [
+    "boat",
+    "island",
+    "line",
+    "paper",
+    "tree"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.36,
+    0.2,
+    0.058
+  ],
+  "bounds": [
+    [
+      -0.18,
+      -0.1,
+      0.0
+    ],
+    [
+      0.18,
+      0.1,
+      0.058
+    ]
+  ],
+  "glbBytes": 13292,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-tour-ticket_main.png",
+    "mat-tour-ticket_thumb.png"
+  ]
+}

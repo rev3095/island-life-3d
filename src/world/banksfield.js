@@ -95,7 +95,7 @@ export function riverBanks(gen) {
     }
     out.push({
       level, NX, NZ, R, tx0, tz0, TW, TH, d, land,
-      x0: tx0 - w / 2, z0: tz0 - h / 2,            // 격자 왼쪽 위 (월드)
+      x0: tx0 - w / 2 + (gen.ox ?? 0), z0: tz0 - h / 2,            // 격자 왼쪽 위 (월드, gen.ox = 투어 섬 x 자리)
       /** 격자 꼭짓점 (i, j) 의 거리 (둘레 네 칸 평균) */
       nodeD(i, j) {
         const ii = [Math.max(0, i - 1), Math.min(NX - 1, i)], jj = [Math.max(0, j - 1), Math.min(NZ - 1, j)];
@@ -141,5 +141,5 @@ export function groundBlend(gen) {
       s[c] = Math.round(255 * Math.min(1, Math.max(0, bn[c] / Math.max(bd[c], 1e-4))));
     }
   }
-  return { NX, NZ, R, x0: -w / 2, z0: -h / 2, s };
+  return { NX, NZ, R, x0: -w / 2 + (gen.ox ?? 0), z0: -h / 2, s };
 }

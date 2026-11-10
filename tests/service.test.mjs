@@ -35,7 +35,7 @@ test('계약 예시 호출이 그대로 돈다', () => {
   const ctx = fakeCtx();
   const { service: d } = createDataService(ctx, { storage: fakeStorage() });
   assert.equal(d.items.get('fish.crucian').name, '붕어');
-  assert.ok(d.items.list('fish').length === 20);
+  assert.ok(d.items.list('fish').length === 22);   // + P35 무인도 물고기 둘
   assert.ok(d.spawns.fish({ habitat: 'river', hour: 12, month: 10, weather: 'clear', rng: Math.random }).startsWith('fish.'));
   const b = d.spawns.bug({ place: 'flower', hour: 12, month: 4, weather: 'clear', rng: Math.random });
   assert.ok(b === null || b.startsWith('bug.'));

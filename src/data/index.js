@@ -87,7 +87,9 @@ export function createDataService(ctx, opts = {}) {
 
   const service = {
     items: { get: items.get, list: items.list, has: items.has, stackOf: items.stackOf, categories: items.CATEGORIES, categoryName: c => items.CATEGORY_NAMES[c] ?? c },
-    spawns,
+    // 출현표: 투어 섬에 가 있으면(tour 서비스 active) 투어 섬에만 나오는 물고기·곤충이 섞인다 (P35)
+    spawns: { ...spawns, fish: o => spawns.fish({ islet: !!ctx.services.tour?.active, ...o }), bug: o => spawns.bug({ islet: !!ctx.services.tour?.active, ...o }),
+      fishPool: o => spawns.fishPool({ islet: !!ctx.services.tour?.active, ...o }), bugPool: o => spawns.bugPool({ islet: !!ctx.services.tour?.active, ...o }) },
     inventory,
     wallet,
     museum,

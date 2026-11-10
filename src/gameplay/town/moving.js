@@ -56,6 +56,7 @@ export function movingState(state) {
   M.leaving ??= null;     // { slug, lot, ok, boxes, gone } 허락해서 떠나는 중
   M.departed ??= [];      // [{ slug, lot, day, next, sent }] 떠난 주민 (편지)
   M.welcomed ??= {};      // slug → 첫 만남 장면 신호를 보낸 날
+  M.invited ??= null;     // P35 무인도 투어 섬에서 초대한 주민 (다음 이사 주민)
   return M;
 }
 
@@ -73,7 +74,8 @@ export const nextArrivalDay = (M, endedDay, every = MOVING.every) => (endedDay ?
  */
 export function planArrival({ M, endedDay, today, count, max = MOVING.max, movers = MOVERS, freeLots = [] }) {
   if (!endedDay || !today || M.coming || count >= max) return null;
-  const slug = movers.find(s => !M.arrived.includes(s) && !isDeparted(M, s));
+  const order = M.invited && movers.includes(M.invited) ? [M.invited, ...movers.filter(s => s !== M.invited)] : movers;   // P35 투어 섬에서 초대한 주민이 먼저
+  const slug = order.find(s => !M.arrived.includes(s) && !isDeparted(M, s));
   const lot = freeLots[0];
   if (!slug || !lot) return null;
   let start = addDays(nextArrivalDay(M, endedDay), -LEAD);

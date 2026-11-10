@@ -115,6 +115,15 @@
       "status": "approved"
     },
     {
+      "id": "EN-13",
+      "slug": "ore-rock",
+      "name": "광석 바위",
+      "category": "nature",
+      "kind": "ore-rock",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FP-01",
       "slug": "festival-part-lantern",
       "name": "반딧불 등불",
@@ -482,6 +491,15 @@
       "kind": "festival-arch",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-08",
+      "slug": "tour-boat",
+      "name": "여행 배",
+      "category": "building",
+      "kind": "tour-boat",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "FB-01",
