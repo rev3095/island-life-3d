@@ -170,7 +170,10 @@ test('build-web: 255개가 넘으면 첫 묶음 254 + 다음 255 … 로 나눈�
 
 test('build-web: 게시본(파일 하나씩 510개)에서 묶음 빌드로 옮기는 차례 — 지우기 먼저, 어느 때도 511개를 넘지 않는다', () => {
   // 예전 게시본 = 페이지 + 모듈·css + 에셋 하나씩 (+ 새 빌드에서 사라진 파일 하나)
-  const live = ['index.html', ...plan.publish.filter(f => !f.path.startsWith('packs/')).map(f => f.path), ...plan.files.filter(f => f.path.startsWith('assets/')).map(f => f.path), 'src/old-gone.js'];
+  // 에셋이 늘어 하나씩 다 두면 511 을 넘으므로(M10), 예전 게시본 크기 510 에 맞춰 에셋 일부만 낱개였다고 본다.
+  const head = ['index.html', ...plan.publish.filter(f => !f.path.startsWith('packs/')).map(f => f.path)];
+  const loose = plan.files.filter(f => f.path.startsWith('assets/')).map(f => f.path).slice(0, Math.max(0, 510 - head.length - 1));
+  const live = [...head, ...loose, 'src/old-gone.js'];
   const steps = planTransition(plan.publish, live);
   const have = new Set(live);
   let removing = true;

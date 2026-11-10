@@ -6,6 +6,7 @@ import { RULES } from './tables.js';
 
 export const SHOP_HOURS = { open: RULES.shop.open, close: RULES.shop.close };   // 도토리상점 영업 8~22시
 export const SHOP_FURNITURE_PER_DAY = RULES.shop.furniturePerDay;
+export const SHOP_OUTDOOR_PER_DAY = RULES.shop.outdoorPerDay ?? 0;   // 10차 D99-A: 하루 가구 중 야외 가구 몫 (실내 셋 + 야외 하나)
 export const SHOP_FLOWER_SEEDS_PER_DAY = RULES.shop.flowerSeedsPerDay;
 
 const FRUIT_TREES = items.list('fruit').filter(f => f.variant).map(f => f.id);
@@ -25,14 +26,28 @@ export const buyPrice = id => items.get(id)?.buy ?? 0;
 
 export const isShopOpen = hour => hour >= SHOP_HOURS.open && hour < SHOP_HOURS.close;
 
-/** 그날의 상점 물건: 가구 2 + 도구 5 + 꽃씨 2 + 묘목 */
+/**
+ * 오늘의 가구 (10차 D99-A): 상점 가구 후보(source 'shop') 중 야외 가구(outdoor) outdoor 개 + 나머지 실내 가구 → [실내…, 야외…].
+ * 야외 후보가 모자라면 실내로, 실내 후보가 모자라면 야외로 채운다 (합계 total 은 지킨다). 순수 함수 (tests/recipes-economy.test.mjs)
+ */
+export function pickShopFurniture(pool, rng, { total = SHOP_FURNITURE_PER_DAY, outdoor = SHOP_OUTDOOR_PER_DAY } = {}) {
+  const outPool = pool.filter(f => f.outdoor).map(f => f.id), inPool = pool.filter(f => !f.outdoor).map(f => f.id);
+  const nOut = Math.min(outdoor, outPool.length, total);
+  const nIn = Math.min(total - nOut, inPool.length);
+  const ins = sample(inPool, nIn, rng);
+  const outs = sample(outPool, Math.min(outPool.length, total - nIn), rng);   // 실내가 모자라면 야외를 더
+  return { indoor: ins, outdoor: outs, all: [...ins, ...outs] };
+}
+
+/** 그날의 상점 물건: 가구 4 (실내 3 + 야외 1) + 도구 5 + 꽃씨 2 + 묘목. furniture = [실내…, 야외…] (진열 받침 순서, assets/interior/places/shop.json stock) */
 export function shopStock(dayKey, seed = 0) {
   const rng = rngFor(seed, dayKey, 'shop');
-  const furniture = sample(items.list('furn').filter(f => f.source === 'shop').map(f => f.id), SHOP_FURNITURE_PER_DAY, rng);
+  const furn = pickShopFurniture(items.list('furn').filter(f => f.source === 'shop'), rng);
+  const furniture = furn.all;
   const tools = items.list('tool').map(t => t.id);
   const seeds = sample(items.list('seed').filter(s => s.flower).map(s => s.id), SHOP_FLOWER_SEEDS_PER_DAY, rng);
   const saplings = items.list('seed').filter(s => s.tree).map(s => s.id);
-  return { furniture, tools, seeds, saplings, all: [...furniture, ...tools, ...seeds, ...saplings] };
+  return { furniture, outdoor: furn.outdoor, tools, seeds, saplings, all: [...furniture, ...tools, ...seeds, ...saplings] };
 }
 
 /** 가방·지갑에 붙여 쓰는 판매·구매. getSeed / getDayKey 는 그때그때 상태에서 읽는다 */

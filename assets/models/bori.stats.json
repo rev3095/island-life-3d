@@ -3,10 +3,10 @@
   "slug": "bori",
   "name": "보리",
   "species": "dog",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 10676,
   "vertices": 5386,
-  "bones": 12,
+  "bones": 14,
   "materials": [
     "shirt",
     "pants",
@@ -35,11 +35,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 1,
-  "glbBytes": 367140,
+  "glbBytes": 408664,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0523,
+    "forward": -0.0041
+  },
   "renders": [
     "bori_back.png",
     "bori_front.png",
@@ -47,6 +63,7 @@
     "bori_hero.png",
     "bori_run.png",
     "bori_side.png",
+    "bori_sit.png",
     "bori_three_quarter.png",
     "bori_thumb.png",
     "bori_walk.png"

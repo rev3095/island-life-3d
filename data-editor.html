@@ -327,7 +327,7 @@ const SHEETS = [
   { id: 'rules', name: '규칙 숫자', emo: '🎲', object: true, hint: '채집 확률은 0~1 (0.08 = 8%). 나무 흔들기·바위 치기 확률은 더해서 1 을 넘을 수 없어요.', groups: [
     ['시작 지급', [['rules/starter/acorns', '처음 도토리', 'int', { max: 99999 }]]],
     ['도토리상점', [['rules/shop/open', '여는 시각', 'int', { max: 23 }], ['rules/shop/close', '닫는 시각', 'int', { max: 24 }],
-      ['rules/shop/furniturePerDay', '하루 가구 수', 'int', { max: 10 }], ['rules/shop/flowerSeedsPerDay', '하루 꽃씨 수', 'int', { max: 3 }]]],
+      ['rules/shop/furniturePerDay', '하루 가구 수 (진열 받침 자리 4)', 'int', { max: 10 }], ['rules/shop/outdoorPerDay', '그중 야외 가구 수', 'int', { max: 4 }], ['rules/shop/flowerSeedsPerDay', '하루 꽃씨 수', 'int', { max: 3 }]]],
     ['채집', [['rules/gather/fruitPerTree', '과일나무 열매 수', 'int', { min: 1, max: 9 }], ['rules/gather/coconutPerPalm', '야자열매 수', 'int', { min: 1, max: 9 }],
       ['rules/gather/rockMaxHits', '바위 하루 칠 수 있는 횟수', 'int', { min: 1, max: 20 }], ['rules/gather/chopMaxHits', '나무 하루 도끼질 횟수', 'int', { min: 1, max: 20 }],
       ['rules/gather/shakeBugChance', '나무 흔들기 → 곤충 떨어짐', 'prob'], ['rules/gather/rockBugChance', '바위 치기 → 곤충 튀어나옴', 'prob'],

@@ -1,0 +1,215 @@
+{
+  "id": "s19-dalmuri-arrival",
+  "version": 1,
+  "status": "review",
+  "chapter": "이사 오가기",
+  "title": "달무리의 이삿날 밤",
+  "summary": "이삿날 밤, 막 잠에서 깬 달무리가 이삿짐 곁에서 인사한다. 하늘을 가리키고는 별이 잘 보이는 광장으로 걸어간다.",
+  "trigger": {
+    "on": "move-in",
+    "slug": "dalmuri"
+  },
+  "place": "event",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "집 앞 인사 → 좋아하는 곳으로",
+      "recommended": true,
+      "desc": "새집과 이삿짐을 넓게 → 달무리와 첫 인사 → 달무리가 좋아하는 곳(별빛 광장)으로 걸어가고, 그곳을 보여 준다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "새집과 이삿짐 상자",
+          "dur": 3,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "night",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "at": [
+                -1.1,
+                1
+              ],
+              "face": 90,
+              "emote": "📦",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.6,
+                4.2
+              ],
+              "face": 0,
+              "hide": false,
+              "text": ""
+            }
+          ],
+          "caption": "{island}에 새 이웃이 왔어요"
+        },
+        {
+          "id": "c2",
+          "note": "플레이어가 다가가고 달무리가 돌아본다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": "player",
+              "emote": "🌙",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "to": [
+                0.5,
+                1.9
+              ],
+              "do": "walk",
+              "face": "dalmuri",
+              "emote": "👋",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "달무리의 인사",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "dalmuri",
+            "angle": 15,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": "player",
+              "do": "happy",
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "😄",
+              "text": ""
+            }
+          ],
+          "wait": true
+        },
+        {
+          "id": "c4",
+          "note": "좋아하는 것(✨)을 보여 주고 별빛 광장 쪽으로",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "actors": [
+            {
+              "who": "dalmuri",
+              "to": [
+                2.6,
+                4.4
+              ],
+              "do": "walk",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "👋",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c5",
+          "note": "별빛 광장",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "place": "plaza",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "hide": true,
+              "text": ""
+            }
+          ],
+          "caption": "달무리는 밤 9시가 지나면 광장에서 은하수 이야기를 해요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "달무리가 이삿짐 곁에서 손을 흔들며 인사, 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "달무리가 손 흔들며 인사",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "music": "night",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "at": [
+                -1.1,
+                1
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "👋",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.5,
+                1.9
+              ],
+              "face": "dalmuri",
+              "emote": "😊",
+              "text": ""
+            }
+          ],
+          "caption": "달무리가 이사 왔어요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

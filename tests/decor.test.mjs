@@ -136,3 +136,66 @@ test('행사 소품·표정·동작 (M9-P1): events.json props → 모델·붙�
   const player = J('assets/models/player.stats.json');
   for (const a of ['sparkler', 'push', 'place']) assert.ok(player.animations[a], `주인공 동작 ${a}`);
 });
+
+// ---------- 10차 M10-P1 (보드 wave10 D95-A · D96-A · 앉기) ----------
+import { pickCell, cellAt, targetCell, tilesOfBox, PICK_REACH } from '../src/gameplay/decor/rules.js';
+import { SEATS, seatSpec, seatsOf, sitRoot, sitMetaOf, nearestSeat, SIT_FALLBACK } from '../src/gameplay/decor/seats.js';
+
+test('decor 칸 누르기 (D96-A): 땅 점 → 칸, 섬 밖·너무 먼 칸은 안 고른다', () => {
+  const W = 96, H = 96;
+  assert.deepEqual(cellAt(0.2, -0.7, W, H), { tx: 48, tz: 47 });
+  assert.deepEqual(cellAt(-48, -48, W, H), { tx: 0, tz: 0 });
+  const from = { tx: 48, tz: 48 };
+  assert.deepEqual(pickCell({ x: 2.5, z: 0.5 }, from, { w: W, h: H }), { ok: true, cell: { tx: 50, tz: 48 }, why: null });
+  assert.equal(pickCell(null, from, { w: W, h: H }).why, 'miss');
+  assert.equal(pickCell({ x: 60, z: 0 }, from, { w: W, h: H }).why, 'outside');
+  assert.equal(pickCell({ x: PICK_REACH + 1.5, z: 0.5 }, from, { w: W, h: H }).why, 'far');
+  assert.equal(pickCell({ x: PICK_REACH + 0.5, z: PICK_REACH + 0.5 }, from, { w: W, h: H }).ok, true, '대각선도 가로·세로 각각 PICK_REACH 안이면 됨');
+});
+
+test('decor 대상 칸: 누른 칸은 가운데 맞춤, 없으면 앞 칸으로 뻗기 (M9 그대로)', () => {
+  const me = { tx: 10, tz: 10 };
+  assert.deepEqual(targetCell(null, me, DIRS.n), { anchor: { tx: 10, tz: 9 }, dir: DIRS.n, picked: false });
+  const t = targetCell({ tx: 14, tz: 12 }, me, DIRS.n);
+  assert.deepEqual(t, { anchor: { tx: 14, tz: 12 }, dir: [0, 0], picked: true });
+  // 2×2 피크닉 탁자를 누른 칸에: 누른 칸이 발자국 안 (가운데 맞춤)
+  const fp = footprintTiles(t.anchor, t.dir, [2, 2], 0);
+  assert.ok(fp.tiles.some(c => c.tx === 14 && c.tz === 12));
+  assert.deepEqual(tilesOfBox({ tx: 3, tz: 4 }, [2, 1]), [{ tx: 3, tz: 4 }, { tx: 4, tz: 4 }]);
+});
+
+test('앉기 자리 표: 벤치 둘 · 피크닉 탁자 넷 · 의자 — 돌리면 자리·바라보는 쪽도 돈다', () => {
+  assert.equal(seatSpec('fu:outdoor-bench').seats.length, 2);
+  assert.equal(seatSpec('furn.picnic-table').seats.length, 4);
+  assert.ok(seatSpec('log-chair') && seatSpec('sofa') && !seatSpec('furn.bookshelf'));
+  for (const [slug, s] of Object.entries(SEATS)) {
+    assert.ok(s.y > 0.3 && s.y < 0.7, `${slug} 앉는 면 높이`);
+    assert.ok(existsSync(new URL(`../assets/furniture/specs/${slug}.json`, import.meta.url)), `${slug} 가구 스펙`);
+  }
+  const bench = seatsOf(seatSpec('outdoor-bench'), { x: 5, z: 5, y: 1, rot: 0 }, 'b');
+  assert.equal(bench[0].key, 'b#0');
+  assert.ok(Math.abs(bench[0].y - 1.455) < 1e-9, '바닥 높이 + 앉는 면');
+  assert.ok(Math.abs(bench[0].facing - Math.PI) < 1e-9 || Math.abs(bench[0].facing + Math.PI) < 1e-9, '정면 +Z = 남쪽을 본다 (facing π)');
+  assert.ok(bench[0].stand.z > bench[0].z, '서는 곳은 앞(+Z)');
+  // 90° 돌린 벤치: 정면이 +X (three rotation.y = π/2 → +Z 가 +X 로)
+  const turned90 = seatsOf(seatSpec('outdoor-bench'), { x: 0, z: 0, rot: Math.PI / 2 }, 'b');
+  assert.ok(turned90[0].stand.x > 0.5 && Math.abs(turned90[0].stand.z - turned90[0].z) < 1e-9);
+  // 피크닉 탁자: 탁자를 보고 앉고, 바깥에서 다가온다
+  const pic = seatsOf(seatSpec('picnic-table'), { x: 0, z: 0 }, 'p');
+  for (const s of pic) assert.ok(Math.hypot(s.stand.x, s.stand.z) > Math.hypot(s.x, s.z), '서는 곳은 탁자 바깥');
+});
+
+test('앉기 뿌리 자리: 엉덩이(hip) 가 앉는 면 위 — 메타가 없으면 키 × 0.28', () => {
+  assert.deepEqual(sitMetaOf(null, 1), { hip: SIT_FALLBACK.hip, forward: 0 });
+  assert.deepEqual(sitMetaOf({ hip: 0.3, forward: 0.05 }, 1), { hip: 0.3, forward: 0.05 });
+  assert.ok(Math.abs(sitMetaOf(undefined, 1.2).hip - 0.336) < 1e-9);
+  const [s] = seatsOf(seatSpec('outdoor-bench'), { x: 0, z: 0, y: 0 }, 'b');
+  const r = sitRoot(s, { hip: 0.28, forward: 0.1 });
+  assert.ok(Math.abs(r.y + 0.28 - s.y) < 1e-9, '뿌리 + 엉덩이 = 앉는 면');
+  assert.ok(r.z < s.z, '엉덩이가 앞으로 0.1 이면 뿌리는 그만큼 뒤로');
+  // 가장 가까운 빈 자리 (누가 앉은 자리는 건너뜀 · 멀면 없음)
+  const bench2 = seatsOf(seatSpec('outdoor-bench'), { x: 0, z: 0 }, 'b');
+  assert.equal(nearestSeat(bench2, -0.4, 0.7).key, 'b#0');
+  assert.equal(nearestSeat(bench2, -0.4, 0.7, { taken: k => k === 'b#0' }).key, 'b#1');
+  assert.equal(nearestSeat(bench2, 5, 5), null);
+});

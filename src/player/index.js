@@ -4,6 +4,7 @@ import { createCameraRig } from './camera.js';
 import { buildTool } from './tools.js';
 import { createMotions } from './motions.js';
 import { createMouseMove } from './mouse.js';
+import { sitMetaOf, sitRoot } from '../gameplay/decor/seats.js';   // 10차 앉기: 엉덩이 닿는 곳 → 뿌리 자리 (순수 함수)
 
 const WALK = 2.6, RUN = 5.0;          // 칸/초
 const RADIUS = 0.26;                  // 충돌 원 반지름
@@ -14,6 +15,7 @@ const STEP_SFX = { sand: 'step-sand', wood: 'step-wood', ramp: 'step-wood', ston
 // facing = three 의 rotation.y 와 같은 뜻: 0 = 북쪽(-Z), +π/2 = 서쪽(-X), π = 남쪽, -π/2 = 동쪽.
 // 모델 정면은 +Z 라서 모델 rotation.y = facing + π.
 const facingOf = (dx, dz) => Math.atan2(-dx, -dz);
+const SIT_SLIDE = 0.42, STAND_SLIDE = 0.4;   // 10차 앉기: 앉는 자리로 미끄러지는 시간 · 일어나 서는 곳으로 (초, 클립이 짧으면 클립 길이)
 
 let P = null;                         // 이 모듈의 상태
 
@@ -49,6 +51,16 @@ export default {
       motions: createMotions(model, toolMount),
     };
     const headBone = model.getObjectByName('head');
+    // 10차 AN-11: 앉을 때 엉덩이 닿는 곳 (모델 메타 sit: {hip, forward} — 없으면 키 × 0.28)
+    {
+      let meta = null;
+      model.traverse(o => { if (!meta && o.userData?.sit) meta = o.userData.sit; });
+      meta ??= gltf.scene?.userData?.sit ?? gltf.userData?.sit ?? gltf.parser?.json?.extras?.sit ?? gltf.parser?.json?.scenes?.[0]?.extras?.sit ?? null;
+      const box = new THREE.Box3().setFromObject(model);
+      P.height = Number.isFinite(box.max.y) && box.max.y > 0.3 ? box.max.y : 1;
+      P.sitMeta = sitMetaOf(meta, P.height);
+      P.sitFromModel = !!meta;
+    }
 
     // 처음 설 곳: 저장된 자리가 걸을 수 있으면 거기, 아니면 선착장 앞
     const sp = world?.places?.spawn ?? { x: 0, z: 0, facing: 0 };
@@ -80,6 +92,40 @@ export default {
       get gait() { return P.gait; }, get stance() { return P.stance; },
       /** 동작 클립이 있나 ('place' 놓기 AN-10 등) */
       hasClip: name => !!P.actions[name],
+      /**
+       * 10차 AN-11 앉기: seat = { key, x, z, y (앉는 면 높이), facing, stand: {x, z} } (gameplay/decor/seats.js seatsOf 의 하나).
+       * 앉는 자리로 돌아 미끄러지며 sit_down → sit 되풀이. 'sit' 클립이 없으면 false (앉지 않는다). 움직이면·stand() 하면 stand_up 하고 seat.stand 에 선다.
+       * 이벤트 player:sit {key} · player:stand {key}
+       */
+      sit(seat) {
+        if (!seat || !P.actions.sit || P.seat || P.frozen || P.motions.locked) return false;
+        P.mouse?.cancel(); P.script?.done(false);
+        const to = sitRoot(seat, P.sitMeta);
+        P.seat = { seat, to, from: { x: P.position.x, y: P.position.y, z: P.position.z, facing: P.facing }, phase: 'down', t: 0, wait: [] };
+        P.vx = P.vz = 0;
+        if (P.actions.sit_down) playOnce('sit_down'); else play('sit');
+        P.seat.dur = Math.min(SIT_SLIDE, P.actions.sit_down ? P.actions.sit_down.getClip().duration * 0.8 : SIT_SLIDE);
+        events.emit('player:sit', { key: seat.key });
+        return true;
+      },
+      /** 일어나기 → Promise (다 서면). 앉아 있지 않으면 바로 */
+      stand() {
+        const st = P.seat;
+        if (!st) return Promise.resolve(false);
+        return new Promise(res => {
+          st.wait.push(res);
+          if (st.phase === 'up') return;
+          st.phase = 'up'; st.t = 0;
+          st.upFrom = { x: P.position.x, y: P.position.y, z: P.position.z };
+          if (P.actions.stand_up) playOnce('stand_up'); else P.oneShot = null;
+          st.dur = Math.min(STAND_SLIDE, P.actions.stand_up ? P.actions.stand_up.getClip().duration * 0.8 : STAND_SLIDE);
+        });
+      },
+      /** 앉아 있는 자리 { key, … } | null (일어나는 중에도 그 자리) */
+      get seat() { return P.seat?.seat ?? null; },
+      get seated() { return !!P.seat; },
+      /** 앉기 메타 (엉덩이 높이 hip · 앞 forward, 모델에서 읽었나 fromModel) */
+      get sitInfo() { return { ...P.sitMeta, height: P.height, fromModel: P.sitFromModel }; },
       /**
        * 도구 동작 (절차적): 'swing' 'cast' 'reel' 'dig' 'chop' 'water' 'shake' 'pickup' 'ouch'.
        * opts: { onHit() 효과 나는 순간, speed, lock=true 동작 중 못 움직임 } → Promise<bool> (끝까지 하면 true)
@@ -122,6 +168,7 @@ export default {
       get walking() { return !!P.script; },
       /** 순간이동 (집 안팎 등). facing 생략하면 그대로 */
       teleport(x, z, facing = P.facing) {
+        if (P.seat) endSeat();                            // 앉아 있었으면 그 자리는 잊는다
         P.position.set(x, world ? world.island.heightAt(x, z) : 0, z);
         P.facing = facing; P.vx = P.vz = 0;
         P.mouse?.cancel();                                // 마우스로 가던 곳은 잊는다
@@ -136,6 +183,14 @@ export default {
       set toolKeys(v) { P.toolKeys = v; }, get toolKeys() { return P.toolKeys; },
     };
     ctx.services.player = api;
+    function endSeat() {
+      const st = P.seat;
+      if (!st) return;
+      P.seat = null; P.oneShot = null;
+      events.emit('player:stand', { key: st.seat.key });
+      for (const f of st.wait) f(true);
+    }
+    P.endSeat = endSeat;
     // 마우스로 걷기 (mouse.js): input 이 키보드·패드가 없을 때 이 방향을 쓴다
     P.mouse = createMouseMove(ctx, { position: () => P.position });
     ctx.input.pointerMove = P.mouse;
@@ -172,6 +227,9 @@ export default {
     if (!P) return;
     const { input, events, state } = ctx;
     const world = ctx.services.world;
+
+    // 10차 앉기: 앉아 있는 동안은 걷기·충돌·높이 따라가기 대신 자리에 붙어 있는다
+    if (P.seat) { updateSeat(dt, ctx); return; }
 
     // 이동 의도 → 목표 속도
     const still = P.frozen || P.motions.locked;
@@ -260,6 +318,37 @@ export default {
     P.mouse?.update(dt);
   },
 };
+
+/** 앉아 있는 동안 (sit → 내려앉기 · 앉기 · 일어나기) */
+function updateSeat(dt, ctx) {
+  const st = P.seat, pos = P.position;
+  const ease = t => t * t * (3 - 2 * t);
+  st.t += dt;
+  const k = ease(Math.min(1, st.t / Math.max(0.05, st.dur ?? SIT_SLIDE)));
+  if (st.phase === 'down' || st.phase === 'sit') {
+    pos.set(st.from.x + (st.to.x - st.from.x) * k, st.from.y + (st.to.y - st.from.y) * k, st.from.z + (st.to.z - st.from.z) * k);
+    let d = st.to.facing - st.from.facing;
+    d = Math.atan2(Math.sin(d), Math.cos(d));
+    P.facing = st.from.facing + d * Math.min(1, k * 1.6);
+    if (st.phase === 'down' && !P.oneShot && k >= 1) { st.phase = 'sit'; play('sit'); }
+    // 움직이려 하면 일어난다 (키보드·패드·마우스 걷기 — input.move)
+    const m = ctx.input.move, frozen = P.frozen || ctx.services.ui?.isBlocking?.();
+    if (!frozen && Math.hypot(m.x, m.z) > 0.3 && st.t > 0.25) ctx.services.player.stand();
+  } else if (st.phase === 'up') {
+    const g = st.seat.stand, gy = ctx.services.world ? ctx.services.world.island.heightAt(g.x, g.z) : 0;
+    pos.set(st.upFrom.x + (g.x - st.upFrom.x) * k, st.upFrom.y + (gy - st.upFrom.y) * k, st.upFrom.z + (g.z - st.upFrom.z) * k);
+    if (k >= 1 && (!P.oneShot || st.t > (st.dur ?? STAND_SLIDE) + 0.35)) { P.endSeat(); play('idle'); }
+  }
+  P.vx = P.vz = 0; P.speed = 0;
+  P.root.rotation.y = P.facing + Math.PI;
+  P.mixer.update(dt);
+  P.motions.update(dt);
+  // 저장은 일어나 설 곳 (불러왔을 때 의자 충돌 안에 서지 않게)
+  const sp = ctx.state.player;
+  sp.x = st.seat.stand.x; sp.z = st.seat.stand.z; sp.facing = P.facing;
+  P.rig.update(dt, pos, 0, 0);
+  P.mouse?.update(dt);
+}
 
 function play(name) {
   if (P.anim === name || !P.actions[name]) return;

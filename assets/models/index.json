@@ -7,8 +7,12 @@
       "species": "human",
       "role": "주인공",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0523,
+        "forward": -0.0041
+      }
     },
     {
       "id": "CH-02",
@@ -17,8 +21,12 @@
       "species": "cat",
       "role": "주민 · 고양이",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0523,
+        "forward": -0.0041
+      }
     },
     {
       "id": "CH-03",
@@ -27,8 +35,12 @@
       "species": "dog",
       "role": "주민 · 강아지",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0523,
+        "forward": -0.0041
+      }
     },
     {
       "id": "CH-04",
@@ -37,8 +49,12 @@
       "species": "rabbit",
       "role": "주민 · 토끼",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0523,
+        "forward": -0.0041
+      }
     },
     {
       "id": "CH-05",
@@ -47,8 +63,12 @@
       "species": "bear",
       "role": "주민 · 곰",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0575,
+        "forward": -0.0045
+      }
     },
     {
       "id": "CH-06",
@@ -57,8 +77,12 @@
       "species": "duck",
       "role": "주민 · 오리",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0471,
+        "forward": -0.0037
+      }
     },
     {
       "id": "CH-07",
@@ -67,8 +91,12 @@
       "species": "frog",
       "role": "주민 · 개구리",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0471,
+        "forward": -0.0037
+      }
     },
     {
       "id": "CH-08",
@@ -77,8 +105,12 @@
       "species": "squirrel",
       "role": "도토리상점 주인 · 다람쥐",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0471,
+        "forward": -0.0037
+      }
     },
     {
       "id": "CH-09",
@@ -87,8 +119,12 @@
       "species": "tortoise",
       "role": "박물관장 · 거북",
       "category": "character",
-      "version": "0.1",
-      "status": "approved"
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0497,
+        "forward": -0.0039
+      }
     },
     {
       "id": "CH-10",
@@ -97,8 +133,54 @@
       "species": "fox",
       "role": "주민 · 여우 (새로 이사 옴)",
       "category": "character",
+      "version": "0.1.1",
+      "status": "approved",
+      "sit": {
+        "hip": 0.0523,
+        "forward": -0.0041
+      }
+    },
+    {
+      "id": "CH-11",
+      "slug": "gureum",
+      "name": "구름",
+      "species": "sheep",
+      "role": "주민 · 양 (새로 이사 옴)",
+      "category": "character",
       "version": "0.1",
-      "status": "approved"
+      "status": "review",
+      "sit": {
+        "hip": 0.0497,
+        "forward": -0.0039
+      }
+    },
+    {
+      "id": "CH-12",
+      "slug": "pado",
+      "name": "파도",
+      "species": "penguin",
+      "role": "주민 · 펭귄 (새로 이사 옴)",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0242,
+        "forward": -0.0038
+      }
+    },
+    {
+      "id": "CH-13",
+      "slug": "dalmuri",
+      "name": "달무리",
+      "species": "owl",
+      "role": "주민 · 부엉이 (새로 이사 옴)",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0497,
+        "forward": -0.0039
+      }
     }
   ]
 }

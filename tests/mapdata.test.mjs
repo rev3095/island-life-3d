@@ -16,16 +16,19 @@ import { plan } from '../tools/apply-edits.mjs';
 const readJSON = p => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
 const lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, readJSON(`assets/env/specs/${k}.json`)])));
 const FILE = readJSON('assets/island/layout.json');
-const make = (seed, layout) => generateIsland(seed, { ...ISLAND, villagers: VILLAGERS, lots, layout });
+const make = (seed, layout, spares) => generateIsland(seed, { ...ISLAND, villagers: VILLAGERS, lots, layout, ...(spares ? { spares } : {}) });
 const sha = v => createHash('sha256').update(v).digest('hex').slice(0, 16);
-const print = g => [sha(Buffer.concat([Buffer.from(g.kind), Buffer.from(g.level), Buffer.from(g.flags)])), sha(JSON.stringify(g.objects)), sha(JSON.stringify(g.places)), g.objects.length];
+// 10차 M10-P4 의 집 자리 site · 남는 집터 spareLots 는 지문에서 뺀다 (남는 집터는 모든 물체를 놓은 뒤에 찾아서 그 자리 풀·나무만 빠진다 — tests/moving.test.mjs)
+const placesPrint = p => JSON.stringify(p, (k, v) => (k === 'site' || k === 'spareLots' ? undefined : v));
+const print = g => [sha(Buffer.concat([Buffer.from(g.kind), Buffer.from(g.level), Buffer.from(g.flags)])), sha(JSON.stringify(g.objects)), sha(placesPrint(g.places)), g.objects.length];
 
 /* ---------- 지도 ---------- */
 
 test('지도: 기본 자리(DEFAULT_LAYOUT)로 만든 섬은 6차 전 섬과 한 칸도 다르지 않다', () => {
   // 6차 전 island.js(코드에 박힌 자리)로 만든 지문 — 기본값을 바꾸면 여기가 깨진다. 지도를 바꾸려면 layout.json 을 고친다
-  assert.deepEqual(print(make(20261028)), ['6b43a67dcf22fc85', '5ff2e8fdbf1322ae', '7807d82a6980f847', 316]);
-  assert.deepEqual(print(make(12345)), ['f7bacd67f47de42b', '6e7ffa34628c33a4', '28aece487f61570d', 300]);
+  // (남는 집터 없이 = spares [] 로 만든 섬이 6차 전 섬 그대로)
+  assert.deepEqual(print(make(20261028, null, [])), ['6b43a67dcf22fc85', '5ff2e8fdbf1322ae', '7807d82a6980f847', 316]);
+  assert.deepEqual(print(make(12345, null, [])), ['f7bacd67f47de42b', '6e7ffa34628c33a4', '28aece487f61570d', 300]);
   assert.deepEqual(print(make(20261028, DEFAULT_LAYOUT)), print(make(20261028)));
 });
 
@@ -176,6 +179,7 @@ test('숫자 표: 규칙 숫자 — 확률은 0~1, 합은 1 아래, 범위는 �
   const { shop, day, starter } = RULES;
   assert.ok(Number.isInteger(shop.open) && Number.isInteger(shop.close) && shop.open >= 0 && shop.open < shop.close && shop.close <= 24, '상점 시각');
   assert.ok(isInt0(shop.furniturePerDay) && isInt0(shop.flowerSeedsPerDay));
+  assert.ok(isInt0(shop.outdoorPerDay ?? 0) && (shop.outdoorPerDay ?? 0) <= shop.furniturePerDay, '야외 가구 수 ≤ 하루 가구 수 (D99-A)');
   assert.ok(Number.isInteger(day.boundaryHour) && day.boundaryHour >= 0 && day.boundaryHour < 12, '하루 바뀌는 시각');
   for (const k of ['shellsPerDay', 'weedsPerDay']) assert.ok(isInt0(day[k][0]) && day[k][1] >= day[k][0], `${k} [작은 값, 큰 값]`);
   assert.ok(isInt0(day.fossilsPerDay) && isInt0(day.fruitRegrowDays) && day.weedsStart <= day.weedsMax);

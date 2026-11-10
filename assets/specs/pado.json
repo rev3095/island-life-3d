@@ -1,0 +1,76 @@
+{
+  "id": "CH-12",
+  "slug": "pado",
+  "name": "파도",
+  "species": "penguin",
+  "role": "주민 · 펭귄 (새로 이사 옴)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "씩씩한 바다 탐험가 펭귄. 선착장에서 수영하고, 만나는 사람마다 물고기 이야기를 들려준다.",
+    "keywords": [
+      "2.5등신",
+      "큰 머리",
+      "남색 머리",
+      "하트 모양 흰 얼굴",
+      "작은 주황 부리",
+      "지느러미 날개",
+      "주황 발",
+      "바다색 옷"
+    ],
+    "references": [
+      "검수 보드 CH-12 얼굴 스케치 (concept/wave5-board.html · wave10-board.html)",
+      "통통한 아기 펭귄 인형"
+    ],
+    "avoid": [
+      "사실적인 깃털",
+      "날카로운 부리",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "오리 부리(작게) + 새 부품 날개(팔 뼈에 붙음) + 얼굴 흰 가면. 10차 M10-P3 (D93-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.92,
+    "headScale": 1,
+    "bodyWidth": 1.1,
+    "limbLength": 0.8,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#2E3A66",
+    "muzzle": "#FBF7F2",
+    "beak": "#F39A3B",
+    "feet": "#F39A3B",
+    "tail": "#2E3A66",
+    "shirt": "#5B8FC9",
+    "stripe": "#EAF3FB",
+    "pants": "#34507E",
+    "eye": "#2A2230",
+    "blush": "#F6A8A0",
+    "outline": "#2B2840"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 1,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

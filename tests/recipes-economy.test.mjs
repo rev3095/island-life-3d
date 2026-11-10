@@ -4,7 +4,7 @@ import { createState } from '../src/core/state.js';
 import { createInventory } from '../src/data/inventory.js';
 import { createWallet } from '../src/data/wallet.js';
 import { createRecipes, RECIPES, needText } from '../src/data/recipes.js';
-import { createEconomy, shopStock, nativeFruit, sellPrice, isShopOpen } from '../src/data/economy.js';
+import { createEconomy, shopStock, pickShopFurniture, nativeFruit, sellPrice, isShopOpen } from '../src/data/economy.js';
 import * as items from '../src/data/items.js';
 
 const make = () => {
@@ -89,12 +89,19 @@ test('canCraft 는 가방 이벤트를 보내지 않는다, craft 는 한 번만
   assert.equal(changes.length, 1);
 });
 
-test('상점: 같은 날은 같은 물건, 가구 2 + 도구 + 씨앗·묘목', () => {
+test('상점: 같은 날은 같은 물건, 가구 4 (실내 3 + 야외 1, D99-A) + 도구 + 씨앗·묘목', () => {
   const a = shopStock('2026-10-28', 7), b = shopStock('2026-10-28', 7);
   assert.deepEqual(a, b);
-  assert.equal(a.furniture.length, 2);
-  assert.notEqual(a.furniture[0], a.furniture[1]);
+  assert.equal(a.furniture.length, 4);
+  assert.equal(new Set(a.furniture).size, 4, '같은 가구 두 번 안 나옴');
   for (const id of a.furniture) assert.equal(items.get(id).source, 'shop');
+  // 실내 셋이 먼저, 마지막 하나가 야외 (진열 받침 순서)
+  assert.deepEqual(a.furniture.map(id => !!items.get(id).outdoor), [false, false, false, true]);
+  assert.deepEqual(a.outdoor, a.furniture.slice(3));
+  for (let d = 1; d <= 20; d++) {
+    const s = shopStock(`2026-11-${String(d).padStart(2, '0')}`, 99);
+    assert.equal(s.furniture.filter(id => items.get(id).outdoor).length, 1, `11-${d} 야외 하나`);
+  }
   assert.equal(a.tools.length, 5);
   assert.equal(a.seeds.length, 2);
   assert.ok(a.saplings.length >= 1);
@@ -133,4 +140,23 @@ test('사고팔기', () => {
   wallet.add(10000);
   assert.equal(eco.buy('tool.axe'), 'full');
   assert.ok(isShopOpen(8) && isShopOpen(21) && !isShopOpen(22) && !isShopOpen(7));
+});
+
+test('상점 가구 고르기 (D99-A): 야외 몫 · 후보가 모자랄 때 채우기', () => {
+  const pool = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }, { id: 'o1', outdoor: true }, { id: 'o2', outdoor: true }];
+  let seed = 1;
+  const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const r = pickShopFurniture(pool, rng, { total: 4, outdoor: 1 });
+  assert.equal(r.indoor.length, 3);
+  assert.equal(r.outdoor.length, 1);
+  assert.ok(r.outdoor[0].startsWith('o'));
+  assert.deepEqual(r.all, [...r.indoor, ...r.outdoor]);
+  // 야외 후보가 없으면 실내로 다 채운다
+  assert.deepEqual(pickShopFurniture(pool.slice(0, 4), rng, { total: 4, outdoor: 1 }).all.length, 4);
+  // 실내 후보가 모자라면 야외로 채운다
+  const few = pickShopFurniture([{ id: 'a' }, { id: 'o1', outdoor: true }, { id: 'o2', outdoor: true }, { id: 'o3', outdoor: true }], rng, { total: 4, outdoor: 1 });
+  assert.equal(few.indoor.length, 1);
+  assert.equal(few.outdoor.length, 3);
+  // 야외 0 = 예전처럼 모두 실내
+  assert.equal(pickShopFurniture(pool, rng, { total: 2, outdoor: 0 }).outdoor.length, 0);
 });

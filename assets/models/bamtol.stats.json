@@ -3,10 +3,10 @@
   "slug": "bamtol",
   "name": "밤톨",
   "species": "squirrel",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 10216,
   "vertices": 5162,
-  "bones": 12,
+  "bones": 14,
   "materials": [
     "shirt",
     "pants",
@@ -37,11 +37,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 0.9,
-  "glbBytes": 356800,
+  "glbBytes": 395852,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0471,
+    "forward": -0.0037
+  },
   "renders": [
     "bamtol_back.png",
     "bamtol_front.png",
@@ -49,6 +65,7 @@
     "bamtol_hero.png",
     "bamtol_run.png",
     "bamtol_side.png",
+    "bamtol_sit.png",
     "bamtol_three_quarter.png",
     "bamtol_thumb.png",
     "bamtol_walk.png"

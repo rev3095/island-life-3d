@@ -435,8 +435,8 @@
       "name": "주민 집",
       "category": "building",
       "kind": "house",
-      "version": "0.2",
-      "status": "approved"
+      "version": "0.3",
+      "status": "review"
     },
     {
       "id": "BD-03",

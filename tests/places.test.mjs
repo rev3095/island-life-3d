@@ -82,7 +82,7 @@ test('박물관 전시: 물고기 20 · 곤충 22 · 화석 8 자리, 늘 같은
   assert.deepEqual([one.lx, one.lz, one.y], [1, 1, 0.5]);
 });
 
-test('상점 진열: 오늘의 가구 2 · 도구 5 · 꽃씨 · 묘목이 진열 자리에, 방 안 · 막는 상자 위', () => {
+test('상점 진열: 오늘의 가구 4 (실내 3 + 야외 1) · 도구 5 · 꽃씨 · 묘목이 진열 자리에, 방 안 · 막는 상자 위', () => {
   const groups = shopStock('2026-11-04', 12345);
   const plan = stockPlan(specs.shop, groups);
   assert.deepEqual(plan.filter(s => s.group === 'furniture').map(s => s.id), groups.furniture);
@@ -235,7 +235,7 @@ test('붙박이 FU-35–42: 스펙 = 목록 = 모델, 아이템 표 밖, 크기�
       used++;
     }
   }
-  assert.equal(used, 1 + 2 + 1 + 1 + 1 + 8 + 2, '상점 계산대·진열 받침 둘·도구 받침·씨앗 진열대 · 박물관 안내대·화석 받침 여덟·케이스 둘');
+  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 8 + 2, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대 · 박물관 안내대·화석 받침 여덟·케이스 둘');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');

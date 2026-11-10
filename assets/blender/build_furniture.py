@@ -1310,7 +1310,118 @@ def b_picnic_table(M):
                 m.add(box((-0.2625 + i * 0.175, -0.167 + j * 0.167, 0.783), (0.17, 0.16, 0.006), bevel=0.002), 'clothLight', outline=False)
 
 
+# ================================================================ 10차 M10-P5 좋아하는 가구 (보드 wave10 D98-A): 새 주민 셋이 좋아하는 것
+def b_paint_easel(M):
+    """FU-51 그림 이젤 (구름이 좋아함): 앞다리 둘 + 가운데 기둥 + 뒷다리, 받침 턱 위에 그리다 만 바다 그림 · 팔레트 · 붓."""
+    m = M.part('easel')
+    tilt = -0.1                                 # 캔버스가 다리를 따라 뒤로 눕는 각 (x 축)
+    R = rot_xyz(x=tilt)
+    for sx in (1, -1):                          # 앞다리 (아래가 벌어짐)
+        m.add(cylinder((sx * 0.3, -0.15, 0), (sx * 0.07, 0.0, 1.42), 0.026, 0.02, seg=10), 'wood')
+    m.add(cylinder((0, 0.36, 0), (0, 0.02, 1.32), 0.022, seg=10), 'wood')                    # 뒷다리
+    m.add(box((0, -0.1, 0.32), (0.56, 0.04, 0.04), bevel=0.012), 'wood')                    # 아래 가로대
+    m.add(cylinder((0, -0.08, 0.32), (0, 0.3, 0.3), 0.012, seg=8), 'woodDark')              # 뒷다리 잇는 막대
+    m.add(box((0, -0.03, 0.97), (0.05, 0.035, 1.0), bevel=0.012, rot=R), 'woodDark')         # 가운데 기둥
+    # 받침 턱 (캔버스를 올려 두는 선반)
+    ledge_z, ledge_y = 0.66, -0.13
+    m.add(box((0, ledge_y, ledge_z), (0.7, 0.13, 0.03), bevel=0.01), 'wood')
+    m.add(box((0, ledge_y - 0.06, ledge_z + 0.025), (0.7, 0.02, 0.04), bevel=0.008), 'wood')
+    # 캔버스: 받침 턱 위에 서서 뒤로 살짝 눕는다. c(u, v, d) = 캔버스 가운데 기준 가로 u · 세로 v · 앞(-Y)으로 d
+    W, H = 0.66, 0.52
+    c0 = V((0, ledge_y + 0.02 + math.sin(-tilt) * H / 2, ledge_z + 0.02 + H / 2 * math.cos(tilt)))
+    c = lambda u, v, d=0.0: c0 + R @ V((u, -d, v))
+    m.add(box(c(0, 0), (W, 0.03, H), bevel=0.008, rot=R), 'canvas')
+    m.add(box(c(0, H / 2 + 0.04, 0.0), (0.18, 0.05, 0.05), bevel=0.012, rot=R), 'woodDark')   # 위 고정 집게
+    # 그리다 만 바다 그림: 왼쪽 2/3 만 칠해졌고 오른쪽은 흰 캔버스 + 붓 자국 몇 개
+    pw = W * 0.64
+    pu = -W / 2 + pw / 2 + 0.02
+    m.add(box(c(pu, H * 0.14, 0.016), (pw, 0.004, H * 0.6), bevel=0.0, rot=R), 'paintSky')
+    m.add(box(c(pu, -H * 0.27, 0.017), (pw, 0.004, H * 0.38), bevel=0.0, rot=R), 'paintSea')
+    for u, v, w in ((-0.2, -0.16, 0.12), (-0.04, -0.24, 0.1), (-0.17, -0.33, 0.09), (0.02, -0.12, 0.07)):
+        m.add(box(c(u, v, 0.02), (w, 0.004, 0.014), bevel=0.0, rot=R), 'paintWave')
+    m.add(ellipsoid(c(-0.17, 0.15, 0.02), (0.055, 0.004, 0.055), rot=R, seg=18, rings=8), 'paintSun')
+    for u, v, w, mat in ((0.17, -0.05, 0.08, 'paintSea'), (0.2, -0.13, 0.05, 'paintSea'), (0.15, 0.12, 0.06, 'paintSky')):
+        m.add(box(c(u, v, 0.018), (w, 0.004, 0.03), bevel=0.0, rot=R), mat)
+    # 팔레트 · 붓 (받침 턱 위 오른쪽, 캔버스 앞)
+    pc = V((0.25, ledge_y - 0.03, ledge_z + 0.03))
+    m.add(ellipsoid(pc, (0.1, 0.05, 0.012), seg=20, rings=6), 'palette')
+    for (dx, dy), mat in (((-0.05, 0.0), 'dab'), ((-0.01, -0.025), 'dab2'), ((0.03, 0.01), 'paintSea'), ((0.06, -0.015), 'paintSun')):
+        m.add(ellipsoid(pc + V((dx, dy, 0.012)), (0.016, 0.013, 0.007), seg=10, rings=5), mat)
+    m.add(cylinder((-0.3, ledge_y - 0.04, ledge_z + 0.03), (-0.1, ledge_y - 0.02, ledge_z + 0.03), 0.008, seg=8), 'woodDark')
+    m.add(cone((-0.1, ledge_y - 0.02, ledge_z + 0.03), (-0.06, ledge_y - 0.02, ledge_z + 0.03), 0.011, 0.002, seg=8), 'brush')
+
+
+def b_sea_chart_frame(M):
+    """FU-52 바다 지도 액자 (파도가 좋아함, 벽걸이): 나무 테 + 누런 종이에 바다 · 섬 둘 · 점선 뱃길 · X 표 · 나침반 별."""
+    m = M.part('chart')
+    cz, W, H, T = 1.5, 0.92, 0.64, 0.06
+    for cx, z, sx, sz in ((0, cz + H / 2 - T / 2, W, T), (0, cz - H / 2 + T / 2, W, T), (-W / 2 + T / 2, cz, T, H), (W / 2 - T / 2, cz, T, H)):
+        m.add(box((cx, -0.04, z), (sx, 0.06, sz), bevel=0.014), 'frame')
+    m.add(box((0, -0.025, cz), (W - T * 1.2, 0.02, H - T * 1.2), bevel=0.003), 'paper')
+    m.add(box((0.01, -0.0355, cz - 0.01), (W - T * 4.2, 0.002, H - T * 4.4), bevel=0.0), 'sea')
+    for x, z, rx, rz in ((-0.36, cz + 0.21, 0.06, 0.04), (0.37, cz - 0.22, 0.07, 0.035), (0.33, cz + 0.2, 0.04, 0.03)):   # 종이 얼룩
+        m.add(ellipsoid((x, -0.0365, z), (rx, 0.002, rz), seg=14, rings=6), 'paperEdge')
+    # 섬: 큰 섬(둥근 덩이 셋) + 작은 섬
+    for x, z, rx, rz in ((-0.14, cz + 0.02, 0.13, 0.09), (-0.06, cz + 0.07, 0.09, 0.07), (-0.2, cz - 0.05, 0.07, 0.05), (0.2, cz + 0.1, 0.05, 0.035)):
+        m.add(ellipsoid((x, -0.038, z), (rx, 0.003, rz), seg=20, rings=8), 'land')
+    # 점선 뱃길: 큰 섬 오른쪽에서 곡선으로 아래 오른쪽 X 표까지
+    p0, p1, p2, p3 = V((0.0, 0, cz - 0.02)), V((0.1, 0, cz - 0.12)), V((0.2, 0, cz + 0.0)), V((0.27, 0, cz - 0.13))
+    pts = bezier(p0, p1, p2, p3, 14)
+    for i in range(0, len(pts) - 1, 2):
+        a, b = pts[i], pts[i + 1]
+        mid, d = (a + b) / 2, b - a
+        m.add(box((mid.x, -0.04, mid.z), (d.length * 0.9, 0.003, 0.012), bevel=0.0, rot=rot_xyz(y=-math.atan2(d.z, d.x))), 'route')
+    for s in (1, -1):
+        m.add(box((0.3, -0.04, cz - 0.15), (0.05, 0.003, 0.012), bevel=0.0, rot=rot_xyz(y=s * 0.785)), 'route')
+    # 나침반 별 (왼쪽 아래): 긴 마름모 넷
+    cc = V((-0.3, -0.04, cz - 0.17))
+    for k in range(4):
+        a = k * math.pi / 4
+        m.add(box(cc, (0.012 if k % 2 else 0.016, 0.003, 0.09 if k % 2 == 0 else 0.06), bevel=0.0, rot=rot_xyz(y=a)), 'compass')
+    m.add(ellipsoid(cc + V((0, -0.002, 0)), (0.012, 0.002, 0.012), seg=10, rings=5), 'route')
+    nail = V((0, -0.02, cz + H / 2 + 0.14))
+    for sx in (1, -1):
+        m.add(cylinder((sx * 0.32, -0.03, cz + H / 2 - 0.02), nail, 0.005, seg=6), 'string')
+    m.add(ellipsoid(nail, (0.014, 0.014, 0.014), seg=8, rings=6), 'string')
+
+
+def b_star_telescope(M):
+    """FU-53 별 망원경 (달무리가 좋아함, 밖에도): 세 다리 받침 + 보라 통이 하늘(뒤 위쪽)을 겨눔, 놋쇠 테 · 렌즈 · 접안 · 작은 파인더."""
+    m = M.part('telescope')
+    apex = V((0, 0, 0.82))
+    for k in range(3):                               # 세 다리: 앞 둘 · 뒤 하나
+        a = math.radians(-90 + 120 * k + 60)
+        foot = V((math.cos(a) * 0.36, math.sin(a) * 0.36, 0))
+        m.add(cylinder(foot, apex + (foot - apex) * 0.04, 0.022, 0.018, seg=10), 'leg')
+        m.add(ellipsoid(foot + V((0, 0, 0.015)), (0.03, 0.03, 0.018), seg=10, rings=5), 'metal')
+    mid = apex * 0.45
+    m.add(cylinder(mid + V((0, 0, -0.01)), mid + V((0, 0, 0.02)), 0.12, seg=3), 'metal')     # 다리 잇는 받침판(세모)
+    m.add(cylinder(apex + V((0, 0, -0.04)), apex + V((0, 0, 0.05)), 0.07, 0.06, seg=16), 'metal')
+    m.add(box(apex + V((0, 0, 0.1)), (0.09, 0.06, 0.1), bevel=0.02), 'metal')                # 고개 (통 거는 곳)
+    d = V((-0.5, 0.3, 0.62)).normalized()              # 겨누는 쪽: 왼쪽 뒤 위 하늘 (45도쯤)
+    c = apex + V((0, 0, 0.16))
+    back, front = c - d * 0.28, c + d * 0.34
+    m.add(cylinder(back, front, 0.07, 0.085, seg=24), 'tube')
+    for t, r in ((0.08, 0.077), (0.55, 0.083)):         # 통 띠
+        p = back + (front - back) * t
+        m.add(cylinder(p - d * 0.025, p + d * 0.025, r, seg=24), 'tubeDark')
+    m.add(cylinder(front - d * 0.03, front + d * 0.05, 0.1, 0.1, seg=24), 'brass')            # 앞 놋쇠 테
+    m.add(cylinder(front + d * 0.045, front + d * 0.055, 0.08, seg=24), 'lens', outline=False)
+    m.add(cylinder(back - d * 0.015, back + d * 0.02, 0.075, seg=20), 'brass')
+    m.add(cylinder(back, back - d * 0.12, 0.028, 0.024, seg=12), 'metal')                     # 접안
+    m.add(cylinder(back - d * 0.12, back - d * 0.15, 0.036, seg=12), 'brass')
+    side = d.cross(V((0, 0, 1))).normalized()
+    fp = c + side * 0.1 + V((0, 0, 0.06))               # 작은 파인더
+    m.add(cylinder(fp - d * 0.12, fp + d * 0.1, 0.022, seg=12), 'tubeDark')
+    m.add(cylinder(fp + d * 0.1, fp + d * 0.12, 0.026, seg=12), 'brass')
+    m.add(cylinder(c + side * 0.02, fp, 0.01, seg=6), 'metal')
+    for s in (1, -1):                                   # 통을 잡는 고리 둘
+        p = c + d * (0.08 * s)
+        m.add(annulus(p, 0.075, 0.09, axis=tuple(d), thick=0.025, seg=24), 'metal')
+
+
 BUILDERS = {
+    'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
     'outdoor-bench': b_outdoor_bench, 'garden-lamp': b_garden_lamp, 'flower-pots': b_flower_pots, 'picnic-table': b_picnic_table,
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,
     'snowman-lamp': b_snowman_lamp,

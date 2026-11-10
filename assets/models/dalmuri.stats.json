@@ -1,0 +1,74 @@
+{
+  "id": "CH-13",
+  "slug": "dalmuri",
+  "name": "달무리",
+  "species": "owl",
+  "version": "0.1",
+  "triangles": 10408,
+  "vertices": 5260,
+  "bones": 13,
+  "materials": [
+    "stripe",
+    "shirt",
+    "pants",
+    "feet",
+    "fur",
+    "beak",
+    "muzzle",
+    "iris",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "earTip",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.95,
+  "glbBytes": 396628,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0497,
+    "forward": -0.0039
+  },
+  "renders": [
+    "dalmuri_back.png",
+    "dalmuri_front.png",
+    "dalmuri_happy.png",
+    "dalmuri_hero.png",
+    "dalmuri_run.png",
+    "dalmuri_side.png",
+    "dalmuri_sit.png",
+    "dalmuri_three_quarter.png",
+    "dalmuri_thumb.png",
+    "dalmuri_walk.png"
+  ]
+}

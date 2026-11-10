@@ -1,0 +1,74 @@
+{
+  "id": "CH-11",
+  "slug": "gureum",
+  "name": "구름",
+  "species": "sheep",
+  "version": "0.1",
+  "triangles": 17980,
+  "vertices": 9094,
+  "bones": 13,
+  "materials": [
+    "shirt",
+    "pants",
+    "feet",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "ear",
+    "innerEar",
+    "wool",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.95,
+  "glbBytes": 606800,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0497,
+    "forward": -0.0039
+  },
+  "renders": [
+    "gureum_back.png",
+    "gureum_front.png",
+    "gureum_happy.png",
+    "gureum_hero.png",
+    "gureum_run.png",
+    "gureum_side.png",
+    "gureum_sit.png",
+    "gureum_three_quarter.png",
+    "gureum_thumb.png",
+    "gureum_walk.png"
+  ]
+}

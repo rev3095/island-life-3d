@@ -11,6 +11,7 @@ export const TRIGGERS = {
   'festival-part': { label: '축제 부품 n개째', event: 'festival:part', test: (p, t) => Number(p?.n) === Number(t.n) },
   festival: { label: '축제 시작', event: 'festival:start' },
   'event-start': { label: '계절 행사를 처음 할 때 (8차 — trigger.event = EV-01…)', event: 'events:start', test: (p, t) => p?.id === t.event && !!p?.first },
+  'move-in': { label: '새 주민이 이사 온 날 저녁 (10차 — trigger.slug = 주민, town/moving.js 가 보내는 town:welcome)', event: 'town:welcome', test: (p, t) => !!t.slug && p?.slug === t.slug },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
@@ -236,6 +237,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if ((t.on === 'after' || t.on === 'newday') && ids && !ids.includes(t.scene)) err.push(at(`trigger.scene ${t.scene} 장면이 없어요`));
     if (t.on === 'festival-part' && !(Number.isInteger(t.n) && t.n >= 1 && t.n <= 5)) err.push(at('festival-part 의 n 은 1~5'));
     if (t.on === 'event-start' && !/^EV-0[1-4]$/.test(t.event ?? '')) err.push(at('event-start 의 event 는 EV-01~04'));
+    if (t.on === 'move-in' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('move-in 의 slug 는 주민 slug'));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];

@@ -61,6 +61,8 @@ export default {
       if (name === 'event') {
         const b = vars.booth ?? vars;
         if (Number.isFinite(b?.x) && Number.isFinite(b?.z)) return { x: b.x, z: b.z };
+        // 10차 이사 장면(move-in)을 ?story= 로 미리 볼 때: 그 주민 집 문 앞, 없으면 남는 집터 문 앞
+        if (vars.moveIn) { const h = p.villagerHouses?.find(x => x.slug === vars.moveIn) ?? p.spareLots?.[0]; if (h?.door) return { x: h.door.x, z: h.door.z }; }
         return p.festival ?? p.plaza ?? { x: 0, z: 0 };
       }
       const v = p[name];
@@ -116,7 +118,7 @@ export default {
     // ---- 장면 틀기 ----
     async function run(sc, opts = {}) {
       const take = R.takeOf(sc, opts.take);
-      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, ...(opts.vars ?? {}) };
+      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, ...(opts.vars ?? {}) };
       const id = sc.id;
       if (!take) return { id, skipped: true };
       if (!take.shots?.length) {          // '연출 없음' 연출안

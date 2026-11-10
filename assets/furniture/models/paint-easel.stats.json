@@ -1,0 +1,58 @@
+{
+  "id": "FU-51",
+  "slug": "paint-easel",
+  "item": "furn.paint-easel",
+  "name": "그림 이젤",
+  "category": "furniture",
+  "kind": "paint-easel",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1720,
+  "parts": 1,
+  "materials": [
+    "brush",
+    "canvas",
+    "dab",
+    "dab2",
+    "paintSea",
+    "paintSky",
+    "paintSun",
+    "paintWave",
+    "palette",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "easel"
+  ],
+  "animations": {},
+  "size": [
+    0.7,
+    0.59,
+    1.47
+  ],
+  "bounds": [
+    [
+      -0.35,
+      -0.21,
+      -0.005
+    ],
+    [
+      0.35,
+      0.381,
+      1.468
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 41036,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "paint-easel_front.png",
+    "paint-easel_main.png",
+    "paint-easel_thumb.png",
+    "paint-easel_top.png"
+  ]
+}

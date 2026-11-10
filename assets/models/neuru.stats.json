@@ -3,10 +3,10 @@
   "slug": "neuru",
   "name": "느루",
   "species": "tortoise",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 11816,
   "vertices": 5968,
-  "bones": 9,
+  "bones": 11,
   "materials": [
     "shirt",
     "pants",
@@ -35,11 +35,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 0.95,
-  "glbBytes": 385068,
+  "glbBytes": 416664,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0497,
+    "forward": -0.0039
+  },
   "renders": [
     "neuru_back.png",
     "neuru_front.png",
@@ -47,6 +63,7 @@
     "neuru_hero.png",
     "neuru_run.png",
     "neuru_side.png",
+    "neuru_sit.png",
     "neuru_three_quarter.png",
     "neuru_thumb.png",
     "neuru_walk.png"

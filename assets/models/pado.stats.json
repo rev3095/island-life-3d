@@ -1,0 +1,72 @@
+{
+  "id": "CH-12",
+  "slug": "pado",
+  "name": "파도",
+  "species": "penguin",
+  "version": "0.1",
+  "triangles": 17424,
+  "vertices": 8752,
+  "bones": 11,
+  "materials": [
+    "pants",
+    "shirt",
+    "stripe",
+    "feet",
+    "fur",
+    "muzzle",
+    "beak",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.92,
+  "glbBytes": 576268,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0242,
+    "forward": -0.0038
+  },
+  "renders": [
+    "pado_back.png",
+    "pado_front.png",
+    "pado_happy.png",
+    "pado_hero.png",
+    "pado_run.png",
+    "pado_side.png",
+    "pado_sit.png",
+    "pado_three_quarter.png",
+    "pado_thumb.png",
+    "pado_walk.png"
+  ]
+}

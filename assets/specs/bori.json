@@ -4,7 +4,7 @@
   "name": "보리",
   "species": "dog",
   "role": "주민 · 강아지",
-  "version": "0.1",
+  "version": "0.1.1",
   "status": "approved",
   "prompt": {
     "concept": "느긋한 강아지 주민. 햇볕 좋은 곳에서 낮잠 자는 게 제일 좋다. 축 늘어진 귀가 트레이드마크.",
@@ -62,6 +62,9 @@
     "idle",
     "walk",
     "run",
-    "happy"
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
   ]
 }

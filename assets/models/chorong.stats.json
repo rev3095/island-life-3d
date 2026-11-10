@@ -3,13 +3,13 @@
   "slug": "chorong",
   "name": "초롱",
   "species": "frog",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 9028,
   "vertices": 4552,
-  "bones": 8,
+  "bones": 10,
   "materials": [
-    "shirt",
     "pants",
+    "shirt",
     "fur",
     "muzzle",
     "eye",
@@ -32,11 +32,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 0.9,
-  "glbBytes": 300152,
+  "glbBytes": 328412,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0471,
+    "forward": -0.0037
+  },
   "renders": [
     "chorong_back.png",
     "chorong_front.png",
@@ -44,6 +60,7 @@
     "chorong_hero.png",
     "chorong_run.png",
     "chorong_side.png",
+    "chorong_sit.png",
     "chorong_three_quarter.png",
     "chorong_thumb.png",
     "chorong_walk.png"

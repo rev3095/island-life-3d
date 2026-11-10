@@ -8,6 +8,9 @@ export const VILLAGER_FILES = [
   'assets/villagers/pong.json',
   'assets/villagers/chorong.json',
   'assets/villagers/danpung.json',
+  'assets/villagers/gureum.json',   // 10차 M10-P3 새 주민 셋 (arrives: 'moving' — 처음엔 없고 엔딩 뒤 이사 온다)
+  'assets/villagers/pado.json',
+  'assets/villagers/dalmuri.json',
   'assets/villagers/bamtol.json',
   'assets/villagers/neuru.json',
 ];

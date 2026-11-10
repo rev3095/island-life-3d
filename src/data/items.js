@@ -8,7 +8,7 @@ import { FESTIVAL_CATEGORY as FC, FESTIVAL_FURN, festivalItems } from './festiva
 // 8차 계절 행사 분류·채집·보상 가구는 event-items.js 에서 (가구는 보드 ID FU-43– 를 code 로 그대로)
 import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 // 9차 섬 꾸미기 야외 가구 FU-47–50 와 밖에 놓을 수 있는 가구 표시(outdoor)는 decor-items.js 에서
-import { DECOR_FURN, OUTDOOR } from './decor-items.js';
+import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
@@ -92,7 +92,7 @@ export const ITEMS = [
   // FU-43– 행사 보상 가구는 event-items.js 의 EVENT_FURN (줄 끝의 보드 ID 가 code)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...DECOR_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,

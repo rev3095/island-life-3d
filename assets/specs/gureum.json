@@ -1,0 +1,78 @@
+{
+  "id": "CH-11",
+  "slug": "gureum",
+  "name": "구름",
+  "species": "sheep",
+  "role": "주민 · 양 (새로 이사 옴)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "수줍은 그림쟁이 양. 바닷가에 이젤을 세우고 하루 종일 바다 그림을 그린다. 머리 위 털 뭉치가 구름처럼 몽실몽실하다.",
+    "keywords": [
+      "2.5등신",
+      "큰 머리",
+      "구름 같은 털 뭉치",
+      "옆으로 누운 둥근 귀",
+      "크림빛 얼굴",
+      "연보라 옷",
+      "수줍은 볼터치"
+    ],
+    "references": [
+      "검수 보드 CH-11 얼굴 스케치 (concept/wave5-board.html · wave10-board.html)",
+      "솜사탕·뭉게구름 같은 몽실한 털"
+    ],
+    "avoid": [
+      "사실적인 털 표현",
+      "뿔",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "곰 둥근 귀(옆으로 단다) + 새 부품 털 뭉치(머리 위·목둘레). 10차 M10-P3 (D93-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.95,
+    "headScale": 1,
+    "bodyWidth": 1.04,
+    "limbLength": 1,
+    "earSize": 0.95,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#E6D6C3",
+    "wool": "#FBF7F2",
+    "ear": "#D8C3AC",
+    "muzzle": "#F3E8DA",
+    "innerEar": "#F4B6C2",
+    "nose": "#B58A86",
+    "tail": "#FBF7F2",
+    "shirt": "#B9A6E0",
+    "stripe": "#F4EEFB",
+    "pants": "#8C7BB8",
+    "feet": "#8A6E5E",
+    "eye": "#3A2A22",
+    "blush": "#F6A8A0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

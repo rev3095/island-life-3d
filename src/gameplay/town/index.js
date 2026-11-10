@@ -12,6 +12,7 @@ import { createChatter } from './chatter.js';
 import { createMail } from './mail.js';
 import { villagerState, pickWeighted, ownerOf, isAsleep } from './rules.js';
 import { createMovein, livesHere } from './movein.js';
+import { createMoving } from './moving.js';
 import { createParty } from './party.js';
 import LINES from './lines/index.js';
 
@@ -80,9 +81,10 @@ export default {
         const hang = ctx.services.decor?.hangouts?.() ?? [];
         if (hang.length && Math.random() < 0.2) {
           const s = hang[Math.floor(Math.random() * hang.length)], t = world.island.toTile(s.x, s.z);
-          if (nav.walkable(t.tx, t.tz) && !blocksAction(s.x, s.z) && !villagers.some(o => o !== V && o.goal && Math.hypot(o.goal.x - s.x, o.goal.z - s.z) < 1)) {
-            if (V) V.goal = { x: s.x, z: s.z };
-            return { x: s.x, z: s.z };
+          // 10차: 자리(seat)가 있으면 같은 자리만 겹침으로 친다 (벤치 두 자리에 둘이 앉을 수 있게) — 주민은 도착해서 앉는다 (villager.js trySit)
+          if (nav.walkable(t.tx, t.tz) && !blocksAction(s.x, s.z) && !villagers.some(o => o !== V && o.goal && (s.seat ? o.goal.seat?.key === s.seat.key : Math.hypot(o.goal.x - s.x, o.goal.z - s.z) < 1))) {
+            if (V) V.goal = { x: s.x, z: s.z, seat: s.seat };
+            return { x: s.x, z: s.z, seat: s.seat };
           }
         }
         const haunts = Object.entries(person.haunts).map(([k, w]) => ({ k, w }));
@@ -159,22 +161,27 @@ export default {
 
     const NEW = ctx.constants.NEWCOMERS ?? [];
     const canLive = s => PEOPLE[s] && LINES[s];
-    /** 지금 섬에 사는 주민 slug (이사 오기 전 새 주민은 빠진다) */
-    const residents = () => ctx.constants.VILLAGERS.filter(s => canLive(s) && livesHere(ctx.state, s, NEW));
+    // 10차 M10-P4 이사 오가기 (moving.js): 주민을 세우기 전에 집터 주인부터 정한다 (떠난 주민 집 = 빈 집터, 새 주민 집터)
+    const moving = createMoving(ctx, { canLive });
+    moving.applyLots();
+    let roomOwner = null;   // 플레이어가 들어가 있는 주민 방 주인 (아래 house:enter)
+    /** 지금 섬에 사는 주민 slug (이사 오기 전 새 주민·떠난 주민은 빠진다, 엔딩 뒤 이사 온 주민은 들어간다) */
+    const residents = () => moving.residents(ctx.constants.VILLAGERS.filter(s => canLive(s) && livesHere(ctx.state, s, NEW)));
     villagers = await Promise.all(residents().map(s => createVillager(ctx, PEOPLE[s], town)));
     const keepers = await createKeepers(ctx, town, LINES);
     actors = [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)];
     // 몸은 단단하다: 주민·가게 주인·플레이어를 world 의 움직이는 충돌체로 (없으면 매 프레임 플레이어를 밀어낸다)
     const solid = !!world.addMover;
     const body = (pos, r, on = () => true) => ({ get x() { return pos.x; }, get z() { return pos.z; }, get y() { return pos.y; }, r, get active() { return on(); } });
-    const solidify = a => world.addMover(body(a.position, RADIUS, () => a.visible && a.opacity > 0.5));
+    const movers = new Map();   // 주민 actor → 충돌체 해제 함수 (떠난 주민을 뺄 때)
+    const solidify = a => { const off = world.addMover(body(a.position, RADIUS, () => a.visible && a.opacity > 0.5)); movers.set(a, off); return off; };
     if (solid) {
       for (const a of actors) solidify(a);
       world.addMover(body(player.position, PLAYER_RADIUS));
     }
     const toast = (text, icon) => { if (ctx.services.ui?.toast) ctx.services.ui.toast(text, icon); else ctx.events.emit('toast', { text, icon }); };
     const labels = createLabels(ctx);
-    const mail = createMail(ctx, { lines: LINES });
+    const mail = createMail(ctx, { lines: LINES, residents });
     town.mail = mail;
     party = createParty(ctx, { mail, residents, toast });
     const talk = createTalk(ctx, { lines: LINES, party });
@@ -195,13 +202,35 @@ export default {
       });
       return adding;
     }
-    const movein = createMovein(ctx, { mail, addResident, toast });
+    /** 10차: 떠난 주민을 섬에서 뺀다 (모델·충돌체·목록) */
+    function removeResident(slug) {
+      adding = adding.then(() => {
+        const V = villagers.find(v => v.slug === slug);
+        if (!V) return;
+        V.stopChat?.();
+        for (const o of villagers) if (o.partner === V) o.stopChat?.();
+        villagers.splice(villagers.indexOf(V), 1);
+        const ai = actors.indexOf(V.actor);
+        if (ai >= 0) actors.splice(ai, 1);
+        movers.get(V.actor)?.();
+        movers.delete(V.actor);
+        V.actor.root.visible = false;
+        V.actor.root.parent?.remove(V.actor.root);
+        console.info(`[town] ${V.person.name} 떠남 — 주민 ${villagers.length}명`);
+      });
+      return adding;
+    }
+    const movein = createMovein(ctx, { mail, addResident, toast, slugs: () => moving.moveinSlugs(), variantOf: moving.variantOf, letter: moving.letter });
+    moving.attach({ mail, movein, addResident, removeResident, toast, residents, villagers: () => villagers, keepers: keepers.all.length, roomOwner: () => roomOwner });
+    ctx.events.on('town:movein', ({ slug } = {}) => moving.moved(slug));
 
     // 아침 편지·이사·생일: 시작할 때 한 번, 하루가 바뀌면 (data 의 하루 리셋 뒤)
     const newDay = dayKey => {
       mail.deliver(dayKey);
       const key = dayKey ?? context(ctx).dayKey;
+      moving.check(key);   // 10차: 떠나기·편지·묻기 마음·다음 이사 시작 (movein 이 그 단계를 이어 간다)
       movein.check(key);
+      moving.check(key);   // 방금 입주했으면 다음 차례·표지판
       party.check(key);
     };
     newDay(undefined);
@@ -215,7 +244,6 @@ export default {
     for (const V of villagers) V.spawn(c.now, c.weather);
 
     // ---- 주민 방 (Z2 house 가 주민 집 문으로 들어가면 house:enter {owner}) ----
-    let roomOwner = null;
     ctx.events.on('house:enter', (e = {}) => {
       const slug = ownerOf(e);
       roomOwner = slug;
@@ -230,6 +258,7 @@ export default {
       const slug = ownerOf(e) ?? roomOwner;
       roomOwner = null;
       villagers.find(v => v.slug === slug)?.leaveRoom();
+      if (moving.state().leaving?.slug === slug) moving.check(context(ctx).dayKey);   // 방에 있느라 미룬 떠나기
     });
 
     // ---- 행동 키 ----
@@ -267,12 +296,12 @@ export default {
       return d < 0.55 || (-Math.sin(pl.facing) * dx - Math.cos(pl.facing) * dz) / d > 0.45 ? mailbox : null;
     }
     const gp = ctx.services.gameplay.interactions;
-    gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, () => talk.converse(V)) });
+    gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, async () => { if (!(await moving.talk(V))) await talk.converse(V); }) });
     gp.add({ name: 'town:knock', intent: 'action', priority: 90, test: homeDoorInFront, run: V => town.conversation(V, () => talk.knock(V), { face: true }) });
     gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** 지금 섬에 사는 주민 slug 목록 (새 주민은 입주한 뒤부터) */
@@ -299,15 +328,20 @@ export default {
       state: slug => villagerState(ctx.state, slug),
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
       mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot },
-      debug: { nav, spots, town, keepers, chatter, party, movein },
+      /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */
+      /** 주민 집 색 변형 이름 (10차 새 주민은 lilac·blue·navy) — house/visit.js 문 덧판이 쓴다 */
+      houseVariant: slug => moving.variantOf(slug),
+      moving: { state: () => moving.state(), lots: () => moving.lots(), stage: slug => moving.stage(slug), asking: slug => moving.asking(slug), count: () => moving.count() },
+      debug: { nav, spots, town, keepers, chatter, party, movein, moving },
     };
     console.info(`[town] 주민 ${villagers.length}명 준비 ${Math.round(performance.now() - t0)}ms`);
   },
 
   update(dt) {
     if (!T) return;
-    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein } = T;
+    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving } = T;
     movein.update();
+    moving.update(dt);
     const time = ctx.services.time;
     const now = time?.now?.() ?? null;
     const weather = time?.weather ?? 'clear';
@@ -321,7 +355,7 @@ export default {
     if (!solid) pushPlayer(ctx, [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)]);
     const letters = mailbox ? mail.unread().length : 0;
     labels.update([
-      ...villagers.map(V => ({ actor: V.actor, name: V.person.name, color: V.person.color, show: V.talkable, bubble: V.bubble })),
+      ...villagers.map(V => ({ actor: V.actor, name: V.person.name, color: V.person.color, show: V.talkable, bubble: V.bubble ?? (moving.asking(V.slug) ? '💭' : null) })),   // 10차: 떠나 볼까 물을 마음이면 💭
       ...keepers.all.map(K => ({ actor: K.actor, name: K.person.name, color: K.person.color })),
       ...(mailbox ? [{ actor: mailbox, bubble: letters ? `✉️ ${letters}` : null }] : []),
     ]);

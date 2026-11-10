@@ -3,14 +3,14 @@
   "slug": "danpung",
   "name": "단풍",
   "species": "fox",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 10240,
   "vertices": 5176,
-  "bones": 12,
+  "bones": 14,
   "materials": [
+    "pants",
     "stripe",
     "shirt",
-    "pants",
     "fur",
     "muzzle",
     "nose",
@@ -38,11 +38,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 1,
-  "glbBytes": 360444,
+  "glbBytes": 402248,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0523,
+    "forward": -0.0041
+  },
   "renders": [
     "danpung_back.png",
     "danpung_front.png",
@@ -50,6 +66,7 @@
     "danpung_hero.png",
     "danpung_run.png",
     "danpung_side.png",
+    "danpung_sit.png",
     "danpung_three_quarter.png",
     "danpung_thumb.png",
     "danpung_walk.png"

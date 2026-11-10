@@ -1,0 +1,55 @@
+{
+  "id": "FU-52",
+  "slug": "sea-chart-frame",
+  "item": "furn.sea-chart-frame",
+  "name": "바다 지도 액자",
+  "category": "furniture",
+  "kind": "sea-chart-frame",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2448,
+  "parts": 1,
+  "materials": [
+    "compass",
+    "frame",
+    "land",
+    "paper",
+    "paperEdge",
+    "route",
+    "sea",
+    "string"
+  ],
+  "objects": [
+    "chart"
+  ],
+  "animations": {},
+  "size": [
+    0.92,
+    0.06,
+    1.97
+  ],
+  "bounds": [
+    [
+      -0.46,
+      -0.07,
+      1.18
+    ],
+    [
+      0.46,
+      -0.006,
+      1.974
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 51988,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-chart-frame_front.png",
+    "sea-chart-frame_main.png",
+    "sea-chart-frame_thumb.png",
+    "sea-chart-frame_top.png"
+  ]
+}
