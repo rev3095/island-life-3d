@@ -843,6 +843,9 @@ export function makeScenario(bot, sk, opts = {}) {
     const lit = S().time.nightFactor;
     const out = S().town.villagers.filter(V => V.mode !== 'home' && V.mode !== 'enter' && V.mode !== 'toDoor').length;
     const spawned = S().gather.bugs.bugs.map(b => b.id);   // 시각을 옮긴 뒤 새로 나온 곤충
+    // 엔딩 뒤엔 가방이 꽉 차 있어 잡아도 못 담는다 (2026-11-11 전체 플레이: 빈칸 0 → 「밤 곤충을 못 잡음」) → 상점(22시까지)에서 남는 것을 먼저 판다
+    const bagFree0 = bot.free();
+    if (bagFree0 < 2) await sellSurplus();
     const bug = await sk.bug({ tries: 4 });
     const day = await clockTo(10);
     if (!day.ok) return block(day.why);
@@ -860,7 +863,7 @@ export function makeScenario(bot, sk, opts = {}) {
     }
     const w0 = bot.acorns();
     if (cheap) await sk.shop({ buy: [cheap.id] });
-    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay });
+    note('clockPhone', { bagFree0, night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay });
     const bad = [];
     if (lit < 0.9) bad.push(`밤 불빛 ${lit.toFixed(2)}`);
     if (!bug) bad.push('밤 곤충을 못 잡음');
