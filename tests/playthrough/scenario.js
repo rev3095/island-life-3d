@@ -837,6 +837,10 @@ export function makeScenario(bot, sk, opts = {}) {
     if (!can.ok) return skip(can.reason);
     await bot.setHour(10);
     await bot.tool(null);
+    // 엔딩 뒤엔 가방이 차 있어서(2026-11-10 전체 플레이: 광석 3번 · 과일 흔들기 모두 줍지 못함) 먼저 남는 것을 판다 — 사람도 빈칸을 만들고 떠난다
+    const free0 = bot.free();
+    if (free0 < 6) await sellSurplus();
+    const free = bot.free();
     if (!(await bot.walkTo(tour().stand(), { near: 0.45, label: '선착장 끝 배' }))) return block('선착장 끝까지 못 감');
     await bot.face(tour().boat());
     if (bot.peek() !== 'tour-boat') return block(`배 앞에서 「섬 여행」이 안 떠요 (${bot.peek()})`);
@@ -877,10 +881,10 @@ export function makeScenario(bot, sk, opts = {}) {
     if (backPeek === 'tour-boat') await bot.act('action', { timeout: 30 });
     bot.policy = {};
     const home = await bot.until(() => !tour().active && !tour().busy, { timeout: 25, label: '본섬 도착' });
-    note('tour', { shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, backPeek, home, pos: bot.pos() });
+    note('tour', { shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, free0, free, backPeek, home, pos: bot.pos() });
     if (!home) return block(`배로 못 돌아옴 (배 앞 ${backPeek})`);
     const odd = [];
-    if (!Object.keys(got).some(id => /^fruit\.(mango|lychee)$/.test(id))) odd.push('무인도 과일을 못 얻음');
+    if (!Object.keys(got).some(id => /^fruit\.(mango|lychee)$/.test(id))) odd.push(`무인도 과일을 못 얻음 (가방 빈칸 ${free0} → ${free})`);
     if (shovel && !oreHits) odd.push('광석 바위를 못 침');
     if (Math.abs(bot.pos().x) > 100) odd.push('돌아왔는데 섬 밖 좌표');
     return odd.length ? awk(odd.join(' · ')) : pass(`${cur.shape} · 얻은 것 ${Object.entries(got).map(([k, v]) => `${k}×${v}`).join(', ')} · 광석 ${shovel ? `${oreHits}번` : '삽 없음'}`);
