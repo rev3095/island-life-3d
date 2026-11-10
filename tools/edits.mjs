@@ -5,11 +5,11 @@
 //   지도  "shop" · "villagers/coco" · "density/trees" · "bridges/1"              (assets/island/layout.json 안)
 //   숫자  "items/fish/crucian/price" · "rules/gather/shake/bees" · "rules/day/shellsPerDay/0" · "rules/recipes/tool.rod/needs"
 //         (첫 칸 = 파일 items | rules)
-// 배열 칸: 줄마다 이름표(slug · kind · result)가 있는 표는 그 이름으로, 아니면 번호로 찾는다.
+// 배열 칸: 줄마다 이름표(slug · kind · result · id — 앞에 있는 것부터)가 있는 표는 그 이름으로, 아니면 번호로 찾는다.
 // 값 { "$delete": true } = 그 칸 지우기 (줄마다 덧붙인 weight 같은 것). 줄 경로에 null = 그 줄 빼기, 줄 객체 = 새 줄 더하기·바꾸기.
 
 export const DELETE = Object.freeze({ $delete: true });
-const ROW_KEYS = ['slug', 'kind', 'result'];
+const ROW_KEYS = ['slug', 'kind', 'result', 'id'];   // id = 밤 노점·타로 카드 줄 (요소 편집기, P36)
 export const rowKeyOf = row => (row && typeof row === 'object' && !Array.isArray(row) ? ROW_KEYS.find(k => typeof row[k] === 'string') ?? null : null);
 const isRows = arr => Array.isArray(arr) && arr.length > 0 && arr.every(r => rowKeyOf(r) === rowKeyOf(arr[0]) && rowKeyOf(r));
 export const isDelete = v => !!v && typeof v === 'object' && v.$delete === true;

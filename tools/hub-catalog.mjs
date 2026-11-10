@@ -35,11 +35,11 @@ export const GROUPS = [
   { id: 'furniture', label: '가구', editor: 'env', how: 'spec' },
   { id: 'item', label: '아이템', editor: 'env', how: 'spec' },
   { id: 'interior', label: '벽지·바닥', editor: 'env', how: 'spec' },
-  { id: 'room', label: '방 배치', editor: 'env', how: 'spec' },
+  { id: 'room', label: '방 배치', editor: 'elem', how: 'spec' },   // P36: 방·가게 가구 배치는 요소 편집기 「방 배치」 탭 (#rooms.<slug>)
   { id: 'scene', label: '장면', editor: 'story', how: 'spec' },
   { id: 'sound', label: '소리', editor: 'sound', how: 'value' },
-  { id: 'map', label: '섬 지도', editor: 'map', how: 'value' },
-  { id: 'data', label: '숫자 표', editor: 'data', how: 'value' },
+  { id: 'map', label: '섬 지도', editor: 'elem', how: 'value' },          // P36: 요소 편집기 「섬 지도」 탭
+  { id: 'data', label: '요소 값', editor: 'elem', how: 'value' },         // P36: 요소 편집기의 값 표 (상점·아이템·규칙·행사·밤·투어·이사)
   { id: 'style', label: '스타일', editor: 'style', how: 'value' },
   { id: 'decision', label: '보드 결정', editor: null, how: 'board' },
 ];
@@ -113,12 +113,12 @@ function rowsFor(g, R, ctx) {
         id: s.slug, ref: s.id, name: s.name, sub: s.kind === 'wallpaper' ? '벽지' : '바닥', state: stateOf(s.status), version: version(s.version), hash: s.slug, file }));
     case 'room': {
       const rows = R.dir('assets/interior/rooms').map(({ file, data: r }) => ({
-        id: r.slug, ref: r.id, name: r.name, sub: `${r.ownerName ?? r.owner} 방`, state: stateOf(r.status), version: version(r.version), hash: r.slug, file }));
+        id: r.slug, ref: r.id, name: r.name, sub: `${r.ownerName ?? r.owner} 방`, state: stateOf(r.status), version: version(r.version), hash: `rooms.${r.slug}`, file }));
       for (const p of PENDING_ROOMS) if (!rows.some(r => r.id === p.slug)) rows.push({
-        id: p.slug, ref: p.id, name: p.name, sub: `${p.ownerName} 방 · 파일 없음 (배경 편집기에서 배치하고 요청)`, state: 'new', version: null, hash: p.slug, file: null });
-      // 상점·박물관 (RM-08·09, M7-P8): 배경 편집기 방 배치 격자 #place-<slug>
+        id: p.slug, ref: p.id, name: p.name, sub: `${p.ownerName} 방 · 파일 없음`, state: 'new', version: null, hash: null, file: null });
+      // 상점·박물관·달빛 가게·새벽 천막 (RM-08–11): 요소 편집기 방 배치 #rooms.<slug>
       for (const { file, data: r } of R.dir('assets/interior/places')) rows.push({
-        id: `place-${r.slug}`, ref: r.id, name: r.name, sub: `${r.size?.join('×') ?? ''} 실내`, state: stateOf(r.status), version: version(r.version), hash: `place-${r.slug}`, file });
+        id: `place-${r.slug}`, ref: r.id, name: r.name, sub: `${r.size?.join('×') ?? ''} 실내`, state: stateOf(r.status), version: version(r.version), hash: `rooms.${r.slug}`, file });
       return rows;
     }
     case 'scene': {
@@ -145,17 +145,19 @@ function rowsFor(g, R, ctx) {
         const v = lay[k];
         const n = Array.isArray(v) && Array.isArray(v[0]) ? v.length : (v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).length : 0);
         const sub = k === 'density' ? `값 ${n}개` : n ? `${n}곳` : k === 'seed' ? String(v) : '';
-        return { id: k, ref: 'MAP', name: LAYOUT[k] ?? k, sub, state: 'approved', version: version(lay.version), hash: null, file: 'assets/island/layout.json' };
+        return { id: k, ref: 'MAP', name: LAYOUT[k] ?? k, sub, state: 'approved', version: version(lay.version), hash: 'map', file: 'assets/island/layout.json' };
       });
     }
     case 'data': {
+      const SHEET_FILE = { events: 'assets/events/events.json', night: 'assets/night/night.json', tour: 'assets/tour/tour.json' };
       const files = { items: R.json('assets/data/items.json'), rules: R.json('assets/data/rules.json') };
-      // 숫자 표 편집기의 표 = SHEETS 의 id·이름 (주소 끝 #<표 id> 로 그 표가 열린다)
-      const sheets = [...R.text('data-editor.html').matchAll(/^ {2}\{ id: '(\w+)', name: '([^']+)'(?:, file: '(\w+)', section: '(\w+)')?/gm)];
+      // 요소 편집기의 값 표 = elem-editor/sheets.js SHEETS 의 id·이름 (주소 끝 #<표 id> 로 그 표가 열린다). 섬 지도·방 배치 탭은 map·room 분류가 따로 센다
+      const sheets = [...R.text('elem-editor/sheets.js').split('export const SHEETS')[1].matchAll(/^ {2}\{ id: '(\w+)', name: '([^']+)'(?:, group: '\w+')?(?:, file: '(\w+)', section: '(\w+)')?/gm)].filter(([, id]) => !['map', 'rooms'].includes(id));
       return sheets.map(([, id, name, file, section]) => {
         const src = file ? files[file]?.[section] : null;
+        const path = SHEET_FILE[id] ?? `assets/data/${file ?? 'rules'}.json`;
         return { id, ref: 'DATA', name, sub: Array.isArray(src) ? `${src.length}줄` : '', state: 'approved',
-          version: version(files[file ?? 'rules'].version), hash: id, file: `assets/data/${file ?? 'rules'}.json` };
+          version: version(SHEET_FILE[id] ? R.json(path).version : files[file ?? 'rules'].version), hash: id, file: path };
       });
     }
     case 'style': {

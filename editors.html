@@ -236,8 +236,8 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <a href="https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh" target="_blank" rel="noopener">배경 ↗</a>
       <a href="https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF" target="_blank" rel="noopener">시나리오 ↗</a>
       <a href="https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2" target="_blank" rel="noopener">곡·효과음 ↗</a>
-      <a href="https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST" target="_blank" rel="noopener">섬 지도 ↗</a>
-      <a href="https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj" target="_blank" rel="noopener">숫자 표 ↗</a>
+      <a href="https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj" target="_blank" rel="noopener">요소 ↗</a>
+      <a href="https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST" target="_blank" rel="noopener">지난 섬 지도 ↗</a>
       <a href="https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd" target="_blank" rel="noopener">스타일 ↗</a>
       <a href="https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU" target="_blank" rel="noopener">밤·새벽 보드 ↗</a>
       <a href="https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx" target="_blank" rel="noopener">투어 보드 ↗</a>
@@ -334,8 +334,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <tr><td><code>"검수 보드 반영"</code></td><td>바뀐 결정·의견을 계획과 게임에 넣기, 되돌리기</td><td class="small">검수 보드</td></tr>
       <tr><td><code>"&lt;이름&gt; 확정"</code> · <code>"&lt;이름&gt; 다시 열기"</code></td><td>그 리소스를 확정(approved)으로, 또는 검수 대기(review)로 — 지우지 않고 언제든 오갈 수 있어요</td><td class="small">이 홈 · 각 편집기</td></tr>
       <tr><td><code>"소리 반영"</code></td><td>고친 곡·선곡 표·효과음·목소리를 소리 데이터에 넣기, 되돌리기</td><td class="small">곡 편집기</td></tr>
-      <tr><td><code>"지도 반영"</code></td><td>옮긴 건물·광장 자리와 시드·밀도를 섬 지도에 넣기 (하던 저장과 어긋날 수 있음)</td><td class="small">섬 지도 편집기</td></tr>
-      <tr><td><code>"숫자 반영"</code></td><td>고친 값·확률·레시피를 표에 넣기 (테스트에 걸리면 반영 안 함)</td><td class="small">게임 숫자 표</td></tr>
+      <tr><td><code>"요소 반영"</code></td><td>고친 상점·아이템 값·확률·레시피·행사·밤·투어·이사 값, 섬 지도 자리, 방·가게 가구 배치를 게임 파일에 넣기 (테스트에 걸리면 반영 안 함, 지도는 하던 저장과 어긋날 수 있음). 예전 "지도 반영"·"숫자 반영"도 이 명령으로</td><td class="small">요소 편집기</td></tr>
       <tr><td><code>"스타일 반영"</code></td><td>고친 셰이더 값을 프리셋에 넣기, 되돌리기</td><td class="small">스타일 편집기</td></tr>
     </tbody></table></div>
   </section>
@@ -393,6 +392,8 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
     "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave5", "applied/wave5"] },
   { "id": "concept", "group": "archive", "name": "컨셉 보드 v0.1", "url": "https://claude.ai/artifact/6Z5WJmpKasDRyVANYbwauM", "file": "concept/concept-board.html",
     "edits": "1차 계획 (저장 없음)", "command": null, "reads": [] },
+  { "id": "map", "group": "archive", "name": "섬 지도 편집기 (요소 편집기 「섬 지도」 탭으로)", "url": "https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST", "file": "map-editor.html",
+    "edits": "P36 에 요소 편집기로 합침 — 예전 반영 기록(map v0)만 남아 있어요", "command": null, "openLabel": "", "reads": [] },
   { "id": "game", "group": "game", "name": "게임 「포근섬 이야기」", "url": "https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ", "file": "dist/web/index.html",
     "edits": "편집기에서 반영한 것이 모두 들어가는 게임. 휴대폰에서도 열려요. 섬폰 「문제 알리기」로 남긴 글과 기기 점검(링크 끝 #check) 결과가 게임 저장소에 쌓여요.",
     "command": "전체 요청 확인", "openLabel": "새 문제", "reads": ["reports", "checks"],
@@ -400,12 +401,9 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "sound", "group": "editor", "name": "곡 편집기 · 효과음 표", "url": "https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2", "file": "sound-editor.html", "et": "ET-06 · ET-07", "track": "M6-P4",
     "edits": "장소·시간대·날씨별 곡 10 (박자·악기·음)과 선곡 표, 효과음 24 · 목소리 9 의 높이·길이·크기. 미리 듣기.",
     "command": "소리 반영", "openLabel": "새 요청", "reads": ["drafts/*", "requests/sound", "applied/sound"] },
-  { "id": "map", "group": "editor", "name": "섬 지도 편집기", "url": "https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST", "file": "map-editor.html", "et": "ET-08", "track": "M6-P5",
-    "edits": "시드, 건물·광장·다리·선착장·축제 광장 자리 끌어 고정, 나무·꽃 밀도. 바로 미리 보기.",
-    "command": "지도 반영", "openLabel": "바뀐 것", "reads": ["drafts/map", "applied/map"] },
-  { "id": "data", "group": "editor", "name": "게임 숫자 표", "url": "https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj", "file": "data-editor.html", "et": "ET-09", "track": "M6-P5",
-    "edits": "아이템 값·출현(계절·시간·장소·확률)·레시피·친밀도·부탁 보상. 반영할 때 테스트로 검사.",
-    "command": "숫자 반영", "openLabel": "바뀐 것", "reads": ["drafts/data", "applied/data"] },
+  { "id": "elem", "group": "editor", "name": "요소 편집기", "url": "https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj", "file": "elem-editor.html", "et": "ET-08 · ET-09", "track": "P36",
+    "edits": "상점 진열·아이템 값·출현·채집 확률·계절 행사·밤·새벽·투어·이사 규칙·섬 지도 자리·방/가게 가구 배치. 칸마다 바꾸면 달라지는 것 한 줄, 반영할 때 테스트로 검사.",
+    "command": "요소 반영", "openLabel": "바뀐 것", "reads": ["drafts/elem", "applied/elem"] },
   { "id": "style", "group": "editor", "name": "스타일 편집기", "url": "https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd", "file": "style-editor.html", "et": "ET-10", "track": "M6-P6",
     "edits": "셰이더 명암·그늘·외곽선·화면 효과 슬라이더. 값을 저장소에 남기고 프리셋으로.",
     "command": "스타일 반영", "openLabel": "바뀐 것", "reads": ["drafts/style", "applied/style"] }
@@ -651,7 +649,7 @@ function renderCards() {
     const items = LIST.filter(e => e.group === g || (g === 'editor' && e.group === 'soon'));
     box.innerHTML = items.length ? items.map(e => safe(`카드 ${e.id}`, () => card(e)) ?? '').join('') : '<p class="small muted">없음</p>';
   }
-  $('archive').innerHTML = LIST.filter(e => e.group === 'archive').map(e => `지난 보드: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.name)} ↗</a> · ${esc(e.edits)}`).join('<br>');
+  $('archive').innerHTML = LIST.filter(e => e.group === 'archive').map(e => `${/-board\.html$/.test(e.file) ? '지난 보드' : '지난 편집기'}: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.name)} ↗</a> · ${esc(e.edits)}`).join('<br>');
 }
 
 /* ---------- 머리 띠 ---------- */

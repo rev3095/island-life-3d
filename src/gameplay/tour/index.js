@@ -98,7 +98,7 @@ export default {
       else if (can.pay === 'ticket') data.inventory.removeId(cfg.ticket.item, 1);
       else if (!data.wallet.spend(cfg.ticket.price)) { toast('도토리가 모자라요.', '🌰'); return; }
       t.trips++;
-      const { seed, shape } = isletOf(dayKey(), t.trips - 1, ctx.state.island?.seed ?? 0);
+      const { seed, shape } = isletOf(dayKey(), t.trips - 1, ctx.state.island?.seed ?? 0, cfg.shapes);
       const guest = guestFor(t.trips);
       busy = true;
       try {
