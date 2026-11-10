@@ -242,6 +242,11 @@ export default {
 
     const c = context(ctx);
     for (const V of villagers) V.spawn(c.now, c.weather);
+    // 11차 시계 (p33-clock): 섬폰 시계로 시각을 옮기면 주민을 새 시간대 자리에 다시 놓는다 (말하는 중·방 안·앉은 주민은 그대로)
+    ctx.events.on('time:shift', () => {
+      const cc = context(ctx);
+      for (const V of villagers) if (V.mode !== 'talk' && V.mode !== 'room' && V.mode !== 'sit') { V.stopChat?.(); V.spawn(cc.now, cc.weather); }
+    });
 
     // ---- 주민 방 (Z2 house 가 주민 집 문으로 들어가면 house:enter {owner}) ----
     ctx.events.on('house:enter', (e = {}) => {

@@ -407,6 +407,8 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
     cast, press,
     /** 낚싯대를 내려놓거나 끊겼을 때 */
     stop() { if (bob.state !== 'idle') { if (bob.fish) scare(bob.fish, true); endFishing(); } },
+    /** 11차 시계: 시각이 바뀌었다 — 찌에 붙은 것 말고 그림자를 거두고 새 시간대 물고기로 곧 다시 채운다 */
+    reshuffle() { for (const f of [...fish]) if (f !== bob.fish) removeFish(f); spawnT = 0; },
     update(dt, paused) {
       if (!kit.world || !kit.player || paused) return;
       spawnTick(dt);

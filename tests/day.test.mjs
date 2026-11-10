@@ -85,13 +85,39 @@ test('며칠 건너뛰어도 한 번에 리셋, 잡초는 쌓이되 최대치까
   assert.ok(next.weeds >= 2 && next.weeds <= 4);
 });
 
-test('시계를 되돌려도 하루로 친다', () => {
+test('11차 시계: 지난 날로 되돌리면 하루 리셋을 다시 하지 않는다 (날짜는 앞으로만)', () => {
   const island = createState().island;
   runDailyReset(island, '2026-10-28');
   island.fruit = { t: '2026-10-28' };
-  const r = runDailyReset(island, '2026-10-20');
+  const before = structuredClone(island);
+  assert.equal(runDailyReset(island, '2026-10-20'), null, '지난 날 = 리셋 없음');
+  assert.deepEqual(island, before, '섬 상태도 그대로');
+  assert.equal(runDailyReset(island, '2026-10-28'), null, '다시 그날로 와도 두 번 받지 않는다');
+  assert.equal(runDailyReset(island, '2026-10-29').days, 1, '다음 날은 그대로 하루');
+});
+
+test('날짜 흉내 시험 칸(allowBack)은 되돌려도 하루로 친다', () => {
+  const island = createState().island;
+  runDailyReset(island, '2026-10-28');
+  island.fruit = { t: '2026-10-28' };
+  const r = runDailyReset(island, '2026-10-20', { allowBack: true });
   assert.equal(r.days, 1);
   assert.deepEqual(r.regrown, ['t']);
+});
+
+test('11차 시계: createDay 는 지난 날이면 그날 기록을 그대로 쓴다', () => {
+  const state = createState();
+  let now = { dayKey: '2026-10-28' };
+  const news = [];
+  const day = createDay({ state, getNow: () => now, onNewDay: r => news.push(r.dayKey) });
+  day.check();
+  day.daily().fossils = 1;
+  now = { dayKey: '2026-10-27' };
+  assert.equal(day.check(), false);
+  assert.equal(day.daily().fossils, 1, '지난 날로 가도 화석이 다시 차지 않는다');
+  now = { dayKey: '2026-10-28' };
+  assert.equal(day.check(), false);
+  assert.deepEqual(news, ['2026-10-28']);
 });
 
 test('createDay: time 서비스가 있으면 그 날을, 없으면 로컬 날짜', () => {

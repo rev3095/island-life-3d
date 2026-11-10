@@ -48,9 +48,11 @@ export function freshDaily() {
  * 하루 리셋 (island 를 고친다). 같은 섬 상태 + 같은 dayKey 면 결과가 늘 같다.
  * 이미 그날이면 null, 아니면 { dayKey, prev, days, regrown, fossils, shells, weeds }.
  */
-export function runDailyReset(island, dayKey) {
+export function runDailyReset(island, dayKey, { allowBack = false } = {}) {
   if (!isDayKey(dayKey) || island.dayKey === dayKey) return null;
   const prev = isDayKey(island.dayKey) ? island.dayKey : null;
+  // 11차 시계: 날짜는 앞으로만 — 지난 날로 돌아가도 하루를 다시 받지 않는다 (날짜 흉내 시험 칸만 allowBack)
+  if (prev && dayKey < prev && !allowBack) return null;
   const days = prev ? Math.max(1, daysBetween(prev, dayKey)) : 0;    // 0 = 첫날, 시계를 되돌려도 하루로 친다
   const rng = rngFor(island.seed ?? 0, dayKey, 'daily');
   const old = island.daily ?? {};
@@ -75,16 +77,16 @@ export function runDailyReset(island, dayKey) {
 }
 
 /** 데이터 서비스의 day: key() · check() 와 그날 기록 도우미 */
-export function createDay({ state, getNow = () => null, onNewDay = () => {} }) {
+export function createDay({ state, getNow = () => null, onNewDay = () => {}, allowBack = false }) {
   const key = () => dayKeyFromNow(safe(getNow)) ?? dayKeyOf(new Date());
   const daily = () => {
-    if (!state.island.daily || state.island.dayKey !== key()) check();
+    if (!state.island.daily || state.island.dayKey !== key()) check();   // 지난 날이면 check 가 아무것도 안 하고 그날 기록을 그대로 쓴다
     return state.island.daily ?? (state.island.daily = freshDaily());
   };
 
   /** 새 날이면 하루 리셋을 하고 true */
   function check() {
-    const r = runDailyReset(state.island, key());
+    const r = runDailyReset(state.island, key(), { allowBack });
     if (r) onNewDay(r);
     return !!r;
   }

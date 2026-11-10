@@ -328,6 +328,12 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
     /** 확인용: 곤충 하나 바로 놓기 */
     debugSpawn(id, place, x, z) { return add(id, place, { x, z, y: ground(x, z) }); },
     clear() { for (const b of [...bugs]) remove(b); },
+    /** 11차 시계: 시각이 바뀌었다 — 모두 거두고 곧바로 새 시간대 곤충을 몇 마리 놓는다 */
+    reshuffle() {
+      for (const b of [...bugs]) remove(b);
+      for (let i = 0; i < 4; i++) trySpawn();
+      spawnT = 0.3;
+    },
     update(dt, paused) {
       if (!kit.world || !kit.player || paused) return;
       const p = kit.player.position, speed = kit.player.speed ?? 0;

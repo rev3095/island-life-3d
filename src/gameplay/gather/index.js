@@ -111,6 +111,8 @@ export default {
     events.on('world:daily', resync);
     events.on('game:ready', resync);
     events.on('gather:garden', resync);
+    // 11차 시계: 시각을 옮기면 지금 나온 곤충·물고기 그림자를 거두고 새 시간대 것으로 다시 채운다 (잡는 중인 것은 둔다)
+    events.on('time:shift', () => { bugs.reshuffle?.(); fishing.reshuffle?.(); });
 
     G = { kit, fx, drops, results, trees, fishing, bugs, work, tickLock };
     // 확인·다른 트랙용 (계약 밖): 지금 낚시·곤충 상태, 강제로 놓기

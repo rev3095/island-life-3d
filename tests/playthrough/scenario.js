@@ -669,6 +669,80 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(`${who}: ${odd.join(' · ')}`) : pass(`${who} ${n}일 뒤 물음 → 허락 → 이삿짐 → 떠남 · 다음 이사 ${next ?? '없음'} · 편지 ${away}`);
   });
 
+  // 11차 시계 (p33-clock): 섬폰 「🕰 시계」 바늘을 사람처럼 끌어 시각을 바꾼다 (setHour 지름길 없이)
+  /** 섬폰 → 시계 → 시침을 앞으로 돌려 hh 시(다음에 오는 그 시각)로 → 적용. → { ok, from, to, hour, day } */
+  const clockTo = async hh => {
+    if (bot.blocking()) await bot.settle(10);
+    const keep = bot.policy;
+    bot.policy = { ...keep, card: (kind, el, card) => !!card?.classList.contains('pk-tclock') || !!keep.card?.(kind, el, card) };   // 시계 창은 봇이 닫지 않게
+    try { return await clockSteps(hh); } finally { bot.policy = keep; }
+  };
+  const clockSteps = async hh => {
+    bot.press('phone');
+    if (!await bot.until(() => bot.$('.pk-app[data-app="clock"]'), { timeout: 5, ui: false })) return { ok: false, why: '섬폰에 시계 줄이 없어요' };
+    await bot.click(bot.$('.pk-app[data-app="clock"]'));
+    if (!await bot.until(() => bot.$('.pk-tclock-dial'), { timeout: 5, ui: false })) return { ok: false, why: '시계 창이 안 열려요' };
+    const dial = bot.$('.pk-tclock-dial');
+    const from = Number(dial.getAttribute('aria-valuenow'));                   // 0~1439 (지금 시·분)
+    const want = (((hh * 60 - from) % 1440) + 1440) % 1440;                      // 앞으로 몇 분
+    // 시침 끝을 잡고 시계 방향으로 10° (= 20분) 씩 끈다
+    const r = dial.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width * 0.2;
+    const at = deg => ({ clientX: cx + Math.sin(deg * Math.PI / 180) * R, clientY: cy - Math.cos(deg * Math.PI / 180) * R });
+    const pe = (el, type, deg) => el.dispatchEvent(new bot.win.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, pointerType: 'mouse', button: 0, buttons: 1, ...at(deg) }));
+    let a = ((from / 60) % 12) / 12 * 360;
+    pe(bot.$('.pk-tclock-dial .h-hour .hit'), 'pointerdown', a);
+    for (let left = want / 2; left > 0; left -= 10) { a += Math.min(10, left); pe(dial, 'pointermove', a); await bot.stepFrame(); }
+    pe(dial, 'pointerup', a);
+    // 5분 단위로 붙은 끝은 ←→ (15분) 로 맞춘다
+    for (let k = 0; k < 8; k++) {
+      const cur = Number(dial.getAttribute('aria-valuenow')), diff = ((((hh * 60 - cur) % 1440) + 1440 + 720) % 1440) - 720;
+      if (Math.abs(diff) < 8) break;
+      dial.focus(); bot.key(diff > 0 ? 'ArrowRight' : 'ArrowLeft'); await bot.stepFrame();
+    }
+    const to = Number(dial.getAttribute('aria-valuenow'));
+    const apply = [...bot.$$('.pk-tclock .pk-btn')].find(b => b.textContent === '적용');
+    if (!apply || apply.disabled) return { ok: false, why: `적용 단추가 없거나 꺼짐 (창 ${!!bot.$('.pk-tclock')}, ${from} → ${to})` };
+    await bot.click(apply);
+    await bot.until(() => !bot.$('.pk-tclock'), { timeout: 3, ui: false });
+    bot.press('esc');                                                             // 섬폰 닫기
+    await bot.until(() => !bot.blocking(), { timeout: 3, ui: false });
+    await bot.frames(4);
+    return { ok: true, from, to, hour: bot.hour(), day: bot.day() };
+  };
+
+  add('clock-phone', '섬폰 시계 바늘로 밤 → 밤 곤충 잡기 · 낮으로 → 상점에서 사기', async () => {
+    if (S().house?.inside) await sk.leaveHome();
+    await bot.settle(20);
+    if (!S().ui?.clock) return block('섬폰 시계 창(ui.clock)이 없어요');
+    S().time.setPaused?.(false);
+    const night = await clockTo(21);
+    if (!night.ok) return block(night.why);
+    const n1 = S().time.now();
+    if (n1.part !== 'night') return block(`밤으로 안 바뀜 (${n1.hour}:${n1.minute}, ${n1.part})`);
+    await bot.shot('clock-night', '시계로 돌린 밤');
+    const lit = S().time.nightFactor;
+    const out = S().town.villagers.filter(V => V.mode !== 'home' && V.mode !== 'enter' && V.mode !== 'toDoor').length;
+    const spawned = S().gather.bugs.bugs.map(b => b.id);   // 시각을 옮긴 뒤 새로 나온 곤충
+    const bug = await sk.bug({ tries: 4 });
+    const day = await clockTo(10);
+    if (!day.ok) return block(day.why);
+    const n2 = S().time.now();
+    if (n2.part !== 'day') return block(`낮으로 안 바뀜 (${n2.hour}:${n2.minute})`);
+    await bot.shot('clock-day', '시계로 돌린 낮');
+    const stock = S().data.economy.stock().filter(id => !String(id).startsWith('tool.') || !S().data.inventory.hasTool?.(String(id).slice(5)));
+    const cheap = stock.map(id => ({ id, p: S().data.economy.buyPrice(id) })).filter(x => x.p > 0 && x.p <= bot.acorns()).sort((x, y) => x.p - y.p)[0];
+    const w0 = bot.acorns();
+    if (cheap) await sk.shop({ buy: [cheap.id] });
+    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), offset: S().time.offset, maxDay: S().time.maxDay });
+    const bad = [];
+    if (lit < 0.9) bad.push(`밤 불빛 ${lit.toFixed(2)}`);
+    if (!bug) bad.push('밤 곤충을 못 잡음');
+    if (!cheap) bad.push('살 수 있는 물건 없음');
+    else if (!(w0 - bot.acorns() > 0)) bad.push(`못 삼 (${cheap.id})`);
+    const msg = `밤 ${Math.floor(night.to / 60)}시 곤충 ${bug ?? '-'} · 낮 ${day.day} ${Math.floor(day.to / 60)}시 ${cheap?.id ?? '-'} 🌰${w0 - bot.acorns()} · 밤에 밖 주민 ${out}`;
+    return bad.length ? awk(`${bad.join(', ')} — ${msg}`) : pass(msg);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;
