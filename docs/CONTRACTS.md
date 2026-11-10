@@ -444,4 +444,4 @@ stats() → { ms, passes }
 - **서비스** `ctx.services.tour` (새): `active` · `busy` · `current {shape, seed, guest, invited}` · `canGo() → {ok, reason?, pay: 'gift'|'ticket'|'acorns'}` · `go()` · `back({auto})` · `boat()` (지금 섬의 배 자리) · `stand()` (본섬 선착장 끝) · `config`. town 서비스 `moving.movers()` · `moving.invite(slug)` 추가.
 - **행동 키**: 배 `tour-boat` 95 (본섬 선착장 끝 배 1.7칸 안 → 「섬 여행」, 투어 섬 배 → 「돌아가기」) · 다른 섬 주민 `tour-guest` 99 (말 걸기 → 초대 확인 창) · 광석 바위 `tour-ore` 11 (삽·도끼를 들고 EN-13 앞, 바위 하나 하루 6번 = `ore.maxHits`, 떨어진 것은 gather drops). 투어 섬 배 앞에서 Space = 돌아가기, 새벽 5시(`data:newday`) = 저절로 돌아옴.
 - **이벤트** `tour:arrive {shape, seed, guest}` · `tour:return {auto}` · `tour:invite {slug}`.
-- **본섬 배** BD-08 `tour-boat` 는 tour 가 `world.home.objects.add('tour-boat', …, { persist: false, id: 'tour:home-boat', at })` 로 선착장 끝 동쪽 바다에 놓는다 (저장 안 함, 투어 묶음 모델 — 받는 동안 기다렸다 놓임).
+- **본섬 배** BD-10 `tour-boat` 는 tour 가 `world.home.objects.add('tour-boat', …, { persist: false, id: 'tour:home-boat', at })` 로 선착장 끝 동쪽 바다에 놓는다 (저장 안 함, 투어 묶음 모델 — 받는 동안 기다렸다 놓임).

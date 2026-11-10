@@ -179,7 +179,7 @@ export function generateIslet(seed, { shape = null, w = ISLET_W, h = ISLET_H, id
     const o = addObj('dock', dock.tx, dock.tz, { x: dock.x, z: dock.z, force: true });
     if (o) dock.id = o.id;
     clear(dock.tx, dock.tz - 2, 2);
-    // 배 (BD-08): 선착장 끝 동쪽 바다에 묶여 있다
+    // 배 (BD-10): 선착장 끝 동쪽 바다에 묶여 있다
     const boat = { x: dock.x + 1.55, z: dock.z + 3.3 };
     addObj('tour-boat', dock.tx + 2, Math.min(h - 1, dock.tz + 3), { ...boat, rot: 0, force: true });
     places.dock = { x: dock.x, z: dock.z + 2.5 };

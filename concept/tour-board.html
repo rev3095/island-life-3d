@@ -180,7 +180,7 @@ details summary { cursor: pointer; font-size: 14px; }
   </section>
 
   <section id="res">
-    <div class="sec-head"><p class="id">BD-08 · EN-13 · TO-01–04 · IC-FR-07–08 · IC-MA-09–10 · IC-BG-23–24 · IC-FS-21–22 · IC-TR-01 · UI-20–21 · s20</p><h2>새 리소스 계획 — 추천안 기준</h2>
+    <div class="sec-head"><p class="id">BD-10 · EN-13 · TO-01–04 · IC-FR-07–08 · IC-MA-09–10 · IC-BG-23–24 · IC-FS-21–22 · IC-TR-01 · UI-22–23 · s22</p><h2>새 리소스 계획 — 추천안 기준</h2>
       <p class="muted">고른 안이 다르면 반영 때 목록을 다시 짜요. 모델은 Blender 스크립트로 만들고 검수 대기(review)로 편집기에 올려요. <span class="tag new">새</span> = 새로 만드는 것, <span class="tag">다시 씀</span> = 지금 있는 것.</p></div>
     <div class="grid" id="resCards"></div>
   </section>
@@ -287,7 +287,7 @@ function sketch(id) {
 /* ---------- 결정 ---------- */
 const DECISIONS = [
   { id: 'D120', q: '다른 섬에는 어떻게 가나요?', now: '선착장 BD-05 는 꾸밈만 (할 일 없음)', opts: [
-    ['A', '선착장에 묶인 작은 배 (혼자 타기)', '선착장 옆에 작은 돛배(BD-08)를 두고 Space 로 「섬 여행 갈까요?」 → 배에 앉아(앉기 AN-11 다시 씀) 바다를 건너는 짧은 장면. 새 캐릭터 없음.', true],
+    ['A', '선착장에 묶인 작은 배 (혼자 타기)', '선착장 옆에 작은 돛배(BD-10)를 두고 Space 로 「섬 여행 갈까요?」 → 배에 앉아(앉기 AN-11 다시 씀) 바다를 건너는 짧은 장면. 새 캐릭터 없음.', true],
     ['B', '뱃사공 주민이 태워 줌', '선착장에 새 뱃사공(새 캐릭터 하나 + 성격 · 대사). 가는 길에 말을 걸어요. 캐릭터 · 동작 작업이 늘어요.'],
     ['C', '비행기 (공항 건물)', '새 건물 · 실내 · 가게 주인까지 생겨서 가장 커요.'] ] },
   { id: 'D121', q: '표 값과 하루 횟수는?', now: '도토리는 채집 · 팔기로 모아요 (비싼 물고기 15,000)', opts: [
@@ -400,7 +400,7 @@ const fruit = (x, y, col, s = 1) => `<g transform="translate(${x} ${y}) scale(${
 const fish = (x, y, col, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="20" ry="9" fill="${col}"/><path d="M18 0 l12 -9 v18z" fill="${col}"/>${C(-10, -2, 2, INK)}</g>`;
 const bug = (x, y, col, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="4" rx="10" ry="13" fill="${col}"/>${C(0, -11, 6, INK)}<path d="M0 -9 V17" stroke="${INK}" stroke-width="1.2"/><path d="M-4 -16 l-6 -8 M4 -16 l6 -8" stroke="${INK}" stroke-width="1.5"/></g>`;
 const RES = [
-  ['BD-08', '여행 배', '건물 · 배', true, '선착장 BD-05 옆에 묶인 작은 돛배. 본섬과 투어 섬 선착장에 하나씩. 배에 앉기(AN-11 다시 씀) · 돛이 바람에 흔들려요.', () => `<rect x="10" y="70" width="180" height="34" fill="${P.sea}"/>` + waves(30, 86, 8) + boat(100, 72, 1.6)],
+  ['BD-10', '여행 배', '건물 · 배', true, '선착장 BD-05 옆에 묶인 작은 돛배. 본섬과 투어 섬 선착장에 하나씩. 배에 앉기(AN-11 다시 씀) · 돛이 바람에 흔들려요.', () => `<rect x="10" y="70" width="180" height="34" fill="${P.sea}"/>` + waves(30, 86, 8) + boat(100, 72, 1.6)],
   ['TO-01–04', '섬 모양 틀 넷', '섬 생성기', true, '둥근 · 초승달 · 쌍둥이(다리) · 언덕. 생성기 <code>src/gameplay/tour/islet.js</code> (본섬 생성기 다시 씀), 지도 데이터 <code>assets/tour/shapes.json</code>.', () => island(50, 55, .5) + `<path d="M100 34 a16 16 0 1 0 8 30 a12 12 0 1 1 -8 -30z" fill="${P.grass}" stroke="${P.sand}" stroke-width="2"/>` + island(140, 56, .25) + island(160, 56, .25) + island(100, 92, .4, P.hill)],
   ['EN-13', '광석 바위', '배경 · 자연', true, '푸른 결정이 박힌 바위. 삽 · 도끼로 두드리면 하루 세 번 광석이 나와요 (금광석 · 수정 · 철 · 돌). 본섬 바위 모델 모양 그대로 색과 결정만.', () => rock(70, 70, 3) + rock(140, 76, 2.2)],
   ['IC-MA-09–10', '금광석 · 수정', '아이템 · 재료', true, '광석 바위에서만. 팔면 비싸고(금광석 6,000 · 수정 3,000 예정) 레시피 재료로도 써요 (새 레시피는 반영 뒤).', () => `<path d="M60 76 l12 -24 l18 -4 l8 22 l-14 12z" fill="${P.gold}" stroke="${P.acc}"/>` + `<path d="M130 80 l-6 -20 l10 -22 l10 22 l-6 20z" fill="${P.gem}" stroke="${P.sea}"/>`],
@@ -408,9 +408,9 @@ const RES = [
   ['IC-FS-21–22', '희귀 물고기 둘', '아이템 · 물고기', true, '무지개 송어(투어 섬 강) · 꽃 쏨뱅이(바다). 투어 섬에서만 잡혀요, 박물관 칸도 하나씩.', () => fish(70, 56, P.pink, 1.2) + fish(140, 64, P.leafA, 1)],
   ['IC-BG-23–24', '희귀 벌레 둘', '아이템 · 벌레', true, '보석 풍뎅이(낮, 광석 바위 둘레) · 달빛 나방(밤). 투어 섬에서만.', () => bug(75, 58, P.gem, 1.4) + bug(135, 58, P.snow, 1.3)],
   ['IC-TR-01', '섬 여행 표', '아이템 · 여행 (새 분류)', true, '도토리상점에서 1,000 도토리. 선착장 배에서 써요. 첫 여행은 선물.', () => ticket(100, 56, 2.2)],
-  ['UI-20', '여행 묻기 창', '화면', true, '배를 누르면: 「섬 여행 갈까요? (표 1장)」 · 오늘 갔는지 · 가진 표 수. 투어 섬에선 「돌아갈까요?」.', () => R(36, 18, 128, 74, P.white, 8, ` stroke="${P.line}"`) + T(100, 42, '섬 여행 갈까요?', { size: 11, anchor: 'middle' }) + btn(46, 60, 50, '가요') + btn(104, 60, 50, '아니요', false)],
-  ['UI-21', '투어 섬 표시', '화면', true, '오른쪽 위에 「🏝 무인도 · TO-02 초승달」 작은 칸과 지도 단추 대신 섬 모양 미리 보기.', () => R(40, 30, 120, 36, P.white, 8, ` stroke="${P.line}"`) + T(100, 53, '🏝 초승달 섬', { size: 12, anchor: 'middle' })],
-  ['s20', '첫 섬 여행 장면', '장면 (시나리오 편집기)', true, '처음 배를 탈 때 한 번: 선착장 → 바다 위 배 → 낯선 섬에 내림. 연출안 둘.', () => R(10, 14, 180, 82, P.sea, 8) + waves(26, 80, 8) + boat(80, 66, 1.1) + island(160, 50, .6)],
+  ['UI-22', '여행 묻기 창', '화면', true, '배를 누르면: 「섬 여행 갈까요? (표 1장)」 · 오늘 갔는지 · 가진 표 수. 투어 섬에선 「돌아갈까요?」.', () => R(36, 18, 128, 74, P.white, 8, ` stroke="${P.line}"`) + T(100, 42, '섬 여행 갈까요?', { size: 11, anchor: 'middle' }) + btn(46, 60, 50, '가요') + btn(104, 60, 50, '아니요', false)],
+  ['UI-23', '투어 섬 표시', '화면', true, '오른쪽 위에 「🏝 무인도 · TO-02 초승달」 작은 칸과 지도 단추 대신 섬 모양 미리 보기.', () => R(40, 30, 120, 36, P.white, 8, ` stroke="${P.line}"`) + T(100, 53, '🏝 초승달 섬', { size: 12, anchor: 'middle' })],
+  ['s22', '첫 섬 여행 장면', '장면 (시나리오 편집기)', true, '처음 배를 탈 때 한 번: 선착장 → 바다 위 배 → 낯선 섬에 내림. 연출안 둘.', () => R(10, 14, 180, 82, P.sea, 8) + waves(26, 80, 8) + boat(80, 66, 1.1) + island(160, 50, .6)],
   ['CH (다시 씀)', '다른 섬 주민', '캐릭터 · 다시 씀', false, '아직 안 온 주민(CH-11–13 · 떠난 주민) 중 하나가 놀러 와 있어요. 초대하면 <code>town/moving.js</code> 의 다음 이사 주민으로.', () => villager(70, 82, P.white, 2.2) + villager(130, 82, P.night, 2.2)],
 ];
 $('resCards').innerHTML = RES.map(([id, name, kind, isNew, desc, art]) => `
@@ -425,7 +425,7 @@ const PLAN = [
   ['T1', '투어 섬 생성기 (모양 틀 넷 · 시드 · 물체 · 선착장) + 규칙 테스트', '<code>src/gameplay/tour/islet.js</code> · <code>assets/tour/</code> · <code>tests/tour.test.mjs</code>', '반영'],
   ['T2', '지역 · 오가기 — 배 행동 · 원형 전환 · <code>world.addZone</code> (x 700) · 본섬 쉬기 · 05:00 귀환 · 저장 <code>state.tour</code>', '<code>src/gameplay/tour/</code> · <code>docs/CONTRACTS.md</code> 「투어」', 'T1'],
   ['T3', '섬에서 할 것 — 희귀 과일 · 광석 · 희귀 물고기 · 벌레 · 다른 섬 주민 초대', '<code>src/gameplay/tour/</code> · <code>assets/data/items.json</code> · <code>src/data/</code>', 'T2'],
-  ['T4', '모델 — 배 BD-08 · 광석 바위 EN-13 · 아이템 9 (Blender 스크립트, 검수 대기) · 「tour」 묶음 · 장면 s20', '<code>assets/env/specs/</code> · <code>assets/items/specs/</code> · <code>tools/build-web.mjs</code> PACKS', 'T1 (T2 와 같이)'],
+  ['T4', '모델 — 배 BD-10 · 광석 바위 EN-13 · 아이템 9 (Blender 스크립트, 검수 대기) · 「tour」 묶음 · 장면 s22', '<code>assets/env/specs/</code> · <code>assets/items/specs/</code> · <code>tools/build-web.mjs</code> PACKS', 'T1 (T2 와 같이)'],
   ['T5', 'QA — 자동 플레이 「섬 여행」 단계 · 개수 박은 테스트 · GPU 시간 · 처음 받는 크기 → 합치기 · 게시 승인', '<code>tests/playthrough/</code> · <code>docs/notes/p35-tour.md</code>', 'T1–T4'],
 ];
 $('planRows').innerHTML = PLAN.map(([id, what, files, need]) => `<tr><td class="id">${id}</td><td>${what}</td><td class="small">${files}</td><td class="small">${need}</td></tr>`).join('');
@@ -433,7 +433,7 @@ $('planRows').innerHTML = PLAN.map(([id, what, files, need]) => `<tr><td class="
 /* ---------- 사용자 몫 ---------- */
 const YOU = [
   ['D120–D128', '결정 고르기', '이 보드에서 고르고 채팅에 "검수 보드 반영". 아무것도 안 바꾸면 추천안 그대로 승인으로 봐요.'],
-  ['검수 12', '새 리소스 보기', '만든 뒤 배경 편집기(배 · 광석 바위 · 아이템)와 시나리오 편집기(s20)에서 보고 "확정" 또는 요청.'],
+  ['검수 12', '새 리소스 보기', '만든 뒤 배경 편집기(배 · 광석 바위 · 아이템)와 시나리오 편집기(s22)에서 보고 "확정" 또는 요청.'],
   ['손 점검', '배 타 보기', '게임 링크에서 선착장 → 무인도 → 돌아오기를 한 번 직접 (특히 휴대폰에서 원형 전환과 로딩 기다림).'],
 ];
 $('youTable').tBodies[0].innerHTML = YOU.map(([a, b, c]) => `<tr><td class="id">${a}</td><td>${b}</td><td class="small">${c}</td></tr>`).join('');
