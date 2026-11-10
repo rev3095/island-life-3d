@@ -14,8 +14,8 @@ const gltfCache = new Map();
 const jsonCache = new Map();
 
 export const PATHS = {
-  character: slug => `assets/models/${slug}`,     // 캐릭터 9종: player, coco, bori, mochi, dubu, pong, chorong, bamtol, neuru
-  env: slug => `assets/env/models/${slug}`,       // 배경 32종: assets/env/index.json 참고
+  character: slug => `assets/models/${slug}`,     // 캐릭터 목록은 assets/models/index.json (주인공 · 주민 · 가게 주인 — 늘어나면 거기만)
+  env: slug => `assets/env/models/${slug}`,       // 배경 목록: assets/env/index.json 참고
   characterSpec: slug => `assets/specs/${slug}.json`,
   envSpec: slug => `assets/env/specs/${slug}.json`,
 };

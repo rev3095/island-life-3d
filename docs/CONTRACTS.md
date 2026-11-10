@@ -337,7 +337,7 @@ state.mail = { list: [{ id, from, kind, day, lines, gift, read, stub? }], day, n
 
 ## 2차 W4 스타일 셰이더 (stylized-shader)
 
-자세한 설명: `docs/SHADERS.md`. 비교·조절: `demos/style.html`.
+자세한 설명: `docs/SHADERS.md`. 비교·조절: 스타일 편집기 `style-editor.html` (예전 `demos/style.html`).
 
 ### `style` — W4 (src/render/)
 ```js

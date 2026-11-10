@@ -202,13 +202,13 @@ test('숫자 표: 레시피 재료·결과는 있는 아이템, 생일은 맞는
   assert.ok(items.has(RULES.birthdays.cake) && RULES.birthdays.giftMult >= 1);
 });
 
-test('숫자 표: 주민(town) 칸은 아직 town/rules.js 가 읽지 않는다 → 표와 코드 값이 같아야 한다 (연결 전)', () => {
-  // town 연결 제안(docs/notes/m6-p5-mapdata.md)을 합치면 이 검사는 저절로 맞는다. 그 전에 표만 바꾸면 게임에 안 들어가므로 여기서 막는다
+test('숫자 표: 주민(town) 칸 = town/rules.js 가 읽는 값 (표와 코드 값이 같다)', () => {
+  // town/rules.js 는 RULES.town 을 그대로 읽는다 (연결됨). 표와 코드가 어긋나면 여기서 잡힌다
   const t = RULES.town;
   assert.deepEqual(
     [t.friendMax, t.tiers, t.talkBonus, t.giftPoints, t.giftsCountedPerDay, t.requestPoints, t.requestDays],
     [townRules.FRIEND_MAX, townRules.TIERS, townRules.TALK_BONUS, townRules.GIFT_POINTS, townRules.GIFTS_COUNTED_PER_DAY, townRules.REQUEST_POINTS, townRules.REQUEST_DAYS],
-    'rules.json town 칸이 src/gameplay/town/rules.js 와 다르다 — town 연결 전에는 반영할 수 없다');
+    'rules.json town 칸이 src/gameplay/town/rules.js 가 읽은 값과 다르다');
   const q = t.requestReward;
   const furn = { rewards: ['furn.sofa'] };
   assert.equal(townRules.requestReward(furn, null, () => q.furnitureChance - 1e-9).id, 'furn.sofa', '부탁 보상 가구 확률');

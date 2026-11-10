@@ -97,6 +97,8 @@ export const SPEAKERS = {
   player: { name: '나', color: '#5DB7A8' }, coco: { name: '코코', color: '#F2B36B' }, bori: { name: '보리', color: '#6CA0DC' },
   mochi: { name: '모찌', color: '#B9A6E0' }, dubu: { name: '두부', color: '#7FA36B' }, pong: { name: '퐁', color: '#FFD866' },
   chorong: { name: '초롱', color: '#8CCB6E' }, bamtol: { name: '밤톨', color: '#C7743E' }, neuru: { name: '느루', color: '#7A9A5A' },
+  // M10 이사 주민 (색은 assets/villagers/<slug>.json color 와 같게)
+  danpung: { name: '단풍', color: '#D9583B' }, gureum: { name: '구름', color: '#B9A6E0' }, pado: { name: '파도', color: '#5B8FC9' }, dalmuri: { name: '달무리', color: '#7A6A9A' },
 };
 
 /** 배경색 위에서 더 잘 읽히는 글자색 (흰색 또는 잉크색) */

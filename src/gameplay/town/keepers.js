@@ -232,7 +232,9 @@ export async function createKeepers(ctx, town, lines) {
     const atHome = visit.on;
     visit.on = false;
     B.happy();
-    await say([...(atHome ? LB.firstday.visit : []), ...(visit.full ? LB.firstday.again : LB.firstday.done)]);
+    // 첫날 할 일을 건너뛴 사람(intro skipped)에게는 「다 해냈네요」 대신 환영 대사 (p11-tune, 백로그 B-25)
+    const skipped = !!fd.progress?.().skipped;
+    await say([...(atHome ? LB.firstday.visit : []), ...(visit.full ? LB.firstday.again : skipped && LB.firstday.welcome ? LB.firstday.welcome : LB.firstday.done)]);
     const left = giveItem(ctx, rw.item);
     visit.full = left > 0;
     if (left > 0) await say(LB.firstday.full);          // 가방이 꽉 참 → 다음에 다시
