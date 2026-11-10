@@ -816,15 +816,22 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.shot('clock-day', '시계로 돌린 낮');
     const stock = S().data.economy.stock().filter(id => !String(id).startsWith('tool.') || !S().data.inventory.hasTool?.(String(id).slice(5)));
     const cheap = stock.map(id => ({ id, p: S().data.economy.buyPrice(id) })).filter(x => x.p > 0 && x.p <= bot.acorns()).sort((x, y) => x.p - y.p)[0];
+    // 상점은 가방이 꽉 차면 조용히 안 판다 (알림은 상점 자체 toast 라 봇 기록에 안 남음) → 늦은 게임처럼 가방이 차 있으면 하나 팔아 칸을 비운다
+    const inv = S().data.inventory, freeSlots = () => inv.slots.filter(s => !s).length;
+    const free0 = freeSlots();
+    let soldFirst = null;
+    if (cheap && free0 === 0) {
+      await sk.shop({ sell: (it, s) => (soldFirst || !it || keep.has(it.id) || it.id.startsWith('tool.') ? 0 : ((soldFirst = it.id), s.count)) });
+    }
     const w0 = bot.acorns();
     if (cheap) await sk.shop({ buy: [cheap.id] });
-    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), offset: S().time.offset, maxDay: S().time.maxDay });
+    note('clockPhone', { night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay });
     const bad = [];
     if (lit < 0.9) bad.push(`밤 불빛 ${lit.toFixed(2)}`);
     if (!bug) bad.push('밤 곤충을 못 잡음');
     if (!cheap) bad.push('살 수 있는 물건 없음');
-    else if (!(w0 - bot.acorns() > 0)) bad.push(`못 삼 (${cheap.id})`);
-    const msg = `밤 ${Math.floor(night.to / 60)}시 곤충 ${bug ?? '-'} · 낮 ${day.day} ${Math.floor(day.to / 60)}시 ${cheap?.id ?? '-'} 🌰${w0 - bot.acorns()} · 밤에 밖 주민 ${out}`;
+    else if (!(w0 - bot.acorns() > 0)) bad.push(`못 삼 (${cheap.id}${freeSlots() === 0 ? ' — 가방 꽉 참' : ''})`);
+    const msg = `밤 ${Math.floor(night.to / 60)}시 곤충 ${bug ?? '-'} · 낮 ${day.day} ${Math.floor(day.to / 60)}시 ${cheap?.id ?? '-'} 🌰${w0 - bot.acorns()} · 가방 빈칸 ${free0}${soldFirst ? ` (먼저 ${soldFirst} 팔기)` : ''} · 밤에 밖 주민 ${out}`;
     return bad.length ? awk(`${bad.join(', ')} — ${msg}`) : pass(msg);
   });
 

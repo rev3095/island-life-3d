@@ -58,7 +58,9 @@ export function createShop(ctx, panels, { bag, toast }) {
       const d = data();
       const it = itemInfo(ctx, id);
       if (it.buy > acorns()) { toast('도토리가 모자라요', '🌰'); return; }
-      if (d.inventory?.isFull?.()) { toast('가방이 꽉 찼어요', '🎒'); return; }
+      // 빈칸이 없어도 같은 물건 칸에 겹쳐 담을 수 있으면 산다 (가진 씨앗 봉투 등 — 예전엔 빈칸만 봐서 못 샀다)
+      const fits = d.inventory?.canFit ? d.inventory.canFit(id, 1) > 0 : !d.inventory?.isFull?.();
+      if (!fits) { toast('가방이 꽉 찼어요', '🎒'); return; }
       const ok = await confirmBox(panels, { title: '사기', icon: it.icon, text: `${itemPhrase(it.name)} 🌰 ${fmt(it.buy)}에 살까요?`, buttons: [{ label: '살게요', value: true, primary: true }, { label: '그만둘래요', value: false }] });
       if (!ok || p.closed) return;
       if (!d.wallet.spend(it.buy)) { toast('도토리가 모자라요', '🌰'); return; }

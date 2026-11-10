@@ -167,3 +167,16 @@ test('시계: 섬폰 줄·창·시각 서비스 API·바뀜 이벤트가 이어�
   // 하루 리셋은 앞으로만 (날짜 흉내만 allowBack)
   assert.match(read('src/data/index.js'), /allowBack: !!ctx\.preview/);
 });
+
+test('상점: 가방이 꽉 차도 같은 물건 칸에 겹쳐 담을 수 있으면 산다 (clock-phone 🟡 — 받은 튤립 씨앗)', async () => {
+  const { createInventory, SLOTS } = await import('../src/data/inventory.js');
+  const state = createState();
+  const inv = createInventory(state);
+  inv.add('seed.tulip', 1);
+  for (let i = 1; i < SLOTS; i++) state.inventory[i] = { id: 'fish.carp', count: 1 };
+  assert.equal(inv.isFull(), true);
+  assert.ok(inv.canFit('seed.tulip', 1) > 0, '튤립 씨앗은 겹쳐 담긴다');
+  assert.equal(inv.canFit('seed.pansy', 1), 0, '없는 씨앗은 못 담는다');
+  const shop = readFileSync(new URL('../src/ui/shop.js', import.meta.url), 'utf8');
+  assert.match(shop, /canFit\(id, 1\) > 0/, '상점 사기는 빈칸이 아니라 canFit 으로 본다');
+});
