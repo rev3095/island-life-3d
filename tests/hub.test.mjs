@@ -35,7 +35,10 @@ test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 �
 
 test('홈 링크 = 문서 링크 (CLAUDE.md · concept/README.md · 시나리오 노트)', () => {
   const claude = read('CLAUDE.md'), readme = read('concept/README.md');
-  for (const id of ['character', 'env', 'game']) assert.ok(claude.includes(byId[id].url), `${id} 링크가 CLAUDE.md 와 다르다`);
+  // 편집기 (새 셋 res·story·elem + 곡·스타일) · 예전 편집기 (concept/ 밖 archive) · 게임 링크는 CLAUDE.md 에 그대로 적혀 있어야 한다
+  for (const e of LIST.filter(x => x.url && (x.group === 'editor' || x.group === 'game' || (x.group === 'archive' && !x.file.startsWith('concept/')))))
+    assert.ok(claude.includes(e.url), `${e.id} 링크가 CLAUDE.md 와 다르다`);
+  for (const id of ['res', 'story', 'elem']) assert.ok(readme.includes(byId[id].url), `${id} 링크가 concept/README.md 에 없다`);
   // 보드 링크 = README 보드 표 줄, 보드 id = 보드 페이지의 window.BOARD.id = reads 의 boards/<id>.
   // 다른 브랜치에서 막 생긴 보드는 합치기 전엔 이 작업 트리에 파일·README 줄이 없다 → 여기 적은 것만 기다려 주고, 파일이 생기면 같은 검사를 받는다.
   const PENDING_BOARDS = {};
@@ -52,6 +55,22 @@ test('홈 링크 = 문서 링크 (CLAUDE.md · concept/README.md · 시나리오
     assert.deepEqual(e.reads, [`boards/${e.id}`, `applied/${e.id}`]);
   }
   assert.ok(read('docs/notes/story.md').split('\n')[0].includes(byId.story.url), 'story 링크가 docs/notes/story.md 첫 줄과 다르다');
+});
+
+test('깨진 링크 없음: 문서·홈·노트의 claude.ai 아티팩트 링크는 모두 홈 목록(또는 홈 자신)의 링크', () => {
+  const HOME = 'https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv';
+  const known = new Set([HOME, ...LIST.map(e => e.url).filter(Boolean)]);
+  const docs = ['CLAUDE.md', 'concept/README.md', 'devlog.md', 'docs/PLAN.md', 'editors.html',
+    ...readdirSync(resolve(root, 'docs/notes')).filter(f => f.endsWith('.md')).map(f => `docs/notes/${f}`)];
+  const bad = [];
+  for (const d of docs) for (const m of read(d).matchAll(/https:\/\/claude\.ai\/(?:code\/)?artifact\/([\w-]+)/g))
+    if (!known.has(`https://claude.ai/artifact/${m[1]}`)) bad.push(`${d}: ${m[0]}`);
+  assert.deepEqual(bad, [], '홈 목록에 없는 링크 (새 편집기·보드면 editors.html 목록과 바로 가기에 더한다)');
+  // 문서가 부르는 채팅 명령은 홈 명령 표에도 있다
+  for (const c of ['리소스 요청 확인', '스토리 반영', '요소 반영']) {
+    assert.ok(home.includes(`<code>"${c}"</code>`), `홈 명령 표에 "${c}"`);
+    for (const d of ['CLAUDE.md', 'concept/README.md']) assert.ok(read(d).includes(c), `${d} 에 "${c}"`);
+  }
 });
 
 test('"전체 요청 확인" 순서와 status 모양이 문서에 있다', () => {
@@ -149,7 +168,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
   assert.equal(docs.villager.count, specCount('assets/villagers', v => v.slug));
   assert.equal(docs.env.count, files('assets/env/specs').length);
   assert.equal(docs.furniture.count, files('assets/furniture/specs').length + files('assets/furniture/fixtures/specs').length, '가구 + 상점·박물관 붙박이');
-  assert.ok(docs.furniture.items.filter(i => i.id.startsWith('fix-')).every(i => /#place-(shop|museum)$/.test(i.link ?? '')), '붙박이는 그 실내 방 배치로');
+  assert.ok(docs.furniture.items.filter(i => i.id.startsWith('fix-')).every(i => i.link?.endsWith(`#${i.id}`)), '붙박이는 리소스 편집기 #fix-<slug>');
   assert.equal(docs.item.count, files('assets/items/specs').length);
   assert.equal(docs.item.icons, files('assets/items/specs').reduce((n, f) => n + (JSON.parse(read(`assets/items/specs/${f}`)).items?.length ?? 1), 0));
   assert.equal(docs.interior.count, specCount('assets/interior/specs', s => s.kind === 'wallpaper' || s.kind === 'floor'));
@@ -167,7 +186,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
   assert.equal(meta.total, Object.values(docs).reduce((n, d) => n + d.count, 0));
 
   const H = loadLogic();
-  const bg = read('bg-editor.html'), ch = read('editor.html'), elemSheets = read('elem-editor/sheets.js');
+  const res = read('res-editor.html'), story = read('story-editor.html'), elemSheets = read('elem-editor/sheets.js');
   const soundTabs = read('sound-editor.html').match(/const TABS = \[([^\]]*)\]/)[1];
   for (const d of Object.values(docs)) {
     assert.ok(Buffer.byteLength(JSON.stringify(d)) < 200 * 1024, `${d.group}: 문서 하나는 256 KiB 안 (넉넉히 200)`);
@@ -180,9 +199,13 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
       const hash = it.link.split('#')[1];
       if (!hash) continue;
       // 그 편집기가 주소 끝 # 를 읽는 방식과 맞는지
-      if (d.editor === 'env') assert.ok(d.group === 'furniture' ? (it.id.startsWith('fix-') ? /^place-(shop|museum)$/.test(hash) && bg.includes("'place-' + p.slug") : hash === `furn-${it.id}` && bg.includes("'furn-' + m.slug"))
-        : d.group === 'item' ? hash === `item-${it.id}` && bg.includes("'item-' + m.slug") : hash === it.id, `${d.group}/${it.id}: 배경 편집기 #${hash}`);
-      if (d.editor === 'character') assert.ok(hash === it.id || (hash === `${it.id}.talk` && ch.includes(".replace(/\\.talk$/, '')")), `캐릭터 편집기 #${hash}`);
+      // 리소스 편집기: 키 = 영역 앞글자 + slug (res-editor.html keyOf — 가구 furn- · 붙박이 fix- · 아이템 item- · 캐릭터·배경·무늬는 slug 그대로)
+      if (d.editor === 'res') {
+        const pre = { furniture: it.id.startsWith('fix-') ? '' : 'furn-', item: 'item-' }[d.group] ?? '';
+        assert.ok(hash === pre + it.id && res.includes("furniture: 'furn-', fixture: 'fix-', item: 'item-'"), `${d.group}/${it.id}: 리소스 편집기 #${hash}`);
+      }
+      // 스토리 편집기: #<탭> (story-editor.html TABS — claude.ai 는 #a/b 를 넘기지 않아 탭까지만)
+      if (d.editor === 'story') assert.ok(hash === 'villager' && story.includes("const TABS = ['scenes', 'villager',"), `스토리 편집기 #${hash}`);
       // 요소 편집기: #<표 id> (elem-editor/sheets.js) 또는 방 배치 #rooms.<방·가게 slug>
       if (d.editor === 'elem') assert.ok(/^rooms\.[\w-]+$/.test(hash) ? existsSync(resolve(root, `assets/interior/rooms/${hash.slice(6)}.json`)) || existsSync(resolve(root, `assets/interior/places/${hash.slice(6)}.json`)) : elemSheets.includes(`{ id: '${hash}', name:`), `요소 편집기 #${hash}`);
       if (d.editor === 'sound') assert.ok(soundTabs.includes(`'${hash}'`), `곡 편집기 #${hash}`);

@@ -2,7 +2,7 @@
 
 새 리소스나 큰 결정이 필요한 차수는 **만들기 전에 검수 보드부터** 보여 주고, 사용자가 보드에서 고른 선택대로 진행한다. 결정이 바뀌거나 되돌릴 때도 사용자는 보드를 고친 뒤 채팅에 **"검수 보드 반영"** 이라고 한다.
 
-모든 편집기·보드 링크와 현황은 **편집기 홈** (https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv, `editors.html`) 에 모여 있다 — 아래 「편집기 홈」·「"전체 요청 확인"」·「반영 기록 공용 모양」.
+모든 편집기·보드 링크와 현황은 **편집기 홈** (https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv, `editors.html`) 에 모여 있다 — 아래 「편집기 홈」·「"전체 요청 확인"」·「반영 기록 공용 모양」. 편집기는 P36(2026-11-11)부터 셋으로 나뉘었다: **리소스 편집기** https://claude.ai/artifact/1weSx9yyf2U4mLnwvopBNV ("리소스 요청 확인") · **스토리 편집기** https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF ("스토리 반영") · **요소 편집기** https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj ("요소 반영") + 곡 편집기 · 스타일 편집기. 예전 캐릭터 편집기(https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2) · 배경 편집기(https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh) · 섬 지도 편집기는 「예전」 — 링크와 저장소는 지우지 않는다.
 
 | 보드 | 파일 | 링크 | 보드 id |
 |---|---|---|---|
@@ -17,27 +17,27 @@
 | 8차 검수 보드 v0.8 (M8 계절 행사 EV-01–04, D74–D85) | `wave8-board.html` + `board-kit.js` | https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T | `wave8` |
 | 9차 검수 보드 v0.9 (M9 방향 · 정리, D86–D92) | `wave9-board.html` + `board-kit.js` | https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc | `wave9` |
 | 10차 검수 보드 v1.0 (M10 방향 · 새 주민, D93–D99) | `wave10-board.html` + `board-kit.js` | https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H | `wave10` |
-| 11차 검수 보드 v1.1 (M11 방향 · 옷 갈아입기, D100–D105) | `wave11-board.html` + `board-kit.js` | https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY | `wave11` |
-| 밤·새벽 검수 보드 v0.1 (M12 야시장 · 야행성 주민 · 밤 상점 · 밤에만 여는 집 · 새벽 타로 천막, D106–D114) | `night-board.html` + `board-kit.js` | https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU | `night` |
-| 무인도 투어 검수 보드 v0.1 (선착장 배 · 무작위 섬 · 희귀 채집, D120–D128 — 11차 D100-B 「새 곳」의 작은 섬을 따로 정함) | `tour-board.html` + `board-kit.js` | https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx | `tour` |
+| 11차 검수 보드 v1.1 (M11 방향 · 옷 갈아입기, D100–D105 — 반영 v1 = 모두 A, 11-11) | `wave11-board.html` + `board-kit.js` | https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY | `wave11` |
+| 밤·새벽 검수 보드 v0.1 (M12 야시장 · 야행성 주민 · 밤 상점 · 밤에만 여는 집 · 새벽 타로 천막, D106–D114 — 반영 v1 = 모두 A, main de3117f) | `night-board.html` + `board-kit.js` | https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU | `night` |
+| 무인도 투어 검수 보드 v0.1 (선착장 배 · 무작위 섬 · 희귀 채집, D120–D128 — 11차 D100-B 「새 곳」의 작은 섬을 따로 정함 · 반영 v1 = 모두 A, main 1c9480f) | `tour-board.html` + `board-kit.js` | https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx | `tour` |
 
 ## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
 | D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) |
-| CH | 캐릭터 | CH-01–10 (+wave10 CH-11 구름 양 · CH-12 파도 펭귄 · CH-13 달무리 부엉이, M10-P3 검수 대기) (+night 계획 CH-14 별밤 박쥐 · CH-15 여명 나방 — 가게 주인) |
-| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night 계획 PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night 계획 BD-08 달빛 가게 · BD-09 새벽 천막) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) (+tour BD-10 여행 배 · EN-13 광석 바위, P35 검수 대기) |
-| FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) (+wave10 FU-51 그림 이젤 · FU-52 바다 지도 액자 · FU-53 별 망원경, M10-P5 검수 대기) (+night 계획 FU-55–58 밤 가구 · FU-59 수정 구슬) |
-| IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 (wave8 EV: IC-EV-01–04) (+night 계획 NT 밤 먹거리: IC-NT-01–04) (+tour IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01 여행 표(데이터 분류는 mat) |
-| WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 (+interiors RM-08 상점 · RM-09 박물관) (+night 계획 RM-10 달빛 가게 · RM-11 천막) |
+| CH | 캐릭터 | CH-01–10 (+wave10 CH-11 구름 양 · CH-12 파도 펭귄 · CH-13 달무리 부엉이, M10-P3 검수 대기) (+night CH-14 별밤 박쥐 · CH-15 여명 나방 — 가게 주인, M12 검수 대기) |
+| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night BD-08 달빛 가게 · BD-09 새벽 천막, 검수 대기) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) (+tour BD-10 여행 배 · EN-13 광석 바위, P35 검수 대기) |
+| FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) (+wave10 FU-51 그림 이젤 · FU-52 바다 지도 액자 · FU-53 별 망원경, M10-P5 검수 대기) (+night FU-55–58 밤 가구 · FU-59 수정 구슬, 검수 대기) |
+| IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 (wave8 EV: IC-EV-01–04) (+night NT 밤 먹거리: IC-NT-01–04) (+tour IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01 여행 표(데이터 분류는 mat), 검수 대기) |
+| WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 (+interiors RM-08 상점 · RM-09 박물관) (+night RM-10 달빛 가게 · RM-11 천막) |
 | EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 (+interiors AN-06 문 열기 · AN-07 걸어 들어가기) (+wave8 AN-08 손 불꽃 흔들기 · AN-09 눈덩이 밀기) (+wave9 AN-10 놓기 — AN-08–10 은 주인공 동작으로 M9-P1 에서 만듦) (+wave10 AN-11 앉기 `sit_down`·`sit`·`stand_up`, 캐릭터 13 모두) · ED-01–06 · SF-1–6 · UI-04–05 |
-| s01– | 장면 (시나리오 편집기) | s01–s12 (+wave8 s13–s16 행사 장면) (+wave10 s17–s19 새 주민 첫 만남, 검수 대기) (+night 계획 s20 달빛 가게 · s21 새벽 천막) (+tour 계획 s22 첫 섬 여행 — 아직) |
-| ET | 편집기 (wave6) | ET-01– |
-| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) (+wave10 UI-18 이사 편지·떠나기 묻기) (+night 계획 UI-20 카드 뽑기 창 · UI-21 오늘 운세 칸) · RC-01–12 · QA-01–19 (+tour UI-22 여행 묻기 창 · UI-23 투어 섬 표시) |
+| s01– | 장면 (스토리 편집기) | s01–s12 (+wave8 s13–s16 행사 장면) (+wave10 s17–s19 새 주민 첫 만남, 검수 대기) (+night 계획 s20 달빛 가게 · s21 새벽 천막) (+tour 계획 s22 첫 섬 여행) — s20–s22 는 `p39-scenes` 에서 |
+| ET | 편집기 (wave6) | ET-01–11 (P36 리소스·스토리·요소 편집기는 ET 번호 없이 홈 id `res`·`story`·`elem`) |
+| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) (+wave10 UI-18 이사 편지·떠나기 묻기) (+night UI-20 카드 뽑기 창 · UI-21 오늘 운세 칸) · RC-01–12 · QA-01–19 (+tour UI-22 여행 묻기 창 · UI-23 투어 섬 표시) |
 | SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
-| CL | 옷 (wave11 계획): 모자 · 윗옷 · 신발 (CL-00 = 주인공 기본 옷) | (+wave11 계획 CL-01–12) · FU-54 옷 진열대 · UI-19 옷장 창 · AN-12 빙글 |
-| TA | 타로 카드 (night 계획, 섬 이야기로 새로 그린 12장, 하루 운세) | TA-01–12 |
+| CL | 옷 (wave11 반영 v1, M11 `p38-m11` 에서 만드는 중): 모자 · 윗옷 · 신발 (CL-00 = 주인공 기본 옷) | (+wave11 CL-01–12) · FU-54 옷 진열대 · UI-19 옷장 창 · AN-12 빙글 |
+| TA | 타로 카드 (night, 섬 이야기로 새로 그린 12장, 하루 운세) | TA-01–12 |
 | TO | 투어 섬 모양 틀 (tour, `src/gameplay/tour/islet.js` SHAPES): 둥근 · 초승달 · 쌍둥이 · 언덕 | TO-01–04 |
 | EV · FX | wave8: 계절 행사 · 효과 셰이더 | EV-01–04 · FX-01 (불꽃) |
 
@@ -69,7 +69,9 @@
 
 https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저장소 루트). 모든 편집기·검수 보드·게임 링크를 한곳에서 열고, 편집기마다 무엇을 고치는지 · 채팅 명령 · 마지막 반영 버전 · 처리할 것 수를 보여 주고, **「전체 관리」 표에서 모든 리소스를 골라 다시 열기 · 고쳐 주세요 · 확정을 남긴다** (아래 「전체 관리」).
 
-- **목록 = `editors.html` 의 `<script type="application/json" id="editors-list">`.** 항목 `{ id, group: editor|board|game|soon|archive, name, url, file, edits, command, openLabel, reads, et?, track?, later? }`. `reads` 는 "전체 요청 확인" 때 Claude 가 그 아티팩트 저장소에서 읽을 곳. 머리의 **바로 가기** (`nav.quick`) 는 같은 링크를 스크립트 없이 적어 둔 것 — 목록을 바꾸면 같이 고친다. `tests/hub.test.mjs` 가 목록 ↔ 바로 가기 · CLAUDE.md·이 표·시나리오 노트의 링크, 보드 id ↔ `window.BOARD.id` 를 검사한다.
+목록 group `archive` 는 지난 보드와 예전 편집기(링크만 남김 — 2026-11-11 캐릭터·배경 편집기, P36 섬 지도 편집기). 홈 화면에서는 「지난 보드」·「지난 편집기」 줄로 보인다.
+
+- **목록 = `editors.html` 의 `<script type="application/json" id="editors-list">`.** 항목 `{ id, group: editor|board|game|soon|archive, name, url, file, edits, command, openLabel, reads, et?, track?, later? }`. `reads` 는 "전체 요청 확인" 때 Claude 가 그 아티팩트 저장소에서 읽을 곳. 머리의 **바로 가기** (`nav.quick`) 는 같은 링크를 스크립트 없이 적어 둔 것 — 목록을 바꾸면 같이 고친다. `tests/hub.test.mjs` 가 목록 ↔ 바로 가기 · CLAUDE.md·이 표·시나리오 노트의 링크, 보드 id ↔ `window.BOARD.id` 를 검사하고, CLAUDE.md·이 문서·`docs/notes/*.md`·홈의 claude.ai 링크가 모두 목록(또는 홈 자신)의 링크인지 본다 (깨진 링크 검사).
 - 아티팩트는 다른 아티팩트의 저장소를 읽을 수 없다 → 홈은 **자기 저장소의 문서만** 보여 주고, 그 문서는 Claude 가 ArtifactData 로 써 넣는다. 숫자·목록은 Claude 가 마지막으로 확인한 때 기준이다. 홈 페이지가 쓰는 곳은 `manage/*` (전체 관리 요청) 하나.
 - **열리게 하는 약속** (게시본에서 무엇이 실패해도 화면이 비지 않게, `tests/hub.test.mjs` 가 본다): ① 맨 앞 작은 스크립트가 오류·`unhandledrejection`·스크립트 파일 못 받음을 잡아 맨 위 상자(`#bootErr`)에 "무엇이 안 됐는지" 적는다 (오류 글 복사 단추 — 채팅에 붙이면 Claude 가 고친다) ② 글꼴은 `<link>` 대신 그 스크립트가 나중에 붙인다 (글꼴 서버가 늦어도 화면을 막지 않음, 없으면 기본 글꼴) ③ 바로 가기 링크·명령 표는 HTML 그대로 ④ `board-kit.js` 를 못 받아도 같은 모양의 대신 도구로 그린다 ⑤ `claude.use()` 는 12초 제한·`null`·던짐·Promise 아님을 모두 견디고, `user.isOwner()`·`can()`·`id()` 도 각각 8초 제한으로 감싼다 ⑥ 현황(`status`) 구독이 실패해야만 "저장소 못 읽음", 다른 구독은 그 칸에만 이유 ⑦ 15초 동안 답이 없으면 그렇게 적는다.
 
@@ -83,7 +85,7 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 | `manage/<자동 id>` | 전체 관리에서 남긴 요청 (아래) | 홈 페이지 (쓰기 interact) · 처리 결과는 Claude |
 | `status/game` | 다른 `status` 칸 + 게임 저장소 요약 `open`·`openItems`·`reports`·`checks` (아래 「게임 저장소」) | Claude (쓰기 admin, `tools/hub-game.mjs`) |
 
-`status` 칸: `open` = 아직 처리 안 한 것 수 (캐릭터·배경: `status:'new'` 요청 · 보드: `applied` 뒤 바뀐 결정·의견 · 시나리오: 바뀐 장면·순서·의견 · 새 편집기: 그 편집기 노트가 정한 것), `openItems` = 짧은 이름 최대 5개, `requested` = 편집기·보드에서 "반영 요청 표시"를 눌렀는지, `applied` = 그 편집기 `applied/<id>` 요약 `{version, appliedAt, summary, commit}` (없으면 `null`), `recent` = `history` 최근 3개 `{version, appliedAt, summary}` (새 것부터), `published` = 그 편집기 아티팩트 게시 버전, `note` = 한 줄 상황, `url` = 목록에 링크가 없는 새 편집기의 링크 (`https://claude.ai/artifact/…` 만 받아 줌 — 홈을 다시 게시하지 않고 자리를 채울 때). 목록에 없는 칸은 비워 둬도 된다.
+`status` 칸 (`<목록 id>` = `res` · `story` · `elem` · `sound` · `style` · 보드 id · `game`, 예전 `character` · `env` 도 남김): `open` = 아직 처리 안 한 것 수 (리소스: `res-requests` `status:'new'` · 예전 캐릭터·배경: `status:'new'` 요청 · 보드: `applied` 뒤 바뀐 결정·의견 · 스토리: 바뀐 장면·순서·의견 + `talk`·`texts` · 요소: `drafts/elem` 의 바뀐 칸 · 곡·스타일: 그 편집기 노트가 정한 것), `openItems` = 짧은 이름 최대 5개, `requested` = 편집기·보드에서 "반영 요청 표시"를 눌렀는지, `applied` = 그 편집기 `applied/<id>` 요약 `{version, appliedAt, summary, commit}` (없으면 `null`), `recent` = `history` 최근 3개 `{version, appliedAt, summary}` (새 것부터), `published` = 그 편집기 아티팩트 게시 버전, `note` = 한 줄 상황, `url` = 목록에 링크가 없는 새 편집기의 링크 (`https://claude.ai/artifact/…` 만 받아 줌 — 홈을 다시 게시하지 않고 자리를 채울 때). 목록에 없는 칸은 비워 둬도 된다.
 
 게시: `file_path: editors.html`, `files: {"concept/board-kit.js": "concept/board-kit.js"}` (홈은 루트에 있어서 로컬과 같은 경로), `capabilities: {"db": {"rules": [{"path":"status","read":"view","write":"admin"},{"path":"meta","read":"view","write":"admin"},{"path":"catalog","read":"view","write":"admin"},{"path":"marks","read":"view","write":"admin"},{"path":"manage","read":"view","write":"interact"}]}, "user": {}}` (capabilities 를 넘기면 전체를 다시 선언 — 생략하면 그대로), 첫 게시 `icon: "home"`. 로컬 확인은 dev-server `/editors.html` — `/api/db/hub-status`·`hub-meta`·`hub-catalog`·`hub-marks`·`hub-manage` (`assets/review/hub-*.json`, 행마다 `docId`; `node tools/hub-catalog.mjs --local` 이 catalog·meta 행을 채운다) 를 읽고 쓴다. 게임 카드는 같은 서버의 `/api/db/game-reports`·`/api/db/checks` (게임이 로컬에서 남긴 것) 를 바로 읽는다.
 
@@ -95,17 +97,17 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 
 | 분류 (`catalog/<id>`) | 읽는 곳 | 상태 | 고치는 곳 (주소 끝) |
 |---|---|---|---|
-| `character` 캐릭터 | `assets/specs/*.json` | 스펙 `status` | 캐릭터 편집기 `#<slug>` |
-| `villager` 주민 성격·대화 | `assets/villagers/*.json` | 파일 `status` | 캐릭터 편집기 `#<slug>.talk` |
-| `env` 배경 (축제 포함) | `assets/env/specs` | 스펙 `status` | 배경 편집기 `#<slug>` |
-| `furniture` 가구 | `assets/furniture/specs` | 스펙 `status` | 배경 편집기 `#furn-<slug>` |
-| `item` 아이템 (`icons` = 아이콘 수) | `assets/items/specs` | 스펙 `status` | 배경 편집기 `#item-<slug>` |
-| `interior` 벽지·바닥 | `assets/interior/specs` (wallpaper·floor) | 스펙 `status` | 배경 편집기 `#wp-0N`·`#fl-0N` |
-| `room` 방 배치 (+ 파일 없는 RM-07 = `new`) | `assets/interior/rooms` | 파일 `status` | 배경 편집기 `#rm-0N` |
-| `scene` 장면 | `assets/story/scenes` (순서 `index.json`) | 파일 `status` | 시나리오 편집기 |
+| `character` 캐릭터 | `assets/specs/*.json` | 스펙 `status` | 리소스 편집기 `#<slug>` |
+| `villager` 주민 성격·대화 | `assets/villagers/*.json` | 파일 `status` | 스토리 편집기 「주민」 탭 `#villager` (claude.ai 는 `#a/b` 를 넘기지 않아 주민까지는 못 감) |
+| `env` 배경 (축제 포함) | `assets/env/specs` | 스펙 `status` | 리소스 편집기 `#<slug>` |
+| `furniture` 가구 | `assets/furniture/specs` | 스펙 `status` | 리소스 편집기 `#furn-<slug>` (붙박이 FU-35–42 `#fix-<slug>`) |
+| `item` 아이템 (`icons` = 아이콘 수) | `assets/items/specs` | 스펙 `status` | 리소스 편집기 `#item-<slug>` |
+| `interior` 벽지·바닥 | `assets/interior/specs` (wallpaper·floor) | 스펙 `status` | 리소스 편집기 `#wp-0N`·`#fl-0N` |
+| `room` 방 배치 (+ 파일 없는 RM-07 = `new`) | `assets/interior/rooms` | 파일 `status` | 요소 편집기 「방 배치」 `#rooms.<slug>` (상점·박물관·밤 가게도) |
+| `scene` 장면 | `assets/story/scenes` (순서 `index.json`) | 파일 `status` | 스토리 편집기 |
 | `sound` 곡·선곡 표·효과음·목소리 | `assets/sound/` | 값 데이터 → `marks` | 곡 편집기 `#songs`·`#schedule`·`#sfx`·`#voices` |
-| `map` 섬 지도 자리·시드·밀도 | `assets/island/layout.json` 칸마다 | 값 데이터 → `marks` | 섬 지도 편집기 |
-| `data` 숫자 표 묶음 | 숫자 표 편집기 `SHEETS` + `assets/data/*.json` | 값 데이터 → `marks` | 숫자 표 `#<표 id>` |
+| `map` 섬 지도 자리·시드·밀도 | `assets/island/layout.json` 칸마다 | 값 데이터 → `marks` | 요소 편집기 `#map` |
+| `data` 요소 값 표 (상점·아이템·규칙·행사·밤·투어·이사) | `elem-editor/sheets.js` `SHEETS` + `assets/data/*.json`·`events`·`night`·`tour` | 값 데이터 → `marks` | 요소 편집기 `#<표 id>` |
 | `style` 스타일 프리셋 | `assets/style/presets.json` | 값 데이터 → `marks` | 스타일 편집기 |
 | `decision` 보드 결정 D8– | 보드 html `DECISIONS` + `--boards` (보드 파일이 아직 이 작업 트리에 없으면 그 보드는 건너뛰고 알린다) | 고른 안이 있으면 확정 → `marks` | 그 보드 |
 
@@ -117,8 +119,8 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 
 | `kind` | `spec` (스펙·파일에 status 가 있는 것) | `value` (소리·지도·숫자·스타일) | `board` (보드 결정) |
 |---|---|---|---|
-| `'reopen'` 다시 열기 | 파일 `status: "review"` (version 은 그대로) → `node tools/build-*.mjs --index` (배경 편집기는 `build-editor-index.mjs` 도) → 그 편집기 다시 게시 (목록 파일만) | `marks/<분류>.items.<id> = {state:'review', at, from}` (파일은 그대로 — 편집기에서 바로 고치면 된다) | `marks/decision` 에 `review` → 사용자가 보드에서 다시 고르면 "검수 보드 반영" |
-| `'fix'` 고쳐 주세요 | 그 편집기 요청 하나처럼 처리 (CLAUDE.md 「"요청 확인"」 흐름: 스펙·빌더 수정 → 재빌드 → 테스트 → 다시 게시 → 그 편집기 `applied`·`history` 새 버전, `changed` 에 `request: 'manage/<id>'`) → 고친 것은 `review` 로 | 의견대로 값 데이터를 고친다 (그 편집기 반영 흐름 — `apply-edits`·`apply-sound` 등과 같은 검사·버전 +1) | 의견을 보드 카드·계획에 반영 ("검수 보드 반영" 흐름) |
+| `'reopen'` 다시 열기 | 파일 `status: "review"` (version 은 그대로) → `node tools/build-*.mjs --index` (리소스·배경 편집기는 `build-editor-index.mjs` 도) → 그 편집기 다시 게시 (목록 파일만) | `marks/<분류>.items.<id> = {state:'review', at, from}` (파일은 그대로 — 편집기에서 바로 고치면 된다) | `marks/decision` 에 `review` → 사용자가 보드에서 다시 고르면 "검수 보드 반영" |
+| `'fix'` 고쳐 주세요 | 그 편집기 요청 하나처럼 처리 (CLAUDE.md 「편집기와 "요청 확인" 흐름」 — 리소스 편집기 "리소스 요청 확인": 스펙·빌더 수정 → 재빌드 → 테스트 → 다시 게시 → 그 편집기 `applied`·`history` 새 버전, `changed` 에 `request: 'manage/<id>'`) → 고친 것은 `review` 로 | 의견대로 값 데이터를 고친다 (그 편집기 반영 흐름 — `apply-edits elem`·`apply-sound` 등과 같은 검사·버전 +1) | 의견을 보드 카드·계획에 반영 ("검수 보드 반영" 흐름) |
 | `'approve'` 확정 | 파일 `status: "approved"` → `--index` → 다시 게시 | `marks` 에서 그 줄을 지운다 (= 확정) | `marks` 에서 지운다 |
 
 끝나면 `manage` 문서를 `done` + `reply` 로, `node tools/hub-catalog.mjs` 로 목록을 다시 만들어 `catalog/*`·`meta/catalog` 를 쓴다 (아래 7번).
@@ -151,24 +153,25 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 
 ## "전체 요청 확인" (Claude 가 하는 일, D27-A)
 
-지금 명령("요청 확인" · "배경 요청 확인" · "시나리오 반영" · "검수 보드 반영" · 6차 새 명령)은 그대로 두고, 모든 편집기를 한 번에 도는 명령을 더한 것.
+편집기마다의 명령("리소스 요청 확인" · "스토리 반영" · "요소 반영" · "소리 반영" · "스타일 반영" · "검수 보드 반영", 예전 "요청 확인" · "배경 요청 확인" · "시나리오 반영" · "지도 반영" · "숫자 반영" 도 같은 뜻으로 받음)은 그대로 두고, 모든 편집기를 한 번에 도는 명령을 더한 것.
 
 1. **목록 읽기**: `editors.html` 의 `editors-list` + 홈 저장소 `status/*` · **`manage` (`query where status == 'new'`)** · `marks/*` (`ArtifactData list`, 홈 링크는 위). `url` 이 없는 자리는 `status/<id>.url` 을 쓴다. `command` 가 없는 것(지난 보드)은 건너뛴다.
 2. **모으기** (읽기만): 항목마다 `reads` 대로 그 아티팩트 저장소를 읽는다.
-   - 캐릭터 `requests` · 배경 `env-requests`: `query where status == 'new'` (되돌리기 요청 `kind: 'rollback'` 포함).
-   - 시나리오: `drafts` 목록 · `timeline/main` · `applied/story` → `docs/notes/story.md` 의 "바뀐 것".
+   - 리소스 `res-requests`: `query where status == 'new'` (되돌리기 `kind: 'rollback'` · 확정/다시 열기 포함, `docs/notes/p36-res-editor.md`). 예전 캐릭터 `requests` · 배경 `env-requests` 도 남은 것이 있는지 같이 본다.
+   - 스토리: `drafts` 목록 · `timeline/main` · `talk/*` · `texts/*` · `applied/story` → `docs/notes/p36-story-editor.md` 「스토리 반영」.
+   - 요소: `drafts/elem` · `applied/elem` → `docs/notes/p36-elem-editor.md` 「요소 반영」.
    - 보드: `boards/<id>` 와 `applied/<id>` 의 `picks`·`notes` 비교, `status == 'requested'`. `applied/<id>` 의 data 는 7번 목록 만들기의 `--boards` 파일로도 쓴다.
    - 새 편집기: 그 트랙 노트(`docs/notes/<트랙>.md`)가 정한 곳 — 정하지 않았으면 아래 공용 모양(`applied/<id>` + `requests` `status:'new'`).
    - **홈 전체 관리**: `manage` 의 `new` 문서마다 `kind` · 줄(`items` 의 `group`·`id`) · `note`. 채팅에 붙여 온 "전체 요청 확인 — 다시 열기 …" 글도 같은 것으로 본다.
    - **게임**: 게임 저장소 `reports` (`query where status == 'new'`) 와 `checks` 전부 (위 「게임 저장소」). 채팅에 붙여 온 "[포근섬 문제 알리기] r…" 글도 `reports` 한 줄로 본다.
 3. **먼저 보여 주기**: 편집기마다 새 것 수와 짧은 목록, 홈에서 남긴 요청(다시 열기·고쳐 주세요·확정 몇 개, 어느 편집기)을 표로 보여 준다. 아무것도 없으면 `status/*`·`meta/check` 의 `checkedAt`·`at` 만 고치고 7번 목록만 다시 만든 뒤 끝.
-4. **처리 순서**: 검수 보드(결정이 다른 일의 방향을 바꾼다) → 홈 「다시 열기」·「확정」 (status·marks 만 바꾸는 가벼운 일) → 게임 문제 (D47-A: 막힘·저장·오류는 고쳐 `'done'`, 보기·밸런스·불편은 7차 보드 QA 칸 `'board'` — 위 「게임 저장소」) → 캐릭터 → 배경 → 시나리오 → 새 편집기 (각 편집기 요청과 홈 「고쳐 주세요」를 같이). 각각 **그 편집기의 기존 흐름** 그대로 (CLAUDE.md 「편집기와 "요청 확인" 흐름」, 이 문서 「"검수 보드 반영"」·「전체 관리」, `docs/notes/story.md` 「시나리오 반영」, 새 편집기 노트). 처리를 시작한 `manage` 문서는 `status: 'working'`. 트랙 하나만큼 큰 일(새 편집기·새 리소스 묶음, 보드 결정 변경)은 세션·브랜치로 나눠 제안하고, 나머지를 먼저 끝낸다. 되돌리기는 무엇을 되돌리는지 먼저 보여 준다. **확정이든 다시 열기든 편집기·요소·기록은 지우지 않는다.**
+4. **처리 순서**: 검수 보드(결정이 다른 일의 방향을 바꾼다) → 홈 「다시 열기」·「확정」 (status·marks 만 바꾸는 가벼운 일) → 게임 문제 (D47-A: 막힘·저장·오류는 고쳐 `'done'`, 보기·밸런스·불편은 7차 보드 QA 칸 `'board'` — 위 「게임 저장소」) → 리소스 → 스토리 → 요소 → 소리 · 스타일 (각 편집기 요청과 홈 「고쳐 주세요」를 같이). 각각 **그 편집기의 기존 흐름** 그대로 (CLAUDE.md 「편집기와 "요청 확인" 흐름」, 이 문서 「"검수 보드 반영"」·「전체 관리」, `docs/notes/p36-res-editor.md` · `p36-story-editor.md` · `p36-elem-editor.md` 와 곡·스타일 노트). 처리를 시작한 `manage` 문서는 `status: 'working'`. 트랙 하나만큼 큰 일(새 편집기·새 리소스 묶음, 보드 결정 변경)은 세션·브랜치로 나눠 제안하고, 나머지를 먼저 끝낸다. 되돌리기는 무엇을 되돌리는지 먼저 보여 준다. **확정이든 다시 열기든 편집기·요소·기록은 지우지 않는다.**
 5. **테스트**: `node --test tests/` 한 번 (편집기마다 따로 돌리지 않아도 된다 — 마지막에 한 번은 꼭).
 6. **다시 게시**: 바뀐 편집기마다 바뀐 파일만, 게임 링크는 맨 끝에 한 번 (D35-A). status 만 바뀐 편집기는 목록 파일(`--index` 결과)만.
 7. **기록**: 편집기마다 `applied/<id>`·`history/<id>-v<n>` (아래 공용 모양), 요청은 `done` + `reply` + `doneVersion` (홈 `manage` 문서도). 그다음 **`node tools/hub-catalog.mjs --boards <보드 반영.json>`** 으로 목록을 다시 만들고, 홈 저장소에 `catalog/<분류>` 13개 + `meta/catalog` + 바뀐 `marks/<분류>` + `status/<id>` 전부 (`open`·`openItems`·`requested`·`applied`·`recent`·`published`·`checkedAt`; `status/game` 은 게임 저장소를 다시 받아 **`node tools/hub-game.mjs`** 결과로) + `meta/check` (`at`, `summary` = "새 요청 3 처리 · 보드 1 반영 · 홈 요청 2" 처럼, 남은 것 수 `open`) 를 `batch` 로 (한 번에 50개까지 — 먼저 `list` 로 각 문서 `version` 을 읽어 `if_version` 에, 처음 만드는 문서는 생략. 파일은 `file_path` 로).
 8. 사용자에게 편집기별로 한 것·남은 것·확인 못 한 것을 나눠 보고.
 
-편집기 하나의 명령("요청 확인" 등)만 왔을 때도 끝에 홈 `status/<그 id>` 를 고치고, 그 편집기 분류의 `catalog/<분류>` 를 다시 쓴다 (`meta/check` 는 그대로). "<이름> 확정" · "<이름> 다시 열기" 가 채팅으로 오면 홈 「확정」·「다시 열기」와 같게 처리한다.
+편집기 하나의 명령("리소스 요청 확인" 등)만 왔을 때도 끝에 홈 `status/<그 id>` 를 고치고, 그 편집기 분류의 `catalog/<분류>` 를 다시 쓴다 (`meta/check` 는 그대로). "<이름> 확정" · "<이름> 다시 열기" 가 채팅으로 오면 홈 「확정」·「다시 열기」와 같게 처리한다.
 
 ## 반영 기록 공용 모양 (ET-11)
 
@@ -191,20 +194,21 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
   items: { bench: 3 } }     // 시나리오는 이 칸이 지금 `scenes`, 연출안 고른 것은 `picks`
 ```
 
-편집기 id = 홈 목록 id: `character` · `env` · `story` · `sound` · `map` · `data` · `style` (보드는 `wave5` · `z5` · `wave6` · `wave7`).
+편집기 id = 홈 목록 id: `res` · `story` · `elem` · `sound` · `style` (예전 `character` · `env` · `map` · `data` 기록은 그대로 남김), 보드는 보드 id (`wave5` · `z5` · … · `wave11` · `night` · `tour`). 리소스 편집기도 같은 모양 `applied/res`·`history/res-v<n>` (`changed[].request` = `res-requests/<id>`, `docs/notes/p36-res-editor.md` 「저장소」).
 
 **되돌리기 요청** (사용자 → Claude):
 - 보드: `history` 의 선택을 다시 고른다 (`board-kit.js` 단추 — 지금 그대로).
-- 시나리오: `timeline/main.rollback = n` (지금 그대로).
+- 스토리: `timeline/main.rollback = n` (지금 그대로).
 - 다른 편집기: 요청 컬렉션에 `{ kind: 'rollback', to: n, status: 'new', createdAt, by }` 한 줄 — 새 요청 수에 같이 잡히고 그 편집기 명령으로 처리된다.
 
 **되돌리기 처리** (Claude): `history/<id>-v<n>.commit` 기준으로 그 편집기가 맡은 파일만 되돌린다 — 그 뒤 그 편집기 때문에 들어간 커밋을 `git revert` 하거나 `git checkout <commit> -- <맡은 파일>` 뒤 새 커밋. 무엇을 되돌리는지 먼저 보여 준다. 끝나면 새 버전(`version + 1`, `changed` 에 `what: 'rollback'`, `summary` "v<n> 로 되돌림")을 남긴다 — 기록은 지우지 않고 앞으로만 쌓는다.
 
 | 편집기 | 맡은 파일 (되돌릴 때) |
 |---|---|
-| `character` | `assets/specs/`, `assets/blender/build_character.py`, `assets/models/`, `assets/renders/` |
-| `env` | `assets/env/`, `assets/furniture/`, `assets/blender/build_env.py`·`build_furniture.py`·`toonkit.py` (6차 탭: `assets/items/`, `assets/interior/`) |
-| `story` | `assets/story/`, `src/gameplay/story/files.js` |
-| `sound` · `map` · `data` · `style` | 그 트랙 노트가 정한다 (`assets/sound/` · `assets/island/` · `assets/data/` · `assets/style/`) |
+| `res` | `assets/specs/`·`assets/models/`·`assets/renders/`·`assets/env/`·`assets/furniture/`·`assets/items/`·`assets/interior/specs/`·`assets/blender/build_*.py`·`toonkit.py` (방 파일 `assets/interior/rooms`·`places` 는 요소 편집기) |
+| `story` | `assets/story/`, `src/gameplay/story/files.js`, `assets/villagers/`, rules.json `birthdays`, `assets/night`·`events`·`tour` 의 글 칸 |
+| `elem` | `assets/data/`·`assets/island/layout.json`·`assets/events/events.json`·`assets/night/night.json`·`assets/tour/tour.json`·`assets/interior/rooms`·`places` 의 값 칸 (`docs/notes/p36-elem-editor.md`) |
+| `sound` · `style` | 그 트랙 노트가 정한다 (`assets/sound/` · `assets/style/`) |
+| (예전) `character` · `env` · `map` · `data` | 지금은 위 `res` · `elem` 이 맡는다 — 예전 기록을 되돌릴 때만 `history` 의 commit 기준 |
 
 **화면**: 편집기는 `concept/board-kit.js` 를 실으면 (`window.BOARD` 없이) `window.ApplyLog` 를 쓸 수 있다 — `head(applied, {label})` 머리 줄, `list(history, {action: h => 단추 HTML, title})` 기록 목록, `watch(db, id, {onApplied, onHistory})` 구독, `esc`·`when`. 보드와 같은 클래스(`.hist`, `details`)를 쓰니 편집기 CSS 에 `.hist` 정도만 있으면 된다. 붙이는 방법 제안은 `docs/notes/m6-p1-hub.md`.

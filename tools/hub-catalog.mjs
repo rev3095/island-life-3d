@@ -29,12 +29,13 @@ const PENDING_ROOMS = [{ id: 'RM-07', slug: 'rm-07', name: '단풍 방', ownerNa
  * hash(it) = 그 편집기 주소 끝 #… (그 요소로 바로 감). 없으면 편집기 첫 화면.
  */
 export const GROUPS = [
-  { id: 'character', label: '캐릭터', editor: 'character', how: 'spec' },
-  { id: 'villager', label: '주민 성격·대화', editor: 'character', how: 'spec' },
-  { id: 'env', label: '배경', editor: 'env', how: 'spec' },
-  { id: 'furniture', label: '가구', editor: 'env', how: 'spec' },
-  { id: 'item', label: '아이템', editor: 'env', how: 'spec' },
-  { id: 'interior', label: '벽지·바닥', editor: 'env', how: 'spec' },
+  // P37: 모델·그림 리소스는 리소스 편집기 (#<slug> · #furn- · #fix- · #item- · #wp-0N), 주민 성격·대화는 스토리 편집기 「주민」 탭 (#villager)
+  { id: 'character', label: '캐릭터', editor: 'res', how: 'spec' },
+  { id: 'villager', label: '주민 성격·대화', editor: 'story', how: 'spec' },
+  { id: 'env', label: '배경', editor: 'res', how: 'spec' },
+  { id: 'furniture', label: '가구', editor: 'res', how: 'spec' },
+  { id: 'item', label: '아이템', editor: 'res', how: 'spec' },
+  { id: 'interior', label: '벽지·바닥', editor: 'res', how: 'spec' },
   { id: 'room', label: '방 배치', editor: 'elem', how: 'spec' },   // P36: 방·가게 가구 배치는 요소 편집기 「방 배치」 탭 (#rooms.<slug>)
   { id: 'scene', label: '장면', editor: 'story', how: 'spec' },
   { id: 'sound', label: '소리', editor: 'sound', how: 'value' },
@@ -84,7 +85,7 @@ function rowsFor(g, R, ctx) {
     case 'villager': {
       const role = Object.fromEntries(R.dir('assets/specs').map(({ data: s }) => [s.slug, s.role]));
       return R.dir('assets/villagers').filter(({ data: v }) => v.slug).map(({ file, data: v }) => ({
-        id: v.slug, ref: v.id ?? '', name: `${v.name} 성격·대화`, sub: role[v.slug] ?? '', state: stateOf(v.status), version: version(v.version), hash: `${v.slug}.talk`, file }));
+        id: v.slug, ref: v.id ?? '', name: `${v.name} 성격·대화`, sub: role[v.slug] ?? '', state: stateOf(v.status), version: version(v.version), hash: 'villager', file }));   // 스토리 편집기 「주민」 탭 (claude.ai 는 #a/b 를 넘기지 않아 탭까지만)
     }
     case 'env':
       return R.dir('assets/env/specs').map(({ file, data: s }) => ({
@@ -93,12 +94,12 @@ function rowsFor(g, R, ctx) {
     case 'furniture': {
       const rows = R.dir('assets/furniture/specs').map(({ file, data: s }) => ({
         id: s.slug, ref: s.id, name: s.name, sub: s.variants ? `색 ${Object.keys(s.variants).length}가지` : '', state: stateOf(s.status), version: version(s.version), hash: `furn-${s.slug}`, file }));
-      // 상점·박물관 붙박이 FU-35–42 (가구 탭 밖, 배경 편집기에서는 그 실내의 방 배치 격자에 보인다 → 그 방으로 링크)
+      // 상점·박물관 붙박이 FU-35–42 — 리소스 편집기 #fix-<slug> (sub 의 방 이름은 처음 쓴 방)
       // 붙박이 → 처음 쓴 방 (상점·박물관 — M12 달빛 가게·천막도 FU-35·36 을 다시 쓰지만 링크는 원래 방으로)
       const placeOf = Object.fromEntries(R.dir('assets/interior/places').flatMap(({ data: r }) => [...(r.furniture ?? []).map(f => f.fu), ...(r.cases ?? []).map(c => c.fixture)].filter(Boolean).map(k => [k, r.slug])).reverse().filter(([k, slug]) => ['shop', 'museum'].includes(slug)));
       for (const { file, data: s } of R.dir('assets/furniture/fixtures/specs')) {
         const place = placeOf[s.id] ?? placeOf[s.slug];
-        rows.push({ id: `fix-${s.slug}`, ref: s.id, name: s.name, sub: `붙박이 · ${place === 'museum' ? '박물관' : '도토리상점'}`, state: stateOf(s.status), version: version(s.version), hash: place ? `place-${place}` : null, file });
+        rows.push({ id: `fix-${s.slug}`, ref: s.id, name: s.name, sub: `붙박이 · ${place === 'museum' ? '박물관' : '도토리상점'}`, state: stateOf(s.status), version: version(s.version), hash: `fix-${s.slug}`, file });
       }
       return rows;
     }

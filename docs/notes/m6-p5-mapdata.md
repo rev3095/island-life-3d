@@ -1,4 +1,4 @@
-섬 지도 편집기: https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST · 파일 `map-editor.html` · 게임 숫자 표: https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj · 파일 `data-editor.html`
+섬 지도 편집기: https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST · 파일 `map-editor.html` · 게임 숫자 표: https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj · 파일 `data-editor.html` (P36 부터 요소 편집기 — `docs/notes/p36-elem-editor.md`)
 
 # M6-P5 지도·숫자 (ET-08 · ET-09, `p9-mapdata`) — 작업 노트
 
