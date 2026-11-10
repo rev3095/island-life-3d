@@ -271,10 +271,27 @@ export function makeScenario(bot, sk, opts = {}) {
   });
 
   add('decor', '집 꾸미기: 라디오 놓기 · 벽지 사서 붙이기', async () => {
-    const wp0 = st().house.wallpaper;
-    const sold = await sellSurplus();   // 벽지 값 마련 (첫날 도구를 사면 거의 남지 않는다)
-    note('decorMoney', { sold: sold?.earned, acorns: bot.acorns() });
-    const r = await sk.shop({ decor: 'auto' });
+    const wp0 = st().house.wallpaper, fl0 = st().house.floor;
+    // QA-10 (11차 보드 D105-A): 첫날 삽·도끼를 사면 50 도토리쯤 남아 오늘의 벽지(1,200~)를 못 사고 「wp-01 → wp-01」 로 끝났다.
+    // 사람처럼 벽지 값이 될 때까지 낚시·곤충·과일로 벌어 판 뒤, 지금 붙은 것과 다른 벽지(없으면 바닥)를 고른다. 상점이 닫히기(22시) 전까지만.
+    const decorToday = () => (S().house?.interior?.today?.() ?? []).filter(d => !d.owned && !d.current && d.slug !== (st().house[d.kind] ?? null));
+    const want = () => decorToday().sort((x, y) => (x.kind === 'wallpaper' ? 0 : 1) - (y.kind === 'wallpaper' ? 0 : 1) || x.price - y.price);
+    const cheapest = () => Math.min(...decorToday().map(d => d.price));
+    const hour = () => S().time.now().hour;
+    let sold = await sellSurplus();
+    const money = { acorns0: bot.acorns(), rounds: 0, earned: sold?.earned ?? 0 };
+    for (let k = 0; k < 6 && decorToday().length && bot.acorns() < cheapest() && hour() < 20; k++) {
+      money.rounds++;
+      await sk.fish({ tries: 3 });
+      if (hour() >= 19 || hour() < 5) await sk.bug({ tries: 2 });
+      else for (const o of sk.objects('fruit-tree').slice(k * 2, k * 2 + 2)) await sk.shakeTree(o);
+      sold = await sellSurplus();
+      money.earned += sold?.earned ?? 0;
+    }
+    money.acorns = bot.acorns();
+    note('decorMoney', money);
+    const pickDecor = want().find(d => d.price <= bot.acorns()) ?? null;
+    const r = pickDecor ? await sk.shop({ decor: pickDecor.slug }) : { decor: 'none' };
     note('decorBuy', r?.decor);
     await sk.enterHome();
     sk.homeEntry = bot.pos();
@@ -282,10 +299,10 @@ export function makeScenario(bot, sk, opts = {}) {
     const placed = bot.has('furn.radio') ? await sk.placeFurniture(s => s.id === 'furn.radio') : false;
     await bot.shot('04-home-decor', '라디오 놓고 벽지 바꾼 방');
     await sk.leaveHome();
-    const wp1 = st().house.wallpaper ?? st().house.floor;
-    const notes = [`라디오 ${placed ? '놓음' : '못 놓음'}`, `벽지·바닥 ${r?.decor ?? '안 삼'} (${wp0 ?? '기본'} → ${st().house.wallpaper ?? '기본'})`];
+    const changed = st().house.wallpaper !== wp0 || st().house.floor !== fl0;
+    const notes = [`라디오 ${placed ? '놓음' : '못 놓음'}`, `벽지·바닥 ${r?.decor ?? '안 삼'} (${wp0 ?? '기본'} → ${st().house.wallpaper ?? '기본'} · 바닥 ${st().house.floor ?? '기본'})`, `번 돈 🌰${money.earned} (${money.rounds}번)`];
     if (!placed) return awk(notes.join(' · '));
-    return r?.decor && r.decor !== 'none' && wp1 !== wp0 ? pass(notes.join(' · ')) : awk(notes.join(' · '));
+    return r?.decor && r.decor !== 'none' && changed ? pass(notes.join(' · ')) : awk(notes.join(' · '));
   });
 
   // ---- 둘째 날부터: 축제 이야기 ----
@@ -359,7 +376,11 @@ export function makeScenario(bot, sk, opts = {}) {
       if (!(await sk.toDoor(kind, label))) return false;
       if (bot.peek() !== 'night:door') { odd.push(`${label} 문 앞 행동 키가 ${bot.peek()}`); return false; }
       bot.press('action');
-      const ok = await bot.until(() => S().house.where === kind && !S().house.passing, { timeout: 12, label: `${label} 들어가기` });
+      if (await bot.until(() => S().story?.playing, { timeout: 4 })) { await bot.wait(5.5); await bot.shot(`night-${kind}-scene`, `${label} 첫 방문 장면`); }
+      // 처음 들어갈 때는 문 앞에서 첫 방문 장면(s20·s21)이 먼저 나온다 (봇은 장면을 끝까지 본다 → 그 뒤 들어감)
+      const scene = kind === 'moonshop' ? 's20-moonshop-first' : 's21-tent-first';
+      const ok = await bot.until(() => S().house.where === kind && !S().house.passing, { timeout: 60, label: `${label} 들어가기` });
+      (got.scenes ??= {})[scene] = !!S().story?.seen?.(scene);
       if (!ok) { odd.push(`${label} 안으로 못 들어감`); return false; }
       await bot.walkLocal(S().house.places.info(kind).talk, { near: 0.2, label: `${label} 계산대 앞` });
       await bot.faceDir(0);
@@ -400,6 +421,7 @@ export function makeScenario(bot, sk, opts = {}) {
       bot.policy = {};
       got.card = st().night?.tarot?.card ?? null;
       if (!got.card) odd.push('카드를 못 뽑음');
+    for (const [id, seen] of Object.entries(got.scenes ?? {})) if (!seen && S().story?.scene?.(id)) odd.push(`첫 방문 장면 ${id} 가 안 나옴`);
       await sk.leavePlace();
     }
     // 3) 다음 날: 오늘 운세 칸
@@ -867,10 +889,16 @@ export function makeScenario(bot, sk, opts = {}) {
     const acorns0 = bot.acorns();
     let asked = null;
     bot.policy = { confirm: info => { if (!/섬 여행/.test(info.title)) return null; asked = info.text; return Math.max(0, info.buttons.indexOf('떠나요')); } };
-    await bot.act('action', { timeout: 30 });
-    bot.policy = {};
+    // 배가 바다로 나가는 연출(약 3초)을 한 장 — 주인공이 배와 같이 동쪽으로
+    const b0 = tour().boat();
+    bot.press('action');
+    const sailed = await bot.until(() => S().player.position.x > b0.x + 2.5 && !tour().active, { timeout: 30, label: '배 떠나기' });
+    if (sailed) await bot.shot('15-tour-sail', '배가 바다로 나감');
     if (!(await bot.until(() => tour().active && !tour().busy, { timeout: 25, label: '무인도 도착' }))) return block(`무인도에 도착하지 못함 (묻기 창 ${asked ? '나옴' : '안 나옴'})`);
     const cur = tour().current, w = S().world;
+    if (await bot.until(() => S().story?.playing?.id === 's22-first-tour', { timeout: 3 })) { await bot.wait(5); await bot.shot('15-tour-s22', '장면 s22 첫 섬 여행'); }
+    await bot.settle(60);   // 첫 여행이면 장면 s22 (봇은 끝까지 본다)
+    const s22 = !!S().story?.seen?.('s22-first-tour');
     await bot.shot('15-tour-arrive', `무인도 ${cur.shape}`);
     const got = {}, inv0 = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
     // 과일나무 흔들기 (투어 섬 과일 = 망고·리치)
@@ -901,11 +929,12 @@ export function makeScenario(bot, sk, opts = {}) {
     if (backPeek === 'tour-boat') await bot.act('action', { timeout: 30 });
     bot.policy = {};
     const home = await bot.until(() => !tour().active && !tour().busy, { timeout: 25, label: '본섬 도착' });
-    note('tour', { shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, free0, free, backPeek, home, pos: bot.pos() });
+    note('tour', { s22, sailed, shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, free0, free, backPeek, home, pos: bot.pos() });
     if (!home) return block(`배로 못 돌아옴 (배 앞 ${backPeek})`);
     const odd = [];
     if (!Object.keys(got).some(id => /^fruit\.(mango|lychee)$/.test(id))) odd.push(`무인도 과일을 못 얻음 (가방 빈칸 ${free0} → ${free})`);
     if (shovel && !oreHits) odd.push('광석 바위를 못 침');
+    if (!s22 && S().story?.scene?.('s22-first-tour')) odd.push('첫 여행인데 장면 s22 가 안 나옴');
     if (Math.abs(bot.pos().x) > 100) odd.push('돌아왔는데 섬 밖 좌표');
     return odd.length ? awk(odd.join(' · ')) : pass(`${cur.shape} · 얻은 것 ${Object.entries(got).map(([k, v]) => `${k}×${v}`).join(', ')} · 광석 ${shovel ? `${oreHits}번` : '삽 없음'}`);
   });

@@ -12,9 +12,13 @@ export const TRIGGERS = {
   festival: { label: '축제 시작', event: 'festival:start' },
   'event-start': { label: '계절 행사를 처음 할 때 (8차 — trigger.event = EV-01…)', event: 'events:start', test: (p, t) => p?.id === t.event && !!p?.first },
   'move-in': { label: '새 주민이 이사 온 날 저녁 (10차 — trigger.slug = 주민, town/moving.js 가 보내는 town:welcome)', event: 'town:welcome', test: (p, t) => !!t.slug && p?.slug === t.slug },
+  'night-first': { label: '밤 가게에 처음 들어갈 때 (M12 — trigger.kind = moonshop · tent, night 가 문 앞에서 보내는 night:first)', event: 'night:first', test: (p, t) => !!t.kind && p?.kind === t.kind },
+  'tour-first': { label: '무인도에 처음 도착했을 때 (P35 — tour 가 보내는 tour:arrive 의 first)', event: 'tour:arrive', test: p => !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
+/** night-first 트리거의 kind (밤 가게 둘) */
+export const NIGHT_KINDS = { moonshop: '달빛 가게 (22–3시)', tent: '새벽 천막 (3–5시)' };
 
 /** 장면 기준 자리 = world.places 의 이름 (건물은 문 앞) */
 export const PLACES = { event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포' };
@@ -238,6 +242,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if (t.on === 'festival-part' && !(Number.isInteger(t.n) && t.n >= 1 && t.n <= 5)) err.push(at('festival-part 의 n 은 1~5'));
     if (t.on === 'event-start' && !/^EV-0[1-4]$/.test(t.event ?? '')) err.push(at('event-start 의 event 는 EV-01~04'));
     if (t.on === 'move-in' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('move-in 의 slug 는 주민 slug'));
+    if (t.on === 'night-first' && !NIGHT_KINDS[t.kind]) err.push(at('night-first 의 kind 는 moonshop · tent'));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];

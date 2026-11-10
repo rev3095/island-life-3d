@@ -25,6 +25,9 @@
     {"scene":"s16-winter-snowman"},
     {"scene":"s17-gureum-arrival"},
     {"scene":"s18-pado-arrival"},
-    {"scene":"s19-dalmuri-arrival"}
+    {"scene":"s19-dalmuri-arrival"},
+    {"scene":"s20-moonshop-first"},
+    {"scene":"s21-tent-first"},
+    {"scene":"s22-first-tour"}
   ]
 }

@@ -103,3 +103,13 @@ test('배우 자리 쌓기·걷기', () => {
   assert.equal(R.fillTokens('{part.emoji} {n}/5', { part: { emoji: '🏮' }, n: 2 }), '🏮 2/5');
   assert.equal(R.fillTokens('{player}', {}), '{player}', '모르는 자리는 그대로 (intro 가 채운다)');
 });
+
+test('밤 가게 첫 방문(s20·s21) · 첫 섬 여행(s22) 트리거', () => {
+  assert.deepEqual(R.scenesFor('night:first', { kind: 'moonshop', x: 1, z: 2 }, scenes), ['s20-moonshop-first']);
+  assert.deepEqual(R.scenesFor('night:first', { kind: 'tent' }, scenes), ['s21-tent-first']);
+  assert.deepEqual(R.scenesFor('night:first', { kind: 'moonshop' }, scenes, { 's20-moonshop-first': '2026-11-11' }), [], '한 번만');
+  assert.deepEqual(R.scenesFor('tour:arrive', { first: true, name: '초승달 섬' }, scenes), ['s22-first-tour']);
+  assert.deepEqual(R.scenesFor('tour:arrive', { first: false }, scenes), [], '두 번째 여행부터는 안 나온다');
+  assert.ok(R.validateScene({ ...scenes.find(s => s.id === 's20-moonshop-first'), trigger: { on: 'night-first', kind: 'shop' } }).some(e => /kind/.test(e)), 'kind 는 moonshop · tent');
+  assert.equal(R.fillTokens('무인도 「{name}」', { name: '초승달 섬' }), '무인도 「초승달 섬」');
+});

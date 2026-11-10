@@ -600,6 +600,7 @@ function renderScene() {
       <label class="f">줄거리<textarea rows="4" data-k="summary">${esc(s.summary ?? '')}</textarea></label>
       <label class="f">언제 시작<select data-k="trigger.on">${opt(Object.fromEntries(Object.entries(R.TRIGGERS).map(([k, v]) => [k, v.label])), t.on)}</select></label>
       ${t.on === 'festival-part' ? `<label class="f">몇 개째 부품<select data-k="trigger.n" data-num="1">${opt({ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' }, t.n)}</select></label>` : ''}
+      ${t.on === 'night-first' ? `<label class="f">어느 가게<select data-k="trigger.kind">${opt(R.NIGHT_KINDS, t.kind)}</select></label>` : ''}
       ${t.on === 'after' || t.on === 'newday' ? `<label class="f">기준 장면<select data-k="trigger.scene">${opt(Object.fromEntries(others.map(id => [id, work.scenes[id].title])), t.scene)}</select></label>` : ''}
       <div class="grid2"><label class="f">끝나면 주인공<select data-k="playerEnd">${opt({ '': '원래 자리로', stay: '장면 끝 자리에' }, s.playerEnd ?? '')}</select></label>
         <label class="f">한 번만<select data-k="once" data-bool="1">${opt({ true: '한 번만', false: '매번' }, String(s.once !== false))}</select></label></div>
@@ -723,7 +724,7 @@ function onEdit(el, live) {
   if (el.dataset.check && !v) v = undefined;
   const t = targetOf(el);
   setPath(t, k, v);
-  if (k === 'trigger.on') { if (v === 'festival-part') s.trigger.n ??= 1; else delete s.trigger.n; if (v === 'after' || v === 'newday') s.trigger.scene ??= sceneIds().find(id => id !== s.id); else delete s.trigger.scene; }
+  if (k === 'trigger.on') { if (v === 'festival-part') s.trigger.n ??= 1; else delete s.trigger.n; if (v === 'night-first') s.trigger.kind ??= 'moonshop'; else delete s.trigger.kind; if (v === 'after' || v === 'newday') s.trigger.scene ??= sceneIds().find(id => id !== s.id); else delete s.trigger.scene; }
   tidyPairs(viewTake());
   saveScene(s.id);
   // 글 입력 중엔 칸을 다시 그리지 않고 스케치만

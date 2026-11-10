@@ -316,6 +316,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     if (!R || P.where || !free() || H.inside || H.visits?.where) return false;
     P.busy = H.busy = true;
     try {
+      await ctx.services.night?.firstVisit?.(kind);   // M12 s20·s21: 밤 가게 첫 방문이면 문 앞 장면이 끝날 때까지
       await build(R);
       await refresh(R);
       await doors.through({ dir: 'in', place: world.places?.[kind], kind: PLACE_BUILDING[kind], room: roomDoor(R),
