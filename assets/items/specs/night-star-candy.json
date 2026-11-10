@@ -1,0 +1,60 @@
+{
+  "id": "IC-NT-04",
+  "slug": "night-star-candy",
+  "name": "별사탕",
+  "group": "night",
+  "category": "item",
+  "kind": "star-candy",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "night.star-candy",
+      "code": "IC-NT-04"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "작은 유리병에 알록달록한 별사탕이 가득. 병 입구는 리본으로 묶었다.",
+    "keywords": [
+      "유리병",
+      "알록달록 별사탕",
+      "리본"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 토요일 밤 야시장"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "jar": "#D8EEF4",
+    "lid": "#E8726A",
+    "candyA": "#F7D35E",
+    "candyB": "#F4A6C0",
+    "candyC": "#9FD3E8",
+    "candyD": "#B8E0A0"
+  },
+  "paletteLabels": {
+    "jar": "병",
+    "lid": "리본",
+    "candyA": "사탕 노랑",
+    "candyB": "사탕 분홍",
+    "candyC": "사탕 하늘",
+    "candyD": "사탕 연두"
+  }
+}

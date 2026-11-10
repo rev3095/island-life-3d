@@ -39,6 +39,9 @@ FEATURES = {
     'sheep': {'ears': 'round', 'earSide': True, 'muzzle': 'small', 'tail': 'puff', 'wool': True, 'head': (1.06, 0.95, 0.9)},   # 곰 둥근 귀(옆으로) + 털 뭉치
     'penguin': {'muzzle': 'beak', 'beakScale': 0.6, 'tail': 'feather', 'wings': True, 'faceMask': True, 'head': (1.06, 0.96, 0.92)},   # 오리 부리 + 날개
     'owl': {'muzzle': 'hook', 'tail': 'feather', 'ears': 'tufts', 'eyes': 'big', 'head': (1.12, 0.95, 0.88), 'eyeSpread': 0.92},   # 귀깃 + 큰 눈
+    # 12차 밤·새벽 (밤·새벽 검수 보드 D106–D114) 밤 가게 주인 · 새벽 점쟁이
+    'bat': {'ears': 'bat', 'muzzle': 'small', 'fangs': True, 'eyes': 'iris', 'batWings': True, 'head': (1.08, 0.95, 0.9)},   # 큰 귀 + 금빛 눈 + 접은 박쥐 날개 (꼬리 없음)
+    'moth': {'mouth': 'smile', 'eyes': 'iris', 'antennae': True, 'mothWings': True, 'ruff': True, 'head': (1.04, 0.95, 0.92)},   # 깃털 더듬이 + 등 날개 넷 + 목털
 }
 SPECIES = spec.get('species', 'cat')
 F = {**FEATURES.get(SPECIES, {}), **spec.get('features', {})}
@@ -287,6 +290,18 @@ for side, sx in (('L', 1), ('R', -1)):
     else:
         B.add(capsule(sh, hand, 0.04, seg=14, rings=10), lambda c, z=sh.z: 'shirt' if c.z > z - 0.035 else 'fur', 'arm.' + side)
         B.add(ellipsoid(hand, (0.047, 0.047, 0.047), seg=16, rings=10), 'fur', 'arm.' + side)
+    if F.get('batWings'):   # 박쥐 (12차): 팔 바깥 뒤쪽에 접어 내린 날개막 + 날개 뼈 둘 + 어깨 위 작은 갈고리
+        d = hand - sh
+        L = d.length
+        R = align_z(d)
+        wc = sh + d * 0.55 + V((sx * 0.035, 0.04, -0.01))
+        B.add(ellipsoid(wc, (0.014, 0.085, L * 0.62), rot=R, seg=18, rings=14), col('wing', 'fur'), 'arm.' + side)
+        for dy in (0.055, -0.01):   # 아래 끝 물결 (날개 끝 둘)
+            B.add(ellipsoid(wc + d.normalized() * L * 0.5 + V((0, dy, 0)), (0.013, 0.042, 0.05), rot=R, seg=12, rings=8), col('wing', 'fur'), 'arm.' + side)
+        for dy in (0.02, 0.075):   # 날개 뼈
+            pts = [sh + V((sx * 0.045, dy * t, 0)) + d * (0.15 + 0.85 * t) for t in (i / 6 for i in range(7))]
+            B.add(tube(pts, [0.008] * 7, seg=6), col('wingBone', 'fur'), 'arm.' + side, outline=False)
+        B.add(cone(sh + V((sx * 0.04, 0.03, 0.03)), sh + V((sx * 0.06, 0.03, 0.09)), 0.02, 0.003), col('wingBone', 'fur'), 'arm.' + side)
     ARMS[side] = (sh, hand)
 
 # 머리 (개구리는 얼굴 아래쪽을 배 색으로 칠한다)
@@ -336,6 +351,10 @@ if mz in MUZZLES:
     w = MR[0] * 0.42
     top_y = -0.13 * MR[2]
     line_tube([on_muzzle(x, top_y - 0.2 * MR[2] * math.sin(math.pi * abs(x) / w)) for x in (w * (i / 8 - 1) for i in range(17))])
+    if F.get('fangs'):   # 박쥐 (12차): 입선 양쪽 아래로 작은 송곳니
+        for fx in (1, -1):
+            b0 = on_muzzle(fx * w * 0.5, top_y - 0.16 * MR[2] * math.sin(math.pi * 0.5))
+            B.add(cone(b0 + mu * 0.004, b0 - mu * 0.016 * hs + mn * 0.004, 0.008 * hs, 0.002, seg=8), 'eyeHighlight', 'head', outline=False)
     if mz in ('dog', 'bear'):   # 코에서 입까지 내려오는 선
         line_tube([on_muzzle(0, ny - nose_r[2] * hs * (1 - t) + (top_y - ny) * t) for t in (0, 0.5, 1)])
 elif mz == 'beak':
@@ -386,6 +405,13 @@ for side, sx in (('L', 1), ('R', -1)):
         B.add(ellipsoid(q, (0.03 * es * hs, 0.008 * hs, 0.034 * es * hs), rot=decal(n), seg=18, rings=10), 'eye', 'head', outline=False)
         r, u = surface_frame(n)
         B.add(ellipsoid(q + n * 0.008 * hs + u * 0.014 * es * hs + r * 0.008 * es * hs, (0.011 * es * hs,) * 3, seg=12, rings=8),
+              'eyeHighlight', 'head', outline=False)
+    elif F.get('eyes') == 'iris':   # 박쥐·나방 (12차): 홍채 색(iris) 큰 눈 + 까만 눈동자 + 반짝임 (부엉이처럼 원판은 없음)
+        r, u = surface_frame(n)
+        B.add(ellipsoid(p, (0.038 * es * hs, 0.016 * hs, 0.05 * es * hs), rot=decal(n), seg=20, rings=12), col('iris', 'eye'), 'head', outline=False)
+        q = p + n * 0.006 * hs
+        B.add(ellipsoid(q, (0.02 * es * hs, 0.012 * hs, 0.034 * es * hs), rot=decal(n), seg=16, rings=10), 'eye', 'head', outline=False)
+        B.add(ellipsoid(q + n * 0.01 * hs + u * 0.018 * es * hs + r * 0.01 * es * hs, (0.011 * es * hs,) * 3, seg=12, rings=8),
               'eyeHighlight', 'head', outline=False)
     else:
         eye(p, n)
@@ -480,6 +506,16 @@ for side, sx in (('L', 1), ('R', -1)):
         d2 = V((sx * 1.3, 0.08, 0.6)).normalized()
         B.add(cone(base - V((0, 0, 0.018 * hs)), base + d2 * L * 0.8, 0.045 * E * hs, 0.012 * hs, squash=0.4), col('earTip', 'fur'), ear)
         EARS[side] = (base, tip)
+    elif ear_kind == 'bat':      # 박쥐 (12차): 머리 옆 위로 크게 벌어진 넓은 귀 + 안쪽 색
+        p, n = head_point(sx * 0.62, 0.6)
+        d = (n + V((0, 0, 0.55)) + V((sx * 0.3, 0, 0))).normalized()
+        L = 0.27 * E * hs
+        base = p - d * 0.04 * hs
+        tip = base + d * L
+        B.add(cone(base, tip, 0.135 * E * hs, 0.012 / P['earPointiness'], squash=0.42), 'fur', ear)
+        ib = base + V((0, -0.03 * hs, 0)) + d * 0.025 * hs
+        B.add(cone(ib, ib + d * L * 0.72, 0.09 * E * hs, 0.01, squash=0.3), col('innerEar', 'muzzle'), ear, outline=False)
+        EARS[side] = (base, tip)
     elif ear_kind == 'human':
         p, n = head_point(sx * 1.5, -0.02)
         B.add(ellipsoid(p, (0.022 * hs, 0.032 * hs, 0.045 * hs), seg=14, rings=10), 'fur', 'head')
@@ -489,6 +525,46 @@ if F.get('crest'):
     p, n = head_point(0, 1.3)
     for k, (dx, dz) in enumerate(((0.0, 0.07), (0.03, 0.05))):
         B.add(cone(p - n * 0.01, p + V((dx, 0.02, dz)) * hs, 0.022 * hs, 0.004, squash=0.6), 'fur', 'head')
+
+# 깃털 더듬이 (나방, 12차): 이마 위에서 바깥으로 휘어 오르는 줄기 + 양옆으로 난 잔깃 (끝으로 갈수록 짧게)
+if F.get('antennae'):
+    amat = col('antenna', 'fur')
+    for sx in (1, -1):
+        b0, n0 = head_point(sx * 0.3, 0.86, inset=0.01 * hs)
+        pts = bezier(b0, b0 + V((sx * 0.02, -0.02, 0.1)) * hs, b0 + V((sx * 0.1, -0.05, 0.2)) * hs, b0 + V((sx * 0.2, -0.03, 0.22)) * hs, 10)
+        B.add(tube(pts, [0.009 * hs] * len(pts), seg=6), amat, 'head')
+        for i in range(2, 11):
+            t = (pts[min(i + 1, 10)] - pts[i - 1]).normalized()
+            side_d = t.cross(V((0, 1, 0))).normalized()
+            ln = (0.05 - 0.035 * (i - 2) / 8) * hs
+            for sg in (1, -1):
+                B.add(cone(pts[i], pts[i] + (side_d * sg + t * 0.6).normalized() * ln, 0.009 * hs, 0.002, squash=0.35, seg=6), amat, 'head', outline=False)
+        B.add(ellipsoid(pts[-1], (0.014 * hs,) * 3, seg=10, rings=6), amat, 'head')
+
+# 목털 (나방, 12차): 목둘레 보송한 털 깃
+if F.get('ruff'):
+    rmat = col('ruff', 'muzzle')
+    z = bodyTop - 0.03
+    for k in range(12):
+        a = math.tau * k / 12
+        rr = 0.98 * math.sqrt(max(0.0, 1 - ((z - BODY_C.z) / BODY_R[2]) ** 2))
+        p = V((BODY_R[0] * rr * math.sin(a), -BODY_R[1] * rr * math.cos(a), z))
+        B.add(ellipsoid(p, (0.045, 0.045, 0.04), seg=14, rings=8), rmat, 'spine')
+
+# 등 날개 (나방, 12차): 등에 붙은 큰 윗날개 둘(바깥이 위로) + 작은 아랫날개 둘, 날개마다 동그란 무늬. 뼈는 spine
+if F.get('mothWings'):
+    wmat, smat = col('wing', 'fur'), col('wingSpot', 'marking')
+    for sx in (1, -1):
+        A = V((sx * 0.04, BODY_R[1] * 0.8, bodyTop - 0.06))
+        for big, off, radii, tilt in ((True, V((sx * 0.2, 0.07, 0.12)), (0.2, 0.014, 0.14), -0.5), (False, V((sx * 0.14, 0.06, -0.08)), (0.13, 0.012, 0.09), 0.55)):
+            Rm = Matrix.Rotation(-sx * 0.3, 3, 'Z') @ Matrix.Rotation(sx * tilt, 3, 'Y')
+            wc = A + off
+            B.add(ellipsoid(wc, radii, rot=Rm, seg=22, rings=12), wmat, 'spine')
+            for yy in (1, -1):   # 앞뒤 양면 무늬
+                sp = wc + Rm @ V((sx * radii[0] * 0.35, yy * (radii[1] + 0.002), radii[2] * 0.15))
+                B.add(ellipsoid(sp, (radii[0] * 0.28, 0.005, radii[2] * 0.36), rot=Rm, seg=14, rings=8), smat, 'spine', outline=False)
+                if big:
+                    B.add(ellipsoid(sp + Rm @ V((0, yy * 0.003, 0)), (radii[0] * 0.12, 0.004, radii[2] * 0.15), rot=Rm, seg=10, rings=6), col('wingSpotCore', 'eye'), 'spine', outline=False)
 
 # 털 뭉치 (양, 10차): 머리 위를 구름처럼 덮는 몽실한 털 + 목둘레 털 깃
 if F.get('wool'):

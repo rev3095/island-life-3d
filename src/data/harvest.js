@@ -3,6 +3,7 @@
 // rng 를 안 주면 (섬 시드, 날, 물체 id, 횟수) 시드를 써서 다시 불러와도 같은 결과가 나온다.
 import * as spawns from './spawns.js';
 import { FRUIT_REGROW_DAYS, daysBetween, isDayKey } from './day.js';
+import { luck } from './luck.js';
 
 export function createHarvest({ state, day }) {
   const island = () => state.island;
@@ -59,7 +60,7 @@ export function createHarvest({ state, day }) {
     if (id) seen.push(key);
     return id;
   }
-  const rockHitsLeft = rockId => Math.max(0, spawns.ROCK_MAX_HITS - (day.daily().rocks[rockId] ?? 0));
+  const rockHitsLeft = rockId => Math.max(0, spawns.ROCK_MAX_HITS + Math.max(0, Math.round(luck('rockHits'))) - (day.daily().rocks[rockId] ?? 0));   // M12 타로 「돌」
 
   /** 오늘의 화석 자리 파기 → 'fossil.unknown' | null (이미 판 자리거나 오늘 4곳을 다 팠으면 null). 무슨 화석인지는 느루가 감정한다 */
   function digFossil(spotKey) {

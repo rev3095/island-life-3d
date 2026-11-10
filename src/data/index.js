@@ -13,6 +13,7 @@ import { createSave } from './save.js';
 import { createDay } from './day.js';
 import { createHarvest } from './harvest.js';
 import { RULES } from './tables.js';
+import { setLuck, luck } from './luck.js';
 
 export const AUTOSAVE_GAME_MINUTES = 5;   // time:tick(게임 1분) 이만큼마다 저장
 export const AUTOSAVE_MIN_GAP_SEC = 15;   // 빠른 시간 모드에서 너무 자주 저장하지 않게
@@ -93,6 +94,8 @@ export function createDataService(ctx, opts = {}) {
     museum,
     recipes,
     economy: { ...economy, rules: economyRules },
+    /** M12 D112-A: 그날 보너스 (타로·달빛 가게). set(fn) — fn() → { 열쇠: 값 } | null, get(열쇠) → 숫자. 열쇠 표는 luck.js */
+    luck: { set: setLuck, get: luck },
     save,
     day,
     harvest,

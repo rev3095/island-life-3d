@@ -94,6 +94,8 @@ export function createTalk(ctx, { lines, party = null }) {
     const first = !v.met;
     v.met = true;
     const daily = dailyTalk(v, c.dayKey);
+    // M12 타로 「친구」(D112-A): 그날 처음 말 건 주민 마음 + (night 서비스가 하루 한 번만 내준다)
+    if (daily.first) { const extra = ctx.services.night?.claimFriend?.(V.slug) ?? 0; if (extra > 0) { const fu = addFriendship(v, extra).up; daily.up ??= fu; } }
     const cc = { ...c, tier: tierOf(v.friendship), r, recent };
     const B = L.birthday;
     const bday = !!(B && party?.isBirthday(V.slug, c.dayKey));

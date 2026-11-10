@@ -337,6 +337,82 @@ export function makeScenario(bot, sk, opts = {}) {
     return pass(n.join(' · '));
   });
 
+  // M12 밤·새벽 (보드 night D106–D114 = A): 둘째 날 밤 달빛 가게 → 새벽 천막 카드 뽑기 → 다음 날 오늘 운세 칸. 토요일이면 야시장 노점도.
+  // 문·계산대·카드 창은 모두 키·단추로 (시계만 time.setHour 로 당긴다).
+  add('night', '밤·새벽: 달빛 가게(22–3시) 들어가 별밤과 말하기 → 새벽 3시 천막에서 카드 뽑기 → 다음 날 운세 칸', async () => {
+    const N = S().night;
+    if (!N) return block('밤 모듈(night)이 없어요');
+    if (!N.open) return skip('밤 콘텐츠가 아직 안 열림 (첫날 안내를 마친 다음 날부터)');
+    const odd = [], got = {};
+    const enter = async (kind, label) => {
+      for (let k = 0; k < 20 && !W().places[kind]; k++) await bot.wait(0.5);
+      if (!W().places[kind]) { odd.push(`${label} 건물이 안 섬`); return false; }
+      if (!(await sk.toDoor(kind, label))) return false;
+      if (bot.peek() !== 'night:door') { odd.push(`${label} 문 앞 행동 키가 ${bot.peek()}`); return false; }
+      bot.press('action');
+      const ok = await bot.until(() => S().house.where === kind && !S().house.passing, { timeout: 12, label: `${label} 들어가기` });
+      if (!ok) { odd.push(`${label} 안으로 못 들어감`); return false; }
+      await bot.walkLocal(S().house.places.info(kind).talk, { near: 0.2, label: `${label} 계산대 앞` });
+      await bot.faceDir(0);
+      await bot.shot(`night-${kind}`, `${label} 안`);
+      return true;
+    };
+    const W = () => S().world;
+    // 1) 밤 10시 반 달빛 가게
+    await bot.setHour(22.5);
+    await bot.settle(30);
+    if (await enter('moonshop', '달빛 가게')) {
+      let who = null;
+      bot.policy = { dialog: (texts, speaker) => { who ??= speaker; const i = texts.findIndex(t => /구경/.test(t)); return i >= 0 ? i : texts.length - 1; } };
+      if (bot.peek() === 'night:desk') await bot.act('action', { timeout: 40 });
+      else odd.push(`달빛 가게 계산대 앞 행동 키가 ${bot.peek()}`);
+      bot.policy = {};
+      got.shop = who;
+      if (!who) odd.push('별밤과 말을 못 함');
+      await sk.leavePlace();
+    }
+    // 2) 새벽 3시 반 천막: 카드 뽑기
+    await bot.setHour(27.5);
+    await bot.settle(30);
+    if (await enter('tent', '새벽 천막')) {
+      let flipped = false;
+      bot.policy = {
+        dialog: texts => { const i = texts.findIndex(t => /카드 뽑기/.test(t)); return i >= 0 ? i : texts.length - 1; },
+        card: (kind, el, card) => {
+          if (kind !== 'tarot') return false;
+          if (!flipped) { const b = card.querySelector('.nt-pick:not([disabled])'); if (b) { bot.click(b); flipped = true; return true; } }
+          const take = [...card.querySelectorAll('.pk-btn')].find(b => b.textContent.trim() === '받기' && !b.hidden);
+          if (take) { bot.click(take); return true; }
+          return true;
+        },
+      };
+      if (bot.peek() === 'night:desk') await bot.act('action', { timeout: 60 });
+      else odd.push(`천막 탁자 앞 행동 키가 ${bot.peek()}`);
+      bot.policy = {};
+      got.card = st().night?.tarot?.card ?? null;
+      if (!got.card) odd.push('카드를 못 뽑음');
+      await sk.leavePlace();
+    }
+    // 3) 다음 날: 오늘 운세 칸
+    await bot.nextDay(8);
+    await bot.settle(30);
+    got.fortune = N.fortune()?.id ?? null;
+    const chip = bot.$('.nt-chip');
+    got.chip = !!chip && !chip.hidden;
+    if (got.card && got.fortune !== got.card) odd.push(`뽑은 카드(${got.card})가 다음 날 기운이 아님 (${got.fortune})`);
+    if (got.card && !got.chip) odd.push('오늘 운세 칸이 안 보임');
+    // 4) 토요일이면 야시장
+    const m = N.market();
+    if (m.today) {
+      await bot.setHour(20);
+      await bot.settle(30);
+      got.market = N.market().open;
+      if (!got.market) odd.push('토요일 밤 8시인데 야시장이 안 열림');
+    }
+    note('night', got);
+    return odd.length ? awk(odd.join(' · ')) : pass(`별밤 대화 · 카드 ${got.card} → 다음 날 ${got.fortune}${m.today ? ' · 야시장' : ''}`);
+  });
+
   add('festival-loop', '부품 5개 모으기 (주민 마음 열기 → 🎉 → 채집 → 전달), 날마다 반복', async () => {
     const maxDays = opts.maxDays ?? 10;
     const log = [];

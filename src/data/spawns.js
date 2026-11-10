@@ -3,6 +3,7 @@
 import * as items from './items.js';
 import { pickWeighted } from './rng.js';
 import { RULES } from './tables.js';
+import { luck } from './luck.js';
 
 const G = RULES.gather;
 
@@ -31,6 +32,7 @@ export function fishPool({ habitat = 'river', hour = 12, month = 1, weather = 'c
     let w = it.weight;
     if (WET.has(weather) && it.shadow >= G.wetBigFish.shadow) w *= G.wetBigFish.mult;   // 비·눈 오는 날은 큰 물고기가 잘 문다
     if (habitat === 'mouth' && it.habitats.includes('mouth')) w *= G.mouthMult;
+    if (it.shadow >= G.wetBigFish.shadow) w *= 1 + luck('bigFish');                    // M12 타로 「바다」
     out.push({ item: it, weight: w });
   }
   return out;
@@ -66,7 +68,8 @@ export function bug({ rng = Math.random, ...opts } = {}) {
 
 /** 화석 하나 정하기 → itemId (공룡 두개골이 가장 드묾). 감정 전 화석은 목록에 없다 */
 export function fossil(rng = Math.random) {
-  return pickWeighted(items.list('fossil'), it => it.weight, rng).id;
+  const rare = 1 + luck('rareFossil');   // M12 타로 「별」: 귀한(가벼운 가중치) 화석일수록 더 잘
+  return pickWeighted(items.list('fossil'), it => (rare > 1 ? it.weight * (it.weight <= 3 ? rare : 1) : it.weight), rng).id;
 }
 /** 화석 자리를 파면 나오는 것: 감정 전 화석 */
 export const FOSSIL_UNKNOWN = items.UNKNOWN_FOSSIL;
@@ -100,8 +103,9 @@ export function shell(rng = Math.random) {
  * hits = 오늘 이 바위를 이미 친 횟수. 칠수록 철광석·도토리 주머니가 덜 나오고, ROCK_MAX_HITS 번 치면 그날은 끝(null).
  */
 export function rock(rng = Math.random, hits = 0) {
-  if (hits >= ROCK_MAX_HITS) return null;
-  const fade = 1 - hits / ROCK_MAX_HITS;                       // 1 → 1/6
+  const max = ROCK_MAX_HITS + Math.max(0, Math.round(luck('rockHits')));   // M12 타로 「돌」: 두 번 더
+  if (hits >= max) return null;
+  const fade = 1 - Math.min(hits, ROCK_MAX_HITS - 1) / ROCK_MAX_HITS;     // 1 → 1/6 (더 친 몫은 마지막 몫 그대로)
   const table = [
     ['mat.acorn-bag', G.rock.acornBag * fade * fade],
     ['mat.iron', G.rock.iron * fade],
@@ -137,7 +141,7 @@ export function treeShake(kind, rng = Math.random, opts = {}) {
     const bees = inHours(items.get('bug.honeybee').hours, hour) ? (orchard ? S.beesOrchard : S.bees) : 0;
     if (r < bees) return { id: 'bug.honeybee', count: 1, event: 'bees' };
     const pool = shakeBugPool({ hour, month, weather });
-    const bug = pool.length ? SHAKE_BUG_CHANCE : 0;
+    const bug = pool.length ? SHAKE_BUG_CHANCE + Math.max(0, luck('shakeBug')) : 0;   // M12 타로 「숲」
     if (r < bees + bug) return { id: pickWeighted(pool, e => e.weight, rng).item.id, count: 1, event: 'bug' };
     if (r < bees + bug + S.furniture) return { id: SHAKE_FURNITURE[Math.floor(rng() * SHAKE_FURNITURE.length)], count: 1 };
     if (r < bees + bug + (S.furniture + S.acornBag)) return { id: 'mat.acorn-bag', count: 1 };

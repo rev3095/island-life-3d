@@ -1,0 +1,59 @@
+{
+  "id": "FU-57",
+  "slug": "firefly-jar",
+  "item": "furn.firefly-jar",
+  "name": "반딧불 병",
+  "category": "furniture",
+  "kind": "firefly-jar",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "뚜껑에 끈을 단 둥근 유리병 안에 반딧불 빛 점이 여럿. 밤에 점들이 켜진다.",
+    "keywords": [
+      "둥근 유리병",
+      "빛 점",
+      "끈 손잡이"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 달빛 가게 (밤 22–3시)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "jar": "#CFE8E2",
+    "lid": "#8C6440",
+    "string": "#C9A27A",
+    "grass": "#7FAE6A",
+    "glow": "#E9F78A"
+  },
+  "paletteLabels": {
+    "jar": "유리",
+    "lid": "뚜껑",
+    "string": "끈",
+    "grass": "풀잎",
+    "glow": "반딧불 빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

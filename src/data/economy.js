@@ -3,6 +3,7 @@
 import * as items from './items.js';
 import { rngFor, sample } from './rng.js';
 import { RULES } from './tables.js';
+import { sellMult, buyMult } from './luck.js';
 
 export const SHOP_HOURS = { open: RULES.shop.open, close: RULES.shop.close };   // 도토리상점 영업 8~22시
 export const SHOP_FURNITURE_PER_DAY = RULES.shop.furniturePerDay;
@@ -53,12 +54,15 @@ export function shopStock(dayKey, seed = 0) {
 /** 가방·지갑에 붙여 쓰는 판매·구매. getSeed / getDayKey 는 그때그때 상태에서 읽는다 */
 export function createEconomy({ inventory, wallet, getSeed = () => 0, getDayKey = () => null }) {
   const native = () => nativeFruit(getSeed());
-  const price = id => sellPrice(id, { native: native() });
+  // M12 D112-A: 그날 타로 카드·달빛 가게 보너스 (luck.js) — 표 값(sellPrice·buyPrice)은 그대로 두고 여기서만 곱한다
+  const catOf = id => items.get(id)?.category ?? null;
+  const price = id => { const v = sellPrice(id, { native: native() }); return v > 0 ? Math.round(v * sellMult(catOf(id))) : v; };
+  const buyNow = id => { const v = buyPrice(id); return v > 0 ? Math.round(v * buyMult(catOf(id))) : v; };
   const stock = (dayKey = getDayKey()) => shopStock(dayKey, getSeed()).all;
 
   return {
     sellPrice: price,
-    buyPrice,
+    buyPrice: buyNow,
     nativeFruit: native,
     isOpen: isShopOpen,
     stock,
@@ -74,7 +78,7 @@ export function createEconomy({ inventory, wallet, getSeed = () => 0, getDayKey 
     },
     /** 사기 → 'ok' | 'money' (도토리 모자람) | 'full' (가방 꽉 참) | 'none' (안 파는 물건) */
     buy(id, n = 1) {
-      const cost = buyPrice(id) * n;
+      const cost = buyNow(id) * n;
       if (!cost) return 'none';
       if (inventory.canFit(id, n) < n) return 'full';
       if (!wallet.spend(cost)) return 'money';

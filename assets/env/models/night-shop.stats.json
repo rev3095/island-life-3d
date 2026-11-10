@@ -1,0 +1,39 @@
+{
+  "id": "BD-08",
+  "slug": "night-shop",
+  "name": "달빛 가게",
+  "category": "building",
+  "kind": "night-shop",
+  "version": "0.2",
+  "triangles": 2304,
+  "parts": 1,
+  "materials": [
+    "awning",
+    "door",
+    "foundation",
+    "glow",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.99,
+    2.45,
+    3.19
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 48504,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-shop_front.png",
+    "night-shop_hero.jpg",
+    "night-shop_main.png",
+    "night-shop_thumb.png",
+    "night-shop_top.png"
+  ]
+}

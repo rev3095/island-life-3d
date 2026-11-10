@@ -181,6 +181,34 @@
         "hip": 0.0497,
         "forward": -0.0039
       }
+    },
+    {
+      "id": "CH-14",
+      "slug": "byeolbam",
+      "name": "별밤",
+      "species": "bat",
+      "role": "달빛 가게 주인 · 박쥐",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0445,
+        "forward": -0.0035
+      }
+    },
+    {
+      "id": "CH-15",
+      "slug": "yeomyeong",
+      "name": "여명",
+      "species": "moth",
+      "role": "새벽 천막 점쟁이 · 나방",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0497,
+        "forward": -0.0039
+      }
     }
   ]
 }

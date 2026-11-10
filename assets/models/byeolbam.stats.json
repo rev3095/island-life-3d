@@ -1,0 +1,74 @@
+{
+  "id": "CH-14",
+  "slug": "byeolbam",
+  "name": "별밤",
+  "species": "bat",
+  "version": "0.1",
+  "triangles": 12428,
+  "vertices": 6298,
+  "bones": 12,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "wing",
+    "wingBone",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "iris",
+    "blush",
+    "innerEar",
+    "bowtie"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.85,
+  "glbBytes": 443720,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0445,
+    "forward": -0.0035
+  },
+  "renders": [
+    "byeolbam_back.png",
+    "byeolbam_front.png",
+    "byeolbam_happy.png",
+    "byeolbam_hero.png",
+    "byeolbam_run.png",
+    "byeolbam_side.png",
+    "byeolbam_sit.png",
+    "byeolbam_three_quarter.png",
+    "byeolbam_thumb.png",
+    "byeolbam_walk.png"
+  ]
+}

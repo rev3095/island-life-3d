@@ -94,7 +94,8 @@ function rowsFor(g, R, ctx) {
       const rows = R.dir('assets/furniture/specs').map(({ file, data: s }) => ({
         id: s.slug, ref: s.id, name: s.name, sub: s.variants ? `색 ${Object.keys(s.variants).length}가지` : '', state: stateOf(s.status), version: version(s.version), hash: `furn-${s.slug}`, file }));
       // 상점·박물관 붙박이 FU-35–42 (가구 탭 밖, 배경 편집기에서는 그 실내의 방 배치 격자에 보인다 → 그 방으로 링크)
-      const placeOf = Object.fromEntries(R.dir('assets/interior/places').flatMap(({ data: r }) => [...(r.furniture ?? []).map(f => f.fu), ...(r.cases ?? []).map(c => c.fixture)].filter(Boolean).map(k => [k, r.slug])));
+      // 붙박이 → 처음 쓴 방 (상점·박물관 — M12 달빛 가게·천막도 FU-35·36 을 다시 쓰지만 링크는 원래 방으로)
+      const placeOf = Object.fromEntries(R.dir('assets/interior/places').flatMap(({ data: r }) => [...(r.furniture ?? []).map(f => f.fu), ...(r.cases ?? []).map(c => c.fixture)].filter(Boolean).map(k => [k, r.slug])).reverse().filter(([k, slug]) => ['shop', 'museum'].includes(slug)));
       for (const { file, data: s } of R.dir('assets/furniture/fixtures/specs')) {
         const place = placeOf[s.id] ?? placeOf[s.slug];
         rows.push({ id: `fix-${s.slug}`, ref: s.id, name: s.name, sub: `붙박이 · ${place === 'museum' ? '박물관' : '도토리상점'}`, state: stateOf(s.status), version: version(s.version), hash: place ? `place-${place}` : null, file });

@@ -1,0 +1,26 @@
+{
+  "id": "RM-11",
+  "slug": "tent",
+  "kind": "place",
+  "place": "tent",
+  "name": "새벽 천막",
+  "version": 1,
+  "status": "review",
+  "note": "밤·새벽 검수 보드 D111-A: 새벽 3–5시에만 나타나는 보라 천막 안. 낮은 탁자(계산대 자리) 뒤에 여명(CH-15), 오른쪽 받침에 수정 구슬(FU-59). 말을 걸면 타로 카드 뽑기(UI-20). 벽지 WP-04 연보라 · 바닥 FL-03 폭신 카펫. 붙박이 FU-35·36 다시 씀 (탁자는 낮게).",
+  "size": [6, 6],
+  "wallpaper": "wp-04",
+  "floor": "fl-03",
+  "windows": [],
+  "door": { "gx0": 2, "gx1": 3 },
+  "keeper": { "slug": "yeomyeong", "lx": 3, "lz": 0.5, "face": "s" },
+  "talk": { "lx": 3, "lz": 2.45 },
+  "furniture": [
+    { "fu": "FU-36", "name": "카드 탁자", "box": [2, 1, 0.6], "color": "#7A6A9A", "gx": 2, "gz": 1, "rot": 0, "role": "counter", "scale": [1, 0.7, 1] },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#7A6A9A", "gx": 4, "gz": 3, "rot": 0 },
+    { "item": "furn.floor-lamp", "gx": 0, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.plant-pot", "gx": 5, "gz": 0, "rot": 0, "deco": true }
+  ],
+  "stock": [
+    { "group": "furniture", "lx": 5, "lz": 4, "y": 0.18, "fit": 1.4, "count": 1 }
+  ]
+}

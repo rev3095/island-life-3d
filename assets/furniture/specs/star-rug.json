@@ -1,0 +1,62 @@
+{
+  "id": "FU-58",
+  "slug": "star-rug",
+  "item": "furn.star-rug",
+  "name": "별자리 깔개",
+  "category": "furniture",
+  "kind": "star-rug",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "남색 네모 깔개에 금빛 별과 별자리 선. 테두리는 보라. 위에 다른 가구를 올릴 수 있다.",
+    "keywords": [
+      "남색 깔개",
+      "별자리 선",
+      "금빛 별"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 달빛 가게 (밤 22–3시)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "flat": [
+      "glow"
+    ],
+    "noOutline": [
+      "star",
+      "line"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "rug": "#33366B",
+    "rugEdge": "#6E5A9E",
+    "star": "#F2D27A",
+    "line": "#B9B3E0"
+  },
+  "paletteLabels": {
+    "rug": "바탕",
+    "rugEdge": "테두리",
+    "star": "별",
+    "line": "별자리 선"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "layer": "rug",
+  "animations": []
+}

@@ -1,0 +1,46 @@
+{
+  "id": "IC-NT-02",
+  "slug": "night-moon-tteok",
+  "name": "달떡",
+  "group": "night",
+  "kind": "moon-tteok",
+  "version": "0.1",
+  "items": [
+    "night.moon-tteok"
+  ],
+  "hold": false,
+  "triangles": 1856,
+  "parts": 1,
+  "materials": [
+    "crumb",
+    "leaf",
+    "plate",
+    "rice"
+  ],
+  "objects": [
+    "tteok"
+  ],
+  "size": [
+    0.44,
+    0.44,
+    0.125
+  ],
+  "bounds": [
+    [
+      -0.22,
+      -0.22,
+      0.0
+    ],
+    [
+      0.22,
+      0.22,
+      0.125
+    ]
+  ],
+  "glbBytes": 37136,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-moon-tteok_main.png",
+    "night-moon-tteok_thumb.png"
+  ]
+}

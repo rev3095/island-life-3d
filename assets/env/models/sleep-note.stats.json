@@ -1,0 +1,35 @@
+{
+  "id": "PR-32",
+  "slug": "sleep-note",
+  "name": "「자는 중」 쪽지",
+  "category": "prop",
+  "kind": "sleep-note",
+  "version": "0.1",
+  "triangles": 394,
+  "parts": 1,
+  "materials": [
+    "card",
+    "ink",
+    "pin",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    0.35,
+    0.11,
+    0.65
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11368,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sleep-note_front.png",
+    "sleep-note_hero.jpg",
+    "sleep-note_main.png",
+    "sleep-note_thumb.png",
+    "sleep-note_top.png"
+  ]
+}

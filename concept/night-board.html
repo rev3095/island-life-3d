@@ -148,7 +148,7 @@ details summary { cursor: pointer; font-size: 14px; }
 
 <div class="wrap">
   <header class="top">
-    <p class="id">ISLAND-LIFE-3D · 밤·새벽 · 검수 보드 v0.1 · 2026-11-10 · main 3854e75 · 게임 v26</p>
+    <p class="id">ISLAND-LIFE-3D · 밤·새벽 · 검수 보드 v0.2 · 2026-11-10 · 반영 v1 (D106–D114 모두 A) · 브랜치 p34-night</p>
     <h1>포근섬 밤·새벽 검수 보드</h1>
     <p class="lede">섬의 <b>밤과 새벽</b>에 할 것을 더해요 — <b>야시장</b>, <b>밤에 깨어 있는 주민</b>, <b>밤에만 들어갈 수 있는 특별한 상점</b>, <b>밤에만 문을 여는 야행성 주민의 집</b>, 그리고 <b>새벽에만 나타나는 마술 상점(타로 카드)</b>. 모델을 만들기 전에 언제 · 어디서 · 무엇을 할지 정해 주세요. 결정 D106–D114 를 골라 주시고 카드에 의견을 적어 주세요. 고른 내용은 바로 저장되고, 채팅에 <b>"검수 보드 반영"</b>이라고 하면 고른 대로 만들어요.</p>
     <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v26)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈</a><a href="https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY">11차 보드 (옷, 선택 대기)</a><a href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2">캐릭터 편집기</a></p>
@@ -186,7 +186,7 @@ details summary { cursor: pointer; font-size: 14px; }
 
   <section id="tarot">
     <div class="sec-head"><p class="id">TA-01 – TA-12 · 새 접두사 TA</p><h2>타로 카드 12장 — D112-A 기준</h2>
-      <p class="muted">섬 이야기로 새로 그린 카드예요 (실제 타로 그림을 베끼지 않아요). 새벽 천막에서 하루 한 장 뽑으면 <b>다음 5시부터 하루 동안</b> 작은 좋은 일이 생겨요. 효과 숫자는 설정 파일 하나에 두어 나중에 쉽게 바꿔요. 카드마다 의견을 적을 수 있어요.</p></div>
+      <p class="muted">섬 이야기로 새로 그린 카드예요 (실제 타로 그림을 베끼지 않아요). 새벽 천막에서 하루 한 장 뽑으면 <b>다음 5시부터 하루 동안</b> 작은 좋은 일이 생겨요. 효과 숫자는 설정 파일 하나에 두어 나중에 쉽게 바꿔요. 반영하며 출현표·지도를 바꾸지 않고 값·출현으로 걸 수 있는 효과로 몇 장(TA-02·03·05·06·09·10·11)을 바꿨어요 — 다르게 하고 싶으면 카드 의견에 적어 주세요. 카드마다 의견을 적을 수 있어요.</p></div>
     <div class="cards12" id="tarotCards"></div>
   </section>
 
@@ -367,7 +367,7 @@ $('decisions').innerHTML = DECISIONS.map(decCard).join('');
 const icon = (body, bg = P.frame, h = 110) => `<svg viewBox="0 0 200 ${h}" role="img"><rect width="200" height="${h}" rx="10" fill="${bg}" stroke="${P.line}"/>${body}</svg>`;
 const NB = P.night;
 const RES = [
-  ['BD-08', '달빛 가게', '건물 (D109-A)', true, '광장 동쪽 언덕의 작은 남색 가게. 지붕에 초승달 간판, 밤엔 창이 노랗게 (재질 window · glow). 낮엔 덧문을 닫아요.', () => stars(10, 10, 180, 30, 6, 2) + house(100, 100, '#6D7DB4', true) + moon(100, 52, 9), NB],
+  ['BD-08', '달빛 가게', '건물 (D109-A)', true, '광장 북쪽 언덕(박물관 서쪽)의 작은 남색 가게 — 동쪽 언덕엔 빈 곳이 없어 옮겼어요 (3×3 칸, 0.85 배). 지붕에 초승달 간판, 밤엔 창이 노랗게 (재질 window · glow). 낮엔 덧문을 닫아요.', () => stars(10, 10, 180, 30, 6, 2) + house(100, 100, '#6D7DB4', true) + moon(100, 52, 9), NB],
   ['CH-14', '별밤 (박쥐)', '가게 주인 (D109-A)', true, '달빛 가게 주인. 말끝 「…찍」, 낮엔 거꾸로 매달려 자는 수줍은 박쥐. 가게 주인이라 주민 수에 안 세요.', () => `<path d="M86 66 q-26 -18 -36 4 q18 -4 24 14z M114 66 q26 -18 36 4 q-18 -4 -24 14z" fill="#6D7DB4"/>` + villager(100, 100, '#6D7DB4', 2.6) + C(94, 62, 2, P.gold) + C(106, 62, 2, P.gold), NB],
   ['RM-10', '달빛 가게 실내', '방 배치 (places)', true, '작은 방 하나: 계산대 · 밤 가구 진열 · 천장에 별 모빌. 도토리상점과 같은 방식 (places.js + places/moonshop.json).', () => R(30, 18, 140, 78, '#3A4670', 6) + stars(36, 22, 128, 26, 6, 7) + R(60, 70, 80, 14, P.wood, 3) + lantern(150, 56, P.gold)],
   ['BD-09', '새벽 천막', '건물 (D111-A)', true, '보라 천 천막 + 꼭대기 별. 3시에 안개와 함께 나타나고 5시에 걷혀요 (투명하게 사라지기).', () => R(0, 70, 200, 40, '#6F7FA6', 0) + tent(100, 96, 1.5) + mist(20, 102, 70) + mist(110, 98, 70), '#4A5A86'],
@@ -393,16 +393,16 @@ $('resCards').innerHTML = RES.map(([id, name, kind, isNew, desc, art, bg]) => `
 /* ---------- 타로 카드 12장 ---------- */
 const TAROT = [
   ['TA-01', '해님', '☀', '#D9822B', '팔 때 값 +10%'],
-  ['TA-02', '달님', '☾', '#4F5F94', '밤 곤충 더 자주'],
-  ['TA-03', '별', '✦', '#7A6A9A', '망원경 소원 하나 더'],
+  ['TA-02', '달님', '☾', '#4F5F94', '곤충 팔 때 +25%'],
+  ['TA-03', '별', '✦', '#7A6A9A', '화석 감정에서 귀한 화석 잘 나옴'],
   ['TA-04', '바다', '≈', '#2F86A6', '큰 물고기 그림자 늘기'],
-  ['TA-05', '숲', '♣', '#3F8F5C', '나무 흔들면 곤충 · 과일 하나 더'],
-  ['TA-06', '바람', '~', '#6F8DB0', '걷기 조금 빠르게'],
-  ['TA-07', '도토리', '●', '#A8642E', '아침에 도토리 주머니 하나'],
-  ['TA-08', '돌', '◆', '#7A7068', '바위 두드리면 광석 하나 더'],
-  ['TA-09', '나비', '❀', '#C76A90', '꽃이 하나씩 더 피어남'],
-  ['TA-10', '화석', '⌇', '#9C7346', '화석 자리 하나 더'],
-  ['TA-11', '친구', '♥', '#C9583B', '주민 한 명 마음 +'],
+  ['TA-05', '숲', '♣', '#3F8F5C', '나무 흔들면 곤충이 잘 떨어짐'],
+  ['TA-06', '바람', '~', '#6F8DB0', '물고기 팔 때 +25%'],
+  ['TA-07', '도토리', '●', '#A8642E', '아침에 도토리 300'],
+  ['TA-08', '돌', '◆', '#7A7068', '바위 두 번 더 두드리기'],
+  ['TA-09', '나비', '❀', '#C76A90', '꽃 팔 때 +50%'],
+  ['TA-10', '화석', '⌇', '#9C7346', '화석 팔 때 +25%'],
+  ['TA-11', '친구', '♥', '#C9583B', '그날 처음 말 건 주민 마음 +'],
   ['TA-12', '집', '⌂', '#5F7268', '가구 살 때 −10%'],
 ];
 const tarotArt = (sym, col, n) => `<svg viewBox="0 0 120 170" role="img" aria-hidden="true"><rect x="2" y="2" width="116" height="166" rx="10" fill="#FBF7F2" stroke="${P.plum}" stroke-width="3"/><rect x="12" y="12" width="96" height="146" rx="6" fill="${col}"/>${stars(18, 20, 84, 36, 5, n)}<text x="60" y="108" font-size="46" text-anchor="middle" fill="#FBF7F2">${esc(sym)}</text><rect x="24" y="130" width="72" height="3" rx="1.5" fill="#FBF7F2" opacity=".6"/></svg>`;
@@ -432,14 +432,14 @@ $('youTable').tBodies[0].innerHTML = YOU.map(([a, b, c]) => `<tr><td class="id">
 
 /* ---------- 머리 숫자 ---------- */
 const newCount = RES.filter(r => r[3]).length;
-$('pills').innerHTML = ['<span class="pill wait">사용자 선택 대기</span>', `결정 ${DECISIONS.length} (D106–D114)`, `리소스 ${RES.length} (새 ${newCount}) + 카드 ${TAROT.length}`, `트랙 ${PLAN.length} (M12-P0–P6)`]
+$('pills').innerHTML = ['<span class="pill ok">반영 v1 — 모두 A · 만든 것 검수 대기</span>', `결정 ${DECISIONS.length} (D106–D114)`, `리소스 ${RES.length} (새 ${newCount}) + 카드 ${TAROT.length}`, `트랙 ${PLAN.length} (M12-P0–P6)`]
   .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
 
 /* ---------- 요청 글 ---------- */
 const notes = [...document.querySelectorAll('.note')];
 window.BOARD = { id: 'night', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
 $('build').addEventListener('click', () => {
-  const lines = ['[포근섬 밤·새벽 검수 보드 v0.1 의견]', '', '■ 결정'];
+  const lines = ['[포근섬 밤·새벽 검수 보드 v0.2 의견]', '', '■ 결정'];
   for (const d of DECISIONS) {
     const r = document.querySelector(`input[name="${d.id}"]:checked`);
     const opt = d.opts.find(o => o[0] === r?.value);

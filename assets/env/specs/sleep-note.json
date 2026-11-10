@@ -1,0 +1,65 @@
+{
+  "id": "PR-32",
+  "slug": "sleep-note",
+  "name": "「자는 중」 쪽지",
+  "category": "prop",
+  "kind": "sleep-note",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤에 잠든 주민 집 문 앞에 꽂아 두는 작은 나무 말뚝 쪽지. 흰 쪽지에 Z 셋이 크게 작게 그려져 있다.",
+    "keywords": [
+      "작은 말뚝",
+      "흰 쪽지",
+      "Z 셋"
+    ],
+    "references": [
+      "문 앞 메모 팻말"
+    ],
+    "avoid": [
+      "글자",
+      "큰 간판"
+    ],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 밤 집 소품 PR-32 (충돌 작게)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#9A6B45",
+    "card": "#FBF7F2",
+    "pin": "#E8604F",
+    "ink": "#4E5A8A"
+  },
+  "paletteLabels": {
+    "wood": "말뚝",
+    "card": "쪽지",
+    "pin": "압정",
+    "ink": "Z 무늬"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.06
+    },
+    "extent": [
+      0.2,
+      0.08
+    ]
+  }
+}

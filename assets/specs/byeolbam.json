@@ -1,0 +1,83 @@
+{
+  "id": "CH-14",
+  "slug": "byeolbam",
+  "name": "별밤",
+  "species": "bat",
+  "role": "달빛 가게 주인 · 박쥐",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤 22시부터 새벽 3시까지 달빛 가게를 지키는 작은 박쥐. 낮엔 거꾸로 매달려 자고, 밤이 되면 금빛 눈을 반짝이며 손님을 맞는다. 접은 날개를 망토처럼 두른다.",
+    "keywords": [
+      "2.5등신",
+      "작은 몸",
+      "큰 귀",
+      "금빛 눈",
+      "접은 박쥐 날개",
+      "남색 털",
+      "금빛 나비넥타이"
+    ],
+    "references": [
+      "검수 보드 밤·새벽 CH-14 (달빛 가게 주인)",
+      "동그란 박쥐 봉제 인형"
+    ],
+    "avoid": [
+      "무서운 흡혈귀 인상",
+      "날카로운 이빨",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 새 부품 박쥐 귀 + 금빛 눈(iris) + 팔에 붙은 접은 날개막 (꼬리 없음)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "flat": [
+      "iris"
+    ]
+  },
+  "proportions": {
+    "height": 0.85,
+    "headScale": 1,
+    "bodyWidth": 0.98,
+    "limbLength": 1,
+    "earSize": 1.05,
+    "earPointiness": 0.55,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#3E4378",
+    "muzzle": "#B9B4D8",
+    "innerEar": "#C98FB8",
+    "nose": "#2A2240",
+    "iris": "#F2C14E",
+    "wing": "#2E2F5E",
+    "wingBone": "#4E5290",
+    "shirt": "#5A4C8A",
+    "pants": "#2E2A4E",
+    "bowtie": "#E0B85A",
+    "eye": "#1E1A2A",
+    "blush": "#E89AB8",
+    "outline": "#2A2440"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "accessories": [
+    "bowtie"
+  ],
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

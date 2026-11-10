@@ -1,0 +1,107 @@
+{
+  "id": "BD-09",
+  "slug": "dawn-tent",
+  "name": "새벽 천막",
+  "category": "building",
+  "kind": "dawn-tent",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "나방 여명이 새벽 3시부터 5시까지 여는 점집 천막. 보라 천 팔각뿔에 금빛 줄 띠, 꼭대기 금빛 별이 빛나고, 앞 입구는 천 문을 드리우고 양옆 자락을 걷어 묶었다.",
+    "keywords": [
+      "보라 천 팔각뿔",
+      "꼭대기 별",
+      "천 문 입구",
+      "금빛 술"
+    ],
+    "references": [
+      "떠돌이 점집 천막"
+    ],
+    "avoid": [
+      "서커스 천막처럼 큰 것",
+      "어두운 무서운 점집"
+    ],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 새벽 천막 BD-09 (문 = 재질 door, 앞 +Z · 별 glow)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.02,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "너비",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.15,
+      "step": 0.01
+    },
+    "height": {
+      "label": "높이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "foundation": "#9C8E7A",
+    "cloth": "#7A5AA8",
+    "clothB": "#A88AD0",
+    "trim": "#E0B85A",
+    "pole": "#6A4A33",
+    "door": "#4E3A78",
+    "rug": "#C26A6A",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "foundation": "바닥 테",
+    "cloth": "천",
+    "clothB": "천 줄무늬",
+    "trim": "금빛 줄·술",
+    "pole": "입구 기둥",
+    "door": "천 문",
+    "rug": "입구 깔개",
+    "glow": "꼭대기 별"
+  },
+  "animations": [],
+  "world": {
+    "lot": [
+      3,
+      3
+    ],
+    "collider": {
+      "boxes": [
+        [
+          -1.15,
+          -1.15,
+          1.15,
+          1.1
+        ],
+        [
+          -0.48,
+          1.0,
+          0.48,
+          1.3
+        ]
+      ]
+    },
+    "door": {
+      "side": "+Z",
+      "x": 0,
+      "width": 0.6,
+      "tile": "집터 앞 가운데 칸 바로 앞 (tx0 + 1, tz0 + 3)"
+    }
+  }
+}

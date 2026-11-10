@@ -1,0 +1,48 @@
+{
+  "id": "IC-NT-01",
+  "slug": "night-bungeoppang",
+  "name": "붕어빵",
+  "group": "night",
+  "kind": "bungeoppang",
+  "version": "0.1",
+  "items": [
+    "night.bungeoppang"
+  ],
+  "hold": false,
+  "triangles": 3484,
+  "parts": 3,
+  "materials": [
+    "bread",
+    "breadDark",
+    "eye",
+    "paper"
+  ],
+  "objects": [
+    "bag",
+    "bread",
+    "bread2"
+  ],
+  "size": [
+    0.394,
+    0.285,
+    0.351
+  ],
+  "bounds": [
+    [
+      -0.197,
+      -0.142,
+      0.0
+    ],
+    [
+      0.197,
+      0.142,
+      0.351
+    ]
+  ],
+  "glbBytes": 69272,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-bungeoppang_main.png",
+    "night-bungeoppang_thumb.png"
+  ]
+}

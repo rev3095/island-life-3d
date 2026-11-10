@@ -421,6 +421,24 @@
       "status": "approved"
     },
     {
+      "id": "PR-30",
+      "slug": "night-lanterns",
+      "name": "종이 등불 줄",
+      "category": "prop",
+      "kind": "night-lanterns",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-32",
+      "slug": "sleep-note",
+      "name": "「자는 중」 쪽지",
+      "category": "prop",
+      "kind": "sleep-note",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -482,6 +500,24 @@
       "kind": "festival-arch",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-08",
+      "slug": "night-shop",
+      "name": "달빛 가게",
+      "category": "building",
+      "kind": "night-shop",
+      "version": "0.2",
+      "status": "review"
+    },
+    {
+      "id": "BD-09",
+      "slug": "dawn-tent",
+      "name": "새벽 천막",
+      "category": "building",
+      "kind": "dawn-tent",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "FB-01",

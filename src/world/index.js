@@ -25,6 +25,11 @@ async function decorKinds(assets, data) {
   return [...env, ...furn];
 }
 
+/** M12 밤·새벽: 밤에만 놓는 것 (assets/night/night.json assets.env — 달빛 가게 · 새벽 천막 · 등불 줄 · 자는 중 쪽지) — 놓일 때 받는다 */
+async function nightKinds(assets) {
+  const cfg = await assets.loadJSON('assets/night/night.json').catch(() => null);
+  return cfg?.assets?.env ?? [];
+}
 
 export default {
   name: 'world',
@@ -41,6 +46,7 @@ export default {
     const index = await assets.loadEnvIndex();
     const lazy = await eventKinds(assets);
     for (const k of await decorKinds(assets, data)) lazy.add(k);
+    for (const k of await nightKinds(assets)) lazy.add(k);
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
