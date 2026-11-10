@@ -355,7 +355,7 @@
       "category": "prop",
       "kind": "snowman",
       "version": "0.2",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-23",
@@ -373,7 +373,7 @@
       "category": "prop",
       "kind": "fence-wood",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-25",
@@ -382,7 +382,7 @@
       "category": "prop",
       "kind": "fence-picket",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-26",
@@ -391,7 +391,7 @@
       "category": "prop",
       "kind": "flower-crown",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-27",
@@ -400,7 +400,7 @@
       "category": "prop",
       "kind": "fan",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-28",
@@ -409,7 +409,7 @@
       "category": "prop",
       "kind": "scarf",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-29",
@@ -418,7 +418,7 @@
       "category": "prop",
       "kind": "muffler",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -607,7 +607,7 @@
       "category": "tile",
       "kind": "path-stone",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-10",
@@ -616,7 +616,7 @@
       "category": "tile",
       "kind": "path-brick",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-11",
@@ -625,7 +625,7 @@
       "category": "tile",
       "kind": "path-plank",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-12",
@@ -634,7 +634,7 @@
       "category": "tile",
       "kind": "path-flower",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

@@ -113,7 +113,7 @@ test('decor: 야외 가구 — FU-47–50 아이템·스펙·모델, outdoor 표
     const it = items.get(`furn.${slug}`);
     assert.equal(it.code, id); assert.equal(it.source, source); assert.ok(buy > 0);
     const spec = J(`assets/furniture/specs/${slug}.json`);
-    assert.equal(spec.outdoor, true); assert.equal(spec.status, 'review');
+    assert.equal(spec.outdoor, true); assert.ok(['review', 'approved'].includes(spec.status));
     assert.equal(spec.footprint.join('×'), size);
     const w = furnitureWorld(spec);
     assert.deepEqual(w.world.extent, [spec.footprint[0] / 2, spec.footprint[1] / 2]);

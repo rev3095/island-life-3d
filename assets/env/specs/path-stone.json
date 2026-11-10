@@ -5,7 +5,7 @@
   "category": "tile",
   "kind": "path-stone",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "납작한 돌 판이 박힌 길 1칸. 이웃 칸과 이어지면 한 판처럼 이어지고, 혼자면 가장자리가 둥글다.",
     "keywords": [

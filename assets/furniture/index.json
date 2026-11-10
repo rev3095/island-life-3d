@@ -851,7 +851,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-48",
@@ -872,7 +872,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-49",
@@ -898,7 +898,7 @@
       ],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-50",
@@ -919,7 +919,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }
