@@ -57,7 +57,7 @@
 
 ## 게시·저장소 기록 (2026-11-11)
 
-- 게시: slug `662a5943-a2e5-4103-b682-cdbb023c7a54` (= DcidJEY1…) **버전 `1794325461-70c7`**, 파일 38개 (예전 4개 위에 patch), 제목 「포근섬 요소 편집기」, capabilities 그대로. 게시본은 이 브랜치 파일이라 `rules.json moving`·`tour.json shapes` 가 들어 있다 → **main 에 합치기 전에 "요소 반영" 이 오면** 이 두 칸은 main 에 없으니 합친 뒤 반영한다.
+- 게시: slug `662a5943-a2e5-4103-b682-cdbb023c7a54` (= DcidJEY1…) **버전 `1794325630-d00d`** (처음 1794325461-70c7 → main 합친 뒤 sheets.js·edits.mjs 다시), 파일 38개 (예전 4개 위에 patch), 제목 「포근섬 요소 편집기」, capabilities 그대로. 게시본은 이 브랜치 파일이라 `rules.json moving`·`tour.json shapes` 가 들어 있다 → **main 에 합치기 전에 "요소 반영" 이 오면** 이 두 칸은 main 에 없으니 합친 뒤 반영한다.
 - 저장소에 쓴 것: `applied/elem` · `history/elem-v0` (`{ board:'elem', version:0, commit:'f1c7279', changed:[], snapshot:{} }` — v0 은 파일 사본 없이 시작 표시만, 되돌리기는 숫자 표 v0 · 섬 지도 v0 사본으로), `history/map-v0` (예전 섬 지도 저장소의 문서 그대로 옮김). `drafts/data`·`drafts/map` 은 비어 있었다.
 - 첫 "요소 반영" 때는 `applied/elem` version 1 · 그 반영에서 바뀐 파일 사본.
 
