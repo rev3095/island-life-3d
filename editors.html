@@ -234,7 +234,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <b>바로 가기</b>
       <a href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2" target="_blank" rel="noopener">캐릭터 ↗</a>
       <a href="https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh" target="_blank" rel="noopener">배경 ↗</a>
-      <a href="https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF" target="_blank" rel="noopener">시나리오 ↗</a>
+      <a href="https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF" target="_blank" rel="noopener">스토리 ↗</a>
       <a href="https://claude.ai/artifact/MDYGS6UsDmmBJXTu9c8qY2" target="_blank" rel="noopener">곡·효과음 ↗</a>
       <a href="https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj" target="_blank" rel="noopener">요소 ↗</a>
       <a href="https://claude.ai/artifact/RYd99RBUsbUN8M3vNhwSST" target="_blank" rel="noopener">지난 섬 지도 ↗</a>
@@ -330,7 +330,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <tr><td><code>"전체 요청 확인"</code></td><td>모든 편집기·보드의 새 요청과 바뀐 선택, 게임의 문제 알리기·기기 점검, 이 홈 「전체 관리」에서 남긴 요청을 모아 아래 명령 순서대로 한 번에 처리</td><td class="small">이 홈</td></tr>
       <tr><td><code>"요청 확인"</code></td><td>캐릭터·주민 성격 요청을 처리하고 모델을 다시 만들기</td><td class="small">캐릭터 편집기</td></tr>
       <tr><td><code>"배경 요청 확인"</code></td><td>배경·가구·아이템·벽지/바닥·방 배치 요청 처리</td><td class="small">배경 편집기</td></tr>
-      <tr><td><code>"시나리오 반영"</code></td><td>고친 장면·순서·의견을 장면 파일에 넣기, 되돌리기</td><td class="small">시나리오 편집기</td></tr>
+      <tr><td><code>"스토리 반영"</code></td><td>고친 장면·순서, 주민 성격·대사·생일, 편지, 밤·행사·투어의 글과 의견을 파일에 넣기, 되돌리기 (예전 "시나리오 반영"·성격·대화 요청을 합친 것)</td><td class="small">스토리 편집기</td></tr>
       <tr><td><code>"검수 보드 반영"</code></td><td>바뀐 결정·의견을 계획과 게임에 넣기, 되돌리기</td><td class="small">검수 보드</td></tr>
       <tr><td><code>"&lt;이름&gt; 확정"</code> · <code>"&lt;이름&gt; 다시 열기"</code></td><td>그 리소스를 확정(approved)으로, 또는 검수 대기(review)로 — 지우지 않고 언제든 오갈 수 있어요</td><td class="small">이 홈 · 각 편집기</td></tr>
       <tr><td><code>"소리 반영"</code></td><td>고친 곡·선곡 표·효과음·목소리를 소리 데이터에 넣기, 되돌리기</td><td class="small">곡 편집기</td></tr>
@@ -351,9 +351,9 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "env", "group": "editor", "name": "배경 편집기", "url": "https://claude.ai/artifact/LuEvzroBSW2RFhVWvm6tkh", "file": "bg-editor.html",
     "edits": "배경 52 (축제 17 포함) · 가구 34 · 아이템 86 (아이콘 97) 의 모델과 색, 벽지·바닥 무늬 16, 주민 방 배치 7. 레퍼런스로 고치기, 새 요소 요청.",
     "command": "배경 요청 확인", "openLabel": "새 요청", "reads": ["env-requests: status == 'new'"] },
-  { "id": "story", "group": "editor", "name": "시나리오 편집기", "url": "https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF", "file": "story-editor.html",
-    "edits": "장면 12. 연출안 고르기, 컷·카메라·배우·말풍선 고치기, 장면 순서, 의견.",
-    "command": "시나리오 반영", "openLabel": "바뀐 것", "reads": ["drafts/*", "timeline/main", "applied/story"] },
+  { "id": "story", "group": "editor", "name": "스토리 편집기", "url": "https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF", "file": "story-editor.html",
+    "edits": "글과 이야기 전부. 탭 넷 — 장면(s01–s19 연출안·컷·순서) · 주민(성격·말버릇·선물·부탁·이모티콘 반응·글 대사·생일·시간표, 예전 캐릭터 편집기 「성격·대화」 탭) · 편지(친구·단짝·생일·이사·떠난 뒤 편지와 밤톨 안내) · 그 밖의 글(밤·새벽 · 계절 행사 · 투어의 말). 글마다 언제 나오는지 같이 보여요.",
+    "command": "스토리 반영", "openLabel": "바뀐 것", "reads": ["drafts/*", "timeline/main", "talk/*", "texts/*", "applied/story"] },
   { "id": "night", "group": "board", "name": "밤·새벽 검수 보드 v0.1", "url": "https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU", "file": "concept/night-board.html",
     "edits": "밤·새벽 콘텐츠. 결정 D106–D114 (야시장 때·자리 · 야시장 물건 · 야행성 주민 · 밤 상점 · 밤에만 여는 집 · 새벽 마술 상점 · 타로 효과 · 밤 행사와 겹침 · 여는 때), 추천안 기준 새 리소스 BD-08–09 · CH-14–15 · RM-10–11 · PR-30–32 · FU-55–59 · IC-NT-01–04 · UI-20–21 · s20–s21 · 타로 카드 TA-01–12.",
     "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/night", "applied/night"] },

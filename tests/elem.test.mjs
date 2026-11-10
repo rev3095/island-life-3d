@@ -75,7 +75,7 @@ test('반영 도구 elem: 경로 첫 칸으로 파일을 고르고, 방·가게�
   const moved = rm.furniture.map((f, i) => (i === rm.furniture.length - 1 ? { ...f, gx: Math.max(0, f.gx - 1) } : f));
   const p = plan('elem', {
     'tour/ticket/price': 800, 'night/market/weekday': 5, 'night/market/stalls/festival-booth-food/prices/night.cocoa': 150,
-    'night/tarot/cards/TA-01/luck/sell': 0.2, 'events/list/spring/todo/petals/goal': 8, 'rules/moving/max': 11,
+    'night/tarot/cards/0/luck/sell': 0.2, 'events/list/spring/todo/0/goal': 8, 'rules/moving/max': 11,
     'rooms/rm-01/furniture': moved, 'rooms/rm-01/name': '해변 쉼터', 'layout/shop': [0.7, 0.55],
   });
   assert.deepEqual(p.errors, []);

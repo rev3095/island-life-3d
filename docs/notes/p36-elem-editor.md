@@ -15,7 +15,7 @@
 | 🏪 상점 | `shop` | `rules.json` shop(여는·닫는 시각, 하루 가구·야외 가구·꽃씨 수), starter.acorns. 진열 받침·계산대 자리는 「방 배치」 → 도토리상점. **옷 칸은 게임에 아직 없다** (옷 아이템이 생기면 shop 에 칸을 더하고 여기에 줄 하나) |
 | 🐟 아이템 값 | `fish` `bugs` `fossils` `fruits` `flowers` `mats` `furniture` `recipes` | `items.json` 줄 표 (사는 값·파는 값·출현·몫·내구도…), `rules.json` recipes — 예전 숫자 표 그대로 |
 | 🎲 채집·하루·주민 | `rules` `birthdays` `town` | `rules.json` gather·day·stack·town (town 은 이제 게임이 읽는다 — 예전 "연결 대기" 띠·검사 줄은 뺐다) |
-| 🌸 행사 | `events` | `events.json` dates.days, 행사마다 시작 달·날·여는 시간(`hours`)·불꽃 쇼 시각·할 것 목표(`todo/<id>/goal`)·주인공 |
+| 🌸 행사 | `events` | `events.json` dates.days, 행사마다 시작 달·날·여는 시간(`hours`)·불꽃 쇼 시각·할 것 목표(`todo/<번호>/goal`)·주인공 |
 | 🌙 밤·새벽 | `night` | `night.json` 야시장 요일·시간·쉬는 행사·고리 던지기 값/횟수/확률·노점 값, 달빛 가게 시간·곤충 덤, 천막 시간, 야행성 집 시간·덤, 타로 뽑는 수·카드 효과 크기 |
 | ⛵ 투어 | `tour` | `tour.json` 표 값·하루 횟수·첫 투어 공짜, **나오는 섬 모양 `shapes`(새 칸)**, 배 시간, 광석 바위 횟수·확률, 손님 주민 |
 | 📦 이사 | `moving` | **`rules.json` moving (새 칸)** — 섬 최대 주민 수·오는 간격·떠나기 확률·편지 |
@@ -33,7 +33,7 @@
 | `history/elem-v<n>` | Claude (admin) | applied 와 같은 모양 (`board` = ApplyLog 가 찾는 칸) |
 | `history/data-v0` · `history/map-v0` | (예전) | 숫자 표 `snapshot.items·rules`, 섬 지도 `layout` — 편집기가 둘 다 읽어 되돌리기에 쓴다 |
 
-경로의 첫 칸 = 파일 키 (`tools/apply-edits.mjs` `ELEM_FILES`): `items` · `rules` · `layout` · `events` · `night` · `tour` · `rooms/<slug>` · `places/<slug>`. 예: `tour/ticket/price` · `night/market/stalls/festival-booth-food/prices/night.cocoa` (줄 이름표는 slug → kind → result → **id** 순 — `tools/edits.mjs` ROW_KEYS 에 id 를 더했다) · `rooms/rm-01/furniture`(배열 통째로) · `layout/villagers/coco`. 편집기는 처음 열 때 `drafts/elem` 이 없고 예전 `drafts/data` 에 바뀐 칸이 있으면 옮겨 온다. capabilities 는 예전 그대로 `{ db: { rules: [applied·history 쓰기 admin] }, user: {} }`.
+경로의 첫 칸 = 파일 키 (`tools/apply-edits.mjs` `ELEM_FILES`): `items` · `rules` · `layout` · `events` · `night` · `tour` · `rooms/<slug>` · `places/<slug>`. 예: `tour/ticket/price` · `night/market/stalls/festival-booth-food/prices/night.cocoa` (줄 이름표는 slug → kind → result, 이름표가 없는 줄은 번호: `night/tarot/cards/0/luck/sell` · `events/list/spring/todo/0/goal` — 스토리 편집기 apply-texts 도 같은 번호 경로를 쓴다) · `rooms/rm-01/furniture`(배열 통째로) · `layout/villagers/coco`. 편집기는 처음 열 때 `drafts/elem` 이 없고 예전 `drafts/data` 에 바뀐 칸이 있으면 옮겨 온다. capabilities 는 예전 그대로 `{ db: { rules: [applied·history 쓰기 admin] }, user: {} }`.
 
 ## "요소 반영" (Claude 가 하는 일) — 예전 "지도 반영"·"숫자 반영" 과 배경 편집기 방 배치 요청을 합친 명령
 
@@ -69,7 +69,6 @@
 | `src/gameplay/town/moving.js` | `MOVING` = 기본값 위에 `RULES.moving` (tables.js) — 빠진 칸만 기본값, 얼린 객체 |
 | `assets/tour/tour.json` | `shapes: ["TO-01", "TO-02", "TO-03", "TO-04"]` 새로 |
 | `src/gameplay/tour/islet.js` · `tour/index.js` | `isletOf(dayKey, trip, seed, shapes = SHAPE_IDS)` — 넷 모두면 예전과 같은 섬 (`elem.test.mjs` 가 본다) |
-| `tools/edits.mjs` | `ROW_KEYS` 끝에 `id` (밤 노점·타로 카드·행사 할 것 줄을 이름으로) |
 | `tools/apply-edits.mjs` | `elem` 종류 · `ELEM_FILES` · `elemTarget` · 방 목록 줄 맞춤 · `formatLike`(원래 줄 모양대로 쓰기) |
 | `tools/elem-checks.mjs` (새) | 값 검사 + `itemList` · `hourKo` · `TOUR_SHAPES` |
 | `tests/elem.test.mjs` (새, 7개) · `tests/hub.test.mjs` | 칸 경로 = 실제 파일 칸, 값 검사, 투어 모양, 이사 숫자, 반영 도구, 원래 모양 쓰기, 게시 목록 / 홈: 명령 '요소 반영', `#표 id`·`#rooms.<slug>` |

@@ -1,10 +1,11 @@
-<title>포근섬 시나리오</title>
+<title>포근섬 스토리</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: 콘티 책상 — 맨 위 반영 상태, 그 아래 처음→엔딩 타임라인 띠, 고른 장면의 정보·연출안(왼쪽)과 컷별 스토리보드 칸(오른쪽 넓게) */
+/* Layout: 콘티 책상 — 맨 위 반영 상태, 그 아래 탭(장면 · 주민 · 편지 · 그 밖의 글). 장면 = 처음→엔딩 타임라인 띠 + 장면 정보·연출안(왼쪽)과 컷별 스토리보드(오른쪽),
+   주민 = 주민 고르기·대답 시험(왼쪽)과 성격·대화 갈래(오른쪽), 편지·그 밖의 글 = 종류별 글 카드와 「언제 나오나」 */
 :root {
   --bg: #F1EEE6;         /* 콘티 종이 */
   --panel: #FFFFFF;
@@ -23,18 +24,20 @@
   --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
   --emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  --bubble: #FFFDF8;     /* 이모티콘 말풍선 — 게임처럼 늘 밝은 종이색 */
+  --bubble-line: #D8CDBF;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #17140F; --panel: #221E18; --ink: #EEE6DC; --muted: #A99F95; --line: #3A342B;
     --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #2E2922; --live: #7CCB93; --warn: #F08A60;
-    --sky: #3E5868; --ground: #4B5A3A; --night: #0E0B09; color-scheme: dark;
+    --sky: #3E5868; --ground: #4B5A3A; --night: #0E0B09; --bubble: #F1EBE0; --bubble-line: #8C8174; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17140F; --panel: #221E18; --ink: #EEE6DC; --muted: #A99F95; --line: #3A342B;
   --accent: #F0A55A; --accent-ink: #2A1A0C; --chip: #2E2922; --live: #7CCB93; --warn: #F08A60;
-  --sky: #3E5868; --ground: #4B5A3A; --night: #0E0B09; color-scheme: dark;
+  --sky: #3E5868; --ground: #4B5A3A; --night: #0E0B09; --bubble: #F1EBE0; --bubble-line: #8C8174; color-scheme: dark;
 }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
 .wrap { max-width: 1320px; margin: 0 auto; padding-block: 22px 80px;
@@ -147,18 +150,120 @@ dialog.player::backdrop { background: rgba(20, 15, 10, .7); }
 
 .empty { padding: 40px 16px; text-align: center; color: var(--muted); border: 2px dashed var(--line); border-radius: 14px; }
 .ro .edit-only { display: none !important; }
+
+/* 탭: 장면 · 주민 · 편지 · 그 밖의 글 (P36) */
+[hidden] { display: none !important; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { font-family: var(--display); font-size: 18px; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; padding: 6px 14px 7px; color: var(--muted); white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs .n { font-family: var(--mono); font-size: 11px; color: var(--warn); margin-left: 4px; }
+.pane { display: grid; gap: 22px; min-width: 0; }
+.subtabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.subtabs button { font-size: 13.5px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
+.subtabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); background: var(--chip); }
+.subtabs .n { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-left: 4px; }
+.when { font-size: 13.5px; color: var(--live); }
+.vlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.vbtn { position: relative; display: grid; justify-items: center; gap: 2px; padding: 6px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); font-size: 13px; }
+.vbtn img { width: 44px; height: 44px; object-fit: contain; }
+.vbtn[aria-pressed="true"] { border: 2px solid var(--accent); padding: 5px 3px; }
+.vbtn .dot { position: absolute; right: 6px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--warn); }
+img.face { width: 56px; height: 56px; object-fit: contain; border-radius: 12px; background: var(--chip); }
+.tsec { display: grid; gap: 14px; min-width: 0; }
+.tsec h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tsec h3 .small { font-family: var(--body); }
+.foot { border-top: 1px solid var(--line); padding-top: 14px; }
+.group-title { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn.link { border: 0; background: none; padding: 0 2px; color: var(--accent); font-family: var(--mono); font-size: 12.5px; }
+.swatch { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.swatch input { width: 40px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; }
+.sliders { display: grid; gap: 6px; }
+.slider { display: grid; grid-template-columns: 140px minmax(0, 1fr) 84px; gap: 8px; align-items: center; font-size: 13.5px; }
+.slider output { font-family: var(--mono); font-size: 12px; text-align: right; }
+@media (max-width: 480px) { .slider { grid-template-columns: 96px minmax(0, 1fr) 70px; } .grid2 { grid-template-columns: 1fr; } }
+.haunts { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+.fe-emo { width: 30px; height: 30px; display: block; }
+.emo-chip { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--bubble); border: 1px solid var(--bubble-line); flex: none; }
+.emo-btn { display: grid; justify-items: center; gap: 1px; padding: 4px 2px 3px; border-radius: 12px; background: var(--bubble); border: 1px solid var(--bubble-line); color: #4A3B32; min-width: 0; }
+.emo-btn span { font-size: 10.5px; line-height: 1.15; max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emo-btn[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.emo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 5px; }
+.chiprow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tchip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 2px 4px 2px 10px; border-radius: 999px; background: var(--chip); border: 1px solid var(--line); }
+.tchip.emo { padding: 2px 4px 2px 2px; background: var(--bubble); border-color: var(--bubble-line); color: #4A3B32; font-family: var(--body); }
+.tchip.emo .fe-emo { width: 26px; height: 26px; }
+.tchip button { font-size: 12px; line-height: 1; border: 0; background: none; color: inherit; opacity: .7; padding: 4px 5px; border-radius: 999px; }
+.addrow { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.addrow select { flex: 1 1 200px; min-width: 0; }
+.rows { display: grid; gap: 6px; margin-bottom: 6px; }
+.rowline { display: grid; grid-template-columns: minmax(0, 1fr) 64px auto; gap: 6px; align-items: center; }
+.pts { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.react-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.react { width: 100%; border-collapse: collapse; font-size: 13px; }
+.react th { text-align: left; font-weight: 400; color: var(--muted); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.react td { padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.react td.em { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.react .res { display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+.react .res .fe-emo { width: 24px; height: 24px; }
+.react .kind { font-size: 12px; color: var(--muted); margin-left: 6px; }
+.react tr.like td:first-child { box-shadow: inset 3px 0 var(--live); }
+.react tr.dislike td:first-child { box-shadow: inset 3px 0 var(--warn); }
+.flagrow { display: grid; gap: 6px; }
+.flag { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: start; font-size: 14px; }
+.flag .small, .flag .extra { grid-column: 2; }
+.flag .extra { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lines { display: grid; gap: 8px; }
+.lcard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; align-items: start; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.lcard.off { opacity: .62; border-style: dashed; }
+.lcard textarea { min-height: 40px; font-size: 14px; }
+.lcard .pv { grid-column: 2; font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.lcard .pv b { font-weight: 400; color: var(--live); }
+.lgroup { display: grid; gap: 8px; border-top: 1px dashed var(--line); padding-top: 12px; min-width: 0; }
+.lgroup summary { cursor: pointer; }
+.lwho { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.lwho img { width: 30px; height: 30px; object-fit: contain; }
+.txgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 8px 12px; }
+label.tx code { font-family: var(--mono); font-size: 10.5px; color: var(--muted); overflow-wrap: anywhere; }
+label.tx.changed > :is(input, textarea) { border-color: var(--warn); }
+.timebar { position: relative; height: 34px; border-radius: 10px; background: var(--chip); overflow: hidden; }
+.timebar .band { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 55%, transparent); }
+.timebar .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+.timebar .lbl { position: absolute; bottom: 2px; font-family: var(--mono); font-size: 10px; color: var(--muted); transform: translateX(-50%); }
+.problems, .changes { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 13px; overflow-wrap: anywhere; }
+.problems { color: var(--warn); }
+.changes code, .problems code { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.try-ctx { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.want { display: flex; gap: 8px; align-items: center; font-size: 13.5px; }
+.tlog { display: grid; gap: 6px; max-height: 260px; overflow-y: auto; background: var(--bg); border-radius: 12px; padding: 8px; }
+.say { display: grid; gap: 2px; justify-items: start; }
+.say.me { justify-items: end; }
+.say .bub { display: flex; gap: 2px; background: var(--bubble); border: 1px solid var(--bubble-line); border-radius: 14px; padding: 3px 6px; }
+.say .text { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; font-size: 14px; }
+.say .meta { font-size: 12px; color: var(--muted); }
+.tray { display: flex; gap: 6px; align-items: center; }
+.tray .slot { width: 40px; height: 40px; border-radius: 12px; border: 1px dashed var(--line); background: var(--bubble); display: grid; place-items: center; padding: 0; }
+.tray .slot.full { border-style: solid; border-color: var(--bubble-line); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 
 <div class="wrap" id="app">
   <header>
-    <p class="mono">STORY · 처음부터 엔딩까지</p>
-    <h1>포근섬 시나리오 편집기</h1>
-    <p class="muted" style="max-width:68ch">장면마다 연출안을 고르고, 컷을 고치고, 의견을 남겨 주세요. 고친 내용은 바로 저장돼요. 게임에 넣으려면 채팅에 <b>"시나리오 반영"</b>이라고 보내 주세요. 말풍선은 이모티콘이고, 글 대사 칸은 나중에 채울 수 있게 비워 두었어요.</p>
+    <p class="mono">STORY · 장면 · 주민 · 편지 · 그 밖의 글</p>
+    <h1>포근섬 스토리 편집기</h1>
+    <p class="muted" style="max-width:72ch">게임의 글과 이야기를 모두 여기서 고쳐요 — 장면(컷신) 연출안·컷, 주민 성격·말버릇·선물·이모티콘 반응·글 대사·생일, 우편함 편지와 밤톨 안내, 밤·행사·투어의 말. 칸마다 <b>언제 나오는지</b> 같이 보여요. 고친 내용은 바로 저장되고, 게임에 넣으려면 「반영 요청 표시」 뒤 채팅에 <b>"스토리 반영"</b>이라고 보내 주세요.</p>
   </header>
 
   <section class="status" id="status" aria-live="polite"><p class="muted">저장소에 연결하는 중…</p></section>
 
+  <nav class="tabs" id="tabs" role="tablist" aria-label="고칠 것">
+    <button type="button" role="tab" id="tab-scenes" data-tab="scenes" aria-selected="true" aria-controls="pane-scenes">장면<span class="n"></span></button>
+    <button type="button" role="tab" id="tab-villager" data-tab="villager" aria-selected="false" aria-controls="pane-villager">주민<span class="n"></span></button>
+    <button type="button" role="tab" id="tab-letters" data-tab="letters" aria-selected="false" aria-controls="pane-letters">편지</button>
+    <button type="button" role="tab" id="tab-texts" data-tab="texts" aria-selected="false" aria-controls="pane-texts">그 밖의 글<span class="n"></span></button>
+  </nav>
+
+  <div class="pane" id="pane-scenes" role="tabpanel" aria-labelledby="tab-scenes">
   <section style="display:grid;gap:10px">
     <div class="board-head"><h2>타임라인</h2><span class="small muted">점선 칸은 지금 게임에 있는 흐름(창·대화)이라 순서 기준으로만 보여요.</span></div>
     <div class="timeline" id="timeline" role="listbox" aria-label="장면 순서"></div>
@@ -172,6 +277,10 @@ dialog.player::backdrop { background: rgba(20, 15, 10, .7); }
   </section>
 
   <section class="scene" id="scene"><div class="empty">장면을 불러오는 중…</div></section>
+  </div>
+  <div class="pane" id="pane-villager" role="tabpanel" aria-labelledby="tab-villager" hidden><div class="empty">주민 데이터를 불러오는 중…</div></div>
+  <div class="pane" id="pane-letters" role="tabpanel" aria-labelledby="tab-letters" hidden><div class="empty">편지를 불러오는 중…</div></div>
+  <div class="pane" id="pane-texts" role="tabpanel" aria-labelledby="tab-texts" hidden><div class="empty">글을 불러오는 중…</div></div>
 </div>
 
 <dialog class="player" id="player">
@@ -184,9 +293,16 @@ dialog.player::backdrop { background: rgba(20, 15, 10, .7); }
   </div>
 </dialog>
 
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
 <script type="module">
 import * as R from './src/gameplay/story/rules.js';
 import { INDEX_FILE, SCENE_FILES } from './src/gameplay/story/files.js';
+import { createWords } from './story-editor/words.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -303,18 +419,20 @@ function changes() {
 
 /* ---------- 상태 칸 ---------- */
 function renderStatus() {
-  const ch = changes(), n = Object.keys(ch).length;
+  const ch = changes(), wch = words.changes(), n = Object.keys(ch).length + wch.length;
   const req = tlDoc?.status === 'requested';
-  const head = applied ? `<b>게임에 들어간 시나리오 v${applied.version}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}` : '<b>게임에 들어간 시나리오 v0 (첫 초안)</b> <span class="muted">· 아직 반영 기록이 없어요</span>';
-  const diff = n ? `반영 뒤 바뀐 것 <b>${n}</b>: ${Object.entries(ch).map(([id, c]) => `<span class="chip changed">${esc(id === '_order' ? '장면 순서' : (work.scenes[id]?.title ?? id))} · ${esc(c.join('·'))}</span>`).join(' ')}` : '<span class="muted small">반영한 뒤로 바뀐 것이 없어요.</span>';
+  const head = applied ? `<b>게임에 들어간 스토리 v${applied.version}</b> · ${esc(when(applied.appliedAt))}${applied.summary ? ` · <span class="muted">${esc(applied.summary)}</span>` : ''}` : '<b>게임에 들어간 스토리 v0 (첫 초안)</b> <span class="muted">· 아직 반영 기록이 없어요</span>';
+  const diff = n ? `반영 뒤 바뀐 것 <b>${n}</b>: ${Object.entries(ch).map(([id, c]) => `<span class="chip changed">${esc(id === '_order' ? '장면 순서' : (work.scenes[id]?.title ?? id))} · ${esc(c.join('·'))}</span>`).join(' ')} ${wch.map(w => `<span class="chip changed">${esc(w.label)} · ${esc(w.what)}</span>`).join(' ')}` : '<span class="muted small">반영한 뒤로 바뀐 것이 없어요.</span>';
   const hist = history.length ? `<details><summary>반영 기록 ${history.length}개 · 되돌리기</summary><ol class="hist">${history.map(h => `
       <li><span><b>v${h.version}</b> · ${esc(when(h.appliedAt))} · ${esc(h.summary ?? '')}</span>
       <button type="button" class="btn ghost tiny edit-only" data-rollback="${h.version}" ${applied && h.version === applied.version ? 'disabled' : ''}>이 버전으로 되돌리기 요청</button></li>`).join('')}</ol></details>` : '';
-  const rb = tlDoc?.rollback ? `<p class="small"><b>v${tlDoc.rollback} 로 되돌리기를 요청했어요.</b> 채팅에 "시나리오 반영"이라고 보내 주세요.</p>` : '';
+  const rb = tlDoc?.rollback ? `<p class="small"><b>v${tlDoc.rollback} 로 되돌리기를 요청했어요.</b> 채팅에 "스토리 반영"이라고 보내 주세요.</p>` : '';
+  const tabN = { scenes: Object.keys(ch).length, villager: wch.filter(w => w.key.startsWith('talk/')).length, texts: wch.filter(w => w.key.startsWith('texts/')).length };
+  for (const [k, v] of Object.entries(tabN)) { const e = document.querySelector(`#tab-${k} .n`); if (e) e.textContent = v || ''; }
   $('status').innerHTML = `<div class="row">${head}</div><div class="row">${diff}</div>
     <div class="row"><button type="button" class="btn ${n || tlDoc?.rollback ? 'primary' : 'ghost'} edit-only" id="markReq">${req ? '반영 요청 표시됨 ✓' : '반영 요청 표시'}</button>
     <span class="small muted">${esc(saveMsg)}</span></div>
-    ${req ? '<p class="small">반영 요청을 표시했어요. 채팅에 <b>"시나리오 반영"</b>이라고 보내 주세요 (편집기가 Claude 를 직접 부르지는 못해요).</p>' : ''}${rb}${hist}`;
+    ${req ? '<p class="small">반영 요청을 표시했어요. 채팅에 <b>"스토리 반영"</b>이라고 보내 주세요 (편집기가 Claude 를 직접 부르지는 못해요).</p>' : ''}${rb}${hist}`;
 }
 $('status').addEventListener('click', e => {
   if (e.target.id === 'markReq') { tlDoc = { ...(tlDoc ?? {}), status: 'requested' }; saveTimeline({ status: 'requested', requestedAt: Date.now() }); renderStatus(); }
@@ -750,8 +868,37 @@ $('plRe').onclick = () => startPlay(play.take);
 $('plClose').onclick = () => { cancelAnimationFrame(play?.raf); $('player').close(); };
 $('player').addEventListener('close', () => cancelAnimationFrame(play?.raf));
 
+/* ---------- 탭 (주소 끝 #villager · #villager/coco · #letters · #texts) ---------- */
+const TABS = ['scenes', 'villager', 'letters', 'texts'];
+let tab = 'scenes';
+function setTab(t, write = true) {
+  if (!TABS.includes(t)) t = 'scenes';
+  tab = t;
+  for (const k of TABS) { $(`tab-${k}`).setAttribute('aria-selected', String(k === t)); $(`pane-${k}`).hidden = k !== t; }
+  if (write) try { window.history.replaceState(null, '', t === 'scenes' ? location.pathname + location.search : `#${t}`); } catch {}
+}
+$('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+$('tabs').addEventListener('keydown', e => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+  const i = (TABS.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length;
+  setTab(TABS[i]); $(`tab-${TABS[i]}`).focus();
+});
+function fromHash() {
+  const [t, slug] = location.hash.slice(1).split('/');
+  if (TABS.includes(t)) { setTab(t, false); if (slug) words.select(slug); }
+}
+addEventListener('hashchange', fromHash);
+
+const busy = () => document.activeElement?.matches?.('input[type=text], textarea') || pending.size;
+const words = createWords({ saveSoon, busy, writable: () => writable, onChange: () => renderStatus() });
+
 /* ---------- 시작 ---------- */
 (async () => {
+  fromHash();
+  words.start(document.querySelector('.wrap')).then(fromHash, e => {
+    console.warn('[story-editor] 주민·글 탭을 불러오지 못했어요', e);
+    for (const k of ['villager', 'letters', 'texts']) $(`pane-${k}`).innerHTML = `<div class="empty">주민·글 데이터를 불러오지 못했어요 (${esc(e.message)}). 새로고침해 보시고, 계속되면 채팅으로 알려 주세요.</div>`;
+  });
   try { await loadBase(); }
   catch (e) { $('scene').innerHTML = `<div class="empty">장면 파일을 읽지 못했어요 (${esc(e.message)}).</div>`; return; }
   let first = null;
@@ -767,7 +914,6 @@ $('player').addEventListener('close', () => cancelAnimationFrame(play?.raf));
   if (!writable) { document.body.classList.add('ro'); saveMsg = '보기 전용이에요 — 고치려면 편집 권한이 필요해요.'; }
   else saveMsg = store.label;
   renderStatus();
-  const busy = () => document.activeElement?.matches?.('input[type=text], textarea') || pending.size;
   store.watchDoc('timeline/main', d => {
     tlDoc = d;
     if (d?.rows && !busy() && canon(d.rows) !== canon(work.rows)) {
@@ -792,6 +938,10 @@ $('player').addEventListener('close', () => cancelAnimationFrame(play?.raf));
     }
     if (touched) { if (!work.scenes[sel]) sel = sceneIds()[0]; renderTimeline(); renderScene(); renderStatus(); }
   });
+  // 주민·글 초안 (talk/<slug> · texts/<id>) — 주민 데이터를 다 읽은 뒤에 얹는다
+  const later = (col, rows) => (words.ready ? words.fromStore(col, rows) : setTimeout(() => later(col, rows), 300));
+  store.watchCol('talk', rows => later('talk', rows));
+  store.watchCol('texts', rows => later('texts', rows));
   store.watchDoc('applied/story', d => { applied = d; renderStatus(); renderTimeline(); });
   store.watchCol('history', rows => { history = rows.filter(r => r.board === 'story' || r.version).sort((a, b) => b.version - a.version); renderStatus(); });
 })();

@@ -182,7 +182,7 @@ export const SHEETS = [
       [`events/list/${e.slug}/start/day`, '시작 날', 'int', { min: 1, max: 31 }],
       [`events/list/${e.slug}/hours`, '여는 시간', 'hours', { min: 5, max: 29 }, '이 시간에만 행사 물건이 놓이고 주인공이 행사 자리에 서요 (그동안 비가 오지 않아요).'],
       ...(e.showAt != null ? [[`events/list/${e.slug}/showAt`, '불꽃 쇼 시각', 'num', { min: 5, max: 29 }, '이 시각에 북쪽 해변 하늘로 불꽃이 올라가요.']] : []),
-      ...(e.todo ?? []).map(t => [`events/list/${e.slug}/todo/${t.id}/goal`, `할 것: ${t.label}${t.daily ? ' (날마다)' : ''}`, 'int', { min: 1, max: 99 }, '이만큼 하면 도장 칸이 채워져요.']),
+      ...(e.todo ?? []).map((t, k) => [`events/list/${e.slug}/todo/${k}/goal`, `할 것: ${t.label}${t.daily ? ' (날마다)' : ''}`, 'int', { min: 1, max: 99 }, '이만큼 하면 도장 칸이 채워져요.']),
       [`events/list/${e.slug}/host`, '주인공 주민', 'select', { options: ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], labels: VILLAGER_KO }, '행사 시간에 자리 둘레에 서서 행사 대사를 해요 (떠나지 않는 주민만 — 이사 탭 참고).'],
     ]]),
   ] },
@@ -212,7 +212,7 @@ export const SHEETS = [
       ]],
       ['🔮 타로', [
         ['night/tarot/pick', '뽑는 카드 수', 'int', { min: 1, max: 5 }, '천막에서 펼친 카드 중 이만큼 골라 그날 운세가 돼요.'],
-        ...N.tarot.cards.flatMap(c => Object.entries(c.luck ?? {}).filter(([, v]) => typeof v === 'number').map(([k]) => [`night/tarot/cards/${c.id}/luck/${k}`, `${c.sym} ${c.name} — ${c.effect}`, 'num', { max: 9999 }, '이 카드를 뽑은 날의 효과 크기 (효과 글은 반영할 때 Claude 가 값에 맞춰 고쳐요).'])),
+        ...N.tarot.cards.flatMap((c, i) => Object.entries(c.luck ?? {}).filter(([, v]) => typeof v === 'number').map(([k]) => [`night/tarot/cards/${i}/luck/${k}`, `${c.sym} ${c.name} — ${c.effect}`, 'num', { max: 9999 }, '이 카드를 뽑은 날의 효과 크기 (효과 글은 반영할 때 Claude 가 값에 맞춰 고쳐요).'])),
       ]],
     ];
   } },
