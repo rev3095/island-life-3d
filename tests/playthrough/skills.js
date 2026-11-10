@@ -433,7 +433,7 @@ export function createSkills(bot) {
     if (!V) return false;
     const end = bot.gameT + timeout;
     while (bot.gameT < end) {
-      if (!V.talkable) return false;
+      if (!V.talkable) { bot.log(`  ${slug}: 말 걸 수 없음 (mode ${V.mode} · 보임 ${V.actor.visible} · 불투명 ${V.actor.opacity.toFixed(2)})`); return false; }
       const q = V.actor.position;
       if (bot.dist(q) > 1.0) await bot.walkTo(q, { near: 0.95, timeout: 6, label: V.person.name, allowTeleport: false, quiet: true });
       if (bot.dist(q) < 1.25) {

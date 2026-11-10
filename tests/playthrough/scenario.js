@@ -237,12 +237,21 @@ export function makeScenario(bot, sk, opts = {}) {
 
   add('meet', '주민 6명 만나기 (첫 이모티콘 대화 연습 포함)', async () => {
     const out = await talkRound({ party: false });
-    note('meet', out);
+    // 비·눈 오는 날엔 rainStay·snowStay 주민(보리·모찌·퐁 등)이 집에 있다 → 플레이어처럼 집을 찾아가 방에서 만난다 (생일 단계와 같은 방법)
+    const weather = S().time?.weather ?? null, inside = [];
+    for (const x of out) {
+      if (x.opened !== false || S().town.atHome(x.slug) !== 'home') continue;
+      const v = await sk.visit(x.slug, { goal: { wins: 3 } });
+      inside.push(`${x.slug} ${v.entered ? '방에서' : v.knocked ? '노크' : `문 ${v.peek}`}`);
+      if (v.talked) Object.assign(x, { opened: true, kinds: v.talked, room: true });
+    }
+    note('meet', { weather, inside, out });
     const opened = out.filter(x => x.opened !== false).length;
     const tut = !!fest().talkTutorial;
     await bot.shot('05-emote-talk', '이모티콘 대화 뒤');
     if (!tut) return awk(`연습이 안 끝남 · 만난 주민 ${opened}`);
-    return opened >= residents().length ? pass(`만남 ${opened}/${residents().length}`) : awk(`만남 ${opened}/${residents().length}`);
+    const tail = inside.length ? ` · ${weather} — 집에서 ${inside.join(', ')}` : '';
+    return opened >= residents().length ? pass(`만남 ${opened}/${residents().length}${tail}`) : awk(`만남 ${opened}/${residents().length}${tail}`);
   });
 
   add('mail', '우편함 읽기 (환영 편지)', async () => {
