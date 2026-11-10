@@ -1,0 +1,471 @@
+<title>포근섬 밤·새벽 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 11차 보드와 같은 섬 안내 책자 — 지금 섬의 밤 → 하루 시간표 → 결정(카드마다 스케치) → 새 리소스 → 계획. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+a { color: var(--sea); }
+code { font-family: var(--mono); font-size: .86em; overflow-wrap: anywhere; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.pill.ok { background: var(--leaf); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정: 스케치 + 선택지 */
+.dec { display: grid; gap: 10px; }
+.decbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 780px) { .decbody { grid-template-columns: 300px minmax(0, 1fr); align-items: start; } }
+.decside { display: grid; gap: 8px; min-width: 0; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+.nowline { font-size: 13px; color: var(--muted); }
+.nowline b { color: var(--ink); font-weight: 400; }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+td.st { font-size: 16px; text-align: center; }
+
+
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+.miles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.mile { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.mile .small { grid-column: 1 / -1; }
+.mile.here { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.mile.done { opacity: .78; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+/* 행사 달력 · 행사 카드 */
+.cal { display: grid; gap: 4px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.cal .m { display: grid; gap: 3px; align-content: start; padding: 6px 4px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); text-align: center; font-size: 12px; min-width: 0; }
+.cal .m b { font-family: var(--display); font-weight: 400; font-size: 14px; }
+.cal .ev { font-size: 11px; padding: 1px 2px; border-radius: 6px; background: var(--acorn); color: var(--panel); overflow-wrap: anywhere; }
+.cal .fest { background: var(--sea); }
+@media (max-width: 640px) { .cal { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.res { display: flex; flex-wrap: wrap; gap: 4px; }
+.res .tag { font-family: var(--mono); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+/* 하루 시간표 (05시 → 다음 날 05시) */
+.day { display: grid; gap: 6px; }
+.day .row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; }
+.day .bar { position: relative; height: 20px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+.day .seg { position: absolute; top: 0; bottom: 0; border-radius: 5px; font-size: 11px; line-height: 20px; padding-left: 5px; color: #FBFDF8; white-space: nowrap; overflow: hidden; }
+.day .night { background-image: linear-gradient(90deg, transparent 0 62.5%, rgba(46,58,92,.22) 62.5% 100%); }
+.day .ticks { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; font-size: 11px; color: var(--muted); }
+.day .ticks div { display: flex; justify-content: space-between; font-family: var(--mono); }
+@media (max-width: 520px) { .day .row, .day .ticks { grid-template-columns: 74px minmax(0, 1fr); } .day .row { font-size: 12px; } }
+.cards12 { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.tcard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; display: grid; gap: 4px; min-width: 0; align-content: start; }
+.tcard svg { width: 100%; height: auto; display: block; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 밤·새벽 · 검수 보드 v0.1 · 2026-11-10 · main 3854e75 · 게임 v26</p>
+    <h1>포근섬 밤·새벽 검수 보드</h1>
+    <p class="lede">섬의 <b>밤과 새벽</b>에 할 것을 더해요 — <b>야시장</b>, <b>밤에 깨어 있는 주민</b>, <b>밤에만 들어갈 수 있는 특별한 상점</b>, <b>밤에만 문을 여는 야행성 주민의 집</b>, 그리고 <b>새벽에만 나타나는 마술 상점(타로 카드)</b>. 모델을 만들기 전에 언제 · 어디서 · 무엇을 할지 정해 주세요. 결정 D106–D114 를 골라 주시고 카드에 의견을 적어 주세요. 고른 내용은 바로 저장되고, 채팅에 <b>"검수 보드 반영"</b>이라고 하면 고른 대로 만들어요.</p>
+    <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v26)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈</a><a href="https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY">11차 보드 (옷, 선택 대기)</a><a href="https://claude.ai/artifact/FTCqiHtFPcACcQEULNbUX2">캐릭터 편집기</a></p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#now">지금 섬의 밤</a><a href="#day">하루 시간표</a><a href="#decide">결정 D106–D114</a><a href="#res">새 리소스</a><a href="#tarot">타로 카드 TA</a><a href="#plan">진행 계획</a><a href="#you">사용자 몫</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="now">
+    <div class="sec-head"><p class="id">AUDIT · 2026-11-10 · main 3854e75 · 게임 v26 · 테스트 394</p><h2>지금 섬의 밤과 새벽</h2>
+      <p class="muted">게임 시각은 실제 시계를 따르고, 하루는 <b>새벽 5시</b>에 바뀌어요. ✅ 있음 · △ 일부 · ❌ 없음. 오른쪽 칸은 이 보드의 어느 결정과 닿는지.</p></div>
+    <div class="tblwrap"><table class="tbl" id="auditTable"><thead><tr><th>무엇</th><th>지금</th><th>상태</th><th>이 보드에서</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="day">
+    <div class="sec-head"><p class="id">ONE DAY · 추천안 기준</p><h2>하루 시간표 — 아침 5시부터 다음 날 5시까지</h2>
+      <p class="muted">추천안을 모두 고르면 이렇게 돼요. 진한 쪽이 밤(20시 뒤)이에요. 달빛 가게가 문을 닫는 3시에 새벽 천막이 나타나고, 5시에 하루가 바뀌면 걷혀요.</p></div>
+    <div class="out day" id="dayChart"></div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS · D106 – D114</p><h2>먼저 정할 것 아홉 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요. 그림은 고른 안이 어떤 모습인지 보여 주는 스케치예요.</p></div>
+    <div id="decisions" class="grid" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="res">
+    <div class="sec-head"><p class="id">BD-08–09 · CH-14–15 · RM-10–11 · PR-30–32 · FU-55–59 · IC-NT-01–04 · UI-20–21 · s20–s21</p><h2>새 리소스 계획 — 추천안 기준</h2>
+      <p class="muted">다른 안을 고르면 반영 때 이 목록을 그 안에 맞게 다시 짜요. 모델은 지금처럼 Blender 스크립트로 만들고 편집기에서 검수해요. <span class="tag new">새</span> = 새로 만드는 것, <span class="tag">다시 씀</span> = 지금 있는 것.</p></div>
+    <div class="grid" id="resCards"></div>
+  </section>
+
+  <section id="tarot">
+    <div class="sec-head"><p class="id">TA-01 – TA-12 · 새 접두사 TA</p><h2>타로 카드 12장 — D112-A 기준</h2>
+      <p class="muted">섬 이야기로 새로 그린 카드예요 (실제 타로 그림을 베끼지 않아요). 새벽 천막에서 하루 한 장 뽑으면 <b>다음 5시부터 하루 동안</b> 작은 좋은 일이 생겨요. 효과 숫자는 설정 파일 하나에 두어 나중에 쉽게 바꿔요. 카드마다 의견을 적을 수 있어요.</p></div>
+    <div class="cards12" id="tarotCards"></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN · M12 밤·새벽</p><h2>승인 뒤 진행 계획</h2>
+      <p class="muted">M11(옷)과 따로 가는 마일스톤이에요. 밤 코드는 새 폴더 <code>src/gameplay/night/</code> 에 모아서 다른 트랙과 겹치지 않게 해요. 시각은 늘 게임 시각 서비스에서 읽어서, 섬폰 시계 바늘로 시각을 옮기면(다른 세션에서 만드는 중) 밤 콘텐츠도 같이 따라와요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>트랙</th><th>만드는 것</th><th>맡는 파일</th><th>먼저 필요한 것</th></tr></thead><tbody id="planRows"></tbody></table></div>
+  </section>
+
+  <section id="you">
+    <div class="sec-head"><p class="id">YOUR TURN</p><h2>사용자가 할 것</h2>
+      <p class="muted">Claude 가 대신할 수 없는 것이에요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="youTable"><thead><tr><th>ID</th><th>할 것</th><th>어떻게</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+// 스케치 색 (밝은 받침 위에 그려서 어두운 화면에서도 같은 색)
+const P = { frame: '#FBF7F2', bar: '#3F8F5C', pane: '#E3EEDD', line: '#C9D3C5', acc: '#A8642E', sea: '#9CC3EA', soft: '#F3E7D3', red: '#C9583B', grass: '#8CCB6E', sand: '#EBD9A8', white: '#FBFDF8',
+  pink: '#F4B6C8', night: '#2E3A5C', gold: '#F2C14E', moon: '#F6E7A8', lav: '#B9A6E0', wood: '#8A5A3B', mist: '#DDE3EE', plum: '#7A6A9A' };
+const T = (x, y, s, { size = 11, anchor = 'start', fill = INK, weight } = {}) =>
+  `<text x="${x}" y="${y}" font-size="${size}" text-anchor="${anchor}" fill="${fill}"${weight ? ` font-weight="${weight}"` : ''}>${esc(s)}</text>`;
+const R = (x, y, w, h, f = P.pane, r = 6, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}"${extra}/>`;
+const C = (x, y, r, f, extra = '') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"${extra}/>`;
+const btn = (x, y, w, label, solid = true) => R(x, y, w, 22, solid ? P.bar : P.white, 11, solid ? '' : ` stroke="${P.bar}" stroke-width="2"`) + T(x + w / 2, y + 15, label, { size: 10, anchor: 'middle', fill: solid ? P.white : P.bar });
+const sketchFrame = (body, label, h = 130) => `<svg viewBox="0 0 320 ${h}" role="img" aria-label="${esc(label)}"><rect width="320" height="${h}" rx="10" fill="${P.frame}" stroke="${P.line}"/>${body}</svg>`;
+// 작은 그림 조각 (밤 · 새벽)
+const villager = (x, y, col = P.acc, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">${C(0, -14, 8, col)}<rect x="-6" y="-7" width="12" height="13" rx="5" fill="${col}"/></g>`;
+const star = (x, y, r = 3, col = P.moon) => `<path d="M${x} ${y - r} L${x + r * .3} ${y - r * .3} L${x + r} ${y} L${x + r * .3} ${y + r * .3} L${x} ${y + r} L${x - r * .3} ${y + r * .3} L${x - r} ${y} L${x - r * .3} ${y - r * .3}z" fill="${col}"/>`;
+const stars = (x, y, w, h, n = 7, seed = 3) => Array.from({ length: n }, (_, i) => { const a = (i * 37 + seed * 11) % 100 / 100, b = (i * 59 + seed * 7) % 100 / 100; return star(+(x + a * w).toFixed(1), +(y + b * h).toFixed(1), 1.6 + (i % 3)); }).join('');
+const moon = (x, y, r = 10, bg = P.night) => C(x, y, r, P.moon) + C(+(x + r * .45).toFixed(1), +(y - r * .3).toFixed(1), +(r * .85).toFixed(1), bg);
+const nightBox = (x, y, w, h, r = 10) => R(x, y, w, h, P.night, r);
+const lantern = (x, y, col = P.red) => `<path d="M${x} ${y - 7} v-4" stroke="${P.wood}" stroke-width="1"/><ellipse cx="${x}" cy="${y}" rx="5" ry="7" fill="${col}"/>` + C(x, y, 2.4, P.moon);
+const lanternLine = (x1, x2, y, n = 5) => `<path d="M${x1} ${y} Q${(x1 + x2) / 2} ${y + 16} ${x2} ${y}" fill="none" stroke="${P.wood}" stroke-width="1.2"/>` + Array.from({ length: n }, (_, i) => { const t = (i + .5) / n; return lantern(+(x1 + (x2 - x1) * t).toFixed(1), +(y + 16 * t * (1 - t) + 10).toFixed(1), [P.red, P.gold, P.pink][i % 3]); }).join('');
+const stall = (x, y, col = P.plum) => R(x - 22, y - 30, 44, 8, col, 3) + `<path d="M${x - 22} ${y - 22} h44 l-4 7 h-36z" fill="${P.lav}"/>` + R(x - 18, y - 14, 36, 14, P.wood, 2);
+const house = (x, y, col = P.red, lit = false) => `<path d="M${x - 16} ${y} v-16 l16 -12 l16 12 v16z" fill="${P.soft}" stroke="${P.line}"/><path d="M${x - 19} ${y - 15} l19 -15 l19 15" fill="none" stroke="${col}" stroke-width="4"/>` + R(x - 4, y - 10, 8, 10, P.wood, 2) + R(x + 6, y - 13, 6, 5, lit ? P.gold : P.mist, 1);
+const tent = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-26 0 L0 -36 L26 0z" fill="${P.plum}"/><path d="M-6 0 L0 -36 L6 0z" fill="${P.lav}"/><path d="M0 -36 v-6" stroke="${P.gold}" stroke-width="2"/>${star(0, -44, 3, P.gold)}</g>`;
+const card = (x, y, w = 22, h = 34, face = P.lav, sym = '') => R(x, y, w, h, P.white, 3, ` stroke="${P.plum}" stroke-width="1.5"`) + R(x + 3, y + 3, w - 6, h - 6, face, 2) + (sym ? T(x + w / 2, y + h / 2 + 4, sym, { size: 11, anchor: 'middle', fill: P.white }) : star(x + w / 2, y + h / 2, 4, P.white));
+const mist = (x, y, w) => `<path d="M${x} ${y} q${w / 4} -8 ${w / 2} 0 t${w / 2} 0" fill="none" stroke="${P.mist}" stroke-width="5" stroke-linecap="round" opacity=".85"/>`;
+const firework = (x, y, r, col) => Array.from({ length: 10 }, (_, i) => { const a = i * Math.PI / 5; return `<path d="M${(x + Math.cos(a) * r * .35).toFixed(1)} ${(y + Math.sin(a) * r * .35).toFixed(1)} L${(x + Math.cos(a) * r).toFixed(1)} ${(y + Math.sin(a) * r).toFixed(1)}" stroke="${col}" stroke-width="2.2" stroke-linecap="round"/>`; }).join('');
+const zz = (x, y) => T(x, y, 'z', { size: 9, fill: P.plum }) + T(x + 6, y - 6, 'z', { size: 11, fill: P.plum }) + T(x + 14, y - 13, 'Z', { size: 13, fill: P.plum });
+
+/* ---------- 지금 섬의 밤 ---------- */
+const AUDIT = [
+  ['밤하늘', '별 · 달 · 은하수(SK-08) · 집 창 불빛 · 가로등', '✅', '— (그대로 씀)'],
+  ['밤 채집', '밤에만 나오는 곤충 11종 (반딧불 · 나방 …) · 밤 물고기', '✅', 'D107 · D109 (밤 곤충 값)'],
+  ['상점', '도토리상점 8–22시, 밤엔 문 닫음 (첫날 밤만 문 너머로 팔기)', '△', 'D109'],
+  ['박물관', '언제나 열림', '✅', '—'],
+  ['주민', '9명 모두 20:30–23:30 에 잠. 달무리(부엉이 CH-13)만 12시–새벽 4시 — 엔딩 뒤 이사 와야 만나요', '△', 'D108'],
+  ['주민 집', '집에 있으면 들어감 · 외출이면 잠김 · 자면 노크만. 밤에만 여는 집은 없음', '❌', 'D110'],
+  ['밤 행사', '불꽃놀이(8월 20–22시) · 섬 축제 저녁 모닥불 · 수확 잔치(18시 잔치)', '✅', 'D113'],
+  ['새벽', '3–5시에 할 것 없음. 5시에 하루가 바뀜', '❌', 'D111 · D112'],
+  ['시각 옮기기', '실제 시계 그대로 — 섬폰 「🕰 시계」 바늘로 옮기기를 다른 세션에서 만드는 중', '△', '밤 콘텐츠가 모두 따라옴'],
+];
+$('auditTable').tBodies[0].innerHTML = AUDIT.map(([a, b, c, d]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="st">${c}</td><td class="small">${d}</td></tr>`).join('');
+
+/* ---------- 하루 시간표 (게임 하루 시각 5–29) ---------- */
+const DAY = [
+  ['도토리상점', [[8, 22, '#3F8F5C', '8–22시']]],
+  ['야시장 (토)', [[19, 24, '#A8642E', '토요일 19–24시']]],
+  ['달빛 가게', [[22, 27, '#4F5F94', '22–3시']]],
+  ['새벽 천막', [[27, 29, '#7A6A9A', '3–5시 · 타로']]],
+  ['달무리', [[19, 29, '#5F7268', '19–5시 깨어 · 집 문 20–5시']]],
+  ['낮 주민', [[7, 22, '#7E9C82', '대개 7–22시']]],
+  ['불꽃놀이', [[20, 22, '#C9583B', '8월 · 그날 야시장 쉼']]],
+];
+const pct = h => (h - 5) / 24 * 100;
+$('dayChart').innerHTML = DAY.map(([name, segs]) => `<div class="row"><span>${name}</span><div class="bar night">${segs.map(([a, b, col, label]) =>
+  `<span class="seg" style="left:${pct(a).toFixed(2)}%;width:${(pct(b) - pct(a)).toFixed(2)}%;background:${col}" title="${esc(label)}">${esc(label)}</span>`).join('')}</div></div>`).join('')
+  + `<div class="ticks"><span></span><div><span>5시</span><span>11</span><span>17</span><span>23</span><span>5시</span></div></div>`;
+
+/* ---------- 결정 스케치 ---------- */
+function sketch(id) {
+  let b = '';
+  if (id === 'D106') {   // 야시장 언제·어디
+    b += nightBox(8, 10, 98, 100) + stars(12, 14, 90, 20, 5, 1) + lanternLine(16, 98, 34, 4) + stall(38, 102, P.plum) + stall(78, 102, P.red) + T(57, 124, 'A 토요일 밤 광장', { size: 9, anchor: 'middle' });
+    b += nightBox(112, 10, 98, 100) + stars(116, 14, 90, 30, 5, 2) + R(112, 92, 98, 18, P.sea, 0) + R(112, 82, 98, 10, P.sand, 0) + stall(160, 90, P.sea) + T(161, 124, 'B 매일 밤 해변 노점', { size: 9, anchor: 'middle' });
+    b += nightBox(216, 10, 96, 100) + C(264, 32, 14, P.moon) + lanternLine(220, 308, 50, 5) + stall(242, 104, P.plum) + stall(286, 104, P.red) + T(264, 124, 'C 보름달 밤만 크게', { size: 9, anchor: 'middle' });
+  } else if (id === 'D107') {   // 야시장 무엇
+    b += nightBox(8, 10, 304, 100) + lanternLine(14, 306, 16, 9);
+    b += stall(60, 96, P.red) + `<path d="M48 72 q12 -10 24 0z" fill="${P.gold}"/>` + T(60, 122, 'A 먹거리', { size: 9, anchor: 'middle' });
+    b += stall(130, 96, P.plum) + lantern(122, 66, P.gold) + star(140, 64, 5) + T(130, 122, 'A 밤 가구', { size: 9, anchor: 'middle' });
+    b += stall(200, 96, P.sea) + C(192, 64, 5, 'none', ` stroke="${P.gold}" stroke-width="2"`) + C(206, 64, 5, 'none', ` stroke="${P.pink}" stroke-width="2"`) + T(200, 122, 'A 고리 던지기', { size: 9, anchor: 'middle' });
+    b += T(270, 66, 'B 벼룩시장', { size: 9, anchor: 'middle', fill: P.white }) + T(270, 84, 'C 먹거리만', { size: 9, anchor: 'middle', fill: P.white });
+  } else if (id === 'D108') {   // 야행성 주민
+    b += nightBox(8, 10, 150, 100) + moon(36, 32, 10) + villager(70, 96, P.plum, 1.6) + villager(104, 96, '#E8C25A', 1.2) + villager(130, 96, '#E7D2B8', 1.2) + T(83, 124, 'A 달무리 + 야시장 날 둘', { size: 9, anchor: 'middle' });
+    b += nightBox(164, 10, 72, 100) + villager(200, 96, '#6D7DB4', 1.6) + `<path d="M188 70 q-12 -8 -16 2 q8 -2 10 6z M212 70 q12 -8 16 2 q-8 -2 -10 6z" fill="#6D7DB4"/>` + T(200, 124, 'B 새 주민 하나', { size: 9, anchor: 'middle' });
+    b += nightBox(242, 10, 70, 100) + villager(277, 96, P.plum, 1.6) + T(277, 124, 'C 달무리만', { size: 9, anchor: 'middle' });
+  } else if (id === 'D109') {   // 밤 상점
+    b += nightBox(8, 10, 98, 100) + stars(12, 14, 90, 22, 5, 4) + house(57, 98, '#6D7DB4', true) + moon(57, 52, 7) + T(57, 124, 'A 새 건물 달빛 가게', { size: 9, anchor: 'middle' });
+    b += nightBox(112, 10, 98, 100) + house(161, 98, P.bar, true) + lantern(188, 76, P.gold) + T(161, 124, 'B 도토리상점 밤 모드', { size: 9, anchor: 'middle' });
+    b += nightBox(216, 10, 96, 100) + R(216, 88, 96, 22, P.sea, 0) + `<path d="M238 88 h52 l-8 12 h-36z" fill="${P.wood}"/><path d="M264 88 v-34 l20 26z" fill="${P.lav}"/>` + lantern(250, 76, P.gold) + T(264, 124, 'C 해변 배 가게', { size: 9, anchor: 'middle' });
+  } else if (id === 'D110') {   // 밤에만 여는 집
+    b += R(8, 10, 150, 100, '#CFE6F5', 10) + C(30, 28, 9, P.gold) + house(82, 98, P.plum) + R(68, 74, 24, 12, P.white, 2) + T(80, 83, '자는 중', { size: 6, anchor: 'middle' }) + zz(102, 66) + T(83, 124, 'A 낮: 쪽지 · 노크만', { size: 9, anchor: 'middle' });
+    b += nightBox(164, 10, 148, 100) + stars(168, 14, 140, 30, 6, 5) + house(232, 98, P.plum, true) + R(228, 88, 8, 10, P.gold, 2) + villager(262, 98, P.plum, 1) + T(238, 124, 'A 밤: 문 열림 · 별빛 방', { size: 9, anchor: 'middle' });
+  } else if (id === 'D111') {   // 새벽 마술 상점
+    b += R(8, 10, 150, 100, '#4A5A86', 10) + R(8, 76, 150, 34, '#6F7FA6', 0) + tent(70, 98, 1.2) + mist(14, 104, 70) + mist(90, 100, 60) + star(130, 26, 4) + T(83, 124, 'A 동쪽 숲 끝 안개 천막', { size: 9, anchor: 'middle' });
+    b += nightBox(164, 10, 72, 100) + house(200, 98, '#6D7DB4', true) + tent(200, 62, .5) + T(200, 124, 'B 가게가 바꿔 염', { size: 9, anchor: 'middle' });
+    b += nightBox(242, 10, 70, 100) + [[256, 34], [294, 46], [268, 92], [298, 84]].map(([x, y], i) => i === 2 ? tent(x, y, .45) : C(x, y, 4, P.line)).join('') + T(277, 124, 'C 다른 자리', { size: 9, anchor: 'middle' });
+  } else if (id === 'D112') {   // 타로 효과
+    b += R(8, 10, 98, 100, P.pane, 10) + card(22, 28, 26, 40) + card(58, 24, 26, 40, P.gold, '☀') + T(57, 92, '좋은 일 하나', { size: 9, anchor: 'middle' }) + T(57, 124, 'A 하루 좋은 효과', { size: 9, anchor: 'middle' });
+    b += R(112, 10, 98, 100, P.soft, 10) + card(126, 24, 26, 40, P.gold, '☀') + `<g transform="rotate(180 173 44)">${card(160, 24, 26, 40, P.plum, '☀')}</g>` + T(161, 92, '정 · 역방향', { size: 9, anchor: 'middle' }) + T(161, 124, 'B 좋고 나쁨 둘 다', { size: 9, anchor: 'middle' });
+    b += R(216, 10, 96, 100, P.soft, 10) + [0, 1, 2, 3].map(i => card(226 + i * 20, 30, 18, 28)).join('') + T(264, 84, '카드 모음만', { size: 9, anchor: 'middle' }) + T(264, 124, 'C 효과 없음', { size: 9, anchor: 'middle' });
+  } else if (id === 'D113') {   // 행사와 겹칠 때
+    b += nightBox(8, 10, 150, 100) + firework(50, 40, 18, P.red) + firework(100, 34, 14, P.gold) + stall(122, 100, P.line) + T(122, 84, '쉼', { size: 10, anchor: 'middle', fill: P.white }) + T(83, 124, 'A 행사 날 야시장 쉼', { size: 9, anchor: 'middle' });
+    b += nightBox(164, 10, 72, 100) + firework(200, 36, 14, P.gold) + stall(200, 100, P.red) + T(200, 124, 'B 같이 열기', { size: 9, anchor: 'middle' });
+    b += nightBox(242, 10, 70, 100) + firework(277, 36, 14, P.pink) + T(277, 80, '밤 가게 모두 쉼', { size: 8, anchor: 'middle', fill: P.white }) + T(277, 124, 'C 모두 쉼', { size: 9, anchor: 'middle' });
+  } else if (id === 'D114') {   // 언제부터
+    const step = (x, label, on) => R(x, 40, 66, 40, on ? P.bar : P.pane, 8) + T(x + 33, 64, label, { size: 9, anchor: 'middle', fill: on ? P.white : INK });
+    b += step(12, '첫날', false) + step(88, '둘째 날', true) + step(164, '… 축제', true) + step(240, '엔딩 뒤', true) + T(160, 26, 'A 둘째 날부터 (첫날 안내 뒤)', { size: 10, anchor: 'middle' }) + T(160, 104, 'B 엔딩 뒤부터 · C 단계마다 하나씩', { size: 9, anchor: 'middle' });
+  }
+  return sketchFrame(b, id);
+}
+
+/* ---------- 결정 ---------- */
+const DECISIONS = [
+  { id: 'D106', q: '야시장은 언제 · 어디서 열까요?', now: '야시장 없음 · 광장엔 축제 부스 자리(FB-01–05)가 있어요', opts: [
+    ['A', '매주 토요일 밤 19–24시 · 광장', '한 주에 한 번 기다리는 맛이 있어요. 축제 부스 자리와 부스 틀(FB)을 다시 써서 노점 셋을 세우고 등불 줄을 걸어요. 토요일 아침에 섬폰 알림.', true],
+    ['B', '매일 밤 20–24시 · 해변 노점 하나', '언제든 갈 수 있지만 작아요 (노점 하나, 물건 셋).'],
+    ['C', '보름달 밤에만 · 크게', '달 모양(한 달 한 번)에 맞춰 노점 다섯. 드물어서 특별하지만 한 달을 기다려요.'] ] },
+  { id: 'D107', q: '야시장에서 무엇을 하나요?', now: '—', opts: [
+    ['A', '먹거리 · 밤 가구 · 놀이 한 칸', '노점 셋: 밤 먹거리 넷(IC-NT-01–04, 선물 · 도감) · 등불 · 야광 가구(FU-55–58) · 고리 던지기(도토리 내고 상품). 주민 둘이 돌아가며 노점을 봐요.', true],
+    ['B', '벼룩시장', '주민이 내 물건을 사 가고, 주민도 자기 물건을 내놔요. 새 모델은 적지만 값 정하기가 많아요.'],
+    ['C', '먹거리만', '노점 하나 · 먹거리 넷. 가장 가벼워요.'] ] },
+  { id: 'D108', q: '밤에 깨어 있는 주민은 누구로 할까요?', now: '달무리(부엉이 CH-13)가 이미 밤 주민 — 12시–새벽 4시 깨어 있고, 엔딩 뒤 이사 와요', opts: [
+    ['A', '달무리를 진짜 야행성으로 + 야시장 날엔 둘 더', '달무리는 19시–5시 깨어 있고 낮엔 집에서 자요. 야시장 날(토)엔 늘 늦게 자던 퐁 · 코코가 자정까지 노점 둘레에 있어요. 새 모델 없음.', true],
+    ['B', '새 야행성 주민 하나 더 (CH-16)', '박쥐 같은 새 주민을 하나 더 만들어 처음부터 섬에 살아요. 모델 · 성격 · 집터가 하나씩 더 들고, 섬 주민 수 한도(11차 D103)와 엮여요.'],
+    ['C', '달무리만 (지금 시간표 그대로)', '바꾸는 것 없음. 엔딩 전엔 밤에 만날 주민이 없어요.'] ] },
+  { id: 'D109', q: '밤에만 들어갈 수 있는 특별한 상점은?', now: '도토리상점은 22시에 닫아요', opts: [
+    ['A', '새 건물 「달빛 가게」 · 22–3시', '광장 동쪽 언덕에 작은 남색 가게(BD-08), 주인은 새 캐릭터 박쥐 「별밤」(CH-14, 가게 주인이라 주민 수에 안 셈). 밤 가구 · 야광 소품 · 별 망원경(FU-53) · 밤 곤충 미끼를 팔고, 밤 곤충은 값을 더 쳐 줘요.', true],
+    ['B', '도토리상점 밤 모드', '같은 건물이 22–2시에 등불 간판으로 바뀌고 밤 물건만 팔아요. 주인 밤톨의 잠옷 차림 대사. 새 건물 · 새 주인 없음.'],
+    ['C', '해변 배 가게', '밤에만 해변에 와서 묶이는 작은 배 가게. 배 모델 · 바다 쪽 자리가 새로 필요해요.'] ] },
+  { id: 'D110', q: '밤에만 문을 여는 주민 집의 규칙은?', now: '자면 노크만, 외출이면 잠김 — 밤에만 여는 집 없음', opts: [
+    ['A', '야행성 주민 집은 20–5시에만 열림', '낮엔 문에 「자는 중 zZ」 쪽지(PR-32), 노크하면 졸린 대사. 밤엔 불이 켜지고 들어가면 차 한 잔 · 창밖 별 이야기. 밤에 처음 놀러 가면 그 주민 마음 +.', true],
+    ['B', 'A + 밤 방문 선물', 'A 에 더해 밤에 놀러 갈 때마다(하루 한 번) 작은 선물을 줘요. 선물이 쌓여서 밸런스를 봐야 해요.'],
+    ['C', '집은 불만 켜기', '밤에 창만 밝고 들어갈 수는 없어요. 가장 가벼워요.'] ] },
+  { id: 'D111', q: '새벽 마술 상점은 언제 · 어디에 나타날까요?', now: '새벽 3–5시에 할 것 없음 · 실제 시계라 새벽에 깨어 있기 어려워요 → 섬폰 시계 바늘로 옮겨 가요 (만드는 중)', opts: [
+    ['A', '3–5시 · 동쪽 숲 끝 안개 속 천막', '달빛 가게가 닫는 3시에 숲 끝에 안개가 끼고 보라 천막(BD-09)이 나타나요. 5시에 걷혀요. 주인은 새 캐릭터 나방 「여명」(CH-15). 타로 하루 한 장 + 마술 소품 몇 가지(수정 구슬 FU-59).', true],
+    ['B', '3–5시 · 달빛 가게가 바꿔 염', '건물 하나로 3시부터 주인이 바뀌어 타로를 봐요. 새 건물 없음, 대신 「나타난다」는 느낌은 약해요.'],
+    ['C', '날마다 다른 자리', '섬 다섯 곳 중 하루 한 곳에 천막이 나타나 찾아다녀요. 찾는 재미가 있지만 못 찾고 지나가는 날도 있어요.'] ] },
+  { id: 'D112', q: '타로 카드 하루 운세는 게임에 무엇을 주나요?', now: '—', opts: [
+    ['A', '하루 동안 작은 좋은 일 하나', '카드 12장(TA-01–12) 중 하루 한 장, 다음 5시부터 하루 동안: 큰 물고기 그림자 늘기 · 나무 흔들면 곤충 · 화석 하나 더 · 팔 때 +10% · 주민 한 명 마음 + 등. 나쁜 카드는 없어요. 섬폰 위 작은 카드로 오늘 운세 보기.', true],
+    ['B', '정 · 역방향 (좋고 나쁨 둘 다)', '거꾸로 나오면 살짝 손해(예: 물고기 덜), 대신 바로 나오면 효과가 커요. 진짜 점 같은 긴장이 있어요.'],
+    ['C', '효과 없음 · 이야기와 모음만', '운세 글과 카드 모음(도감)만. 게임 숫자는 안 바뀌어요.'] ] },
+  { id: 'D113', q: '밤 행사와 겹칠 때는?', now: '불꽃놀이 8월 20–22시 · 섬 축제 저녁(17시~) · 수확 잔치 18시 · 꽃놀이 · 눈사람 날은 낮', opts: [
+    ['A', '행사 우선 — 그날 야시장만 쉼', '행사 날 저녁엔 야시장이 열리지 않고 노점 자리를 행사가 써요. 달빛 가게 · 새벽 천막은 늦은 시간이라 그대로 열어요. 행사 주인공 주민도 그대로.', true],
+    ['B', '같이 열기', '불꽃놀이 날엔 야시장이 행사 자리 옆에 더 크게 열려요. 자리 · 주민 동선이 겹쳐서 손이 더 가요.'],
+    ['C', '행사 날엔 밤 콘텐츠 모두 쉼', '가장 단순해요. 그날 밤 가게 · 천막도 안 열려요.'] ] },
+  { id: 'D114', q: '밤 콘텐츠는 언제부터 열리나요?', now: '계절 행사 · 이사는 첫 섬 축제(엔딩) 뒤부터', opts: [
+    ['A', '둘째 날부터', '첫날 안내가 끝난 다음 날부터 모두 열려요 (달무리만 지금처럼 엔딩 뒤 이사). 밤에 하는 일이 처음부터 생겨요.', true],
+    ['B', '엔딩 뒤부터', '계절 행사처럼 첫 섬 축제가 끝난 뒤에 한꺼번에 열려요.'],
+    ['C', '단계마다 하나씩', '달빛 가게 둘째 날 · 야시장 주민 다섯과 친해진 뒤 · 새벽 천막 엔딩 뒤. 길잡이가 되지만 규칙이 늘어요.'] ] },
+];
+const decCard = d => `
+  <div class="card dec" id="dec-${d.id}"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="decbody"><div class="stage">${sketch(d.id)}</div>
+      <div class="decside"><p class="nowline">지금: <b>${d.now}</b></p>
+        <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+          <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+            <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div></div></div>
+    ${noteBox(d.id, d.q)}</div>`;
+$('decisions').innerHTML = DECISIONS.map(decCard).join('');
+
+/* ---------- 새 리소스 (추천안 기준) ---------- */
+const icon = (body, bg = P.frame, h = 110) => `<svg viewBox="0 0 200 ${h}" role="img"><rect width="200" height="${h}" rx="10" fill="${bg}" stroke="${P.line}"/>${body}</svg>`;
+const NB = P.night;
+const RES = [
+  ['BD-08', '달빛 가게', '건물 (D109-A)', true, '광장 동쪽 언덕의 작은 남색 가게. 지붕에 초승달 간판, 밤엔 창이 노랗게 (재질 window · glow). 낮엔 덧문을 닫아요.', () => stars(10, 10, 180, 30, 6, 2) + house(100, 100, '#6D7DB4', true) + moon(100, 52, 9), NB],
+  ['CH-14', '별밤 (박쥐)', '가게 주인 (D109-A)', true, '달빛 가게 주인. 말끝 「…찍」, 낮엔 거꾸로 매달려 자는 수줍은 박쥐. 가게 주인이라 주민 수에 안 세요.', () => `<path d="M86 66 q-26 -18 -36 4 q18 -4 24 14z M114 66 q26 -18 36 4 q-18 -4 -24 14z" fill="#6D7DB4"/>` + villager(100, 100, '#6D7DB4', 2.6) + C(94, 62, 2, P.gold) + C(106, 62, 2, P.gold), NB],
+  ['RM-10', '달빛 가게 실내', '방 배치 (places)', true, '작은 방 하나: 계산대 · 밤 가구 진열 · 천장에 별 모빌. 도토리상점과 같은 방식 (places.js + places/moonshop.json).', () => R(30, 18, 140, 78, '#3A4670', 6) + stars(36, 22, 128, 26, 6, 7) + R(60, 70, 80, 14, P.wood, 3) + lantern(150, 56, P.gold)],
+  ['BD-09', '새벽 천막', '건물 (D111-A)', true, '보라 천 천막 + 꼭대기 별. 3시에 안개와 함께 나타나고 5시에 걷혀요 (투명하게 사라지기).', () => R(0, 70, 200, 40, '#6F7FA6', 0) + tent(100, 96, 1.5) + mist(20, 102, 70) + mist(110, 98, 70), '#4A5A86'],
+  ['CH-15', '여명 (나방)', '가게 주인 (D111-A)', true, '새벽 천막의 마술사. 큰 더듬이 · 가루 날리는 날개, 말끝 「…스르륵」. 카드를 섞는 동작 하나.', () => `<path d="M100 74 q-40 -40 -56 -6 q20 4 56 16z M100 74 q40 -40 56 -6 q-20 4 -56 16z" fill="${P.lav}"/>` + villager(100, 100, '#E7D2B8', 2.4) + `<path d="M94 52 q-8 -14 -16 -16 M106 52 q8 -14 16 -16" stroke="${INK}" stroke-width="2" fill="none"/>`],
+  ['RM-11', '천막 실내', '방 배치 (places)', true, '둥근 천막 안: 낮은 탁자 · 수정 구슬 · 카드 셋. 들어가면 바로 「카드 뽑기」.', () => `<path d="M30 100 L100 16 L170 100z" fill="${P.plum}"/>` + R(66, 76, 68, 10, P.wood, 3) + C(100, 66, 8, P.lav) + card(74, 80, 12, 18) + card(94, 80, 12, 18) + card(114, 80, 12, 18)],
+  ['PR-30', '종이 등불 줄', '소품 (야시장)', true, '노점 사이에 거는 등불 줄. 빨강 · 노랑 · 분홍, 밤엔 빛나요 (glow).', () => lanternLine(12, 188, 30, 7), NB],
+  ['PR-31', '야시장 노점 덮개', '소품 (FB 다시 씀)', false, '축제 부스(FB-01–05) 틀에 남색 · 보라 천 지붕만 바꿔 끼워요.', () => stall(64, 90, P.plum) + stall(136, 90, P.red), NB],
+  ['PR-32', '「자는 중」 쪽지', '소품 (D110-A)', true, '야행성 주민 집 문에 낮 동안 걸려요. zZ 그림.', () => R(62, 26, 76, 52, P.white, 4, ` stroke="${P.line}"`) + T(100, 50, '자는 중', { size: 13, anchor: 'middle' }) + zz(88, 70)],
+  ['FU-55–58', '밤 가구 넷', '가구 (달빛 가게 · 야시장)', true, '야광 별 등 · 초승달 램프 · 반딧불 병 · 별자리 깔개. 집에 두면 밤에 빛나요.', () => star(36, 56, 16, P.gold) + moon(84, 56, 14) + R(116, 40, 24, 34, P.mist, 6) + C(124, 52, 2, P.gold) + C(132, 62, 2, P.gold) + R(150, 66, 40, 14, '#6D7DB4', 3) + star(170, 73, 3), NB],
+  ['FU-59', '수정 구슬', '가구 (새벽 천막)', true, '받침 위 보랏빛 구슬, 안에 별이 천천히 돌아요 (glow).', () => C(100, 50, 26, P.lav) + star(94, 46, 5, P.white) + R(80, 78, 40, 12, P.wood, 3)],
+  ['IC-NT-01–04', '밤 먹거리 넷', '아이템 (새 분류 NT)', true, '붕어빵 · 달떡 · 따뜻한 코코아 · 별사탕. 선물하면 주민이 좋아하고 도감에 남아요.', () => `<ellipse cx="42" cy="56" rx="22" ry="12" fill="${P.gold}"/>` + C(90, 56, 14, P.white, ` stroke="${P.line}"`) + R(122, 42, 22, 28, P.wood, 4) + star(168, 56, 12, P.pink)],
+  ['UI-20', '카드 뽑기 창', '화면 (D112-A)', true, '엎어 둔 카드 셋 중 하나를 누르면 뒤집혀요 → 카드 이름 · 오늘 운세 글 · 효과 한 줄 → 「받기」.', () => R(30, 12, 140, 88, P.white, 8, ` stroke="${P.line}"`) + card(50, 22, 26, 40) + card(87, 22, 26, 40, P.gold, '☀') + card(124, 22, 26, 40) + btn(70, 70, 60, '받기')],
+  ['UI-21', '오늘 운세 칸', '화면', true, '섬폰 위 · 오른쪽 아래 작은 카드. 누르면 오늘 효과와 남은 시간. 다음 5시에 사라져요.', () => R(70, 20, 60, 70, P.white, 8, ` stroke="${P.line}"`) + card(87, 28, 26, 40, P.gold, '☀') + T(100, 82, '오늘', { size: 9, anchor: 'middle' })],
+  ['CH-13', '달무리 시간표', '주민 (다시 씀, D108-A)', false, '깨는 때 12 → 19시, 자는 때 4 → 5시. 낮엔 집에서 자요. 낮 대사는 잠꼬대로.', () => moon(56, 46, 16) + villager(124, 100, P.plum, 2.4), NB],
+  ['s20 · s21', '첫 만남 장면 둘', '장면 (시나리오 편집기)', true, 's20 달빛 가게 첫 방문 (별밤) · s21 안개 천막 첫 방문 (여명, 카드 섞기). 연출안 둘씩.', () => R(20, 20, 72, 60, NB, 4) + house(56, 72, '#6D7DB4', true) + R(108, 20, 72, 60, '#4A5A86', 4) + tent(144, 72, .8)],
+];
+$('resCards').innerHTML = RES.map(([id, name, kind, isNew, desc, art, bg]) => `
+  <div class="card" id="res-${id}"><div class="head"><span class="id">${id}</span><h3>${name}</h3>${isNew ? '<span class="tag new">새</span>' : '<span class="tag">다시 씀</span>'}</div>
+    <div class="stage">${icon(art(), bg)}</div>
+    <p class="small"><span class="tag">${kind}</span></p>
+    <p class="small muted">${desc}</p>${noteBox(id, name)}</div>`).join('');
+
+/* ---------- 타로 카드 12장 ---------- */
+const TAROT = [
+  ['TA-01', '해님', '☀', '#D9822B', '팔 때 값 +10%'],
+  ['TA-02', '달님', '☾', '#4F5F94', '밤 곤충 더 자주'],
+  ['TA-03', '별', '✦', '#7A6A9A', '망원경 소원 하나 더'],
+  ['TA-04', '바다', '≈', '#2F86A6', '큰 물고기 그림자 늘기'],
+  ['TA-05', '숲', '♣', '#3F8F5C', '나무 흔들면 곤충 · 과일 하나 더'],
+  ['TA-06', '바람', '~', '#6F8DB0', '걷기 조금 빠르게'],
+  ['TA-07', '도토리', '●', '#A8642E', '아침에 도토리 주머니 하나'],
+  ['TA-08', '돌', '◆', '#7A7068', '바위 두드리면 광석 하나 더'],
+  ['TA-09', '나비', '❀', '#C76A90', '꽃이 하나씩 더 피어남'],
+  ['TA-10', '화석', '⌇', '#9C7346', '화석 자리 하나 더'],
+  ['TA-11', '친구', '♥', '#C9583B', '주민 한 명 마음 +'],
+  ['TA-12', '집', '⌂', '#5F7268', '가구 살 때 −10%'],
+];
+const tarotArt = (sym, col, n) => `<svg viewBox="0 0 120 170" role="img" aria-hidden="true"><rect x="2" y="2" width="116" height="166" rx="10" fill="#FBF7F2" stroke="${P.plum}" stroke-width="3"/><rect x="12" y="12" width="96" height="146" rx="6" fill="${col}"/>${stars(18, 20, 84, 36, 5, n)}<text x="60" y="108" font-size="46" text-anchor="middle" fill="#FBF7F2">${esc(sym)}</text><rect x="24" y="130" width="72" height="3" rx="1.5" fill="#FBF7F2" opacity=".6"/></svg>`;
+$('tarotCards').innerHTML = TAROT.map(([id, name, sym, col, eff], i) => `
+  <div class="tcard" id="res-${id}">${tarotArt(sym, col, i + 1)}<div><span class="id">${id}</span> <b>${name}</b></div><p class="small muted">${eff}</p>${noteBox(id, name + ' 카드')}</div>`).join('');
+
+/* ---------- 계획 ---------- */
+const PLAN = [
+  ['M12-P0', '밤·새벽 검수 보드 (<b>이 보드</b>) → 사용자 선택 → "검수 보드 반영"', '<code>concept/night-board.html</code>', '—'],
+  ['M12-P1', '밤 틀 — 밤 · 새벽 때 (게임 시각 서비스에서 읽기), 야시장 날 · 행사 겹침 계산(순수 함수), 설정 파일 하나, 저장 <code>state.night</code>, 약속 「밤」', '<code>src/gameplay/night/</code> (새) · <code>assets/night/night.json</code> (새) · <code>docs/CONTRACTS.md</code>', '반영'],
+  ['M12-P2', '리소스 — BD-08·09 · CH-14·15 · PR-30·32 · FU-55–59 · IC-NT-01–04 (Blender 스크립트, 검수 대기) · 카드 그림 TA-01–12', '<code>assets/env/specs</code> · <code>assets/specs</code> · <code>assets/furniture/specs</code> · <code>assets/items/specs</code> · <code>tools/build-*.mjs</code>', '반영'],
+  ['M12-P3', '달빛 가게 · 새벽 천막 — 문 · 실내 · 가게 주인 · 파는 것', '<code>src/gameplay/house/places.js</code> · <code>assets/interior/places/</code> · <code>src/gameplay/night/</code>', 'P1 (모델 없이 틀 먼저)'],
+  ['M12-P4', '야시장 · 야행성 주민 · 밤에만 여는 집', '<code>src/gameplay/night/market.js</code> · <code>assets/villagers/</code> (시간표) · 집 문 규칙', 'P1'],
+  ['M12-P5', '타로 — 카드 뽑기 창 · 오늘 운세 칸 · 하루 효과', '<code>src/gameplay/night/tarot.js</code> · <code>assets/night/night.json</code>', 'P1'],
+  ['M12-P6', 'QA — 자동 플레이에 밤 단계 · 행사 점검 · 테스트 → 합치기 승인 → 게임 · 편집기 다시 게시', '<code>tests/</code> · <code>tests/playthrough/</code> · <code>tools/check-events.mjs</code>', 'P1–P5'],
+];
+$('planRows').innerHTML = PLAN.map(([id, what, files, need]) => `<tr><td class="id">${id}</td><td>${what}</td><td class="small">${files}</td><td class="small">${need}</td></tr>`).join('');
+
+/* ---------- 사용자 몫 ---------- */
+const YOU = [
+  ['고르기', '이 보드 결정 9개', '추천안이 골라져 있어요. 바꿀 것만 바꾸고 채팅에 "검수 보드 반영"'],
+  ['검수', '새 모델 보기 (반영 뒤)', '캐릭터 편집기: 별밤 · 여명 / 배경 편집기: 달빛 가게 · 천막 · 등불 · 밤 가구 · 먹거리 / 시나리오 편집기: s20 · s21. 고칠 게 있으면 요청, 없으면 "확정"'],
+  ['🕰', '밤에 해 보기', '게임에서 섬폰 「🕰 시계」 바늘(만드는 중)로 밤 · 새벽으로 옮겨 가 보기. 토요일은 게임 링크 끝 <code>#date=2026-11-14</code> 처럼 날짜 흉내'],
+  ['11차', '11차 보드(옷) 선택', '그 보드와 따로 고르면 돼요. 결정 번호도 겹치지 않아요 (11차 D100–D105 · 이 보드 D106–D114)'],
+];
+$('youTable').tBodies[0].innerHTML = YOU.map(([a, b, c]) => `<tr><td class="id">${a}</td><td>${b}</td><td class="small">${c}</td></tr>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+const newCount = RES.filter(r => r[3]).length;
+$('pills').innerHTML = ['<span class="pill wait">사용자 선택 대기</span>', `결정 ${DECISIONS.length} (D106–D114)`, `리소스 ${RES.length} (새 ${newCount}) + 카드 ${TAROT.length}`, `트랙 ${PLAN.length} (M12-P0–P6)`]
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'night', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 밤·새벽 검수 보드 v0.1 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 나머지는 그대로 승인)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>
