@@ -10,7 +10,7 @@ export const SHOP_FURNITURE_PER_DAY = RULES.shop.furniturePerDay;
 export const SHOP_OUTDOOR_PER_DAY = RULES.shop.outdoorPerDay ?? 0;   // 10차 D99-A: 하루 가구 중 야외 가구 몫 (실내 셋 + 야외 하나)
 export const SHOP_FLOWER_SEEDS_PER_DAY = RULES.shop.flowerSeedsPerDay;
 
-const FRUIT_TREES = items.list('fruit').filter(f => f.variant).map(f => f.id);
+const FRUIT_TREES = items.list('fruit').filter(f => f.variant && !f.islet).map(f => f.id);   // 무인도 과일(P35)은 섬 특산이 되지 않는다
 /** 섬 특산 과일: 섬 시드로 정해진다. 특산 과일은 싸게(nativePrice 100), 나머지는 비싸게(500) 팔린다 */
 export const nativeFruit = seed => FRUIT_TREES[Math.floor(rngFor(seed, 'native-fruit')() * FRUIT_TREES.length)];
 

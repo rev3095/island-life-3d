@@ -65,9 +65,9 @@ export const ITEMS = [
   { id: UNKNOWN_FOSSIL, category: 'fossil', code: 'FO-00', name: T.unknownFossil.name, icon: itemIcon('fossil-unknown'), emoji: T.unknownFossil.emoji, price: T.unknownFossil.price, unknown: true,
     desc: T.unknownFossil.desc },
   // 과일 (MA-01, MA-02): 섬 특산 과일(economy.nativeFruit)은 nativePrice 로 팔린다. variant = 배경 fruit-tree 변형 이름
-  ...T.fruits.map(({ slug, name, emoji, price, nativePrice, variant }) => ({
+  ...T.fruits.map(({ slug, name, emoji, price, nativePrice, variant, islet }) => ({
     id: `fruit.${slug}`, category: 'fruit', code: slug === 'coconut' ? 'MA-02' : 'MA-01', name, icon: itemIcon(`fruit-${slug}`), emoji, price,
-    nativePrice: nativePrice ?? price, variant, tree: variant ? 'fruit-tree' : 'palm',
+    nativePrice: nativePrice ?? price, variant, tree: variant ? 'fruit-tree' : 'palm', ...(islet ? { islet: true } : {}),   // islet = 무인도 투어 섬에만 (P35)
   })),
   // 조개 (MA-07): weight = 해변 출현 가중치, variant = 배경 shell 변형
   ...T.shells.map(({ slug, name, emoji, price, weight, variant }) => ({

@@ -1,0 +1,95 @@
+{
+  "id": "BD-10",
+  "slug": "tour-boat",
+  "name": "여행 배",
+  "category": "building",
+  "kind": "tour-boat",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "선착장 옆에 묶인 작은 돛배. Space 로 타면 무인도 투어를 떠난다 (보드 tour D120-A). 투어 섬 선착장에도 하나.",
+    "keywords": [
+      "작은 나무 돛배",
+      "하얀 돛",
+      "빨간 줄무늬",
+      "밧줄로 묶임"
+    ],
+    "references": [
+      "어촌 작은 돛배"
+    ],
+    "avoid": [
+      "큰 배",
+      "모터보트"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.014
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "mastHeight": {
+      "label": "돛대 높이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "hull": "#B98957",
+    "hullDark": "#7F5A36",
+    "deck": "#D9B583",
+    "stripe": "#C9583B",
+    "mast": "#7F5A36",
+    "sail": "#FBF7EE",
+    "flag": "#F2C14E",
+    "rope": "#E8D5A8"
+  },
+  "paletteLabels": {
+    "hull": "배 몸",
+    "hullDark": "뱃전",
+    "deck": "갑판",
+    "stripe": "줄무늬",
+    "mast": "돛대",
+    "sail": "돛",
+    "flag": "깃발",
+    "rope": "밧줄"
+  },
+  "footprint": [
+    1,
+    2
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.5,
+        2.2
+      ]
+    }
+  }
+}

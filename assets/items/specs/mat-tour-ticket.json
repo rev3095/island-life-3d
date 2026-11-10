@@ -1,0 +1,56 @@
+{
+  "id": "IC-TR-01",
+  "slug": "mat-tour-ticket",
+  "name": "섬 여행 표",
+  "group": "mat",
+  "category": "item",
+  "kind": "ticket",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.tour-ticket",
+      "code": "IC-TR-01"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "무인도 투어 배를 타는 노란 표 (선착장 배에서 1,000 도토리)",
+    "keywords": [
+      "노란 표",
+      "섬·배 그림"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "P35 무인도 투어 (보드 tour)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "paper": "#F2D27A",
+    "line": "#FBF7EE",
+    "island": "#8CCB6E",
+    "tree": "#3F8F5C",
+    "boat": "#C9583B"
+  },
+  "paletteLabels": {
+    "paper": "표",
+    "line": "점선",
+    "island": "섬",
+    "tree": "나무",
+    "boat": "배"
+  }
+}

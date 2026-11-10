@@ -1414,6 +1414,48 @@ def b_sleep_note(M):
     zee(0.11, 0.55, 0.5)
 
 
+# ================================================================ P35 무인도 투어 (보드 tour)
+def b_ore_rock(M):
+    """EN-13 광석 바위: 본섬 바위(b_rock)와 같은 둥글넓적한 몸에 푸른 결정 다발과 금빛 줄무늬."""
+    s, seed = P.get('size', 1), int(P.get('seed', 5))
+    rock = M.part('rock')
+    rock.add(jitter(ellipsoid((0, 0, 0.24 * s), (0.44 * s, 0.38 * s, 0.32 * s), seg=10, rings=7), 0.05 * s, seed, keep_bottom=0.0), 'rock', smooth=False)
+    rock.add(jitter(ellipsoid((-0.4 * s, 0.2 * s, 0.06 * s), (0.12 * s, 0.1 * s, 0.08 * s), seg=8, rings=5), 0.015 * s, seed + 1, keep_bottom=0.0), 'rock', smooth=False)
+    # 결정 다발 (위·옆으로 비스듬히)
+    for x, y, z, h, r, lean in ((0.05, -0.05, 0.4, 0.3, 0.12, (0.15, -0.1)), (0.22, 0.06, 0.34, 0.22, 0.1, (0.5, 0.1)),
+                                (-0.14, -0.12, 0.36, 0.2, 0.09, (-0.4, -0.3)), (0.3, -0.2, 0.2, 0.16, 0.08, (0.6, -0.5))):
+        base = V((x * s, y * s, z * s))
+        tip = base + V((lean[0] * h, lean[1] * h, h)) * s
+        rock.add(cone(base, tip, r * s, 0.0, seg=6), 'crystal', smooth=False)
+        rock.add(cone(base + V((0.01, 0.01, 0.02)) * s, base + (tip - base) * 0.55, r * 0.5 * s, 0.0, seg=6), 'crystalLight', outline=False, smooth=False)
+    # 금빛 줄무늬
+    for x, y, z, rx in ((-0.2, -0.3, 0.3, 0.12), (0.12, -0.33, 0.18, 0.09)):
+        rock.add(ellipsoid((x * s, y * s, z * s), (rx * s, 0.04 * s, 0.03 * s), rot=rot_xyz(y=0.4), seg=10, rings=6), 'gold', outline=False)
+
+
+def b_tour_boat(M):
+    """BD-08 여행 배: 선착장 옆에 묶인 작은 돛배. 길이는 Y(-Y = 게임 남쪽), 물 위로 뜬다 (원점 = 바다 칸 바닥 높이 0, 물 윗면 -0.15)."""
+    L, W = 2.2 * P.get('length', 1), 0.95 * P.get('width', 1)
+    hull = M.part('hull')
+    zc = -0.08
+    hull.add(ellipsoid((0, 0, zc), (W / 2, L / 2, 0.28), seg=20, rings=10), 'hull')
+    hull.add(ellipsoid((0, 0, zc + 0.2), (W * 0.42, L * 0.43, 0.05), seg=20, rings=6), 'deck')
+    hull.add(tube([V((math.sin(a) * W * 0.47, math.cos(a) * L * 0.47, zc + 0.24)) for a in (TAU * i / 24 for i in range(24))], [0.045] * 24, seg=8, closed=True), 'hullDark')
+    hull.add(ellipsoid((0, 0, zc - 0.02), (W / 2 + 0.01, L / 2 + 0.01, 0.12), seg=20, rings=8), 'stripe', outline=False)
+    for y in (-0.42, 0.42):
+        hull.add(box((0, y * L / 2.2, zc + 0.3), (W * 0.62, 0.16, 0.05), bevel=0.02), 'hullDark')
+    mast = M.part('mast')
+    top = 1.55 * P.get('mastHeight', 1)
+    mast.add(cylinder((0, 0.12, zc + 0.24), (0, 0.12, top), 0.035, 0.028, seg=10), 'mast')
+    mast.add(cylinder((0, 0.12, zc + 0.62), (0, -0.62, zc + 0.62), 0.025, seg=8), 'mast')
+    sail = M.part('sail')
+    sail.add(wedge(0.03, 0.72, top - zc - 0.72, center=(0, -0.24, (top + zc + 0.66) / 2)), 'sail')
+    mast.add(ellipsoid((0, 0.12, top + 0.03), (0.05, 0.05, 0.04), seg=10, rings=6), 'flag')
+    mast.add(box((0.0, 0.2, top - 0.08), (0.02, 0.18, 0.1), bevel=0.005), 'flag')
+    # 밧줄 (선착장 쪽 말뚝으로)
+    hull.add(tube([V((-W * 0.45, -L * 0.3, zc + 0.26)), V((-W * 0.75, -L * 0.25, zc + 0.12)), V((-W * 1.05, -L * 0.2, zc + 0.36))], [0.018] * 3, seg=6), 'rope')
+
+
 BUILDERS = {
     'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
@@ -1431,6 +1473,7 @@ BUILDERS = {
     'harvest-pot': b_harvest_pot, 'scarecrow': b_scarecrow,
     'fireworks-raft': b_fireworks_raft,
     'cherry-tree': b_cherry_tree, 'picnic-mat': b_picnic_mat, 'event-sign': b_event_sign,
+    'ore-rock': b_ore_rock, 'tour-boat': b_tour_boat,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
 

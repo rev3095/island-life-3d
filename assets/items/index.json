@@ -573,6 +573,58 @@
       "status": "approved"
     },
     {
+      "id": "IC-BG-23",
+      "slug": "bug-jewel-beetle",
+      "name": "보석풍뎅이",
+      "group": "bug",
+      "kind": "beetle",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.jewel-beetle",
+          "code": "IC-BG-23",
+          "icon": "assets/items/renders/bug-jewel-beetle_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.211,
+        0.329,
+        0.099
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-BG-24",
+      "slug": "bug-moon-moth",
+      "name": "달빛나방",
+      "group": "bug",
+      "kind": "butterfly",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.moon-moth",
+          "code": "IC-BG-24",
+          "icon": "assets/items/renders/bug-moon-moth_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.299,
+        0.225,
+        0.084
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-EV-01",
       "slug": "event-petal",
       "name": "벚꽃잎",
@@ -1366,6 +1418,64 @@
       "status": "approved"
     },
     {
+      "id": "IC-FR-07",
+      "slug": "fruit-mango",
+      "name": "망고",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.mango",
+          "code": "IC-FR-07",
+          "icon": "assets/items/renders/fruit-mango_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.258,
+        0.24,
+        0.379
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FR-08",
+      "slug": "fruit-lychee",
+      "name": "리치",
+      "group": "fruit",
+      "kind": "fruit",
+      "hold": false,
+      "items": [
+        {
+          "item": "fruit.lychee",
+          "code": "IC-FR-08",
+          "icon": "assets/items/renders/fruit-lychee_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.28,
+        0.28,
+        0.323
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-FS-01",
       "slug": "fish-crucian",
       "name": "붕어",
@@ -1886,6 +1996,58 @@
       "status": "approved"
     },
     {
+      "id": "IC-FS-21",
+      "slug": "fish-rainbow-wrasse",
+      "name": "무지개놀래기",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.rainbow-wrasse",
+          "code": "IC-FS-21",
+          "icon": "assets/items/renders/fish-rainbow-wrasse_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.097,
+        0.49,
+        0.178
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-FS-22",
+      "slug": "fish-flower-scorpionfish",
+      "name": "꽃쏨뱅이",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.flower-scorpionfish",
+          "code": "IC-FS-22",
+          "icon": "assets/items/renders/fish-flower-scorpionfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.122,
+        0.49,
+        0.269
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-MA-01",
       "slug": "mat-wood",
       "name": "나무",
@@ -2092,6 +2254,58 @@
       },
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "IC-MA-09",
+      "slug": "mat-gold-ore",
+      "name": "금광석",
+      "group": "mat",
+      "kind": "iron",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.gold-ore",
+          "code": "IC-MA-09",
+          "icon": "assets/items/renders/mat-gold-ore_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.358,
+        0.261,
+        0.234
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-10",
+      "slug": "mat-crystal",
+      "name": "수정",
+      "group": "mat",
+      "kind": "crystal",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.crystal",
+          "code": "IC-MA-10",
+          "icon": "assets/items/renders/mat-crystal_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.297,
+        0.27,
+        0.33
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "IC-NT-01",
@@ -2584,6 +2798,32 @@
       },
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "IC-TR-01",
+      "slug": "mat-tour-ticket",
+      "name": "섬 여행 표",
+      "group": "mat",
+      "kind": "ticket",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.tour-ticket",
+          "code": "IC-TR-01",
+          "icon": "assets/items/renders/mat-tour-ticket_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.36,
+        0.2,
+        0.058
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

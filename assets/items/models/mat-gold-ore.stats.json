@@ -1,0 +1,44 @@
+{
+  "id": "IC-MA-09",
+  "slug": "mat-gold-ore",
+  "name": "금광석",
+  "group": "mat",
+  "kind": "iron",
+  "version": "0.1",
+  "items": [
+    "mat.gold-ore"
+  ],
+  "hold": false,
+  "triangles": 306,
+  "parts": 1,
+  "materials": [
+    "metal",
+    "stone"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.358,
+    0.261,
+    0.234
+  ],
+  "bounds": [
+    [
+      -0.179,
+      -0.131,
+      0.0
+    ],
+    [
+      0.179,
+      0.131,
+      0.234
+    ]
+  ],
+  "glbBytes": 20616,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-gold-ore_main.png",
+    "mat-gold-ore_thumb.png"
+  ]
+}

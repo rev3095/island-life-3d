@@ -33,7 +33,8 @@ const MOVERS = VILLAGERS.filter(d => d.arrives === 'moving' && !RESIDENTS.includ
 const ALL_RES = [...RESIDENTS, ...MOVERS];
 
 // ---------- 지문 (주민마다 데이터·결과를 한 줄 글로 → sha256 앞 16자) ----------
-const EVENT_IDS = new Set([...EVENT_GOODS.map(([slug]) => `event.${slug}`), ...EVENT_FURN.map(([slug]) => `furn.${slug}`), ...DECOR_FURN.map(([slug]) => `furn.${slug}`), ...FAVOR_FURN.map(([slug]) => `furn.${slug}`),
+const TOUR_IDS = ['fish.rainbow-wrasse', 'fish.flower-scorpionfish', 'bug.jewel-beetle', 'bug.moon-moth', 'fruit.mango', 'fruit.lychee', 'mat.gold-ore', 'mat.crystal', 'mat.tour-ticket'];   // P35 무인도 투어 아이템도 지문에서 뺀다
+const EVENT_IDS = new Set([...TOUR_IDS, ...EVENT_GOODS.map(([slug]) => `event.${slug}`), ...EVENT_FURN.map(([slug]) => `furn.${slug}`), ...DECOR_FURN.map(([slug]) => `furn.${slug}`), ...FAVOR_FURN.map(([slug]) => `furn.${slug}`),
   ...NIGHT_GOODS.map(([slug]) => `night.${slug}`), ...NIGHT_FURN.map(([slug]) => `furn.${slug}`)]);   // 9차 야외 가구 · 10차 좋아하는 가구 · 12차 밤 먹거리·밤 가구도 지문에서 뺀다
 const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
 const sha = s => createHash('sha256').update(s).digest('hex').slice(0, 16);

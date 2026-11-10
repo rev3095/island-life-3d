@@ -59,14 +59,14 @@ test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
   assert.ok(checkPlace(walled, furn).some(e => e.includes('걸어갈 수 없어요')));
 });
 
-test('박물관 전시: 물고기 20 · 곤충 22 · 화석 8 자리, 늘 같은 자리, 케이스·받침 안, 겹치지 않음', () => {
+test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은 자리, 케이스·받침 안, 겹치지 않음', () => {
   const lists = Object.fromEntries(MUSEUM_CATS.map(c => [c, items.list(c).map(it => it.id)]));
-  assert.equal(lists.fish.length, 20);
-  assert.equal(lists.bug.length, 22);
+  assert.equal(lists.fish.length, 22);   // + P35 무인도 물고기 둘
+  assert.equal(lists.bug.length, 24);    // + P35 무인도 곤충 둘
   assert.equal(lists.fossil.length, specs.museum.fossils.length, '화석 받침 = 화석 종류 수 (알 수 없는 화석 빼고)');
   const given = new Set(['fish.carp', 'bug.ladybug', 'fossil.ammonite']);
   const plan = exhibitPlan(specs.museum, lists, id => given.has(id));
-  assert.equal(plan.length, 50);
+  assert.equal(plan.length, 54);
   assert.deepEqual(plan.filter(e => e.donated).map(e => e.id).sort(), [...given].sort());
   // 기증 여부와 상관없이 자리는 같다
   const again = exhibitPlan(specs.museum, lists, () => true);

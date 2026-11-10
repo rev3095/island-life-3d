@@ -1,0 +1,35 @@
+{
+  "id": "EN-13",
+  "slug": "ore-rock",
+  "name": "광석 바위",
+  "category": "nature",
+  "kind": "ore-rock",
+  "version": "0.1",
+  "triangles": 464,
+  "parts": 1,
+  "materials": [
+    "crystal",
+    "crystalLight",
+    "gold",
+    "rock"
+  ],
+  "animations": {},
+  "size": [
+    0.96,
+    0.81,
+    0.7
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 22508,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "ore-rock_front.png",
+    "ore-rock_hero.jpg",
+    "ore-rock_main.png",
+    "ore-rock_thumb.png",
+    "ore-rock_top.png"
+  ]
+}

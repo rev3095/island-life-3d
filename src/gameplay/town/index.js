@@ -12,7 +12,7 @@ import { createChatter } from './chatter.js';
 import { createMail } from './mail.js';
 import { villagerState, pickWeighted, ownerOf, isAsleep, setLateHook, addFriendship } from './rules.js';
 import { createMovein, livesHere } from './movein.js';
-import { createMoving } from './moving.js';
+import { createMoving, MOVERS } from './moving.js';
 import { createParty } from './party.js';
 import LINES from './lines/index.js';
 
@@ -340,7 +340,9 @@ export default {
       /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */
       /** 주민 집 색 변형 이름 (10차 새 주민은 lilac·blue·navy) — house/visit.js 문 덧판이 쓴다 */
       houseVariant: slug => moving.variantOf(slug),
-      moving: { state: () => moving.state(), lots: () => moving.lots(), stage: slug => moving.stage(slug), asking: slug => moving.asking(slug), count: () => moving.count() },
+      moving: { state: () => moving.state(), lots: () => moving.lots(), stage: slug => moving.stage(slug), asking: slug => moving.asking(slug), count: () => moving.count(),
+        /** P35 무인도 투어: 이사 올 수 있는 주민 (순서) · 투어 섬에서 초대한 주민을 다음 이사 주민으로 */
+        movers: () => [...MOVERS], invite: slug => { if (MOVERS.includes(slug)) moving.state().invited = slug; } },
       debug: { nav, spots, town, keepers, chatter, party, movein, moving },
     };
     console.info(`[town] 주민 ${villagers.length}명 준비 ${Math.round(performance.now() - t0)}ms`);

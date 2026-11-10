@@ -828,6 +828,64 @@ export function makeScenario(bot, sk, opts = {}) {
     return bad.length ? awk(`${bad.join(', ')} — ${msg}`) : pass(msg);
   });
 
+  // P35 무인도 투어 (보드 tour D120–D128): 선착장 끝 배 → 여행 묻기 창(첫 여행은 표 선물) → 무인도 → 과일 흔들기·광석 캐기·줍기 → 배로 돌아오기.
+  // 투어 섬은 x 900 이라 봇은 섬 밖 좌표처럼 walkLocal(구역 isWalkable 로 0.25칸 길찾기)로 걷는다.
+  add('tour', '무인도 투어: 선착장 배 → 표 → 무인도 → 과일·광석 캐기 → 배로 돌아오기', async () => {
+    const tour = () => S().tour;
+    if (!tour()) return block('무인도 투어(tour) 서비스가 없어요');
+    const can = tour().canGo();
+    if (!can.ok) return skip(can.reason);
+    await bot.setHour(10);
+    await bot.tool(null);
+    if (!(await bot.walkTo(tour().stand(), { near: 0.45, label: '선착장 끝 배' }))) return block('선착장 끝까지 못 감');
+    await bot.face(tour().boat());
+    if (bot.peek() !== 'tour-boat') return block(`배 앞에서 「섬 여행」이 안 떠요 (${bot.peek()})`);
+    const acorns0 = bot.acorns();
+    let asked = null;
+    bot.policy = { confirm: info => { if (!/섬 여행/.test(info.title)) return null; asked = info.text; return Math.max(0, info.buttons.indexOf('떠나요')); } };
+    await bot.act('action', { timeout: 30 });
+    bot.policy = {};
+    if (!(await bot.until(() => tour().active && !tour().busy, { timeout: 25, label: '무인도 도착' }))) return block(`무인도에 도착하지 못함 (묻기 창 ${asked ? '나옴' : '안 나옴'})`);
+    const cur = tour().current, w = S().world;
+    await bot.shot('15-tour-arrive', `무인도 ${cur.shape}`);
+    const got = {}, inv0 = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
+    // 과일나무 흔들기 (투어 섬 과일 = 망고·리치)
+    const ft = w.objects.list('fruit-tree')[0];
+    if (ft) {
+      await bot.walkLocal({ x: ft.x, z: ft.z + 0.85 }, { timeout: 40, label: '무인도 과일나무' });
+      await bot.face(ft);
+      if (bot.peek() === 'gather-shake') { await bot.act('action'); await bot.wait(0.8); await sk.pickupAround(2.4); }
+    }
+    // 광석 바위 캐기 (삽)
+    const ore = w.objects.list('ore-rock')[0];
+    let oreHits = 0;
+    const shovel = bot.has('tool.shovel') > 0;   // 새 게임 첫날엔 삽이 없다 (단계만 돌릴 때)
+    if (ore && shovel && (await bot.tool('shovel'))) {
+      await bot.walkLocal({ x: ore.x, z: ore.z + 0.95 }, { timeout: 40, label: '광석 바위' });
+      await bot.face(ore);
+      for (let k = 0; k < 3 && bot.peek() === 'tour-ore'; k++) { await bot.act('action'); oreHits++; }
+      await bot.tool(null);
+      await sk.pickupAround(2.4);
+    }
+    for (const s of bot.inv().filter(Boolean)) if (s.count > (inv0[s.id] ?? 0)) got[s.id] = s.count - (inv0[s.id] ?? 0);
+    // 돌아오기
+    const b = tour().boat();
+    await bot.walkLocal({ x: b.x - 1.45, z: b.z }, { timeout: 60, label: '무인도 배' });
+    await bot.face(b);
+    const backPeek = bot.peek();
+    bot.policy = { confirm: info => (/돌아가기/.test(info.title) ? Math.max(0, info.buttons.indexOf('돌아가요')) : null) };
+    if (backPeek === 'tour-boat') await bot.act('action', { timeout: 30 });
+    bot.policy = {};
+    const home = await bot.until(() => !tour().active && !tour().busy, { timeout: 25, label: '본섬 도착' });
+    note('tour', { shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, backPeek, home, pos: bot.pos() });
+    if (!home) return block(`배로 못 돌아옴 (배 앞 ${backPeek})`);
+    const odd = [];
+    if (!Object.keys(got).some(id => /^fruit\.(mango|lychee)$/.test(id))) odd.push('무인도 과일을 못 얻음');
+    if (shovel && !oreHits) odd.push('광석 바위를 못 침');
+    if (Math.abs(bot.pos().x) > 100) odd.push('돌아왔는데 섬 밖 좌표');
+    return odd.length ? awk(odd.join(' · ')) : pass(`${cur.shape} · 얻은 것 ${Object.entries(got).map(([k, v]) => `${k}×${v}`).join(', ')} · 광석 ${shovel ? `${oreHits}번` : '삽 없음'}`);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;

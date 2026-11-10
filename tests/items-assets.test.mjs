@@ -26,7 +26,7 @@ const HOLD = new Set(['fish', 'bug', 'fossil']);       // 잡아서 들어 보�
 const FIXED_MATERIALS = new Set(['eyeHighlight']);
 
 test('아이템 아이콘: 가구를 뺀 93개가 모두 렌더 썸네일이고 글자용 emoji 가 남아 있다', () => {
-  assert.equal(NOT_FURN.length, 107);   // 93 + 5차 Z5 축제 4 (IC-FE) + 8차 행사 채집 6 (IC-EV-01·02 · 버섯 셋 IC-EV-03 · IC-EV-04) + 12차 야시장 먹거리 4 (IC-NT)
+  assert.equal(NOT_FURN.length, 116);   // 93 + 5차 Z5 축제 4 (IC-FE) + 8차 행사 채집 6 (IC-EV) + 12차 야시장 먹거리 4 (IC-NT) + P35 무인도 투어 9 (IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01)
   for (const it of NOT_FURN) {
     assert.match(it.icon, /^assets\/items\/renders\/[\w-]+_thumb\.png$/, `${it.id}: icon 이 썸네일 경로가 아님`);
     assert.ok(has(it.icon), `${it.id}: 썸네일 없음 ${it.icon} (node tools/build-item.mjs)`);
@@ -35,7 +35,7 @@ test('아이템 아이콘: 가구를 뺀 93개가 모두 렌더 썸네일이고 
 });
 
 test('아이템 모델 목록: 스펙 82개가 빠짐없이 빌드되어 있고 id·version·status 가 스펙과 같다', () => {
-  assert.equal(Object.keys(SPECS).length, 94, '스펙 개수 (고유 모델 94 = 아이콘 107 − 같은 모델의 색 변형 13)');
+  assert.equal(Object.keys(SPECS).length, 103, '스펙 개수 (고유 모델 103 = 아이콘 116 − 같은 모델의 색 변형 13)');
   assert.equal(LIST.length, Object.keys(SPECS).length, '목록에 없는 스펙이 있다 (node tools/build-item.mjs <slug>)');
   const ids = new Set();
   for (const m of LIST) {
@@ -46,7 +46,7 @@ test('아이템 모델 목록: 스펙 82개가 빠짐없이 빌드되어 있고 
     assert.equal(sp.version, m.version, `${m.slug}: 목록 version`);
     assert.equal(sp.status ?? 'review', m.status, `${m.slug}: 목록 status (--index)`);
     assert.ok(['review', 'approved'].includes(m.status));
-    assert.match(m.id, /^IC-(TL|MA|SD|FR|SH|FL|FS|BG|FO|FE|EV|NT)-\d\d$/, `${m.slug}: 검수 보드 ID`);   // FE = 5차 Z5 축제 · EV = 8차 계절 행사 · NT = 12차 밤 야시장
+    assert.match(m.id, /^IC-(TL|MA|SD|FR|SH|FL|FS|BG|FO|FE|EV|NT|TR)-\d\d$/, `${m.slug}: 검수 보드 ID`);   // FE = 5차 Z5 축제 · EV = 8차 계절 행사 · NT = 12차 밤 야시장 · TR = P35 투어 표
     assert.ok(!ids.has(m.id), `id 겹침 ${m.id}`);
     ids.add(m.id);
     for (const f of [`${DIR}/models/${m.slug}.glb.json`, `${DIR}/models/${m.slug}.stats.json`, `${DIR}/renders/${m.slug}_thumb.png`]) assert.ok(has(f), `${m.slug}: ${f} 없음`);
@@ -75,7 +75,7 @@ test('아이템 모델 목록: 아이템마다 모델이 하나, 아이콘 경�
     if (vars.length) assert.equal(m.items.length, vars.length, `${m.slug}: 변형마다 아이템 하나`);
   }
   for (const it of NOT_FURN) assert.ok(seen.has(it.id), `${it.id}: 아이템 모델 없음`);
-  assert.equal(seen.size, 107);
+  assert.equal(seen.size, 116);
 });
 
 test('아이템 모델: 재질 이름은 모두 스펙 팔레트 키 (리소스 교체 약속)', () => {
@@ -103,7 +103,7 @@ test('아이템 모델: 물고기·곤충·화석은 들어 보이는 모델(hol
       assert.ok(Math.abs(lo[2]) < 0.01, `${m.slug}: 바닥이 원점 높이가 아니다`);
     }
   }
-  assert.equal(LIST.filter(m => m.hold).length, 51, '물고기 20 · 곤충 22 · 화석 9');
+  assert.equal(LIST.filter(m => m.hold).length, 55, '물고기 22 · 곤충 24 · 화석 9 (P35 무인도 물고기 둘 · 곤충 둘)');
 });
 
 test('아이템 스펙: 편집기가 읽을 params 모양 (label·value, 숫자는 min ≤ value ≤ max, 고르기는 options 안)', () => {

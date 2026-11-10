@@ -1,0 +1,49 @@
+{
+  "id": "IC-FS-22",
+  "slug": "fish-flower-scorpionfish",
+  "name": "꽃쏨뱅이",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.flower-scorpionfish"
+  ],
+  "hold": true,
+  "triangles": 5832,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.122,
+    0.49,
+    0.269
+  ],
+  "bounds": [
+    [
+      -0.061,
+      -0.245,
+      -0.134
+    ],
+    [
+      0.061,
+      0.245,
+      0.134
+    ]
+  ],
+  "glbBytes": 118932,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-flower-scorpionfish_main.png",
+    "fish-flower-scorpionfish_thumb.png"
+  ]
+}

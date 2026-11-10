@@ -198,7 +198,7 @@ if ( vGround > 0.5 ) {
   }
   /** 월드 (x, z) 가 강물 칸이면 보이는 물가 선에서 물 쪽으로의 거리 (칸, 둑 위면 < 0), 강물 칸이 아니면 null */
   function riverDistance(x, z) {
-    const tx = Math.floor(x + gen.w / 2), tz = Math.floor(z + gen.h / 2);
+    const tx = Math.floor(x - (gen.ox ?? 0) + gen.w / 2), tz = Math.floor(z + gen.h / 2);
     if (tx < 0 || tz < 0 || tx >= gen.w || tz >= gen.h || gen.kind[tz * gen.w + tx] !== KIND.WATER) return null;
     const L = levels.find(l => l.level === gen.level[tz * gen.w + tx]);
     if (!L) return null;

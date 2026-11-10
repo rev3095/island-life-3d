@@ -18,24 +18,26 @@
 | 10차 검수 보드 v1.0 (M10 방향 · 새 주민, D93–D99) | `wave10-board.html` + `board-kit.js` | https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H | `wave10` |
 | 11차 검수 보드 v1.1 (M11 방향 · 옷 갈아입기, D100–D105) | `wave11-board.html` + `board-kit.js` | https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY | `wave11` |
 | 밤·새벽 검수 보드 v0.1 (M12 야시장 · 야행성 주민 · 밤 상점 · 밤에만 여는 집 · 새벽 타로 천막, D106–D114) | `night-board.html` + `board-kit.js` | https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU | `night` |
+| 무인도 투어 검수 보드 v0.1 (선착장 배 · 무작위 섬 · 희귀 채집, D120–D128 — 11차 D100-B 「새 곳」의 작은 섬을 따로 정함) | `tour-board.html` + `board-kit.js` | https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx | `tour` |
 
 ## ID 표 (새 ID 는 여기 다음 번호부터 — 겹치지 않게)
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
-| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) |
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) |
 | CH | 캐릭터 | CH-01–10 (+wave10 CH-11 구름 양 · CH-12 파도 펭귄 · CH-13 달무리 부엉이, M10-P3 검수 대기) (+night 계획 CH-14 별밤 박쥐 · CH-15 여명 나방 — 가게 주인) |
-| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night 계획 PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night 계획 BD-08 달빛 가게 · BD-09 새벽 천막) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) |
+| EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night 계획 PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night 계획 BD-08 달빛 가게 · BD-09 새벽 천막) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) (+tour BD-10 여행 배 · EN-13 광석 바위, P35 검수 대기) |
 | FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) (+wave10 FU-51 그림 이젤 · FU-52 바다 지도 액자 · FU-53 별 망원경, M10-P5 검수 대기) (+night 계획 FU-55–58 밤 가구 · FU-59 수정 구슬) |
-| IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 (wave8 EV: IC-EV-01–04) (+night 계획 NT 밤 먹거리: IC-NT-01–04) |
+| IC-xx | 아이템 아이콘 (TL MA SD FR SH FL FS BG FO, z5 FE) | 분류마다 01부터 (wave8 EV: IC-EV-01–04) (+night 계획 NT 밤 먹거리: IC-NT-01–04) (+tour IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01 여행 표(데이터 분류는 mat) |
 | WP · FL · RM | 벽지 · 바닥 · 방 배치 | WP-01–08 · FL-01–08 · RM-01–07 (+interiors RM-08 상점 · RM-09 박물관) (+night 계획 RM-10 달빛 가게 · RM-11 천막) |
 | EM · TK · FP · FB · AN · ED · SF · UI | z5: 이모티콘 · 주민 읽기 규칙 · 축제 부품 · 부스 · 동작 · 엔딩 컷 · 이야기 흐름 · 화면 | EM-01–36 · TK-01–07 · FP-01–05 · FB-01–05 · AN-01–05 (+interiors AN-06 문 열기 · AN-07 걸어 들어가기) (+wave8 AN-08 손 불꽃 흔들기 · AN-09 눈덩이 밀기) (+wave9 AN-10 놓기 — AN-08–10 은 주인공 동작으로 M9-P1 에서 만듦) (+wave10 AN-11 앉기 `sit_down`·`sit`·`stand_up`, 캐릭터 13 모두) · ED-01–06 · SF-1–6 · UI-04–05 |
-| s01– | 장면 (시나리오 편집기) | s01–s12 (+wave8 s13–s16 행사 장면) (+wave10 s17–s19 새 주민 첫 만남, 검수 대기) (+night 계획 s20 달빛 가게 · s21 새벽 천막) |
+| s01– | 장면 (시나리오 편집기) | s01–s12 (+wave8 s13–s16 행사 장면) (+wave10 s17–s19 새 주민 첫 만남, 검수 대기) (+night 계획 s20 달빛 가게 · s21 새벽 천막) (+tour 계획 s22 첫 섬 여행 — 아직) |
 | ET | 편집기 (wave6) | ET-01– |
-| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) (+wave10 UI-18 이사 편지·떠나기 묻기) (+night 계획 UI-20 카드 뽑기 창 · UI-21 오늘 운세 칸) · RC-01–12 · QA-01–19 |
+| UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) (+wave10 UI-18 이사 편지·떠나기 묻기) (+night 계획 UI-20 카드 뽑기 창 · UI-21 오늘 운세 칸) · RC-01–12 · QA-01–19 (+tour UI-22 여행 묻기 창 · UI-23 투어 섬 표시) |
 | SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
 | CL | 옷 (wave11 계획): 모자 · 윗옷 · 신발 (CL-00 = 주인공 기본 옷) | (+wave11 계획 CL-01–12) · FU-54 옷 진열대 · UI-19 옷장 창 · AN-12 빙글 |
 | TA | 타로 카드 (night 계획, 섬 이야기로 새로 그린 12장, 하루 운세) | TA-01–12 |
+| TO | 투어 섬 모양 틀 (tour, `src/gameplay/tour/islet.js` SHAPES): 둥근 · 초승달 · 쌍둥이 · 언덕 | TO-01–04 |
 | EV · FX | wave8: 계절 행사 · 효과 셰이더 | EV-01–04 · FX-01 (불꽃) |
 
 ## 새 보드 만드는 법 (6차부터)

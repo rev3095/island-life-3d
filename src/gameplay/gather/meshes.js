@@ -3,7 +3,7 @@
 // 잡은 물고기·곤충·화석을 들어 보일 때는 아이콘과 같은 Blender 모델(assets/items, 5차 Z1)을 heldModel 로 받아 쓴다 — 받기 전·못 받으면 이 코드 모델.
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-export const FRUIT_COLOR = { apple: '#E8504F', pear: '#D9D36A', peach: '#F7A6A0', cherry: '#B5232F', orange: '#F39A3B', coconut: '#7A5232' };
+export const FRUIT_COLOR = { apple: '#E8504F', pear: '#D9D36A', peach: '#F7A6A0', cherry: '#B5232F', orange: '#F39A3B', coconut: '#7A5232', mango: '#F2B33D', lychee: '#D9455F' };   // 망고·리치 = P35 무인도
 const LEAF = '#5FAE5A', STEM = '#7F5636';
 
 // 물고기 몸 색은 아이템 데이터 colors { body, back, belly, fin } (data/items.js, 4차 Y2). 없으면 이 색
@@ -83,7 +83,8 @@ export function createMeshKit(ctx) {
       part(G.cyl(0.006, 0.006, 0.12, 5), STEM, { p: [0.025, 0.16, 0], r: [0, 0, 0.4] }), part(G.cyl(0.006, 0.006, 0.12, 5), STEM, { p: [-0.025, 0.16, 0], r: [0, 0, -0.4] }),
       part(G.sphere(0.03, 6, 4), LEAF, { p: [0.04, 0.22, 0], sc: [1.4, 0.35, 0.8] }),
     ];
-    const body = kind === 'pear'
+    const body = kind === 'mango' ? [part(G.sphere(0.1), c, { p: [0, 0.1, 0], sc: [0.85, 1.05, 1.15] })]
+      : kind === 'pear'
       ? [part(G.sphere(0.095), c, { p: [0, 0.095, 0] }), part(G.sphere(0.065), c, { p: [0, 0.17, 0] })]
       : [part(G.sphere(0.1), c, { p: [0, 0.1, 0], sc: [1, kind === 'orange' ? 0.95 : 0.9, 1] })];
     const top = kind === 'pear' ? 0.23 : 0.19;
