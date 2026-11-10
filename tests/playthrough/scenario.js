@@ -689,14 +689,17 @@ export function makeScenario(bot, sk, opts = {}) {
     if (outAt || S().town.atHome(slug) !== 'home') talk = await sk.emoteTalk(slug, { wins: 1 });
     else {
       const v = await sk.visit(slug, { goal: { wins: 1 } });
-      visited = { weather: S().time?.weather ?? null, entered: v.entered, talked: v.talked, knocked: v.knocked };
+      visited = { weather: S().time?.weather ?? null, entered: v.entered, talked: v.talked, knocked: v.knocked, left: v.left };
       talk = { opened: !!v.talked };
     }
-    // 이삿날 저녁: 첫 만남 장면 (s17–s19, 트리거 move-in)
+    // 이삿날 저녁: 첫 만남 장면 (s17–s19, 트리거 move-in — 플레이어가 밖에 있을 때만 town:welcome)
+    if (S().house?.where || S().house?.inside || Math.abs(bot.pos().x) > 100) await bot.exitRoom();
     await bot.setHour(17.6);
     await bot.settle(120);
-    const scene = Object.keys(st().story?.seen ?? {}).find(id => /^s1[789]-/.test(id) && id.includes(slug)) ?? null;
-    note('movingInTalk', { outAt, talk: talk.opened, visited, scene });
+    const seenScene = () => Object.keys(st().story?.seen ?? {}).find(id => /^s1[789]-/.test(id) && id.includes(slug)) ?? null;
+    if (!seenScene()) await bot.until(() => !!seenScene() && !bot.storyOn(), { timeout: 90, label: '첫 만남 장면' });
+    const scene = seenScene();
+    note('movingInTalk', { outAt, talk: talk.opened, visited, scene, at17: { where: S().house?.where ?? null, inside: !!S().house?.inside, x: +bot.pos().x.toFixed(1), welcomed: moving().state().welcomed?.[slug] ?? null } });
     const odd = [];
     if (!letter) odd.push('오기 전날 편지가 없음');
     else if (!letter.read) odd.push('편지를 못 읽음');
