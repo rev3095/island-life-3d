@@ -157,7 +157,7 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame, size = 
       if (spec.palette?.edge) mats.floorEdge.color.set(spec.palette.edge);
     },
     /** 창밖 색: 밤 정도(0~1)에 맞춰 */
-    setNight(nf) { mats.pane.color.copy(paneDay).lerp(paneNight, Math.min(1, Math.max(0, nf))); },
+    setNight(nf) { mats.pane?.color.copy(paneDay).lerp(paneNight, Math.min(1, Math.max(0, nf))); },
     dispose() {
       group.removeFromParent();
       group.traverse(o => { if (o.isMesh) o.geometry.dispose(); });

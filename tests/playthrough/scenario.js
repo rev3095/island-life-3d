@@ -388,7 +388,7 @@ export function makeScenario(bot, sk, opts = {}) {
       bot.policy = {
         dialog: texts => { const i = texts.findIndex(t => /카드 뽑기/.test(t)); return i >= 0 ? i : texts.length - 1; },
         card: (kind, el, card) => {
-          if (kind !== 'tarot') return false;
+          if (!card?.classList.contains('nt-card')) return false;   // 카드 뽑기 창 (bot.top 은 kind 'card')
           if (!flipped) { const b = card.querySelector('.nt-pick:not([disabled])'); if (b) { bot.click(b); flipped = true; return true; } }
           const take = [...card.querySelectorAll('.pk-btn')].find(b => b.textContent.trim() === '받기' && !b.hidden);
           if (take) { bot.click(take); return true; }
