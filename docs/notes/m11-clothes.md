@@ -142,7 +142,11 @@
 
 ### 잰 것
 
-(아래 「자동 플레이 · 행사 점검 · GPU」 절에 이어 적음)
+- **처음 받는 크기 (boot 묶음)**: main c1e2f88 11.48MB → 이 브랜치 11.50MB (+0.02MB: 주인공 모델 메시 둘 + spin, 옷 목록). 옷 모델·썸네일 `clothes-1` 1.33MB 는 처음에 받지 않는다. 게시 파일 202 → 207.
+- **행사 점검** `node tools/check-events.mjs --target=dev --port=4244`: 4/4 통과 (`docs/qa/runs/2026-11-11-01-20-events`).
+- **자동 플레이 전체** (`--port=4243`, 1023초): 28✅ 2🟡 0⛔ · 콘솔 오류 0 · 「주민 만나기」 6/6. 🟡 둘 = `decor`(벽지 QA-10, 다른 세션 몫) · `clothes`.
+- **`clothes` 단계 🟡 (봇 쪽, 게임은 손으로·CDP 로 확인됨)**: 옷 사기 ✅ · 덤 옷장 받기·놓기 ✅ 인데, 놓은 뒤 봇 앞이 `house-place`(빈 바닥)라 옷장 메뉴를 못 열었다. 봇 창 종류 목록에 `closet` 은 더했다 (`bot.js` `bot.top`). **남은 일**: `skills.js` `sk.changeClothes` 가 놓은 옷장 쪽으로 돌아서거나 한 칸 물러서게 (옷장 2×1 이 플레이어 앞 칸보다 한 칸 더 앞에 놓이는 듯) → `node tools/playtest.mjs --port=4243 --only=boot,naming,arrival,clock,fd-tool,fd-gather,fd-catch,fd-sell,fd-donate,fd-home,clothes` (2분)로 다시 확인.
+- **GPU 시간**: 못 잼 (사용 한도). 스크립트는 세션 임시 폴더에 있었음 — 최적화 세션의 `tools/perf-bench.mjs` 로 광장 적정 사양, 기본 옷 ↔ 세 칸 입음(옷 메시 셋 = 그리기 +6 정도) 비교를 부탁.
 
 ## 문서 세션이 반영할 문장 (지금은 고치지 않음)
 

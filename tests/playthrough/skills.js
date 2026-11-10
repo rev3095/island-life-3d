@@ -415,10 +415,11 @@ export function createSkills(bot) {
     }
     if (!recOf()) { bot.issue('minor', 'house', '집에 옷장이 없어 갈아입을 수 없어요'); await sk.leaveHome(); return res; }
     // 방금 놓았으면 바로 앞. 아니면 옷장 앞쪽 칸으로 가서 바라본다
-    const want = () => S().gameplay.interactions.peek('action');
-    if (want()?.name !== 'house-furniture') {
-      for (const deg of [0, 90, -90, 180]) { await bot.faceDir(deg); if (want()?.name === 'house-furniture') break; }
+    // 방금 놓았으면 바로 앞 — 아니면 네 방향을 돌아보며 가구 메뉴가 뜨는 쪽을 찾는다
+    if (bot.peek() !== 'house-furniture') {
+      for (const deg of [0, 90, -90, 180]) { await bot.faceDir(deg); if (bot.peek() === 'house-furniture') break; }
     }
+    res.peek = bot.peek();
     const e = S().outfit?.info(id);
     bot.policy = {
       dialog: texts => Math.max(0, texts.findIndex(t => /갈아입기/.test(t))),
