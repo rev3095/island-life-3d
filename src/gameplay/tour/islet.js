@@ -22,12 +22,13 @@ export const SHAPE_IDS = Object.keys(SHAPES);
 export const ISLET_FRUITS = ['mango', 'lychee'];
 const FLOWERS = { tulip: ['red', 'yellow', 'white', 'pink'], cosmos: ['pink', 'white', 'orange', 'red'], pansy: ['purple', 'yellow', 'blue', 'orange'] };
 
-/** 날짜·횟수로 그날 섬 정하기 → { seed, shape }. 같은 날 같은 횟수면 늘 같은 섬 */
-export function isletOf(dayKey, trip = 0, baseSeed = 0) {
+/** 날짜·횟수로 그날 섬 정하기 → { seed, shape }. 같은 날 같은 횟수면 늘 같은 섬. shapes = 나올 수 있는 모양 (tour.json shapes, 요소 편집기 「투어」) */
+export function isletOf(dayKey, trip = 0, baseSeed = 0, shapes = SHAPE_IDS) {
   let h = 2166136261 ^ baseSeed;
   for (const c of `${dayKey}#${trip}`) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
   const seed = h >>> 0;
-  return { seed, shape: SHAPE_IDS[seed % SHAPE_IDS.length] };
+  const ids = shapes?.filter(id => SHAPES[id]).length ? shapes.filter(id => SHAPES[id]) : SHAPE_IDS;
+  return { seed, shape: ids[seed % ids.length] };
 }
 
 /**

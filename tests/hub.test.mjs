@@ -16,7 +16,7 @@ const LIST = JSON.parse(home.match(/<script type="application\/json" id="editors
 const byId = Object.fromEntries(LIST.map(e => [e.id, e]));
 const GROUPS = ['editor', 'board', 'game', 'soon', 'archive'];
 // 채팅 명령 → 그 명령을 설명하는 문서 (CLAUDE.md 편집기 절 · concept/README.md · 각 트랙 노트)
-const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '스토리 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
+const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '스토리 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '요소 반영', '스타일 반영'];
 
 test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 맞다', () => {
   assert.equal(new Set(LIST.map(e => e.id)).size, LIST.length, 'id 겹침');
@@ -166,7 +166,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
   assert.equal(meta.total, Object.values(docs).reduce((n, d) => n + d.count, 0));
 
   const H = loadLogic();
-  const bg = read('bg-editor.html'), ch = read('editor.html'), dataEd = read('data-editor.html');
+  const bg = read('bg-editor.html'), ch = read('editor.html'), elemSheets = read('elem-editor/sheets.js');
   const soundTabs = read('sound-editor.html').match(/const TABS = \[([^\]]*)\]/)[1];
   for (const d of Object.values(docs)) {
     assert.ok(Buffer.byteLength(JSON.stringify(d)) < 200 * 1024, `${d.group}: 문서 하나는 256 KiB 안 (넉넉히 200)`);
@@ -182,7 +182,8 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
       if (d.editor === 'env') assert.ok(d.group === 'furniture' ? (it.id.startsWith('fix-') ? /^place-(shop|museum)$/.test(hash) && bg.includes("'place-' + p.slug") : hash === `furn-${it.id}` && bg.includes("'furn-' + m.slug"))
         : d.group === 'item' ? hash === `item-${it.id}` && bg.includes("'item-' + m.slug") : hash === it.id, `${d.group}/${it.id}: 배경 편집기 #${hash}`);
       if (d.editor === 'character') assert.ok(hash === it.id || (hash === `${it.id}.talk` && ch.includes(".replace(/\\.talk$/, '')")), `캐릭터 편집기 #${hash}`);
-      if (d.editor === 'data') assert.ok(dataEd.includes(`{ id: '${hash}', name:`), `숫자 표 #${hash}`);
+      // 요소 편집기: #<표 id> (elem-editor/sheets.js) 또는 방 배치 #rooms.<방·가게 slug>
+      if (d.editor === 'elem') assert.ok(/^rooms\.[\w-]+$/.test(hash) ? existsSync(resolve(root, `assets/interior/rooms/${hash.slice(6)}.json`)) || existsSync(resolve(root, `assets/interior/places/${hash.slice(6)}.json`)) : elemSheets.includes(`{ id: '${hash}', name:`), `요소 편집기 #${hash}`);
       if (d.editor === 'sound') assert.ok(soundTabs.includes(`'${hash}'`), `곡 편집기 #${hash}`);
     }
   }

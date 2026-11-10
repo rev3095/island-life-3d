@@ -58,5 +58,9 @@
     "requestPoints": 6,
     "requestDays": 3,
     "requestReward": { "furnitureChance": 0.4, "valueDefault": 200, "valueMult": 1.2, "valuePlus": 250, "bagMin": 2, "bagMax": 12 }
+  },
+  "moving": {
+    "every": 7, "max": 10, "minStay": 30, "quiet": 7, "chanceStep": 0.02, "chanceMax": 0.35, "askDays": 5, "calmDays": 30,
+    "boxesAfter": 1, "goneAfter": 2, "letters": { "first": 3, "every": 12, "max": 4 }, "catchUp": 120
   }
 }

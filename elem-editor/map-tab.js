@@ -1,0 +1,419 @@
+// 요소 편집기 「섬 지도」 탭 — 예전 섬 지도 편집기(map-editor.html, ET-08)를 옮긴 것. 섬은 게임과 같은 generateIsland 로 다시 만든다.
+// 칸 경로는 layout 안 경로 ('shop' · 'villagers/coco' · 'density/trees'), 편집기 바뀐 칸에는 'layout/' 를 붙여 남는다 (api.set).
+import { generateIsland, resolveLayout, DEFAULT_LAYOUT, lotsOf, BUILDING_KINDS, KIND, KIND_NAMES } from '../src/world/island.js';
+import { ISLAND, VILLAGERS } from '../src/core/constants.js';
+import { getAt, same } from '../tools/edits.mjs';
+
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const W = ISLAND.w, H = ISLAND.h;
+const R5 = v => Math.round(v * 1e5) / 1e5;
+
+const PEOPLE = { coco: ['코코', '#F2B36B'], bori: ['보리', '#6CA0DC'], mochi: ['모찌', '#B9A6E0'], dubu: ['두부', '#7FA36B'], pong: ['퐁', '#FFD866'], chorong: ['초롱', '#8CCB6E'], danpung: ['단풍', '#D9583B'] };
+const TILE_KO = { sea: '바다', sand: '모래', grass: '풀밭', path: '흙길', plaza: '광장', water: '강·연못', cliff: '언덕 가장자리', ramp: '경사로' };
+const OBJ_KO = { tree: '나무', cedar: '삼나무', 'fruit-tree': '과일나무', palm: '야자수', tulip: '튤립', cosmos: '코스모스', pansy: '팬지', bush: '꽃덤불', rock: '바위', weed: '잡초', shell: '조개',
+  'fossil-spot': '화석 자리', lamp: '가로등', bench: '벤치', signboard: '안내판', campfire: '모닥불', fence: '울타리', mailbox: '우편함', bridge: '다리', dock: '선착장',
+  museum: '박물관', shop: '도토리상점', 'house-player': '내 집', 'house-villager': '주민 집' };
+const TILE_COLOR = ['#7EC4DE', '#EED9A6', '#A6D46E', '#D9B887', '#EDE4D3', '#5FB3E0', '#82B35A', '#C9A673'];
+const HILL_GRASS = '#91C25E';
+const VAR_COLOR = { red: '#E24B4B', yellow: '#F2CF3A', white: '#FAFAF2', pink: '#F29BB8', orange: '#F29440', purple: '#9B6BD0', blue: '#5C8FE0', green: '#5DA35A', peach: '#F6C3A6' };
+const FRUIT_COLOR = { apple: '#D9473B', pear: '#C9C24A', peach: '#F2A38A', cherry: '#B8243A', orange: '#F08A2A' };
+const BUILDING_COLOR = { museum: '#6F8F7A', shop: '#8A5A3A', 'house-player': '#E8635A' };
+
+// path = layout 칸 경로, axis 'x' = x 만 움직임 (y 는 섬 모양이 정함)
+export const PINS = [
+  { path: 'museum', name: '박물관 (언덕 위)', emo: '🏛', building: 'museum', fx: '박물관 건물이 이 자리 가까운 언덕 위 빈 땅에 지어져요.' },
+  { path: 'museumLow', name: '박물관 아래 자리 (언덕에 자리가 없을 때)', emo: '🏛', small: true },
+  { path: 'shop', name: '도토리상점', emo: '🏪', building: 'shop', fx: '상점 건물 자리 — 주민 길찾기와 아침 산책 길이 따라 바뀌어요.' },
+  { path: 'playerHouse', name: '내 집', emo: '🏠', building: 'house-player' },
+  ...VILLAGERS.map(s => ({ path: `villagers/${s}`, name: `${PEOPLE[s]?.[0] ?? s}의 집`, emo: '🏡', building: 'house-villager', owner: s, color: PEOPLE[s]?.[1] })),
+  { path: 'plaza', name: '광장', emo: '🔥', place: 'plaza', fx: '모닥불·우편함·안내판이 있는 돌바닥 광장 가운데.' },
+  { path: 'festival/at', name: '축제 광장', emo: '🎪', festival: true, fx: '섬 축제·야시장·봄/가을 행사 무대가 서는 원.' },
+  { path: 'bridges/0', name: '북쪽 다리', emo: '🌉', bridge: 0, fx: '강이 이 자리를 곧게 지나며 다리가 놓여요.' },
+  { path: 'bridges/1', name: '남쪽 다리', emo: '🌉', bridge: 1 },
+  { path: 'dock', name: '선착장', emo: '⚓', axis: 'x', dock: true, fx: '남쪽 바닷가 선착장 — 투어 배가 여기서 떠요.' },
+  { path: 'pond', name: '연못·폭포', emo: '💧', small: true, pond: true },
+  { path: 'orchard', name: '과수원 언덕', emo: '🍎', orchard: true },
+  ...[0, 1, 2].map(i => ({ path: `ramps/${i}`, name: `경사로 ${i + 1}`, emo: '⤴', axis: 'x', small: true, ramp: i })),
+  ...[0, 1, 2, 3, 4, 5].map(i => ({ path: `rocks/${i}`, name: `바위 ${i + 1}`, emo: '🪨', small: true, rock: i })),
+];
+export const DENS = [
+  ['trees', '나무 (활엽수) 최대', 0, 140, 1, 'tree'], ['cedars', '삼나무 (언덕 위) 최대', 0, 50, 1, 'cedar'], ['forest', '숲 짙기', 0.3, 2, 0.05],
+  ['fruitTrees', '숲 속 과일나무 최대', 0, 15, 1], ['fruitChance', '숲 속 과일나무 확률', 0, 0.5, 0.01], ['orchardTrees', '과수원 과일나무', 0, 15, 1],
+  ['palms', '야자수 최대', 0, 24, 1, 'palm'], ['flowerClusters', '꽃 무더기 수', 0, 30, 1], ['flowerSize/0', '무더기 꽃 수 (적게)', 1, 10, 1], ['flowerSize/1', '무더기 꽃 수 (많게)', 1, 12, 1],
+  ['bushes', '꽃덤불 (들판)', 0, 20, 1], ['weeds', '잡초 (처음)', 0, 60, 1, 'weed'], ['shells', '조개 (처음)', 0, 24, 1, 'shell'], ['fossils', '화석 자리 (처음)', 0, 8, 1, 'fossil-spot'],
+];
+
+/** 지도 칸 경로 → 사람 이름 (바뀐 칸 목록) */
+export function mapLabel(path) {
+  const p = PINS.find(p => p.path === path);
+  if (p) return p.name;
+  const named = { seed: '시드', 'festival/r': '축제 광장 반지름', bridges: '다리 자리', ramps: '경사로 자리', rocks: '바위 자리', 'density/flowerSize': '무더기 꽃 수' };
+  if (named[path]) return named[path];
+  return DENS.find(([k]) => `density/${k}` === path)?.[1] ?? path;
+}
+export function mapShow(path, v) {
+  if (v == null) return '(없음)';
+  if (Array.isArray(v) && v.length === 2 && v.every(Number.isFinite) && v.every(x => x <= 1) && !path.includes('flowerSize')) return `(${Math.round(v[0] * W)}, ${Math.round(v[1] * H)})`;
+  if (Array.isArray(v) && Array.isArray(v[0])) return v.map(q => `(${Math.round(q[0] * W)}, ${Math.round(q[1] * H)})`).join(' ');
+  if (path === 'dock' && typeof v === 'number') return `x ${Math.round(v * W)}`;
+  if (path === 'ramps') return v.map(x => `x ${Math.round(x * W)}`).join(' · ');
+  return Array.isArray(v) ? v.join('~') : String(v);
+}
+
+/**
+ * api = { base(): 반영된 layout.json, work(): 지금 layout (파일 + 바뀐 칸), set(path, v), del(prefixOrPath, { prefix }), changed(): layout 안 바뀐 경로 목록, onChange() }
+ * → { show(), hide(), refresh(), checks(): [[ok, label, why]] (섬을 한 번은 만들어야 함), ready: Promise }
+ */
+export function createMapTab(root, api) {
+  root.innerHTML = `
+  <div class="savewarn" data-r="saveWarn" role="note">
+    <b>하던 게임 저장과 어긋날 수 있어요</b>
+    <span>섬 위에 옮겨 심은 나무·꽃, 밖에 놓은 물건, 벤 나무·딴 열매 기록은 칸 자리로 저장돼요. 건물 자리를 옮기면 그 자리에 놓아 둔 물건이 건물과 겹칠 수 있고, 시드나 밀도를 바꾸면 섬의 나무·꽃·바위가 모두 새로 놓여서 저장된 기록이 엉뚱한 나무를 가리켜요.</span>
+  </div>
+  <div class="mapwork">
+    <div class="mapcol">
+      <div class="maptools">
+        <label><input type="checkbox" data-r="optLabels" checked> 이름 보기</label>
+        <label><input type="checkbox" data-r="optSmall" checked> 작은 자리</label>
+        <label><input type="checkbox" data-r="optObjects" checked> 나무·꽃</label>
+        <span class="muted small" data-r="genTime"></span>
+      </div>
+      <div class="map" data-r="map" role="group" aria-label="섬 지도. 자리 표시를 끌거나 화살표 키로 옮겨요">
+        <canvas data-r="cv"></canvas><div data-r="pins"></div>
+      </div>
+      <p class="readout" data-r="readout">지도 위에 올리면 칸 좌표와 땅 종류가 보여요.</p>
+      <div class="legend" data-r="legend"></div>
+    </div>
+    <div class="mapside">
+      <section class="box"><header><h3>고른 자리</h3><span class="muted small">자리 표시를 누르세요</span></header><div data-r="selBox"></div></section>
+      <section class="box"><header><h3>시드</h3><span class="muted small">섬 모양·나무·꽃이 정해지는 숫자</span></header>
+        <div class="seedrow"><input type="number" data-r="seed" min="0" step="1" aria-label="지도 시드">
+          <button type="button" class="btn ghost" data-r="seedRoll"><span class="emo">🎲</span> 아무거나</button>
+          <button type="button" class="btn ghost tiny" data-r="seedBack">반영된 시드로</button></div>
+        <p class="fx">바꾸면: 해안선·언덕·강 굽이와 나무·꽃 자리가 모두 바뀌어요 (같은 시드면 늘 같은 섬).</p></section>
+      <section class="box"><header><h3>나무·꽃 밀도</h3><button type="button" class="btn ghost tiny" data-r="densBack">반영된 값으로</button></header>
+        <p class="fx">바꾸면: 새 게임의 섬에 처음 놓이는 나무·꽃·바위 수가 바뀌어요 (날마다 새로 놓는 조개·잡초·화석은 「채집·하루·주민」 표).</p>
+        <div class="sliders" data-r="sliders"></div></section>
+      <section class="box"><header><h3>섬 확인</h3></header><ul class="checks" data-r="checks"></ul><div class="counts" data-r="counts"></div></section>
+    </div>
+  </div>`;
+  const $ = k => root.querySelector(`[data-r="${k}"]`);
+  const cv = $('cv'), ctx2 = cv.getContext('2d'), pinsEl = $('pins'), mapEl = $('map');
+  let lots = null, gen = null, sel = null, genMs = 0, visible = false, drag = null;
+
+  const work = () => api.work();
+  function setChange(path, v) { api.set(path, v); }
+
+  function regenerate() {
+    if (!lots) return;
+    const L = work();
+    const t0 = performance.now();
+    gen = generateIsland(L.seed ?? DEFAULT_LAYOUT.seed, { w: W, h: H, villagers: VILLAGERS, lots, layout: L });
+    genMs = performance.now() - t0;
+    if (!visible) return;
+    $('genTime').textContent = `섬 만들기 ${Math.round(genMs)}ms`;
+    draw(); placePins(); renderSide();
+  }
+  let queued = false;
+  const regenSoon = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; regenerate(); }); };
+
+  function draw() {
+    if (!gen || !visible) return;
+    const box = mapEl.getBoundingClientRect();
+    if (!box.width) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(box.width * dpr); cv.height = Math.round(box.height * dpr);
+    const s = cv.width / W, c = ctx2;
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.fillStyle = TILE_COLOR[KIND.SEA]; c.fillRect(0, 0, cv.width, cv.height);
+    const px = t => Math.round(t * s);
+    for (let tz = 0; tz < H; tz++) for (let tx = 0; tx < W; tx++) {
+      const i = tz * W + tx, k = gen.kind[i];
+      if (k === KIND.SEA) continue;
+      c.fillStyle = k === KIND.GRASS && gen.level[i] ? HILL_GRASS : TILE_COLOR[k];
+      c.fillRect(px(tx), px(tz), px(tx + 1) - px(tx), px(tz + 1) - px(tz));
+    }
+    c.fillStyle = 'rgba(40,60,20,.28)';
+    for (let tz = 0; tz < H - 1; tz++) for (let tx = 0; tx < W; tx++) {
+      const i = tz * W + tx;
+      if (gen.level[i] && !gen.level[i + W]) c.fillRect(px(tx), px(tz + 1) - Math.max(1, s * 0.22), px(tx + 1) - px(tx), Math.max(1, s * 0.22));
+    }
+    const F = gen.layout.festival;
+    c.save(); c.setLineDash([s * 0.6, s * 0.4]); c.lineWidth = Math.max(1.5, s * 0.16);
+    c.strokeStyle = '#C9701F'; c.fillStyle = 'rgba(246,200,76,.22)';
+    c.beginPath(); c.arc(F.at[0] * W * s, F.at[1] * H * s, F.r * s, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore();
+    c.fillStyle = '#9A6A3E';
+    for (const b of gen.bridges) c.fillRect(px(b.tx) - s * 0.2, px(b.tz) + s * 0.15, s * 2.4, s * 0.7);
+    if (gen.dock) c.fillRect(px(gen.dock.tx), px(gen.dock.tz + 1), s * 2, s * 4);
+    for (const b of gen.buildings) {
+      const col = b.kind === 'house-villager' ? PEOPLE[b.data.owner]?.[1] ?? '#C98' : BUILDING_COLOR[b.kind];
+      const x = px(b.tx0), z = px(b.tz0), w = px(b.tx0 + b.fw) - x, d = px(b.tz0 + b.fd) - z;
+      if (b.data.lot) { c.save(); c.setLineDash([s * 0.5, s * 0.35]); c.strokeStyle = col; c.lineWidth = Math.max(1.5, s * 0.18); c.strokeRect(x + 1, z + 1, w - 2, d - 2); c.restore(); }
+      else {
+        c.fillStyle = col; c.fillRect(x, z, w, d);
+        c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(x, z + d - Math.max(1, s * 0.25), w, Math.max(1, s * 0.25));
+        c.fillStyle = 'rgba(255,255,255,.85)'; c.fillRect(px(b.door.tx) + s * 0.25, z + d - s * 0.6, s * 0.5, s * 0.6);
+      }
+    }
+    if ($('optObjects').checked) for (const o of gen.objects) drawObj(c, o, s);
+    c.save(); c.setLineDash([3, 3]); c.strokeStyle = 'rgba(51,48,42,.7)'; c.lineWidth = 1.2;
+    for (const p of PINS) {
+      const t = targetOf(p), a = actualOf(p);
+      if (!t || !a || Math.hypot(t[0] - a[0], t[1] - a[1]) < 1.2) continue;
+      c.beginPath(); c.moveTo(t[0] * s, t[1] * s); c.lineTo(a[0] * s, a[1] * s); c.stroke();
+    }
+    c.restore();
+  }
+  const SKIP = new Set(['bridge', 'dock', 'museum', 'shop', 'house-player', 'house-villager']);
+  function drawObj(c, o, s) {
+    if (SKIP.has(o.kind)) return;
+    const x = (o.tx + 0.5) * s, z = (o.tz + 0.5) * s;
+    const dot = (r, col) => { c.fillStyle = col; c.beginPath(); c.arc(x, z, Math.max(1, r * s), 0, Math.PI * 2); c.fill(); };
+    switch (o.kind) {
+      case 'tree': dot(0.44, '#4E9A47'); dot(0.2, '#6DB85F'); break;
+      case 'cedar': dot(0.44, '#2C6A44'); dot(0.18, '#3F8556'); break;
+      case 'fruit-tree': dot(0.44, '#5AA24C'); dot(0.16, FRUIT_COLOR[o.variant] ?? '#D9473B'); break;
+      case 'palm': c.strokeStyle = '#3D9447'; c.lineWidth = Math.max(1, s * 0.14); c.beginPath();
+        for (let k = 0; k < 5; k++) { const a = k * 1.2566; c.moveTo(x, z); c.lineTo(x + Math.cos(a) * s * 0.45, z + Math.sin(a) * s * 0.45); } c.stroke(); break;
+      case 'tulip': case 'cosmos': case 'pansy': dot(0.2, VAR_COLOR[o.variant] ?? '#F29BB8'); break;
+      case 'bush': dot(0.36, '#5FAE5E'); dot(0.12, VAR_COLOR[o.variant] ?? '#F29BB8'); break;
+      case 'rock': dot(0.34, '#8F918A'); dot(0.14, '#B3B4AD'); break;
+      case 'weed': dot(0.13, '#6E9A3E'); break;
+      case 'shell': dot(0.13, '#FFF3E8'); break;
+      case 'fossil-spot': c.strokeStyle = '#6B4A2E'; c.lineWidth = Math.max(1, s * 0.12); c.beginPath();
+        c.moveTo(x - s * .22, z - s * .22); c.lineTo(x + s * .22, z + s * .22); c.moveTo(x + s * .22, z - s * .22); c.lineTo(x - s * .22, z + s * .22); c.stroke(); break;
+      case 'lamp': dot(0.14, '#F6C84C'); break;
+      case 'campfire': dot(0.3, '#E8742A'); break;
+      case 'fence': c.fillStyle = '#FFFFFF'; c.fillRect(x - s * .45, z - s * .08, s * .9, s * .16); break;
+      case 'mailbox': dot(0.15, VAR_COLOR[o.variant] ?? '#E24B4B'); break;
+      default: dot(0.18, '#8A6A4A');
+    }
+  }
+
+  function targetOf(p) {
+    const v = getAt(gen.layout, p.path);
+    if (v == null) return null;
+    if (p.axis === 'x') {
+      const y = p.dock ? (gen.dock ? gen.dock.tz + 0.5 : H * 0.92) : (gen.ramps[p.ramp]?.tzTop ?? H * 0.4) + 1;
+      return [v * W, y];
+    }
+    return [v[0] * W, v[1] * H];
+  }
+  function actualOf(p) {
+    if (p.building === 'museum' || p.building === 'shop' || p.building === 'house-player' || p.owner) {
+      const b = gen.buildings.find(b => b.kind === p.building && (!p.owner || b.data.owner === p.owner));
+      return b ? [b.tx0 + b.fw / 2, b.tz0 + b.fd / 2] : null;
+    }
+    if (p.path === 'museumLow') { const b = gen.buildings.find(b => b.kind === 'museum'); return b && b.level === 0 ? [b.tx0 + b.fw / 2, b.tz0 + b.fd / 2] : null; }
+    if (p.bridge != null) { const b = gen.bridges[p.bridge]; return b ? [b.tx + 1, b.tz + 0.5] : null; }
+    if (p.dock) return gen.dock ? [gen.dock.tx + 1, gen.dock.tz + 0.5] : null;
+    if (p.ramp != null) { const r = gen.ramps[p.ramp]; return r ? [r.tx + 0.5, r.tzTop + 1] : null; }
+    if (p.rock != null) {
+      const t = targetOf(p);
+      const near = gen.objects.filter(o => o.kind === 'rock').map(o => [o.tx + 0.5, o.tz + 0.5]).sort((a, b) => Math.hypot(a[0] - t[0], a[1] - t[1]) - Math.hypot(b[0] - t[0], b[1] - t[1]))[0];
+      return near && Math.hypot(near[0] - t[0], near[1] - t[1]) < 6 ? near : null;
+    }
+    return null;
+  }
+  const placed = p => (p.path === 'museumLow' || p.festival || p.pond || p.orchard || p.place) ? true : !!actualOf(p);
+
+  pinsEl.innerHTML = PINS.map((p, i) => `<button type="button" class="pin${p.small ? ' small' : ''}" data-i="${i}" aria-label="${esc(p.name)}"
+    ${p.color ? `style="border-color:${p.color}"` : ''}><span aria-hidden="true">${p.emo}</span><span class="tag">${esc(p.name.replace(/ \(.*\)$/, ''))}</span></button>`).join('');
+  function placePins() {
+    const baseL = resolveLayout(api.base());
+    for (const el of pinsEl.children) {
+      const p = PINS[+el.dataset.i], t = targetOf(p);
+      if (!t) { el.hidden = true; continue; }
+      el.hidden = false;
+      el.style.left = `${(t[0] / W) * 100}%`; el.style.top = `${(t[1] / H) * 100}%`;
+      el.classList.toggle('sel', sel === p);
+      el.classList.toggle('bad', !placed(p));
+      el.classList.toggle('moved', !same(getAt(baseL, p.path), getAt(gen.layout, p.path)));
+      el.setAttribute('aria-label', `${p.name}, 칸 ${Math.round(t[0])}, ${Math.round(t[1])}${placed(p) ? '' : ', 자리를 못 찾음'}. 화살표 키로 옮겨요`);
+    }
+  }
+  function moveTo(p, fx, fz) {
+    const cx = Math.min(0.97, Math.max(0.03, R5(Math.round(fx * W) / W)));
+    const cz = Math.min(0.97, Math.max(0.03, R5(Math.round(fz * H) / H)));
+    const next = p.axis === 'x' ? cx : [cx, cz];
+    if (same(getAt(work(), p.path), next)) return false;
+    setPinValue(p, next);
+    return true;
+  }
+  // 배열 칸(다리·경사로·바위)은 배열 통째로 — diff 가 한 줄로 읽힌다
+  function setPinValue(p, v) {
+    const m = p.path.match(/^(bridges|ramps|rocks)\/(\d+)$/);
+    if (m) { const arr = structuredClone(getAt(work(), m[1])); arr[+m[2]] = v; setChange(m[1], arr); }
+    else setChange(p.path, v);
+  }
+  pinsEl.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.pin');
+    if (!el) return;
+    e.preventDefault();
+    el.focus({ preventScroll: true });
+    const p = PINS[+el.dataset.i];
+    select(p);
+    try { el.setPointerCapture(e.pointerId); } catch {}
+    el.classList.add('dragging');
+    drag = { p, el, id: e.pointerId, moved: false };
+  });
+  pinsEl.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const r = mapEl.getBoundingClientRect();
+    if (moveTo(drag.p, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height)) { drag.moved = true; if (genMs < 45) regenSoon(); else placePins(); }
+  });
+  const endDrag = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag.el.classList.remove('dragging');
+    const moved = drag.moved;
+    drag = null;
+    if (moved) { regenerate(); api.onChange(); }
+  };
+  pinsEl.addEventListener('pointerup', endDrag);
+  pinsEl.addEventListener('pointercancel', endDrag);
+  pinsEl.addEventListener('keydown', e => {
+    const el = e.target.closest('.pin');
+    if (!el) return;
+    const p = PINS[+el.dataset.i], step = e.shiftKey ? 3 : 1;
+    const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    select(p);
+    const t = targetOf(p);
+    if (p.axis === 'x' && d[1]) return;
+    if (moveTo(p, (t[0] + d[0]) / W, (t[1] + d[1]) / H)) { regenerate(); api.onChange(); }
+  });
+  pinsEl.addEventListener('click', e => { const el = e.target.closest('.pin'); if (el) select(PINS[+el.dataset.i]); });
+  function select(p) { sel = p; placePins(); renderSel(); }
+
+  mapEl.addEventListener('pointermove', e => {
+    if (!gen || drag) return;
+    const r = mapEl.getBoundingClientRect();
+    const tx = Math.floor(((e.clientX - r.left) / r.width) * W), tz = Math.floor(((e.clientY - r.top) / r.height) * H);
+    if (tx < 0 || tz < 0 || tx >= W || tz >= H) return;
+    const i = tz * W + tx, k = KIND_NAMES[gen.kind[i]];
+    const o = gen.objects.find(o => o.tx === tx && o.tz === tz);
+    const b = gen.buildings.find(b => tx >= b.tx0 && tx < b.tx0 + b.fw && tz >= b.tz0 && tz < b.tz0 + b.fd);
+    const bName = b ? (b.kind === 'house-villager' ? `${PEOPLE[b.data.owner]?.[0] ?? b.data.owner}의 ${b.data.lot ? '빈 집터' : '집'}` : OBJ_KO[b.kind]) : null;
+    $('readout').textContent = `칸 (${tx}, ${tz}) · ${TILE_KO[k] ?? k}${gen.level[i] ? ' · 언덕 위' : ''}${bName ? ` · ${bName}` : o ? ` · ${OBJ_KO[o.kind] ?? o.kind}` : ''}`;
+  });
+
+  function renderSel() {
+    const box = $('selBox');
+    if (document.activeElement?.dataset?.r === 'festR') { box.querySelector('[data-r="frVal"]').textContent = `${gen.layout.festival.r}칸`; return; }
+    if (!sel || !gen) { box.innerHTML = '<p class="empty">지도에서 건물·다리·선착장 같은 자리 표시를 누르면 여기에 목표 자리와 실제로 지은 자리가 나와요.</p>'; return; }
+    const p = sel, t = targetOf(p), a = actualOf(p);
+    const baseV = getAt(resolveLayout(api.base()), p.path), workV = getAt(gen.layout, p.path);
+    const tile = v => `(${Math.round(v[0])}, ${Math.round(v[1])})`;
+    const dist = a ? Math.round(Math.hypot(t[0] - a[0], t[1] - a[1])) : null;
+    let result = '';
+    if (p.building || p.bridge != null || p.dock || p.ramp != null || p.rock != null)
+      result = a ? `${tile(a)}${dist >= 2 ? ` — 목표에서 ${dist}칸 떨어진 곳에 지었어요 (가까운 빈 땅을 찾아요)` : ''}` : '<span style="color:var(--warn)">자리를 못 찾았어요 — 풀밭 쪽으로 옮겨 보세요</span>';
+    if (p.path === 'museumLow') result = a ? `${tile(a)} — 지금은 언덕에 자리가 없어 여기에 지었어요` : '쓰지 않음 (언덕 위에 지었어요)';
+    if (p.festival) result = `지름 ${gen.layout.festival.r * 2}칸`;
+    const was = same(baseV, workV) ? '그대로' : esc(p.axis === 'x' ? `x ${Math.round(baseV * W)}` : tile([baseV[0] * W, baseV[1] * H]));
+    box.innerHTML = `<div class="sel-title"><span class="emo" aria-hidden="true">${p.emo}</span><h3>${esc(p.name)}</h3></div>
+      <dl class="kv"><dt>목표 자리</dt><dd>${tile(t)}</dd>${result ? `<dt>지은 자리</dt><dd>${result}</dd>` : ''}<dt>반영된 자리</dt><dd>${was}</dd></dl>
+      ${p.fx ? `<p class="fx">바꾸면: ${esc(p.fx)}</p>` : ''}
+      ${p.festival ? `<label class="sl"><span class="lab">축제 광장 반지름</span><span class="val" data-r="frVal">${gen.layout.festival.r}칸</span>
+        <input type="range" data-r="festR" min="3" max="10" step="0.5" value="${gen.layout.festival.r}"></label>` : ''}
+      <p class="small muted">${p.axis === 'x' ? '좌우로만 옮겨요 (위아래는 섬 모양이 정해요).' : '끌거나 화살표 키(Shift = 3칸)로 옮겨요.'}</p>
+      <div class="seedrow"><button type="button" class="btn ghost tiny" data-r="selBack" ${same(baseV, workV) ? 'disabled' : ''}>반영된 자리로</button>
+        <button type="button" class="btn ghost tiny" data-r="selDefault">처음 섬 자리로</button></div>`;
+    box.querySelector('[data-r="selBack"]').onclick = () => { setPinValue(p, structuredClone(baseV)); regenerate(); api.onChange(); };
+    box.querySelector('[data-r="selDefault"]').onclick = () => { setPinValue(p, structuredClone(getAt(DEFAULT_LAYOUT, p.path))); regenerate(); api.onChange(); };
+    const fr = box.querySelector('[data-r="festR"]');
+    if (fr) { fr.oninput = () => { box.querySelector('[data-r="frVal"]').textContent = `${fr.value}칸`; setChange('festival/r', Number(fr.value)); regenSoon(); }; fr.onchange = () => api.onChange(); }
+  }
+
+  $('sliders').innerHTML = DENS.map(([k, label, min, max, step]) => `<label class="sl" data-sl="${k}"><span class="lab">${esc(label)}</span><span class="val"></span>
+    <input type="range" min="${min}" max="${max}" step="${step}" data-k="${k}"></label>`).join('');
+  $('sliders').addEventListener('input', e => {
+    const k = e.target.dataset.k;
+    if (!k) return;
+    const v = Number(e.target.value);
+    if (k.startsWith('flowerSize/')) {
+      const fs = [...work().density.flowerSize];
+      fs[+k.split('/')[1]] = v;
+      if (fs[0] > fs[1]) fs[k.endsWith('0') ? 1 : 0] = v;
+      setChange('density/flowerSize', fs);
+    } else setChange(`density/${k}`, v);
+    regenSoon();
+  });
+  $('sliders').addEventListener('change', () => api.onChange());
+  const countOf = kind => gen.objects.filter(o => o.kind === kind).length;
+  function renderSliders() {
+    const L = gen.layout.density, B = resolveLayout(api.base()).density;
+    for (const [k, , , , step, kind] of DENS) {
+      const row = root.querySelector(`[data-sl="${k}"]`);
+      const v = getAt(L, k), input = row.querySelector('input');
+      if (document.activeElement !== input) input.value = v;
+      row.querySelector('.val').innerHTML = `${Number(v).toFixed(step < 1 ? 2 : 0)}${kind ? ` <small>· 실제 ${countOf(kind)}</small>` : ''}`;
+      row.classList.toggle('changed', !same(v, getAt(B, k)));
+    }
+  }
+
+  function checks() {
+    if (!gen) regenerate();
+    if (!gen) return [];
+    const p = gen.places, L = gen.layout;
+    const vill = new Set(p.villagerHouses.map(v => v.slug));
+    const missing = VILLAGERS.filter(s => !vill.has(s)).map(s => PEOPLE[s]?.[0] ?? s);
+    const at = (x, z) => gen.kind[Math.round(z) * W + Math.round(x)];
+    const plazaOk = at(p.plaza.x + W / 2 - 0.5, p.plaza.z + H / 2 - 0.5) === KIND.PLAZA;
+    const fk = at(Math.round(W * L.festival.at[0]), Math.round(H * L.festival.at[1]));
+    const pts = [L.pond, L.plaza, L.museum, L.museumLow, L.shop, L.playerHouse, L.orchard, L.festival.at, ...Object.values(L.villagers), ...L.bridges, ...L.rocks];
+    const inside = pts.every(([x, z]) => x > 0.05 && x < 0.95 && z > 0.05 && z < 0.95) && [L.dock, ...L.ramps].every(x => x > 0.1 && x < 0.9);
+    return [
+      [!!(p.museum && p.shop && p.playerHouse), '박물관·도토리상점·내 집', '못 지은 건물이 있어요'],
+      [!missing.length, `주민 집 ${VILLAGERS.length - missing.length} / ${VILLAGERS.length}`, `${missing.join('·')} 집 자리를 못 찾았어요`],
+      [gen.bridges.length === 2, `다리 ${gen.bridges.length} / 2`, '강이 다리 줄을 지나지 않아요'],
+      [!!gen.dock, '선착장', '남쪽 바닷가에서 자리를 못 찾았어요'],
+      [gen.ramps.length === 3, `경사로 ${gen.ramps.length} / 3`, '언덕 가장자리 가까이로 옮겨 보세요'],
+      [gen.waterfalls.length >= 1, '폭포', '연못이 언덕 위에 있어야 해요'],
+      [plazaOk, '광장 돌바닥', '광장 가운데가 풀밭이 아니에요'],
+      [fk !== KIND.SEA && fk !== KIND.WATER, '축제 광장이 땅 위', '축제 광장 가운데가 물이에요'],
+      [inside, '모든 자리가 섬 안쪽', '가장자리에 너무 붙은 자리가 있어요'],
+    ];
+  }
+  function renderSide() {
+    if (!gen) return;
+    const L = gen.layout;
+    if (document.activeElement !== $('seed')) $('seed').value = L.seed ?? DEFAULT_LAYOUT.seed;
+    $('seedBack').disabled = same(L.seed, resolveLayout(api.base()).seed);
+    const loud = api.changed().some(k => k === 'seed' || k.startsWith('density'));
+    $('saveWarn').classList.toggle('loud', loud);
+    renderSliders();
+    $('checks').innerHTML = checks().map(([ok, label, why]) => `<li class="${ok ? 'ok' : 'bad'}"><span class="mark">${ok ? '✓' : '!'}</span><span>${esc(label)}${ok ? '' : ` — ${esc(why)}`}</span></li>`).join('');
+    const kinds = [['tree', '나무'], ['cedar', '삼나무'], ['fruit-tree', '과일나무'], ['palm', '야자수'], [['tulip', 'cosmos', 'pansy'], '꽃'], ['bush', '꽃덤불'], ['rock', '바위'], ['weed', '잡초'], ['shell', '조개'], ['fossil-spot', '화석 자리']];
+    $('counts').innerHTML = kinds.map(([k, n]) => `<span class="chip">${n} ${Array.isArray(k) ? k.reduce((s, x) => s + countOf(x), 0) : countOf(k)}</span>`).join('') + `<span class="chip">물체 모두 ${gen.objects.length}</span>`;
+    renderSel();
+  }
+  $('seed').addEventListener('change', () => {
+    const v = Math.floor(Number($('seed').value));
+    if (!Number.isFinite(v) || v < 0) { $('seed').value = work().seed; return; }
+    setChange('seed', v); regenerate(); api.onChange();
+  });
+  $('seedRoll').onclick = () => { setChange('seed', Math.floor(Math.random() * 2 ** 31)); regenerate(); api.onChange(); };
+  $('seedBack').onclick = () => { api.del('seed'); regenerate(); api.onChange(); };
+  $('densBack').onclick = () => { api.del('density', { prefix: true }); regenerate(); api.onChange(); };
+  $('optLabels').onchange = () => mapEl.classList.toggle('nolabels', !$('optLabels').checked);
+  $('optSmall').onchange = () => mapEl.classList.toggle('nosmall', !$('optSmall').checked);
+  $('optObjects').onchange = () => draw();
+  $('legend').innerHTML = [
+    [TILE_COLOR[KIND.GRASS], '풀밭'], [HILL_GRASS, '언덕'], [TILE_COLOR[KIND.SAND], '모래'], [TILE_COLOR[KIND.PATH], '흙길'], [TILE_COLOR[KIND.PLAZA], '광장'],
+    [TILE_COLOR[KIND.WATER], '강·연못'], ['#4E9A47', '나무'], ['#2C6A44', '삼나무'], ['#8F918A', '바위'], ['#F29BB8', '꽃'], ['rgba(246,200,76,.6)', '축제 광장'],
+  ].map(([c, n]) => `<span><i style="background:${c}"></i>${n}</span>`).join('') + '<span>점선 = 목표 자리 → 실제로 지은 자리</span>';
+  if (window.matchMedia('(max-width: 600px)').matches) { $('optSmall').checked = false; $('optLabels').checked = false; mapEl.classList.add('nosmall', 'nolabels'); }
+  new ResizeObserver(() => draw()).observe(mapEl);
+
+  const ready = Promise.all(BUILDING_KINDS.map(k => fetch(`assets/env/specs/${k}.json`).then(r => r.json())))
+    .then(specs => { lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map((k, i) => [k, specs[i]]))); regenerate(); });
+  return {
+    ready,
+    show() { visible = true; regenerate(); },
+    hide() { visible = false; },
+    refresh() { if (visible && !drag) regenerate(); else if (!visible) gen = null; },
+    checks,
+  };
+}

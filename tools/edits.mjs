@@ -5,7 +5,7 @@
 //   지도  "shop" · "villagers/coco" · "density/trees" · "bridges/1"              (assets/island/layout.json 안)
 //   숫자  "items/fish/crucian/price" · "rules/gather/shake/bees" · "rules/day/shellsPerDay/0" · "rules/recipes/tool.rod/needs"
 //         (첫 칸 = 파일 items | rules)
-// 배열 칸: 줄마다 이름표(slug · kind · result)가 있는 표는 그 이름으로, 아니면 번호로 찾는다.
+// 배열 칸: 줄마다 이름표(slug · kind · result)가 있는 표는 그 이름으로, 아니면 번호로 찾는다 (타로 카드·행사 할 것처럼 id 만 있는 줄은 번호 — 스토리 편집기 apply-texts 도 번호로 쓴다).
 // 값 { "$delete": true } = 그 칸 지우기 (줄마다 덧붙인 weight 같은 것). 줄 경로에 null = 그 줄 빼기, 줄 객체 = 새 줄 더하기·바꾸기.
 
 export const DELETE = Object.freeze({ $delete: true });

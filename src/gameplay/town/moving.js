@@ -10,9 +10,10 @@
 import { daysBetween, josa, rngOf, pickLines } from './rules.js';
 import { addDays, moveinState, MOVEIN_DAYS, PROPS, propKind } from './movein.js';
 import { VILLAGERS as FILES, LINES } from './people.js';
+import { RULES } from '../../data/tables.js';
 
-/** 숫자 (바꿀 자리는 여기 하나) */
-export const MOVING = {
+/** 숫자 기본값 — 실제 값은 assets/data/rules.json 의 moving 칸 (요소 편집기 「이사」 탭 → "요소 반영"). 빠진 칸만 여기 값 */
+const MOVING_DEFAULT = {
   every: 7,            // 엔딩 뒤 입주 날 사이 (첫 입주 = 엔딩 날 + 7)
   max: 10,             // 섬 최대 주민 수 (가게 주인 포함)
   minStay: 30,         // 이만큼 넘게 산 주민만 떠나 볼까 묻는다
@@ -26,6 +27,8 @@ export const MOVING = {
   letters: { first: 3, every: 12, max: 4 },   // 떠난 주민 편지: 떠난 뒤 3일에 첫 편지, 그 뒤 12일마다, 4통까지
   catchUp: 120,        // 오래 쉬었다 와도 굴려 보는 지난 날 수 (넘으면 그 앞은 건너뜀)
 };
+/** 이사 오가기 숫자 (rules.json moving 위에 빠진 칸만 기본값) */
+export const MOVING = Object.freeze({ ...MOVING_DEFAULT, ...(RULES.moving ?? {}), letters: { ...MOVING_DEFAULT.letters, ...(RULES.moving?.letters ?? {}) } });
 /** 입주 날 - LEAD = 이사 흐름 시작(start) — 다음 날 표지판, 3일 뒤 이삿짐, 다음 날 집 (movein.js MOVEIN_DAYS 합) */
 export const LEAD = MOVEIN_DAYS.lot + MOVEIN_DAYS.boxes + MOVEIN_DAYS.house;
 /** 떠나지 않는 주민: 섬 축제 부스 주인(축제 설정 booths.owner)과 계절 행사 주인공(events.json host) — tests/moving.test.mjs 가 맞는지 본다 */
