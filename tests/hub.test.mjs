@@ -16,7 +16,7 @@ const LIST = JSON.parse(home.match(/<script type="application\/json" id="editors
 const byId = Object.fromEntries(LIST.map(e => [e.id, e]));
 const GROUPS = ['editor', 'board', 'game', 'soon', 'archive'];
 // 채팅 명령 → 그 명령을 설명하는 문서 (CLAUDE.md 편집기 절 · concept/README.md · 각 트랙 노트)
-const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
+const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '스토리 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
 
 test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 맞다', () => {
   assert.equal(new Set(LIST.map(e => e.id)).size, LIST.length, 'id 겹침');
