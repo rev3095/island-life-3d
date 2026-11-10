@@ -1,4 +1,5 @@
 시나리오 편집기: https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF · 파일 `story-editor.html`
+> P36 부터 이 아티팩트는 **스토리 편집기**(탭 장면 · 주민 · 편지 · 그 밖의 글)이고 명령은 **"스토리 반영"** — 장면 부분은 아래 그대로, 전체 순서는 `docs/notes/p36-story-editor.md`.
 
 # 스토리 — 작업 노트 (`story` 브랜치, 고정 세션)
 
