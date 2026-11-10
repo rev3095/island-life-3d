@@ -504,8 +504,11 @@ export function makeScenario(bot, sk, opts = {}) {
     // 입주한 날 아침엔 새 집 안에 있다 → 나올 때까지 기다린다 (사람도 집 앞에서 기다리거나 다른 일을 한다)
     const V = sk.villager('danpung');
     const outAt = await bot.until(() => V?.talkable, { timeout: 240, label: '단풍이 나오기' });
-    note('danpungOut', { waited: outAt, hour: bot.hour().toFixed(2) });
-    const r = await sk.emoteTalk('danpung', { wins: 2 });
+    note('danpungOut', { waited: outAt, hour: bot.hour().toFixed(2), weather: S().time?.weather ?? null });
+    // 비·눈 오는 날엔 일과대로 집에 있다 → 집에 찾아가 방에서 말 건다 (moving-in 과 같게)
+    let r = { opened: false, sent: [] };
+    if (outAt || S().town.atHome('danpung') !== 'home') r = await sk.emoteTalk('danpung', { wins: 2 });
+    else { const v = await sk.visit('danpung', { goal: { wins: 2 } }); r = { opened: !!v.talked, sent: (v.talked || []).map(kind => ({ kind })) }; }
     return r.opened ? pass(`${rec.lot} 집터 · ${rec.boxes} 이삿짐 · ${rec.moved} 입주 · 대화 ${r.sent.map(x => x.kind)}`) : awk(`입주했는데 말을 못 걸었어요 (나옴 ${outAt})`);
   });
 
@@ -681,18 +684,28 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.shot('12-moving-in', `${slug} 입주한 날`);
     const V = sk.villager(slug);
     const outAt = await bot.until(() => V?.talkable, { timeout: 240, label: `${slug} 나오기` });
-    const talk = await sk.emoteTalk(slug, { wins: 1 });
-    // 이삿날 저녁: 첫 만남 장면 (s17–s19, 트리거 move-in)
+    // 이삿날이 비·눈이면 새 주민도 일과대로(rainStay·snowStay) 집에 있다 → 사람처럼 집에 찾아가 방에서 말 건다
+    let talk = { opened: false }, visited = null;
+    if (outAt || S().town.atHome(slug) !== 'home') talk = await sk.emoteTalk(slug, { wins: 1 });
+    else {
+      const v = await sk.visit(slug, { goal: { wins: 1 } });
+      visited = { weather: S().time?.weather ?? null, entered: v.entered, talked: v.talked, knocked: v.knocked, left: v.left };
+      talk = { opened: !!v.talked };
+    }
+    // 이삿날 저녁: 첫 만남 장면 (s17–s19, 트리거 move-in — 플레이어가 밖에 있을 때만 town:welcome)
+    if (S().house?.where || S().house?.inside || Math.abs(bot.pos().x) > 100) await bot.exitRoom();
     await bot.setHour(17.6);
     await bot.settle(120);
-    const scene = Object.keys(st().story?.seen ?? {}).find(id => /^s1[789]-/.test(id) && id.includes(slug)) ?? null;
-    note('movingInTalk', { outAt, talk: talk.opened, scene });
+    const seenScene = () => Object.keys(st().story?.seen ?? {}).find(id => /^s1[789]-/.test(id) && id.includes(slug)) ?? null;
+    if (!seenScene()) await bot.until(() => !!seenScene() && !bot.storyOn(), { timeout: 90, label: '첫 만남 장면' });
+    const scene = seenScene();
+    note('movingInTalk', { outAt, talk: talk.opened, visited, scene, at17: { where: S().house?.where ?? null, inside: !!S().house?.inside, x: +bot.pos().x.toFixed(1), welcomed: moving().state().welcomed?.[slug] ?? null } });
     const odd = [];
     if (!letter) odd.push('오기 전날 편지가 없음');
     else if (!letter.read) odd.push('편지를 못 읽음');
     if (!talk.opened) odd.push('새 주민에게 말을 못 걸음');
     if (!scene) odd.push('첫 만남 장면이 안 나옴');
-    return odd.length ? awk(`${slug}: ${odd.join(' · ')} (${days.join(', ')})`) : pass(`${slug} ${days.join(' → ')} · 편지 ${letter.day} · 대화 · 장면 ${scene}`);
+    return odd.length ? awk(`${slug}: ${odd.join(' · ')} (${days.join(', ')})`) : pass(`${slug} ${days.join(' → ')} · 편지 ${letter.day} · 대화${visited ? ` (${visited.weather} — 집에 찾아가서)` : ''} · 장면 ${scene}`);
   });
 
   add('moving-out', '떠나 볼까: 30일 넘게 산 주민이 물으면 허락 → 이삿짐 → 떠남 → 빈 집터 표지판 → 떠난 주민 편지', async () => {

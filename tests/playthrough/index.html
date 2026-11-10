@@ -50,6 +50,8 @@ if (q.get('keep') !== '1') { try { localStorage.removeItem(SAVE_KEY); } catch { 
 const gameParams = new URLSearchParams(q.get('debug') === '1' ? { debug: '' } : {});
 if (q.get('touch')) gameParams.set('touch', q.get('touch'));
 if (q.get('quality')) gameParams.set('quality', q.get('quality'));
+// 날짜 흉내 (게임 ?date=, 저장 칸은 미리 보기 쪽) — 어떤 날짜에서 실패한 실행을 같은 날씨·요일로 다시 돌릴 때 (--date=2026-11-10)
+if (q.get('date')) gameParams.set('date', q.get('date'));
 const url = (target === 'artifact' ? '/artifact/' : '/index.html') + '?' + gameParams.toString().replace(/=(&|$)/g, '$1');
 $('#opts').textContent = `대상 ${url} · ${innerWidth}×${innerHeight}`;
 const frame = $('#game');
