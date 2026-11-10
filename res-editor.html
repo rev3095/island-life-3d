@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>리소스 편집기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 리소스 편집기 (p36): 게임에 들어가는 모델·그림 리소스 전부 — 캐릭터 · 배경 · 가구(붙박이 포함) · 아이템 · 벽지/바닥 무늬.
+   위: 영역·주제·상태 거르기 + 요소 격자. 아래: 고른 요소 한 화면 — 왼쪽 3D·렌더·버전 비교, 오른쪽 상태 · 바꾸는 방법(스펙 값 / 로컬 생성 / 만든 파일 교체) · 레퍼런스 · 교체 약속 검사 · 요청.
+   요청은 저장소 res-requests 에 남고, 채팅 "리소스 요청 확인" 으로 Claude 가 처리한다 (docs/notes/p36-res-editor.md). */
+:root {
+  --bg: #EEF2EA; --panel: #FFFFFF; --ink: #3B2F28; --muted: #6D6259; --line: #D9E0D4;
+  --accent: #4F8A3C; --accent-ink: #FFFFFF; --chip: #E3EBDD; --live: #3E8A55; --warn: #B4532A; --wait: #C9701F;
+  --sky-top: #BFE6F7; --sky-bot: #EEF8FC;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161B17; --panel: #1F261F; --ink: #EEE6DC; --muted: #A99F95; --line: #323B32;
+    --accent: #8CCB6E; --accent-ink: #14200F; --chip: #29312A; --live: #7CCB93; --warn: #F08A60; --wait: #F0A55A;
+    --sky-top: #5E88A8; --sky-bot: #A9C9DA; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 24px 72px;
+  padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: clamp(28px, 5vw, 42px); }
+h2 { font-size: 22px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .88em; overflow-wrap: anywhere; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .05em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+header { display: grid; gap: 8px; }
+.pills, .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 12.5px; padding: 2px 10px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill.wait, .pill.st-new { background: var(--wait); color: var(--accent-ink); }
+.pill.st-working { background: var(--ink); color: var(--panel); }
+.pill.st-done, .pill.ok { background: var(--live); color: var(--panel); }
+.pill.bad { background: var(--warn); color: var(--panel); }
+.bar { display: grid; gap: 8px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button, .chips button { font: inherit; font-size: 14.5px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 4px 13px; border-radius: 999px; cursor: pointer; }
+.chips button { font-size: 13px; padding: 2px 11px; }
+.tabs button span, .chips button span { color: var(--muted); font-size: 12px; margin-left: 4px; font-family: var(--mono); }
+.tabs button[aria-pressed="true"], .chips button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tabs button[aria-pressed="true"] span, .chips button[aria-pressed="true"] span { color: inherit; opacity: .8; }
+.findrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.findrow input { max-width: 260px; }
+.grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); max-height: 360px; overflow: auto; padding: 2px; }
+.pick { display: grid; gap: 1px; justify-items: center; text-align: center; font: inherit; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 14px; padding: 7px 5px; cursor: pointer; position: relative; min-width: 0; }
+.pick img { width: 64px; height: 64px; object-fit: contain; border-radius: 10px; background: var(--chip); }
+.pick .nm { font-family: var(--display); font-size: 14px; line-height: 1.15; overflow-wrap: anywhere; }
+.pick .id { font-size: 10px; }
+.pick[aria-pressed="true"] { border: 2px solid var(--accent); padding: 6px 4px; }
+.pick .dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--wait); }
+.pick .dot.ok { background: var(--live); }
+.pick .warnmark { position: absolute; top: 4px; left: 6px; font-size: 12px; color: var(--warn); font-weight: 700; }
+.pick.add { border-style: dashed; align-content: center; min-height: 104px; }
+.pick.add .plus { font-family: var(--display); font-size: 28px; line-height: 1; color: var(--accent); }
+.main { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 920px) { .main { grid-template-columns: 1fr; } }
+.col { display: grid; gap: 14px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.card > h3 { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.card > h3 .small { font-family: var(--body); }
+.sel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.viewer { position: relative; aspect-ratio: 1 / 1; max-height: 560px; width: 100%; border-radius: 12px; overflow: hidden;
+  background: linear-gradient(var(--sky-top), var(--sky-bot) 70%); touch-action: none; }
+.viewer canvas { display: block; width: 100%; height: 100%; }
+.viewer .msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: #2F4A57; font-size: 14px; }
+.viewer .tag { position: absolute; left: 10px; top: 10px; font-size: 12.5px; background: var(--wait); color: #fff; padding: 2px 10px; border-radius: 999px; }
+.flat { display: block; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; background: var(--chip); }
+.controls { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--chip); border-radius: 10px; padding: 3px; gap: 2px; max-width: 100%; }
+.seg button, .btn { font: inherit; font-size: 14px; border: 0; background: transparent; color: var(--ink); padding: 5px 12px; border-radius: 8px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.btn { border: 1px solid var(--line); background: var(--panel); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-family: var(--display); font-size: 16px; padding: 7px 16px; }
+.btn.link { border: 0; padding: 0; background: none; color: var(--muted); font-size: 12.5px; text-decoration: underline; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 13.5px; }
+.strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.strip figure { margin: 0; display: grid; gap: 2px; justify-items: center; flex: 0 0 auto; }
+.strip img { width: 120px; height: 120px; object-fit: contain; border-radius: 10px; background: var(--chip); cursor: zoom-in; }
+.strip figcaption { font-size: 12px; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; }
+.stat { background: var(--chip); border-radius: 10px; padding: 6px 9px; display: grid; }
+.stat b { font-family: var(--mono); font-weight: 500; font-size: 14px; overflow-wrap: anywhere; }
+.stat span { font-size: 11.5px; color: var(--muted); }
+/* 버전 비교: 예전 ↔ 지금, 가운데 줄을 끌어 겹쳐 보기 */
+.cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cmp figure { margin: 0; display: grid; gap: 4px; }
+.cmp img { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; border-radius: 10px; background: var(--chip); }
+.cmp figcaption { font-size: 12.5px; color: var(--muted); text-align: center; }
+.wipe { position: relative; aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden; background: var(--chip); max-width: 360px; width: 100%; justify-self: center; }
+.wipe img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.wipe .top { clip-path: inset(0 calc(100% - var(--x, 50%)) 0 0); }
+.wipe .line { position: absolute; top: 0; bottom: 0; left: var(--x, 50%); width: 2px; background: var(--accent); }
+/* 바꾸는 방법 */
+.methods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 520px) { .methods { grid-template-columns: 1fr; } }
+.methods button { font: inherit; text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 12px; padding: 8px 10px; cursor: pointer; display: grid; gap: 2px; }
+.methods button b { font-family: var(--display); font-weight: 400; font-size: 15.5px; }
+.methods button span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.methods button[aria-pressed="true"] { border: 2px solid var(--accent); padding: 7px 9px; background: var(--chip); }
+.methods button:disabled { opacity: .5; cursor: default; }
+.field { display: grid; gap: 4px; }
+.field > label, .ctl-label { font-size: 12.5px; color: var(--muted); }
+textarea, input[type="text"], input[type="number"], select { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; width: 100%; }
+textarea { resize: vertical; min-height: 60px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 520px) { .two { grid-template-columns: 1fr; } }
+.palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); gap: 6px 10px; }
+.swatch { display: grid; grid-template-columns: 32px 1fr; gap: 7px; align-items: center; font-size: 13px; }
+.swatch input[type="color"] { width: 32px; height: 26px; border: 1px solid var(--line); border-radius: 8px; padding: 0; background: none; cursor: pointer; }
+.swatch code { font-size: 11px; color: var(--muted); display: block; }
+.swatch.changed span { font-weight: 700; }
+.sliders { display: grid; gap: 4px; }
+.slider { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 1.3fr) 44px; gap: 8px; align-items: center; font-size: 13px; }
+.slider input[type="range"] { width: 100%; }
+.slider output { font-family: var(--mono); font-size: 12px; text-align: right; }
+.slider .tag { grid-column: 1 / -1; font-size: 11px; color: var(--muted); margin-top: -4px; }
+.slider.changed > span { font-weight: 700; }
+.note { font-size: 12.5px; color: var(--muted); background: var(--chip); border-radius: 10px; padding: 8px 10px; }
+.note.warn { color: var(--warn); }
+/* 레퍼런스 */
+.drop { border: 2px dashed var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 6px; justify-items: center; text-align: center; font-size: 13px; color: var(--muted); }
+.drop.over { border-color: var(--accent); background: var(--chip); }
+.refs { display: grid; gap: 8px; }
+.ref { display: grid; grid-template-columns: 84px 1fr; gap: 10px; align-items: start; background: var(--bg); border-radius: 12px; padding: 8px; }
+.ref-media img, .ref-media video { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; background: var(--chip); }
+.ref-body { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
+.ref-name { display: flex; gap: 8px; justify-content: space-between; overflow-wrap: anywhere; }
+.frames { display: flex; gap: 4px; flex-wrap: wrap; }
+.frames img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+/* 교체 약속 */
+.tblwrap { overflow-x: auto; }
+table.chk { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.chk th, table.chk td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.chk th { font-weight: 400; color: var(--muted); font-size: 12px; }
+table.chk td.lab { min-width: 120px; }
+.st { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.st.ok { color: var(--live); } .st.fail { color: var(--warn); font-weight: 700; } .st.warn { color: var(--wait); } .st.skip { color: var(--muted); }
+/* 요청 */
+.reqs { display: grid; gap: 8px; }
+.req { background: var(--bg); border-radius: 12px; padding: 8px 10px; display: grid; gap: 4px; font-size: 13px; }
+.req-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.req pre, #out { white-space: pre-wrap; font-family: var(--mono); font-size: 12px; margin: 0; overflow-wrap: anywhere; }
+.reply { background: var(--chip); border-radius: 8px; padding: 6px 8px; }
+#sendStatus.err { color: var(--warn); }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13px; }
+.hist li { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: space-between; }
+details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+ol.flow { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.5px; }
+.zoom { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: grid; place-items: center; z-index: 10; padding: 16px; }
+.zoom img { max-width: 100%; max-height: 100%; border-radius: 12px; background: var(--panel); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="id">RESOURCES · p36</p>
+    <h1>리소스 편집기</h1>
+    <p class="muted">게임에 들어가는 모델·그림 리소스를 한곳에서 — 캐릭터 · 배경 · 가구 · 아이템 · 벽지/바닥 무늬 (행사·밤·투어 모델 포함). 요소마다 스펙 값을 고치거나, 로컬에서 새로 만들어 보거나, 만든 파일로 바꾸는 요청을 남기면 채팅 <b>"리소스 요청 확인"</b> 때 Claude 가 처리해요.</p>
+    <div class="pills" id="pills"></div>
+    <p class="small muted" id="storeState">저장소 연결 중…</p>
+    <div class="small" id="appliedHead"></div>
+  </header>
+
+  <section class="bar" aria-label="거르기">
+    <div class="tabs" id="areas" role="group" aria-label="영역"></div>
+    <div class="chips" id="themes" role="group" aria-label="주제"></div>
+    <div class="findrow">
+      <div class="seg" id="stateSeg" role="group" aria-label="상태"></div>
+      <input type="text" id="q" placeholder="이름·ID 찾기 (예: 벤치, PR-02)" aria-label="찾기">
+    </div>
+    <div class="grid" id="grid" aria-live="polite"><p class="small muted">목록 불러오는 중…</p></div>
+  </section>
+
+  <section class="main" id="mainSec">
+    <div class="col">
+      <div class="card">
+        <div class="sel-head"><span class="id" id="selId">—</span><h2 id="selName">요소를 골라 주세요</h2><span class="small muted" id="selRole"></span><span id="selStatus"></span></div>
+        <div class="viewer" id="viewer"><div class="msg" id="viewerMsg">불러오는 중…</div><span class="tag" id="candTag" hidden>바꿀 파일 보는 중</span></div>
+        <canvas class="flat" id="flat" hidden aria-label="무늬 크게"></canvas>
+        <div class="controls" id="viewControls">
+          <div class="seg" id="animSeg" role="group" aria-label="동작"></div>
+          <div class="seg" id="varSeg" role="group" aria-label="색 변형"></div>
+          <label class="toggle"><input type="checkbox" id="autoRot" checked> 돌려 보기</label>
+          <label class="toggle"><input type="checkbox" id="outlineOn" checked> 외곽선</label>
+          <label class="toggle"><input type="checkbox" id="scaleRef"> 키 1.0 막대</label>
+          <button type="button" class="btn" id="candBack" hidden>지금 모델로 돌아가기</button>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+      <div class="card" id="renderCard">
+        <h3>Blender 렌더 <span class="small muted" id="renderNote"></span></h3>
+        <div class="strip" id="strip"><p class="small muted">—</p></div>
+      </div>
+      <div class="card" id="cmpCard">
+        <h3>버전 비교 <span class="small muted">예전 렌더 ↔ 지금 렌더</span></h3>
+        <div id="cmpBox"><p class="small muted">—</p></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h3>상태 <span class="small muted" id="verLine"></span></h3>
+        <p class="small" id="stateLine"></p>
+        <div class="btns">
+          <button type="button" class="btn" id="askApprove">확정 요청</button>
+          <button type="button" class="btn" id="askReopen">다시 열기 요청 (검수 대기로)</button>
+        </div>
+        <p class="small muted">확정은 "지금 게임에 들어간 것" 표시예요. 확정해도 지우지 않고, 언제든 다시 열거나 여기서 바로 고쳐 요청할 수 있어요.</p>
+      </div>
+
+      <div class="card">
+        <h3>바꾸는 방법</h3>
+        <div class="methods" id="methods" role="group" aria-label="바꾸는 방법">
+          <button type="button" data-method="blender" aria-pressed="true"><b>스펙 고쳐 다시 빌드</b><span>색·크기·비율 숫자를 고치면 Blender 스크립트로 다시 만들어요</span></button>
+          <button type="button" data-method="local" aria-pressed="false"><b>로컬 생성 시험</b><span>ComfyUI 등으로 그림·모양을 만들어 비교해 봐요</span></button>
+          <button type="button" data-method="file" aria-pressed="false"><b>만든 파일로 교체</b><span>.glb 파일을 골라 미리 보고 약속 검사 뒤 바꿔 끼워요</span></button>
+        </div>
+
+        <div id="paneBlender">
+          <div class="field" id="newFields" hidden>
+            <div class="two">
+              <div class="field"><label for="newName">새 리소스 이름</label><input type="text" id="newName" placeholder="예: 조개 풍경"></div>
+              <div class="field"><label for="newCat">분류</label><select id="newCat"></select></div>
+            </div>
+          </div>
+          <div class="field" id="palField"><span class="ctl-label">색 (바로 보기)</span><div class="palette" id="palette"></div></div>
+          <div class="field" id="sliderField"><span class="ctl-label" id="sliderLabel">크기·모양 수치</span><div class="sliders" id="sliders"></div></div>
+          <div class="field"><label for="concept">컨셉 (스펙 prompt.concept)</label><textarea id="concept" rows="2"></textarea></div>
+        </div>
+
+        <div id="paneLocal" hidden>
+          <div class="note" id="localNote"></div>
+          <div class="two">
+            <div class="field"><label for="gen">만드는 것</label><select id="gen"></select></div>
+            <div class="field"><label for="genUse">결과 쓰는 곳</label><select id="genUse"></select></div>
+          </div>
+          <div class="field"><label for="genPrompt">생성 프롬프트 (영어로 적으면 그대로, 한국어면 Claude 가 옮겨요)</label><textarea id="genPrompt" rows="3"></textarea></div>
+          <div class="two">
+            <div class="field"><label for="genSeed">시드 (빈칸 = 넷 뽑기)</label><input type="text" id="genSeed" inputmode="numeric" placeholder="예: 404"></div>
+            <div class="field" id="decField"><label for="genDec">줄이는 비율 (Decimate)</label><input type="text" id="genDec" inputmode="decimal" placeholder="예: 0.04"></div>
+          </div>
+        </div>
+
+        <div id="paneFile" hidden>
+          <div class="note">.glb 파일은 웹 저장소에 올릴 수 없어서 <b>이 화면에서만</b> 풀어 미리 보고 약속을 검사해요. 바꿔 끼울 때 Claude 가 읽을 수 있게 파일 위치(이 PC 경로)나 받을 수 있는 링크를 적어 주세요.</div>
+          <div class="btns"><input type="file" id="glbFile" accept=".glb,model/gltf-binary" hidden><button type="button" class="btn" id="pickGlb">.glb 파일 고르기</button><span class="small muted" id="glbName">고른 파일 없음</span></div>
+          <div class="field"><label for="filePath">파일 위치 (이 PC 경로 또는 링크)</label><input type="text" id="filePath" placeholder="예: C:\Users\…\Downloads\bench.glb"></div>
+          <div class="field"><label for="fileFrom">어디서 만든 파일인지</label><input type="text" id="fileFrom" placeholder="예: Hunyuan3D 결과를 Blender 에서 손질 · 직접 모델링"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>교체 약속 검사 <span class="small muted" id="chkSum"></span></h3>
+        <div class="tblwrap"><table class="chk" id="chkTable"></table></div>
+        <p class="small muted">약속은 <code>docs/CONTRACTS.md</code> 끝 「리소스 교체 약속」, 같은 검사를 <code>tests/assets.test.mjs</code> · <code>items-assets.test.mjs</code> 가 해요. ✗ 는 게임 테스트가 실패하는 것, △ 는 통과하지만 손볼 것 (예: 삼각형 예산 — 개발 PC 가 Intel UHD).</p>
+      </div>
+
+      <div class="card">
+        <h3>레퍼런스 그림 <span class="small muted">이미지 · 영상 (영상은 장면 6장)</span></h3>
+        <div class="drop" id="drop" aria-disabled="true">
+          <span id="dropHint">여기에 끌어 놓거나 붙여 넣거나</span>
+          <input type="file" id="refFile" accept="image/*,video/mp4,video/webm" multiple hidden>
+          <button type="button" class="btn" id="pickFile" disabled>파일 고르기</button>
+        </div>
+        <div class="refs" id="refList"></div>
+      </div>
+
+      <div class="card">
+        <h3>요청</h3>
+        <div class="field"><label for="req">하고 싶은 말 (자유롭게)</label><textarea id="req" rows="3" placeholder="예: 다리를 조금 더 굵게, 나무색을 밝게"></textarea></div>
+        <div class="btns">
+          <button type="button" class="btn primary" id="sendReq">요청 보내기</button>
+          <button type="button" class="btn" id="makeReq">글로 보기 · 복사</button>
+        </div>
+        <p class="small" id="sendStatus" aria-live="polite"></p>
+        <div id="outWrap" hidden class="field"><textarea id="out" rows="8" readonly></textarea><div class="btns"><button type="button" class="btn" id="copyOut">복사</button><span class="small muted" id="copyStatus"></span></div></div>
+        <div class="reqs" id="reqList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="howSec">
+    <h3>반영 순서 · 기록 <span class="small muted">채팅 명령 "리소스 요청 확인"</span></h3>
+    <ol class="flow">
+      <li>여기서 요청을 남겨요 (저장소 <code>res-requests</code>). 레퍼런스는 <code>res-refs</code>.</li>
+      <li>채팅에 <b>"리소스 요청 확인"</b> — Claude 가 새 요청을 읽고 <code>working</code> 으로 바꾼 뒤, 방법대로 처리해요: 스펙 고쳐 다시 빌드 · 로컬 생성 시험 · 만든 파일 교체 · 되돌리기 · 확정/다시 열기.</li>
+      <li>교체 약속 검사(이 화면의 표와 같은 것)와 <code>node --test tests/</code> 를 통과해야 바꿔 끼워요.</li>
+      <li>바뀐 묶음만 이 편집기와 게임 링크에 다시 올리고, 요청에 답(<code>done</code> · <code>reply</code> · <code>doneVersion</code>), 반영 기록 <code>applied/res</code> · <code>history/res-v&lt;n&gt;</code> 을 남겨요.</li>
+    </ol>
+    <div id="logBox"><p class="small muted">반영 기록 불러오는 중…</p></div>
+  </section>
+</div>
+<div class="zoom" id="zoom" hidden><img id="zoomImg" alt=""></div>
+
+<!-- 반영 기록 공용 (ET-11): window.ApplyLog -->
+<script src="concept/board-kit.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { checkResource, glbInfo, summary } from './tools/res-contracts.mjs';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const loadJSON = url => fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); });
+const clone = o => JSON.parse(JSON.stringify(o ?? null));
+const when = ts => ts ? new Date(ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+const NEW = '_new';
+
+/* ---------- 영역 ---------- */
+// 영역마다 묶음 파일 (tools/build-editor-index.mjs). 가구 탭에는 상점·박물관 붙박이(fixture)도 같이 보인다
+const AREA = {
+  character: { label: '캐릭터', idx: 'assets/models/editor-index.json', models: 'assets/models/', renders: 'assets/renders/', thumbs: 'assets/renders/editor-thumbs.json', specDir: 'assets/specs/' },
+  env: { label: '배경', idx: 'assets/env/editor-index.json', models: 'assets/env/', renders: 'assets/env/', thumbs: 'assets/env/editor-thumbs.json', specDir: 'assets/env/specs/' },
+  furniture: { label: '가구', idx: 'assets/furniture/editor-index.json', models: 'assets/furniture/', renders: 'assets/furniture/', thumbs: 'assets/furniture/editor-thumbs.json', specDir: 'assets/furniture/specs/' },
+  fixture: { label: '붙박이', idx: 'assets/interior/editor-index.json', list: d => d.fixtures, models: 'assets/furniture/fixtures/', specDir: 'assets/furniture/fixtures/specs/' },
+  item: { label: '아이템', idx: 'assets/items/editor-index.json', models: 'assets/items/', specDir: 'assets/items/specs/' },
+  pattern: { label: '무늬', idx: 'assets/interior/editor-index.json', list: d => d.models.filter(m => m.kind === 'wallpaper' || m.kind === 'floor'), specDir: 'assets/interior/specs/' },
+};
+const TABS = [['all', '전체'], ['character', '캐릭터'], ['env', '배경'], ['furniture', '가구'], ['item', '아이템'], ['pattern', '무늬']];
+const tabOf = area => area === 'fixture' ? 'furniture' : area;
+const THEME = { event: '계절 행사', festival: '축제', night: '밤·새벽', tour: '무인도 투어' };
+const STATE_FILTER = [['all', '전체'], ['review', '검수 대기'], ['approved', '확정'], ['asked', '요청 있음'], ['issue', '약속 △·✗']];
+const CAT_LABEL = { character: '캐릭터', nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구', fixture: '상점·박물관 붙박이',
+  fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃', event: '행사', night: '밤', tour: '투어',
+  wallpaper: '벽지', floor: '바닥' };
+const NEW_CATS = { character: ['character'], env: ['nature', 'prop', 'building', 'tile'], furniture: ['furniture'], item: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower', 'event', 'night', 'tour'], pattern: ['wallpaper', 'floor'] };
+const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
+const REQ_STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'], cancelled: ['', '취소'] };
+const KIND_LABEL = { edit: '스펙 고치기', swap: '교체', add: '새 리소스', rollback: '되돌리기', approve: '확정', reopen: '다시 열기' };
+const METHOD_LABEL = { blender: 'Blender 스크립트 다시 빌드', local: '로컬 생성 시험', file: '만든 파일(.glb) 교체' };
+const CHK_MARK = { ok: '✓ 맞음', fail: '✗ 어긋남', warn: '△ 손볼 것', skip: '– 해당 없음' };
+// 캐릭터 색·비율 이름 (editor.html 과 같게)
+const PAL_LABEL = { fur: '털', marking: '무늬', muzzle: '주둥이·배', innerEar: '귀 안쪽', ear: '귀', eye: '눈·입', nose: '코', blush: '볼터치',
+  shirt: '셔츠', stripe: '줄무늬', pants: '반바지', outline: '외곽선', hair: '머리카락', tail: '꼬리', beak: '부리', feet: '발',
+  shell: '등껍질', apron: '앞치마', bowtie: '나비넥타이', glasses: '안경', iris: '눈동자 색', wing: '날개', wingBone: '날개 뼈', wingSpot: '날개 무늬', wingSpotCore: '무늬 가운데', antenna: '더듬이', ruff: '목털',
+  base: '바탕', thin: '가는 줄', check: '체크', petal: '꽃잎', heart: '꽃술', petalLight: '연한 꽃잎', groove: '홈', shine: '빛', knot: '옹이',
+  tile: '타일', drop: '빗방울', dropGreen: '초록 빗방울', star: '별', twinkle: '반짝이', light: '밝은 판', gap: '틈', dot: '점', stone: '돌', line: '선', grain: '알갱이',
+  edge: '앞 턱', wainscot: '징두리', molding: '몰딩', baseboard: '걸레받이' };
+const PROP = [
+  ['height', '키', 0.8, 1.2, true], ['headScale', '머리 크기', 0.8, 1.3, true], ['limbLength', '팔다리 길이', 0.7, 1.5, false],
+  ['earSize', '귀 크기', 0.6, 1.5, false], ['tailLength', '꼬리 길이', 0.5, 1.6, false], ['bodyWidth', '몸 너비', 0.8, 1.3, false],
+  ['earPointiness', '귀 뾰족함', 0.6, 2.0, false], ['eyeSize', '눈 크기', 0.7, 1.5, false], ['eyeSpacing', '눈 간격', 0.8, 1.2, false],
+];
+const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기', sit: '앉기', sit_down: '앉는 중', stand_up: '일어나기', sway: '흔들림', shake: '나무 흔들기', flicker: '일렁임' };
+const RENDER_LABEL = { main: '3/4', front: '정면', top: '위', three_quarter: '3/4', side: '옆', back: '뒤', hero: '장면' };
+// 로컬 생성 (docs/notes/local-resources.md 3절) — 3D 생성은 뼈 없는 것만 (캐릭터는 자동 뼈 심기가 지금 뼈 이름·동작과 안 맞음)
+const GENERATORS = [
+  { id: 'comfy-sdxl', label: 'ComfyUI 그림 (SDXL)', kind: 'image', uses: ['ref', 'spec'] },
+  { id: 'comfy-tile', label: 'ComfyUI 이음매 없는 무늬 (seamless-tiling)', kind: 'image', uses: ['ref', 'spec', 'texture'], only: ['pattern'] },
+  { id: 'hunyuan3d-2.1', label: 'Hunyuan3D-2.1 모양 (텍스처 없이)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern'] },
+  { id: 'trellis', label: 'TRELLIS 모양 (12GB 에선 빠듯)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern'] },
+];
+const USE_LABEL = { ref: '레퍼런스 그림으로만 (스펙은 Claude 가 맞춤)', spec: '보고 스펙 숫자·색 맞추기', shape: '모양을 가져와 바꿔 끼우기 (build_import)', texture: '무늬 그림으로 직접 (색 4–6개로 줄여)' };
+const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
+const MAX_BYTES = 20 * 1024 * 1024;
+const COL = { refs: 'res-refs', requests: 'res-requests' };
+
+/* ---------- 목록 ---------- */
+let ROWS = [], index = null;
+const areaData = {}, thumbs = {};
+function loadArea(area) {
+  return areaData[area] ??= loadJSON(AREA[area].idx).then(d => {
+    const list = AREA[area].list ? AREA[area].list(d) : d.models;
+    const map = Object.fromEntries(list.map(m => [m.slug, m]));
+    // 격자 썸네일: 아이템은 아이콘(data:), 붙박이는 목록의 thumb, 무늬는 견본 그림
+    for (const m of list) {
+      const key = keyOf(area, m.slug);
+      if (area === 'item') thumbs[key] = m.items?.[0]?.thumb;
+      if (area === 'fixture') thumbs[key] = m.thumb;
+      if (area === 'pattern') try { thumbs[key] = swatchURL(m.spec, { px: 128 }); } catch {}
+    }
+    return { raw: d, map };
+  }).catch(e => { delete areaData[area]; throw e; });
+}
+const keyOf = (area, slug) => ({ furniture: 'furn-', fixture: 'fix-', item: 'item-' }[area] ?? '') + slug;
+const thumbPacks = {};
+function needThumbs(area) {
+  if (thumbPacks[area]) return;
+  if (AREA[area].thumbs) thumbPacks[area] = loadJSON(AREA[area].thumbs).then(map => { for (const [slug, url] of Object.entries(map)) thumbs[keyOf(area, slug)] = url; renderGrid(); }).catch(() => { delete thumbPacks[area]; });
+  else thumbPacks[area] = loadArea(area).then(renderGrid, () => { delete thumbPacks[area]; });
+}
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+try { index = await loadJSON('assets/res/editor-index.json'); ROWS = index.rows; }
+catch { $('grid').innerHTML = '<p class="small">리소스 목록(assets/res/editor-index.json)이 없어요. 로컬에서는 <code>node tools/build-editor-index.mjs</code> 를 먼저 돌려 주세요.</p>'; $('viewerMsg').textContent = '목록 없음'; throw new Error('no index'); }
+
+/* ---------- 거르기 · 격자 ---------- */
+let tab = 'character', theme = 'all', stateF = 'all', q = '';
+let key = null, row = null, rec = null, spec = null, draft = null, method = 'blender', newCat = 'nature';
+const asked = () => new Set(allReqs.filter(r => r.status === 'new' || r.status === 'working').map(r => r.key));
+function visibleRows() {
+  const a = asked(), qq = q.trim().toLowerCase();
+  return ROWS.filter(r => (tab === 'all' || tabOf(r.area) === tab) && (theme === 'all' || r.themes.includes(theme))
+    && (stateF === 'all' || (stateF === 'asked' ? a.has(r.key) : stateF === 'issue' ? r.sum.fail || r.sum.warn : r.status === stateF))
+    && (!qq || `${r.name} ${r.id} ${r.slug}`.toLowerCase().includes(qq)));
+}
+function renderHead() {
+  const review = ROWS.filter(r => r.status !== 'approved').length, fail = ROWS.filter(r => r.sum.fail).length, warn = ROWS.filter(r => r.sum.warn).length;
+  $('pills').innerHTML = [`리소스 ${ROWS.length}개`, ...TABS.slice(1).map(([t, l]) => `${l} ${ROWS.filter(r => tabOf(r.area) === t).length}`), `검수 대기 ${review}`, `확정 ${ROWS.length - review}`,
+    `약속 ✗ ${fail} · △ ${warn}`, `목록 ${when(index.builtAt)} · ${index.commit}`].map(t => `<span class="pill">${esc(t)}</span>`).join('');
+}
+function renderBars() {
+  $('areas').innerHTML = TABS.map(([t, l]) => `<button type="button" data-tab="${t}" aria-pressed="${tab === t}">${l}<span>${t === 'all' ? ROWS.length : ROWS.filter(r => tabOf(r.area) === t).length}</span></button>`).join('');
+  const inTab = ROWS.filter(r => tab === 'all' || tabOf(r.area) === tab);
+  $('themes').innerHTML = [['all', '모든 주제', inTab.length], ...Object.entries(THEME).map(([t, l]) => [t, l, inTab.filter(r => r.themes.includes(t)).length]).filter(x => x[2])]
+    .map(([t, l, n]) => `<button type="button" data-theme="${t}" aria-pressed="${theme === t}">${l}<span>${n}</span></button>`).join('');
+  $('stateSeg').innerHTML = STATE_FILTER.map(([s, l]) => `<button type="button" data-state="${s}" aria-pressed="${stateF === s}">${l}</button>`).join('');
+}
+function renderGrid() {
+  const rows = visibleRows();
+  for (const a of new Set(rows.map(r => r.area))) needThumbs(a);
+  const a = asked();
+  const adds = tab !== 'all' && stateF === 'all' && theme === 'all' && !q ? `<button type="button" class="pick add" data-key="${NEW}" aria-pressed="${key === NEW}"><span class="plus">+</span><span class="nm">새 ${esc(TABS.find(t => t[0] === tab)[1])}</span></button>` : '';
+  $('grid').innerHTML = rows.map(r => `<button type="button" class="pick" data-key="${esc(r.key)}" aria-pressed="${r.key === key}" title="${esc(r.name)} · ${esc(MODEL_STATUS[r.status]?.[1] ?? r.status)}${a.has(r.key) ? ' · 요청 있음' : ''}">
+      <span class="dot ${r.status === 'approved' ? 'ok' : ''}"></span>${r.sum.fail ? '<span class="warnmark">✗</span>' : r.sum.warn ? '<span class="warnmark">△</span>' : ''}
+      <img src="${esc(thumbs[r.key] ?? BLANK)}" alt="" loading="lazy"><span class="id">${esc(r.id)}</span><span class="nm">${esc(r.name)}</span></button>`).join('') + adds
+    || '<p class="small muted">맞는 리소스가 없어요.</p>';
+}
+$('areas').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return; tab = b.dataset.tab; theme = 'all'; renderBars(); renderGrid(); });
+$('themes').addEventListener('click', e => { const b = e.target.closest('[data-theme]'); if (!b) return; theme = b.dataset.theme; renderBars(); renderGrid(); });
+$('stateSeg').addEventListener('click', e => { const b = e.target.closest('[data-state]'); if (!b) return; stateF = b.dataset.state; renderBars(); renderGrid(); });
+$('q').addEventListener('input', e => { q = e.target.value; renderGrid(); });
+$('grid').addEventListener('click', e => { const b = e.target.closest('[data-key]'); if (b) select(b.dataset.key); });
+
+/* ---------- 고르기 ---------- */
+const draftKey = () => key === NEW ? `res-draft-new-${tab}` : `res-draft-${key}-v${spec?.version}`;
+const saveDraft = () => { try { localStorage.setItem(draftKey(), JSON.stringify(draft)); } catch {} };
+const restoreDraft = base => { try { const s = localStorage.getItem(draftKey()); if (s) return { ...base, ...JSON.parse(s) }; } catch {} return base; };
+// 슬라이더 정의: 캐릭터는 proportions(PROP), 무늬는 pattern.size 두 개, 나머지는 스펙 params
+function sliderDefs(area, s) {
+  if (!s) return {};
+  if (area === 'character') return Object.fromEntries(PROP.filter(([k]) => s.proportions?.[k] != null).map(([k, label, min, max, live]) => [k, { label, value: s.proportions[k], min, max, step: 0.01, live }]));
+  if (area === 'pattern') {
+    const r = v => Math.round(v * 100) / 100, def = (label, v) => ({ label, value: v, min: r(Math.max(0.1, v * 0.4)), max: r(v * 2.5), step: 0.01, live: true });
+    return { sizeX: def('가로 간격 (m)', s.pattern.size[0]), sizeY: def('세로 간격 (m)', s.pattern.size[1]) };
+  }
+  return s.params ?? {};
+}
+let defs = {};
+const baseDraft = s => ({ palette: { ...(s?.palette ?? {}) }, values: Object.fromEntries(Object.entries(defs).map(([k, d]) => [k, d.value])), concept: s?.prompt?.concept ?? '',
+  local: { gen: '', use: '', prompt: '', seed: '', dec: '' }, file: { path: '', from: '' }, name: '', request: '' });
+
+async function select(next) {
+  if (next !== NEW && !ROWS.some(r => r.key === next)) next = ROWS.find(r => tabOf(r.area) === tab)?.key ?? ROWS[0].key;
+  key = next;
+  try { history.replaceState(null, '', '#' + (key === NEW ? 'new' : key)); } catch {}
+  clearCandidate();
+  row = key === NEW ? null : ROWS.find(r => r.key === key);
+  if (row && tab !== 'all' && tabOf(row.area) !== tab) { tab = tabOf(row.area); renderBars(); }
+  renderGrid();
+  $('outWrap').hidden = true; setStatus('');
+  if (key === NEW) return selectNew();
+  $('newFields').hidden = true;
+  $('selId').textContent = row.id; $('selName').textContent = row.name;
+  $('selRole').textContent = [CAT_LABEL[row.cat] ?? row.cat, ...row.themes.map(t => THEME[t])].join(' · ');
+  const [cls, label] = MODEL_STATUS[row.status] ?? MODEL_STATUS.review;
+  $('selStatus').innerHTML = `<span class="pill ${cls}">${label}</span>`;
+  spec = null; rec = null;
+  clearModel();
+  showViewer(row.area !== 'pattern');
+  $('viewerMsg').hidden = false; $('viewerMsg').textContent = '불러오는 중…';
+  const want = key;
+  let data;
+  try { data = await loadArea(row.area); } catch { if (key === want) $('viewerMsg').textContent = '이 영역 목록을 불러오지 못했어요. 새로고침해 주세요.'; return; }
+  if (key !== want) return;
+  rec = data.map[row.slug];
+  spec = rec?.spec ?? null;
+  defs = sliderDefs(row.area, spec);
+  draft = restoreDraft(baseDraft(spec));
+  variant = null;
+  fillForm(); renderStats(); renderState(); renderStrip(); renderCompare(); renderChecks(); renderRefs(); renderRequests();
+  if (row.area === 'pattern') { drawFlat(); $('viewerMsg').hidden = true; }
+  else loadModel(want, row, rec);
+}
+function selectNew() {
+  row = null; rec = null; spec = null; defs = {};
+  const cats = NEW_CATS[tab] ?? NEW_CATS.env;
+  if (!cats.includes(newCat)) newCat = cats[0];
+  $('newCat').innerHTML = cats.map(c => `<option value="${c}"${c === newCat ? ' selected' : ''}>${CAT_LABEL[c]}</option>`).join('');
+  $('newFields').hidden = false;
+  $('selId').textContent = 'NEW'; $('selName').textContent = `새 리소스 · ${CAT_LABEL[newCat]}`; $('selRole').textContent = ''; $('selStatus').innerHTML = '';
+  clearModel(); showViewer(true);
+  $('viewerMsg').hidden = false; $('viewerMsg').textContent = '새 리소스는 레퍼런스와 설명으로 요청해요. 만든 .glb 가 있으면 "만든 파일로 교체" 에서 미리 볼 수 있어요.';
+  draft = restoreDraft(baseDraft(null));
+  fillForm(); renderStats(); renderState(); renderStrip(); renderCompare(); renderChecks(); renderRefs(); renderRequests();
+}
+function showViewer(model) {
+  $('viewer').hidden = !model; $('flat').hidden = model;
+  for (const id of ['autoRot', 'outlineOn', 'scaleRef']) $(id).closest('label').hidden = !model;
+}
+const areaNow = () => row?.area ?? (tab === 'all' ? 'env' : tab === 'furniture' ? 'furniture' : tab);
+
+/* ---------- 폼 (스펙 값) ---------- */
+function fillForm() {
+  const area = areaNow(), pal = spec?.palette ?? {}, labels = spec?.paletteLabels ?? {};
+  $('palField').hidden = !Object.keys(pal).length;
+  $('palette').innerHTML = Object.keys(pal).map(k => {
+    const v = draft.palette[k] ?? pal[k];
+    return `<label class="swatch${v.toUpperCase() !== pal[k].toUpperCase() ? ' changed' : ''}"><input type="color" value="${esc(v)}" data-pal="${esc(k)}"><span>${esc(labels[k] ?? PAL_LABEL[k] ?? k)}<code>${esc(k)} ${esc(v)}</code></span></label>`;
+  }).join('');
+  $('sliderField').hidden = !Object.keys(defs).length;
+  $('sliderLabel').textContent = area === 'character' ? '비율 (proportions)' : area === 'pattern' ? '무늬 간격 (pattern.size)' : '크기·모양 수치 (params)';
+  $('sliders').innerHTML = Object.entries(defs).map(([k, d]) => {
+    const v = draft.values[k] ?? d.value;
+    if (d.options) return `<label class="slider${v !== d.value ? ' changed' : ''}"><span>${esc(d.label ?? k)}</span><select data-val="${esc(k)}">${d.options.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select><output></output></label>`;
+    if (typeof d.value !== 'number') return `<label class="slider"><span>${esc(d.label ?? k)}</span><code class="small muted">${esc(JSON.stringify(d.value))}</code><output></output><span class="tag">목록 값 — 바꿀 때는 요청 글에 적어 주세요</span></label>`;
+    return `<label class="slider${Math.abs(v - d.value) > 1e-9 ? ' changed' : ''}"><span>${esc(d.label ?? k)}</span><input type="range" min="${d.min}" max="${d.max}" step="${d.step ?? 0.01}" value="${v}" data-val="${esc(k)}"><output>${(+v).toFixed(2)}</output>${d.live ? '' : '<span class="tag">다시 빌드할 때 반영 (지금 3D 는 그대로)</span>'}</label>`;
+  }).join('');
+  $('concept').value = draft.concept ?? '';
+  $('newName').value = draft.name ?? '';
+  $('req').value = draft.request ?? '';
+  // 로컬 생성
+  const gens = GENERATORS.filter(g => (!g.only || g.only.includes(area)) && !(g.not ?? []).includes(area));
+  if (!gens.some(g => g.id === draft.local.gen)) draft.local.gen = gens[0].id;
+  const g = GENERATORS.find(x => x.id === draft.local.gen);
+  if (!g.uses.includes(draft.local.use)) draft.local.use = g.uses[0];
+  $('gen').innerHTML = gens.map(x => `<option value="${x.id}"${x.id === g.id ? ' selected' : ''}>${esc(x.label)}</option>`).join('');
+  $('genUse').innerHTML = g.uses.map(u => `<option value="${u}"${u === draft.local.use ? ' selected' : ''}>${esc(USE_LABEL[u])}</option>`).join('');
+  $('genPrompt').value = draft.local.prompt; $('genSeed').value = draft.local.seed; $('genDec').value = draft.local.dec;
+  $('decField').hidden = g.kind !== '3d';
+  $('localNote').innerHTML = area === 'character'
+    ? '캐릭터는 <b>그림 생성만</b> 돼요 — 3D 생성의 자동 뼈 심기가 지금 뼈 이름·동작과 맞지 않아 걷기·표정이 깨져요. 컨셉 시트(앞·옆·뒤)를 만들어 비율을 정하는 기준 그림으로 써요.'
+    : area === 'pattern' ? '무늬는 9차 시험(WP-04)에서 스크립트 무늬가 더 어울렸어요 — 로컬 그림은 레퍼런스·밑그림으로 쓰는 걸 추천해요. 텍스처로 직접 넣으면 색 4–6개로 줄이고 칸을 2–3배 크게.'
+    : '3D 모양은 <b>텍스처는 버리고 모양만</b> 가져와 Blender 에서 팔레트 재질로 다시 칠해요 (재질 이름 = 팔레트 키). 이 PC(RTX 4080 12GB)에서 Hunyuan3D-2.1 모양 단계가 들어가요. 처음엔 모델 내려받기(수 GB) 승인이 필요해요.';
+  $('filePath').value = draft.file.path; $('fileFrom').value = draft.file.from;
+  for (const b of $('methods').querySelectorAll('[data-method]')) b.setAttribute('aria-pressed', String(b.dataset.method === method));
+  $('paneBlender').hidden = method !== 'blender'; $('paneLocal').hidden = method !== 'local'; $('paneFile').hidden = method !== 'file';
+  $('askApprove').disabled = !row || row.status === 'approved'; $('askReopen').disabled = !row || row.status !== 'approved';
+}
+$('methods').addEventListener('click', e => { const b = e.target.closest('[data-method]'); if (!b || !draft) return; method = b.dataset.method; fillForm(); renderChecks(); });
+$('palette').addEventListener('input', e => {
+  const k = e.target.dataset.pal; if (!k) return;
+  draft.palette[k] = e.target.value.toUpperCase();
+  const lab = e.target.closest('.swatch'); lab.classList.toggle('changed', draft.palette[k] !== String(spec.palette[k]).toUpperCase()); lab.querySelector('code').textContent = `${k} ${draft.palette[k]}`;
+  recolor(); saveDraft();
+});
+$('sliders').addEventListener('input', e => {
+  const k = e.target.dataset.val; if (!k) return;
+  const d = defs[k];
+  draft.values[k] = d.options ? e.target.value : +e.target.value;
+  const out = e.target.parentElement.querySelector('output'); if (out && !d.options) out.textContent = (+e.target.value).toFixed(2);
+  e.target.closest('.slider').classList.toggle('changed', d.options ? draft.values[k] !== d.value : Math.abs(draft.values[k] - d.value) > 1e-9);
+  if (row?.area === 'pattern') drawFlat();
+  saveDraft();
+});
+const bindText = (id, set) => $(id).addEventListener('input', e => { if (!draft) return; set(e.target.value); saveDraft(); });
+bindText('concept', v => draft.concept = v);
+bindText('newName', v => draft.name = v);
+bindText('req', v => draft.request = v);
+bindText('genPrompt', v => draft.local.prompt = v);
+bindText('genSeed', v => draft.local.seed = v);
+bindText('genDec', v => draft.local.dec = v);
+bindText('filePath', v => draft.file.path = v);
+bindText('fileFrom', v => draft.file.from = v);
+$('gen').addEventListener('change', e => { draft.local.gen = e.target.value; fillForm(); saveDraft(); });
+$('genUse').addEventListener('change', e => { draft.local.use = e.target.value; saveDraft(); });
+$('newCat').addEventListener('change', e => { newCat = e.target.value; $('selName').textContent = `새 리소스 · ${CAT_LABEL[newCat]}`; renderRequests(); });
+
+/* ---------- 상태 · 수치 ---------- */
+function renderState() {
+  if (!row) { $('verLine').textContent = ''; $('stateLine').textContent = '새 리소스는 요청을 보내면 Claude 가 스펙을 만들고 검수 대기로 올려요.'; fillForm(); return; }
+  const p = row.prev;
+  $('verLine').textContent = `${row.id} · 스펙 v${row.version}`;
+  $('stateLine').innerHTML = `${row.status === 'approved' ? '<b>확정</b> — 지금 게임에 들어간 모습이에요.' : '<b>검수 대기</b> — 새로 만들었거나 고쳐서 확인을 기다려요.'}`
+    + (p ? ` 바로 전 그림은 ${esc(when(p.at))} (${esc(p.commit)}${p.version ? ` · v${esc(p.version)}` : ''}).` : ' 예전 그림 기록은 없어요 (처음 만든 그대로).')
+    + ` 스펙 <code>${esc(row.specFile)}</code>`;
+}
+function renderStats() {
+  if (!row) { $('stats').innerHTML = ''; return; }
+  const st = rec?.stats ?? {}, size = row.size ?? st.size;
+  const cells = [];
+  if (row.tri) cells.push([row.tri.toLocaleString('ko-KR'), '삼각형']);
+  if (size) cells.push([size.map(n => (+n).toFixed(2)).join(' × '), '크기 m (가로×깊이×높이)']);
+  if (st.bones) cells.push([st.bones, '뼈']);
+  if (Object.keys(st.animations ?? {}).length) cells.push([Object.keys(st.animations).length, '동작']);
+  if (spec?.footprint) cells.push([spec.footprint.join('×'), `칸 (${spec.place === 'wall' ? '벽' : spec.place === 'window' ? '창문' : '바닥'})`]);
+  if (spec?.pattern) cells.push([`${spec.pattern.size.join('×')}m`, '무늬 한 칸']);
+  if (st.glbBytes) cells.push([`${Math.round(st.glbBytes / 1024)}KB`, '모델 파일']);
+  cells.push([Object.keys(spec?.palette ?? {}).length, '색']);
+  $('stats').innerHTML = cells.map(([v, l]) => `<div class="stat"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('');
+}
+
+/* ---------- 렌더 · 버전 비교 ---------- */
+const renderPacks = {};
+function renderPack(area, n) { const k = `${area}|${n}`; return renderPacks[k] ??= loadJSON(`${AREA[area].renders}editor-renders-${n}.json`).catch(e => { delete renderPacks[k]; throw e; }); }
+let mainRender = null;
+async function renderStrip() {
+  mainRender = null;
+  const box = $('strip');
+  if (!row) { box.innerHTML = '<p class="small muted">—</p>'; $('renderNote').textContent = ''; return; }
+  const files = (rec?.stats?.renders ?? []).filter(f => !f.endsWith('_thumb.png'));
+  if (row.area === 'pattern') { $('renderNote').textContent = '무늬는 그림 파일 없이 스펙 도형으로 그려요 (위 그림이 게임과 같은 그림)'; box.innerHTML = ''; $('renderCard').hidden = true; return; }
+  $('renderCard').hidden = false;
+  if (!rec?.renders || !AREA[row.area].renders) {
+    $('renderNote').textContent = row.area === 'item' ? '아이템은 아이콘만 (큰 렌더는 파일 수 때문에 안 올림)' : '썸네일만';
+    box.innerHTML = thumbs[row.key] ? `<figure><img src="${esc(thumbs[row.key])}" alt="${esc(row.name)}" data-zoom><figcaption>썸네일</figcaption></figure>` : '<p class="small muted">렌더 없음</p>';
+    (rec?.items ?? []).slice(1).forEach(it => box.insertAdjacentHTML('beforeend', `<figure><img src="${esc(it.thumb)}" alt="" data-zoom><figcaption>${esc(it.variant ?? it.code)}</figcaption></figure>`));
+    return;
+  }
+  $('renderNote').textContent = '불러오는 중…';
+  const want = key;
+  try {
+    const pack = await renderPack(row.area, rec.renders);
+    if (key !== want) return;
+    const shown = files.filter(f => pack[f]);
+    mainRender = pack[shown.find(f => /_(main|three_quarter)\.png$/.test(f)) ?? shown[0]] ?? null;
+    $('renderNote').textContent = `${shown.length}장 · 눌러서 크게`;
+    box.innerHTML = shown.map(f => `<figure><img src="${esc(pack[f])}" alt="${esc(f)}" data-zoom><figcaption>${esc(RENDER_LABEL[f.replace(`${row.slug}_`, '').replace('.png', '')] ?? f.replace(`${row.slug}_`, '').replace('.png', ''))}</figcaption></figure>`).join('') || '<p class="small muted">렌더 없음</p>';
+  } catch { if (key === want) { $('renderNote').textContent = '렌더 묶음을 불러오지 못했어요'; box.innerHTML = ''; } }
+  renderCompare();
+}
+let prevPack = null;
+async function renderCompare() {
+  const box = $('cmpBox');
+  if (!row) { box.innerHTML = '<p class="small muted">새 리소스는 비교할 예전 그림이 없어요.</p>'; return; }
+  const now = row.area === 'pattern' ? swatchURL(liveSpec(), { px: 360 }) : thumbs[row.key];
+  if (!row.prev) { box.innerHTML = `<p class="small muted">예전 그림 기록이 없어요 — 처음 만든 그대로예요. 다시 만들면 여기에 예전 ↔ 새 그림이 나란히 나와요.</p>`; return; }
+  box.innerHTML = '<p class="small muted">예전 그림 불러오는 중…</p>';
+  const want = key;
+  try { prevPack ??= loadJSON('assets/res/editor-prev.json'); const all = await prevPack; if (key !== want) return;
+    const p = all[row.key];
+    const old = p?.thumb ?? (p?.spec?.pattern ? swatchURL(p.spec, { px: 360 }) : null);
+    if (!old) { box.innerHTML = '<p class="small muted">예전 그림을 찾지 못했어요.</p>'; return; }
+    box.innerHTML = `<div class="cmp"><figure><img src="${esc(old)}" alt="예전" data-zoom><figcaption>예전 · ${p.version ? `v${esc(p.version)} · ` : ''}${esc(when(p.at))} · ${esc(p.commit)}</figcaption></figure>
+      <figure><img src="${esc(now ?? BLANK)}" alt="지금" data-zoom><figcaption>지금 · v${esc(row.version)} · ${esc(MODEL_STATUS[row.status]?.[1] ?? '')}</figcaption></figure></div>
+      <div class="field"><span class="ctl-label">겹쳐 보기 (왼쪽 = 예전)</span><div class="wipe" id="wipe"><img src="${esc(now ?? BLANK)}" alt=""><img class="top" src="${esc(old)}" alt=""><span class="line"></span></div>
+      <input type="range" id="wipeX" min="0" max="100" value="50" aria-label="겹쳐 보기 경계"></div>
+      <div class="btns"><button type="button" class="btn" id="askRollback">예전 그림(${p.version ? `v${esc(p.version)}` : esc(p.commit)})으로 되돌리기 요청</button></div>`;
+  } catch { if (key === want) box.innerHTML = '<p class="small muted">예전 그림 묶음을 불러오지 못했어요.</p>'; }
+}
+$('cmpBox').addEventListener('input', e => { if (e.target.id === 'wipeX') $('wipe').style.setProperty('--x', e.target.value + '%'); });
+document.addEventListener('click', e => {
+  const z = e.target.closest('[data-zoom]');
+  if (z) { $('zoomImg').src = z.src; $('zoom').hidden = false; return; }
+  if (e.target.closest('#zoom')) $('zoom').hidden = true;
+});
+
+/* ---------- 교체 약속 검사 ---------- */
+let cand = null;   // 바꿀 파일 { name, bytes, info, size, triangles, rows, gltf }
+function renderChecks() {
+  const t = $('chkTable');
+  if (!row) { t.innerHTML = '<tr><td class="small muted">새 리소스는 만든 뒤 검사해요. 만든 .glb 가 있으면 "만든 파일로 교체" 에서 골라 보세요.</td></tr>'; $('chkSum').textContent = ''; return; }
+  const nowRows = row.checks, cRows = cand?.rows ?? null;
+  const ids = [...new Set([...nowRows.map(r => r.id), ...(cRows ?? []).map(r => r.id)])];
+  const cell = r => r ? `<span class="st ${r.state}">${CHK_MARK[r.state]}</span><br><span class="small muted">${esc(r.detail)}</span>` : '<span class="st skip">–</span>';
+  t.innerHTML = `<thead><tr><th>약속</th><th>지금 모델</th>${cRows ? `<th>바꿀 파일 (${esc(cand.name)})</th>` : ''}</tr></thead><tbody>${ids.map(id => {
+    const a = nowRows.find(r => r.id === id), b = cRows?.find(r => r.id === id);
+    return `<tr><td class="lab">${esc((a ?? b).label)}</td><td>${cell(a)}</td>${cRows ? `<td>${cell(b)}</td>` : ''}</tr>`;
+  }).join('')}</tbody>`;
+  const s = summary(nowRows), c = cRows ? summary(cRows) : null;
+  $('chkSum').textContent = `지금 ✓${s.ok} △${s.warn} ✗${s.fail}${c ? ` · 바꿀 파일 ✓${c.ok} △${c.warn} ✗${c.fail}` : ''} · 목록 ${when(index.builtAt)}`;
+}
+
+/* ---------- 바꿀 파일 (.glb) 미리 보기 ---------- */
+$('pickGlb').addEventListener('click', () => $('glbFile').click());
+$('glbFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  $('glbName').textContent = `${f.name} 푸는 중…`;
+  try {
+    const buf = new Uint8Array(await f.arrayBuffer());
+    const info = glbInfo(buf);
+    const gltf = await new Promise((ok, no) => new GLTFLoader().parse(buf.buffer, '', ok, no));
+    const box = new THREE.Box3().setFromObject(gltf.scene), sz = box.getSize(new THREE.Vector3());
+    const size = [sz.x, sz.z, sz.y].map(n => Math.round(n * 1000) / 1000);   // Blender 축 (가로 X · 깊이 Y · 높이 Z) = three (x · z · y)
+    const area = areaNow();
+    const s = spec ? { ...spec, palette: { ...spec.palette, ...draft.palette } } : { id: 'NEW', slug: 'new', version: '0', status: 'review', palette: Object.fromEntries(info.materials.map(m => [m, '#888888'])) };
+    const rows = checkResource({ area, spec: s, stats: { size, triangles: info.triangles }, info });
+    cand = { name: f.name, bytes: f.size, info, size, rows };
+    draft.file.name = f.name; if (!draft.file.path) { draft.file.path = f.name; $('filePath').value = f.name; }
+    $('glbName').textContent = `${f.name} · ${Math.round(f.size / 1024)}KB · 삼각형 ${info.triangles.toLocaleString('ko-KR')} · 재질 ${new Set(info.materials).size}`;
+    showCandidate(gltf);
+    renderChecks();
+  } catch (err) { cand = null; $('glbName').textContent = `풀지 못했어요: ${err.message ?? err}`; renderChecks(); }
+});
+$('candBack').addEventListener('click', () => { clearCandidate(); if (row && row.area !== 'pattern') { clearModel(); loadModel(key, row, rec); } renderChecks(); });
+function clearCandidate() { cand = null; $('candTag').hidden = true; $('candBack').hidden = true; $('glbName').textContent = '고른 파일 없음'; }
+
+/* ---------- 저장소: 웹 링크(아티팩트 db·assets) 또는 로컬 dev-server ---------- */
+function artifactStore(db, assets, user) {
+  return {
+    label: '이 페이지의 저장소(웹)에 저장돼요', canUpload: !!assets,
+    watch(col, cb) { return db.collection(col).onSnapshot(s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), e => cb(null, e)); },
+    watchDoc: (path, cb) => db.doc(path).onSnapshot(s => cb(s.exists ? s.data() : null), () => {}),
+    watchHistory: cb => db.collection('history').where('board', '==', 'res').onSnapshot(qs => cb(qs.docs.map(d => d.data())), () => {}),
+    add: (col, data) => db.collection(col).add(data).then(ref => ref.id),
+    update: (col, id, data) => db.doc(`${col}/${id}`).update(data),
+    upload: async (blob, type) => { const r = await assets.upload(blob, { type }); return { id: r.id, url: r.url }; },
+    url: id => '/_blob/' + id,
+    who: async () => (await user?.id?.()) ?? null,
+  };
+}
+function localStore() {
+  const listeners = {};
+  const refresh = async col => { try { const rows = await fetch(`api/db/${col}`).then(r => r.json()); (listeners[col] ?? []).forEach(cb => cb(rows)); } catch {} };
+  setInterval(() => Object.keys(listeners).forEach(refresh), 5000);
+  const send = (url, m, payload) => fetch(url, { method: m, headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }).then(r => r.json());
+  const st = {
+    label: '로컬 프로젝트 폴더(assets/review, assets/references)에 저장돼요', canUpload: true,
+    watch(col, cb) { (listeners[col] ??= []).push(cb); refresh(col); return () => {}; },
+    // 반영 기록: 로컬에서는 assets/review/res-applied.json · res-history.json (행마다 docId)
+    watchDoc(path, cb) { const [col, id] = path.split('/'); st.watch(`res-${col}`, rows => cb((rows ?? []).find(r => r.docId === id) ?? null)); },
+    watchHistory(cb) { st.watch('res-history', rows => cb((rows ?? []).filter(r => r.board === 'res'))); },
+    async add(col, data) { const r = await send(`api/db/${col}`, 'POST', data); refresh(col); return r.id; },
+    async update(col, id, data) { await send(`api/db/${col}/${id}`, 'PATCH', data); refresh(col); },
+    async upload(blob, type, name) {
+      const r = await fetch(`api/assets?name=${encodeURIComponent(name ?? 'file')}`, { method: 'POST', headers: { 'content-type': type }, body: blob });
+      if (!r.ok) throw Object.assign(new Error('upload'), { code: (await r.json()).code });
+      return r.json();
+    },
+    url: id => `assets/references/${id}`,
+    who: async () => 'local',
+  };
+  return st;
+}
+const timeout = (p, ms) => Promise.race([p, new Promise(ok => setTimeout(() => ok(null), ms))]);
+async function connectStore() {
+  if (typeof window.claude?.use === 'function') {
+    const [db, assets, user] = await Promise.all(['db', 'assets', 'user'].map(n => timeout(Promise.resolve().then(() => window.claude.use(n)).catch(() => null), 12000)));
+    if (db) return artifactStore(db, assets, user);
+  }
+  try { if ((await fetch('api/ping')).ok) return localStore(); } catch {}
+  return null;
+}
+let store = null, allRefs = [], allReqs = [], applied = null, records = [];
+connectStore().then(s => {
+  store = s;
+  if (!s) {
+    $('storeState').textContent = '이 화면에서는 저장소를 쓸 수 없어서 "글로 보기 · 복사" 로 채팅에 붙여 주세요.';
+    $('dropHint').textContent = '이 화면에서는 파일을 올릴 수 없어요. 그림은 채팅에 직접 첨부해 주세요.';
+    $('sendReq').disabled = true; $('askApprove').disabled = true; $('askReopen').disabled = true;
+    $('logBox').innerHTML = '<p class="small muted">이 화면에서는 반영 기록을 볼 수 없어요.</p>';
+    return;
+  }
+  $('storeState').textContent = s.label;
+  if (s.canUpload) { $('drop').setAttribute('aria-disabled', 'false'); $('pickFile').disabled = false; }
+  else $('dropHint').textContent = '파일은 이 페이지를 편집할 수 있는 사람만 올릴 수 있어요.';
+  s.watch(COL.refs, rows => { if (rows) { allRefs = rows; renderRefs(); } });
+  s.watch(COL.requests, rows => { if (rows) { allReqs = rows; renderRequests(); renderGrid(); renderLog(); } });
+  s.watchDoc('applied/res', d => { applied = d; renderLog(); });
+  s.watchHistory(rows => { records = (rows ?? []).sort((a, b) => b.version - a.version); renderLog(); });
+});
+
+/* ---------- 반영 기록 (applied/res · history/res-v<n>) ---------- */
+function renderLog() {
+  const L = window.ApplyLog;
+  if (!L) { $('logBox').innerHTML = '<p class="small muted">반영 기록 도구(board-kit.js)를 불러오지 못했어요.</p>'; return; }
+  const want = new Set(allReqs.filter(r => r.kind === 'rollback' && r.key === '_log' && r.status !== 'done').map(r => r.to));
+  const html = L.head(applied, { label: '마지막 반영' }) + L.list(records, { action: h => (applied && h.version === applied.version ? '<span class="small muted">지금 버전</span>'
+    : want.has(h.version) ? '<span class="pill st-new">되돌리기 요청함</span>' : `<button type="button" class="btn link" data-rollback="${h.version}">v${h.version} 로 되돌리기 요청</button>`) });
+  $('logBox').innerHTML = html;
+  $('appliedHead').innerHTML = applied ? L.head(applied, { label: '리소스 마지막 반영' }) : '';
+}
+$('logBox').addEventListener('click', async e => {
+  const b = e.target.closest('[data-rollback]');
+  if (!b || !store) return;
+  const to = +b.dataset.rollback;
+  b.disabled = true;
+  try { await store.add(COL.requests, { key: '_log', area: null, kind: 'rollback', method: null, to, status: 'new', createdAt: Date.now(), by: await store.who(), text: `[리소스 편집기 되돌리기 요청] 반영 기록 v${to} 로 (history/res-v${to}.commit 기준)` }); }
+  catch { b.disabled = false; b.textContent = '보내지 못했어요. 다시 눌러 주세요.'; }
+});
+
+/* ---------- 레퍼런스 ---------- */
+const refRows = () => allRefs.filter(r => r.key === key && (key !== NEW || r.cat === newCat));
+const mediaURL = a => store ? store.url(a) : '';
+const mediaTag = r => r.kind === 'video' ? `<video src="${esc(mediaURL(r.asset))}" muted playsinline preload="metadata" controls></video>` : `<img src="${esc(mediaURL(r.asset))}" alt="${esc(r.name)}" loading="lazy">`;
+function renderRefs() {
+  const rows = refRows(), parents = rows.filter(r => r.kind !== 'frame' && r.status !== 'removed').sort((a, b) => a.createdAt - b.createdAt);
+  const list = $('refList');
+  [...list.querySelectorAll('.pending')].forEach(n => n.dataset.key !== key && n.remove());
+  const pend = [...list.querySelectorAll('.pending')];
+  list.innerHTML = parents.map(r => {
+    const frames = rows.filter(f => f.kind === 'frame' && f.parent === r.id).sort((a, b) => a.t - b.t);
+    return `<article class="ref" data-ref="${esc(r.id)}"><div class="ref-media">${mediaTag(r)}</div><div class="ref-body">
+      <div class="ref-name"><span>${esc(r.name)}</span><span class="muted">${r.kind === 'video' ? '영상' : '이미지'}${r.gen ? ' · 로컬 생성' : ''}</span></div>
+      <input type="text" class="ref-note" value="${esc(r.note ?? '')}" placeholder="이 그림에서 볼 점" aria-label="볼 점">
+      ${frames.length ? `<div class="frames">${frames.map(f => `<img src="${esc(mediaURL(f.asset))}" alt="" data-zoom>`).join('')}</div>` : ''}
+      <div><button type="button" class="btn link" data-remove>목록에서 빼기</button></div></div></article>`;
+  }).join('') || (store ? '<p class="small muted">아직 올린 레퍼런스가 없어요.</p>' : '');
+  pend.forEach(n => list.append(n));
+}
+$('refList').addEventListener('change', e => { if (e.target.classList.contains('ref-note') && store) store.update(COL.refs, e.target.closest('[data-ref]').dataset.ref, { note: e.target.value.trim() }).catch(() => {}); });
+$('refList').addEventListener('click', async e => {
+  const rm = e.target.closest('[data-remove]'); if (!rm || !store) return;
+  if (!rm.dataset.armed) { rm.dataset.armed = '1'; rm.textContent = '한 번 더 누르면 빠져요'; return; }
+  await store.update(COL.refs, rm.closest('[data-ref]').dataset.ref, { status: 'removed' }).catch(() => {});
+});
+const seek = (v, t) => new Promise((ok, no) => { const tm = setTimeout(() => no(new Error('seek')), 8000); v.onseeked = () => { clearTimeout(tm); ok(); }; v.currentTime = t; });
+async function extractFrames(src, n = 6) {
+  const v = document.createElement('video');
+  v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = src;
+  await new Promise((ok, no) => { const tm = setTimeout(() => no(new Error('timeout')), 15000); v.onloadeddata = () => { clearTimeout(tm); ok(); }; v.onerror = () => no(new Error('video')); });
+  if (!isFinite(v.duration) || v.duration <= 0 || !v.videoWidth) throw new Error('duration');
+  const W = Math.min(768, v.videoWidth), H = Math.round(v.videoHeight * W / v.videoWidth), c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const g = c.getContext('2d'), out = [];
+  for (let i = 0; i < n; i++) { const t = v.duration * (i + 0.5) / n; await seek(v, t); g.drawImage(v, 0, 0, W, H); out.push({ t, blob: await new Promise(r => c.toBlob(r, 'image/jpeg', 0.86)) }); }
+  return out;
+}
+const UPLOAD_ERR = { too_large: '20MB보다 커서 올릴 수 없어요.', unsupported_type: '지원하지 않는 형식이에요.', quota_or_state: '저장 공간이 가득 찼어요.', rate_limited: '잠시 후 다시 올려 주세요.', not_granted: '이 화면에서는 올릴 권한이 없어요.' };
+async function addFiles(files) {
+  if (!store?.canUpload || !key) return;
+  const target = key, meta = { area: row?.area ?? areaNow(), cat: row?.cat ?? newCat, gen: method === 'local' ? draft.local.gen : null };
+  for (const file of files) {
+    const pending = document.createElement('article');
+    pending.className = 'ref pending'; pending.dataset.key = target;
+    pending.innerHTML = `<div class="ref-media small muted">올리는 중…</div><div class="ref-body"><div class="ref-name"><span>${esc(file.name)}</span></div><span class="small muted" data-msg>업로드 중</span></div>`;
+    $('refList').append(pending);
+    const msg = t => { const m = pending.querySelector('[data-msg]'); if (m) m.textContent = t; };
+    if (!UPLOAD_TYPES.includes(file.type)) { msg('PNG·JPG·WEBP·GIF·MP4·WEBM 만 올릴 수 있어요 (.glb 는 "만든 파일로 교체" 에서 골라 주세요).'); setTimeout(() => pending.remove(), 7000); continue; }
+    if (file.size > MAX_BYTES) { msg(UPLOAD_ERR.too_large); setTimeout(() => pending.remove(), 6000); continue; }
+    try {
+      const kind = file.type.startsWith('video/') ? 'video' : 'image';
+      const a = await store.upload(file, file.type, file.name);
+      const refId = await store.add(COL.refs, { key: target, ...meta, kind, asset: a.id, mime: file.type, name: file.name, note: '', status: 'active', createdAt: Date.now() });
+      if (kind === 'video') {
+        msg('장면 뽑는 중…');
+        const local = URL.createObjectURL(file);
+        let frames = await extractFrames(local).catch(() => []);
+        URL.revokeObjectURL(local);
+        for (const [i, f] of frames.entries()) {
+          msg(`장면 저장 중 ${i + 1}/${frames.length}`);
+          const fa = await store.upload(f.blob, 'image/jpeg', `${file.name}-${i + 1}.jpg`);
+          await store.add(COL.refs, { key: target, ...meta, kind: 'frame', parent: refId, asset: fa.id, mime: 'image/jpeg', name: `${file.name} #${i + 1}`, t: f.t, status: 'active', createdAt: Date.now() });
+        }
+      }
+      pending.remove();
+    } catch (err) { msg(UPLOAD_ERR[err?.code] ?? '올리지 못했어요. 다시 해 주세요.'); setTimeout(() => pending.remove(), 8000); }
+  }
+}
+$('pickFile').addEventListener('click', () => $('refFile').click());
+$('refFile').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { if (!store?.canUpload) return; e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('over')));
+drop.addEventListener('drop', e => { if (!store?.canUpload) return; e.preventDefault(); addFiles([...e.dataTransfer.files]); });
+document.addEventListener('paste', e => { const f = [...(e.clipboardData?.files ?? [])].filter(x => UPLOAD_TYPES.includes(x.type)); if (f.length && store?.canUpload) { e.preventDefault(); addFiles(f); } });
+
+/* ---------- 요청 만들기 ---------- */
+const activeRefs = () => {
+  const live = refRows().filter(r => r.status !== 'removed');
+  return live.filter(r => r.kind !== 'frame').map(r => ({ id: r.id, asset: r.asset, kind: r.kind, name: r.name, note: r.note ?? '', gen: r.gen ?? null,
+    frames: live.filter(f => f.kind === 'frame' && f.parent === r.id).sort((a, b) => a.t - b.t).map(f => f.asset) }));
+};
+// 스펙에서 바뀐 값만 (색 · 수치 · 컨셉)
+function changes() {
+  const out = { palette: {}, values: {}, concept: null };
+  if (!spec) return out;
+  for (const [k, v] of Object.entries(draft.palette)) if (String(spec.palette?.[k]).toUpperCase() !== String(v).toUpperCase()) out.palette[k] = [spec.palette[k], v];
+  for (const [k, d] of Object.entries(defs)) { const v = draft.values[k]; if (v != null && (typeof v === 'number' ? Math.abs(v - d.value) > 0.004 : v !== d.value)) out.values[k] = [d.value, v]; }
+  if ((draft.concept ?? '') !== (spec.prompt?.concept ?? '')) out.concept = draft.concept;
+  return out;
+}
+const kindOf = () => !row ? 'add' : method === 'file' || (method === 'local' && draft.local.use === 'shape') ? 'swap' : 'edit';
+function buildRequest(kind = kindOf(), extra = {}) {
+  const refs = activeRefs(), area = row?.area ?? areaNow();
+  const head = row ? `${row.id} ${row.name}` : `새 ${CAT_LABEL[newCat]} ${draft.name || '(이름 미정)'}`;
+  const out = [`[리소스 ${KIND_LABEL[kind]} 요청] ${head}${row ? ` · 기준 스펙 v${row.version}` : ''}`];
+  if (kind === 'approve' || kind === 'reopen') { out.push('', kind === 'approve' ? `■ 확정 — 스펙 status: "approved"` : '■ 다시 열기 — 스펙 status: "review" (version 그대로)'); return out.join('\n'); }
+  if (kind === 'rollback') { out.push('', `■ 되돌리기 — 예전 그림 ${extra.commit}${extra.to ? ` (v${extra.to})` : ''} 의 스펙·모델·렌더로`); return out.join('\n'); }
+  out.push(`■ 바꾸는 방법: ${METHOD_LABEL[method]}`);
+  if (draft.request.trim()) out.push('', '■ 하고 싶은 말', draft.request.trim());
+  if (refs.length) out.push('', `■ 레퍼런스 ${refs.length}개`, ...refs.map(r => `- ${r.name} (${r.kind === 'video' ? `영상, 장면 ${r.frames.length}장` : '이미지'})${r.gen ? ` · 로컬 생성 ${r.gen}` : ''}${r.note ? ` · ${r.note}` : ''}`));
+  if (method === 'blender') {
+    const c = changes(), labels = spec?.paletteLabels ?? {};
+    const pal = Object.entries(c.palette), val = Object.entries(c.values);
+    if (pal.length) out.push('', '■ 색 변경', ...pal.map(([k, [a, b]]) => `- ${k}(${labels[k] ?? PAL_LABEL[k] ?? k}): ${a} → ${b}`));
+    if (val.length) out.push('', area === 'character' ? '■ 비율 변경 (proportions)' : area === 'pattern' ? '■ 무늬 간격 변경 (pattern.size, m)' : '■ 수치 변경 (params)', ...val.map(([k, [a, b]]) => `- ${k}(${defs[k]?.label ?? k}): ${a} → ${b}`));
+    if (c.concept != null) out.push('', '■ 컨셉', c.concept);
+    if (row && !pal.length && !val.length && c.concept == null && !draft.request.trim() && !refs.length) out.push('', '(바뀐 값이 없어요.)');
+  }
+  if (method === 'local') {
+    const g = GENERATORS.find(x => x.id === draft.local.gen);
+    out.push('', '■ 로컬 생성', `- 만드는 것: ${g?.label ?? draft.local.gen}`, `- 결과 쓰는 곳: ${USE_LABEL[draft.local.use] ?? draft.local.use}`,
+      ...(draft.local.prompt.trim() ? [`- 프롬프트: ${draft.local.prompt.trim()}`] : []), ...(draft.local.seed.trim() ? [`- 시드: ${draft.local.seed.trim()}`] : ['- 시드: 넷 뽑기']),
+      ...(g?.kind === '3d' && draft.local.dec.trim() ? [`- 줄이는 비율: ${draft.local.dec.trim()}`] : []));
+  }
+  if (method === 'file') {
+    out.push('', '■ 바꿀 파일', `- 위치: ${draft.file.path || '(안 적음)'}`, ...(draft.file.from ? [`- 만든 곳: ${draft.file.from}`] : []));
+    if (cand) {
+      const s = summary(cand.rows);
+      out.push(`- 미리 본 파일: ${cand.name} · ${Math.round(cand.bytes / 1024)}KB · 크기 ${cand.size.join('×')} · 삼각형 ${cand.info.triangles}`,
+        `- 약속 검사: ✓${s.ok} △${s.warn} ✗${s.fail}`, ...cand.rows.filter(r => r.state === 'fail' || r.state === 'warn').map(r => `  ${r.state === 'fail' ? '✗' : '△'} ${r.label}: ${r.detail}`));
+    } else out.push('- (이 화면에서 미리 보지 않음)');
+  }
+  return out.join('\n');
+}
+function requestDoc(kind = kindOf(), extra = {}) {
+  const c = changes();
+  return { key: key === NEW ? NEW : row.key, area: row?.area ?? areaNow(), cat: row?.cat ?? newCat, ref: row?.id ?? null, slug: row?.slug ?? null, name: row?.name ?? (draft.name.trim() || null),
+    kind, method: ['approve', 'reopen', 'rollback'].includes(kind) ? null : method, base: row?.version ?? null, status: 'new', createdAt: Date.now(),
+    text: buildRequest(kind, extra), request: draft.request.trim(),
+    ...(method === 'blender' && !['approve', 'reopen', 'rollback'].includes(kind) ? { fields: { palette: Object.fromEntries(Object.entries(c.palette).map(([k, [, b]]) => [k, b])), values: Object.fromEntries(Object.entries(c.values).map(([k, [, b]]) => [k, b])), ...(c.concept != null ? { concept: c.concept } : {}) } } : {}),
+    ...(method === 'local' && !['approve', 'reopen', 'rollback'].includes(kind) ? { local: { generator: draft.local.gen, use: draft.local.use, prompt: draft.local.prompt.trim(), seed: draft.local.seed.trim() || null, decimate: draft.local.dec.trim() || null } } : {}),
+    ...(method === 'file' && !['approve', 'reopen', 'rollback'].includes(kind) ? { file: { path: draft.file.path.trim(), from: draft.file.from.trim(), name: cand?.name ?? null, bytes: cand?.bytes ?? null, size: cand?.size ?? null, info: cand ? { ...cand.info, nodes: cand.info.nodes.length } : null }, checks: cand?.rows ?? null } : {}),
+    refs: ['approve', 'reopen'].includes(kind) ? [] : activeRefs(), ...extra };
+}
+function setStatus(t, err = false) { const s = $('sendStatus'); s.textContent = t; s.classList.toggle('err', err); }
+async function send(kind, extra = {}) {
+  if (!store || !draft) return;
+  if (key === NEW && !draft.name.trim() && !draft.request.trim()) { setStatus('새 리소스 이름이나 하고 싶은 말을 적어 주세요.', true); return; }
+  if (kind === 'swap' && method === 'file' && !draft.file.path.trim()) { setStatus('바꿀 파일 위치를 적어 주세요 (이 PC 경로 또는 링크).', true); return; }
+  setStatus('보내는 중…');
+  try {
+    const doc = requestDoc(kind, extra);
+    doc.by = await store.who();
+    await store.add(COL.requests, doc);
+    setStatus(`요청을 저장했어요 (${KIND_LABEL[kind]}). 채팅에 "리소스 요청 확인" 이라고 보내 주시면 처리할게요.`);
+    if (!['approve', 'reopen', 'rollback'].includes(kind)) { draft.request = ''; $('req').value = ''; saveDraft(); }
+  } catch (err) { setStatus(err?.code === 'quota_exceeded' ? '저장 공간이 가득 차서 보내지 못했어요.' : '보내지 못했어요. "글로 보기 · 복사" 로 채팅에 붙여 주세요.', true); }
+}
+$('sendReq').addEventListener('click', () => send(kindOf()));
+$('askApprove').addEventListener('click', () => send('approve'));
+$('askReopen').addEventListener('click', () => send('reopen'));
+$('cmpBox').addEventListener('click', e => { if (e.target.id === 'askRollback' && row?.prev) send('rollback', { to: row.prev.version, commit: row.prev.commit }); });
+$('makeReq').addEventListener('click', () => { if (!draft) return; $('out').value = buildRequest(); $('outWrap').hidden = false; $('copyStatus').textContent = ''; });
+$('copyOut').addEventListener('click', () => {
+  const ta = $('out'), fallback = () => { ta.select(); $('copyStatus').textContent = '선택해 두었어요. Ctrl+C 로 복사해 주세요.'; };
+  try { navigator.clipboard.writeText(ta.value).then(() => { $('copyStatus').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; }, fallback); } catch { fallback(); }
+});
+function renderRequests() {
+  const rows = allReqs.filter(r => r.key === key && (key !== NEW || r.cat === newCat)).sort((a, b) => b.createdAt - a.createdAt);
+  $('reqList').innerHTML = rows.length ? rows.map(r => {
+    const [cls, label] = REQ_STATUS[r.status] ?? REQ_STATUS.new;
+    return `<article class="req"><div class="req-head"><span class="pill ${cls}">${label}</span><span class="pill">${esc(KIND_LABEL[r.kind] ?? r.kind)}${r.method ? ` · ${esc(METHOD_LABEL[r.method] ?? r.method)}` : ''}</span>
+      <span class="small muted">${esc(when(r.createdAt))}${r.base ? ` · 기준 v${esc(r.base)}` : ''}${r.doneVersion ? ` → v${esc(r.doneVersion)}` : ''}</span></div>
+      ${r.reply ? `<p class="reply">${esc(r.reply)}</p>` : ''}<details><summary>요청 글</summary><pre>${esc(r.text)}</pre></details></article>`;
+  }).join('') : '<p class="small muted">이 요소에 남긴 요청이 없어요.</p>';
+}
+
+/* ---------- 3D 뷰어 ---------- */
+const host = $('viewer');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+host.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.56; controls.autoRotate = true; controls.autoRotateSpeed = 1.0;
+controls.addEventListener('start', () => { controls.autoRotate = false; $('autoRot').checked = false; });
+$('autoRot').addEventListener('change', e => { controls.autoRotate = e.target.checked; });
+scene.add(new THREE.HemisphereLight(0xeef8ff, 0xc9d79f, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+sun.position.set(-1.4, 3.2, 2.6);
+scene.add(sun);
+const grad = new THREE.DataTexture(new Uint8Array([168, 168, 168, 255, 255, 255, 255, 255]), 2, 1, THREE.RGBAFormat);
+grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
+const ground = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshToonMaterial({ color: 0xa9c46a, gradientMap: grad }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.002;
+scene.add(ground);
+const GROUND = { grass: 0xa9c46a, sand: 0xf1dfae, water: 0x6bb8d6, floor: 0xd9b48a };
+const refBar = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1, 12), new THREE.MeshToonMaterial({ color: 0xf2b36b, gradientMap: grad }));
+refBar.position.y = 0.5; refBar.visible = false;
+scene.add(refBar);
+$('scaleRef').addEventListener('change', () => { refBar.visible = $('scaleRef').checked; });
+const outlineW = { value: 0.01 };
+const outlineMat = new THREE.MeshBasicMaterial({ color: '#4A3B32', side: THREE.BackSide });
+outlineMat.onBeforeCompile = sh => { sh.uniforms.uW = outlineW; sh.vertexShader = 'uniform float uW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize( normal ) * uW;'); };
+const NO_OUTLINE = new Set(['glow', 'flame', 'flameCore', 'crack', 'paper', 'waterLight', 'center', 'petalDark', 'rockDark', 'shellRib', 'flower', 'grassDark', 'pebble', 'window', 'eyeHighlight', 'eye', 'blush']);
+let holder = null, model = null, mixer = null, actions = {}, current = null, mats = {}, loadSeq = 0, variant = null, headBone = null;
+function clearModel() {
+  loadSeq++;
+  if (holder) { scene.remove(holder); holder.traverse(o => { if (o.isMesh) { o.geometry.dispose(); if (o.material !== outlineMat) o.material.dispose(); } }); }
+  holder = null; model = null; mixer = null; actions = {}; current = null; mats = {}; headBone = null;
+  $('animSeg').innerHTML = ''; $('varSeg').innerHTML = '';
+}
+function currentPalette() { return { ...(draft?.palette ?? {}), ...((variant && spec?.variants?.[variant]?.palette) ?? {}) }; }
+function recolor() {
+  if (row?.area === 'pattern') { drawFlat(); return; }
+  const pal = currentPalette();
+  for (const [name, list] of Object.entries(mats)) if (pal[name]) list.forEach(m => m.color.set(pal[name]));
+  outlineMat.color.set(pal.outline ?? '#4A3B32');
+}
+function play(name) {
+  const next = actions[name] ?? null;
+  if (next === current) return;
+  if (current) current.fadeOut(0.2);
+  if (next) next.reset().fadeIn(0.2).play();
+  current = next;
+  $('animSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.anim === (name ?? 'none'))));
+}
+$('animSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) play(b.dataset.anim === 'none' ? null : b.dataset.anim); });
+$('varSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; variant = b.dataset.v || null; $('varSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); recolor(); });
+$('outlineOn').addEventListener('change', e => holder?.traverse(o => { if (o.userData.outline) o.visible = e.target.checked; }));
+function frame() {
+  const box = new THREE.Box3().setFromObject(holder), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+  const small = row?.area === 'item';
+  const r = Math.max(size.length() / 2, small ? 0.06 : 0.3);
+  const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
+  controls.target.copy(center);
+  camera.position.copy(center).add(new THREE.Vector3(-0.45, 0.5, 1).normalize().multiplyScalar(dist));
+  controls.minDistance = r * 0.8; controls.maxDistance = dist * 3;
+  camera.near = dist / 100; camera.far = dist * 10; camera.updateProjectionMatrix();
+  controls.autoRotate = $('autoRot').checked;
+  const tile = spec?.category === 'tile';
+  ground.visible = !tile && spec?.heroGround !== 'none';
+  ground.material.color.setHex(GROUND[spec?.heroGround] ?? (row?.area === 'furniture' || row?.area === 'fixture' ? GROUND.floor : row?.cat === 'fish' ? GROUND.water : row?.cat === 'shell' ? GROUND.sand : GROUND.grass));
+  ground.scale.setScalar(Math.max(small ? 0.3 : 1.2, Math.hypot(size.x, size.z) * (small ? 1.4 : 0.9)));
+  refBar.position.set(box.max.x + 0.3, 0.5, 0); refBar.visible = $('scaleRef').checked;
+}
+function onModel(gltf, s, candidate = false) {
+  clearModel();
+  model = gltf.scene;
+  const FLAT = new Set(s?.style?.flat ?? []), meshes = [];
+  model.traverse(o => {
+    if (o.isBone && /^head$/i.test(o.name)) headBone = o;
+    if (!o.isMesh) return;
+    const src = o.material, name = src.name;
+    const m = FLAT.has(name) ? new THREE.MeshBasicMaterial({ color: src.color.clone() }) : new THREE.MeshToonMaterial({ color: src.color.clone(), gradientMap: grad });
+    m.name = name; o.material = m;
+    (mats[name] ||= []).push(m);
+    meshes.push(o);
+  });
+  for (const o of meshes) {
+    if (NO_OUTLINE.has(o.material.name) || s?.style?.noOutline?.includes(o.material.name)) continue;
+    const ol = o.isSkinnedMesh ? new THREE.SkinnedMesh(o.geometry, outlineMat) : new THREE.Mesh(o.geometry, outlineMat);
+    if (o.isSkinnedMesh) ol.bind(o.skeleton, o.bindMatrix);
+    ol.userData.outline = true; ol.visible = $('outlineOn').checked;
+    o.isSkinnedMesh ? o.parent.add(ol) : o.add(ol);
+  }
+  holder = new THREE.Group(); holder.add(model); scene.add(holder);
+  if (row?.area === 'item') model.position.y -= new THREE.Box3().setFromObject(model).min.y;
+  outlineW.value = s?.style?.outlineWidth ?? 0.01;
+  mixer = new THREE.AnimationMixer(model);
+  for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
+  const names = Object.keys(actions);
+  $('animSeg').innerHTML = names.length ? [...names.map(n => `<button type="button" data-anim="${esc(n)}" aria-pressed="false">${esc(ANIM_LABEL[n] ?? n)}</button>`), '<button type="button" data-anim="none" aria-pressed="false">멈춤</button>'].join('') : '';
+  const vars = Object.entries(s?.variants ?? {});
+  $('varSeg').innerHTML = !candidate && vars.length ? vars.map(([v, d], i) => `<button type="button" data-v="${i ? esc(v) : ''}" aria-pressed="${!i}">${esc(d.label ?? v)}</button>`).join('') : '';
+  if (!candidate) recolor(); else outlineMat.color.set('#4A3B32');
+  frame();
+  play(names.includes('idle') ? 'idle' : names.includes('sway') ? 'sway' : names[0] ?? null);
+  $('viewerMsg').hidden = true;
+}
+const bundles = {};
+function modelData(r, m) {
+  const A = AREA[r.area], k = A.models + m.bundle;
+  bundles[k] ??= loadJSON(`${A.models}editor-models-${m.bundle}.json`).catch(e => { delete bundles[k]; throw e; });
+  return bundles[k].then(b => b[r.slug]);
+}
+const parseGLB = data => new Promise((ok, no) => new GLTFLoader().parse(Uint8Array.from(atob(data), c => c.charCodeAt(0)).buffer, '', ok, no));
+function loadModel(want, r, m) {
+  const seq = loadSeq;
+  $('viewerMsg').hidden = false;
+  $('viewerMsg').textContent = m?.bundle && !bundles[AREA[r.area].models + m.bundle] ? '모델 묶음 불러오는 중… (1.5MB 안팎, 처음 한 번만)' : '3D 모델 불러오는 중…';
+  if (!m?.bundle) { $('viewerMsg').textContent = '이 요소의 모델 묶음 번호가 없어요 (node tools/build-editor-index.mjs).'; return; }
+  modelData(r, m).then(d => { if (!d) throw new Error('model'); return parseGLB(d); })
+    .then(g => { if (seq === loadSeq && key === want) onModel(g, spec); })
+    .catch(() => { if (seq === loadSeq) $('viewerMsg').textContent = '3D 모델을 불러오지 못했어요. 새로고침해 보시고, 계속되면 채팅으로 알려 주세요.'; });
+}
+function showCandidate(gltf) {
+  showViewer(true);
+  onModel(gltf, spec, true);
+  $('candTag').hidden = false; $('candBack').hidden = false;
+}
+function resize() { const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(host);
+resize();
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  if (host.hidden || !holder) return;
+  const dt = Math.min(clock.getDelta(), 0.05);
+  mixer?.update(dt);
+  // 바로 보기: 전체 크기(params.scale)·키(proportions.height)·머리 크기
+  if (draft && model && $('candTag').hidden) {   // 바꿀 파일을 보는 동안은 그대로
+    if (row?.area === 'character') {
+      const p0 = spec?.proportions ?? {}, k = n => (draft.values[n] ?? p0[n] ?? 1) / (p0[n] || 1);
+      holder.scale.setScalar(k('height'));
+      headBone?.scale.setScalar(k('headScale'));
+    } else if (defs.scale) holder.scale.setScalar((draft.values.scale ?? defs.scale?.value ?? 1) / (defs.scale?.value || 1));
+  }
+  controls.update();
+  renderer.render(scene, camera);
+});
+
+/* ---------- 벽지·바닥 무늬 (게임 src/gameplay/house/pattern.js 의 paint·patternCanvas·swatchURL 을 옮김 — bg-editor.html 과 같다) ---------- */
+const HEX = /^#[0-9A-Fa-f]{6}$/;
+function resolveFill(s, k) { if (k == null) return null; if (HEX.test(k)) return k; const c = s?.palette?.[k]; return HEX.test(c ?? '') ? c : null; }
+function paint(g, s, k) {
+  const p = s.pattern, [tw, th] = p.tile;
+  g.save(); g.scale(k, k);
+  g.fillStyle = resolveFill(s, p.base) ?? '#FFFFFF'; g.fillRect(0, 0, tw, th);
+  for (const sh of p.shapes ?? []) for (const ox of [-tw, 0, tw]) for (const oy of [-th, 0, th]) {
+    g.save(); g.translate(ox, oy); g.globalAlpha = sh.opacity ?? 1;
+    let path = null;
+    if (sh.rect) { const [x, y, w, h] = sh.rect; path = new Path2D(); if (sh.rx && path.roundRect) path.roundRect(x, y, w, h, sh.rx); else path.rect(x, y, w, h); }
+    else if (sh.circle) { const [cx, cy, r] = sh.circle; path = new Path2D(); path.arc(cx, cy, r, 0, Math.PI * 2); }
+    else if (sh.ellipse) { const [cx, cy, rx, ry] = sh.ellipse; path = new Path2D(); path.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); }
+    else if (sh.path) path = new Path2D(sh.path);
+    if (path) {
+      const fill = resolveFill(s, sh.fill), stroke = resolveFill(s, sh.stroke);
+      if (fill) { g.fillStyle = fill; g.fill(path); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = sh.strokeWidth ?? 1; g.stroke(path); }
+    }
+    g.restore();
+  }
+  g.restore();
+}
+function patternCanvas(s, minPx = 128) {
+  const [tw, th] = s.pattern.tile, k = Math.min(512 / Math.max(tw, th), Math.max(1, Math.ceil(minPx / Math.min(tw, th))));
+  const cv = document.createElement('canvas'); cv.width = Math.round(tw * k); cv.height = Math.round(th * k);
+  paint(cv.getContext('2d'), s, cv.width / tw);
+  return cv;
+}
+function swatchURL(s, { px = 96, meters = 1.2 } = {}) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = px;
+  const g = cv.getContext('2d'), tile = patternCanvas(s, 64), [sw, sh] = s.pattern.size, pat = g.createPattern(tile, 'repeat');
+  pat.setTransform?.(new DOMMatrix().scale((sw / meters) * px / tile.width, (sh / meters) * px / tile.height));
+  g.fillStyle = pat; g.fillRect(0, 0, px, px);
+  return cv.toDataURL('image/png');
+}
+const liveSpec = () => ({ ...spec, palette: { ...spec.palette, ...draft.palette }, pattern: { ...spec.pattern, size: [draft.values.sizeX ?? spec.pattern.size[0], draft.values.sizeY ?? spec.pattern.size[1]] } });
+function drawFlat() {
+  if (row?.area !== 'pattern' || !spec) return;
+  const cv = $('flat'), px = Math.round((cv.clientWidth || 600) * Math.min(devicePixelRatio, 2));
+  cv.width = cv.height = px;
+  const s = liveSpec(), [sw, sh] = s.pattern.size, meters = Math.min(7, Math.max(1.6, Math.max(sw, sh) * 2.2));
+  const g = cv.getContext('2d'), tile = patternCanvas(s, 128), pat = g.createPattern(tile, 'repeat');
+  pat.setTransform(new DOMMatrix().scale((sw / meters) * px / tile.width, (sh / meters) * px / tile.height));
+  g.fillStyle = pat; g.fillRect(0, 0, px, px);
+  const u = px / 600, m = px / meters, x = 16 * u, y = px - 22 * u;
+  g.fillStyle = 'rgba(255,255,255,.88)'; g.fillRect(x - 8 * u, y - 24 * u, m + 16 * u, 36 * u);
+  g.fillStyle = '#3B2F28'; g.fillRect(x, y, m, 4 * u); g.fillRect(x, y - 6 * u, 2 * u, 14 * u); g.fillRect(x + m - 2 * u, y - 6 * u, 2 * u, 14 * u);
+  g.font = `${14 * u}px "Gowun Dodum", sans-serif`; g.fillText(`1m · 무늬 한 칸 ${sw}×${sh}m`, x, y - 8 * u);
+}
+
+/* ---------- 시작 ---------- */
+const keyFromHash = () => { const h = decodeURIComponent(location.hash.slice(1)); return h === 'new' ? NEW : ROWS.some(r => r.key === h) ? h : null; };
+addEventListener('hashchange', () => { const k = keyFromHash(); if (k && k !== key) select(k); });
+const first = keyFromHash();
+if (first && first !== NEW) tab = tabOf(ROWS.find(r => r.key === first).area);
+renderHead(); renderBars(); renderGrid();
+select(first ?? ROWS.find(r => r.area === 'character')?.key ?? ROWS[0].key);
+</script>
+</body>
+</html>
