@@ -55,6 +55,12 @@
 - 파일 목록 `elem-editor/files.json` (모듈 13 · 에셋 24 + 페이지 = 38개). `index.html` = `elem-editor.html` 을 `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` … `<body>` + 파일 + `</body></html>` 로 감싼 사본 (devlog 2026-11-10 메모 — 예전 게시본과 같은 모양). 모듈을 더하면 `tests/elem.test.mjs` 가 목록에 없는 import 를 잡는다.
 - `publish_files` (slug DcidJEY1VRNNJdCxwge3Sj): 예전 숫자 표 게시본(`index.html` · `tools/edits.mjs` · `assets/data/*.json`) 위에 patch. 다시 게시 때는 `list_files` 로 지금 게시본이 저장소 파일과 같은지 보고 바뀐 것만.
 
+## 게시·저장소 기록 (2026-11-11)
+
+- 게시: slug `662a5943-a2e5-4103-b682-cdbb023c7a54` (= DcidJEY1…) **버전 `1794325461-70c7`**, 파일 38개 (예전 4개 위에 patch), 제목 「포근섬 요소 편집기」, capabilities 그대로. 게시본은 이 브랜치 파일이라 `rules.json moving`·`tour.json shapes` 가 들어 있다 → **main 에 합치기 전에 "요소 반영" 이 오면** 이 두 칸은 main 에 없으니 합친 뒤 반영한다.
+- 저장소에 쓴 것: `applied/elem` · `history/elem-v0` (`{ board:'elem', version:0, commit:'f1c7279', changed:[], snapshot:{} }` — v0 은 파일 사본 없이 시작 표시만, 되돌리기는 숫자 표 v0 · 섬 지도 v0 사본으로), `history/map-v0` (예전 섬 지도 저장소의 문서 그대로 옮김). `drafts/data`·`drafts/map` 은 비어 있었다.
+- 첫 "요소 반영" 때는 `applied/elem` version 1 · 그 반영에서 바뀐 파일 사본.
+
 ## 게임 코드에서 바꾼 것 (값을 데이터로 꺼냄 — 값은 그대로)
 
 | 파일 | 바꾼 것 |
@@ -97,7 +103,7 @@
 
 ## 못 한 것 · 다음
 
-- claude.ai 게시본에서 직접 끌기·저장 (`window.claude` db) 은 사용자가 열어 볼 때. 게시 뒤 저장소 읽기는 확인 (아래 devlog 메모).
+- claude.ai 게시본에서 직접 끌기·저장 (`window.claude` db) 은 사용자가 열어 볼 때 (보는 사람 권한으로 `applied` 읽기는 확인).
 - 방 배치의 3D 보기·새 방 더하기(`kind:'add'`)는 없다 — 새 방 파일은 리소스 편집기 요청으로.
 - 진열 자리 `stock`·박물관 `cases`·말 거는 자리 `talk` 는 보기만 (예전과 같음) — 의견 칸으로.
 - 타로 카드 효과 글(`effect`·`text`)은 값만 바뀌고 글은 그대로 → "요소 반영" 때 Claude 가 맞춘다.
