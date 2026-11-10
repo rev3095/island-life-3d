@@ -1,6 +1,7 @@
 // 웹 배포 빌드(tools/build-web.mjs) 검사: 게시 목록에 .glb 가 없고, 모듈·에셋이 읽는 파일이 모두 들어가고,
 // 에셋은 묶음 파일(packs/*.json) 안에 원본 그대로 들어가고 (M6-P0), 페이지가 아티팩트 뼈대 규칙을 지키고, 255개·511개 제한에 맞게 나뉘는지.
 // 마지막 검사는 src/core/packs.js 를 게시본 페이지처럼 꾸며 돌려 본다 (묶음에서 꺼내기·나중에 받기·진행 수·그림 주소·fetch 덮개).
+import { quantizeGlbJson } from '../tools/glb-quantize.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
@@ -83,7 +84,7 @@ test('build-web: 에셋 목록의 slug 마다 모델·스펙이 묶음에 들어
   }
 });
 
-test('build-web: 에셋은 모두 한 묶음에 한 번씩, 내용은 원본 그대로 (JSON = 같은 값, 그림 = base64 같은 바이트)', () => {
+test('build-web: 에셋은 모두 한 묶음에 한 번씩, 내용은 원본 그대로 (JSON = 같은 값, 모델 = 법선·가중치만 줄인 원본, 그림 = base64 같은 바이트)', () => {
   const assets = plan.files.filter(f => f.path.startsWith('assets/'));
   assert.equal(packOf.size, assets.length, '묶음에 든 파일 수');
   for (const f of assets) assert.ok(packOf.has(f.path), `묶음 밖 에셋 ${f.path}`);
@@ -95,7 +96,8 @@ test('build-web: 에셋은 모두 한 묶음에 한 번씩, 내용은 원본 그
     assert.equal(j.pack, p.name);
     assert.deepEqual(Object.keys(j.files), p.files.map(f => f.path));
     for (const f of p.files) {
-      if (f.path.endsWith('.json')) assert.deepEqual(j.files[f.path], JSON.parse(read(f.path)), f.path);
+      if (f.path.endsWith('.glb.json')) assert.deepEqual(j.files[f.path], JSON.parse(quantizeGlbJson(read(f.path)).text), f.path);   // 모델 = 줄인 원본 (P40)
+      else if (f.path.endsWith('.json')) assert.deepEqual(j.files[f.path], JSON.parse(read(f.path)), f.path);
       else assert.ok(Buffer.from(j.files[f.path], 'base64').equals(readFileSync(join(ROOT, f.path))), f.path);
     }
   }
@@ -285,7 +287,9 @@ test('packs.js: 게시본처럼 — boot 묶음만 먼저, 나머지는 읽을 �
       await assert.rejects(P.readJSON(itemPath), /404/);
       assert.equal(P.loadStats.failed - before, plan.manifest.packs.find(p => p.path === 'packs/items-2.json').files.length);
       assert.ok(P.loadStats.failedUrls.includes('packs/items-2.json'));
-      assert.deepEqual(await P.readJSON(itemPath), JSON.parse(read(itemPath)));
+      // 모델은 묶을 때 법선·가중치를 줄인다 (P40, tools/glb-quantize.mjs) — 원본을 같은 함수로 줄인 것과 같아야 한다
+      const want = itemPath.endsWith('.glb.json') ? quantizeGlbJson(read(itemPath)).text : read(itemPath);
+      assert.deepEqual(await P.readJSON(itemPath), JSON.parse(want));
     }
     assert.ok(P.packStatus().filter(p => p.boot).every(p => p.state === 'ready'));
   } finally {

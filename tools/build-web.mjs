@@ -9,6 +9,7 @@
 // - 에셋(assets/ 의 JSON · .glb.json · 그림)은 아티팩트 한 버전 511파일 제한 때문에 묶음 파일 몇 개로 모은다 (PACKS 표).
 //   src/core/packs.js 가 게시본에서 묶음에서 꺼내 준다. 개발 서버(/index.html)는 묶음 없이 파일을 하나씩.
 // - 넣는 파일: main.js 에서 닿는 모듈·css + 게임이 읽는 에셋(.glb.json·스펙·목록·가구 썸네일). .glb·렌더·stats 는 빼고.
+import { quantizeGlbJson } from './glb-quantize.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, posix, relative } from 'node:path';
 import { execSync } from 'node:child_process';
@@ -51,11 +52,34 @@ export const TOUR_FILES = (() => {
   const cfg = JSON.parse(readFileSync(join(ROOT, 'assets/tour/tour.json'), 'utf8'));
   return new Set((cfg.env ?? []).flatMap(k => [`assets/env/models/${k}.glb.json`, `assets/env/specs/${k}.json`]));
 })();
+// P40 밤 묶음: 밤에만 놓는 배경(달빛 가게·새벽 천막·등불 줄·자는 중 쪽지)과 밤 가게 주인 모델 (assets/night/night.json assets) —
+// 처음에 받지 않고 그 밤 건물·주인이 처음 나올 때 (world 가 env 를 lazy 로, night 가 주인을 keeperOf 로 늦게 읽는다).
+// 스펙(작은 JSON)은 다른 모듈이 시작할 때 읽을 수 있어 섬·사람 묶음에 그대로 — 모델만 뺀다
+export const NIGHT_FILES = (() => {
+  const a = JSON.parse(readFileSync(join(ROOT, 'assets/night/night.json'), 'utf8')).assets ?? {};
+  return new Set([
+    ...(a.env ?? []).map(k => `assets/env/models/${k}.glb.json`),
+    ...(a.characters ?? []).map(k => `assets/models/${k}.glb.json`),
+  ]);
+})();
+// P40 이사 오는 주민 묶음: 처음 섬에 없는 주민(assets/villagers/<slug>.json "arrives": "moving")의 캐릭터 모델 — 이사 와서 처음 세울 때
+// (주민 성격·대사 파일은 작아서 섬 묶음 그대로). 이미 이사 온 저장이면 시작할 때 이 묶음을 받는다
+export const MOVER_FILES = (() => {
+  const dir = join(ROOT, 'assets/villagers');
+  const slugs = readdirSync(dir).filter(f => f.endsWith('.json') && f !== 'editor-files.json')
+    .filter(f => { try { return JSON.parse(readFileSync(join(dir, f), 'utf8')).arrives === 'moving'; } catch { return false; } })
+    .map(f => f.replace(/\.json$/, ''));
+  return new Set(slugs.map(k => `assets/models/${k}.glb.json`));
+})();
+// 묶을 때 모델 줄이기 (tools/glb-quantize.mjs). --no-quantize 로 끄면 원본 그대로 (비교용)
+const QUANTIZE = !process.argv.includes('--no-quantize');
 export const PACKS = [
   { name: 'icons', test: p => !!imageType(p) },                                     // 그림: 아이템 아이콘·가구 썸네일 (가방·상점·박물관을 처음 열 때)
   ...seasonPacks,                                                                   // 계절 행사 모델 (그 행사 때)
   { name: 'decor', test: p => DECOR_FILES.has(p) },                                 // 9차 섬 꾸미기 길·울타리 (놓을 때)
   { name: 'tour', test: p => TOUR_FILES.has(p) },                                   // P35 무인도 투어 배·광석 바위 (배를 놓을 때)
+  { name: 'night', test: p => NIGHT_FILES.has(p) },                                 // P40 밤 건물·등불·밤 가게 주인 (밤에 처음 나올 때)
+  { name: 'movers', test: p => MOVER_FILES.has(p) },                                // P40 이사 오는 주민 모델 (이사 와서 처음 세울 때)
   { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|night|tour)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
   { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
@@ -234,6 +258,8 @@ export function planWeb() {
 function packValue(f, errors) {
   const buf = readFileSync(join(ROOT, f.src));
   if (imageType(f.path)) return JSON.stringify(buf.toString('base64'));
+  // P40: 모델(.glb.json)은 법선·뼈 가중치를 작은 정수로 줄여 묶는다 (tools/glb-quantize.mjs — WASM 없이 GLTFLoader 가 그대로 읽음, 원본은 그대로)
+  if (f.path.endsWith('.glb.json') && QUANTIZE) { try { return quantizeGlbJson(buf.toString('utf8')).text; } catch (e) { errors.push(`모델 줄이기 실패: ${f.path} (${e.message})`); return 'null'; } }
   try { return JSON.stringify(JSON.parse(buf.toString('utf8'))); } catch (e) { errors.push(`JSON 이 아니에요: ${f.path} (${e.message})`); return 'null'; }
 }
 
