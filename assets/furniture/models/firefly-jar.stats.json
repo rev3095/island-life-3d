@@ -1,0 +1,52 @@
+{
+  "id": "FU-57",
+  "slug": "firefly-jar",
+  "item": "furn.firefly-jar",
+  "name": "반딧불 병",
+  "category": "furniture",
+  "kind": "firefly-jar",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2320,
+  "parts": 1,
+  "materials": [
+    "glow",
+    "grass",
+    "jar",
+    "lid",
+    "string"
+  ],
+  "objects": [
+    "jar"
+  ],
+  "animations": {},
+  "size": [
+    0.38,
+    0.4,
+    0.63
+  ],
+  "bounds": [
+    [
+      -0.19,
+      -0.212,
+      0.0
+    ],
+    [
+      0.19,
+      0.19,
+      0.625
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 46644,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "firefly-jar_front.png",
+    "firefly-jar_main.png",
+    "firefly-jar_thumb.png",
+    "firefly-jar_top.png"
+  ]
+}

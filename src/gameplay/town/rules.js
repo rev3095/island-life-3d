@@ -122,14 +122,20 @@ export const dayHour = now => {
 /** 그날의 나오는 시각·들어가는 시각 (dayKey 시드로 ±0.5시간 흔들림) */
 export function scheduleOf(person, dayKey) {
   const r = rngOf(dayKey, person.slug, 'schedule');
-  return { wake: person.wake + (r() - 0.5), sleep: person.sleep + (r() - 0.5) };
+  const out = { wake: person.wake + (r() - 0.5), sleep: person.sleep + (r() - 0.5) };
+  const late = lateHook?.(person.slug, dayKey);   // M12 D108-A: 야시장 날 늦게까지 (night 서비스)
+  if (Number.isFinite(late) && late > out.sleep) out.sleep = late;
+  return out;
 }
+/** M12: 그날 늦게 자는 시각을 묻는 함수 (slug, dayKey) → 게임 하루 시각 | null. town/index.js 가 night 서비스로 건다 */
+let lateHook = null;
+export function setLateHook(fn) { lateHook = typeof fn === 'function' ? fn : null; }
 
 /** 잠들기 전 집에 깨어 있는 시간 (7차 D57-A: 날마다 1~2시간 — 맑은 날에도 저녁에 찾아가 방 구경·대화) */
 export const HOME_BEFORE_SLEEP = T.homeBeforeSleep ?? [1, 2];
 export function homeFrom(person, dayKey) {
   const { sleep } = scheduleOf(person, dayKey);
-  const [lo, hi] = HOME_BEFORE_SLEEP;
+  const [lo, hi] = person.homeBefore ?? HOME_BEFORE_SLEEP;   // M12 야행성 주민은 자기 값 (새벽에 집에서 차 시간)
   return sleep - (lo + rngOf(dayKey, person.slug, 'home')() * (hi - lo));
 }
 /** 자는 시간인가 (일과 그대로) */

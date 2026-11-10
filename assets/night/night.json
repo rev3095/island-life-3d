@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "about": "밤·새벽 콘텐츠 설정 (M12, 밤·새벽 검수 보드 night 반영 v1 = D106–D114 모두 A, https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU). 시각은 게임 하루 시각 5~29 (24 = 자정, 27 = 새벽 3시). 읽는 곳 src/gameplay/night/ · 약속 docs/CONTRACTS.md 「밤」",
+  "opensAfterDay": 1,
+  "market": {
+    "id": "D106-A",
+    "name": "야시장",
+    "weekday": 6,
+    "hours": [19, 24],
+    "hosts": ["pong", "coco"],
+    "hostsLate": 25.5,
+    "skipOnEvents": ["EV-02", "EV-03"],
+    "skipOnFestival": true,
+    "ringCost": 100,
+    "ringThrows": 3,
+    "ringHit": 0.45,
+    "ringPrizes": [
+      { "hits": 1, "items": ["night.star-candy"] },
+      { "hits": 2, "items": ["night.moon-tteok", "night.bungeoppang"] },
+      { "hits": 3, "items": ["furn.firefly-jar", "furn.glow-star-lamp"] }
+    ],
+    "stalls": [
+      { "id": "food", "name": "먹거리 노점", "kind": "festival-booth-food", "host": "pong", "stock": ["night.bungeoppang", "night.moon-tteok", "night.cocoa", "night.star-candy"], "prices": { "night.bungeoppang": 160, "night.moon-tteok": 220, "night.cocoa": 180, "night.star-candy": 120 } },
+      { "id": "goods", "name": "밤 가구 노점", "kind": "festival-booth-lantern", "host": "coco", "stock": ["furn.glow-star-lamp", "furn.firefly-jar"] },
+      { "id": "ring", "name": "고리 던지기", "kind": "festival-booth-fish", "host": null, "game": "ring" }
+    ],
+    "lanterns": "night-lanterns"
+  },
+  "shop": {
+    "id": "D109-A",
+    "name": "달빛 가게",
+    "building": "night-shop",
+    "keeper": "byeolbam",
+    "hours": [22, 27],
+    "stock": ["furn.glow-star-lamp", "furn.moon-lamp", "furn.firefly-jar", "furn.star-rug", "furn.star-telescope"],
+    "sellBonus": { "bug": 0.2 },
+    "near": "plaza",
+    "offset": [8, -16]
+  },
+  "tent": {
+    "id": "D111-A",
+    "name": "새벽 천막",
+    "building": "dawn-tent",
+    "keeper": "yeomyeong",
+    "hours": [27, 29],
+    "stock": ["furn.crystal-ball"],
+    "side": "east"
+  },
+  "nocturnal": {
+    "id": "D108-A · D110-A",
+    "villagers": ["dalmuri"],
+    "houseOpen": [20, 29],
+    "note": "sleep-note",
+    "firstNightVisitBonus": 2
+  },
+  "tarot": {
+    "id": "D112-A",
+    "pick": 3,
+    "cards": [
+      { "id": "TA-01", "name": "해님", "sym": "☀", "color": "#D9822B", "luck": { "sell": 0.1 }, "text": "햇살이 넉넉한 날. 무엇을 팔든 값을 조금 더 쳐 줘요.", "effect": "팔 때 값 +10%" },
+      { "id": "TA-02", "name": "달님", "sym": "☾", "color": "#4F5F94", "luck": { "sell:bug": 0.25 }, "text": "달빛 아래 날개가 반짝여요. 곤충이 귀하게 팔려요.", "effect": "곤충 팔 때 +25%" },
+      { "id": "TA-03", "name": "별", "sym": "✦", "color": "#7A6A9A", "luck": { "rareFossil": 2 }, "text": "별이 오래된 것들을 비춰요. 감정하면 귀한 화석이 잘 나와요.", "effect": "화석 감정에서 귀한 화석 잘 나옴" },
+      { "id": "TA-04", "name": "바다", "sym": "≈", "color": "#2F86A6", "luck": { "bigFish": 1 }, "text": "물결이 깊어요. 큰 그림자가 다가와요.", "effect": "큰 물고기가 잘 물어요" },
+      { "id": "TA-05", "name": "숲", "sym": "♣", "color": "#3F8F5C", "luck": { "shakeBug": 0.25 }, "text": "나뭇잎이 수군거려요. 흔들면 무언가 떨어져요.", "effect": "나무 흔들면 곤충이 잘 떨어져요" },
+      { "id": "TA-06", "name": "바람", "sym": "~", "color": "#6F8DB0", "luck": { "sell:fish": 0.25 }, "text": "순풍이 불어요. 물고기가 귀하게 팔려요.", "effect": "물고기 팔 때 +25%" },
+      { "id": "TA-07", "name": "도토리", "sym": "●", "color": "#A8642E", "luck": { "acorns": 300 }, "text": "주머니가 묵직해지는 날. 아침에 도토리가 굴러와요.", "effect": "아침에 도토리 300" },
+      { "id": "TA-08", "name": "돌", "sym": "◆", "color": "#7A7068", "luck": { "rockHits": 2 }, "text": "단단한 마음. 바위를 두 번 더 두드릴 수 있어요.", "effect": "바위 두드리기 두 번 더" },
+      { "id": "TA-09", "name": "나비", "sym": "❀", "color": "#C76A90", "luck": { "sell:flower": 0.5 }, "text": "꽃잎이 춤추는 날. 꽃이 귀하게 팔려요.", "effect": "꽃 팔 때 +50%" },
+      { "id": "TA-10", "name": "화석", "sym": "⌇", "color": "#9C7346", "luck": { "sell:fossil": 0.25 }, "text": "땅속 이야기가 들려요. 화석이 귀하게 팔려요.", "effect": "화석 팔 때 +25%" },
+      { "id": "TA-11", "name": "친구", "sym": "♥", "color": "#C9583B", "luck": { "friend": 2 }, "text": "마음이 닿는 날. 처음 말 건 주민과 더 가까워져요.", "effect": "그날 처음 말 건 주민 마음 +" },
+      { "id": "TA-12", "name": "집", "sym": "⌂", "color": "#5F7268", "luck": { "buy:furn": -0.1 }, "text": "포근한 집의 기운. 가구를 싸게 살 수 있어요.", "effect": "가구 살 때 −10%" }
+    ]
+  },
+  "lines": {
+    "byeolbam": {
+      "name": "별밤", "color": "#4F5F94", "voice": "bori",
+      "greet": ["…찍. 어, 어서 와. 달빛 가게야찍.", "밤에 와 줘서 고마워찍. 천천히 봐찍.", "쉿… 별이 듣고 있어찍. 뭐 찾아찍?"],
+      "first": ["…찍! 놀랐잖아. 나는 별밤, 이 가게 주인이야찍.", "낮엔 거꾸로 매달려 자고, 밤 10시부터 새벽 3시까지 가게를 열어찍.", "밤 곤충을 가져오면 값을 조금 더 쳐 줄게찍."],
+      "after": ["또 와찍. 달이 지기 전에찍.", "고마워찍. 밤길 조심해찍."],
+      "bye": ["응… 다음에 또 와찍."],
+      "closed": ["(문에 쪽지가 붙어 있어요) 달빛 가게 — 밤 10시부터 새벽 3시까지"]
+    },
+    "yeomyeong": {
+      "name": "여명", "color": "#9A86C8", "voice": "mochi",
+      "greet": ["어서 오렴… 새벽 안개가 너를 데려왔구나스르륵.", "카드가 기다리고 있었단다스르륵.", "해가 뜨기 전, 아주 잠깐만 열리는 곳이란다스르륵."],
+      "first": ["…스르륵. 처음 보는 얼굴이구나. 나는 여명.", "새벽 3시에 안개와 함께 왔다가, 5시가 되면 사라진단다.", "하루에 한 장, 카드를 뒤집어 보렴. 오늘 하루에 작은 좋은 일이 생길 거야스르륵."],
+      "already": ["오늘의 카드는 이미 너와 함께 있단다스르륵. 내일 새벽에 또 오렴."],
+      "after": ["좋은 하루가 되길스르륵.", "카드의 기운은 다음 새벽까지란다스르륵."],
+      "bye": ["안개가 걷히기 전에 또 보자스르륵."],
+      "closed": ["(천막은 아직 안개 속에 없어요)"]
+    },
+    "market": {
+      "start": "🏮 토요일 밤 야시장이 열렸어요! 광장으로 가 보세요 (밤 12시까지)",
+      "morning": "🏮 오늘 밤 7시부터 광장에서 야시장이 열려요",
+      "ringIntro": "고리 던지기! 도토리 {cost}개로 고리 {n}개. 많이 걸면 좋은 상품이에요.",
+      "ringLose": "아쉬워요… 하나도 안 걸렸어요.",
+      "ringWin": "고리 {hits}개가 걸렸어요! 상품: {prize}"
+    },
+    "nocturnal": {
+      "sleepNote": "「자는 중 zZ」 쪽지가 걸려 있어요. 밤 8시가 지나면 문이 열려요",
+      "visit": ["밤에 놀러 와 줘서 기뻐부엉. 따뜻한 차 한 잔 할래부엉?", "창밖 좀 봐. 오늘 별이 정말 많아부엉."]
+    }
+  },
+  "assets": {
+    "env": ["night-shop", "dawn-tent", "night-lanterns", "sleep-note"],
+    "characters": ["byeolbam", "yeomyeong"]
+  }
+}

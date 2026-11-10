@@ -1,0 +1,39 @@
+{
+  "id": "BD-09",
+  "slug": "dawn-tent",
+  "name": "새벽 천막",
+  "category": "building",
+  "kind": "dawn-tent",
+  "version": "0.1",
+  "triangles": 1772,
+  "parts": 1,
+  "materials": [
+    "cloth",
+    "clothB",
+    "door",
+    "foundation",
+    "glow",
+    "pole",
+    "rug",
+    "trim"
+  ],
+  "animations": {},
+  "size": [
+    2.48,
+    2.89,
+    3.06
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 43840,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "dawn-tent_front.png",
+    "dawn-tent_hero.jpg",
+    "dawn-tent_main.png",
+    "dawn-tent_thumb.png",
+    "dawn-tent_top.png"
+  ]
+}

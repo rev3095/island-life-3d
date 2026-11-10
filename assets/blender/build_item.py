@@ -13,6 +13,7 @@
 원점: hold(들어 보이는 것 — 물고기·곤충·화석)는 모델 한가운데, 나머지는 바닥 가운데.
 """
 import bpy, bmesh, json, math, os, random, sys
+from mathutils import Matrix
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import toonkit
@@ -1438,7 +1439,111 @@ def b_snow_crystal(M):
         m.add(ellipsoid(d * 0.205 + V((0, 0, 0.01)), (0.014, 0.014, 0.01), seg=8, rings=4), 'iceLight', outline=False)
 
 
+# ================================================================ 12차 밤 야시장 먹거리 (IC-NT-01–04)
+def fish_bread(m, c, s=1.0, z_rot=0.0):
+    """붕어빵 하나: 납작한 물고기 몸 + 꼬리 + 등지느러미, 윗면에 비늘 자국과 눈 (머리 = -X)"""
+    R = rot_xyz(z=z_rot)
+    c = V(c)
+    m.add(ellipsoid(c, (0.15 * s, 0.075 * s, 0.035 * s), rot=R, seg=24, rings=12), 'bread')
+    tail = c + R @ V((0.15 * s, 0, 0))
+    for sg in (1, -1):
+        m.add(ellipsoid(tail + R @ V((0.04 * s, sg * 0.035 * s, 0)), (0.05 * s, 0.03 * s, 0.022 * s), rot=R @ rot_xyz(z=sg * 0.6), seg=14, rings=8), 'bread')
+    m.add(ellipsoid(c + R @ V((0.02 * s, 0.07 * s, 0)), (0.06 * s, 0.022 * s, 0.018 * s), rot=R, seg=12, rings=6), 'bread')   # 지느러미
+    m.add(ellipsoid(c + R @ V((0.02 * s, -0.07 * s, 0)), (0.06 * s, 0.022 * s, 0.018 * s), rot=R, seg=12, rings=6), 'bread')
+    for i in range(3):   # 비늘 자국 (윗면 위 갈색 반달)
+        for j in (-1, 0, 1):
+            p = c + R @ V(((-0.02 + 0.045 * i) * s, j * 0.032 * s, 0.031 * s))
+            m.add(ellipsoid(p, (0.014 * s, 0.018 * s, 0.006 * s), rot=R, seg=8, rings=4), 'breadDark', outline=False)
+    m.add(ellipsoid(c + R @ V((-0.1 * s, -0.025 * s, 0.026 * s)), (0.011 * s, 0.011 * s, 0.008 * s), seg=8, rings=4), 'eye', outline=False)
+    m.add(ellipsoid(c + R @ V((-0.142 * s, 0, 0.004 * s)), (0.014 * s, 0.03 * s, 0.01 * s), rot=R, seg=8, rings=4), 'breadDark', outline=False)   # 입
+
+
+def b_bungeoppang(M):
+    """IC-NT-01 붕어빵: 종이 봉투에 하나 꽂혀 있고, 앞에 하나 누워 있다"""
+    m = M.part('bread')
+    fish_bread(m, (0.02, -0.04, 0.035), 1.0, z_rot=0.15)
+    bag = M.part('bag')
+    bag.add(box((0.05, 0.12, 0.11), (0.22, 0.07, 0.22), bevel=0.01), 'paper')
+    b2 = M.part('bread2')
+    fish_bread(b2, V((0.0, 0.0, 0.0)), 0.9)
+    # 봉투에 꽂힌 붕어빵: 머리를 위로 세운다
+    for v in b2.bm.verts:
+        x, y, z = v.co
+        v.co = V((0.05 + y * 0.6, 0.12 - z, 0.2 - x))
+
+
+def b_moon_tteok(M):
+    """IC-NT-02 달떡: 나무 접시 위 둥근 떡 셋 (하나는 노란 고물), 잎 한 장"""
+    m = M.part('tteok')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.025), 0.2, 0.22, seg=28), 'plate')
+    m.add(cylinder((0, 0, 0.024), (0, 0, 0.03), 0.18, seg=28), 'plate')
+    m.add(ellipsoid((0.04, 0.06, 0.04), (0.12, 0.055, 0.008), rot=rot_xyz(z=0.5), seg=14, rings=6), 'leaf')
+    for (x, y, mat) in ((-0.07, -0.03, 'rice'), (0.07, -0.04, 'crumb'), (0.0, 0.07, 'rice')):
+        m.add(ellipsoid((x, y, 0.075), (0.075, 0.075, 0.05), seg=22, rings=12), mat)
+    m.add(ellipsoid((-0.1, -0.06, 0.1), (0.018, 0.01, 0.01), seg=8, rings=4), 'crumb', outline=False)
+
+
+def b_cocoa(M):
+    """IC-NT-03 따뜻한 코코아: 둥근 머그 · 손잡이 · 마시멜로 둘 · 김 두 줄기"""
+    m = M.part('mug')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.2), 0.09, 0.1, seg=24), 'mug')
+    m.add(cylinder((0, 0, 0.17), (0, 0, 0.196), 0.088, seg=24), 'cocoa', outline=False)
+    hp = [V((0.095 + 0.055 * math.sin(math.pi * t), 0, 0.04 + 0.12 * t)) for t in (i / 10 for i in range(11))]
+    m.add(tube(hp, [0.016] * 11, seg=8), 'mug')
+    for x, y in ((-0.03, -0.02), (0.03, 0.03)):
+        m.add(box((x, y, 0.205), (0.05, 0.05, 0.035), bevel=0.014, rot=rot_xyz(z=x * 10)), 'marsh')
+    for k, x in enumerate((-0.03, 0.035)):
+        pts = [V((x + 0.025 * math.sin(4 * t + k), 0.0, 0.25 + 0.16 * t)) for t in (i / 8 for i in range(9))]
+        m.add(tube(pts, [0.012 * (1 - 0.6 * i / 8) for i in range(9)], seg=6), 'steam', outline=False)
+
+
+def star_bm(c, r, thick, rot=None, points=5, inner=0.5):
+    """납작한 별 (면이 위를 본다)"""
+    bm = bmesh.new()
+    top, bot = [], []
+    for k in range(points * 2):
+        a = math.pi / 2 + math.pi * k / points
+        rr = r if k % 2 == 0 else r * inner
+        top.append(bm.verts.new(V((math.cos(a) * rr, math.sin(a) * rr, thick / 2))))
+        bot.append(bm.verts.new(V((math.cos(a) * rr, math.sin(a) * rr, -thick / 2))))
+    ct, cb = bm.verts.new(V((0, 0, thick / 2 + r * 0.15))), bm.verts.new(V((0, 0, -thick / 2 - r * 0.15)))
+    n = len(top)
+    for k in range(n):
+        j = (k + 1) % n
+        bm.faces.new([ct, top[k], top[j]])
+        bm.faces.new([cb, bot[j], bot[k]])
+        bm.faces.new([top[k], bot[k], bot[j], top[j]])
+    M4 = Matrix.Translation(V(c)) @ (rot.to_4x4() if rot is not None else Matrix.Identity(4))
+    bmesh.ops.transform(bm, matrix=M4, verts=bm.verts)
+    return bm
+
+
+def b_star_candy(M):
+    """IC-NT-04 별사탕: 둥근 유리병에 알록달록 작은 별사탕 (병 앞면은 비워 사탕이 보이게), 목에 리본, 앞에 몇 알 흘림"""
+    m = M.part('jar')
+    cols = ('candyA', 'candyB', 'candyC', 'candyD')
+    rnd = random.Random(7)
+    for k in range(26):   # 병 안 사탕 (아래부터 쌓임)
+        a, r = rnd.uniform(0, TAU), 0.075 * math.sqrt(rnd.random())
+        z = 0.03 + 0.11 * (k / 26) + rnd.uniform(0, 0.02)
+        m.add(ellipsoid((math.cos(a) * r, math.sin(a) * r, z), (0.024, 0.024, 0.022), seg=8, rings=5), cols[k % 4])
+        for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1)):   # 별사탕 돌기
+            p = V((math.cos(a) * r, math.sin(a) * r, z)) + V(d) * 0.022
+            m.add(ellipsoid(p, (0.008, 0.008, 0.008), seg=6, rings=3), cols[k % 4], outline=False)
+    glass = M.part('glass')
+    gb = ellipsoid((0, 0, 0.1), (0.11, 0.11, 0.105), seg=28, rings=16)
+    bmesh.ops.delete(gb, geom=[f for f in gb.faces if f.calc_center_median().y < -0.03 and f.calc_center_median().z > 0.02], context='FACES')   # 앞을 열어 속이 보이게
+    glass.add(gb, 'jar', outline=False)
+    glass.add(cylinder((0, 0, 0.19), (0, 0, 0.24), 0.05, seg=18), 'jar')
+    glass.add(cylinder((0, 0, 0.2), (0, 0, 0.225), 0.056, seg=18), 'lid')
+    for sg in (1, -1):   # 리본 고리
+        glass.add(ellipsoid((sg * 0.05, -0.04, 0.215), (0.035, 0.012, 0.022), rot=rot_xyz(y=sg * 0.4), seg=10, rings=6), 'lid')
+    for k, (x, y) in enumerate(((0.12, -0.08), (0.16, -0.02), (-0.13, -0.09))):
+        glass.add(star_bm((x, y, 0.014), 0.026, 0.014, rot=rot_xyz(z=k)), cols[k])
+
+
 BUILDERS = {
+    'bungeoppang': b_bungeoppang, 'moon-tteok': b_moon_tteok, 'cocoa': b_cocoa, 'star-candy': b_star_candy,
     'snow-crystal': b_snow_crystal,
     'mushroom': b_mushroom,
     'sparkler': b_sparkler,
@@ -1459,7 +1564,7 @@ BUILDERS = {
 
 # 렌더 방향 (스펙 render 칸이 없을 때): 물고기는 옆모습(머리 왼쪽), 곤충은 위에서 비스듬히
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
-          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50)}
+          'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50), 'night': (-25, 32)}
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
 
 

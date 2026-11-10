@@ -1,0 +1,56 @@
+{
+  "id": "IC-NT-02",
+  "slug": "night-moon-tteok",
+  "name": "달떡",
+  "group": "night",
+  "category": "item",
+  "kind": "moon-tteok",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "night.moon-tteok",
+      "code": "IC-NT-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "보름달처럼 둥글고 하얀 떡 셋을 나무 접시에 담았다. 하나는 노란 고물을 묻혀 달빛 같다.",
+    "keywords": [
+      "둥근 떡 셋",
+      "노란 고물",
+      "나무 접시"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 토요일 밤 야시장"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "plate": "#A87A4E",
+    "rice": "#FBF6EC",
+    "crumb": "#F2C14E",
+    "leaf": "#7FAE6A"
+  },
+  "paletteLabels": {
+    "plate": "접시",
+    "rice": "떡",
+    "crumb": "고물",
+    "leaf": "잎"
+  }
+}

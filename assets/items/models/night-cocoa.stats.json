@@ -1,0 +1,46 @@
+{
+  "id": "IC-NT-03",
+  "slug": "night-cocoa",
+  "name": "따뜻한 코코아",
+  "group": "night",
+  "kind": "cocoa",
+  "version": "0.1",
+  "items": [
+    "night.cocoa"
+  ],
+  "hold": false,
+  "triangles": 780,
+  "parts": 1,
+  "materials": [
+    "cocoa",
+    "marsh",
+    "mug",
+    "steam"
+  ],
+  "objects": [
+    "mug"
+  ],
+  "size": [
+    0.266,
+    0.2,
+    0.412
+  ],
+  "bounds": [
+    [
+      -0.133,
+      -0.1,
+      0.0
+    ],
+    [
+      0.133,
+      0.1,
+      0.412
+    ]
+  ],
+  "glbBytes": 17820,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-cocoa_main.png",
+    "night-cocoa_thumb.png"
+  ]
+}

@@ -10,7 +10,7 @@ import { createLabels } from './labels.js';
 import { createTalk, context } from './talk.js';
 import { createChatter } from './chatter.js';
 import { createMail } from './mail.js';
-import { villagerState, pickWeighted, ownerOf, isAsleep } from './rules.js';
+import { villagerState, pickWeighted, ownerOf, isAsleep, setLateHook, addFriendship } from './rules.js';
 import { createMovein, livesHere } from './movein.js';
 import { createMoving } from './moving.js';
 import { createParty } from './party.js';
@@ -29,6 +29,7 @@ export default {
   name: 'town',
 
   async init(ctx) {
+    setLateHook((slug, dayKey) => ctx.services.night?.lateUntil?.(slug, dayKey) ?? null);   // M12 D108-A: 야시장 날 늦게 자기
     const world = ctx.services.world, player = ctx.services.player;
     if (!world || !player || !ctx.services.gameplay) { console.warn('[town] world·player 가 없어 주민을 놓지 않아요'); return; }
     const t0 = performance.now();
@@ -44,6 +45,7 @@ export default {
       world.places.museum?.door && { x: world.places.museum.door.x, z: world.places.museum.door.z, r: 1.6 },
       world.places.festival && { x: world.places.festival.x, z: world.places.festival.z, r: 2.8 },
       ...eventSpots(),
+      ...(ctx.services.night?.clearSpots?.() ?? []),   // M12 야시장 노점 앞 · 달빛 가게·천막 문 앞
     ].filter(Boolean);
     // 8차 행사 시간엔 그 행사 자리(간판·돗자리·솥·눈덩이)도 — 행동 거리(1.4~1.9) + 말 걸기 거리(1.3). 주인공이 1.4칸 둘레에 서서
     // 간판 앞 Space 가 「소원 빌기」 대신 말 걸기로 가던 것 (M8-P8 행사 점검 EV-02, 가끔)
@@ -67,7 +69,7 @@ export default {
       blocksAction,
       pickSpot(person, V) {
         // 8차 D79-A: 계절 행사 주인공은 행사 시간 동안 대개 그 행사 자리 둘레에 (gameplay/events hostSpot)
-        const ev = ctx.services.events?.hostSpot?.(person.slug);
+        const ev = ctx.services.events?.hostSpot?.(person.slug) ?? ctx.services.night?.hostSpot?.(person.slug);   // M12 D108-A: 야시장 날 노점 둘레
         if (ev && Math.random() < 0.75) {
           for (let i = 0; i < 16; i++) {   // 무대·모닥불 둘레(blocksAction)에 걸리는 자리가 많아 넉넉히
             const a = Math.random() * Math.PI * 2, r = EVENT_CLEAR + 0.2 + Math.random() * 1.6;   // 행사 자리 바로 앞(EVENT_CLEAR)은 비워 둔다
@@ -331,6 +333,8 @@ export default {
       movein: { stage: slug => movein.stage(slug ?? NEW[0]), skip: slug => movein.skip(slug, context(ctx).dayKey), lot: slug => movein.lotOf(slug ?? NEW[0]) },
       /** 개발용: 주민 상태 보기·고치기 */
       state: slug => villagerState(ctx.state, slug),
+      /** M12 D110-A: 친밀도 더하기 (밤에 처음 놀러 간 야행성 주민 등) → 올라간 새 단계 id | null */
+      befriend: (slug, n) => (villagers.some(v => v.slug === slug) ? addFriendship(villagerState(ctx.state, slug), n).up : null),
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
       mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot },
       /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */

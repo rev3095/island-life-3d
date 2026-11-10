@@ -981,6 +981,107 @@
       "animations": [],
       "version": "0.1",
       "status": "review"
+    },
+    {
+      "id": "FU-55",
+      "slug": "glow-star-lamp",
+      "item": "furn.glow-star-lamp",
+      "name": "야광 별 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.51,
+        0.48,
+        0.77
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-56",
+      "slug": "moon-lamp",
+      "item": "furn.moon-lamp",
+      "name": "초승달 램프",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.59,
+        0.4,
+        1.44
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-57",
+      "slug": "firefly-jar",
+      "item": "furn.firefly-jar",
+      "name": "반딧불 병",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.38,
+        0.4,
+        0.63
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-58",
+      "slug": "star-rug",
+      "item": "furn.star-rug",
+      "name": "별자리 깔개",
+      "place": "floor",
+      "layer": "rug",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.9,
+        1.9,
+        0.05
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-59",
+      "slug": "crystal-ball",
+      "item": "furn.crystal-ball",
+      "name": "수정 구슬",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.64,
+        0.62,
+        0.62
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

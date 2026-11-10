@@ -1250,7 +1250,172 @@ def b_neck_wrap(M):
             m.add(box(knot + V((sx * 0.02, 0, -0.07)), (0.03, 0.01, 0.1), bevel=0.008, rot=rot_xyz(y=sx * 0.25)), 'stripe')
 
 
+# ================================================================ 12차 밤·새벽 (밤·새벽 검수 보드 D106–D114)
+def star_shape(c, r, thick, rot=None, points=5, inner=0.48, puff=0.3):
+    """통통한 별: 끝 다섯 개, 가운데가 앞뒤로 볼록 (기본은 면이 -Y 를 보고 서 있다)"""
+    bm = bmesh.new()
+    ring_f, ring_b = [], []
+    for k in range(points * 2):
+        a = math.pi / 2 + math.pi * k / points
+        rr = r if k % 2 == 0 else r * inner
+        ring_f.append(bm.verts.new(V((math.cos(a) * rr, -thick / 2, math.sin(a) * rr))))
+        ring_b.append(bm.verts.new(V((math.cos(a) * rr, thick / 2, math.sin(a) * rr))))
+    cf, cb = bm.verts.new(V((0, -thick / 2 - r * puff, 0))), bm.verts.new(V((0, thick / 2 + r * puff, 0)))
+    n = len(ring_f)
+    for k in range(n):
+        j = (k + 1) % n
+        bm.faces.new([cf, ring_f[j], ring_f[k]])
+        bm.faces.new([cb, ring_b[k], ring_b[j]])
+        bm.faces.new([ring_f[k], ring_f[j], ring_b[j], ring_b[k]])
+    M4 = Matrix.Translation(V(c)) @ (rot.to_4x4() if rot is not None else Matrix.Identity(4))
+    bmesh.ops.transform(bm, matrix=M4, verts=bm.verts)
+    return bm
+
+
+def crescent(m, c, R, thick, mat, a0=-70, a1=70, w=0.32, seg=24):
+    """초승달 (면이 -Y): 원호를 따라 가운데가 굵은 띠. 오목한 쪽이 -X"""
+    c = V(c)
+    pts = [c + V((math.cos(a) * R, 0, math.sin(a) * R)) for a in (math.radians(a0 + (a1 - a0) * t / seg) for t in range(seg + 1))]
+    radii = [R * (0.05 + w * math.sin(math.pi * t / seg)) for t in range(seg + 1)]
+    m.add(tube(pts, radii, seg=12, flat=thick / max(radii)), mat)
+
+
+def b_night_shop(M):
+    """BD-08 달빛 가게 (별밤의 밤 가게, 밤 22–3시): 남색 벽 · 진보라 박공지붕 · 앞 가운데 문(door, 앞 = -Y → 게임 +Z) ·
+    양옆 둥근 창(window — 밤에 켜짐) · 문 위 작은 차양 · 지붕 위 초승달 간판(glow) · 처마 끝 별 장식"""
+    W, D, Hh = 3.2 * P.get('width', 1), 2.2 * P.get('depth', 1), 1.6 * P.get('wallHeight', 1)
+    m = M.part('shop')
+    m.add(box((0, 0, 0.1), (W + 0.14, D + 0.14, 0.2), bevel=0.04), 'foundation')
+    m.add(box((0, 0, 0.2 + Hh / 2), (W, D, Hh), bevel=0.06), 'wall')
+    top = 0.2 + Hh
+    m.add(box((0, 0, top - 0.04), (W + 0.06, D + 0.06, 0.1), bevel=0.03), 'trim')
+    m.add(prism((0, 0, top - 0.02), W, D, 0.85 * 0.96), 'wall')
+    m.add(prism((0, 0, top + 0.02), W, D, 0.85, overhang=0.16), 'roof')
+    # 문 + 손잡이 + 문 위 작은 차양 + 디딤돌
+    m.add(box((0, -D / 2 - 0.02, 0.2 + 0.52), (0.62, 0.08, 1.0), bevel=0.04), 'door')
+    m.add(ellipsoid((0.19, -D / 2 - 0.07, 0.7), (0.035, 0.03, 0.035), seg=10, rings=6), 'trim')
+    m.add(box((0, -D / 2 - 0.2, 0.2 + 1.18), (0.95, 0.4, 0.05), bevel=0.02, rot=rot_xyz(x=0.35)), 'awning')
+    m.add(box((0, -D / 2 - 0.3, 0.06), (0.9, 0.44, 0.12), bevel=0.03), 'foundation')
+    # 둥근 창 둘 (창틀 고리 + 유리)
+    for sx in (1, -1):
+        c = V((sx * W * 0.3, -D / 2 - 0.02, 0.2 + Hh * 0.55))
+        m.add(cylinder(c + V((0, 0.03, 0)), c - V((0, 0.05, 0)), 0.36, seg=28), 'trim')
+        m.add(cylinder(c + V((0, 0.0, 0)), c - V((0, 0.065, 0)), 0.29, seg=28), 'window', outline=False)
+        m.add(box(c - V((0, 0.07, 0)), (0.58, 0.02, 0.035), bevel=0.0), 'trim')
+        m.add(box(c - V((0, 0.07, 0)), (0.035, 0.02, 0.58), bevel=0.0), 'trim')
+        m.add(box(c + V((0, -0.08, -0.38)), (0.78, 0.12, 0.05), bevel=0.015), 'trim')
+    # 지붕 위 초승달 간판 (받침 기둥 + 달 + 작은 별 둘)
+    sign = V((0, -0.1, top + 0.85))
+    m.add(cylinder(sign - V((0, 0, 0.1)), sign + V((0, 0, 0.25)), 0.04, seg=8), 'trim')
+    crescent(m, sign + V((0.1, 0, 0.62)), 0.48, 0.08, 'glow', a0=-80, a1=80)
+    for x, z, r in ((-0.26, 0.86, 0.1), (-0.14, 0.45, 0.07)):
+        m.add(star_shape(sign + V((x, 0, z)), r, 0.03, puff=0.25), 'glow')
+    m.add(cylinder(sign + V((-0.26, 0, 0.76)), sign + V((-0.26, 0, 0.3)), 0.006, seg=6), 'trim')
+    # 처마 끝 늘어진 별 장식 셋
+    for x in (-W * 0.42, W * 0.42):
+        p = V((x, -D / 2 - 0.12, top - 0.05))
+        m.add(cylinder(p, p - V((0, 0, 0.22)), 0.006, seg=6), 'trim')
+        m.add(star_shape(p - V((0, 0, 0.29)), 0.07, 0.025, puff=0.25), 'glow')
+
+
+def b_dawn_tent(M):
+    """BD-09 새벽 천막 (여명의 점집, 3–5시): 보라 천 팔각뿔 천막 · 금빛 줄 띠 · 꼭대기 금빛 별(glow) ·
+    앞(-Y → 게임 +Z) 입구: 기둥 둘 + 작은 박공 차양 + 드리운 천 문(door), 양옆으로 걷어 묶은 자락"""
+    R, Ht = 1.2 * P.get('width', 1), 2.5 * P.get('height', 1)
+    m = M.part('tent')
+    rot = rot_xyz(z=math.pi / 8)                      # 팔각형의 한 면이 정면을 보게
+    base = cylinder((0, 0, 0), (0, 0, 0.06), R + 0.05, seg=8)
+    bmesh.ops.rotate(base, verts=base.verts, cent=(0, 0, 0), matrix=rot)
+    m.add(base, 'foundation', smooth=False)
+    body = cylinder((0, 0, 0.06), (0, 0, 0.62), R, R * 0.93, seg=8)          # 낮은 옆벽
+    bmesh.ops.rotate(body, verts=body.verts, cent=(0, 0, 0), matrix=rot)
+    m.add(body, lambda c, n: 'clothB' if (math.degrees(math.atan2(c.y, c.x)) // 45) % 2 else 'cloth', smooth=False)
+    roof = cone((0, 0, 0.6), (0, 0, Ht), R * 1.06, 0.03, seg=8)              # 지붕 뿔 (조금 내밀어 처마)
+    bmesh.ops.rotate(roof, verts=roof.verts, cent=(0, 0, 0), matrix=rot)
+    m.add(roof, lambda c, n: 'clothB' if (math.degrees(math.atan2(c.y, c.x)) // 45) % 2 else 'cloth', smooth=False)
+    ring = [V((math.cos(a) * R * 1.07, math.sin(a) * R * 1.07, 0.62)) for a in (math.pi / 8 + TAU * k / 8 for k in range(8))]
+    m.add(tube(ring, [0.03] * 8, seg=6, closed=True), 'trim', smooth=False)   # 처마 금빛 줄
+    for k in range(8):                                                      # 처마 술 장식
+        a = TAU * k / 8
+        p = V((math.cos(a) * R * 1.0, math.sin(a) * R * 1.0, 0.56))
+        m.add(cone(p, p - V((0, 0, 0.14)), 0.04, 0.0, seg=8), 'trim')
+    # 꼭대기 별
+    m.add(cylinder((0, 0, Ht - 0.05), (0, 0, Ht + 0.2), 0.025, seg=8), 'trim')
+    m.add(star_shape((0, 0, Ht + 0.36), 0.2, 0.07, puff=0.3), 'glow')
+    # 입구 (정면 면 = y = -R·cos(22.5°))
+    fy = -R * math.cos(math.pi / 8)
+    ey = fy - 0.24
+    for sx in (1, -1):
+        m.add(cylinder((sx * 0.42, ey, 0.0), (sx * 0.42, ey, 1.25), 0.035, seg=8), 'pole')
+        m.add(ellipsoid((sx * 0.42, ey, 1.27), (0.05, 0.05, 0.05), seg=10, rings=6), 'trim')
+    m.add(prism((0, ey + 0.2, 1.2), 1.1, 0.62, 0.3, overhang=0.04), 'clothB')   # 입구 차양 (앞 경사면)
+    m.add(box((0, ey + 0.14, 0.62), (0.86, 0.3, 1.2), bevel=0.03), 'cloth')       # 입구 몸 (천막과 잇는 짧은 통로)
+    m.add(box((0, ey - 0.03, 0.06 + 0.5), (0.6, 0.06, 1.0), bevel=0.03), 'door')   # 드리운 천 문
+    for sx in (1, -1):                                                           # 걷어 묶은 자락
+        m.add(ellipsoid((sx * 0.35, ey - 0.05, 0.75), (0.09, 0.05, 0.42), rot=rot_xyz(y=sx * 0.12), seg=14, rings=10), 'clothB')
+        m.add(ellipsoid((sx * 0.35, ey - 0.09, 0.78), (0.1, 0.03, 0.03), seg=10, rings=6), 'trim')
+    m.add(box((0, ey - 0.17, 0.03), (0.8, 0.26, 0.06), bevel=0.02), 'rug')         # 입구 깔개
+    for x, z, r in ((-0.75, 1.55, 0.07), (0.62, 1.85, 0.06), (0.15, 1.35, 0.05)):   # 천에 수놓은 별
+        y = fy * (1 - (z - 0.6) / (Ht - 0.6)) * 1.06 - 0.02
+        m.add(star_shape((x * (1 - (z - 0.6) / (Ht - 0.6)) * 1.0, y, z), r, 0.015, rot=rot_xyz(x=-0.45), puff=0.2), 'trim')
+
+
+def paper_lantern(m, c, color, s=1.0):
+    """종이 등불 하나: 위·아래 1/4 은 종이 색, 가운데 띠는 불빛(glow — 밤에 켜짐), 위 뚜껑 · 아래 술"""
+    c = V(c)
+    rx, rz = 0.1 * s, 0.13 * s
+    band = 0.42
+    m.add(ellipsoid(c, (rx, rx, rz), seg=14, rings=10), lambda p, n: 'glow' if abs(p.z - c.z) < rz * band else color)
+    for k in range(4):   # 세로 살
+        a = TAU * k / 4 + TAU / 8
+        pts = [c + V((math.cos(a) * rx * math.cos(t) * 1.01, math.sin(a) * rx * math.cos(t) * 1.01, rz * math.sin(t))) for t in (math.pi * (i / 6 - 0.5) for i in range(7))]
+        m.add(tube(pts, [0.005 * s] * 7, seg=4), color, outline=False)
+    m.add(cylinder(c + V((0, 0, rz * 0.9)), c + V((0, 0, rz + 0.025 * s)), 0.045 * s, seg=12), 'cap')
+    m.add(cylinder(c - V((0, 0, rz * 0.9)), c - V((0, 0, rz + 0.02 * s)), 0.04 * s, seg=12), 'cap')
+    m.add(cone(c - V((0, 0, rz + 0.02 * s)), c - V((0, 0, rz + 0.1 * s)), 0.015 * s, 0.03 * s, seg=8), color)
+
+
+def b_night_lanterns(M):
+    """PR-30 종이 등불 줄 (야시장): 기둥 둘 사이에 처진 줄, 빨강·노랑·분홍 종이 등불 여섯"""
+    m = M.part('lanterns')
+    hw, top = 1.35, 2.0
+    for sx in (1, -1):
+        m.add(cylinder((sx * hw, 0, 0), (sx * hw, 0, 0.06), 0.11, 0.09, seg=14), 'pole')
+        m.add(cylinder((sx * hw, 0, 0.06), (sx * hw, 0, top + 0.05), 0.035, seg=10), 'pole')
+        m.add(ellipsoid((sx * hw, 0, top + 0.07), (0.05, 0.05, 0.05), seg=12, rings=8), 'cap')
+    sag = lambda t: V((-hw + 2 * hw * t, 0, top - 0.3 * math.sin(math.pi * t)))
+    m.add(tube([sag(i / 24) for i in range(25)], [0.008] * 25, seg=6), 'string')
+    cols = ('paperRed', 'paperYellow', 'paperPink')
+    for i in range(6):
+        t = (i + 0.5) / 6
+        p = sag(t)
+        drop = 0.07 + 0.03 * (i % 2)
+        m.add(cylinder(p, p - V((0, 0, drop)), 0.005, seg=5), 'string', outline=False)
+        paper_lantern(m, p - V((0, 0, drop + 0.19)), cols[i % 3], 1.25 + 0.12 * (i % 2))
+
+
+def b_sleep_note(M):
+    """PR-32 「자는 중」 쪽지: 작은 나무 말뚝에 흰 쪽지, 쪽지에 Z 셋 (큰 Z · 작은 z 둘 — 글자가 아니라 막대 모양)"""
+    m = M.part('note')
+    m.add(box((0, 0, 0.3), (0.06, 0.06, 0.6), bevel=0.012), 'wood')
+    m.add(cone((0, 0, 0.6), (0, 0, 0.65), 0.045, 0.0, seg=4), 'wood', smooth=False)
+    m.add(box((0, -0.04, 0.5), (0.34, 0.02, 0.24), bevel=0.01, rot=rot_xyz(y=0.06)), 'card')
+    m.add(ellipsoid((0, -0.055, 0.6), (0.02, 0.012, 0.02), seg=8, rings=5), 'pin', outline=False)
+    y = -0.053
+
+    def zee(cx, cz, s):
+        w, h, t = 0.09 * s, 0.1 * s, 0.016 * s
+        m.add(box((cx, y, cz + h / 2), (w, 0.006, t), bevel=0.0), 'ink', outline=False)
+        m.add(box((cx, y, cz - h / 2), (w, 0.006, t), bevel=0.0), 'ink', outline=False)
+        m.add(box((cx, y, cz), (math.hypot(w, h) * 0.95, 0.006, t), bevel=0.0, rot=rot_xyz(y=-math.atan2(h, w))), 'ink', outline=False)
+
+    zee(-0.08, 0.47, 1.0)
+    zee(0.04, 0.5, 0.7)
+    zee(0.11, 0.55, 0.5)
+
+
 BUILDERS = {
+    'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
     'fence-wood': b_deco_fence, 'fence-picket': b_deco_fence,
     'flower-crown': b_flower_crown, 'fan': b_fan, 'scarf': b_neck_wrap, 'muffler': b_neck_wrap,

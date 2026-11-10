@@ -1420,7 +1420,127 @@ def b_star_telescope(M):
         m.add(annulus(p, 0.075, 0.09, axis=tuple(d), thick=0.025, seg=24), 'metal')
 
 
+# ================================================================ 12차 밤·새벽 가구 (FU-55–59, 달빛 가게 · 새벽 천막)
+def star_shape(c, r, thick, rot=None, points=5, inner=0.48, puff=0.3):
+    """통통한 별: 끝 다섯 개, 가운데가 앞뒤로 볼록 (기본은 면이 -Y 를 보고 서 있다)"""
+    from mathutils import Matrix
+    bm = bmesh.new()
+    ring_f, ring_b = [], []
+    for k in range(points * 2):
+        a = math.pi / 2 + math.pi * k / points
+        rr = r if k % 2 == 0 else r * inner
+        ring_f.append(bm.verts.new(V((math.cos(a) * rr, -thick / 2, math.sin(a) * rr))))
+        ring_b.append(bm.verts.new(V((math.cos(a) * rr, thick / 2, math.sin(a) * rr))))
+    cf, cb = bm.verts.new(V((0, -thick / 2 - r * puff, 0))), bm.verts.new(V((0, thick / 2 + r * puff, 0)))
+    n = len(ring_f)
+    for k in range(n):
+        j = (k + 1) % n
+        bm.faces.new([cf, ring_f[j], ring_f[k]])
+        bm.faces.new([cb, ring_b[k], ring_b[j]])
+        bm.faces.new([ring_f[k], ring_f[j], ring_b[j], ring_b[k]])
+    M4 = Matrix.Translation(V(c)) @ (rot.to_4x4() if rot is not None else Matrix.Identity(4))
+    bmesh.ops.transform(bm, matrix=M4, verts=bm.verts)
+    return bm
+
+
+def b_glow_star_lamp(M):
+    """FU-55 야광 별 등: 둥근 받침 + 짧은 기둥 위 통통한 별 (별 전체가 glow — 밤에 켜짐), 받침 앞 작은 별 둘"""
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.08), 0.24, 0.22, seg=28), 'base')
+    m.add(annulus((0, 0, 0.08), 0.18, 0.225, thick=0.012, seg=28), 'trim')
+    m.add(cylinder((0, 0, 0.08), (0, 0, 0.42), 0.035, seg=10), 'trim')
+    m.add(star_shape((0, 0, 0.5), 0.27, 0.08, puff=0.28), 'glow')
+    for k, x in enumerate((-0.13, 0.12)):
+        m.add(star_shape((x, -0.17, 0.115), 0.035 + 0.008 * k, 0.012, rot=rot_xyz(x=-1.2), puff=0.2), 'trim')
+
+
+def b_moon_lamp(M):
+    """FU-56 초승달 램프: 둥근 받침 · 가는 기둥 · 위에서 앞으로 휜 팔 끝에 매단 초승달 (안쪽 glow), 달 끝에 작은 별"""
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.06), 0.2, 0.18, seg=24), 'base')
+    m.add(cylinder((0, 0, 0.06), (0, 0, 1.25), 0.025, seg=10), 'base')
+    arm = bezier(V((0, 0, 1.25)), V((0, 0, 1.4)), V((0.08, 0, 1.45)), V((0.16, 0, 1.4)), 10)
+    m.add(tube(arm, [0.02] * len(arm), seg=8), 'metal')
+    m.add(cylinder((0.16, 0, 1.4), (0.16, 0, 1.27), 0.006, seg=6), 'metal')
+    # 초승달: 원호를 따라 가운데가 굵은 띠 (앞 = glow 빛, 뒤 = 껍데기). 면이 -Y 를 본다
+    C, R = V((0.08, 0, 1.0)), 0.27   # 기둥 오른쪽에 달, 오목한 쪽이 기둥을 본다 (위 끝을 끈에 매닮)
+    outer = [C + V((math.cos(a) * R, 0, math.sin(a) * R)) for a in (math.radians(-75 + 150 * t / 20) for t in range(21))]
+    radii = [0.012 + 0.07 * math.sin(math.pi * t / 20) for t in range(21)]
+    m.add(tube(outer, radii, seg=14, flat=0.55), 'glow')
+    back = [p + V((0, 0.03, 0)) for p in outer]
+    m.add(tube(back, [r * 0.9 for r in radii], seg=12, flat=0.5), 'moonShell')
+    tip = outer[0]
+    m.add(cylinder(tip, tip - V((0, 0, 0.12)), 0.004, seg=6), 'metal')
+    m.add(star_shape(tip - V((0, 0, 0.16)), 0.045, 0.014), 'metal')
+    m.add(annulus((0, 0, 0.06), 0.15, 0.185, thick=0.01, seg=24), 'metal')
+
+
+def b_firefly_jar(M):
+    """FU-57 반딧불 병: 둥근 유리병 · 나무 뚜껑 · 끈 손잡이 · 병 속 풀잎, 반딧불 빛 점 (앞에서 보이게 겉면 가까이)"""
+    m = M.part('jar')
+    m.add(ellipsoid((0, 0, 0.21), (0.19, 0.19, 0.21), seg=28, rings=16), 'jar')
+    m.add(cylinder((0, 0, 0.38), (0, 0, 0.45), 0.11, seg=20), 'jar')
+    m.add(cylinder((0, 0, 0.44), (0, 0, 0.5), 0.125, 0.12, seg=20), 'lid')
+    hp = bezier(V((-0.11, 0, 0.48)), V((-0.11, 0, 0.66)), V((0.11, 0, 0.66)), V((0.11, 0, 0.48)), 10)
+    m.add(tube(hp, [0.012] * len(hp), seg=6), 'string')
+    for k in range(3):   # 병 바닥 풀잎 (앞쪽으로 비쳐 보이게 겉면에)
+        a = -math.pi / 2 + (k - 1) * 0.5
+        p = V((math.cos(a) * 0.16, math.sin(a) * 0.16, 0.12))
+        m.add(ellipsoid(p, (0.025, 0.01, 0.055), rot=rot_xyz(y=(k - 1) * 0.4, z=a + math.pi / 2), seg=10, rings=6), 'grass', outline=False)
+    for k, (da, zt) in enumerate(((-0.9, 0.35), (-0.4, -0.3), (0.1, 0.5), (0.5, -0.1), (0.95, 0.3), (-0.15, 0.05), (0.7, -0.5), (-0.75, -0.45), (0.3, 0.75))):   # 빛 점: 겉면 앞쪽에 고루
+        a = -math.pi / 2 + da
+        cz = math.sqrt(1 - zt * zt)
+        p = V((math.cos(a) * 0.19 * cz, math.sin(a) * 0.19 * cz, 0.21 + zt * 0.21))
+        m.add(ellipsoid(p, (0.024, 0.024, 0.024), seg=10, rings=6), 'glow')
+
+
+def b_star_rug(M):
+    """FU-58 별자리 깔개 (2×2): 남색 네모 깔개 · 보라 테두리 · 금빛 별 · 별을 잇는 별자리 선"""
+    m = M.part('rug')
+    S = 1.9
+    m.add(box((0, 0, 0.012), (S, S, 0.024), bevel=0.01), 'rugEdge')
+    m.add(box((0, 0, 0.016), (S - 0.16, S - 0.16, 0.024), bevel=0.008), 'rug')
+    groups = [
+        [(-0.6, -0.45), (-0.35, -0.6), (-0.1, -0.42), (0.05, -0.62), (0.32, -0.5)],
+        [(0.25, 0.15), (0.5, 0.35), (0.62, 0.05), (0.38, -0.12)],
+        [(-0.55, 0.25), (-0.4, 0.55), (-0.15, 0.4), (-0.25, 0.12)],
+    ]
+    for g in groups:
+        for (x0, y0), (x1, y1) in zip(g, g[1:]):
+            a, b = V((x0, y0, 0.03)), V((x1, y1, 0.03))
+            m.add(box((a + b) / 2, ((b - a).length, 0.018, 0.006), bevel=0.0, rot=rot_xyz(z=math.atan2(y1 - y0, x1 - x0))), 'line')
+        for k, (x, y) in enumerate(g):
+            m.add(star_shape((x, y, 0.034), 0.05 + 0.02 * (k % 2), 0.008, rot=rot_xyz(x=math.pi / 2), puff=0.15), 'star')
+    for x, y in ((0.7, 0.7), (-0.72, -0.05), (0.05, 0.72), (0.72, -0.62), (-0.7, 0.72), (0.0, 0.0)):
+        m.add(cylinder((x, y, 0.028), (x, y, 0.032), 0.018, seg=10), 'star')
+
+
+def b_crystal_ball(M):
+    """FU-59 수정 구슬 (새벽 천막): 천을 덮은 낮은 받침 · 금빛 세 발 · 연보라 구슬 · 구슬 앞면에 비친 작은 별(glow)과 반짝임"""
+    m = M.part('ball')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.16), 0.3, 0.27, seg=28), 'stand')
+    m.add(cylinder((0, 0, 0.16), (0, 0, 0.19), 0.31, 0.3, seg=28), 'cloth')
+    for k in range(10):   # 받침 천 늘어진 자락
+        a = TAU * k / 10
+        m.add(ellipsoid((math.cos(a) * 0.29, math.sin(a) * 0.29, 0.15), (0.06, 0.03, 0.06), rot=rot_xyz(z=a + math.pi / 2), seg=10, rings=6), 'cloth')
+    for k in range(3):   # 금빛 세 발 (구슬을 받친다)
+        a = TAU * k / 3 + math.pi / 2
+        foot = V((math.cos(a) * 0.12, math.sin(a) * 0.12, 0.19))
+        top = V((math.cos(a) * 0.1, math.sin(a) * 0.1, 0.3))
+        m.add(tube(bezier(foot, foot + V((0, 0, 0.06)), top + V((math.cos(a) * 0.05, math.sin(a) * 0.05, -0.02)), top, 8), [0.018] * 9, seg=8), 'metal')
+    m.add(annulus((0, 0, 0.27), 0.1, 0.135, thick=0.03, seg=24), 'metal')
+    C = V((0, 0, 0.43))
+    m.add(ellipsoid(C, (0.19, 0.19, 0.19), seg=32, rings=20), 'ball')
+    m.add(star_shape(C + V((0.0, -0.185, 0.02)), 0.06, 0.01, puff=0.25), 'glow', outline=False)
+    for x, z, r in ((0.07, 0.06, 0.016), (-0.06, -0.05, 0.012), (0.1, -0.04, 0.01)):
+        p = C + V((x, 0, z))
+        p.y = C.y - math.sqrt(max(0.0, 0.19 ** 2 - x * x - z * z)) - 0.002
+        m.add(ellipsoid(p, (r, r * 0.4, r), seg=8, rings=5), 'glow', outline=False)
+    m.add(ellipsoid(C + V((-0.08, -0.15, 0.09)), (0.04, 0.015, 0.025), rot=rot_xyz(y=0.6), seg=10, rings=6), 'glow', outline=False)
+
+
 BUILDERS = {
+    'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
     'outdoor-bench': b_outdoor_bench, 'garden-lamp': b_garden_lamp, 'flower-pots': b_flower_pots, 'picnic-table': b_picnic_table,
     'log-chair': b_log_chair, 'log-table': b_log_table, 'wood-bed': b_wood_bed, 'campfire': b_campfire, 'woodpile': b_woodpile,

@@ -27,6 +27,8 @@ test('실내 배치 파일: 폴더 = PLACE_FILES, 상점 RM-08 · 박물관 RM-0
   assert.deepEqual(files, [...PLACE_FILES].sort());
   assert.equal(specs.shop.id, 'RM-08');
   assert.equal(specs.museum.id, 'RM-09');
+  assert.equal(specs.moonshop.id, 'RM-10');   // M12 밤·새벽 D109-A
+  assert.equal(specs.tent.id, 'RM-11');       // M12 밤·새벽 D111-A
   for (const k of PLACE_KINDS) {
     assert.equal(specs[k].place, k);
     assert.equal(specs[k].kind, 'place');
@@ -235,7 +237,7 @@ test('붙박이 FU-35–42: 스펙 = 목록 = 모델, 아이템 표 밖, 크기�
       used++;
     }
   }
-  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 8 + 2, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대 · 박물관 안내대·화석 받침 여덟·케이스 둘');
+  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 8 + 2 + 3 + 2, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대 · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 탁자·받침');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');
@@ -246,5 +248,6 @@ test('방 셋 확정: 단풍 방 RM-07 · 상점 RM-08 · 박물관 RM-09 status
   const index = json('assets/interior/index.json');
   assert.equal(index.rooms.find(r => r.id === 'RM-07').status, 'approved');
   assert.equal(json('assets/interior/rooms/rm-07.json').status, 'approved');
-  for (const k of PLACE_KINDS) assert.equal(specs[k].status, 'approved', k);
+  for (const k of ['shop', 'museum']) assert.equal(specs[k].status, 'approved', k);
+  for (const k of ['moonshop', 'tent']) assert.ok(['review', 'approved'].includes(specs[k].status), `${k}: M12 새 방은 검수 대기`);
 });

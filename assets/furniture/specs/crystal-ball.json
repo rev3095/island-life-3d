@@ -1,0 +1,59 @@
+{
+  "id": "FU-59",
+  "slug": "crystal-ball",
+  "item": "furn.crystal-ball",
+  "name": "수정 구슬",
+  "category": "furniture",
+  "kind": "crystal-ball",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "세 발 달린 금빛 받침 위에 연보라 수정 구슬. 구슬 속에 작은 별이 떠 있어 밤에 빛난다.",
+    "keywords": [
+      "연보라 구슬",
+      "금빛 받침",
+      "속에 별"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 새벽 천막 (3–5시)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stand": "#7A4E8A",
+    "metal": "#E0B85A",
+    "ball": "#CDB8F0",
+    "glow": "#FFF0A8",
+    "cloth": "#4A3E7A"
+  },
+  "paletteLabels": {
+    "stand": "받침",
+    "metal": "금빛 발",
+    "ball": "구슬",
+    "glow": "별빛",
+    "cloth": "받침 천"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

@@ -1,0 +1,55 @@
+{
+  "id": "FU-55",
+  "slug": "glow-star-lamp",
+  "item": "furn.glow-star-lamp",
+  "name": "야광 별 등",
+  "category": "furniture",
+  "kind": "glow-star-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "둥근 나무 받침 위에 통통한 노란 별이 서 있다. 별 전체가 밤에 은은하게 빛나고, 받침에 작은 별 둘.",
+    "keywords": [
+      "통통한 별",
+      "나무 받침",
+      "밤에 빛남"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 달빛 가게 (밤 22–3시)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "base": "#5A4C78",
+    "trim": "#E0B85A",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "trim": "받침 테",
+    "glow": "별빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

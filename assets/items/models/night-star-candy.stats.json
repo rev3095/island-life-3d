@@ -1,0 +1,49 @@
+{
+  "id": "IC-NT-04",
+  "slug": "night-star-candy",
+  "name": "별사탕",
+  "group": "night",
+  "kind": "star-candy",
+  "version": "0.1",
+  "items": [
+    "night.star-candy"
+  ],
+  "hold": false,
+  "triangles": 5856,
+  "parts": 2,
+  "materials": [
+    "candyA",
+    "candyB",
+    "candyC",
+    "candyD",
+    "jar",
+    "lid"
+  ],
+  "objects": [
+    "glass",
+    "jar"
+  ],
+  "size": [
+    0.34,
+    0.226,
+    0.245
+  ],
+  "bounds": [
+    [
+      -0.17,
+      -0.113,
+      0.0
+    ],
+    [
+      0.17,
+      0.113,
+      0.245
+    ]
+  ],
+  "glbBytes": 120004,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-star-candy_main.png",
+    "night-star-candy_thumb.png"
+  ]
+}

@@ -417,7 +417,8 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 
 const PAL_LABEL = { fur: '털', marking: '무늬', muzzle: '주둥이·배', innerEar: '귀 안쪽', ear: '귀', eye: '눈·입', nose: '코', blush: '볼터치',
   shirt: '셔츠', stripe: '셔츠 줄무늬', pants: '반바지', outline: '외곽선', hair: '머리카락', tail: '꼬리', beak: '부리', feet: '발',
-  shell: '등껍질', apron: '앞치마', bowtie: '나비넥타이', glasses: '안경' };
+  shell: '등껍질', apron: '앞치마', bowtie: '나비넥타이', glasses: '안경',
+  iris: '눈동자 색', wing: '날개', wingBone: '날개 뼈', wingSpot: '날개 무늬', wingSpotCore: '무늬 가운데', antenna: '더듬이', ruff: '목털' };   // 12차 박쥐·나방
 const palLabel = (k, species) => (k === 'fur' && species === 'human') ? '피부' : (PAL_LABEL[k] ?? k);
 const PROP = [
   ['height', '키', 0.8, 1.2, true], ['headScale', '머리 크기', 0.8, 1.3, true], ['limbLength', '팔다리 길이', 0.7, 1.5, true],

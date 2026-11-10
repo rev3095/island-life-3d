@@ -1,0 +1,56 @@
+{
+  "id": "IC-NT-03",
+  "slug": "night-cocoa",
+  "name": "따뜻한 코코아",
+  "group": "night",
+  "category": "item",
+  "kind": "cocoa",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "night.cocoa",
+      "code": "IC-NT-03"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "손잡이 달린 둥근 머그에 담긴 코코아. 위에 마시멜로 둘, 김이 모락모락.",
+    "keywords": [
+      "둥근 머그",
+      "마시멜로",
+      "김"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 토요일 밤 야시장"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "flat": []
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "mug": "#5E7FB8",
+    "cocoa": "#7A4A2E",
+    "marsh": "#FBF7F2",
+    "steam": "#E8EEF2"
+  },
+  "paletteLabels": {
+    "mug": "머그",
+    "cocoa": "코코아",
+    "marsh": "마시멜로",
+    "steam": "김"
+  }
+}

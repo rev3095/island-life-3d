@@ -12,7 +12,7 @@
 import { boxOf, moveCircle, inBox } from './grid.js';
 import { PLACE_ROOMS, buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } from './room.js';
 import { resolveFurniture, FACE, DEFAULT } from './interior.js';
-import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
+import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, EXHIBIT_KINDS, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
 import { createFurnitureKit } from './furniture.js';
 
 const PUSH_TIME = 0.2;
@@ -233,7 +233,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
   /** 지금 보여 줄 것의 열쇠 (같으면 다시 놓지 않는다) */
   function shownKey(R) {
-    if (R.kind === 'shop') return `shop:${JSON.stringify(ctx.services.data?.economy?.stockGroups?.() ?? {})}`;
+    if (!EXHIBIT_KINDS.includes(R.kind)) return `${R.kind}:${JSON.stringify(stockGroupsOf(R.kind))}`;
     const mu = ctx.services.data?.museum;
     return `museum:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).length).join(',')}:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).join('|')).join('/')}`;
   }
@@ -242,14 +242,19 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     if (key === R.shownKey) return;
     R.shownKey = key;
     clearShown(R);
-    const jobs = R.kind === 'shop' ? stockJobs(R) : exhibitJobs(R);
+    const jobs = EXHIBIT_KINDS.includes(R.kind) ? exhibitJobs(R) : stockJobs(R);
     const made = (await Promise.all(jobs)).filter(Boolean);
     if (R.shownKey !== key) { made.forEach(o => o.dispose()); return; }   // 그 사이 또 바뀌었다
     R.shown = made;
     for (const o of made) R.room.group.add(o.root);
   }
+  /** 진열할 오늘의 물건 묶음: 도토리상점 = economy, M12 달빛 가게·새벽 천막 = night 서비스 */
+  function stockGroupsOf(kind) {
+    if (kind === 'shop') return ctx.services.data?.economy?.stockGroups?.() ?? {};
+    return ctx.services.night?.stockGroups?.(kind) ?? {};
+  }
   function stockJobs(R) {
-    const groups = ctx.services.data?.economy?.stockGroups?.() ?? {};
+    const groups = stockGroupsOf(R.kind);
     return stockPlan(R.spec, groups).map(async s => {
       try {
         if (s.group === 'furniture' && kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구)
@@ -396,7 +401,8 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
           const d = world.places?.[kind]?.door;
           if (d && rooms[kind] && Math.abs(p.x - d.x) < 0.45 && p.z < d.z - 0.2 && p.z > d.z - 1.0) hit = kind;
         }
-        const open = hit && (ctx.services.town?.placeRule?.(hit) ?? 'open') === 'open';
+        const rule = hit && (PLACE_BUILDING[hit] === hit ? ctx.services.town?.placeRule?.(hit) ?? 'open' : ctx.services.night?.placeRule?.(hit) ?? null);   // M12: 밤 가게는 night 가 연다
+        const open = rule === 'open';
         P.pushT = open && input.move.z < -0.5 ? P.pushT + dt : 0;
         if (P.pushT > PUSH_TIME) { P.pushT = 0; enter(hit); }
       } else {

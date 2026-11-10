@@ -1,0 +1,80 @@
+{
+  "id": "CH-15",
+  "slug": "yeomyeong",
+  "name": "여명",
+  "species": "moth",
+  "role": "새벽 천막 점쟁이 · 나방",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "새벽 3시부터 5시까지 천막에서 수정 구슬로 하루 운세를 봐 주는 나방. 크림빛 보송한 몸에 연보라 큰 날개, 깃털 더듬이를 살랑인다. 말이 느리고 다정하다.",
+    "keywords": [
+      "2.5등신",
+      "크림빛 보송한 몸",
+      "연보라 큰 날개",
+      "깃털 더듬이",
+      "목털",
+      "보라 옷에 연보라 줄 하나"
+    ],
+    "references": [
+      "검수 보드 밤·새벽 CH-15 (새벽 천막 점쟁이)",
+      "누에나방 봉제 인형"
+    ],
+    "avoid": [
+      "벌레처럼 징그러운 디자인",
+      "사실적인 날개 무늬",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 새 부품 깃털 더듬이 + 등 날개 넷(무늬) + 목털 + 큰 눈(iris)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "flat": [
+      "iris"
+    ]
+  },
+  "proportions": {
+    "height": 0.95,
+    "headScale": 1,
+    "bodyWidth": 1.02,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#F4EAD2",
+    "muzzle": "#FBF6EA",
+    "iris": "#6A5A9A",
+    "antenna": "#C9B48A",
+    "ruff": "#FFFFFF",
+    "wing": "#C9B6EC",
+    "wingSpot": "#9A86CC",
+    "wingSpotCore": "#F2D27A",
+    "shirt": "#7A5AA8",
+    "stripe": "#D9CCF2",
+    "pants": "#5A467E",
+    "eye": "#2A2230",
+    "blush": "#F2A6B0",
+    "outline": "#4A3E5A"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 1,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

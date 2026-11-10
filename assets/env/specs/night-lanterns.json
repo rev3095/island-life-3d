@@ -1,0 +1,82 @@
+{
+  "id": "PR-30",
+  "slug": "night-lanterns",
+  "name": "종이 등불 줄",
+  "category": "prop",
+  "kind": "night-lanterns",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "토요일 밤 야시장에 서는 등불 줄. 기둥 둘 사이로 처진 줄에 빨강·노랑·분홍 종이 등불 여섯이 달려 밤에 가운데 띠가 환하게 켜진다.",
+    "keywords": [
+      "종이 등불 여섯",
+      "처진 줄",
+      "기둥 둘"
+    ],
+    "references": [
+      "골목 야시장 등불"
+    ],
+    "avoid": [
+      "글씨 현수막",
+      "특정 나라 축제 그대로"
+    ],
+    "notes": "밤·새벽 검수 보드 (https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU) D106–D114 반영 v1 · 12차 야시장 소품 PR-30"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "pole": "#6A4A33",
+    "string": "#4A3B32",
+    "cap": "#3A2E3A",
+    "paperRed": "#E8604F",
+    "paperYellow": "#F2C14E",
+    "paperPink": "#F4A0BC",
+    "glow": "#FFE7A0"
+  },
+  "paletteLabels": {
+    "pole": "기둥",
+    "string": "줄",
+    "cap": "등불 뚜껑",
+    "paperRed": "빨간 종이",
+    "paperYellow": "노란 종이",
+    "paperPink": "분홍 종이",
+    "glow": "불빛"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          -1.35,
+          0,
+          0.1
+        ],
+        [
+          1.35,
+          0,
+          0.1
+        ]
+      ]
+    },
+    "extent": [
+      1.45,
+      0.2
+    ]
+  }
+}

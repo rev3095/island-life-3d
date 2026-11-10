@@ -1,0 +1,29 @@
+{
+  "id": "RM-10",
+  "slug": "moonshop",
+  "kind": "place",
+  "place": "moonshop",
+  "name": "달빛 가게",
+  "version": 1,
+  "status": "review",
+  "note": "밤·새벽 검수 보드 D109-A: 밤 10시–새벽 3시에만 여는 작은 남색 가게. 안쪽 가운데 계산대 뒤에 별밤(CH-14), 왼쪽·오른쪽 진열 받침에 밤 가구 넷(assets/night/night.json shop.stock 앞 넷). 벽지 WP-08 밤하늘 별 · 바닥 FL-05 짙은 판자. 붙박이 FU-35·36 다시 씀.",
+  "size": [8, 6],
+  "wallpaper": "wp-08",
+  "floor": "fl-05",
+  "windows": ["n:1", "n:6"],
+  "door": { "gx0": 3, "gx1": 4 },
+  "keeper": { "slug": "byeolbam", "lx": 4, "lz": 0.5, "face": "s" },
+  "talk": { "lx": 4, "lz": 2.45 },
+  "furniture": [
+    { "fu": "FU-36", "name": "계산대", "box": [2, 1, 0.6], "color": "#5A6AA0", "gx": 3, "gz": 1, "rot": 0, "role": "counter", "scale": [1, 0.72, 1] },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#4F5F94", "gx": 0, "gz": 2, "rot": 0 },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#4F5F94", "gx": 6, "gz": 2, "rot": 0 },
+    { "item": "furn.floor-lamp", "gx": 0, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.star-telescope", "gx": 7, "gz": 0, "rot": 0 },
+    { "item": "furn.wall-clock", "wall": "n", "slot": 3 }
+  ],
+  "stock": [
+    { "group": "furniture", "lx": 1, "lz": 2.5, "y": 0.18, "fit": 0.95, "count": 2, "dz": 1 },
+    { "group": "furniture", "from": 2, "lx": 7, "lz": 2.5, "y": 0.18, "fit": 0.95, "count": 2, "dz": 1 }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "PR-30",
+  "slug": "night-lanterns",
+  "name": "종이 등불 줄",
+  "category": "prop",
+  "kind": "night-lanterns",
+  "version": "0.1",
+  "triangles": 4360,
+  "parts": 1,
+  "materials": [
+    "cap",
+    "glow",
+    "paperPink",
+    "paperRed",
+    "paperYellow",
+    "pole",
+    "string"
+  ],
+  "animations": {},
+  "size": [
+    2.91,
+    0.27,
+    2.12
+  ],
+  "footprint": [
+    3,
+    1
+  ],
+  "glbBytes": 91188,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "night-lanterns_front.png",
+    "night-lanterns_hero.jpg",
+    "night-lanterns_main.png",
+    "night-lanterns_thumb.png",
+    "night-lanterns_top.png"
+  ]
+}

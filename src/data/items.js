@@ -9,13 +9,15 @@ import { FESTIVAL_CATEGORY as FC, FESTIVAL_FURN, festivalItems } from './festiva
 import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 // 9차 섬 꾸미기 야외 가구 FU-47–50 와 밖에 놓을 수 있는 가구 표시(outdoor)는 decor-items.js 에서
 import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
+// 12차 밤·새벽 분류(야시장 먹거리 IC-NT)·달빛 가게·새벽 천막 가구 FU-55–59 는 night-items.js 에서
+import { NIGHT_CATEGORY as NC, NIGHT_FURN, nightItems } from './night-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
-CATEGORIES.push(FC.key, EC.key); CATEGORY_NAMES[FC.key] = FC.name; CATEGORY_NAMES[EC.key] = EC.name;
+CATEGORIES.push(FC.key, EC.key, NC.key); CATEGORY_NAMES[FC.key] = FC.name; CATEGORY_NAMES[EC.key] = EC.name; CATEGORY_NAMES[NC.key] = NC.name;
 
 /** 한 칸에 쌓이는 최대 개수 (아이템에 stack 이 있으면 그 값) */
-export const STACK = { ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack };
+export const STACK = { ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack, [NC.key]: NC.stack };
 /** 계절 표기 → 달 목록 */
 export const SEASON_MONTHS = T.seasons;
 /** 시간 표기 → [시작, 끝) 시각 구간. 낮 = 새벽~저녁(5~19시), 밤 = 저녁~새벽(17~5시). 저녁엔 둘 다 나온다 */
@@ -92,7 +94,7 @@ export const ITEMS = [
   // FU-43– 행사 보상 가구는 event-items.js 의 EVENT_FURN (줄 끝의 보드 ID 가 code)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...[...DECOR_FURN, ...FAVOR_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,
@@ -106,6 +108,7 @@ export const ITEMS = [
 ];
 ITEMS.push(...festivalItems(itemIcon));   // IC-FE-01–04 축제 부스에서 만드는 것 (5차 Z5)
 ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8차 M8)
+ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {

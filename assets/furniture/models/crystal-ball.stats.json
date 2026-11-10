@@ -1,0 +1,52 @@
+{
+  "id": "FU-59",
+  "slug": "crystal-ball",
+  "item": "furn.crystal-ball",
+  "name": "수정 구슬",
+  "category": "furniture",
+  "kind": "crystal-ball",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3376,
+  "parts": 1,
+  "materials": [
+    "ball",
+    "cloth",
+    "glow",
+    "metal",
+    "stand"
+  ],
+  "objects": [
+    "ball"
+  ],
+  "animations": {},
+  "size": [
+    0.64,
+    0.62,
+    0.62
+  ],
+  "bounds": [
+    [
+      -0.32,
+      -0.31,
+      0.0
+    ],
+    [
+      0.32,
+      0.31,
+      0.62
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 65952,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "crystal-ball_front.png",
+    "crystal-ball_main.png",
+    "crystal-ball_thumb.png",
+    "crystal-ball_top.png"
+  ]
+}

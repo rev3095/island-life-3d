@@ -1,0 +1,50 @@
+{
+  "id": "FU-55",
+  "slug": "glow-star-lamp",
+  "item": "furn.glow-star-lamp",
+  "name": "야광 별 등",
+  "category": "furniture",
+  "kind": "glow-star-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 488,
+  "parts": 1,
+  "materials": [
+    "base",
+    "glow",
+    "trim"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.51,
+    0.48,
+    0.77
+  ],
+  "bounds": [
+    [
+      -0.257,
+      -0.24,
+      0.0
+    ],
+    [
+      0.257,
+      0.24,
+      0.77
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 11636,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "glow-star-lamp_front.png",
+    "glow-star-lamp_main.png",
+    "glow-star-lamp_thumb.png",
+    "glow-star-lamp_top.png"
+  ]
+}

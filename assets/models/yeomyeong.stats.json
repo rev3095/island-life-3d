@@ -1,0 +1,74 @@
+{
+  "id": "CH-15",
+  "slug": "yeomyeong",
+  "name": "여명",
+  "species": "moth",
+  "version": "0.1",
+  "triangles": 16156,
+  "vertices": 8252,
+  "bones": 10,
+  "materials": [
+    "shirt",
+    "pants",
+    "stripe",
+    "fur",
+    "eye",
+    "iris",
+    "eyeHighlight",
+    "blush",
+    "antenna",
+    "ruff",
+    "wing",
+    "wingSpot",
+    "wingSpotCore"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.95,
+  "glbBytes": 541344,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0497,
+    "forward": -0.0039
+  },
+  "renders": [
+    "yeomyeong_back.png",
+    "yeomyeong_front.png",
+    "yeomyeong_happy.png",
+    "yeomyeong_hero.png",
+    "yeomyeong_run.png",
+    "yeomyeong_side.png",
+    "yeomyeong_sit.png",
+    "yeomyeong_three_quarter.png",
+    "yeomyeong_thumb.png",
+    "yeomyeong_walk.png"
+  ]
+}
