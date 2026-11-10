@@ -257,6 +257,13 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
           const fp = kit.info(s.id).footprint ?? [1, 1];
           obj.root.scale.setScalar(Math.min(1, (s.fit ?? 2) / Math.max(...fp)));
           obj.root.position.set(R.x0 + s.lx, s.y, R.z0 + s.lz);
+          // 10차: 벽 가구(액자 등)는 모델이 벽 높이에 떠 있어서 받침 위로 내려 앉힌다 (바닥 가구는 아랫면이 0 이라 그대로)
+          if (kit.info(s.id).place === 'wall' || kit.info(s.id).place === 'window') {
+            obj.root.updateMatrixWorld(true);
+            const box = new ctx.THREE.Box3().setFromObject(obj.root);
+            if (Number.isFinite(box.min.y)) obj.root.position.y += s.y - box.min.y;
+            if (Number.isFinite(box.min.z)) obj.root.position.z += (R.z0 + s.lz) - (box.min.z + box.max.z) / 2;
+          }
           return obj;
         }
         const m = await itemModel(s.id);

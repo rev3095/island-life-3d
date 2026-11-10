@@ -9,6 +9,18 @@ export const DECOR_FURN = [
   ['picnic-table', '피크닉 탁자', '2×2', '도토리상점 (가끔)', '🧺', 600, 2400, 'shop', 'FU-50'],
 ];
 
+/**
+ * 10차 M10-P5 (보드 wave10 D98-A) 새 주민 셋이 좋아하는 가구 FU-51–53 — DECOR_FURN 과 같은 줄 모양.
+ * 상점 가구 후보(source 'shop') + 주민 선물·답례 (주민 파일 gifts·좋아하는 것에 이 id 를 넣는다). 별 망원경만 밖에도 놓는다.
+ */
+export const FAVOR_FURN = [
+  ['paint-easel', '그림 이젤', '1×1', '도토리상점 (가끔) · 주민 선물', '🎨', 500, 2000, 'shop', 'FU-51'],
+  ['sea-chart-frame', '바다 지도 액자', '벽', '도토리상점 (가끔) · 주민 선물', '🗺️', 400, 1600, 'shop', 'FU-52'],
+  ['star-telescope', '별 망원경', '1×1', '도토리상점 (가끔) · 주민 선물', '🔭', 700, 2800, 'shop', 'FU-53'],
+];
+/** FAVOR_FURN 중 섬에도 놓을 수 있는 것 (스펙 outdoor: true) */
+const FAVOR_OUTDOOR = ['star-telescope'];
+
 /** 섬에도 놓을 수 있는 지금 가구 (보드 wave9 RES 「실내 가구 다시 씀」) */
 export const OUTDOOR = new Set(['campfire', 'log-chair', 'log-table', 'plant-pot', 'woodpile', 'surfboard', 'harvest-basket', 'snowman-lamp', 'cherry-lamp',
-  ...DECOR_FURN.map(r => r[0])]);
+  ...DECOR_FURN.map(r => r[0]), ...FAVOR_OUTDOOR]);

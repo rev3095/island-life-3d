@@ -3,10 +3,10 @@
   "slug": "pong",
   "name": "퐁",
   "species": "duck",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 8936,
   "vertices": 4510,
-  "bones": 9,
+  "bones": 11,
   "materials": [
     "shirt",
     "pants",
@@ -34,11 +34,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 0.9,
-  "glbBytes": 302856,
+  "glbBytes": 334452,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0471,
+    "forward": -0.0037
+  },
   "renders": [
     "pong_back.png",
     "pong_front.png",
@@ -46,6 +62,7 @@
     "pong_hero.png",
     "pong_run.png",
     "pong_side.png",
+    "pong_sit.png",
     "pong_three_quarter.png",
     "pong_thumb.png",
     "pong_walk.png"

@@ -2,6 +2,8 @@
 // 키보드·패드로 움직이면 바로 그만둔다. 창이 열려 있거나(input.enabled false·ui.isBlocking) 손가락(터치 — 패드가 따로 있다)이면 하지 않는다.
 // 화면 → 땅: 곡면 월드(보이는 y = y − (z − 초점 z)² · uCurve)까지 맞춰, 광선이 "보이는" 땅과 만나는 점을 푼다 (groundPick).
 // input.js 가 매 프레임 pointerMove.get() 으로 이동 방향을 받는다 (키보드·패드가 없을 때만). 가는 곳엔 작은 고리 표시.
+// 10차 D96-A: setClickHandler(fn) 가 걸려 있으면 (섬 꾸미기 동안) 짧게 누르기 = fn(땅 점) (걷지 않음), 꾹 누르기·끌기 = 걷기 그대로.
+//   손가락도 짧게 톡 = fn (걷기는 패드라서). 두 손가락(시점)은 셈하지 않는다.
 // three 는 ctx.THREE 로 받는다 (위쪽 순수 함수 groundPick·steer 를 tests/mouse.test.mjs 가 Node 에서 검사)
 
 export const MOUSE = {
@@ -51,6 +53,8 @@ export function createMouseMove(ctx, { position }) {
   let holding = false, pointerId = null, downAt = 0, downX = 0, downY = 0, curX = 0, curY = 0, shift = false;
   let target = null;                 // { x, z } — 놓은 뒤에도 걸어가는 곳 (한 번 누름)
   let best = Infinity, stuck = 0;    // 못 가는 곳 알아채기
+  let clickFn = null, pending = false; // 10차 칸 누르기: 짧은 누름을 넘겨줄 곳 · 아직 누름인지 걷기인지 모름
+  const taps = new Map();            // 손가락 톡: pointerId → { x, y, t }
 
   // 가는 곳 표시: 땅에 얇은 고리 (곡면 월드 맞춤, 깊이는 쓰지 않아 땅에 묻히지 않는다)
   const ringMat = materials.curved(new THREE.MeshBasicMaterial({ color: 0xFFF8E6, transparent: true, opacity: 0, depthWrite: false }));
@@ -73,31 +77,54 @@ export function createMouseMove(ctx, { position }) {
     return { x: hit.x, z: hit.z, y: world?.island?.heightAt?.(hit.x, hit.z) ?? p.y };
   }
 
-  function stop() { holding = false; target = null; best = Infinity; stuck = 0; }
+  function stop() { holding = false; target = null; best = Infinity; stuck = 0; pending = false; }
 
   el.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'touch' || e.button !== 0 || blocked()) return;
+    if (e.pointerType === 'touch') {
+      if (clickFn && !blocked()) taps.set(e.pointerId, { x: e.clientX, y: e.clientY, t: performance.now(), multi: taps.size > 0 });
+      if (taps.size > 1) for (const t of taps.values()) t.multi = true;   // 두 손가락 = 시점 (camera.js)
+      return;
+    }
+    if (e.button !== 0 || blocked()) return;
     holding = true; pointerId = e.pointerId; shift = e.shiftKey;
     downAt = performance.now(); downX = curX = e.clientX; downY = curY = e.clientY;
-    target = pick(curX, curY);
+    pending = !!clickFn;               // 칸 누르기 중: 꾹 누르거나 끌 때까지 걷지 않는다
+    target = pending ? null : pick(curX, curY);
     best = Infinity; stuck = 0;
     try { el.setPointerCapture(e.pointerId); } catch { /* 이미 놓음 */ }
   });
   el.addEventListener('pointermove', e => { if (holding && e.pointerId === pointerId) { curX = e.clientX; curY = e.clientY; shift = e.shiftKey; } });
   const up = e => {
+    const tap = taps.get(e.pointerId);
+    if (tap) {
+      taps.delete(e.pointerId);
+      const ok = !tap.multi && performance.now() - tap.t < MOUSE.clickMs * 1.6 && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < MOUSE.clickPx * 2;
+      if (ok && clickFn && !blocked()) clickFn(pick(e.clientX, e.clientY), e);
+      return;
+    }
     if (!holding || e.pointerId !== pointerId) return;
     holding = false;
     const click = performance.now() - downAt < MOUSE.clickMs && Math.hypot(e.clientX - downX, e.clientY - downY) < MOUSE.clickPx;
+    if (pending) {                   // 짧게 눌렀다 뗌 = 칸 고르기 (걷지 않음)
+      pending = false;
+      target = null;
+      if (click && clickFn && !blocked()) clickFn(pick(e.clientX, e.clientY), e);
+      return;
+    }
     if (!click) target = null;       // 꾹 눌러 따라가던 것은 놓으면 멈춘다
   };
   el.addEventListener('pointerup', up);
-  el.addEventListener('pointercancel', e => { if (e.pointerId === pointerId) stop(); });
+  el.addEventListener('pointercancel', e => { taps.delete(e.pointerId); if (e.pointerId === pointerId) stop(); });
   addEventListener('blur', stop);
 
   return {
     /** input.js 가 매 프레임: 이동 방향 { x, z, run } 또는 null */
     get(dt = 1 / 60) {
       if (blocked()) { stop(); return null; }
+      if (holding && pending) {      // 칸 누르기 중: 꾹 누르거나 끌면 그때부터 걷기
+        if (performance.now() - downAt < MOUSE.clickMs && Math.hypot(curX - downX, curY - downY) < MOUSE.clickPx) return null;
+        pending = false;
+      }
       if (holding) target = pick(curX, curY) ?? target;
       if (!target) return null;
       const p = position();
@@ -110,6 +137,10 @@ export function createMouseMove(ctx, { position }) {
     },
     /** 키보드·패드를 쓰면 input.js 가 부른다 */
     cancel: stop,
+    /** 10차 D96-A: 짧은 누르기·톡을 받을 곳 (point = {x, z, y} | null) → 걸려 있는 동안 짧게 누르면 걷지 않는다. null = 끄기 */
+    setClickHandler(fn) { clickFn = typeof fn === 'function' ? fn : null; pending = false; taps.clear(); },
+    /** 화면 점 → 보이는 땅 점 (곡면 월드까지) */
+    pickAt: (sx, sy) => pick(sx, sy),
     /** 플레이어 update 에서: 고리 표시 */
     update(dt) {
       const show = !!target && !blocked();

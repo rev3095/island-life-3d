@@ -3,14 +3,14 @@
   "slug": "coco",
   "name": "코코",
   "species": "cat",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 10512,
   "vertices": 5312,
-  "bones": 12,
+  "bones": 14,
   "materials": [
-    "stripe",
-    "shirt",
     "pants",
+    "shirt",
+    "stripe",
     "fur",
     "muzzle",
     "nose",
@@ -36,11 +36,27 @@
     "happy": {
       "frames": 36,
       "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 1,
-  "glbBytes": 369616,
+  "glbBytes": 411560,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0523,
+    "forward": -0.0041
+  },
   "renders": [
     "coco_back.png",
     "coco_front.png",
@@ -48,6 +64,7 @@
     "coco_hero.png",
     "coco_run.png",
     "coco_side.png",
+    "coco_sit.png",
     "coco_three_quarter.png",
     "coco_thumb.png",
     "coco_walk.png"

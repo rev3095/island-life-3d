@@ -920,6 +920,67 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-51",
+      "slug": "paint-easel",
+      "item": "furn.paint-easel",
+      "name": "그림 이젤",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.7,
+        0.59,
+        1.47
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-52",
+      "slug": "sea-chart-frame",
+      "item": "furn.sea-chart-frame",
+      "name": "바다 지도 액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.92,
+        0.06,
+        1.97
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-53",
+      "slug": "star-telescope",
+      "item": "furn.star-telescope",
+      "name": "별 망원경",
+      "place": "floor",
+      "outdoor": true,
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.68,
+        0.6,
+        1.33
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

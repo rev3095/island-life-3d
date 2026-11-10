@@ -4,9 +4,9 @@
   "kind": "place",
   "place": "shop",
   "name": "도토리상점",
-  "version": 2,
+  "version": 3,
   "status": "approved",
-  "note": "실내 검수 보드 D69-A: 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 오늘의 가구, 오른쪽에 도구 다섯·꽃씨. 붙박이 모델(assets/furniture/fixtures): 진열 받침 FU-35 · 계산대 FU-36 · 도구 받침 FU-39 · 씨앗 진열대 FU-40 (box·color 는 모델을 못 읽을 때 임시 상자).",
+  "note": "실내 검수 보드 D69-A: 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 오늘의 실내 가구 셋(앞 받침에 둘), 가운데 오른쪽 받침에 오늘의 야외 가구 하나(10차 D99-A), 오른쪽에 도구 다섯·꽃씨. 붙박이 모델(assets/furniture/fixtures): 진열 받침 FU-35 · 계산대 FU-36 · 도구 받침 FU-39 · 씨앗 진열대 FU-40 (box·color 는 모델을 못 읽을 때 임시 상자).",
   "size": [10, 7],
   "wallpaper": "wp-05",
   "floor": "fl-02",
@@ -18,6 +18,7 @@
     { "fu": "FU-36", "name": "계산대", "box": [2, 1, 0.6], "color": "#D9B382", "gx": 4, "gz": 1, "rot": 0, "role": "counter" },
     { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 1, "rot": 0 },
     { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 4, "rot": 0 },
+    { "fu": "FU-35", "name": "야외 가구 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 6, "gz": 3, "rot": 0 },
     { "fu": "FU-39", "name": "도구 받침", "box": [1, 3, 0.12], "color": "#B98A5A", "gx": 9, "gz": 1, "rot": 0 },
     { "fu": "FU-40", "name": "씨앗 진열대", "box": [1, 2, 0.6], "color": "#C99A63", "gx": 9, "gz": 4, "rot": 0 },
     { "item": "furn.round-rug", "gx": 3, "gz": 3, "rot": 0 },
@@ -30,8 +31,9 @@
     { "item": "furn.rod-rack", "wall": "e", "slot": 2 }
   ],
   "stock": [
-    { "group": "furniture", "lx": 1, "lz": 2, "y": 0.18, "fit": 1.7, "count": 1 },
-    { "group": "furniture", "from": 1, "lx": 1, "lz": 5, "y": 0.18, "fit": 1.7, "count": 1 },
+    { "group": "furniture", "lx": 1, "lz": 1.5, "y": 0.18, "fit": 0.95, "count": 2, "dz": 1 },
+    { "group": "furniture", "from": 2, "lx": 1, "lz": 5, "y": 0.18, "fit": 1.7, "count": 1 },
+    { "group": "furniture", "from": 3, "lx": 7, "lz": 4, "y": 0.18, "fit": 1.7, "count": 1 },
     { "group": "tools", "lx": 9.5, "lz": 1.35, "y": 0.12, "dz": 0.55, "count": 5 },
     { "group": "seeds", "lx": 9.5, "lz": 4.3, "y": 0.6, "dz": 0.45, "count": 3 },
     { "group": "saplings", "lx": 9.5, "lz": 5.65, "y": 0.6, "dz": 0.4, "count": 1 }

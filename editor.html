@@ -425,8 +425,8 @@ const PROP = [
   ['earPointiness', '귀 뾰족함', 0.6, 2.0, false], ['eyeSize', '눈 크기', 0.7, 1.5, false], ['eyeSpacing', '눈 간격', 0.8, 1.2, false],
 ];
 const FOCUS = ['전체 느낌', '얼굴', '비율·실루엣', '색', '의상', '동작'];
-const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기' };
-const RENDER_LABEL = { front: '정면', three_quarter: '3/4', side: '옆', back: '뒤', walk: '걷기', run: '달리기', happy: '기뻐하기' };
+const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기', sit: '앉기' };   // 앉기 = 10차 AN-11 (sit_down · sit · stand_up 중 반복 동작)
+const RENDER_LABEL = { front: '정면', three_quarter: '3/4', side: '옆', back: '뒤', walk: '걷기', run: '달리기', happy: '기뻐하기', sit: '앉기' };
 const STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'] };
 const KIND_LABEL = { edit: '모양', add: '새 모델', traits: '성격·대화', rollback: '되돌리기' };
 const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
@@ -500,7 +500,7 @@ async function select(next) {
   ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
   const img = name => `<figure><div class="ph"><img src="assets/renders/${want}_${name}.png" alt="${esc(spec.name)} ${RENDER_LABEL[name] ?? name} 렌더" loading="lazy"></div><figcaption><span class="id">${name.toUpperCase()}</span>${RENDER_LABEL[name] ?? ''}</figcaption></figure>`;
   $('turn').innerHTML = ['front', 'three_quarter', 'side', 'back'].map(img).join('');
-  $('poses').innerHTML = ['walk', 'run', 'happy'].filter(n => stats.renders.includes(`${want}_${n}.png`)).map(img).join('');
+  $('poses').innerHTML = ['walk', 'run', 'happy', 'sit'].filter(n => stats.renders.includes(`${want}_${n}.png`)).map(img).join('');
   $('hero').innerHTML = `<img src="assets/renders/${want}_hero.png" alt="섬 위에 서 있는 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>섬 위에 세워 본 모습</figcaption>`;
   draft = restore(pick(spec));
   fillForm(); renderRefs(); renderRequests();
@@ -1557,7 +1557,7 @@ function onModel(gltf) {
   scene.add(model);
   mixer = new THREE.AnimationMixer(model);
   for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
-  const order = ['idle', 'walk', 'run', 'happy'].filter(n => actions[n]);
+  const order = ['idle', 'walk', 'run', 'happy', 'sit'].filter(n => actions[n]);
   $('animSeg').innerHTML = order.map(n => `<button type="button" data-anim="${n}" aria-pressed="false">${ANIM_LABEL[n] ?? n}</button>`).join('');
   outlineW.value = spec.style?.outlineWidth ?? 0.006;
   const h = stats.height ?? 1;

@@ -404,6 +404,8 @@ const MAX_BYTES = 20 * 1024 * 1024;
 function loadJSON(url) { return fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); }); }
 
 let models = [], area = 'env', tab = 'all', itemsLoaded = false, frameSpec = null;
+// 10차 M10-P2: 게시본은 배경·가구 격자 썸네일을 영역마다 묶음 하나(editor-thumbs.json = { slug: data: 주소 })로 — 목록의 thumbs 칸. 로컬(묶음 빌드 전)은 null → 낱개 renders/
+const THUMBS = {};
 // 게시본은 요소마다 스펙·통계를 넣은 묶음 목록(editor-index.json, tools/build-editor-index.mjs)을 읽는다 — 아티팩트 파일 수 제한 때문. 없으면 index.json
 const loadIndex = b => loadJSON(b + 'editor-index.json').catch(() => loadJSON(b + 'index.json'));
 // 실내 묶음이 없으면(로컬에서 빌드 전) 목록·스펙·방 파일을 하나씩. 상점·박물관은 places/, 그 붙박이(계산대·받침·수조 FU-35–42)는 가구 폴더의 fixtures/
@@ -428,6 +430,7 @@ const RM07 = { id: 'RM-07', slug: 'rm-07', kind: 'room', owner: 'danpung', owner
 const itemsFetch = loadIndex(ITEMS);   // 아이템 목록은 아이콘이 들어 있어 크다(2MB 남짓) → 기다리지 않고 나중에 붙인다
 try {
   const env = await loadIndex(BASE);
+  THUMBS[BASE] = env.thumbs ?? null;
   if (env.categories) AREAS[0].cats = env.categories;
   models = env.models.map(m => ({ ...m, key: m.slug, base: BASE, area: 'env', cat: m.category, type: 'model' }));
 }
@@ -435,6 +438,7 @@ catch (e) { $('selName').textContent = '요소 목록을 불러오지 못했어�
 // 배경 요소·가구·아이템은 폴더가 달라서 요소마다 폴더(base)를 기억한다. 모닥불처럼 slug 가 겹치면 안 되니 가구 key 앞에 furn-, 아이템은 item- 을 붙인다.
 {
   const [furn, interior] = await Promise.all([loadIndex(FURN).catch(() => null), loadInterior().catch(() => null)]);
+  THUMBS[FURN] = furn?.thumbs ?? null;
   models.push(...(furn?.models ?? []).map(m => ({ ...m, category: 'furniture', key: 'furn-' + m.slug, base: FURN, area: 'furniture', cat: 'furniture', type: 'model' })));
   if (interior) {
     frameSpec = interior.frame ?? null;
@@ -474,9 +478,23 @@ function thumbOf(m) {
   if (m.type === 'pattern') return m.thumb ??= swatchURL(m.spec, { px: 152, meters: 1.2 });
   if (m.type === 'room') return m.thumb ??= roomThumb(m.spec);
   if (m.category === 'item') return m.items?.[0]?.thumb ?? m.items?.[0]?.icon;
-  return m.thumb ?? `${m.base}renders/${m.slug}_thumb.png`;   // 9차부터 더한 요소는 묶음 목록의 data: 썸네일
+  if (m.thumb) return m.thumb;
+  if (!THUMBS[m.base]) return `${m.base}renders/${m.slug}_thumb.png`;   // 묶음 없음(로컬): 낱개 파일
+  needThumbs(m.base);
+  return BLANK;
 }
-// 9차 M9: 게시 파일 501/511 뒤로 더한 요소는 렌더 그림도 묶음(editor-renders-<n>.json = { 파일 이름: data: 주소 }) — tools/build-editor-index.mjs
+// 썸네일 묶음은 그 영역(또는 방 배치 격자의 가구)을 처음 그릴 때 한 번 받고, 받은 뒤 격자·배치 격자를 다시 그린다
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const thumbPacks = new Map();
+function needThumbs(base) {
+  if (!THUMBS[base] || thumbPacks.has(base)) return;
+  thumbPacks.set(base, loadJSON(base + THUMBS[base]).then(map => {
+    for (const m of models) if (m.base === base && m.type === 'model' && map[m.slug]) m.thumb = map[m.slug];
+    renderGroups();
+    if (mode === 'plan') renderPlan();
+  }, e => { console.warn('썸네일 묶음을 불러오지 못했어요', base, e); setTimeout(() => thumbPacks.delete(base), 5000); }));
+}
+// 렌더 그림 묶음 (9차 M9 새 요소 → 10차 M10-P2 모든 배경·가구): editor-renders-<n>.json = { 파일 이름: data: 주소 }, 요소의 renders = 묶음 번호 — tools/build-editor-index.mjs
 const renderPacks = new Map();
 function renderPack(base, n) {
   const k = `${base}|${n}`;
@@ -633,7 +651,7 @@ function renderSheet() {
   const hasVariants = stats.renders.includes(`${file}_variants.png`);
   $('variantsImg').innerHTML = hasVariants ? `<img src="${R(`${file}_variants.png`)}" alt="${esc(spec.name)} 변형 모음" loading="lazy"><figcaption><span class="id">VARIANTS</span>${Object.values(spec.variants ?? {}).map(v => esc(v.label)).join(' · ')}</figcaption>` : '';
   $('variantsImg').hidden = !hasVariants;
-  const hasHero = stats.renders.includes(`${file}_hero.jpg`) || B === BASE;
+  const hasHero = cur.renderMap ? !!cur.renderMap[`${file}_hero.jpg`] : stats.renders.includes(`${file}_hero.jpg`) || B === BASE;   // 묶음이면 든 것만
   $('hero').hidden = !hasHero;
   $('hero').innerHTML = !hasHero ? '' : `<img src="${R(`${file}_hero.jpg`)}" alt="섬 위에 놓아 본 ${esc(spec.name)}" loading="lazy"><figcaption><span class="id">HERO</span>${spec.category === 'tile' ? '3×3으로 깔아 본 모습' : '섬 위에 놓아 본 모습'}</figcaption>`;
 }
@@ -1635,7 +1653,7 @@ function renderPlan() {
     const cls = ['piece', r.layer === 'rug' && 'rug', e.wall && 'wall', selPiece === e._id && 'sel', chk.bad.has(e._id) && 'bad'].filter(Boolean).join(' ');
     const v = e.variant && r.m?.spec?.variants?.[e.variant], vc = v ? Object.values(v.palette)[0] : null;
     parts.push(`<div class="${cls}" data-pid="${esc(e._id)}" style="${pos};${r.m ? '' : `background:${esc(e.color ?? '#C99A63')}`}" title="${esc(r.name)}${v ? ` · ${esc(v.label)}` : ''}">`
-      + (r.m ? `<img src="${esc(r.m.thumb ?? `${r.m.base ?? FURN}renders/${r.m.slug}_thumb.png`)}" alt="" draggable="false">` : '')
+      + (r.m ? `<img src="${esc(r.m.thumb ?? (r.m.base ? thumbOf(r.m) : `${FURN}renders/${r.m.slug}_thumb.png`))}" alt="" draggable="false">` : '')
       + `<span class="lbl">${esc(r.name)}</span>${e.wall ? '' : `<i class="front f${e.rot ?? 0}"></i>`}${vc ? `<i class="vdot" style="background:${vc}"></i>` : ''}</div>`);
   }
   const h = L.host;

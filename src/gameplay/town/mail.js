@@ -7,7 +7,7 @@ import { PEOPLE, KEEPERS } from './people.js';
 const KEEP = 30;              // 읽은 편지는 이만큼만 남긴다
 const BOX = { name: '', color: '#C9A27A', voice: '' };
 
-export function createMail(ctx, { lines }) {
+export function createMail(ctx, { lines, residents = null }) {
   const world = ctx.services.world;
   const box = () => {
     const m = (ctx.state.mail ??= {});
@@ -26,10 +26,10 @@ export function createMail(ctx, { lines }) {
   const who = slug => PEOPLE[slug] ?? KEEPERS[slug];
   const itemName = id => ctx.services.data?.items?.get?.(id)?.name ?? id;
 
-  /** 편지 한 통 넣기 (kind = 대사 묶음 letters 의 키) */
-  function post(from, kind, gift = null) {
+  /** 편지 한 통 넣기 (kind = 대사 묶음 letters 의 키). opts.pool = 주민 파일에 그 편지가 없을 때 쓸 묶음 (10차 이사·떠난 주민 편지) */
+  function post(from, kind, gift = null, opts = {}) {
     const m = box();
-    const pool = lines[from]?.letters?.[kind];
+    const pool = lines[from]?.letters?.[kind]?.length ? lines[from].letters[kind] : opts.pool;
     if (!pool?.length || !who(from)) return null;
     const letter = { id: m.nextId++, from, kind, day: context(ctx).dayKey, lines: pickLines(pool, rngOf(m.nextId, from, kind)), gift, read: false };
     m.list.push(letter);
@@ -45,7 +45,10 @@ export function createMail(ctx, { lines }) {
     m.day = dayKey;
     if (!ctx.state.flags?.intro) return 0;
     let n = 0;
-    for (const p of planLetters(ctx.state, PEOPLE, dayKey)) {
+    // 10차: 섬에 사는 주민만 (이사 오기 전·떠난 주민의 편지는 moving.js 가 따로)
+    const live = residents?.();
+    const people = live ? Object.fromEntries(Object.entries(PEOPLE).filter(([s]) => live.includes(s))) : PEOPLE;
+    for (const p of planLetters(ctx.state, people, dayKey)) {
       if (p.mark) villagerState(ctx.state, p.from).thankedDay = p.mark;
       if (post(p.from, p.kind, p.gift)) n++;
     }

@@ -1,6 +1,7 @@
 // 캐릭터 한 명: 모델(툰 재질·외곽선은 ctx.materials) + 동작 섞기 + 서서히 나타나기·사라지기 + 길 따라 걷기.
 // 방향은 player.facing 과 같은 뜻 (0 = 북쪽 -Z, 모델 rotation.y = facing + π).
 import { LoopOnce, LoopRepeat } from 'three';
+import { sitMetaOf } from '../decor/seats.js';   // 10차 앉기: 엉덩이 닿는 곳
 
 const FADE = 0.2;           // 동작 섞는 시간
 const TURN = 7;             // 라디안/초
@@ -27,6 +28,10 @@ export async function createActor(ctx, slug) {
   const mixer = new THREE.AnimationMixer(model);
   let lag = 0;
   const actions = Object.fromEntries(animations.map(c => [c.name, mixer.clipAction(c)]));
+  // 10차 AN-11: 앉을 때 엉덩이 닿는 곳 (모델 메타 sit: {hip, forward} — 없으면 키 × 0.28)
+  let sitMeta = null;
+  model.traverse(o => { if (!sitMeta && o.userData?.sit) sitMeta = o.userData.sit; });
+  sitMeta ??= gltf.scene?.userData?.sit ?? gltf.parser?.json?.extras?.sit ?? gltf.parser?.json?.scenes?.[0]?.extras?.sit ?? spec?.sit ?? spec?.meta?.sit ?? null;
   const mats = [];
   root.traverse(o => { if (o.isMesh) for (const m of [o.material].flat()) if (!mats.includes(m)) mats.push(m); });
 
@@ -37,6 +42,11 @@ export async function createActor(ctx, slug) {
     anim: null, oneShot: null, speed: 0,
     opacity: 1, fadeTo: 1, fadeSpeed: 2,
     path: [], goal: null, stuck: 0,
+    /** 10차 앉기: 자리에 붙들기 (높이 따라가기를 쉰다 — villager.js 가 position 을 직접 옮긴다) */
+    pinned: false,
+    sit: sitMetaOf(sitMeta, height), sitFromModel: !!sitMeta,
+    hasClip: name => !!actions[name],
+    clipSeconds: name => actions[name]?.getClip().duration ?? 0,
 
     play(name) {
       if (A.anim === name || !actions[name]) return;
@@ -50,10 +60,11 @@ export async function createActor(ctx, slug) {
       A.anim = name;
       A.oneShot = null;
     },
-    /** 한 번만 하는 동작 (기뻐하기) — 끝나면 서기로 */
-    playOnce(name) {
+    /** 한 번만 하는 동작 (기뻐하기) — 끝나면 then 으로 (기본 서기 · 10차 sit_down → 'sit') */
+    playOnce(name, then = 'idle') {
       const next = actions[name];
       if (!next) return;
+      A.then = actions[then] ? then : 'idle';
       const prev = A.anim && actions[A.anim];
       next.reset();
       next.setLoop(LoopOnce, 1);
@@ -69,6 +80,7 @@ export async function createActor(ctx, slug) {
     /** 땅 높이에 맞춰 놓기 */
     place(x, z, facing = A.facing) {
       const y = ctx.services.world?.island.heightAt(x, z) ?? 0;
+      A.pinned = false;
       A.position.set(x, y, z);
       A.setFacing(facing);
     },
@@ -119,7 +131,7 @@ export async function createActor(ctx, slug) {
     update(dt, animate = true) {
       // 높이 따라가기
       const world = ctx.services.world;
-      if (world) {
+      if (world && !A.pinned) {
         const gy = world.island.heightAt(A.position.x, A.position.z);
         const dy = gy - A.position.y;
         A.position.y = Math.abs(dy) > 0.6 ? gy : A.position.y + dy * (1 - Math.exp(-dt * 20));
@@ -138,7 +150,7 @@ export async function createActor(ctx, slug) {
       }
       if (A.oneShot) {
         const a = actions[A.oneShot];
-        if (!a.isRunning() || a.time >= a.getClip().duration - 0.02) A.play('idle');
+        if (!a.isRunning() || a.time >= a.getClip().duration - 0.02) A.play(A.then ?? 'idle');
       }
       // 화면·그림자 밖이면 동작 계산을 쉬고 밀린 시간만 모아 둔다 (render/cull.js offscreen — 주민 9명 중 보통 6~7명이 밖)
       if (animate && root.visible) {

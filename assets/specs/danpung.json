@@ -4,7 +4,7 @@
   "name": "단풍",
   "species": "fox",
   "role": "주민 · 여우 (새로 이사 옴)",
-  "version": "0.1",
+  "version": "0.1.1",
   "status": "approved",
   "prompt": {
     "concept": "섬으로 이사 온 꼼꼼한 수집가 여우. 박물관 기증을 제일 좋아하고, 가을이 오면 신이 나서 꼬리를 흔든다.",
@@ -72,6 +72,9 @@
     "idle",
     "walk",
     "run",
-    "happy"
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
   ]
 }

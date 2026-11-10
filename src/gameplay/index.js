@@ -10,6 +10,7 @@ const PARTS = [
   ['festival', './festival/index.js'],   // 5차 Z5 축제·이모티콘 대화·엔딩
   ['events', './events/index.js'],       // 8차 M8 계절 행사 (assets/events/, 보드 wave8)
   ['decor', './decor/index.js'],         // 9차 M9 섬 꾸미기 (assets/decor/, 보드 wave9 D86-A)
+  ['telescope', './decor/telescope.js'], // 10차 M10-P5 섬에 놓은 별 망원경 — 밤에 하늘 올려다보기 (FU-53)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

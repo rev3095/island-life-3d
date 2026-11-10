@@ -19,9 +19,9 @@ const gltfOf = p => {
 };
 
 const SETS = [
-  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 10 },
+  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 13 },   // + 10차 새 주민 CH-11–13
   { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 70 },   // + 9차 길 TI-09–12 · 울타리 PR-24–25 · 행사 소품 PR-26–29   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18 · 가을 PR-19·PR-20 · 겨울 PR-21·PR-22,
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 42 },   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 45 },   // + 10차 좋아하는 가구 FU-51–53   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;

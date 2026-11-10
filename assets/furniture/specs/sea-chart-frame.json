@@ -1,0 +1,79 @@
+{
+  "id": "FU-52",
+  "slug": "sea-chart-frame",
+  "item": "furn.sea-chart-frame",
+  "name": "바다 지도 액자",
+  "category": "furniture",
+  "kind": "sea-chart-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "벽에 거는 낡은 바다 지도. 누런 종이에 섬 모양과 점선 뱃길, 나침반 별. 파도(펭귄) 주민이 좋아한다.",
+    "keywords": [
+      "벽걸이",
+      "낡은 바다 지도",
+      "점선 뱃길"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "10차 검수 보드 wave10 (https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H) 반영 v1 · M10-P5 좋아하는 가구 (D98-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "paper",
+      "paperEdge",
+      "sea",
+      "land",
+      "route",
+      "compass",
+      "string"
+    ],
+    "flat": [
+      "paper",
+      "paperEdge",
+      "sea",
+      "land",
+      "route",
+      "compass"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#8C6440",
+    "paper": "#EAD9B0",
+    "paperEdge": "#C9AE7C",
+    "sea": "#A9CFD6",
+    "land": "#9CBF73",
+    "route": "#C8553D",
+    "compass": "#3F5A7A",
+    "string": "#6B4B30"
+  },
+  "paletteLabels": {
+    "frame": "액자 테",
+    "paper": "지도 종이",
+    "paperEdge": "종이 얼룩",
+    "sea": "바다",
+    "land": "섬",
+    "route": "뱃길 점선",
+    "compass": "나침반",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

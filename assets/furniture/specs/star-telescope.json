@@ -1,0 +1,64 @@
+{
+  "id": "FU-53",
+  "slug": "star-telescope",
+  "item": "furn.star-telescope",
+  "name": "별 망원경",
+  "category": "furniture",
+  "kind": "star-telescope",
+  "version": "0.1",
+  "status": "review",
+  "outdoor": true,
+  "prompt": {
+    "concept": "세 다리 받침 위에 보라색 망원경. 밖에 놓으면 밤에 눌러서 하늘을 올려다본다. 달무리(부엉이) 주민이 좋아한다.",
+    "keywords": [
+      "세 다리 받침",
+      "보라 망원경",
+      "별 보기"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "10차 검수 보드 wave10 (https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H) 반영 v1 · M10-P5 좋아하는 가구 (D98-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "tube": "#7A6A9A",
+    "tubeDark": "#5A4C78",
+    "brass": "#E0B85A",
+    "lens": "#BFE0F2",
+    "leg": "#8C6440",
+    "metal": "#3F4A45"
+  },
+  "paletteLabels": {
+    "tube": "망원경 통",
+    "tubeDark": "통 띠",
+    "brass": "놋쇠 테",
+    "lens": "렌즈",
+    "leg": "다리",
+    "metal": "받침 쇠"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.3
+    }
+  }
+}

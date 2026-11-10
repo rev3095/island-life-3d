@@ -1,0 +1,53 @@
+{
+  "id": "FU-53",
+  "slug": "star-telescope",
+  "item": "furn.star-telescope",
+  "name": "별 망원경",
+  "category": "furniture",
+  "kind": "star-telescope",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1640,
+  "parts": 1,
+  "materials": [
+    "brass",
+    "leg",
+    "lens",
+    "metal",
+    "tube",
+    "tubeDark"
+  ],
+  "objects": [
+    "telescope"
+  ],
+  "animations": {},
+  "size": [
+    0.68,
+    0.6,
+    1.33
+  ],
+  "bounds": [
+    [
+      -0.339,
+      -0.209,
+      -0.009
+    ],
+    [
+      0.339,
+      0.389,
+      1.333
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 34792,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-telescope_front.png",
+    "star-telescope_main.png",
+    "star-telescope_thumb.png",
+    "star-telescope_top.png"
+  ]
+}

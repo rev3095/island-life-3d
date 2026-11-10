@@ -171,7 +171,7 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
     V.busy = H.busy = true;
     try {
       const spec = await roomSpecOf(slug);
-      await doors.through({ dir: 'in', place: houseOf(slug), kind: 'house-villager', variant: slug, room: roomDoor(),
+      await doors.through({ dir: 'in', place: houseOf(slug), kind: 'house-villager', variant: ctx.services.town?.houseVariant?.(slug) ?? slug, room: roomDoor(),
         arrive: async s => { await furnish(spec); goIn(slug, { lx: s.x - vx0, lz: s.z - vz0, facing: s.facing }); } });
     } finally { V.busy = H.busy = false; }
     return true;
@@ -182,7 +182,7 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
     V.busy = H.busy = true;
     const slug = V.where;
     try {
-      await doors.through({ dir: 'out', place: houseOf(slug), kind: 'house-villager', variant: slug, room: roomDoor(), arrive: s => goOut({ spot: s }) });
+      await doors.through({ dir: 'out', place: houseOf(slug), kind: 'house-villager', variant: ctx.services.town?.houseVariant?.(slug) ?? slug, room: roomDoor(), arrive: s => goOut({ spot: s }) });
     } finally { V.busy = H.busy = false; }
     return true;
   }

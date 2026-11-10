@@ -25,10 +25,12 @@ test('이모티콘 세트: 36개, ID·key 겹침 없음, 플레이어 30 · 대�
   assert.ok(!EM.emotes.some(e => ['🙏', '🏮'].includes(e.glyph)), '기도·특정 문화 등불 이모티콘은 넣지 않는다');
 });
 
-test('대화 규칙: 주민 7명, 쓰는 이모티콘이 모두 세트에 있고 좋아함·원하는 것은 플레이어가 보낼 수 있다', () => {
-  assert.deepEqual(SLUGS.sort(), ['bori', 'chorong', 'coco', 'danpung', 'dubu', 'mochi', 'pong']);
+test('대화 규칙: 주민 7명 + 10차 이사 오는 셋, 쓰는 이모티콘이 모두 세트에 있고 좋아함·원하는 것은 플레이어가 보낼 수 있다', () => {
+  assert.deepEqual(SLUGS.sort(), ['bori', 'chorong', 'coco', 'dalmuri', 'danpung', 'dubu', 'gureum', 'mochi', 'pado', 'pong']);
+  const ids = Object.values(RULES.villagers).map(R => R.id);
+  assert.equal(new Set(ids).size, ids.length, '읽는 법 TK id 겹침');
   for (const [slug, R] of Object.entries(RULES.villagers)) {
-    assert.match(R.id, /^TK-0[1-7]$/);
+    assert.match(R.id, /^TK-(0[1-9]|10)$/);
     for (const k of [...R.likes, ...R.dislikes, ...R.reply]) assert.ok(KEYS.has(k), `${slug}: ${k}`);
     for (const k of [...R.likes, ...R.wants]) assert.ok(PLAYER.includes(k), `${slug}: ${k} 를 플레이어가 못 보냄`);
   }

@@ -1,0 +1,215 @@
+{
+  "id": "s17-gureum-arrival",
+  "version": 1,
+  "status": "review",
+  "chapter": "이사 오가기",
+  "title": "구름의 이삿날 저녁",
+  "summary": "이삿날 저녁, 새집 앞 이삿짐 곁에서 수줍게 인사하는 구름. 붓을 들어 보이고는 바닷가 이젤 쪽으로 걸어간다.",
+  "trigger": {
+    "on": "move-in",
+    "slug": "gureum"
+  },
+  "place": "event",
+  "once": true,
+  "playerEnd": "stay",
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "집 앞 인사 → 좋아하는 곳으로",
+      "recommended": true,
+      "desc": "새집과 이삿짐을 넓게 → 구름과 첫 인사 → 구름이 좋아하는 곳(바닷가 이젤)으로 걸어가고, 그곳을 보여 준다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "새집과 이삿짐 상자",
+          "dur": 3,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "evening",
+          "actors": [
+            {
+              "who": "gureum",
+              "at": [
+                -1.1,
+                1
+              ],
+              "face": 90,
+              "emote": "📦",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.6,
+                4.2
+              ],
+              "face": 0,
+              "hide": false,
+              "text": ""
+            }
+          ],
+          "caption": "{island}에 새 이웃이 왔어요"
+        },
+        {
+          "id": "c2",
+          "note": "플레이어가 다가가고 구름이 돌아본다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "gureum",
+              "face": "player",
+              "emote": "🥹",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "to": [
+                0.5,
+                1.9
+              ],
+              "do": "walk",
+              "face": "gureum",
+              "emote": "👋",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "구름의 인사",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "gureum",
+            "angle": 15,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "gureum",
+              "face": "player",
+              "do": "happy",
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "gureum",
+              "emote": "😄",
+              "text": ""
+            }
+          ],
+          "wait": true
+        },
+        {
+          "id": "c4",
+          "note": "좋아하는 것(🎨)을 보여 주고 바닷가 이젤 쪽으로",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "actors": [
+            {
+              "who": "gureum",
+              "to": [
+                3.2,
+                4.2
+              ],
+              "do": "walk",
+              "emote": "🎨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "gureum",
+              "emote": "👋",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c5",
+          "note": "바닷가 이젤",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "place": "spawn",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "gureum",
+              "hide": true,
+              "text": ""
+            }
+          ],
+          "caption": "구름은 바닷가에서 하루 종일 그림을 그려요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "구름이 이삿짐 곁에서 손을 흔들며 인사, 바로 조작.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "구름이 손 흔들며 인사",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "music": "evening",
+          "actors": [
+            {
+              "who": "gureum",
+              "at": [
+                -1.1,
+                1
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "👋",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.5,
+                1.9
+              ],
+              "face": "gureum",
+              "emote": "😊",
+              "text": ""
+            }
+          ],
+          "caption": "구름이 이사 왔어요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

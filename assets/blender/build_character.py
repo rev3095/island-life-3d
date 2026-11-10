@@ -35,6 +35,10 @@ FEATURES = {
     'squirrel': {'ears': 'tuft', 'muzzle': 'small', 'tail': 'bushy'},
     'fox': {'ears': 'fox', 'muzzle': 'cat', 'tail': 'fox'},   # 고양이 귀(끝 진한 색) + 다람쥐 꼬리(끝 흰색) 다시 쓰기
     'tortoise': {'mouth': 'smile', 'tail': 'stub', 'shell': True, 'head': (1.0, 0.95, 0.9)},
+    # 10차 M10-P3 (보드 wave10 D93-A) 새 주민 셋
+    'sheep': {'ears': 'round', 'earSide': True, 'muzzle': 'small', 'tail': 'puff', 'wool': True, 'head': (1.06, 0.95, 0.9)},   # 곰 둥근 귀(옆으로) + 털 뭉치
+    'penguin': {'muzzle': 'beak', 'beakScale': 0.6, 'tail': 'feather', 'wings': True, 'faceMask': True, 'head': (1.06, 0.96, 0.92)},   # 오리 부리 + 날개
+    'owl': {'muzzle': 'hook', 'tail': 'feather', 'ears': 'tufts', 'eyes': 'big', 'head': (1.12, 0.95, 0.88), 'eyeSpread': 0.92},   # 귀깃 + 큰 눈
 }
 SPECIES = spec.get('species', 'cat')
 F = {**FEATURES.get(SPECIES, {}), **spec.get('features', {})}
@@ -248,19 +252,41 @@ for v in body_bm.verts:   # 아래쪽을 살짝 눌러서 반바지가 뾰족해
 B.add(body_bm, body_mat, body_w)
 
 ARMS, LEGS, EARS = {}, {}, {}
+# 무릎 (10차 AN-11 앉기): 다리 뼈를 허벅지 leg.* + 정강이 shin.* 둘로 나눈다. 서 있을 때 모양·예전 동작은 그대로
+KNEE_Z = 0.03 + (legLen + 0.01) * 0.5
+
+
+def leg_w(side):
+    def w(co):
+        t = min(1.0, max(0.0, (KNEE_Z + 0.02 - co.z) / 0.04))
+        return {'leg.' + side: 1 - t, 'shin.' + side: t}
+    return w
+
+
 for side, sx in (('L', 1), ('R', -1)):
     # 다리 + 발
     x = 0.068 * bw * sx
     top, bot = V((x, 0, legLen + 0.05)), V((x, 0, 0.05))
-    B.add(capsule(top, bot, 0.05), lambda c: 'pants' if c.z > legLen - 0.005 else col('feet'), 'leg.' + side)
-    B.add(ellipsoid(V((x, -0.02, 0.032)), (0.054, 0.068, 0.036)), col('feet'), 'leg.' + side)
-    LEGS[side] = (V((x, 0, legLen + 0.04)), V((x, 0, 0.03)))
+    B.add(capsule(top, bot, 0.05), lambda c: 'pants' if c.z > legLen - 0.005 else col('feet'), leg_w(side))
+    B.add(ellipsoid(V((x, -0.02, 0.032)), (0.054, 0.068, 0.036)), col('feet'), 'shin.' + side)
+    LEGS[side] = (V((x, 0, legLen + 0.04)), V((x, 0, KNEE_Z)), V((x, 0, 0.03)))
 
     # 팔 (윗부분은 소매) + 손
     sh = V((sx * BODY_R[0] * 0.9, 0, BODY_C.z + 0.075))
     hand = sh + V((sx * 0.055, -0.01, -0.15 * P['limbLength']))
-    B.add(capsule(sh, hand, 0.04, seg=14, rings=10), lambda c, z=sh.z: 'shirt' if c.z > z - 0.035 else 'fur', 'arm.' + side)
-    B.add(ellipsoid(hand, (0.047, 0.047, 0.047), seg=16, rings=10), 'fur', 'arm.' + side)
+    if F.get('wings'):   # 펭귄 날개: 손 대신 납작한 지느러미 날개 (팔 뼈에 붙어 같이 흔들린다)
+        d = hand - sh
+        L = d.length
+        wb = ellipsoid(sh + d * 0.5 + V((sx * 0.012, 0, -0.012)), (0.026, 0.058, L * 0.5 + 0.035), rot=align_z(d), seg=18, rings=12)
+        for v in wb.verts:   # 끝으로 갈수록 가늘게 (노 모양)
+            k = 1.0 - 0.35 * max(0.0, (v.co - sh).dot(d.normalized()) / L)
+            rel = v.co - (sh + d * 0.5)
+            along = d.normalized() * rel.dot(d.normalized())
+            v.co = sh + d * 0.5 + along + (rel - along) * k
+        B.add(wb, 'fur', 'arm.' + side)
+    else:
+        B.add(capsule(sh, hand, 0.04, seg=14, rings=10), lambda c, z=sh.z: 'shirt' if c.z > z - 0.035 else 'fur', 'arm.' + side)
+        B.add(ellipsoid(hand, (0.047, 0.047, 0.047), seg=16, rings=10), 'fur', 'arm.' + side)
     ARMS[side] = (sh, hand)
 
 # 머리 (개구리는 얼굴 아래쪽을 배 색으로 칠한다)
@@ -269,6 +295,16 @@ if F.get('faceBelly'):
     # 앞쪽은 높게, 뒤로 갈수록 낮아지는 비스듬한 경계 (옆에서 봐도 각진 자국이 없게)
     head_mat = lambda c: col('muzzle') if (c - HEAD_C).z / HEAD_R[2] < -0.3 - 0.18 * (c - HEAD_C).y / HEAD_R[1] else 'fur'
 B.add(ellipsoid(HEAD_C, HEAD_R, seg=40, rings=26), head_mat, 'head')
+MASK_LIFT = 0.009 * hs if F.get('faceMask') else 0.0   # 가면 두께 → 눈·볼·부리를 그만큼 띄운다
+if F.get('faceMask'):
+    # 펭귄 얼굴 흰 가면: 머리보다 아주 조금 작은 타원체를 앞으로 살짝 밀어 겹치면 머리 겉에 매끈한 둥근 경계로 드러난다.
+    # 눈 둘레 두 덩이 + 볼·턱 한 덩이 = 이마 가운데가 파인 하트 모양. (yaw, pitch, 경계 반각)
+    rm = sum(HEAD_R) / 3
+    for yaw, pitch, half in ((0.36, 0.14, 0.62), (-0.36, 0.14, 0.62), (0.0, -0.32, 0.85)):
+        u = V((math.sin(yaw) * math.cos(pitch), -math.cos(yaw) * math.cos(pitch), math.sin(pitch)))
+        shrink = MASK_LIFT / (rm * (1 / math.cos(half) - 1))   # 가운데가 MASK_LIFT 만큼 솟게
+        off = shrink * rm / math.cos(half)
+        B.add(ellipsoid(HEAD_C + u * off, tuple(r * (1 - shrink) for r in HEAD_R), seg=48, rings=32), col('muzzle'), 'head', outline=False)
 
 
 def line_tube(points, r=0.0055):
@@ -303,11 +339,16 @@ if mz in MUZZLES:
     if mz in ('dog', 'bear'):   # 코에서 입까지 내려오는 선
         line_tube([on_muzzle(0, ny - nose_r[2] * hs * (1 - t) + (top_y - ny) * t) for t in (0, 0.5, 1)])
 elif mz == 'beak':
-    bp, bn = head_point(0, -0.2, inset=0.03 * hs)
-    B.add(ellipsoid(bp + bn * 0.045 * hs, (0.13 * hs, 0.085 * hs, 0.045 * hs), rot=decal(bn), seg=24, rings=12), col('beak'), 'head')
+    bs = F.get('beakScale', 1.0)   # 펭귄은 작게
+    bp, bn = head_point(0, -0.2, inset=0.03 * hs - MASK_LIFT)
+    B.add(ellipsoid(bp + bn * 0.045 * hs * bs, (0.13 * hs * bs, 0.085 * hs * bs, 0.045 * hs * bs), rot=decal(bn), seg=24, rings=12), col('beak'), 'head')
     br, bu = surface_frame(bn)
-    line_tube([bp + bn * (0.045 * hs + 0.085 * hs * math.sqrt(max(0.0, 1 - (x / 0.13) ** 2)) + 0.001) + br * x * hs
+    line_tube([bp + bn * ((0.045 + 0.085 * math.sqrt(max(0.0, 1 - (x / 0.13) ** 2))) * hs * bs + 0.001) + br * x * hs * bs
                for x in (0.11 * (i / 8 - 1) for i in range(17))], r=0.004)
+elif mz == 'hook':   # 부엉이: 두 눈 사이에서 아래로 굽은 작은 부리
+    bp, bn = head_point(0, -0.1, inset=0.01 * hs)
+    tip = bp + bn * 0.05 * hs + V((0, 0, -0.045 * hs))
+    B.add(cone(bp - bn * 0.01 * hs, tip, 0.03 * hs, 0.004, squash=0.8), col('beak'), 'head')
 mouth = F.get('mouth')
 if mouth in ('smile', 'wide'):   # 주둥이 없는 얼굴: 머리 표면에 웃는 입
     wy, mpitch, dip = (0.13, -0.36, 0.06) if mouth == 'smile' else (0.5, -0.1, 0.07)
@@ -337,10 +378,19 @@ for side, sx in (('L', 1), ('R', -1)):
         B.add(ellipsoid(bump_p, BR, seg=20, rings=12), 'fur', 'head')
         p, n = ell_point(bump_p, BR, 0, 0.12, inset=0.006)
     else:
-        p, n = head_point(sx * 0.34 * sp * F.get('eyeSpread', 1.0), F.get('eyePitch', 0.03), inset=0.008)
-    eye(p, n)
+        p, n = head_point(sx * 0.34 * sp * F.get('eyeSpread', 1.0), F.get('eyePitch', 0.03), inset=0.008 - MASK_LIFT)
+    if F.get('eyes') == 'big':   # 부엉이 큰 눈: 얼굴 깃 원판(muzzle) + 금빛 홍채(iris) + 까만 눈동자
+        B.add(ellipsoid(p - n * 0.004, (0.088 * es * hs, 0.014 * hs, 0.084 * es * hs), rot=decal(n), seg=24, rings=12), col('muzzle'), 'head')
+        B.add(ellipsoid(p + n * 0.008 * hs, (0.054 * es * hs, 0.01 * hs, 0.054 * es * hs), rot=decal(n), seg=20, rings=12), col('iris', 'eye'), 'head', outline=False)
+        q = p + n * 0.014 * hs
+        B.add(ellipsoid(q, (0.03 * es * hs, 0.008 * hs, 0.034 * es * hs), rot=decal(n), seg=18, rings=10), 'eye', 'head', outline=False)
+        r, u = surface_frame(n)
+        B.add(ellipsoid(q + n * 0.008 * hs + u * 0.014 * es * hs + r * 0.008 * es * hs, (0.011 * es * hs,) * 3, seg=12, rings=8),
+              'eyeHighlight', 'head', outline=False)
+    else:
+        eye(p, n)
     EYES[side] = (p, n)
-    p, n = head_point(sx * 0.6 * F.get('blushSpread', 1.0), -0.2, inset=0.004)
+    p, n = head_point(sx * 0.6 * F.get('blushSpread', 1.0), -0.2, inset=0.004 - MASK_LIFT)
     B.add(ellipsoid(p, (0.042 * hs, 0.008, 0.027 * hs), rot=decal(n), seg=16, rings=8), 'blush', 'head', outline=False)
 
 # 이마 줄무늬
@@ -396,6 +446,15 @@ for side, sx in (('L', 1), ('R', -1)):
         B.add(ellipsoid(base + d * L * 0.53 + V((0, -0.02 * hs, 0)), (0.03 * hs, 0.016 * hs, L * 0.38), rot=R, seg=16, rings=12),
               col('innerEar', 'muzzle'), ear, outline=False)
         EARS[side] = (base, base + d * L)
+    elif ear_kind == 'round' and F.get('earSide'):   # 양: 곰 둥근 귀를 머리 옆에 눕혀 단다 (털 뭉치 아래로 나온다)
+        p, n = head_point(sx * 1.2, 0.12)
+        out = V((sx, 0, 0))
+        c = p + out * 0.045 * hs + V((0, 0, -0.012 * hs))
+        R = Matrix.Rotation(-sx * 0.38, 3, 'Y') @ Matrix.Rotation(sx * 0.25, 3, 'Z')
+        B.add(ellipsoid(c, (0.078 * E * hs, 0.036 * hs, 0.042 * E * hs), rot=R, seg=20, rings=12), col('ear'), ear)
+        B.add(ellipsoid(c + V((sx * 0.004, -0.022 * hs, 0)), (0.05 * E * hs, 0.018 * hs, 0.024 * E * hs), rot=R, seg=16, rings=10),
+              col('innerEar', 'muzzle'), ear, outline=False)
+        EARS[side] = (p, c + out * 0.07 * hs)
     elif ear_kind == 'round':    # 곰
         p, n = head_point(sx * 0.58, 0.75)
         d = (n + V((0, 0, 0.6))).normalized()
@@ -410,6 +469,17 @@ for side, sx in (('L', 1), ('R', -1)):
         c = p + V((sx * 0.03, 0, -0.085)) * hs * E
         B.add(ellipsoid(c, (0.03 * hs, 0.062 * E * hs, 0.11 * E * hs), rot=rot_y(-sx * 0.28), seg=20, rings=14), col('ear'), ear)
         EARS[side] = (p, c - V((0, 0, 0.1)) * hs * E)
+    elif ear_kind == 'tufts':    # 부엉이 귀깃: 머리 위 양옆에 바깥으로 뻗은 깃 두 겹
+        p, n = head_point(sx * 0.66, 0.74)
+        d = V((sx * 0.85, 0.08, 1)).normalized()
+        L = 0.11 * E * hs
+        base = p - d * 0.035 * hs
+        tip = base + d * L
+        B.add(cone(base, tip, 0.06 * E * hs, 0.018 * hs, squash=0.42), 'fur', ear)
+        B.add(ellipsoid(tip, (0.018 * hs, 0.008 * hs, 0.018 * hs), rot=align_z(d), seg=12, rings=8), 'fur', ear)   # 끝을 둥글게
+        d2 = V((sx * 1.3, 0.08, 0.6)).normalized()
+        B.add(cone(base - V((0, 0, 0.018 * hs)), base + d2 * L * 0.8, 0.045 * E * hs, 0.012 * hs, squash=0.4), col('earTip', 'fur'), ear)
+        EARS[side] = (base, tip)
     elif ear_kind == 'human':
         p, n = head_point(sx * 1.5, -0.02)
         B.add(ellipsoid(p, (0.022 * hs, 0.032 * hs, 0.045 * hs), seg=14, rings=10), 'fur', 'head')
@@ -419,6 +489,22 @@ if F.get('crest'):
     p, n = head_point(0, 1.3)
     for k, (dx, dz) in enumerate(((0.0, 0.07), (0.03, 0.05))):
         B.add(cone(p - n * 0.01, p + V((dx, 0.02, dz)) * hs, 0.022 * hs, 0.004, squash=0.6), 'fur', 'head')
+
+# 털 뭉치 (양, 10차): 머리 위를 구름처럼 덮는 몽실한 털 + 목둘레 털 깃
+if F.get('wool'):
+    wool = col('wool', 'fur')
+    for yaw, pitch, r in ((0, 1.25, 0.1), (0, 0.66, 0.085), (0.42, 0.74, 0.088), (-0.42, 0.74, 0.088),
+                          (0.9, 0.62, 0.085), (-0.9, 0.62, 0.085), (1.45, 0.66, 0.085), (-1.45, 0.66, 0.085),
+                          (2.1, 0.55, 0.09), (-2.1, 0.55, 0.09), (math.pi, 0.6, 0.095), (2.6, 0.15, 0.08), (-2.6, 0.15, 0.08),
+                          (math.pi, 0.1, 0.085), (0.7, 1.05, 0.085), (-0.7, 1.05, 0.085), (2.4, 1.0, 0.09), (-2.4, 1.0, 0.09)):
+        p, n = head_point(yaw, pitch, inset=r * 0.5 * hs)
+        B.add(ellipsoid(p, (r * hs, r * hs, r * 0.9 * hs), seg=16, rings=10), wool, 'head')
+    z = bodyTop - 0.035
+    for k in range(10):
+        a = math.tau * k / 10
+        rr = 0.95 * math.sqrt(max(0.0, 1 - ((z - BODY_C.z) / BODY_R[2]) ** 2))
+        p = V((BODY_R[0] * rr * math.sin(a), -BODY_R[1] * rr * math.cos(a), z))
+        B.add(ellipsoid(p, (0.042, 0.042, 0.036), seg=14, rings=8), wool, 'spine')
 
 # 등껍질 (거북)
 if F.get('shell'):
@@ -551,7 +637,8 @@ for s in ('L', 'R'):
     if s in EARS:
         bone('ear.' + s, *EARS[s], 'head')
     bone('arm.' + s, *ARMS[s], 'spine')
-    bone('leg.' + s, *LEGS[s], 'hips')
+    bone('leg.' + s, LEGS[s][0], LEGS[s][1], 'hips')
+    bone('shin.' + s, LEGS[s][1], LEGS[s][2], 'leg.' + s)
 if len(TAIL) > 2:
     bone('tail.1', TAIL[0], TAIL[len(TAIL) // 2], 'hips')
     bone('tail.2', TAIL[len(TAIL) // 2], TAIL[-1], 'tail.1')
@@ -677,8 +764,80 @@ def place(t):
     }
 
 
+# 10차 M10-P1 (보드 wave10 D95-A) AN-11 앉기 · 일어서기 — 주인공·주민 모두. 뿌리(root)는 발바닥 높이에 그대로 두고 엉덩이(hips)만 내린다.
+# 게임은 모델 메타 sit.hip(앉은 엉덩이 아래 높이)·sit.forward(그 점이 뿌리보다 앞으로 얼마)로 뿌리를 자리 위에 놓는다 (아래 SIT 계산).
+SIT_DROP = 0.07   # 엉덩이를 내리는 만큼 (키 1.0 기준) — 앉은 발바닥이 뿌리 높이 둘레에 오게
+
+
+def seated(t=0.0):
+    """앉은 자세: 허벅지는 앞으로, 정강이는 아래로 늘어뜨리고 손은 무릎 위. t 로 숨쉬기·고개·발 까딱 (t=0 이면 숨 0)."""
+    f = TAU * t
+    s = sin(f)
+    return {
+        'hips': ((0, 0, 0), (0, -SIT_DROP + 0.004 * s, 0)),
+        'spine': ((0.04 + 0.025 * s, 0, 0), None),
+        'head': ((-0.06 - 0.02 * s, 0, 0.07 * sin(f)), None),
+        'leg.L': ((1.42, 0, 0.1), None), 'leg.R': ((1.42, 0, -0.1), None),
+        'shin.L': ((-1.32 + 0.12 * sin(2 * f), 0, 0), None), 'shin.R': ((-1.32 - 0.12 * sin(2 * f), 0, 0), None),
+        'arm.L': ((0.62 + 0.03 * s, 0, 0.04), None), 'arm.R': ((0.62 + 0.03 * s, 0, -0.04), None),
+        'ear.L': ((0.06 * s, 0, 0), None), 'ear.R': ((0.06 * s, 0, 0), None),
+        'tail.1': ((0.45, 0, 0.15 * s), None),   # 꼬리는 들어 올려 자리 뒤로 늘어지지 않게
+        'tail.2': ((0, 0, 0.2 * sin(f - 0.8)), None),
+    }
+
+
+def mix_pose(a, b, k):
+    """두 자세를 k(0~1)로 섞는다 (빠진 뼈는 0)."""
+    out = {}
+    for name in set(a) | set(b):
+        ra, la = a.get(name, ((0, 0, 0), None))
+        rb, lb = b.get(name, ((0, 0, 0), None))
+        la, lb = la or (0, 0, 0), lb or (0, 0, 0)
+        out[name] = (tuple(x + (y - x) * k for x, y in zip(ra, rb)), tuple(x + (y - x) * k for x, y in zip(la, lb)))
+    return out
+
+
+def smooth(t):
+    t = min(1.0, max(0.0, t))
+    return t * t * (3 - 2 * t)
+
+
+def add_pose(p, name, rot=(0, 0, 0), loc=(0, 0, 0)):
+    r, l = p.get(name, ((0, 0, 0), (0, 0, 0)))
+    p[name] = (tuple(x + y for x, y in zip(r, rot)), tuple(x + y for x, y in zip(l or (0, 0, 0), loc)))
+
+
+def sit_down(t):
+    """AN-11 앉기 (한 번, 0.6초): 선 자세 → 상체를 살짝 숙이며 엉덩이를 내리고 다리를 앞으로 → 앉은 자세로 끝난다."""
+    p = mix_pose({}, seated(0), smooth(t / 0.9))
+    lean = sin(math.pi * min(1.0, t / 0.85))
+    add_pose(p, 'spine', (0.32 * lean, 0, 0))
+    add_pose(p, 'head', (-0.18 * lean, 0, 0))
+    add_pose(p, 'arm.L', (0.35 * lean, 0, 0.1 * lean))
+    add_pose(p, 'arm.R', (0.35 * lean, 0, -0.1 * lean))
+    return p
+
+
+def sit(t):
+    """AN-11 앉아 있기 (반복): 숨쉬기 · 고개 살랑 · 늘어뜨린 발 까딱."""
+    return seated(t)
+
+
+def stand_up(t):
+    """AN-11 일어서기 (한 번, 0.5초): 상체를 앞으로 숙여 힘을 주고 → 다리를 내려 선 자세로."""
+    p = mix_pose(seated(0), {}, smooth((t - 0.1) / 0.85))
+    lean = sin(math.pi * min(1.0, t / 0.8))
+    add_pose(p, 'spine', (0.4 * lean, 0, 0))
+    add_pose(p, 'head', (-0.22 * lean, 0, 0))
+    add_pose(p, 'arm.L', (-0.25 * lean, 0, 0.12 * lean))
+    add_pose(p, 'arm.R', (-0.25 * lean, 0, -0.12 * lean))
+    add_pose(p, 'hips', loc=(0, 0.012 * sin(math.pi * min(1.0, max(0.0, (t - 0.45) / 0.45))), 0))
+    return p
+
+
 ANIMS = {'idle': (48, idle), 'walk': (24, walk), 'run': (16, run), 'happy': (36, happy),
-         'sparkler': (36, sparkler), 'push': (28, push), 'place': (30, place)}
+         'sparkler': (36, sparkler), 'push': (28, push), 'place': (30, place),
+         'sit_down': (14, sit_down), 'sit': (48, sit), 'stand_up': (12, stand_up)}
 ANIMS = {k: v for k, v in ANIMS.items() if k in spec.get('animations', ANIMS)}
 
 
@@ -712,13 +871,40 @@ for name, (frames, fn) in ANIMS.items():
     track.mute = True
     rig.animation_data.action = None
 
+# ---------------------------------------------------------------- 앉는 자리 (AN-11)
+# 앉은 자세(sit 0번 장)에서 몸통·허벅지 아래 가장 낮은 점 = 자리에 닿는 곳. 키 적용 뒤 모델 단위.
+# hip = 뿌리(발바닥 높이)에서 그 점까지 높이, forward = 그 점이 뿌리보다 정면(-Y, 게임에서는 +Z 바라보는 쪽)으로 얼마나 앞인지.
+SIT = None
+if 'sit' in ANIMS:
+    assign_action(bpy.data.actions['sit'])
+    scene.frame_set(0)
+    dg = bpy.context.evaluated_depsgraph_get()
+    ev = body.evaluated_get(dg)
+    em = ev.to_mesh()
+    gi = {g.index: g.name for g in body.vertex_groups}
+    seat_groups = {'hips', 'spine', 'leg.L', 'leg.R'}
+    skip_mats = {i for i, m in enumerate(me.materials) if m.name in ('shell', 'marking', 'tail')}   # 등껍질·꼬리는 자리 뒤로 늘어진다
+    seat_verts = {vi for poly in me.polygons if poly.material_index not in skip_mats for vi in poly.vertices}
+    pts = []
+    for v in me.vertices:
+        ws = [(g.weight, gi[g.group]) for g in v.groups if gi[g.group] != 'outline']
+        if v.index in seat_verts and ws and max(ws)[1] in seat_groups:
+            pts.append(em.vertices[v.index].co.copy())
+    low = min(p.z for p in pts)
+    band = [p for p in pts if p.z < low + 0.012 * H]
+    SIT = {'hip': round(low, 4), 'forward': round(-sum(p.y for p in band) / len(band), 4)}
+    ev.to_mesh_clear()
+    rig['sit'] = SIT   # glTF extras → three.js 의 <slug>_rig 노드 userData.sit
+    rig.animation_data.action = None
+    scene.frame_set(0)
+
 # ---------------------------------------------------------------- glb 내보내기
 glb_path = os.path.join(ASSETS, 'models', SLUG + '.glb')
 for o in scene.objects:
     o.select_set(o in (rig, body))
 bpy.context.view_layer.objects.active = rig
 export_kw = dict(filepath=glb_path, export_format='GLB', use_selection=True, export_apply=False,
-                 export_animations=True, export_skins=True, export_animation_mode='ACTIONS', export_yup=True)
+                 export_animations=True, export_skins=True, export_animation_mode='ACTIONS', export_yup=True, export_extras=True)
 try:
     bpy.ops.export_scene.gltf(**export_kw)
 except TypeError as e:
@@ -733,6 +919,8 @@ stats = {
     'animations': {k: {'frames': v[0], 'seconds': round(v[0] / 24, 2)} for k, v in ANIMS.items()},
     'height': H, 'glbBytes': os.path.getsize(glb_path), 'blender': bpy.app.version_string,
 }
+if SIT:
+    stats['sit'] = SIT
 
 # ---------------------------------------------------------------- 렌더 (툰 셰이딩 + 외곽선)
 TOON_SHADOW = (0.76, 0.72, 0.82, 1.0)
@@ -776,7 +964,7 @@ def mat_for(name, hexstr, flat=False):
 if DO_RENDER:
     for m in me.materials:
         toon_material(m, lin('#FFFFFF') if m.name == 'eyeHighlight' else lin(PAL[m.name]),
-                      flat=m.name in ('eye', 'eyeHighlight', 'blush'))
+                      flat=m.name in ('eye', 'eyeHighlight', 'blush', *STYLE.get('flat', [])))
 
     if STYLE.get('outline', True):
         # 뒤집은 껍데기(inverted hull) 외곽선: 법선을 뒤집은 복제 메시를 바깥으로 살짝 부풀린다
@@ -887,6 +1075,30 @@ if DO_RENDER:
         if action in ANIMS:
             set_pose(action, frame)
             shot(fname, 800, 860)
+
+    # 앉기 (AN-11): 계산한 sit.hip 높이의 나무 걸상을 받쳐 두고 찍는다 → 엉덩이가 걸상 위에 딱 닿는지 그림으로 확인
+    if SIT:
+        sb = bmesh.new()
+        bmesh.ops.create_cube(sb, size=1.0)
+        bmesh.ops.transform(sb, matrix=Matrix.Translation(V((0, -SIT['forward'] + 0.02 * H, SIT['hip'] / 2)))
+                            @ Matrix.Diagonal((0.34 * H, 0.2 * H, SIT['hip'], 1.0)), verts=sb.verts)
+        sm = bpy.data.meshes.new('seat')
+        sb.to_mesh(sm)
+        sb.free()
+        sm.materials.append(mat_for('seat', '#B98A5E'))
+        seat = bpy.data.objects.new('seat', sm)
+        scene.collection.objects.link(seat)
+        seat.parent = rig
+        for fname, yaw in (('sit', 30),) + ((('sit_side', 90),) if '--sit-debug' in args else ()):
+            rig.rotation_euler = (0, 0, math.radians(yaw))
+            set_pose('sit', 0)
+            shot(fname, 800, 860)
+        if '--sit-debug' in args:
+            for fname, action, frame in (('sitdown_mid', 'sit_down', 7), ('standup_mid', 'stand_up', 6)):
+                set_pose(action, frame)
+                shot(fname, 800, 860)
+        bpy.data.objects.remove(seat, do_unlink=True)
+        rig.rotation_euler = (0, 0, math.radians(30))
 
     # 히어로 컷: 가을 잔디 위
     def toon_obj(name, bm, hexstr, smooth=True):

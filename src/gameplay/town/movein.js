@@ -1,5 +1,6 @@
 // 5차 D10-A 새 주민 이사: 첫날(안내 끝난 날) 다음 날 빈 집터에 표지판(PR-12) → 3일 뒤 이삿짐(PR-10) → 다음 날 집 + 입주.
-// 진행은 state.town.movein[slug] = { start, lot, boxes, moved } (각 단계가 시작된 dayKey). 아무도 떠나지 않는다.
+// 진행은 state.town.movein[slug] = { start, lot, boxes, moved } (각 단계가 시작된 dayKey).
+// 10차 M10-P4: 엔딩 뒤 이사(moving.js)도 같은 단계를 쓴다 — moving 이 start 를 정해 두면 여기서 표지판 → 이삿짐 → 집. 떠나기도 moving.js.
 // 집터는 world.places.villagerHouses 의 lot 칸 (island.js 가 비워 둔 자리). 소품·집은 저장하지 않는 물체(persist:false)로
 // 시작할 때마다 단계에 맞게 다시 놓는다. 소품 모델이 아직 없으면(Z3 가 만드는 중) 건너뛰고, 합친 뒤엔 저절로 보인다.
 import { daysBetween, josa } from './rules.js';
@@ -60,12 +61,14 @@ export function propKind(world, prop) {
 }
 
 /**
- * 이사 흐름 실행: opts = { mail, addResident(slug) → Promise, toast(text, icon) }
- * → { check(dayKey), sync(), update(), skip(slug), stage(slug), lotOf(slug) }
+ * 이사 흐름 실행: opts = { mail, addResident(slug) → Promise, toast(text, icon), slugs?() → 진행할 slug 목록, variantOf?(slug) → 집 색 변형,
+ *   letter?(slug, kind) → 주민 파일에 편지가 없을 때 쓸 편지 묶음 }   (뒤 셋은 10차 moving.js — 없으면 예전 그대로 NEWCOMERS·slug 변형)
+ * → { check(dayKey), sync(), update(), skip(slug), stage(slug), lotOf(slug), clear(slug) }
  */
-export function createMovein(ctx, { mail, addResident, toast }) {
+export function createMovein(ctx, { mail, addResident, toast, slugs = null, variantOf = null, letter = null }) {
   const world = ctx.services.world;
   const newcomers = ctx.constants.NEWCOMERS ?? [];
+  const list = () => slugs?.() ?? newcomers;
   const placed = {};   // slug → { sign, boxes, house, mailbox } 물체 id
   const waiting = new Set();   // 플레이어가 집터 위에 있어서 집을 아직 못 세운 slug
   const lotOf = slug => world.places.villagerHouses?.find(h => h.slug === slug && h.lot) ?? null;
@@ -94,7 +97,7 @@ export function createMovein(ctx, { mail, addResident, toast }) {
     if (playerOnLot(h)) { waiting.add(slug); return; }
     waiting.delete(slug);
     const L = h.lot;
-    put(slug, 'house', HOUSE_KIND, L.cx, L.cz, { variant: slug, owner: slug });
+    put(slug, 'house', HOUSE_KIND, L.cx, L.cz, { variant: variantOf?.(slug) ?? slug, owner: slug });
     put(slug, 'mailbox', 'mailbox', h.tx + 1, h.tz, { variant: MAILBOX[slug] ?? 'red', owner: slug });
     if (L.pad) L.pad.off = false;   // 문 앞 계단
   }
@@ -120,17 +123,17 @@ export function createMovein(ctx, { mail, addResident, toast }) {
       if (intro) mail.post('bamtol', 'lot');
       toast('빈 집터에 표지판이 섰어요. 누군가 이사 온대요!', '🪧');
     } else if (step === 'boxes') {
-      mail.post(slug, 'moving');
+      mail.post(slug, 'moving', null, { pool: letter?.(slug, 'moving') });
       toast('빈 집터에 이삿짐이 도착했어요', '📦');
     } else if (step === 'moved') {
-      mail.post(slug, 'movein');
+      mail.post(slug, 'movein', null, { pool: letter?.(slug, 'movein') });
       toast(`${josa(PEOPLE[slug]?.name ?? slug, '이')} 섬으로 이사 왔어요!`, '🏡');
     }
   }
 
   /** 하루가 바뀌었을 때(와 시작할 때) 진행 → 새 단계 알림·물체 */
   function check(dayKey) {
-    for (const slug of newcomers) {
+    for (const slug of list()) {
       const r = moveinState(ctx.state, slug);
       const steps = advanceMovein(r, dayKey, !!ctx.state.flags?.intro);
       if (steps.length) {
@@ -150,6 +153,13 @@ export function createMovein(ctx, { mail, addResident, toast }) {
 
   return {
     check, sync, lotOf,
+    /** 10차: 떠난 주민 — 이 흐름이 놓은 표지판·이삿짐·집·우편함을 치운다 (문 앞 계단도 끈다) */
+    clear(slug) {
+      for (const key of ['sign', 'boxes', 'house', 'mailbox']) drop(slug, key);
+      waiting.delete(slug);
+      const L = lotOf(slug)?.lot;
+      if (L?.pad) L.pad.off = true;
+    },
     stage: slug => stageOf(moveinState(ctx.state, slug)),
     /** 매 프레임: 집터 위에 서 있던 플레이어가 비켜나면 집을 세운다 */
     update() { for (const slug of waiting) { const h = lotOf(slug); if (h && !playerOnLot(h)) placeHouse(slug, h); } },

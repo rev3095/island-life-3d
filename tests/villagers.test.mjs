@@ -1,7 +1,7 @@
 // 주민 데이터 (6차 M6-P3): assets/villagers/<slug>.json ↔ town 이 읽는 모양 · 이모티콘 규칙 · 생일 · 반영 도구 · 편집기 게시 목록
 import { test } from 'node:test';
 import { EVENT_GOODS, EVENT_FURN } from '../src/data/event-items.js';
-import { DECOR_FURN } from '../src/data/decor-items.js';
+import { DECOR_FURN, FAVOR_FURN } from '../src/data/decor-items.js';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -27,9 +27,12 @@ const EM = readJSON('assets/emotes/emotes.json');
 const T = J0.withVillagers(TALK, VILLAGERS);
 const J = { ...J0, keys: EM.emotes.map(e => e.key), player: EM.emotes.filter(e => e.cat !== 'reply').map(e => e.key) };
 const ENV = await checkEnv();
+// 10차 이사 오는 주민(파일 arrives: 'moving' — 구름·파도·달무리): 처음 섬 주민 목록(constants VILLAGERS)에 없어도 주민 파일·규칙·생일은 있다
+const MOVERS = VILLAGERS.filter(d => d.arrives === 'moving' && !RESIDENTS.includes(d.slug)).map(d => d.slug);
+const ALL_RES = [...RESIDENTS, ...MOVERS];
 
 // ---------- 지문 (주민마다 데이터·결과를 한 줄 글로 → sha256 앞 16자) ----------
-const EVENT_IDS = new Set([...EVENT_GOODS.map(([slug]) => `event.${slug}`), ...EVENT_FURN.map(([slug]) => `furn.${slug}`), ...DECOR_FURN.map(([slug]) => `furn.${slug}`)]);   // 9차 야외 가구도 지문에서 뺀다
+const EVENT_IDS = new Set([...EVENT_GOODS.map(([slug]) => `event.${slug}`), ...EVENT_FURN.map(([slug]) => `furn.${slug}`), ...DECOR_FURN.map(([slug]) => `furn.${slug}`), ...FAVOR_FURN.map(([slug]) => `furn.${slug}`)]);   // 9차 야외 가구 · 10차 좋아하는 가구도 지문에서 뺀다
 const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
 const sha = s => createHash('sha256').update(s).digest('hex').slice(0, 16);
 const dayOf = d => new Date(Date.UTC(2026, 0, 1) + d * 86400000).toISOString().slice(0, 10);
@@ -120,9 +123,9 @@ test('주민 파일: 폴더 = files.js 목록, 이름 = 파일 이름, 주민 7 
   const inDir = readdirSync(new URL('assets/villagers/', ROOT)).filter(f => f.endsWith('.json') && f !== 'editor-files.json').map(f => `assets/villagers/${f}`).sort();
   assert.deepEqual([...VILLAGER_FILES].sort(), inDir, 'assets/villagers/ 의 파일과 src/gameplay/town/files.js 가 다르다 (웹 빌드는 files.js 글자로 묶는다)');
   VILLAGERS.forEach((d, i) => assert.equal(VILLAGER_FILES[i], `assets/villagers/${d.slug}.json`));
-  assert.deepEqual(Object.keys(PEOPLE), RESIDENTS, '주민 순서 = core/constants.js VILLAGERS (편지·목록 순서)');
+  assert.deepEqual(Object.keys(PEOPLE), ALL_RES, '주민 순서 = core/constants.js VILLAGERS (편지·목록 순서) + 이사 오는 주민');
   assert.deepEqual(Object.keys(KEEPERS), ['bamtol', 'neuru']);
-  assert.deepEqual(Object.keys(LINES), [...RESIDENTS, 'bamtol', 'neuru']);
+  assert.deepEqual(Object.keys(LINES), [...ALL_RES, 'bamtol', 'neuru']);
   const models = readJSON('assets/models/index.json').models;
   for (const d of VILLAGERS) assert.equal(models.find(m => m.slug === d.slug)?.id, d.id, `${d.slug}: 캐릭터 ID 가 모델 목록과 같다`);
 });
@@ -140,12 +143,12 @@ test('주민 파일 검사: 모두 통과 (편집기 「확인」 · 반영 도�
 
 test('한 곳만 정답: 이모티콘 주민 규칙은 주민 파일에만, 생일은 rules.json 에만 (주민 파일은 가리키기만)', () => {
   assert.equal(TALK.villagers, undefined, 'talk.json 에 주민 칸이 남아 있다 — 주민 규칙은 assets/villagers/<slug>.json 의 emote');
-  assert.deepEqual(Object.keys(T.villagers), RESIDENTS);
+  assert.deepEqual(Object.keys(T.villagers), ALL_RES);
   for (const d of VILLAGERS.filter(x => x.role === 'villager')) {
     assert.ok(d.birthday.path === `birthdays/dates/${d.slug}` && d.slug in TABLE.birthdays.dates, `${d.slug}: 생일 칸`);
     assert.ok(!('date' in d.birthday) && !('mmdd' in d.birthday), '주민 파일에 생일 날짜를 적지 않는다');
   }
-  assert.deepEqual(Object.keys(TABLE.birthdays.dates).sort(), [...RESIDENTS].sort());
+  assert.deepEqual(Object.keys(TABLE.birthdays.dates).sort(), [...ALL_RES].sort());
   for (const s of NEWCOMERS) assert.equal(TABLE.birthdays.dates[s], null, `${s}: 이사 온 날이 생일`);
   // town 숫자는 rules.json town 칸에서 (M6-P5 연결 제안)
   assert.deepEqual([R.FRIEND_MAX, R.TIERS, R.TALK_BONUS, R.GIFT_POINTS], [TABLE.town.friendMax, TABLE.town.tiers, TABLE.town.talkBonus, TABLE.town.giftPoints]);
@@ -178,6 +181,7 @@ test('같은 결과 지문: 대화·선물·부탁·보상·일과·대사 고�
   const skipped = [];
   for (const d of VILLAGERS) {
     if (d.version !== 1) { skipped.push(`${d.slug} v${d.version}`); continue; }
+    if (!PINS[d.slug]) { skipped.push(`${d.slug} 새 주민`); continue; }   // 10차 새 주민(구름·파도·달무리)은 6차 전 지문이 없다 — 핀 값은 그대로
     assert.deepEqual(fp[d.slug], PINS[d.slug], `${d.name}: 6차 전과 결과가 다르다 (data = 파일 값, play = 결과)`);
   }
   if (VILLAGERS.every(d => d.version === 1) && TABLE.version === 0 && TALK.version === 2) assert.equal(fp.shared, PINS.shared, '공통(생일·편지·인사·town 숫자)이 6차 전과 다르다');

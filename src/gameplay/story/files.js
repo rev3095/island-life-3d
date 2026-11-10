@@ -17,4 +17,7 @@ export const SCENE_FILES = [
   'assets/story/scenes/s14-summer-fireworks.json',   // 8차 계절 행사 (trigger event-start)
   'assets/story/scenes/s15-autumn-harvest.json',   // 8차 계절 행사 (trigger event-start)
   'assets/story/scenes/s16-winter-snowman.json',   // 8차 계절 행사 (trigger event-start)
+  'assets/story/scenes/s17-gureum-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
+  'assets/story/scenes/s18-pado-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
+  'assets/story/scenes/s19-dalmuri-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
 ];

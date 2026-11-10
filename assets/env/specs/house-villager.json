@@ -4,8 +4,8 @@
   "name": "주민 집",
   "category": "building",
   "kind": "house",
-  "version": "0.2",
-  "status": "approved",
+  "version": "0.3",
+  "status": "review",
   "prompt": {
     "concept": "주민 일곱 명의 집. 모양은 같고 지붕 색이 주민 테마색이다. 문 위에 작은 차양이 있다.",
     "keywords": [
@@ -19,7 +19,7 @@
     "avoid": [
       "집마다 완전히 다른 모양 (나중에 따로 요청)"
     ],
-    "notes": "0.2: 새 주민 단풍(여우) 지붕 변형 추가 (5차 wave5 D13)."
+    "notes": "0.2: 새 주민 단풍(여우) 지붕 변형 추가 (5차 wave5 D13). 0.3: 새 주민 셋(10차 M10, BD-02)용 지붕 색 변형 셋 — lilac 연보라 · blue 파랑 · navy 남색 (주민 slug 가 아니라 색 이름)."
   },
   "style": {
     "shading": "toon",
@@ -119,6 +119,24 @@
       "label": "단풍",
       "palette": {
         "roof": "#D9583B"
+      }
+    },
+    "lilac": {
+      "label": "연보라",
+      "palette": {
+        "roof": "#C9A2DE"
+      }
+    },
+    "blue": {
+      "label": "파랑",
+      "palette": {
+        "roof": "#4F86D9"
+      }
+    },
+    "navy": {
+      "label": "남색",
+      "palette": {
+        "roof": "#3B4A78"
       }
     }
   },

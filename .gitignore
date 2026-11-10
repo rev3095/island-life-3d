@@ -24,6 +24,11 @@ assets/furniture/editor-models-*.json
 assets/furniture/fixtures/editor-models-*.json
 assets/env/editor-renders-*.json
 assets/furniture/editor-renders-*.json
+assets/env/editor-thumbs.json
+assets/furniture/editor-thumbs.json
 
 # 자동 플레이 점검 실행 결과 (node tools/playtest.mjs) — 보고서에 쓸 장면만 docs/qa/shots/ 로 옮겨 커밋
 docs/qa/runs/
+
+# 파이썬 캐시 (Blender 빌드마다 바뀜)
+__pycache__/

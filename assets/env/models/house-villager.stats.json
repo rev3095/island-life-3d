@@ -4,7 +4,7 @@
   "name": "주민 집",
   "category": "building",
   "kind": "house",
-  "version": "0.2",
+  "version": "0.3",
   "triangles": 1412,
   "parts": 1,
   "materials": [

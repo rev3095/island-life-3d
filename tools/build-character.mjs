@@ -45,7 +45,11 @@ const index = readdirSync(specDir)
   .map(f => JSON.parse(readFileSync(resolve(specDir, f), "utf8")))
   .filter(s => existsSync(resolve(modelDir, `${s.slug}.stats.json`)))
   .sort((a, b) => ORDER(a).localeCompare(ORDER(b)))
-  .map(s => ({ id: s.id, slug: s.slug, name: s.name, species: s.species, role: s.role ?? "", category: "character", version: s.version, status: s.status ?? "review" }));
+  .map(s => {
+    // 10차 AN-11: 앉는 자리 (빌더가 stats 에 쓴 sit = { hip, forward }, 모델 단위) — 게임이 모델을 받기 전에 목록에서 읽는다
+    const sit = JSON.parse(readFileSync(resolve(modelDir, `${s.slug}.stats.json`), "utf8")).sit;
+    return { id: s.id, slug: s.slug, name: s.name, species: s.species, role: s.role ?? "", category: "character", version: s.version, status: s.status ?? "review", ...(sit ? { sit } : {}) };
+  });
 writeFileSync(resolve(modelDir, "index.json"), JSON.stringify({ models: index }, null, 2) + "\n");
 console.log(`\n모델 목록 ${index.length}개 → assets/models/index.json`);
 process.exit(failed ? 1 : 0);

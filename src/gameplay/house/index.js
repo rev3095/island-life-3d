@@ -18,6 +18,7 @@ import { swatchURL } from './pattern.js';
 import { createVisits } from './visit.js';
 import { createDoors } from './door.js';
 import { createPlaces } from './places.js';
+import { seatSpec, seatsOf, nearestSeat } from '../decor/seats.js';   // 10차 앉기: 의자 자리 표
 
 const WORKBENCH = { id: 'workbench', item: 'workbench', gx: 0, gz: 2, rot: 1 };   // 서쪽 벽에 붙여 동쪽을 본다
 const WORKBENCH_INFO = { footprint: [2, 1], place: 'floor' };
@@ -160,6 +161,11 @@ export default {
       run: t => (t.kind === 'workbench' ? workbench() : menu(t.rec)) });
     I.add({ name: 'house-furniture-store', intent: 'pickup', priority: 80, test: () => { const t = H.inside && !H.busy ? targetInFront() : null; return t?.kind === 'furniture' ? t : null; },
       run: t => store(t.rec) });
+    // 10차 M10-P1 앉기: 의자·소파 앞 Space = 앉기 (가구 메뉴 80 위, 문 90 아래), 그 가구의 메뉴(돌리기·옮기기·색)는 F 로 — 일어나기는 decor/sit.js 'seat-stand' 115
+    I.add({ name: 'house-sit', intent: 'action', priority: 85, label: '앉기', test: () => (H.inside && !H.busy && !H.moving ? seatInFront() : null),
+      run: seat => ctx.services.seats?.sitPlayer(seat) });
+    I.add({ name: 'house-seat-menu', intent: 'pickup', priority: 85, label: '고치기', test: () => (H.inside && !H.busy && !H.moving && seatInFront() ? targetInFront() : null),
+      run: t => menu(t.rec) });
     I.add({ name: 'house-decor', intent: 'action', priority: 25, label: '꾸미기', test: () => (H.inside && !H.busy && !H.moving ? decorWall() : null), run: () => decorate() });
     I.add({ name: 'house-place', intent: 'action', priority: 20, test: () => (H.inside && !H.busy ? true : null), run: () => placeFromBag() });
 
@@ -522,6 +528,19 @@ export default {
         return inBox(b, px, pz) && !inBox(b, lx, lz);
       });
       return rug ? { kind: 'furniture', rec: rug } : null;
+    }
+
+    /** 10차 앉기: 앞의 가구가 앉을 수 있는 것이면 가장 가까운 빈 자리 (seats.js) → seat | null */
+    function seatInFront() {
+      const pl = ctx.services.player;
+      if (!pl?.hasClip?.('sit') || pl.seated || !ctx.services.seats) return null;
+      const t = targetInFront();
+      const spec = t?.kind === 'furniture' ? seatSpec(t.rec.item) : null;
+      if (!spec) return null;
+      const b = boxOf(t.rec, info(t.rec.item).footprint);
+      const cx = x0 + b.cx, cz = z0 + b.cz;
+      const list = seatsOf(spec, { x: cx, z: cz, y: world.island.heightAt(cx, cz), rot: (t.rec.rot ?? 0) * Math.PI / 2 }, `house:${t.rec.id}`);
+      return nearestSeat(list, pl.position.x, pl.position.z, { reach: 1.6, facing: pl.facing, taken: k => !!ctx.services.seats.holder(k) });
     }
 
     async function menu(rec) {

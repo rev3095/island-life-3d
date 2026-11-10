@@ -69,3 +69,38 @@ export const WHY_TEXT = {
   outside: '섬 밖이에요', ground: '여기엔 놓을 수 없어요 (풀밭·모래·흙길에만)', level: '높이가 다른 칸에 걸쳐요',
   taken: '이미 무언가 있어요', door: '문 앞은 비워 둬요', player: '서 있는 칸이에요', limit: '섬에 더 놓을 수 없어요',
 };
+
+// ---------- 10차 D96-A 칸 누르기 · D95-A 옮기기 ----------
+/** 누른 칸을 고를 수 있는 거리 (플레이어 칸에서 가로·세로 각각 이 칸 수 안 — 화면에 늘 보이는 정도, 멀리 놓고 잊지 않게) */
+export const PICK_REACH = 6;
+
+/** 월드 점 → 칸 (world/island.js toTile 과 같은 규칙). w, h = 섬 칸 수 */
+export const cellAt = (x, z, w, h) => ({ tx: Math.floor(x + w / 2), tz: Math.floor(z + h / 2) });
+
+/**
+ * 땅을 누른 점(hit = {x, z}, groundPick 결과) → 고를 칸. from = 플레이어 칸 {tx, tz}
+ * → { ok, cell, why } (why: 'miss' 땅을 안 누름 · 'outside' 섬 밖 · 'far' 너무 멂)
+ */
+export function pickCell(hit, from, { w, h, reach = PICK_REACH } = {}) {
+  if (!hit || !Number.isFinite(hit.x) || !Number.isFinite(hit.z)) return { ok: false, cell: null, why: 'miss' };
+  const cell = cellAt(hit.x, hit.z, w, h);
+  if (cell.tx < 0 || cell.tz < 0 || cell.tx >= w || cell.tz >= h) return { ok: false, cell, why: 'outside' };
+  if (Math.max(Math.abs(cell.tx - from.tx), Math.abs(cell.tz - from.tz)) > reach) return { ok: false, cell, why: 'far' };
+  return { ok: true, cell, why: null };
+}
+
+/**
+ * 놓을 자리의 기준 칸과 뻗는 쪽: 누른 칸이 있으면 그 칸 가운데 맞춤(dir [0, 0]), 없으면 앞 칸(바라보는 쪽으로 뻗기).
+ * → { anchor, dir, picked }
+ */
+export function targetCell(picked, playerTile, facingDir) {
+  if (picked) return { anchor: { tx: picked.tx, tz: picked.tz }, dir: [0, 0], picked: true };
+  return { anchor: { tx: playerTile.tx + facingDir[0], tz: playerTile.tz + facingDir[1] }, dir: facingDir, picked: false };
+}
+
+/** 옮기기: 들어 올린 물체의 발자국 칸 (min + 크기) — 옛 자리 둘레 이어짐 다시 맞추기·되돌리기에 */
+export function tilesOfBox(min, size) {
+  const out = [];
+  for (let z = min.tz; z < min.tz + size[1]; z++) for (let x = min.tx; x < min.tx + size[0]; x++) out.push({ tx: x, tz: z });
+  return out;
+}

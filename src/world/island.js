@@ -67,6 +67,9 @@ export function resolveLayout(layout) {
   };
 }
 
+// 10차 M10-P4: 엔딩 뒤 새 주민이 들어올 남는 집터 자리 (섬 크기 비율, 이 자리 가까운 빈 풀밭부터). 섬 최대 10명 = 지금 9명 + 1 이라 하나
+export const SPARE_LOTS = [[0.6, 0.64]];
+
 // 건물 집터(칸 수 [가로, 세로])는 배경 스펙의 world.lot 에서 받는다 (lots = { 종류: [가로, 세로] }). 문은 +Z(남쪽)를 본다.
 export const BUILDING_KINDS = ['house-player', 'house-villager', 'shop', 'museum'];
 /** 배경 스펙들(종류 → spec)에서 집터 표를 만든다 */
@@ -81,7 +84,7 @@ export const lotsOf = specs => Object.fromEntries(BUILDING_KINDS.map(k => {
  * layout = assets/island/layout.json (빠진 칸은 DEFAULT_LAYOUT). 시드는 인자로 받은 것을 쓴다 (layout.seed 는 부르는 쪽이 고른다)
  * @returns {{ w, h, seed, kind, level, flags, ramps, bridges, dock, waterfalls, objects, places, pads, layout }}
  */
-export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], newcomers = NEWCOMERS, nativeFruit: fruitWanted = null, lots, layout = null } = {}) {
+export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong'], newcomers = NEWCOMERS, nativeFruit: fruitWanted = null, lots, layout = null, spares = SPARE_LOTS } = {}) {
   if (!lots) throw new Error('[world] generateIsland 에 lots(건물 집터)가 필요하다 — lotsOf(배경 스펙)');
   const lay = resolveLayout(layout), dens = lay.density;
   const rng = mulberry32(seed);
@@ -330,7 +333,6 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     const b = placeBuilding('house-villager', w * fx, h * fz, 0, { owner: slug, variant: slug, ...(lot ? { lot: true } : {}) });
     if (b) villagerHouses.push(b);
   }
-
   // ── 10. 흙길 (A*): 선착장·광장·집·상점·다리·경사로·박물관을 잇는다 ──
   const spawnT = dock ? { tx: dock.tx + 1, tz: dock.tz - 1 } : { tx: plazaC.tx, tz: plazaC.tz + 5 };
   const isPlaza = (tx, tz) => at(tx, tz) === PLAZA;
@@ -560,11 +562,57 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     if (addObj('fossil-spot', tx, tz, { rot: rot() })) nFossil++;
   }
 
+  // ── 11-1. 10차 M10-P4 남는 집터 (엔딩 뒤 이사 오는 주민용, town/moving.js) ──
+  // 다른 물체를 다 놓은 뒤에 찾는다 — 앞 단계의 난수·길·물체 id 는 하나도 바뀌지 않는다 (예전 저장 그대로).
+  // 집 자리 + 둘레 1칸 + 문 앞 2줄이 아래 단 풀밭이고 건물·광장 예약 칸이 아닌 곳 중, 목표에 가깝고 치울 풀·나무가 적은 곳.
+  // 그 자리의 나무·꽃·덤불만 생성 목록에서 뺀다. 못 찾으면 남는 집터 없이 (떠난 주민 집터만 쓴다).
+  const spareLots = [];
+  const CLEARABLE = /^(tree|cedar|palm|fruit-tree|bush|weed|tulip|cosmos|pansy|flower|shell|fossil-spot)/;
+  for (const [fx, fz] of spares) {
+    const [fw, fd] = lots['house-villager'];
+    const ox = Math.round(w * fx - fw / 2), oz = Math.round(h * fz - fd / 2);
+    let best = null;
+    for (let dz = -12; dz <= 12; dz++) for (let dx = -12; dx <= 12; dx++) {
+      const tx0 = ox + dx, tz0 = oz + dz;
+      let n = 0, ok = true;
+      for (let tz = tz0 - 1; tz <= tz0 + fd + 2 && ok; tz++) for (let tx = tx0 - 1; tx <= tx0 + fw && ok; tx++) {
+        if (!inside(tx, tz)) { ok = false; break; }
+        const i = idx(tx, tz), k = K[i];
+        if (occ[i] < 0 || L[i] !== 0 || F[i]) ok = false;
+        else if (tx >= tx0 && tx < tx0 + fw && tz >= tz0 && tz < tz0 + fd ? k !== GRASS : !(k === GRASS || k === PATH)) ok = false;
+        else if (occ[i] > 0) { if (CLEARABLE.test(objects[occ[i] - 1].kind)) n++; else ok = false; }
+      }
+      if (!ok) continue;
+      for (const r of ramps) if (Math.abs(r.tx - (tx0 + fw / 2)) < fw / 2 + 2.5 && r.tzTop + 1 >= tz0 - 2 && r.tzTop <= tz0 + fd + 3) ok = false;
+      const score = Math.hypot(dx, dz) + n * 1.5;
+      if (ok && (!best || score < best.score)) best = { tx0, tz0, score };
+    }
+    if (!best) continue;
+    const { tx0, tz0 } = best;
+    const drop = new Set();
+    for (let tz = tz0 - 1; tz <= tz0 + fd + 2; tz++) for (let tx = tx0 - 1; tx <= tx0 + fw; tx++) {
+      const i = idx(tx, tz);
+      if (occ[i] > 0) drop.add(objects[occ[i] - 1]);
+    }
+    for (let k = objects.length - 1; k >= 0; k--) if (drop.has(objects[k])) objects.splice(k, 1);
+    for (let i = 0; i < N; i++) if (occ[i] > 0) occ[i] = 0;   // 물체 번호를 다시 매긴다 (예약 칸 -1 은 그대로)
+    objects.forEach((o, k) => { if (inside(o.tx, o.tz)) occ[idx(o.tx, o.tz)] = k + 1; });
+    for (let tz = tz0 - 1; tz <= tz0 + fd + 1; tz++) for (let tx = tx0 - 1; tx <= tx0 + fw; tx++) occ[idx(tx, tz)] = -1;
+    const x = tx0 + fw / 2 - w / 2, z = tz0 + fd / 2 - h / 2;
+    const b = { kind: 'house-villager', tx0, tz0, fw, fd, x, z, door: { tx: tx0 + Math.floor(fw / 2), tz: tz0 + fd }, level: 0, data: { owner: null, lot: true, spare: true } };
+    pads.push({ x0: x - 1.27, x1: x + 1.27, z0: z + 1.1, z1: z + 1.59, y: 0, h: 0.12, off: true });
+    b.pad = pads[pads.length - 1];
+    buildings.push(b);
+    spareLots.push(b);
+  }
+
   // ── 12. 장소 ──
   const tw = (tx, tz) => ({ x: tx + 0.5 - w / 2, z: tz + 0.5 - h / 2 });
   const bPlace = b => b && { x: b.x, z: b.z, door: tw(b.door.tx, b.door.tz), tx: b.door.tx, tz: b.door.tz };
   // 빈 집터는 lot = { tx, tz, fw, fd, cx, cz (집 가운데 칸), pad (문 앞 계단, off 면 꺼짐) } 를 더 준다 — town 이 집·표지판·이삿짐을 놓는다
-  const lotOf = b => (b.data.lot ? { lot: { tx: b.tx0, tz: b.tz0, fw: b.fw, fd: b.fd, cx: b.tx0 + Math.floor(b.fw / 2), cz: b.tz0 + Math.floor(b.fd / 2), pad: b.pad } } : {});
+  // site = 같은 모양을 집이 선 자리에도 (10차: 떠난 주민 집은 town 이 다시 빈 집터로 쓴다)
+  const siteOf = b => ({ tx: b.tx0, tz: b.tz0, fw: b.fw, fd: b.fd, cx: b.tx0 + Math.floor(b.fw / 2), cz: b.tz0 + Math.floor(b.fd / 2), pad: b.pad });
+  const lotOf = b => ({ site: siteOf(b), ...(b.data.lot ? { lot: siteOf(b) } : {}) });
   const places = {
     spawn: dock ? { x: dock.x, z: dock.z - 1, facing: 0 } : { ...tw(spawnT.tx, spawnT.tz), facing: 0 },
     plaza: tw(plazaC.tx, plazaC.tz),
@@ -573,6 +621,7 @@ export function generateIsland(seed, { w = 64, h = 56, villagers = ['coco', 'bor
     dock: dock ? { x: dock.x, z: dock.z + 2.5 } : null,
     playerHouse: bPlace(playerHouse),
     villagerHouses: villagerHouses.map(b => ({ slug: b.data.owner, ...bPlace(b), ...lotOf(b) })),
+    spareLots: spareLots.map((b, i) => ({ slug: null, id: `spare-${i + 1}`, ...bPlace(b), ...lotOf(b) })),   // 10차 남는 집터 (주인 없음)
     pond: { x: pond.x - w / 2, z: pond.z - h / 2 },
     waterfall: waterfalls[0] ? tw(waterfalls[0].tx, waterfalls[0].tz + 1) : null,
     bridges: bridges.map(b => ({ x: b.x, z: b.z })),

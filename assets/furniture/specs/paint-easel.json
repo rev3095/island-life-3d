@@ -1,0 +1,76 @@
+{
+  "id": "FU-51",
+  "slug": "paint-easel",
+  "item": "furn.paint-easel",
+  "name": "그림 이젤",
+  "category": "furniture",
+  "kind": "paint-easel",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "세 다리 나무 이젤 위에 그리다 만 바다 그림. 받침 턱에 물감 팔레트와 붓. 구름(양) 주민이 좋아한다.",
+    "keywords": [
+      "세 다리 이젤",
+      "그리다 만 바다 그림",
+      "물감 팔레트"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "10차 검수 보드 wave10 (https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H) 반영 v1 · M10-P5 좋아하는 가구 (D98-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "paintSky",
+      "paintSea",
+      "paintWave",
+      "paintSun",
+      "dab",
+      "dab2"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B98957",
+    "woodDark": "#8C6440",
+    "canvas": "#FBF6EA",
+    "paintSky": "#BFE6F7",
+    "paintSea": "#5BA7D6",
+    "paintWave": "#FFFFFF",
+    "paintSun": "#F6C84C",
+    "palette": "#D9B07A",
+    "dab": "#E86A5B",
+    "dab2": "#7FC46B",
+    "brush": "#3F4A45"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "받침·나사",
+    "canvas": "빈 캔버스",
+    "paintSky": "하늘 물감",
+    "paintSea": "바다 물감",
+    "paintWave": "파도 물감",
+    "paintSun": "해 물감",
+    "palette": "팔레트",
+    "dab": "물감 1",
+    "dab2": "물감 2",
+    "brush": "붓"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

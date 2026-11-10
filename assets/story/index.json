@@ -22,6 +22,9 @@
     {"scene":"s13-spring-blossom"},
     {"scene":"s14-summer-fireworks"},
     {"scene":"s15-autumn-harvest"},
-    {"scene":"s16-winter-snowman"}
+    {"scene":"s16-winter-snowman"},
+    {"scene":"s17-gureum-arrival"},
+    {"scene":"s18-pado-arrival"},
+    {"scene":"s19-dalmuri-arrival"}
   ]
 }

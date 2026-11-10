@@ -1,0 +1,81 @@
+{
+  "id": "CH-13",
+  "slug": "dalmuri",
+  "name": "달무리",
+  "species": "owl",
+  "role": "주민 · 부엉이 (새로 이사 옴)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤에 깨어 있는 부엉이. 별 보기를 좋아해서 밤 9시가 지나면 광장에서 은하수 이야기를 한다. 낮에는 늘 졸린 얼굴.",
+    "keywords": [
+      "2.5등신",
+      "큰 머리",
+      "귀깃",
+      "금빛 큰 눈",
+      "얼굴 깃 원판",
+      "작은 굽은 부리",
+      "어스름 보라",
+      "밤하늘 남색 옷"
+    ],
+    "references": [
+      "검수 보드 CH-13 스케치 (concept/wave10-board.html, #7A6A9A)",
+      "동그란 부엉이 봉제 인형"
+    ],
+    "avoid": [
+      "무서운 맹금류 인상",
+      "사실적인 깃털",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "새 부품 귀깃 + 큰 눈(얼굴 깃 원판·금빛 홍채). 10차 M10-P3 (D93-A)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006,
+    "flat": [
+      "iris"
+    ]
+  },
+  "proportions": {
+    "height": 0.95,
+    "headScale": 1,
+    "bodyWidth": 1.06,
+    "limbLength": 1,
+    "earSize": 1,
+    "earPointiness": 1,
+    "tailLength": 1,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#7A6A9A",
+    "muzzle": "#EADFCB",
+    "iris": "#F2C14E",
+    "beak": "#E8A94A",
+    "feet": "#E8A94A",
+    "earTip": "#5E4F80",
+    "tail": "#66578A",
+    "shirt": "#3E3A6B",
+    "stripe": "#F2C14E",
+    "pants": "#55497A",
+    "eye": "#2A2230",
+    "blush": "#F2A6B0",
+    "outline": "#3A3048"
+  },
+  "outfit": {
+    "top": "striped-tee",
+    "stripes": 1,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

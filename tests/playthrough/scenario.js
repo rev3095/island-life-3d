@@ -572,6 +572,103 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`돌길 3 · 울타리 2 이어짐 · 하나 치움 · 저장 기록 ${saved}`);
   });
 
+  // 10차 M10-P4 이사 오가기 (보드 wave10 D94-A): 엔딩 뒤 7일마다 새 주민이 빈 집터로, 30일 넘게 산 주민이 가끔 "떠나 볼까…".
+  // 봇은 시계만 넘기고(다음 날) 우편함·말 걸기·창 단추로만 한다. 누가 물을 마음인지는 읽기만 (사람은 💭 말풍선을 보고 말을 건다).
+  const moving = () => S().town.moving;
+  add('moving-in', '엔딩 뒤 이사 오기: 오기 전날 편지 → 표지판 → 이삿짐 → 새 주민 입주 → 말 걸기 → 저녁 첫 만남 장면', async () => {
+    if (!fest().endedDay) return skip('엔딩 전');
+    if (!moving()) return block('이사 오가기(town.moving) 서비스가 없어요');
+    let slug = null, letter = null;
+    const days = [];
+    const offMail = bot.on('mail:new', e => { if (e?.kind === 'moving' && e.from === moving().state().coming) letter ??= { from: e.from, day: bot.day() }; });
+    for (let k = 0; k < 14; k++) {
+      slug = moving().state().coming ?? slug;
+      if (slug && residents().includes(slug)) break;
+      await bot.nextDay(9); await bot.settle(60);
+      slug = moving().state().coming ?? slug;
+      if (slug) days.push(`${bot.day().slice(5)} ${S().town.movein.stage(slug)}`);
+      if (letter && !letter.read) { letter.read = (await sk.mail()).opened; }
+    }
+    offMail();
+    note('movingIn', { slug, letter, days, lots: moving().lots().filter(l => l.free || l.owner === slug) });
+    if (!slug) return block(`엔딩(${fest().endedDay}) 뒤 14일 안에 이사가 시작되지 않음`);
+    if (!residents().includes(slug)) return block(`${slug} 입주 안 됨 (${days.join(', ')})`);
+    await bot.shot('12-moving-in', `${slug} 입주한 날`);
+    const V = sk.villager(slug);
+    const outAt = await bot.until(() => V?.talkable, { timeout: 240, label: `${slug} 나오기` });
+    const talk = await sk.emoteTalk(slug, { wins: 1 });
+    // 이삿날 저녁: 첫 만남 장면 (s17–s19, 트리거 move-in)
+    await bot.setHour(17.6);
+    await bot.settle(120);
+    const scene = Object.keys(st().story?.seen ?? {}).find(id => /^s1[789]-/.test(id) && id.includes(slug)) ?? null;
+    note('movingInTalk', { outAt, talk: talk.opened, scene });
+    const odd = [];
+    if (!letter) odd.push('오기 전날 편지가 없음');
+    else if (!letter.read) odd.push('편지를 못 읽음');
+    if (!talk.opened) odd.push('새 주민에게 말을 못 걸음');
+    if (!scene) odd.push('첫 만남 장면이 안 나옴');
+    return odd.length ? awk(`${slug}: ${odd.join(' · ')} (${days.join(', ')})`) : pass(`${slug} ${days.join(' → ')} · 편지 ${letter.day} · 대화 · 장면 ${scene}`);
+  });
+
+  add('moving-out', '떠나 볼까: 30일 넘게 산 주민이 물으면 허락 → 이삿짐 → 떠남 → 빈 집터 표지판 → 떠난 주민 편지', async () => {
+    if (!fest().endedDay) return skip('엔딩 전');
+    if (!moving()) return block('이사 오가기(town.moving) 서비스가 없어요');
+    const MAX = opts.leaveDays ?? 50;
+    let who = null, n = 0;
+    for (; n < MAX; n++) {
+      who = residents().find(s => moving().asking(s)) ?? null;
+      if (who) break;
+      await bot.nextDay(10); await bot.settle(60);
+    }
+    if (!who) return skip(`${MAX}일 안에 떠나 볼까 묻는 주민이 없었어요 (${bot.day()}) — ?date= 로 손 점검 (docs/notes/m10-moving.md)`);
+    const V = sk.villager(who);
+    let asked = null, how = [];
+    const ask = async () => {
+      if (!(await sk.reach(who))) return false;
+      bot.policy = { dialog: () => 0, confirm: info => { asked = info; return /떠나 볼까/.test(info.title) ? Math.max(0, info.buttons.indexOf('허락')) : null; } };
+      await bot.act('action', { timeout: 60 });
+      bot.policy = {};
+      return true;
+    };
+    // 밖에 있으면 다가가 말 걸고, 집에 있으면(비·저녁) 집에 들어가 방에서 말 건다 — 시각을 바꿔 가며
+    for (const hh of [10, 12, 14, 16, 18.5]) {
+      if (asked || !moving().asking(who)) break;
+      await bot.setHour(hh);
+      await bot.until(() => V?.talkable || S().town.atHome(who) === 'home', { timeout: 40, label: `${who} 찾기` });
+      if (V?.talkable) { how.push(`${hh}시 밖`); await ask(); continue; }
+      if (S().town.atHome(who) === 'home' && await sk.toVillagerDoor(who)) {
+        await bot.act('action', { timeout: 20 });
+        if (await bot.until(() => Math.abs(bot.pos().x) > 100 && !S().house?.passing, { timeout: 8 })) {
+          how.push(`${hh}시 방`);
+          await bot.wait(1);
+          await ask();
+          await bot.exitRoom(); await bot.settle(20);
+        }
+      }
+    }
+    if (!asked) return block(`${who} 에게 말을 걸었는데 떠나기 묻기 창이 안 나옴 (${how.join(', ') || '못 찾음'} · 물을 마음 ${moving().asking(who)})`);
+    const plan = moving().state().leaving;
+    if (plan?.slug !== who) return block(`허락했는데 떠날 일정이 없음 (${JSON.stringify(plan)})`);
+    await bot.shot('13-leave-asked', `${who} 떠나기 허락`);
+    await bot.nextDay(10); await bot.settle(60);
+    const boxes = S().world.objects.list('moving-boxes').some(o => o.id.includes(`leave-${who}`));
+    await bot.nextDay(10); await bot.settle(60);
+    const gone = !residents().includes(who) && !S().town.villagers.some(v => v.slug === who);
+    const next = moving().state().coming;
+    await bot.shot('14-left-lot', `${who} 떠난 집터`);
+    let away = null;
+    const offMail = bot.on('mail:new', e => { if (e?.from === who && e.kind === 'away') away ??= bot.day(); });
+    for (let k = 0; k < 5 && !away; k++) { await bot.nextDay(10); await bot.settle(60); }
+    offMail();
+    const read = away ? (await sk.mail()).opened : false;
+    note('movingOut', { who, waitedDays: n, asked: asked?.text, boxes, gone, next, away, read });
+    const odd = [];
+    if (!boxes) odd.push('다음 날 이삿짐이 안 보임');
+    if (!gone) odd.push('그다음 날에도 섬에 있음');
+    if (!away) odd.push('떠난 뒤 편지가 안 옴');
+    return odd.length ? awk(`${who}: ${odd.join(' · ')}`) : pass(`${who} ${n}일 뒤 물음 → 허락 → 이삿짐 → 떠남 · 다음 이사 ${next ?? '없음'} · 편지 ${away}`);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;

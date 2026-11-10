@@ -3,13 +3,13 @@
   "slug": "player",
   "name": "플레이어",
   "species": "human",
-  "version": "0.1",
+  "version": "0.1.1",
   "triangles": 10604,
   "vertices": 5375,
-  "bones": 8,
+  "bones": 10,
   "materials": [
-    "shirt",
     "pants",
+    "shirt",
     "fur",
     "eye",
     "eyeHighlight",
@@ -44,11 +44,27 @@
     "place": {
       "frames": 30,
       "seconds": 1.25
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
     }
   },
   "height": 1,
-  "glbBytes": 366328,
+  "glbBytes": 398304,
   "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0523,
+    "forward": -0.0041
+  },
   "renders": [
     "player_back.png",
     "player_front.png",
@@ -58,6 +74,7 @@
     "player_push.png",
     "player_run.png",
     "player_side.png",
+    "player_sit.png",
     "player_sparkler.png",
     "player_three_quarter.png",
     "player_thumb.png",

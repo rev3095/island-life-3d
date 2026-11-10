@@ -4,7 +4,7 @@
   "name": "두부",
   "species": "bear",
   "role": "주민 · 곰",
-  "version": "0.1",
+  "version": "0.1.1",
   "status": "approved",
   "prompt": {
     "concept": "무뚝뚝하지만 다정한 곰 주민. 낚시가 취미이고 말수가 적다. 섬 주민 중 제일 크다.",
@@ -61,6 +61,9 @@
     "idle",
     "walk",
     "run",
-    "happy"
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
   ]
 }
