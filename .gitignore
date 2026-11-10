@@ -32,3 +32,9 @@ docs/qa/runs/
 
 # 파이썬 캐시 (Blender 빌드마다 바뀜)
 __pycache__/
+# 리소스 편집기 게시용 묶음 (p36, node tools/build-editor-index.mjs)
+assets/models/editor-index.json
+assets/models/editor-models-*.json
+assets/renders/editor-renders-*.json
+assets/renders/editor-thumbs.json
+assets/res/

@@ -16,7 +16,7 @@ const LIST = JSON.parse(home.match(/<script type="application\/json" id="editors
 const byId = Object.fromEntries(LIST.map(e => [e.id, e]));
 const GROUPS = ['editor', 'board', 'game', 'soon', 'archive'];
 // 채팅 명령 → 그 명령을 설명하는 문서 (CLAUDE.md 편집기 절 · concept/README.md · 각 트랙 노트)
-const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '시나리오 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
+const COMMANDS = ['전체 요청 확인', '요청 확인', '배경 요청 확인', '리소스 요청 확인', '시나리오 반영', '검수 보드 반영', '소리 반영', '지도 반영', '숫자 반영', '스타일 반영'];
 
 test('홈 목록: id 가 겹치지 않고 링크·명령·읽을 곳 모양이 맞다', () => {
   assert.equal(new Set(LIST.map(e => e.id)).size, LIST.length, 'id 겹침');
@@ -39,7 +39,8 @@ test('홈 링크 = 문서 링크 (CLAUDE.md · concept/README.md · 시나리오
   // 보드 링크 = README 보드 표 줄, 보드 id = 보드 페이지의 window.BOARD.id = reads 의 boards/<id>.
   // 다른 브랜치에서 막 생긴 보드는 합치기 전엔 이 작업 트리에 파일·README 줄이 없다 → 여기 적은 것만 기다려 주고, 파일이 생기면 같은 검사를 받는다.
   const PENDING_BOARDS = {};
-  for (const e of LIST.filter(x => x.group === 'board' || x.group === 'archive')) {
+  // 예전 편집기(archive 인데 concept/ 밖, p36)는 보드 표 대신 CLAUDE.md 링크로 본다 (아래 character·env)
+  for (const e of LIST.filter(x => x.group === 'board' || (x.group === 'archive' && x.file.startsWith('concept/')))) {
     if (!existsSync(resolve(root, e.file))) {
       assert.ok(PENDING_BOARDS[e.id], `${e.id}: ${e.file} 가 없다 (다른 브랜치에서 오는 보드면 PENDING_BOARDS 에)`);
       continue;
