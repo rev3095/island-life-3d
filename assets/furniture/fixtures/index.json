@@ -178,7 +178,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-60",
@@ -200,7 +200,7 @@
         "flicker"
       ],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-61",
@@ -222,7 +222,7 @@
         "flicker"
       ],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-62",
@@ -242,7 +242,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

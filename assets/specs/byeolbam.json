@@ -5,7 +5,7 @@
   "species": "bat",
   "role": "달빛 가게 주인 · 박쥐",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "밤 22시부터 새벽 3시까지 달빛 가게를 지키는 작은 박쥐. 낮엔 거꾸로 매달려 자고, 밤이 되면 금빛 눈을 반짝이며 손님을 맞는다. 접은 날개를 망토처럼 두른다.",
     "keywords": [

@@ -5,7 +5,7 @@
   "species": "penguin",
   "role": "주민 · 펭귄 (새로 이사 옴)",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "씩씩한 바다 탐험가 펭귄. 선착장에서 수영하고, 만나는 사람마다 물고기 이야기를 들려준다.",
     "keywords": [

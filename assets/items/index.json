@@ -596,7 +596,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-BG-24",
@@ -622,7 +622,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-EV-01",
@@ -1444,7 +1444,7 @@
         ]
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-FR-08",
@@ -1473,7 +1473,7 @@
         ]
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-FS-01",
@@ -2019,7 +2019,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-FS-22",
@@ -2045,7 +2045,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-MA-01",
@@ -2279,7 +2279,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-MA-10",
@@ -2305,7 +2305,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-NT-01",
@@ -2332,7 +2332,7 @@
         "flat": []
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-NT-02",
@@ -2359,7 +2359,7 @@
         "flat": []
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-NT-03",
@@ -2386,7 +2386,7 @@
         "flat": []
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-NT-04",
@@ -2413,7 +2413,7 @@
         "flat": []
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "IC-SD-01",
@@ -2823,7 +2823,7 @@
         "outlineWidth": 0.004
       },
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

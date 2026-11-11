@@ -8,7 +8,7 @@
       "role": "주인공",
       "category": "character",
       "version": "0.2.0",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0523,
         "forward": -0.0041
@@ -148,7 +148,7 @@
       "role": "주민 · 양 (새로 이사 옴)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0497,
         "forward": -0.0039
@@ -162,7 +162,7 @@
       "role": "주민 · 펭귄 (새로 이사 옴)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0242,
         "forward": -0.0038
@@ -176,7 +176,7 @@
       "role": "주민 · 부엉이 (새로 이사 옴)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0497,
         "forward": -0.0039
@@ -190,7 +190,7 @@
       "role": "달빛 가게 주인 · 박쥐",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0445,
         "forward": -0.0035
@@ -204,7 +204,7 @@
       "role": "새벽 천막 점쟁이 · 나방",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0497,
         "forward": -0.0039

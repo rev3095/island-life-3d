@@ -5,7 +5,7 @@
   "place": "moonshop",
   "name": "달빛 가게",
   "version": 1,
-  "status": "review",
+  "status": "approved",
   "note": "밤·새벽 검수 보드 D109-A: 밤 10시–새벽 3시에만 여는 작은 남색 가게. 안쪽 가운데 계산대 뒤에 별밤(CH-14), 왼쪽·오른쪽 진열 받침에 밤 가구 넷(assets/night/night.json shop.stock 앞 넷). 벽지 WP-08 밤하늘 별 · 바닥 FL-05 짙은 판자. 붙박이 FU-35·36 다시 씀.",
   "size": [8, 6],
   "wallpaper": "wp-08",

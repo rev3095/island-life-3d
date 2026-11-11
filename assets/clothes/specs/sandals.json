@@ -6,7 +6,7 @@
   "slot": "shoes",
   "kind": "sandals",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "body": "player",
   "buy": 1000,
   "sell": 250,

@@ -13,7 +13,7 @@
       "slot": "top",
       "kind": "tee",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 0,
       "sell": 0,
       "palette": {
@@ -29,7 +29,7 @@
       "slot": "hat",
       "kind": "straw-hat",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1400,
       "sell": 350,
       "palette": {
@@ -49,7 +49,7 @@
       "slot": "hat",
       "kind": "beanie",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1200,
       "sell": 300,
       "palette": {
@@ -70,7 +70,7 @@
       "slot": "hat",
       "kind": "flower-pin",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 900,
       "sell": 225,
       "palette": {
@@ -91,7 +91,7 @@
       "slot": "hat",
       "kind": "sailor-cap",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1600,
       "sell": 400,
       "palette": {
@@ -111,7 +111,7 @@
       "slot": "top",
       "kind": "striped-tee",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1400,
       "sell": 350,
       "palette": {
@@ -146,7 +146,7 @@
       "slot": "top",
       "kind": "overalls",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 2200,
       "sell": 550,
       "palette": {
@@ -182,7 +182,7 @@
       "slot": "top",
       "kind": "sweater",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 2400,
       "sell": 600,
       "palette": {
@@ -219,7 +219,7 @@
       "slot": "top",
       "kind": "raincoat",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 2000,
       "sell": 500,
       "palette": {
@@ -254,7 +254,7 @@
       "slot": "top",
       "kind": "vest",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 2600,
       "sell": 650,
       "palette": {
@@ -291,7 +291,7 @@
       "slot": "shoes",
       "kind": "sneakers",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1200,
       "sell": 300,
       "palette": {
@@ -313,7 +313,7 @@
       "slot": "shoes",
       "kind": "rain-boots",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1500,
       "sell": 375,
       "palette": {
@@ -336,7 +336,7 @@
       "slot": "shoes",
       "kind": "sandals",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "buy": 1000,
       "sell": 250,
       "palette": {

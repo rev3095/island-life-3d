@@ -121,7 +121,7 @@
       "category": "nature",
       "kind": "ore-rock",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-01",
@@ -436,7 +436,7 @@
       "category": "prop",
       "kind": "night-lanterns",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-32",
@@ -445,7 +445,7 @@
       "category": "prop",
       "kind": "sleep-note",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -463,7 +463,7 @@
       "category": "building",
       "kind": "house",
       "version": "0.3",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-03",
@@ -517,7 +517,7 @@
       "category": "building",
       "kind": "night-shop",
       "version": "0.2",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-09",
@@ -526,7 +526,7 @@
       "category": "building",
       "kind": "dawn-tent",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-10",
@@ -535,7 +535,7 @@
       "category": "building",
       "kind": "tour-boat",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-01",
