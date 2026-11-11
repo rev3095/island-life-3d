@@ -816,14 +816,17 @@ export function makeScenario(bot, sk, opts = {}) {
     if (!await bot.until(() => bot.$('.pk-tclock-dial'), { timeout: 5, ui: false })) return { ok: false, why: '시계 창이 안 열려요' };
     const dial = bot.$('.pk-tclock-dial');
     const from = Number(dial.getAttribute('aria-valuenow'));                   // 0~1439 (지금 시·분)
-    const want = (((hh * 60 - from) % 1440) + 1440) % 1440;                      // 앞으로 몇 분
+    // P47 오늘·내일: 바늘은 오늘(새벽 5시 ~ 다음 새벽 5시) 안에서만 → 오늘 안의 그 시각까지 앞으로든 뒤로든 (밤 → 낮은 거꾸로 돌린다)
+    const g = m => (m < 300 ? m + 1440 : m);
+    const want = g(hh * 60 % 1440) - g(from);                                   // + 앞으로 · − 뒤로 (분)
     // 시침 끝을 잡고 시계 방향으로 10° (= 20분) 씩 끈다
     const r = dial.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width * 0.2;
     const at = deg => ({ clientX: cx + Math.sin(deg * Math.PI / 180) * R, clientY: cy - Math.cos(deg * Math.PI / 180) * R });
     const pe = (el, type, deg) => el.dispatchEvent(new bot.win.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, pointerType: 'mouse', button: 0, buttons: 1, ...at(deg) }));
     let a = ((from / 60) % 12) / 12 * 360;
     pe(bot.$('.pk-tclock-dial .h-hour .hit'), 'pointerdown', a);
-    for (let left = want / 2; left > 0; left -= 10) { a += Math.min(10, left); pe(dial, 'pointermove', a); await bot.stepFrame(); }
+    const dir = Math.sign(want);
+    for (let left = Math.abs(want) / 2; left > 0; left -= 10) { a += dir * Math.min(10, left); pe(dial, 'pointermove', a); await bot.stepFrame(); }
     pe(dial, 'pointerup', a);
     // 5분 단위로 붙은 끝은 ←→ (15분) 로 맞춘다
     for (let k = 0; k < 8; k++) {
@@ -877,7 +880,7 @@ export function makeScenario(bot, sk, opts = {}) {
     const strip = bot.$('.pk-hclock-strip');
     if (strip?.hidden) await bot.click(bot.$('.pk-hclock-dial'));             // 좁은 화면은 접혀 있다 → 시계를 눌러 펼침
     const sp0 = S().time.speed, seen = [];
-    for (let k = 0; k < 3; k++) { await bot.click(bot.$('.pk-hclock-speed')); seen.push(S().time.speed); }
+    for (let k = 0; k < 4; k++) { await bot.click(bot.$('.pk-hclock-speed')); seen.push(S().time.speed); }   // P47 빠르기 넷 (번개처럼)
     const h0 = S().time.now().ms;
     await bot.click([...bot.$$('.pk-hclock-strip button')].find(b => /\+1/.test(b.textContent)));
     const plusMin = Math.round((S().time.now().ms - h0) / 60000);
@@ -912,7 +915,7 @@ export function makeScenario(bot, sk, opts = {}) {
     note('clockPhone', { bagFree0, night, day, lit, out, spawned, bug, buy: cheap, spent: w0 - bot.acorns(), free0, soldFirst, freeAfter: freeSlots(), offset: S().time.offset, maxDay: S().time.maxDay, speeds: seen, speed: S().time.speed, plusMin });
     if (wasPaused) S().time.setPaused?.(true);   // 다음 단계도 봇 시계(setHour)로
     const bad = [];
-    if (new Set(seen).size !== 3 || seen.at(-1) !== sp0) bad.push(`빠르기 단추 ${sp0} → ${seen.join('→')}`);
+    if (new Set(seen).size !== 4 || seen.at(-1) !== sp0) bad.push(`빠르기 단추 ${sp0} → ${seen.join('→')}`);
     if (Math.abs(plusMin - 60) > 2) bad.push(`+1시간 단추 ${plusMin}분`);
     if (lit < 0.9) bad.push(`밤 불빛 ${lit.toFixed(2)}`);
     if (!bug) bad.push('밤 곤충을 못 잡음');

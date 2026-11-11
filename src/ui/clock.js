@@ -7,7 +7,7 @@
 import { h } from './dom.js';
 import { panelShell, button } from './panels.js';
 import { injectCss } from './report.js';
-import { dayKeyOf, dayDiff, partOf } from '../sky/clock.js';
+import { dayKeyOf, dayDiff, partOf, todayRange, DAY_JUMPS, TOMORROW_HOUR, msAtDayHour } from '../sky/clock.js';
 
 const MIN = 60e3;
 export const KEY_STEP = { ArrowLeft: -15, ArrowRight: 15, ArrowDown: -60, ArrowUp: 60, PageDown: -180, PageUp: 180 };
@@ -221,6 +221,8 @@ export function createDial({ cls = 'pk-tclock-dial', compact = false, label = '�
     target, label: L, draw,
     /** delta 를 정한다 (범위 끝에 붙음) → 끝에 닿았으면 true */
     setDelta,
+    /** 그 시각(ms)으로 바늘을 옮겨 미리 보기 (P47 낮·밤 단추) → 끝에 닿았으면 true */
+    set: ms => setDelta((ms - baseMs()) / MIN),
     /** 키 하나 (KEY_STEP · Home) → 처리했으면 true */
     key(code) {
       if (KEY_STEP[code]) { setDelta(delta + KEY_STEP[code]); return true; }
@@ -255,10 +257,10 @@ export function createClock(ctx) {
     // 시계 판 (createDial — HUD 원형 시계와 같은 부품)
     const dw = createDial({
       getBase: () => n0,
-      getRange: () => time?.range?.() ?? { floor: -Infinity, ceil: Infinity },
+      getRange: () => todayRange(baseDay, time?.range?.() ?? {}),   // P47: 바늘은 오늘 안에서만 — 내일은 「내일 아침으로」
       onChange: (L, { hit, low }) => {
         drawExtra(L);
-        if (hit) say(low ? '오늘 새벽 5시보다 앞으로는 돌릴 수 없어요 (지난 날은 다시 오지 않아요)' : '한 번에 7일 뒤까지만 돌릴 수 있어요', true);
+        if (hit) say(low ? '오늘 새벽 5시보다 앞으로는 돌릴 수 없어요 (지난 날은 다시 오지 않아요)' : '바늘은 오늘 밤(새벽 5시 전)까지 — 내일로는 「내일 아침으로 ▶」', true);
         else say('');
       },
       onEnd: () => ctx.events.emit('sfx', { name: 'menu' }),
@@ -297,9 +299,22 @@ export function createClock(ctx) {
       p.close(r);
     }
 
-    shell.body.append(h('div', { class: 'pk-tclock-read' }, dayEl, timeEl, partEl), dial, hints, note);
-    shell.foot.append(h('div', { class: 'pk-btn-row' }, apply, reset), offsetEl,
-      h('p', { class: 'pk-tclock-help' }, '바늘을 끌어 돌려요 · 새벽 5시에 날이 바뀌어요'));
+    // P47 낮·밤 바로 가기: 바늘을 그 시각으로 옮겨 미리 보기 (적용을 눌러야 간다)
+    const hh = x => { const v = x % 24; return `${v < 12 ? '오전' : '오후'} ${v % 12 || 12}시`; };
+    const jumpRow = h('div', { class: 'pk-btn-row pk-tclock-jumps', role: 'group', 'aria-label': '낮·밤 바로 가기' },
+      ...DAY_JUMPS.map(j => button(`${j.icon} ${j.name}`, { cls: 'pk-tclock-jump', onclick: () => { dw.set(msAtDayHour(baseDay, j.hour)); say(`${j.name} ${hh(j.hour)} — 「적용」을 누르면 가요`); } })));
+    let armed = 0;
+    const tomorrow = button(`내일 아침 ${TOMORROW_HOUR}시로 ▶`, { cls: 'pk-tclock-next', onclick: () => {
+      if (Date.now() > armed) { armed = Date.now() + 4000; say(`한 번 더 누르면 내일 아침 ${TOMORROW_HOUR}시로 넘어가요 — 오늘로는 돌아올 수 없어요`, true); return; }
+      const r = time?.shiftTo?.(TOMORROW_HOUR, 0, { days: 1 });
+      ctx.events.emit('sfx', { name: 'menu' });
+      if (r?.ok) ui.toast?.(`새 하루 — 내일 아침 ${TOMORROW_HOUR}시예요`, '🌅');
+      p.close(r ?? null);
+    } });
+    tomorrow.disabled = !time?.shiftTo;
+    shell.body.append(h('div', { class: 'pk-tclock-read' }, dayEl, timeEl, partEl), dial, jumpRow, hints, note);
+    shell.foot.append(h('div', { class: 'pk-btn-row' }, apply, reset), h('div', { class: 'pk-btn-row' }, tomorrow), offsetEl,
+      h('p', { class: 'pk-tclock-help' }, '바늘을 끌어 오늘 안에서 앞뒤로 자유롭게 · 새벽 5시에 날이 바뀌어요 (내일로는 아래 단추)'));
     if (!time?.jumpTo) say('시간(sky) 모듈이 없어 돌릴 수 없어요', true);
     drawExtra(dw.label());
     showOffset();
