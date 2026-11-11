@@ -1,11 +1,14 @@
 // p41 원형 시계 HUD: 왼쪽 위 시계 칸에 늘 보이는 작은 아날로그 시계(시침·분침, 낮·밤 색) + 그 밑 시간 조정 칸.
 // 판은 섬폰 「🕰 시계」 창과 같은 부품(src/ui/clock.js createDial, compact). 바늘을 끌어 놓으면 그 시각으로 바로 간다.
-// 조정 칸: −1시간 · 빠르기(누를 때마다 실제와 같게 → 빠르게 → 아주 빠르게) · +1시간 · 🕰(섬폰 시계 창).
+// 조정 칸: −1시간 · 빠르기(누를 때마다 실제와 같게 → 빠르게 → 아주 빠르게 → 번개처럼) · +1시간 · 🕰(섬폰 시계 창).
+// P47 오늘·내일: 그 밑 줄 = 낮·밤 바로 가기 🌅아침 ☀️낮 🌇저녁 🌙밤 🌌새벽 (오늘 안에서 앞뒤 자유) · 「내일 ▶」(두 번 눌러 다음 날 아침 — 오늘로는 못 돌아옴).
+// 바늘·−1·+1 은 오늘(새벽 5시 ~ 다음 새벽 5시 직전) 안에서만 움직인다.
 // 키보드: Tab 으로 시계에 와서 ←→ 15분 · ↑↓ 1시간 · PageUp/PageDown 3시간 (미리 보기) → Enter 적용 · Esc 취소 (둘 다 포커스를 놓아 게임 키로 돌아감).
 // 휴대폰(좁은 화면)은 조정 칸이 접혀 있고 시계를 톡 누르면 펼친다 (다시 누르면 접힘).
 import { h } from './dom.js';
 import { injectCss } from './report.js';
 import { createDial, labelOf } from './clock.js';
+import { todayRange, DAY_JUMPS, TOMORROW_HOUR, msAtDayHour } from '../sky/clock.js';
 
 const HOUR = 3600e3;
 const NARROW = '(max-width: 560px)';
@@ -34,6 +37,10 @@ const CSS = `
 .pk-hclock-peek { grid-column: 1 / span 2; margin-top: 2px; font-size: 12px; color: var(--pk-accent-deep); min-height: 0; }
 .pk-hclock-peek:empty { display: none; }
 .pk-hclock-strip .sm { display: none; }
+.pk-hclock-parts { margin-top: 4px; }   /* P47 낮·밤 바로 가기 */
+.pk-hclock-parts .pk-hclock-jump { min-width: 30px; padding: 2px 4px; font-size: 14px; }
+.pk-hclock-parts .pk-hclock-next { margin-left: auto; white-space: nowrap; }
+.pk-hclock-parts .pk-hclock-next.is-armed { background: var(--pk-accent, #F2B36B); }
 @media ${NARROW} {
   .pk-hclock-dial { width: 44px; height: 44px; }
   .pk-hclock-strip { gap: 3px; }
@@ -42,20 +49,22 @@ const CSS = `
   .pk-hclock-strip .sm { display: inline; }
 }
 `;
-const SPEED_ICON = { real: '🕰', fast: '⏩', faster: '⏭' };
+const SPEED_ICON = { real: '🕰', fast: '⏩', faster: '⏭', fastest: '⚡' };
 
 export function createHudClock(ctx, { toast = () => {}, blocking = () => false } = {}) {
   const S = () => ctx.services;
   const time = () => S().time;
   const nowOf = () => time()?.now?.() ?? { ms: Date.now(), dayKey: '2000-01-01' };
+  /** 오늘(지금 게임 하루) 범위 — 바늘·−1·+1·낮밤 단추가 움직이는 곳 */
+  const today = () => todayRange(nowOf().dayKey, time()?.range?.() ?? {});
   const peek = h('div', { class: 'pk-hclock-peek', 'aria-live': 'polite' });
   const dw = createDial({
     cls: 'pk-hclock-dial', compact: true, label: '게임 시계 — 바늘을 끌어 놓으면 그 시각으로. ← → 15분, ↑ ↓ 1시간, Enter 적용, Esc 취소',
     getBase: () => nowOf(),
-    getRange: () => time()?.range?.() ?? { floor: -Infinity, ceil: Infinity },
+    getRange: () => today(),
     onChange: (L, { hit, low }) => {
       dw.el.classList.toggle('is-preview', dw.delta !== 0);
-      peek.textContent = dw.delta === 0 ? '' : `→ ${L.dayLabel} ${L.text} (${L.partName})${hit ? (low ? ' · 오늘 새벽 5시까지만' : ' · 7일 뒤까지만') : ''}`;
+      peek.textContent = dw.delta === 0 ? '' : `→ ${L.dayLabel} ${L.text} (${L.partName})${hit ? (low ? ' · 오늘 새벽 5시까지만' : ' · 오늘 밤까지만 — 내일은 「내일 ▶」') : ''}`;
       extra();
     },
     onEnd: ({ moved }) => { if (moved) apply(); else toggle(); release(); },
@@ -70,18 +79,25 @@ export function createHudClock(ctx, { toast = () => {}, blocking = () => false }
   const speed = btn('', '시간 빠르기 바꾸기', () => cycleSpeed(), 'pk-hclock-speed');
   const more = btn('🕰', '시계 창 열기 (자세히 돌리기)', () => S().ui?.clock?.open?.(), 'pk-hclock-more');
   const strip = h('div', { class: 'pk-hclock-strip', role: 'group', 'aria-label': '시간 조정' }, minus, speed, plus, more);
+  // P47 낮·밤 바로 가기 + 내일 ▶
+  const hh = x => { const v = x % 24; return `${v < 12 ? '오전' : '오후'} ${v % 12 || 12}시`; };
+  const jumps = DAY_JUMPS.map(j => btn(j.icon, `오늘 ${j.name} (${hh(j.hour)})로`, () => goPart(j), `pk-hclock-jump is-${j.key}`));
+  const next = btn(two('내일 ▶', '▶'), `내일 아침 ${TOMORROW_HOUR}시로 넘어가기 — 두 번 눌러요 (오늘로는 돌아올 수 없어요)`, () => goTomorrow(), 'pk-hclock-next');
+  const parts = h('div', { class: 'pk-hclock-strip pk-hclock-parts', role: 'group', 'aria-label': '낮·밤 바로 가기 · 내일' }, ...jumps, next);
+  let armed = 0;
   const narrow = () => !!globalThis.matchMedia?.(NARROW).matches;
   let open = !narrow();
 
   function toggle(force) {
     open = force ?? !open;
     strip.hidden = !open;
+    parts.hidden = !open;
     dw.el.setAttribute('aria-expanded', String(open));
     extra();
   }
   // 시계 칸 밑에 붙은 것(첫날 할 일 목록·축제 칸)이 펼친 조정 칸만큼 내려가게: CSS 변수 --pk-clock-extra
   function extra() {
-    const px = (open ? strip.offsetHeight + 6 : 0) + (peek.textContent ? peek.offsetHeight + 2 : 0);
+    const px = (open ? strip.offsetHeight + parts.offsetHeight + 10 : 0) + (peek.textContent ? peek.offsetHeight + 2 : 0);
     try { document.documentElement.style.setProperty('--pk-clock-extra', `${px}px`); } catch { /* DOM 없음 */ }
   }
   const busy = () => blocking() || !!S().story?.playing;
@@ -96,11 +112,43 @@ export function createHudClock(ctx, { toast = () => {}, blocking = () => false }
     cancel();
   }
   function cancel() { dw.rebase(); dw.el.classList.remove('is-preview'); peek.textContent = ''; extra(); refresh(); }
+  /** 오늘 안의 그 시각으로 (지금보다 앞이든 뒤든 — 날은 그대로) */
+  function goPart(j) {
+    const t = time();
+    if (!t?.jumpTo || busy()) return;
+    const n = nowOf(), R = today();
+    const target = Math.min(R.ceil, Math.max(R.floor, msAtDayHour(n.dayKey, j.hour)));
+    const r = t.jumpTo(target);
+    ctx.events.emit('sfx', { name: 'menu' });
+    if (r?.ok) toast(`오늘 ${j.name} — ${labelOf(r.now?.ms ?? target, n.dayKey).text}`, j.icon);
+    cancel();
+  }
+  /** 내일 아침으로 — 처음 누르면 알려 주고(3초), 한 번 더 누르면 넘어간다 */
+  function goTomorrow() {
+    const t = time();
+    if (!t?.shiftTo || busy()) return;
+    const now = Date.now();
+    if (now > armed) {
+      armed = now + 3000;
+      next.classList.add('is-armed');
+      peek.textContent = `한 번 더 누르면 내일 아침 ${TOMORROW_HOUR}시로 넘어가요 (오늘로는 돌아올 수 없어요)`;
+      extra();
+      setTimeout(() => { if (Date.now() > armed) { next.classList.remove('is-armed'); if (/한 번 더/.test(peek.textContent)) { peek.textContent = ''; extra(); } } }, 3100);
+      return;
+    }
+    armed = 0;
+    next.classList.remove('is-armed');
+    const r = t.shiftTo(TOMORROW_HOUR, 0, { days: 1 });
+    ctx.events.emit('sfx', { name: 'menu' });
+    if (r?.ok) toast(`새 하루 — 내일 아침 ${TOMORROW_HOUR}시예요`, '🌅');
+    cancel();
+  }
   function step(dir) {
     const t = time();
     if (!t?.jumpTo || busy()) return;
-    const n = nowOf();
-    const r = t.jumpTo(n.ms + dir * HOUR);
+    const n = nowOf(), R = today();
+    if (dir > 0 && n.ms + HOUR > R.ceil + 60e3) { toast('오늘은 새벽 5시 전까지예요 — 내일로는 「내일 ▶」', '🕰'); return; }
+    const r = t.jumpTo(Math.min(R.ceil, n.ms + dir * HOUR));
     const L = labelOf(r?.now?.ms ?? n.ms, n.dayKey);
     ctx.events.emit('sfx', { name: 'menu' });
     if (r?.clamped === 'floor') toast('오늘 새벽 5시보다 앞으로는 못 돌려요 (지난 날은 다시 오지 않아요)', '🕰');
@@ -124,9 +172,11 @@ export function createHudClock(ctx, { toast = () => {}, blocking = () => false }
     speed.textContent = cur ? `${SPEED_ICON[cur.key]} ${cur.mult > 1 ? `×${cur.mult}` : '실제'}` : '—';
     speed.setAttribute('aria-label', cur ? `시간 빠르기 ${cur.name}${cur.mult > 1 ? ` (실제 1분에 게임 ${cur.mult}분)` : ''} — 눌러서 바꾸기` : '시간 빠르기');
     speed.disabled = !t?.setSpeed;
-    const floor = t?.range?.().floor ?? -Infinity;
-    minus.disabled = !t?.jumpTo || nowOf().ms - HOUR < floor - 60e3;
-    plus.disabled = !t?.jumpTo;
+    const R = today(), n = nowOf().ms;
+    minus.disabled = !t?.jumpTo || n - HOUR < R.floor - 60e3;
+    plus.disabled = !t?.jumpTo || n + HOUR > R.ceil + 60e3;
+    for (const b of jumps) b.disabled = !t?.jumpTo;
+    next.disabled = !t?.shiftTo;
   }
 
   // 키보드: 게임 이동 키로 새지 않게 여기서 멈춘다
@@ -147,7 +197,7 @@ export function createHudClock(ctx, { toast = () => {}, blocking = () => false }
   try { globalThis.matchMedia?.(NARROW).addEventListener?.('change', e => toggle(!e.matches)); } catch { /* 옛 브라우저 */ }
 
   return {
-    dial: dw, strip, peek,
+    dial: dw, strip, parts, peek, goPart, goTomorrow,
     get open() { return open; },
     toggle, apply, step, cycleSpeed, refresh,
     /** HUD 시계 칸(.pk-clock)에 붙인다 */
@@ -155,7 +205,7 @@ export function createHudClock(ctx, { toast = () => {}, blocking = () => false }
       if (!bubble) return;
       bubble.classList.add('has-dial');
       bubble.prepend(dw.el);
-      bubble.append(strip, peek);
+      bubble.append(strip, parts, peek);
       requestAnimationFrame?.(extra);
     },
     /** 게임 1분마다 (time:tick) · 시각이 옮겨졌을 때 — 미리 보는 중이 아니면 바늘을 지금 시각으로 */

@@ -200,7 +200,7 @@ test('시간 빠르기: rules.json time 값 · 빠진 칸은 기본값 · 실제
   assert.ok(SPEED_KEYS.includes(R.speed));
   assert.equal(R.speeds.real, 1);
   assert.ok(R.speeds.fast > 1 && R.speeds.faster >= R.speeds.fast);
-  assert.deepEqual(timeRules({ speeds: { real: 5, fast: -1 } }).speeds, { real: 1, fast: 12, faster: 30 });
+  assert.deepEqual(timeRules({ speeds: { real: 5, fast: -1 } }).speeds, { real: 1, fast: 12, faster: 30, fastest: 60 });   // P47 번개처럼 ×60
   assert.equal(timeRules({ whenClosed: 'x' }).whenClosed, 'pause');
   assert.equal(dayLengthText(12), '게임 하루 = 실제 2시간');
   assert.equal(dayLengthText(30), '게임 하루 = 실제 48분');
@@ -290,4 +290,14 @@ test('p41 화면: HUD 원형 시계 + 조정 칸 · 섬폰 「시간 빠르기�
   const sheets = read('elem-editor/sheets.js');
   for (const p of ['rules/time/speed', 'rules/time/speeds/fast', 'rules/time/speeds/faster', 'rules/time/whenClosed']) assert.ok(sheets.includes(`'${p}'`), p);
   for (const f of ['src/gameplay/intro/intro.css', 'src/gameplay/festival/festival.css']) assert.match(read(f), /var\(--pk-clock-extra, 0px\)/, f);
+});
+
+test('P47 오늘·내일: todayRange = 그날 새벽 5시 ~ 다음 새벽 5시 직전, 가 본 날 하한과 겹치면 더 늦은 쪽 · 낮밤 단추는 오늘 안', async () => {
+  const { todayRange, DAY_JUMPS, TOMORROW_HOUR, msAtDayHour } = await import('../src/sky/clock.js');
+  const R = todayRange('2027-05-15');
+  assert.equal(R.floor, msAtDayHour('2027-05-15', 5));
+  assert.equal(R.ceil, msAtDayHour('2027-05-15', 29) - 60000);
+  assert.equal(todayRange('2027-05-15', { floor: msAtDayHour('2027-05-15', 9) }).floor, msAtDayHour('2027-05-15', 9));
+  for (const j of DAY_JUMPS) { const m = msAtDayHour('2027-05-15', j.hour); assert.ok(m >= R.floor && m <= R.ceil, j.key); }
+  assert.ok(TOMORROW_HOUR >= 5 && TOMORROW_HOUR < 12);
 });

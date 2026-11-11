@@ -106,6 +106,25 @@ export function msAtClock(baseDayKey, hour, minute = 0, days = 0) {
   return msAtDayHour(baseDayKey, hh) + days * DAY_MS;
 }
 
+/**
+ * P47 오늘 · 내일: 시계 바늘·−1/+1·낮/밤 단추가 움직이는 「오늘」 = 지금 게임 하루 (그날 새벽 5시 ~ 다음 날 새벽 5시 직전).
+ * 내일로는 「내일 ▶」 로만 넘어간다 (실수로 날이 넘어가 오늘로 못 돌아오는 일이 없게). range = time.range() { floor, ceil }
+ */
+export function todayRange(dayKey, range = {}) {
+  const start = msAtDayHour(dayKey, 5), end = msAtDayHour(dayKey, 29) - 60000;
+  return { floor: Math.max(range.floor ?? -Infinity, start), ceil: Math.min(range.ceil ?? Infinity, end) };
+}
+/** 낮·밤 단추 (게임 하루 시각 5~29 — 새벽 3시 = 27, 그날 밤) */
+export const DAY_JUMPS = Object.freeze([
+  { key: 'morning', icon: '🌅', name: '아침', hour: 7 },
+  { key: 'noon', icon: '☀️', name: '낮', hour: 12 },
+  { key: 'evening', icon: '🌇', name: '저녁', hour: 18 },
+  { key: 'night', icon: '🌙', name: '밤', hour: 22 },
+  { key: 'dawn', icon: '🌌', name: '새벽', hour: 27 },
+]);
+/** 내일로 넘어갈 때 도착 시각 (다음 날 아침) */
+export const TOMORROW_HOUR = 7;
+
 /** 갈 시각을 [floor, ceil] 안으로 → { ms, clamped: 'floor'|'ceil'|null } */
 export function clampShift(target, { floor = -Infinity, ceil = Infinity } = {}) {
   if (target < floor) return { ms: floor, clamped: 'floor' };
@@ -115,9 +134,9 @@ export function clampShift(target, { floor = -Infinity, ceil = Infinity } = {}) 
 
 // ── 시간 빠르기 (p41-fast-time, docs/notes/p41-fast-time.md) ──
 // 값은 assets/data/rules.json time (요소 편집기 「규칙 숫자」 → 시간 빠르기): speed = 처음 빠르기 키, speeds = 키 → 배수, whenClosed = 'pause'|'catchUp'.
-export const SPEED_KEYS = ['real', 'fast', 'faster'];
-export const SPEED_NAME = { real: '실제와 같게', fast: '빠르게', faster: '아주 빠르게' };
-export const DEFAULT_TIME_RULES = Object.freeze({ speed: 'fast', speeds: Object.freeze({ real: 1, fast: 12, faster: 30 }), whenClosed: 'pause' });
+export const SPEED_KEYS = ['real', 'fast', 'faster', 'fastest'];   // P47 ⚡ 번개처럼 ×60 (게임 하루 = 실제 24분)
+export const SPEED_NAME = { real: '실제와 같게', fast: '빠르게', faster: '아주 빠르게', fastest: '번개처럼' };
+export const DEFAULT_TIME_RULES = Object.freeze({ speed: 'fast', speeds: Object.freeze({ real: 1, fast: 12, faster: 30, fastest: 60 }), whenClosed: 'pause' });
 export const GAP_MS = 1500;            // 프레임 사이가 이보다 길면(탭 숨김·창 닫힘·멈춤) 그동안은 안 흐른 것으로 ('pause')
 /** rules.time → 빠진 칸은 기본값 */
 export function timeRules(r = {}) {
