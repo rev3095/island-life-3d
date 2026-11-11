@@ -14,6 +14,7 @@
 | 7차 검수 보드 v0.7 (M7 출시 준비, D36–D48 · QA 결과 D49–D57) | `wave7-board.html` + `board-kit.js` | https://claude.ai/artifact/HuSkBdHEr2VrWxts9YtStV | `wave7` |
 | 하늘 검수 보드 v0.1 (하늘 셰이더, D58–D66 · 하늘 층 SK-01–08, 그림 = 게임 화면 `concept/sky/*.jpg`) | `sky-board.html` + `board-kit.js` + `sky/*.jpg` | https://claude.ai/artifact/UtvXfFPhvgvYREhHoaAyGE | `sky` |
 | 실내 검수 보드 v0.1 (상점·박물관 실내 · 문 드나들기, D67–D73) | `interiors-board.html` + `board-kit.js` | https://claude.ai/artifact/8w5fbrjNthoTgkCMqHURDh | `interiors` |
+| 셰이더 검수 보드 v0.1 (눈·잎 비침·젖은 땅·낮은 안개·색 보정·물 빛 그물·반짝임 등 D130–D139, 그림 = 게임 화면 `concept/shader/*.jpg`) — 반영 v1 2026-11-12 | `shader-board.html` + `board-kit.js` + `shader/*.jpg` | https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp | `shader` |
 | 8차 검수 보드 v0.8 (M8 계절 행사 EV-01–04, D74–D85) | `wave8-board.html` + `board-kit.js` | https://claude.ai/artifact/THtUdkR9e9G9qaf6FDLM5T | `wave8` |
 | 9차 검수 보드 v0.9 (M9 방향 · 정리, D86–D92) | `wave9-board.html` + `board-kit.js` | https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc | `wave9` |
 | 10차 검수 보드 v1.0 (M10 방향 · 새 주민, D93–D99) | `wave10-board.html` + `board-kit.js` | https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H | `wave10` |
@@ -25,7 +26,7 @@
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
-| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) |
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) · D130–D139 (shader) |
 | CH | 캐릭터 | CH-01–10 (+wave10 CH-11 구름 양 · CH-12 파도 펭귄 · CH-13 달무리 부엉이, M10-P3 검수 대기) (+night CH-14 별밤 박쥐 · CH-15 여명 나방 — 가게 주인, M12 검수 대기) |
 | EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night BD-08 달빛 가게 · BD-09 새벽 천막, 검수 대기) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) (+tour BD-10 여행 배 · EN-13 광석 바위, P35 검수 대기) |
 | FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) (+wave10 FU-51 그림 이젤 · FU-52 바다 지도 액자 · FU-53 별 망원경, M10-P5 검수 대기) (+night FU-55–58 밤 가구 · FU-59 수정 구슬, 검수 대기) |

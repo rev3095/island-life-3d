@@ -25,7 +25,7 @@ node tools/apply-edits.mjs elem <초안.json> [--dry]   # "요소 반영": 요�
 node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용, 커밋 안 함)
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 node tools/check-events.mjs [--target=dev|artifact|both] [--only=EV-01,EV-03]   # 계절 행사 넷을 날짜 흉내로 실제 키 점검 (행사마다 새 브라우저, 하나 20초 안팎)
-node tools/perf-bench.mjs [--target=artifact] [--probe] [--editors]   # GPU 시간 재기 (머리 없는 Chrome, 광장 낮·밤·투어 × 사양, 1280×800 — docs/notes/p40-perf.md)
+node tools/perf-bench.mjs [--target=artifact] [--probe] [--editors] [--variants=<json>] [--looks=<json> --shots=<폴더>]   # GPU 시간 재기 (머리 없는 Chrome, 광장 낮·밤·투어 × 사양, 1280×800 — docs/notes/p40-perf.md)
 node tools/check-interiors.mjs [--target=dev|artifact|both] [--hours=10,23,28] [--only=pado,shop]   # 실내 점검: 시각마다 모든 문(내 집·상점·박물관·주민 집·달빛 가게·새벽 천막) 앞 행동 키 → 들어가 사진·임시 상자 수 (docs/qa/interiors-2026-11-11.md)
 node tools/check-clock.mjs [--target=dev|artifact|both]   # 시계 점검: HUD 단추·시계 판 키·섬폰 시계 창으로 빠르기 넷 · 낮밤 오가기 · 오늘 안 하한/상한 · 내일 ▶ (15가지)
 ```
@@ -77,10 +77,11 @@ node tools/check-clock.mjs [--target=dev|artifact|both]   # 시계 점검: HUD �
 - 모든 3D 모델은 `applyToonStyle(root, {spec})` / `toonMaterial` / `outlineMaterial` 을 거친다. 여기 들어 있는 **곡면 월드 패치**(`project_vertex` 대체, 중심 = `ctx.focus`, 세기 `curve.uCurve`)와 외곽선(뒤집은 껍데기, `userData.outline = true`)이 모든 메시·인스턴스·스킨 메시에 맞게 걸려야 한다. 그림자는 휘기 전 좌표로 조회해 어긋나지 않지만, 깊이·법선을 다시 그리는 후처리(SSAO 등)의 override 재질에는 곡면 패치가 없다.
 - **재질 이름 = 스펙 팔레트 키**이고 의미가 있다: `glow`·`window` 밤에 켜짐, `ground grass sand …` 비에 젖음, 일부 이름은 외곽선 제외·평면(flat) 처리. world 는 합친 땅 재질 이름을 `ground` 로 둔다.
 - 스타일 셰이더 값은 모두 `materials.look` uniform 이라 바꿔도 셰이더를 다시 만들지 않는다. 0 이면 그 갈래를 통째로 건너뛰므로, 사양별 끄기도 uniform 으로 한다 (구름 그림자 `uCloudShadow × uCloudGate`, 물 하늘 반사 `uSkyReflect` — sky 가 세기·색을, render 가 켜기를 넣는다). 구조는 `docs/SHADERS.md`.
+- **셰이더 보드 효과 (P48, 보드 shader 반영 v1)**: 눈 쌓임·잎 뒤 비침·젖은 땅 윤기·낮은 안개·물 빛 그물·반짝임은 `#define STYLE_FX_*` 로 **필요한 날만 셰이더 글자째** 넣는다 (`materials.setShaderTier`, sky `syncShaderFx` 가 오늘 예보로 고름) — uniform 0 갈래도 내장 그래픽에선 비용이 있어서다. 낮음·매우 낮음은 셰이더 없이 CPU 로 대신(땅 색·거리 안개)해 GPU 시간이 반영 전과 같다. 새 효과도 이 모양을 따른다. 넣는 길·사양표·재 본 값은 `docs/notes/p48-shader-study.md` (1절·7절).
 
 ### 사양(그래픽 품질, `src/render/quality.js`)
 - 넷: `high` 높음 · `mid` 적정(처음) · `low` 낮음 · `min` 매우 낮음 (예전 `lite` = mid). `QUALITY[q]` 가 화소 배율(`maxRatio`·`maxPixels` → `ratioFor`) · 그림자 · 화면 효과(post 5단계) · 외곽선 · 초당 장수(`fps`, main.js `createFrameGate`) · 계단 무늬 줄이기(`aa`) · 셰이더 켜고 끄기(`fx`: 구름 그림자·하늘 반사·렌즈 빛·하이라이트·림·접촉 그늘·물결·솜구름)를 정한다. 사양마다 다른 곳: world 묶음 그리는 거리(`kit.js` `DRAW_FAR`), 하늘 셰이더(`sky/dome.js` `SKY_QUALITY`), 실내 작은 소품(`deco: true`).
-- 정하는 순서: 주소 > 저장된 섬폰 「그래픽 사양」(`state.settings.spec` — MSAA 는 렌더러를 만들 때만 정해져서 main.js 가 저장 글을 미리 엿본다 `savedSpec`) > 적정 + 자동(처음 몇 초·광장 평균 33ms 넘으면 한 칸씩 낮춤). 바꾸면 `quality:changed`. 로딩 화면(`tools/web-loader.html`)에도 네 단추.
+- 적정은 화면 효과 중 색 보정 + FXAA 만 (`post: 'grade'`, P48 D134). 정하는 순서: 주소 > 저장된 섬폰 「그래픽 사양」(`state.settings.spec` — MSAA 는 렌더러를 만들 때만 정해져서 main.js 가 저장 글을 미리 엿본다 `savedSpec`) > 적정 + 자동(처음 몇 초·광장 평균 33ms 넘으면 한 칸씩 낮춤). 바꾸면 `quality:changed`. 로딩 화면(`tools/web-loader.html`)에도 네 단추.
 - 성능은 GPU 시간으로 잰다 (`EXT_disjoint_timer_query_webgl2` — 이 개발 컴퓨터는 Intel UHD 내장 그래픽이라 느린 기기 기준으로 쓸 만하다). 2026-11-04 광장 1280×800: 높음 9.9 · 적정 5.1 · 낮음 3.7 · 매우 낮음 2.5ms.
 
 ### 하늘 (`src/sky/`)
