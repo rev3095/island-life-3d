@@ -64,6 +64,8 @@ export default {
       joy: V => (V.slug === 'chorong' && ctx.services.time?.weather === 'rain') || (!!V.person.joySeason && (world.season ?? context(ctx).season) === V.person.joySeason),
       /** 생일엔 하루 종일 집에 */
       staysIn: V => !!party?.staysIn(V.slug),
+      /** 행사·야시장 주인공으로 지금 자리를 지켜야 하나 → 낮에 집에 들르는 시간(homeBreak)을 건너뛴다 (P44 FB-01) */
+      hostBusy: slug => !!(ctx.services.events?.hostSpot?.(slug) ?? ctx.services.night?.hostSpot?.(slug)),
       /** 자주 가는 곳 하나 → {x, z} (다른 주민이 가려는 곳과 겹치지 않게) */
       /** 이 자리에 서면 행동 키를 가로막나: 상점·박물관 문 앞 · 광장 모닥불 둘레 (7차 D56-A — 주민이 비켜 선다) */
       blocksAction,

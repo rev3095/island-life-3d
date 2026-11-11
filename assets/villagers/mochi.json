@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "approved",
   "about": "주민 데이터 (6차 M6-P3, 검수 보드 wave6 D30-A). 캐릭터 편집기 「성격·대화」 탭에서 고치고 채팅 \"요청 확인\" 으로 반영 (version +1). 읽는 곳 src/gameplay/town/people.js · 모양 docs/notes/m6-p3-traits.md",
   "id": "CH-04",
@@ -9,7 +9,7 @@
   "traits": { "species": "토끼", "personality": "상냥함 · 꽃 가꾸기", "speech": "말끝 '깡', 부드럽고 다정한 말투", "ending": "깡" },
   "color": "#B9A6E0",
   "pace": { "walk": 1.15, "run": 2.6, "runChance": 0.05, "idle": [2.5, 5.5], "happy": 0.2 },
-  "schedule": { "wake": 7, "sleep": 21.5, "rainStay": true, "snowStay": false },
+  "schedule": { "wake": 7, "sleep": 21.5, "rainStay": true, "snowStay": false, "homeBreak": [15, 16] },
   "roam": { "range": 16, "haunts": { "flowers": 5, "home": 2, "plaza": 1, "dock": 1 } },
   "gifts": {
     "loves": ["hybrid", "shell.coral"],

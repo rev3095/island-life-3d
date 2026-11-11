@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "approved",
   "about": "주민 데이터 (6차 M6-P3, 검수 보드 wave6 D30-A). 캐릭터 편집기 「성격·대화」 탭에서 고치고 채팅 \"요청 확인\" 으로 반영 (version +1). 읽는 곳 src/gameplay/town/people.js · 모양 docs/notes/m6-p3-traits.md",
   "id": "CH-05",
@@ -9,7 +9,7 @@
   "traits": { "species": "곰", "personality": "무뚝뚝하지만 다정함 · 낚시", "speech": "말끝 없이 짧게, '…'가 많다", "ending": "" },
   "color": "#7FA36B",
   "pace": { "walk": 1, "run": 2.5, "runChance": 0, "idle": [5, 11], "happy": 0.06 },
-  "schedule": { "wake": 5.5, "sleep": 20.5, "rainStay": false, "snowStay": false },
+  "schedule": { "wake": 5.5, "sleep": 20.5, "rainStay": false, "snowStay": false, "homeBreak": [11, 12] },
   "roam": { "range": 22, "haunts": { "river": 5, "home": 2, "dock": 2, "bridge": 1 } },
   "gifts": {
     "loves": ["fish.mandarin-fish", "fish.catfish", "fish.snakehead", "fish.sea-bream", "rare"],

@@ -268,7 +268,7 @@ export async function createVillager(ctx, person, town) {
   }
 
   /** 지금 밖에 있어야 하나 (일과·날씨 + 생일엔 집에) */
-  function outNow(now, weather) { return shouldBeOut(person, now, weather) && !town.staysIn?.(V); }
+  function outNow(now, weather) { return shouldBeOut(person, now, weather, { noBreak: !!town.hostBusy?.(person.slug) }) && !town.staysIn?.(V); }
 
   function think(now, weather) {
     if (!now || V.mode === 'talk' || V.mode === 'room') return;

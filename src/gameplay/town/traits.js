@@ -9,7 +9,7 @@ export function toPerson(d) {
     ...(d.voice ? { voice: d.voice } : {}), ...(d.joySeason ? { joySeason: d.joySeason } : {}),
     pace: d.pace,
     wake: s.wake, sleep: s.sleep, rainStay: s.rainStay, snowStay: s.snowStay, range: d.roam.range,
-    ...(s.nocturnal ? { nocturnal: true } : {}), ...(Array.isArray(s.homeBefore) ? { homeBefore: s.homeBefore } : {}),   // M12 D108-A 야행성
+    ...(s.nocturnal ? { nocturnal: true } : {}), ...(Array.isArray(s.homeBefore) ? { homeBefore: s.homeBefore } : {}), ...(Array.isArray(s.homeBreak) ? { homeBreak: s.homeBreak } : {}),   // P44 FB-01 낮에 집에 들르는 시간   // M12 D108-A 야행성
     haunts: d.roam.haunts,
     loves: g.loves, likes: g.likes, dislikes: g.dislikes,
     wants: q.wants, rewards: q.rewards,
@@ -99,6 +99,7 @@ export function checkVillager(d, env = {}) {
     if (!(s.wake >= 5 && s.wake <= (s.nocturnal ? 21 : 12))) no('schedule/wake', s.nocturnal ? '야행성 주민이 나오는 시각은 5~21시' : '나오는 시각은 5~12시');
     if (s.homeBefore != null && !(Array.isArray(s.homeBefore) && s.homeBefore.length === 2 && s.homeBefore[0] >= 0 && s.homeBefore[1] >= s.homeBefore[0] && s.homeBefore[1] <= 8)) no('schedule/homeBefore', '[짧게, 길게] 시간 (0~8)');
     if (!(s.sleep >= s.wake + 4 && s.sleep <= 29)) no('schedule/sleep', '들어가는 시각은 나오고 4시간 뒤 ~ 다음 날 5시(29)');
+    if (s.homeBreak != null && !(Array.isArray(s.homeBreak) && s.homeBreak.length === 2 && s.homeBreak[0] >= s.wake && s.homeBreak[1] > s.homeBreak[0] && s.homeBreak[1] - s.homeBreak[0] <= 4 && s.homeBreak[1] <= s.sleep)) no('schedule/homeBreak', '[들어가는 시각, 나오는 시각] — 일어난 뒤 · 자기 전, 4시간 안');
     for (const k of ['rainStay', 'snowStay']) if (typeof s[k] !== 'boolean') no(`schedule/${k}`, '켜기/끄기');
     const r = d.roam ?? {};
     if (!(r.range >= 4 && r.range <= 64)) no('roam/range', '4~64칸');
