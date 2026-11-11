@@ -85,6 +85,72 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   const free = () => !P.busy && !H.busy && !doors.busy;
   I.add({ name: 'house-place-out', intent: 'action', priority: 90, label: '나가기', test: () => (free() && P.where && onDoormat() ? true : null), run: () => leave() });
   I.add({ name: 'house-place-idle', intent: 'action', priority: 20, label: '', test: () => (P.where ? true : null), run: () => {} });
+  // P45 (동물의 숲처럼): 가게 진열품 앞에서 바로 「보기」 → 설명·값 → 사기, 박물관 전시물 앞에서 「살펴보기」 → 설명판. 계산대 말 걸기(90)·문(90)보다 아래
+  I.add({ name: 'house-place-look', intent: 'action', priority: 85, label: t => (t.meta.exhibit ? '살펴보기' : '보기'), test: () => (free() && P.where ? shownInFront() : null), run: t => lookAt(t) });
+
+  /** 플레이어 앞(0.9칸)에 있는 진열품·전시물 → shown 하나 | null */
+  function shownInFront(reach = 0.9) {
+    const R = rooms[P.where];
+    if (!R?.shown?.length) return null;
+    const f = player.facing, px = player.position.x - Math.sin(f) * reach, pz = player.position.z - Math.cos(f) * reach;
+    let best = null, bestD = 0.75;
+    for (const o of R.shown) {
+      if (!o.meta) continue;
+      const d = Math.hypot(o.meta.x - px, o.meta.z - pz);
+      if (d < bestD) { best = o; bestD = d; }
+    }
+    return best;
+  }
+  const fmt = n => Number(n ?? 0).toLocaleString('ko-KR');
+  async function lookAt(o) {
+    const ui = ctx.services.ui, d = ctx.services.data, m = o.meta;
+    if (!ui?.confirm || !d) return;
+    P.busy = true;
+    try {
+      if (m.exhibit) {   // 박물관 설명판
+        const it = d.items.get(m.id);
+        const CAT = { fish: '물고기', bug: '곤충', fossil: '화석' };
+        const when = [it?.place, it?.time, it?.season].filter(Boolean).join(' · ');
+        await ui.confirm({ title: `${CAT[m.group] ?? ''} · ${it?.name ?? m.id}`, icon: it?.icon, text: `${it?.desc ?? ''}${when ? `
+
+📍 ${when}` : ''}
+
+— 기증해 준 ${ctx.services.intro?.fill?.('{player}') ?? '친구'}에게 고마워요.`, buttons: [{ label: '다 봤어요', value: true, primary: true }], cancelValue: true });
+        return;
+      }
+      if (m.group === 'clothes') {   // 옷: 입어 본 모습 → 사기 (상점 창 「오늘의 옷」 과 같은 규칙)
+        const O = ctx.services.outfit, c = O?.today?.().find(x => x.id === m.id);
+        if (!O || !c) return;
+        if (O.owns(c.id)) { ui.toast?.(`이미 옷장에 있어요. 집 옷장에서 갈아입을 수 있어요`, '👕'); return; }
+        O.preview({ [c.slot]: c.id });
+        const v = await ui.confirm({ title: c.name, icon: c.thumb ?? '👕', text: `${c.slotName} · 🌰 ${fmt(c.buy)}
+산 옷은 집 옷장에 걸려요.`, buttons: [{ label: '사서 바로 입을게요', value: 'wear', primary: true }, { label: '사기만 할게요', value: 'buy' }, { label: '그만둘래요', value: false }], cancelValue: false });
+        if (!v) { O.revert(); return; }
+        const r = O.buy(c.id);
+        if (r.result !== 'ok') { O.revert(); ui.toast?.(r.result === 'money' ? '도토리가 모자라요' : '살 수 없는 옷이에요', '🌰'); return; }
+        if (v === 'wear') await O.wear({ [c.slot]: r.info.id }, { spin: true }); else O.revert();
+        ctx.events.emit('sfx', { name: 'acorn' });
+        ui.toast?.(v === 'wear' ? `${c.name} 사서 입었어요!` : `${c.name} 샀어요! 옷장에 걸어 둘게요`, c.thumb ?? '👕');
+        if (r.gift) setTimeout(() => ui.toast?.('밤톨이 옷장을 덤으로 줬어요 — 집에 놓고 「갈아입기」 해 봐요', '🚪'), 900);
+        return;
+      }
+      const it = d.items.get(m.id);
+      if (!it) return;
+      const price = it.buy ?? 0;
+      const v = await ui.confirm({ title: it.name, icon: it.icon, text: `${it.desc ? `${it.desc}
+
+` : ''}${it.sizeText ? `크기 ${it.sizeText}` : ''}${it.from ? `${it.sizeText ? ' · ' : ''}구하는 곳 ${it.from}` : ''}
+
+🌰 ${fmt(price)}에 살까요?`, buttons: [{ label: '살게요', value: true, primary: true }, { label: '그만둘래요', value: false }], cancelValue: false });
+      if (!v) return;
+      const fits = d.inventory?.canFit ? d.inventory.canFit(m.id, 1) > 0 : !d.inventory?.isFull?.();
+      if (!fits) { ui.toast?.('가방이 꽉 찼어요', '🎒'); return; }
+      if (!d.wallet.spend(price)) { ui.toast?.('도토리가 모자라요', '🌰'); return; }
+      if (!(d.inventory.add(m.id, 1) > 0)) { d.wallet.add(price); ui.toast?.('가방이 꽉 찼어요', '🎒'); return; }
+      ctx.events.emit('sfx', { name: 'acorn' });
+      ui.toast?.(`${it.name} 샀어요!`, it.icon);
+    } finally { P.busy = false; }
+  }
 
   function onDoormat(margin = 0.85) {
     const R = rooms[P.where];
@@ -260,6 +326,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   function stockJobs(R) {
     const groups = stockGroupsOf(R.kind);
     return stockPlan(R.spec, groups).map(async s => {
+      const tag = o => (o ? Object.assign(o, { meta: { id: s.id, group: s.group, x: R.x0 + s.lx, z: R.z0 + s.lz } }) : o);   // P45 진열품 앞 「보기」
       try {
         if (s.group === 'clothes') {   // 11차 옷: 윗옷은 가로대(hang)에 걸고, 모자·신발은 아래 단(y)에
           const m = await ctx.services.outfit?.displayModel?.(s.id);
@@ -267,7 +334,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
           const b = m.size, cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2;
           const top = m.slot === 'top' && s.hang != null;
           m.root.position.set(R.x0 + s.lx - cx, top ? s.hang - b.max.y : s.y - b.min.y, R.z0 + s.lz - cz);
-          return m;
+          return tag(m);
         }
         if (s.group === 'furniture' && kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구)
           const obj = await kit.make(s.id);
@@ -281,12 +348,12 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
             if (Number.isFinite(box.min.y)) obj.root.position.y += s.y - box.min.y;
             if (Number.isFinite(box.min.z)) obj.root.position.z += (R.z0 + s.lz) - (box.min.z + box.max.z) / 2;
           }
-          return obj;
+          return tag(obj);
         }
         const m = await itemModel(s.id);
         if (!m) return null;
         m.root.position.set(R.x0 + s.lx, s.y, R.z0 + s.lz);
-        return { root: m.root, tick() {}, dispose() { m.root.removeFromParent(); } };
+        return tag({ root: m.root, tick() {}, dispose() { m.root.removeFromParent(); } });
       } catch (e) { console.warn('[house] 진열 물건을 못 놓았어요', s.id, e); return null; }
     });
   }
@@ -305,7 +372,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       m.root.rotation.y = turn;
       const phase = i * 1.7;
       return {
-        root: m.root, cat: e.cat,
+        root: m.root, cat: e.cat, meta: { id: e.id, group: e.cat, x, z, exhibit: true },
         tick() {
           const t = P.clock;
           if (e.cat === 'fish') { m.root.position.y = e.y + Math.sin(t * 1.3 + phase) * 0.04; m.root.rotation.y = turn + Math.sin(t * 0.8 + phase) * 0.18; }
@@ -443,6 +510,8 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     },
     /** 개발용: 지금 진열·전시된 것 수, 임시 상자, 붙박이 모델 목록 */
     shown: kind => (rooms[kind]?.shown ?? []).length,
+    /** 진열품·전시물 자리 (P45 「보기」·「살펴보기」 — 봇·점검이 앞에 서 볼 곳) → [{ id, group, x, z, exhibit? }] */
+    shownSpots: kind => (rooms[kind]?.shown ?? []).filter(o => o.meta).map(o => ({ ...o.meta })),
     fixtures: () => fixtures.list.map(m => m.slug),
     placeholders: kind => (rooms[kind]?.list ?? []).filter(r => !r.real).map(r => r.fu ?? r.key),
   };

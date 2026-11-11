@@ -68,6 +68,9 @@ async function boot() {
     M.arrived = ['gureum', 'pado', 'dalmuri'];
     M.homes = { ...(M.homes ?? {}) };
     M.arrived.forEach((s, i) => { T.movein[s] = { ...stamp }; if (spare[i]) M.homes[s] = spare[i].id; });
+    // 박물관 전시를 보려고 물고기·곤충·화석 몇 개 기증 (점검 준비)
+    const D = c.services.data;
+    for (const cat of ['fish', 'bug', 'fossil']) for (const it of (D.items.list?.(cat) ?? []).slice(0, 3)) D.museum.donate(it.id);
     c.state.flags.ckPrepared = true;
     c.services.data.save.save();
     return { ok: true, reload: true, spare: spare.map(l => l.id) };
@@ -109,6 +112,20 @@ async function visitDoor({ hour, key, slug, label }) {
   const near = new Set(), v = new c.THREE.Vector3();
   c.scene.traverse(o => { if (o.userData?.placeholder && o.visible !== false && Math.abs(o.getWorldPosition(v).x - P.position.x) < 20) near.add(String(o.userData.placeholder)); });
   out.placeholders = [...near];
+  // P45 진열품·전시물 앞 「보기」·「살펴보기」: 하나씩 그 앞(남쪽 0.9칸)에 서서 행동 키 글자 → 첫 하나는 실제 Space (사기 창·설명판이 뜨는지, 그만둘래요/다 봤어요)
+  const HP = S.house.places, spots = HP?.where ? HP.shownSpots?.(HP.where) ?? [] : [];
+  out.looks = { n: spots.length, ok: 0, bad: [] };
+  for (const [i, sp] of spots.entries()) {
+    P.teleport(sp.x, sp.z + 0.95, 0); step(6);
+    const k = S.gameplay.interactions.peek('action');
+    if (k?.name === 'house-place-look') out.looks.ok++; else out.looks.bad.push(`${sp.id}:${k?.name ?? '없음'}`);
+    if (i === 0 && k?.name === 'house-place-look') {
+      await press(); step(6); await wait(200);
+      const box = [...document.querySelectorAll('.pk-dlg-box, [role=dialog]')].map(e => e.textContent.trim().replace(/\s+/g, ' ').slice(0, 70)).join(' / ');
+      out.looks.first = `${sp.id} → ${box || '창 없음'}`;
+      await press('Escape'); await settle();
+    }
+  }
   step(10);
   return out;
 }
@@ -169,7 +186,7 @@ async function main() {
         r.leftOk = await ev(leaveAll);
       }
       results.push(r);
-      say(`  ${String(hour).padStart(2)}시 ${String(d.label).padEnd(12)} ${r.entered ? `✅ 들어감 (${r.where})` : `·· ${r.note ?? r.error}`}${r.placeholders?.length ? ` ⚠ 임시 상자 ${r.placeholders.join(',')}` : ''} [${r.peek ?? '행동 없음'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''}]`);
+      say(`  ${String(hour).padStart(2)}시 ${String(d.label).padEnd(12)} ${r.entered ? `✅ 들어감 (${r.where})${r.looks?.n ? ` · 보기 ${r.looks.ok}/${r.looks.n}${r.looks.bad.length ? ` ✗ ${r.looks.bad.join(',')}` : ''} · ${r.looks.first ?? ''}` : ''}` : `·· ${r.note ?? r.error}`}${r.placeholders?.length ? ` ⚠ 임시 상자 ${r.placeholders.join(',')}` : ''} [${r.peek ?? '행동 없음'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''}]`);
     }
     results.push({ target, console: logs.slice(0, 20) });
     if (logs.length) say(`  콘솔·요청 ${logs.length}: ${logs.slice(0, 3).join(' | ')}`);
@@ -184,7 +201,7 @@ async function main() {
     ...rows.map(r => `| ${r.target} | ${hr(r.hour)} | ${r.label} | ${r.entered ? `✅ 들어감${r.shot ? ` ([사진](${r.shot}))` : ''}` : r.note ?? r.error} | ${r.peek ?? '—'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''} | ${r.placeholders?.join(', ') || ''} |`),
     '', ...results.filter(r => r.console).map(r => `- [${r.target}] 콘솔 오류·실패 요청 ${r.console.length}${r.console.length ? `: ${r.console.join(' · ')}` : ''}`)].join('\n');
   await writeFile(join(outDir, 'report.md'), md);
-  const bad = rows.filter(r => r.error || r.placeholders?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
+  const bad = rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
   say(`\n결과 ${outDir} · 문제 ${bad}`);
   process.exit(bad ? 1 : 0);
 }

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "approved",
   "about": "주민 데이터 (6차 M6-P3, 검수 보드 wave6 D30-A). 캐릭터 편집기 「성격·대화」 탭에서 고치고 채팅 \"요청 확인\" 으로 반영 (version +1). 읽는 곳 src/gameplay/town/people.js · 모양 docs/notes/m6-p3-traits.md",
   "id": "CH-02",
@@ -9,7 +9,7 @@
   "traits": { "species": "고양이", "personality": "활발함 · 운동 좋아함", "speech": "말끝 '냥'", "ending": "냥" },
   "color": "#F2B36B",
   "pace": { "walk": 1.55, "run": 3.3, "runChance": 0.35, "idle": [1.2, 3.5], "happy": 0.25 },
-  "schedule": { "wake": 6, "sleep": 22.5, "rainStay": false, "snowStay": false },
+  "schedule": { "wake": 6, "sleep": 22.5, "rainStay": false, "snowStay": false, "homeBreak": [12, 13] },
   "roam": { "range": 32, "haunts": { "beach": 4, "dock": 2, "plaza": 2, "home": 1, "bridge": 2 } },
   "gifts": {
     "loves": ["fruit.orange", "fish.sweetfish", "rare"],

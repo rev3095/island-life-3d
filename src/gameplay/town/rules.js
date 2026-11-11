@@ -145,11 +145,24 @@ export function isAsleep(person, now) {
   return h < wake || h >= sleep;
 }
 
-/** 지금 밖에 있어야 하나 (잠들기 전 1~2시간은 집에) */
-export function shouldBeOut(person, now, weather) {
+/**
+ * 낮에 집에 들르는 시간 (P44 FB-01: 하루 종일 밖에 있던 주민도 낮에 한 번은 방에 찾아갈 수 있게). 주민 파일 schedule.homeBreak [들어가는 시각, 나오는 시각],
+ * 날마다 ±0.25시간 흔들림. 없으면 null. → [from, to] | null
+ */
+export function homeBreakOf(person, dayKey) {
+  const b = person.homeBreak;
+  if (!Array.isArray(b) || b.length !== 2) return null;
+  const j = (rngOf(dayKey, person.slug, 'break')() - 0.5) * 0.5;
+  return [b[0] + j, b[1] + j];
+}
+
+/** 지금 밖에 있어야 하나 (잠들기 전 1~2시간은 집에 · 낮에 집에 들르는 시간 homeBreak 도 집에 — opts.noBreak 면 건너뜀: 행사·야시장 주인공) */
+export function shouldBeOut(person, now, weather, { noBreak = false } = {}) {
   const h = dayHour(now);
   const { wake } = scheduleOf(person, now.dayKey);
   if (h < wake || h >= homeFrom(person, now.dayKey)) return false;
+  const br = noBreak ? null : homeBreakOf(person, now.dayKey);
+  if (br && h >= br[0] && h < br[1]) return false;
   if (weather === 'rain' && person.rainStay) return false;
   if (weather === 'snow' && person.snowStay) return false;
   return true;

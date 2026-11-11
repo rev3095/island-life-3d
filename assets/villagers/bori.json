@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "approved",
   "about": "주민 데이터 (6차 M6-P3, 검수 보드 wave6 D30-A). 캐릭터 편집기 「성격·대화」 탭에서 고치고 채팅 \"요청 확인\" 으로 반영 (version +1). 읽는 곳 src/gameplay/town/people.js · 모양 docs/notes/m6-p3-traits.md",
   "id": "CH-03",
@@ -9,7 +9,7 @@
   "traits": { "species": "강아지", "personality": "느긋함 · 낮잠 전문가", "speech": "말끝 '멍', 느릿한 말투", "ending": "멍" },
   "color": "#6CA0DC",
   "pace": { "walk": 0.95, "run": 2.4, "runChance": 0, "idle": [4, 9], "happy": 0.12 },
-  "schedule": { "wake": 8.5, "sleep": 21, "rainStay": true, "snowStay": true },
+  "schedule": { "wake": 8.5, "sleep": 21, "rainStay": true, "snowStay": true, "homeBreak": [13, 15] },
   "roam": { "range": 12, "haunts": { "plaza": 4, "home": 4, "bridge": 1 } },
   "gifts": {
     "loves": ["furn.wood-bed", "furn.sofa", "fruit.peach"],

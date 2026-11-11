@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "review",
   "about": "주민 데이터 (6차 M6-P3, 검수 보드 wave6 D30-A). 캐릭터 편집기 「성격·대화」 탭에서 고치고 채팅 \"요청 확인\" 으로 반영 (version +1). 읽는 곳 src/gameplay/town/people.js · 모양 docs/notes/m6-p3-traits.md",
   "id": "CH-11",
@@ -17,7 +17,7 @@
   "voice": "mochi",
   "joySeason": "spring",
   "pace": { "walk": 1, "run": 2.4, "runChance": 0.03, "idle": [3, 7], "happy": 0.15 },
-  "schedule": { "wake": 7.5, "sleep": 21.5, "rainStay": true, "snowStay": true },
+  "schedule": { "wake": 7.5, "sleep": 21.5, "rainStay": true, "snowStay": true, "homeBreak": [16.5, 17.5] },
   "roam": { "range": 22, "haunts": { "beach": 5, "home": 2, "flowers": 1, "plaza": 1 } },
   "gifts": {
     "loves": ["furn.paint-easel", "flower.tulip-white", "shell.turban"],
