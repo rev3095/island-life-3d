@@ -187,6 +187,14 @@ export default {
     const labels = createLabels(ctx);
     const mail = createMail(ctx, { lines: LINES, residents });
     town.mail = mail;
+    // B-06 (스토리 s12-C): 섬 축제가 끝나면 다음 아침 우편함에 섬 주민 모두의 축하 편지 — 첫 축제(엔딩)는 festival, 그다음 해부터 festivalAgain.
+    // 편지는 그날 바로 넣는다 (우편함은 아침 배달과 같은 함). 하루에 한 번만.
+    ctx.events.on('festival:end', ({ day, first } = {}) => {
+      const m = (ctx.state.town ||= {});
+      if (m.festLetters === day) return;
+      m.festLetters = day ?? true;
+      for (const slug of residents()) mail.post(slug, first ? 'festival' : 'festivalAgain');
+    });
     party = createParty(ctx, { mail, residents, toast });
     const talk = createTalk(ctx, { lines: LINES, party });
     const chatter = createChatter(villagers, LINES);

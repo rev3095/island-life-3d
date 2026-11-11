@@ -79,8 +79,8 @@ export const ITEMS = [
     price: ci === 3 ? hybridPrice : price, kind, variant, hybrid: ci === 3,
   }))),
   // 재료 (MA-03 ~ MA-06, MA-08)
-  ...T.mats.map(({ slug, name, emoji, price, from, code: c }) => ({
-    id: `mat.${slug}`, category: 'mat', code: c, name, icon: itemIcon(`mat-${slug}`), emoji, price, from,
+  ...T.mats.map(({ slug, name, emoji, price, buy, from, code: c }) => ({   // buy = 상점에서 살 때 값 (B-14 섬 여행 표만)
+    id: `mat.${slug}`, category: 'mat', code: c, name, icon: itemIcon(`mat-${slug}`), emoji, price, ...(buy ? { buy } : {}), from,
   })),
   { id: 'mat.acorn-bag', category: 'mat', code: 'MA-08', name: T.acornBag.name, icon: itemIcon('mat-acorn-bag'), emoji: T.acornBag.emoji, price: T.acornBag.price,
     acorns: T.acornBag.acorns, stack: T.acornBag.stack, from: T.acornBag.from },

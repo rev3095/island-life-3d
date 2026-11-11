@@ -20,7 +20,8 @@ export function createSeats(ctx, { objs, isActive }) {
   function outdoor() {
     const out = [];
     for (const o of objs.list()) {
-      if (!o.data?.decor || o.data.decor !== 'furn') continue;
+      // 꾸밈으로 놓은 가구 + B-17 섬에 처음부터 있는 광장 벤치(배경 bench)
+      if (!(o.data?.decor === 'furn' || o.kind === 'bench')) continue;
       const spec = seatSpec(o.kind);
       if (!spec) continue;
       for (const s of seatsOf(spec, { x: o.x, z: o.z, y: o.y ?? 0, rot: o.rot ?? 0 }, `decor:${o.id}`)) out.push({ ...s, id: o.id, kind: o.kind });

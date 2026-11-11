@@ -1,5 +1,5 @@
 // 가방: 동그란 20칸. 보기(view)·팔기(sell)·기증(donate)·고르기(pick) 모드. open() 은 고른 칸 번호(또는 null)를 돌려준다.
-import { h, fmt, itemInfo, iconEl, josa, DEX_CATEGORIES } from './dom.js';
+import { h, fmt, itemInfo, iconEl, josa, DEX_CATEGORIES, BAG_TABS } from './dom.js';
 import { panelShell, gridMove } from './panels.js';
 import { createVariants } from './variants.js';
 
@@ -50,7 +50,13 @@ export function createBag(ctx, panels) {
     for (let r = 0; r < SIZE / COLS; r++) grid.append(h('div', { class: 'pk-bag-row', role: 'row' }, cells.slice(r * COLS, r * COLS + COLS)));
     const info = h('div', { class: 'pk-bag-info', 'aria-live': 'polite' });
     const wallet = h('span', { class: 'pk-wallet' });
-    shell.body.append(modeHint, grid, info);
+    // B-12 분류 탭 (보기 모드만): 고른 분류가 아닌 칸은 흐리게 (칸 자리·순서는 그대로)
+    let tab = 'all';
+    const tabRow = h('div', { class: 'pk-tabs pk-bag-tabs', role: 'tablist', 'aria-label': '가방 분류', hidden: m !== 'view' });
+    const drawTabs = () => tabRow.replaceChildren(...BAG_TABS.map(t => h('button', { type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(t.id === tab), tabindex: t.id === tab ? '0' : '-1',
+      onclick: () => { tab = t.id; drawTabs(); render(); } }, t.name)));
+    drawTabs();
+    shell.body.append(tabRow, modeHint, grid, info);
     shell.foot.append(wallet);
 
     function render() {
@@ -61,7 +67,8 @@ export function createBag(ctx, panels) {
         const ok = pickable(slot, it);
         b.replaceChildren();
         b.classList.toggle('is-empty', !slot);
-        b.classList.toggle('is-off', !!slot && m !== 'view' && !ok);
+        const inTab = !slot || m !== 'view' || BAG_TABS.find(t => t.id === tab)?.test(ctx.services.data?.items?.get?.(slot.id) ?? it) !== false;   // 표의 아이템 (나오는 시간 hours 포함)
+        b.classList.toggle('is-off', !!slot && ((m !== 'view' && !ok) || !inTab));
         b.classList.toggle('is-selected', i === selected);
         if (slot) {
           const v = variants.of(slot);

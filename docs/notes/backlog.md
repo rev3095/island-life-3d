@@ -16,7 +16,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-03 | p35-tour | s22 첫 섬 여행 + 배가 바다로 나가는 3초 장면 (지금은 원형 전환 + 알림) | 큼 | 이번 p39 에서 | tour 「배 장면」 | `assets/story/scenes/s22-*.json` · `src/gameplay/tour/` |
 | B-04 | story | H1 s01 도착 장면을 이름 정하기 *전* 배 위로 (지금은 이름 정한 뒤 `intro:named`) | 큼 | 남음 | 스토리 s01 연출안 A | `src/gameplay/intro/index.js` · `story/rules.js` |
 | B-05 | story | H2 town 이 `story.playing` 을 보고 기다리기 (지금은 story 가 `ui.isBlocking` 을 감싸서 대신) | 큼 | 반쯤 (감싸기로 돌아감) | — | `town/keepers.js` · `villager.js` · `story/index.js` |
-| B-06 | story | H3 엔딩 사진 뒤 주민 축하 편지 (s12-C) — `festival:end` 듣고 `mail.post(slug, 'festival')`, 편지 글 `letters.festival` 없음 | 큼 | 남음 | 스토리 s12 | `src/gameplay/town/mail.js` · `assets/villagers/*.json` |
+| B-06 | story | H3 엔딩 사진 뒤 주민 축하 편지 (s12-C) — `festival:end` 듣고 `mail.post(slug, 'festival')`, 편지 글 `letters.festival` 없음 | 큼 | **고침 (p50)** — 주민 열 명 `letters.festival`(첫 축제)·`festivalAgain`(해마다), `festival:end` 에 하루 한 번 섬 주민 모두 보냄 (`town/index.js`) | 스토리 s12 | `src/gameplay/town/mail.js` · `assets/villagers/*.json` |
 | B-07 | story | H4 장면 이모티콘을 Z5 이모티콘 id 로 (`emote.glyph(id)`), 말풍선 모양 맞추기 — 지금은 `EMOTES` 글자 50개 | 큼 | 남음 | Z5 축제 보드 | `story/rules.js` · `layer.js` · `story.css` |
 | B-08 | story | 장면 시작 대기열을 저장하지 않음 (부품 얻고 바로 새로고침하면 그 장면은 다음 트리거까지 안 나옴) | 작음 | **고침 (p43)** — `state.story.queue` 에 줄 선 장면·트는 중인 장면을 적어 두고 다시 열면 이어서 | — | `src/gameplay/story/index.js` |
 | B-09 | p11-tune | 짧게 고른 사람에게도 s02(할 일 목록 건네기)가 나옴 → 트리거 `guide-done` 에 `skip` 조건 | 작음 | 남음 | wave7 D44 | `src/gameplay/story/rules.js` (또는 `s02-guide-after.json`) |
@@ -27,9 +27,9 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
 | B-11 | m12-night | 야시장 노점 자리가 축제 부스(엔딩 뒤)와 겹치지 않는지 손 점검 | 작음 | 남음 | night D106·D107 | `src/gameplay/night/index.js` |
-| B-12 | m12-night | 가방·도감 「밤」 분류 탭 — 가방엔 분류 탭이 아예 없고, 도감 탭은 물고기·곤충·화석뿐 | 큼 | 남음 | night | `src/ui/bag.js` · `phone.js` · `data/night-items.js` |
+| B-12 | m12-night | 가방·도감 「밤」 분류 탭 — 가방엔 분류 탭이 아예 없고, 도감 탭은 물고기·곤충·화석뿐 | 큼 | **고침 (p50)** — 가방 분류 탭 전체·생물·재료·가구·🌙 밤 (보기 모드, 흐리게만) · 도감 🌙 밤 탭 (`dom.js isNightOnly`) | night | `src/ui/bag.js` · `phone.js` · `data/night-items.js` |
 | B-13 | p35-tour | UI-23 오른쪽 위 「🏝 섬 이름」 작은 칸 (지금은 도착 알림으로 대신) | 작음 | **고침 (p43)** — `.pk-tour-tag` 를 HUD 오른쪽 위 줄 맨 위에, 돌아오면 치움 (봇 tour 단계가 확인) | tour UI-23 | `src/gameplay/tour/index.js` · `ui.css` |
-| B-14 | p35-tour | 배 표를 도토리상점 진열에도 (지금은 선착장 배에서만, 없으면 1,000 도토리) | 큼 | 남음 | tour | `assets/data/rules.json shop` · `src/data/economy.js` |
+| B-14 | p35-tour | 배 표를 도토리상점 진열에도 (지금은 선착장 배에서만, 없으면 1,000 도토리) | 큼 | **고침 (p50)** — `shopStock().tickets` 늘 · items.json `buy: 1000` | tour | `assets/data/rules.json shop` · `src/data/economy.js` |
 
 ### 계절 행사
 
@@ -42,7 +42,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
-| B-17 | m9-decor | 주민이 벤치·피크닉 탁자에 앉는 동작 (지금은 앞에 서기만) | 큼 | 남음 | wave9 | `assets/specs/*.json` animations · `town/actor.js` |
+| B-17 | m9-decor | 주민이 벤치·피크닉 탁자에 앉는 동작 (지금은 앞에 서기만) | 큼 | **이미 됨 (M10-P1) + p50** — 놓은 벤치·피크닉 탁자·의자엔 10차부터 주민이 앉음(`villager.js trySit`). 이번에 광장 배경 벤치도 자리 (`seats.js bench`, 엔딩 전 광장) | wave9 | `assets/specs/*.json` animations · `town/actor.js` |
 | B-18 | m9-decor | 꾸밈 옮기기 (들어서 다른 칸으로 — 지금은 치우고 다시 놓기) | 큼 | 남음 | wave9 | `src/gameplay/decor/` |
 | B-19 | m9-decor | 휴대폰에서 놓을 칸을 손가락으로 고르기 (지금은 앞 칸) | 큼 | 남음 | wave9 | `src/gameplay/decor/` · `core/input.js` |
 | B-20 | m9-decor | 상점 가구 후보가 넷 늘어 하루 진열이 섞임 — 밸런스 정하기 | 큼 | 남음 | wave9 D92 | `assets/data/rules.json shop` |
