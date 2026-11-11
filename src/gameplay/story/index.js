@@ -76,11 +76,21 @@ export default {
     const heightAt = (x, z) => svc().world?.island?.heightAt?.(x, z) ?? 0;
 
     // ---- 줄 세우기 ----
+    // 줄 선 장면은 state.story.queue 에도 적어 둔다 — 트리거 직후 새로고침해도 다음에 이어서 튼다 (B-08)
     const queue = [];
     let P = null;                       // 지금 트는 장면
+    const plain = v => { try { return JSON.parse(JSON.stringify(v ?? {})); } catch { return {}; } };
+    let running = null;                 // 줄에서 꺼내 트는 중인 장면 — 다 볼 때까지 저장 줄에 남긴다
+    const keepQueue = () => { st().queue = [...(running ? [running] : []), ...queue].map(q => ({ id: q.id, vars: q.vars })); };
     function enqueue(ids, vars) {
-      for (const id of ids) if (!queue.some(q => q.id === id) && P?.id !== id) queue.push({ id, vars, wait: START_DELAY });
+      let added = false;
+      for (const id of ids) if (!queue.some(q => q.id === id) && P?.id !== id) { queue.push({ id, vars: plain(vars), wait: START_DELAY }); added = true; }
+      if (added) keepQueue();
     }
+    for (const q of Array.isArray(st().queue) ? st().queue : []) {
+      if (q?.id && scenes.has(q.id) && !st().seen[q.id] && !queue.some(x => x.id === q.id)) queue.push({ id: q.id, vars: q.vars ?? {}, wait: START_DELAY });
+    }
+    keepQueue();
     const trigEvents = new Set(Object.values(R.TRIGGERS).map(t => t.event).filter(Boolean));
     for (const ev of trigEvents) events.on(ev, payload => enqueue(R.scenesFor(ev, payload ?? {}, ordered(), st().seen), payload ?? {}));
     // ---- 화면 막 (update 가 움직인다 — 창이 숨겨져도 ctx.step 으로 돌 수 있게) ----
@@ -205,6 +215,7 @@ export default {
     }
 
     function finishSeen(sc, opts) {
+      if (running?.id === sc.id) { running = null; keepQueue(); }
       if (opts.preview) return;
       st().seen[sc.id] = svc().time?.now?.().dayKey ?? svc().data?.day?.key?.() ?? true;
       svc().data?.save?.save?.();
@@ -319,8 +330,12 @@ export default {
           const q = queue[0];
           if ((q.wait -= dt) <= 0) {
             queue.shift();
+            running = q;
+            keepQueue();
             const sc = scenes.get(q.id);
-            if (sc && !(sc.once !== false && st().seen[sc.id])) run(sc, { vars: q.vars }).catch(e => console.error('[story] 장면', e));
+            const clear = () => { if (running === q) { running = null; keepQueue(); } };
+            if (sc && !(sc.once !== false && st().seen[sc.id])) run(sc, { vars: q.vars }).catch(e => console.error('[story] 장면', e)).finally(clear);
+            else clear();
           }
         }
         if (P) {

@@ -66,6 +66,7 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon, img.pk-dex-icon { w
 
 .pk-top-right { position: absolute; right: calc(14px + var(--sar)); top: calc(12px + var(--sat)); display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .pk-acorns { display: flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 16px; font: calc(21px * var(--pk-fs, 1)) var(--pk-display); font-variant-numeric: tabular-nums; }
+.pk-tour-tag { border-radius: 999px; padding: 4px 14px; font: calc(16px * var(--pk-fs, 1)) var(--pk-display); white-space: nowrap; }   /* UI-23 투어 섬 이름 (tour) */
 .pk-acorns.is-bump { animation: pk-bump .45s ease; }
 .pk-quick { display: flex; gap: 8px; }
 .pk-quick-btn { position: relative; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--pk-cream); box-shadow: var(--pk-shadow-sm); font-size: 22px; display: grid; place-items: center; padding: 0; transition: transform .12s; }

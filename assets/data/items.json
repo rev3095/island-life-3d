@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "about": "아이템 사전 — 이름·파는 값(price)·사는 값(buy)·출현(장소·시간·계절·희귀). 표 편집기(data-editor.html)에서 고치고 채팅 \"숫자 반영\" 으로 들어온다. 읽는 곳 src/data/items.js. 모양: docs/notes/m6-p5-mapdata.md",
   "stack": {
     "fish": 1,
@@ -179,18 +179,18 @@
     { "slug": "shell-curtain", "name": "조개 커튼", "emoji": "🐚", "price": 600, "buy": 0, "size": "창문", "source": "craft", "from": "제작: 조개 6" },
     { "slug": "fruit-chair", "name": "과일 의자", "emoji": "🍎", "price": 1500, "buy": 0, "size": "1×1", "source": "craft", "from": "제작: 과일 10" },
     { "slug": "dino-model", "name": "공룡 모형", "emoji": "🦕", "price": 3000, "buy": 0, "size": "2×2", "source": "museum", "from": "박물관 완성 보상" },
-    { "slug": "surfboard", "name": "서핑보드", "emoji": "🏄", "price": 800, "buy": 0, "size": "1×1", "source": "friend", "from": "코코 친밀도 선물" },
+    { "slug": "surfboard", "name": "서핑보드", "emoji": "🏄", "price": 800, "buy": 0, "size": "1×1", "source": "friend", "from": "코코 친밀도 선물", "owner": "coco" },
     { "slug": "ball-basket", "name": "공 바구니", "emoji": "🏐", "price": 300, "buy": 1200, "size": "1×1", "source": "shop", "from": "상점" },
-    { "slug": "cushion-bed", "name": "쿠션 침대", "emoji": "🛏️", "price": 1000, "buy": 0, "size": "2×2", "source": "friend", "from": "보리 친밀도 선물" },
+    { "slug": "cushion-bed", "name": "쿠션 침대", "emoji": "🛏️", "price": 1000, "buy": 0, "size": "2×2", "source": "friend", "from": "보리 친밀도 선물", "owner": "bori" },
     { "slug": "bone-cushion", "name": "뼈다귀 쿠션", "emoji": "🦴", "price": 250, "buy": 1000, "size": "1×1", "source": "shop", "from": "상점" },
     { "slug": "flower-shelf", "name": "꽃 선반", "emoji": "💐", "price": 800, "buy": 0, "size": "2×1", "source": "craft", "from": "제작: 나무 6 · 꽃 4" },
-    { "slug": "terrarium", "name": "유리 온실", "emoji": "🌱", "price": 900, "buy": 0, "size": "1×1", "source": "friend", "from": "모찌 친밀도 선물" },
-    { "slug": "rod-rack", "name": "낚싯대 걸이", "emoji": "🎣", "price": 600, "buy": 0, "size": "벽", "source": "friend", "from": "두부 친밀도 선물" },
+    { "slug": "terrarium", "name": "유리 온실", "emoji": "🌱", "price": 900, "buy": 0, "size": "1×1", "source": "friend", "from": "모찌 친밀도 선물", "owner": "mochi" },
+    { "slug": "rod-rack", "name": "낚싯대 걸이", "emoji": "🎣", "price": 600, "buy": 0, "size": "벽", "source": "friend", "from": "두부 친밀도 선물", "owner": "dubu" },
     { "slug": "wood-stove", "name": "나무 난로", "emoji": "🔥", "price": 1800, "buy": 0, "size": "1×1", "source": "craft", "from": "제작: 철광석 4 · 나무 4" },
-    { "slug": "kitchen-counter", "name": "조리대", "emoji": "🍳", "price": 1200, "buy": 0, "size": "2×1", "source": "friend", "from": "퐁 친밀도 선물" },
+    { "slug": "kitchen-counter", "name": "조리대", "emoji": "🍳", "price": 1200, "buy": 0, "size": "2×1", "source": "friend", "from": "퐁 친밀도 선물", "owner": "pong" },
     { "slug": "fruit-basket", "name": "과일 바구니", "emoji": "🧺", "price": 750, "buy": 0, "size": "1×1", "source": "craft", "from": "제작: 과일 5" },
     { "slug": "umbrella-stand", "name": "우산꽂이", "emoji": "☂️", "price": 280, "buy": 1120, "size": "1×1", "source": "shop", "from": "상점" },
-    { "slug": "lotus-chair", "name": "연잎 의자", "emoji": "🪷", "price": 700, "buy": 0, "size": "1×1", "source": "friend", "from": "초롱 친밀도 선물" },
+    { "slug": "lotus-chair", "name": "연잎 의자", "emoji": "🪷", "price": 700, "buy": 0, "size": "1×1", "source": "friend", "from": "초롱 친밀도 선물", "owner": "chorong" },
     { "slug": "birthday-cake", "name": "생일 케이크", "emoji": "🎂", "price": 1000, "buy": 0, "size": "1×1", "source": "birthday", "from": "생일 선물" }
   ],
   "seeds": [

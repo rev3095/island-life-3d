@@ -145,9 +145,11 @@ function buildStamp() {
 }
 
 /** 오류 세기: 점검을 켠 순간(그리기 준비 = 모듈 불러오기 전)부터 console.error · 잡히지 않은 오류 · 거절 */
-function watchErrors() {
+function watchErrors(log) {
   const box = { count: 0, list: [] };
   const add = msg => { box.count++; if (box.list.length < CHECK.maxErrors) box.list.push(String(msg).slice(0, 200)); };
+  // 게임이 모으는 오류 기록장(ctx.errors, src/core/errors.js)이 있으면 그것을 듣는다 — 같은 오류를 두 곳에서 따로 세지 않게 (B-39)
+  if (typeof log?.on === 'function') { log.on(e => add(e?.message ?? e)); return box; }
   const orig = console.error;
   console.error = (...a) => { add(a.map(x => (x instanceof Error ? x.message : typeof x === 'string' ? x : (() => { try { return JSON.stringify(x); } catch { return String(x); } })())).join(' ')); return orig.apply(console, a); };
   addEventListener('error', e => add(e.message || `파일을 받지 못함: ${e.target?.src ?? e.target?.href ?? '?'}`), true);
@@ -216,7 +218,7 @@ const ms = v => (v == null ? '-' : `${v.toFixed(1)}ms`);
 export function createCheck(ctx, { service } = {}) {
   const { renderer, events } = ctx;
   const gl = renderer.getContext();
-  const errors = watchErrors();
+  const errors = watchErrors(ctx.errors);
   const isFixed = () => !!urlQuality(location) || !!normalizeQuality(ctx.state?.settings?.spec);   // 저장을 불러온 뒤에 본다 (섬폰 「그래픽 사양」)
   let state = 'boot', ready = false, t0 = 0, frameT0 = 0, lastNow = 0, frameNo = 0, skipGap = false;
   let spots = [], spot = -1, samples = {}, home = null, froze = false, startedAt = null, quality = null, result = null;
