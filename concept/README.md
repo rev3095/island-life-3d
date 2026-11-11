@@ -36,7 +36,7 @@
 | ET | 편집기 (wave6) | ET-01–11 (P36 리소스·스토리·요소 편집기는 ET 번호 없이 홈 id `res`·`story`·`elem`) |
 | UI · RC · QA | wave7: 새 화면 (UI-01–03 v0.1, UI-04–05 z5 다음) · 출시 점검표 · QA 결과 (`docs/qa/playthrough-2026-10-30.md` 의 버그 ID 그대로) | UI-06–11 (+interiors UI-12 원형 화면 전환) (+wave8 UI-13–15) (+wave9 UI-16 섬 꾸미기 칸 · UI-17 놓을 칸 미리 보기) (+wave10 UI-18 이사 편지·떠나기 묻기) (+night UI-20 카드 뽑기 창 · UI-21 오늘 운세 칸) · RC-01–12 · QA-01–19 (+tour UI-22 여행 묻기 창 · UI-23 투어 섬 표시) |
 | SK | 하늘 층 (sky 보드): 그라데이션 · 안개 띠 · 해 빛무리·노을빛 · 빛살 · 툰 구름층 · 3D 솜구름 · 은하수 · 별·달 | SK-01–08 |
-| CL | 옷 (wave11 반영 v1, M11 `p38-m11` 에서 만드는 중): 모자 · 윗옷 · 신발 (CL-00 = 주인공 기본 옷) | (+wave11 CL-01–12) · FU-54 옷 진열대 · UI-19 옷장 창 · AN-12 빙글 |
+| CL | 옷 (wave11 반영 v1, M11 main ba6a490): 모자 · 윗옷 · 신발 (CL-00 = 주인공 기본 옷 `player_top`) | **M11 검수 대기 CL-01–12 · FU-54 · UI-19 · AN-12** (리소스 편집기 「옷」 `#cloth-<slug>`) |
 | TA | 타로 카드 (night, 섬 이야기로 새로 그린 12장, 하루 운세) | TA-01–12 |
 | TO | 투어 섬 모양 틀 (tour, `src/gameplay/tour/islet.js` SHAPES): 둥근 · 초승달 · 쌍둥이 · 언덕 | TO-01–04 |
 | EV · FX | wave8: 계절 행사 · 효과 셰이더 | EV-01–04 · FX-01 (불꽃) |
@@ -69,7 +69,7 @@
 
 https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저장소 루트). 모든 편집기·검수 보드·게임 링크를 한곳에서 열고, 편집기마다 무엇을 고치는지 · 채팅 명령 · 마지막 반영 버전 · 처리할 것 수를 보여 주고, **「전체 관리」 표에서 모든 리소스를 골라 다시 열기 · 고쳐 주세요 · 확정을 남긴다** (아래 「전체 관리」).
 
-목록 group `archive` 는 지난 보드와 예전 편집기(링크만 남김 — 2026-11-11 캐릭터·배경 편집기, P36 섬 지도 편집기). 홈 화면에서는 「지난 보드」·「지난 편집기」 줄로 보인다.
+목록 group `archive` 는 지난 보드와 예전 편집기(링크만 남김 — 2026-11-11 캐릭터·배경 편집기, P36 섬 지도 편집기). 홈 화면에서는 「지난 보드」·「지난 편집기」 줄로 보인다. 예전 캐릭터·배경 편집기의 요청 처리 순서("요청 확인"·"배경 요청 확인")와 배경 편집기 영역·방 요청 모양은 `docs/notes/old-editors.md` 로 옮겼다.
 
 - **목록 = `editors.html` 의 `<script type="application/json" id="editors-list">`.** 항목 `{ id, group: editor|board|game|soon|archive, name, url, file, edits, command, openLabel, reads, et?, track?, later? }`. `reads` 는 "전체 요청 확인" 때 Claude 가 그 아티팩트 저장소에서 읽을 곳. 머리의 **바로 가기** (`nav.quick`) 는 같은 링크를 스크립트 없이 적어 둔 것 — 목록을 바꾸면 같이 고친다. `tests/hub.test.mjs` 가 목록 ↔ 바로 가기 · CLAUDE.md·이 표·시나리오 노트의 링크, 보드 id ↔ `window.BOARD.id` 를 검사하고, CLAUDE.md·이 문서·`docs/notes/*.md`·홈의 claude.ai 링크가 모두 목록(또는 홈 자신)의 링크인지 본다 (깨진 링크 검사).
 - 아티팩트는 다른 아티팩트의 저장소를 읽을 수 없다 → 홈은 **자기 저장소의 문서만** 보여 주고, 그 문서는 Claude 가 ArtifactData 로 써 넣는다. 숫자·목록은 Claude 가 마지막으로 확인한 때 기준이다. 홈 페이지가 쓰는 곳은 `manage/*` (전체 관리 요청) 하나.
