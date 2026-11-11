@@ -219,6 +219,12 @@ function createNight(ctx, cfg) {
   function hideKeeper(kind) { const a = keepers[kind]?.actor; if (a) { a.root.visible = false; a.setOpacity(0); } }
 
   /** 달빛 가게·천막 문 (house/places.js 가 문 쪽으로 밀 때·문 앞 행동 키): 'open' | 'closed' | null (건물이 없음) */
+  /** [22, 27] → '밤 10시–새벽 3시에 열어요' (게임 하루 시각 5~29) */
+  function openText(hours) {
+    if (!Array.isArray(hours)) return '';
+    const t = h => { const x = ((h % 24) + 24) % 24; const part = h >= 24 || x < 5 ? '새벽' : x < 12 ? '오전' : x < 18 ? '오후' : '밤'; const hh = x === 0 ? 12 : x > 12 ? x - 12 : x; return `${part} ${hh}시`; };
+    return `${t(hours[0])}–${t(hours[1])}에 열어요`;
+  }
   function placeRule(kind, n = now()) {
     const c = kinds[kind];
     if (!c || !n || !placed[kind]) return null;
@@ -488,7 +494,8 @@ function createNight(ctx, cfg) {
     });
     gp.add({
       name: 'night:door', intent: 'action', priority: 90,   // 섬: 달빛 가게 · 천막 문
-      label: () => '들어가기',
+      // P46 FB-03: 닫혀 있으면 문 앞 글자에 여는 시각을 보여 준다 (예전엔 「들어가기」 → 눌러야 「닫혔어요」)
+      label: kind => (placeRule(kind) === 'open' ? '들어가기' : `닫힘 · ${openText(kinds[kind]?.hours)}`),
       test: () => doorInFront(),
       run: kind => {
         if (placeRule(kind) === 'open') return S().house?.places?.enter?.(kind);

@@ -21,6 +21,7 @@ const CSS = `
 .pk-hclock-dial .face { transition: fill .6s; }
 .pk-hclock-dial .hand { stroke-linecap: round; }
 .pk-hclock-dial .hit { stroke: transparent; stroke-width: 40; stroke-linecap: round; }
+.pk-hclock-dial .pk-dial-day { font-family: var(--pk-display); text-anchor: middle; dominant-baseline: central; pointer-events: none; }   /* P46 FB-04 바늘이 내일로 넘어가면 */
 .pk-hclock-dial.is-preview .h-minute .hand { stroke: #E0663A !important; }
 .pk-hclock-strip { grid-column: 1 / span 2; display: flex; align-items: center; gap: 4px; margin-top: 6px; font: 13px var(--pk-display); }
 .pk-hclock-strip[hidden] { display: none; }

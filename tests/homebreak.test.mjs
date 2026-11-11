@@ -27,3 +27,15 @@ test('낮 10–18시 어느 시각이든 맑은 날 집에 깨어 있는 주민�
     assert.ok(home.length >= 1, `${h}시: 집에 있는 주민 없음`);
   }
 });
+
+test('FB-02: 야시장 날 노점 주인은 24시까지 밖(노점), 24시–늦잠 사이엔 집에 깨어 있다', async () => {
+  const { setLateHook, homeFrom, isAsleep } = await import('../src/gameplay/town/rules.js');
+  const p = PEOPLE.pong;
+  setLateHook((slug) => (slug === 'pong' ? 25.5 : null));
+  try {
+    assert.equal(homeFrom(p, '2027-05-15'), 24);
+    assert.equal(shouldBeOut(p, at('2027-05-15', 23.5), 'clear', { noBreak: true }), true, '23:30 노점');
+    assert.equal(shouldBeOut(p, at('2027-05-16', 0.5), 'clear', { noBreak: true }), false, '0:30 집');
+    assert.equal(isAsleep(p, { dayKey: '2027-05-15', hour: 0, hourF: 0.5 }), false, '0:30 깨어 있음');
+  } finally { setLateHook(null); }
+});
