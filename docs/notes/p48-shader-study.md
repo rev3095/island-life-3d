@@ -2,7 +2,7 @@
 
 브랜치 `p48-shader-study` (main bd74a46 에서). 사용자 요청: "셰이더 적용 관련해서 어떻게 셰이더 적용할 수 있는지 분석 보고 진행, 자주 쓰이는 셰이더 찾아서 현재 모델링·사양에 맞게 최적화 고려해서 셰이더 여러 개 추천".
 
-결과물: 이 노트 · 검수 보드 `concept/shader-board.html` (게시 https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp, slug 2e5144b1-35ec-4c1b-bb4c-f2a477272543, capabilities db·user) (보드 id `shader`, 결정 D130–D139, 그림 `concept/shader/`) · 시제품 넷(`src/core/materials.js`, **기본 0 = 게임 모습 그대로**) · 재기 도구 `tools/perf-bench.mjs --variants` / `--looks`.
+결과물: 이 노트 · 검수 보드 `concept/shader-board.html` (게시 아티팩트 id `6ijKYZnTxNerwg3jwTa6Vp`, slug 2e5144b1-35ec-4c1b-bb4c-f2a477272543, capabilities db·user) (보드 id `shader`, 결정 D130–D139, 그림 `concept/shader/`) · 시제품 넷(`src/core/materials.js`, **기본 0 = 게임 모습 그대로**) · 재기 도구 `tools/perf-bench.mjs --variants` / `--looks`.
 
 ---
 
@@ -181,6 +181,82 @@ sky/dome.js              ─▶ 하늘 돔 ShaderMaterial (SKY_QUALITY 로 #defi
 - **CLAUDE.md 「사양」**: "`QUALITY.mid.post = false` 라 처음 사양(적정)에는 색 보정·비네트도 없다 — D134 결정 대기."
 - **CLAUDE.md 명령어 표** `perf-bench` 줄에 `[--variants=<json>] [--looks=<json> --shots=<폴더>]` 를 더한다.
 - **docs/SHADERS.md**: 「새 재질 효과 더하기」 1번 앞에 "조각 자리 표"(이 노트 1절 두 표)를 옮기고, 「효과마다 어디에 있나」 표에 시제품 넷을 "시제품(꺼짐)" 으로 한 줄씩.
-- **concept/README.md 보드 목록**: `shader` · 셰이더 검수 보드 · 결정 D130–D139 · 링크 https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp.
+- **concept/README.md 보드 목록**: `shader` · 셰이더 검수 보드 · 결정 D130–D139 · 링크 아티팩트 id `6ijKYZnTxNerwg3jwTa6Vp`.
 - **편집기 홈 `editors.html` 의 `editors-list`** (group `board`) 에 shader 보드를 더한다.
-- **devlog 「게시물」**: 셰이더 검수 보드 v0.1 https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp (2026-11-11).
+- **devlog 「게시물」**: 셰이더 검수 보드 v0.1 아티팩트 id `6ijKYZnTxNerwg3jwTa6Vp` (2026-11-11).
+
+---
+
+## 7. 반영 v1 (2026-11-12, 보드 shader 사용자 선택 + "최대한 저사양에서 돌아가게")
+
+보드 `boards/shader` v1 선택: D130-B(all) · D131-A(hml) · D132-A(hml) · D133-A(all) · D134-A · D135-A · D136-A(hm) · D137-A(hm) · D138-A · D139-A, 의견 없음.
+
+### 사양별로 실제로 켜진 것
+
+| 결정 | 높음 | 적정 | 낮음 | 매우 낮음 |
+|---|---|---|---|---|
+| D130-B 눈 쌓임 (눈 오는 날만, 세기 1) | 셰이더 (눈 예보가 있는 날만 넣음) | 셰이더 (같음) | 셰이더 없이 위를 보는 꼭짓점 색을 눈 색으로 (CPU — 섬 땅 + 배경 묶음 풀·지붕·나무 위) | 같음 (CPU) |
+| D131-A 잎 뒤 비침 0.6 | ✅ | ✅ | — ¹ | — |
+| D132-A 젖은 땅 윤기 (비 × 1) | 셰이더 (비 예보가 있는 날만) | 셰이더 (같음) | 예전처럼 어둡게만 | 예전처럼 어둡게만 |
+| D133-A 낮은 안개 (새벽 0.6 · 비 0.4) | 셰이더 | 셰이더 | 거리 안개를 당김 (CPU, GPU 0) | 거리 안개 당김 |
+| D134-A 색 보정·비네트 | 화면 효과 다섯 단 (그대로) | **색 보정 + FXAA** (`post: 'grade'`, 빛 번짐·흐림 없음) | — | — |
+| D135-A 외곽선 | 껍데기 그대로 | 그대로 | (꺼짐 그대로) | (꺼짐 그대로) |
+| D136-A 물 빛 그물 0.5 | ✅ 얕은 바다 | ✅ | — | — |
+| D137-A 반짝임 1 | 눈·비 오는 날 | — ² | — | — |
+| D138-A LUT · D139-A 하프톤 | 안 함 | 안 함 | 안 함 | 안 함 |
+
+¹ 보드는 높음·적정·낮음(hml)이었지만, 낮음에서 셰이더로 넣으면 GPU 가 늘어서(아래) 사용자 조건 「낮음·매우 낮음은 늘지 않게」를 따라 뺐다.
+² 보드는 높음·적정(hm)이었지만, 적정에서 눈·젖음과 같이 넣으면 +0.6ms 라 높음만.
+
+### 저사양을 위해 바꾼 구조 — 셰이더 글자째 넣고 빼기
+
+재 보니 **uniform 0 으로 건너뛰는 갈래도 공짜가 아니었다** (Intel UHD · ANGLE D3D11). 같은 페이지에서 번갈아 잰 값:
+
+| 시도 | 낮음 광장 낮 | 매우 낮음 광장 낮 |
+|---|---|---|
+| main (반영 전) | 2.70 ~ 2.86 | 1.68 ~ 1.72 |
+| 효과를 조각 셰이더 갈래로 늘 넣음 (값 0) | 3.36 (+0.55) | 1.97 (+0.28) |
+| 갈래 안 그림 읽기를 `textureLod`·`fwidth` 빼기 | 3.36 (그대로 — 갈래 펴짐이 원인이 아님) | 1.96 |
+| 꼭짓점에서 세어 조각은 섞기만 | 3.08 (+0.27) | 1.88 (+0.2) |
+| **셰이더 글자를 빼고 CPU(땅 색·거리 안개)로** | **2.77 ~ 2.81 (±0)** | **1.66 ~ 1.71 (±0)** |
+
+적정에서도 같았다: 효과 여섯을 다 넣어 두면 맑은 날에도 +1.27ms. 하나씩 넣어 보면 눈 0.29 · 잎 0.21 · 안개 0.13 · 젖음 0.12 · 반짝임 0.01 · 물 빛 그물 0, 여럿이면 더한 값보다 커진다 (레지스터가 늘어 GPU 가 동시에 덜 돌리는 것으로 본다). 눈과 반짝임을 같이 넣으면 눈만 넣을 때보다 +0.6ms 더 든다.
+
+그래서:
+- `core/materials.js` `setShaderTier(목록)` — 넣을 효과마다 `#define STYLE_FX_<이름>` (SNOW · HFOG · LEAF · WET · GLITTER · CAUSTIC). 툰 재질의 프로그램 열쇠에 목록이 들어가고, 바뀌면 툰 재질만 `needsUpdate`. world 의 kit·banks·coast 덧씌우기는 열쇠를 **그때그때** 읽게 바꿨다 (예전엔 만들 때 한 번 읽어 굳혀 둠).
+- `render/quality.js` `QUALITY[q].shaderFx`: 높음·적정 `'full'`, 낮음·매우 낮음 `'lite'` (아무것도 안 넣음). `main.js` 가 재질을 만들기 전에, `render.setQuality` 가 바꿀 때 건다.
+- `sky/index.js` `syncShaderFx()`: 높음·적정에서 **오늘 예보로** 고른다 — 잎·안개·물 빛 그물은 늘, 눈은 눈 예보가 있는 날, 젖음은 비·무지개가 있는 날, 반짝임(높음)은 그 둘과 같이. 다시 만드는 때 = 처음 · 하루가 바뀔 때(05:00) · `setWeather` · 사양 바꿀 때. **날씨가 바뀔 때마다 다시 만들지 않는다** (하루에 한 번 이하).
+- 셰이더에 눈·안개가 없으면 sky 가 대신: 눈 = `surfaces.js snowVerts` 가 섬 땅(`ground`)·배경 묶음(`kit-toon`) 메시의 **꼭짓점 색**을 위를 보는 만큼(법선 y) 눈 색(#EEF2FA)으로 85% 까지 섞는다 (물 aStyle 2 는 빼고, 눈 양 0.05 단위로만, 프레임마다 꼭짓점 3만 개까지 나눠 써서 CPU 한 프레임 11ms 안 — 처음엔 재질 색만 바꿨는데 섬 땅은 색이 꼭짓점 색이라 곱하기로는 하얘지지 않았다). 꼭짓점 색 없는 땅 재질은 재질 색. 안개 = 거리 안개 near ×(1−0.45f) · far ×(1−0.3f). GPU 몫 0.
+- 세기: render `apply()` → `look.uLeafLight·uCaustic·uGlitter` 는 바로, 날씨 셋은 `materials.weatherFx` 에 두고 sky 가 매 프레임 곱한다 (눈은 눈 오는 동안 40초에 쌓이고 그치면 150초에 녹음, 처음·`setWeather({instant})` 는 바로).
+- 셰이더 프로그램 수: 사양 하나 안에서는 늘지 않는다 (효과는 uniform 값으로 켜고 끔). 열쇠가 바뀌는 날(눈·비 예보 날)에 툰 프로그램을 한 번 다시 만든다.
+
+### 반영 전후 GPU 시간 (Intel UHD · 1280×800, ms — main bd74a46 → 이 브랜치, 같은 때 차례로)
+
+| 사양 | 광장 낮 | 광장 밤 | 투어 섬 |
+|---|---|---|---|
+| 높음 | 9.22 → 9.54 (+0.32) | 9.11 → 9.36 (+0.25) | 6.71 → 6.96 (+0.25) |
+| 적정 | 4.80 → 5.39 (+0.59) | 4.89 → 5.29 (+0.40) | 3.90 → 4.59 (+0.69) |
+| 낮음 | 2.82 → 2.78 (±0) | 2.81 → 2.84 (±0) | 2.50 → 2.58 (±0.1, 투어는 흔들림 큼) |
+| 매우 낮음 | 1.69 → 1.66 (±0) | 1.69 → 1.68 (±0) | 1.12 → 1.00 (±0.1) |
+
+적정의 +0.4~0.7 = 색 보정+FXAA(MSAA 바로 그리기와 거의 같음, 재 보니 +0.1) + 맑은 날 셰이더(잎·안개·물 빛 그물 ≈ +0.36). 날씨 날 (광장 낮, 그날 셰이더까지): 적정 눈 +0.26 · 비 +0.26 더, 높음 눈 +0.9 · 비 +0.6 더 (반짝임 포함). 낮음·매우 낮음은 눈·비 날에도 ±0.05 안.
+
+실내는 GPU 를 따로 재지 않았다 — 집 안에서는 sky 가 눈·젖음·안개 세기를 0 으로 둬서 맑은 날 광장과 같은 셰이더 몫(잎·물 빛 그물은 실내에 거의 없음). 회귀는 아래 점검으로 봤다.
+
+### 그 밖에 바뀐 것
+- `presets.json` cozy: `leafLight 0.6 · glitter 1 · caustic 0.5 · snow 1 · wetSheen 1 · heightFog 1`, toon 은 모두 0. **`version` 은 올리지 않았다** (스타일 편집기 반영 번호 applied/style 과 따로 — 다음 "스타일 반영" 때 같이).
+- `PARAMS` 6줄 (빛: 잎 뒤 비침·반짝임 / 움직임: 얕은 물 빛 그물 / 새 묶음 「날씨·계절」: 눈 쌓임·젖은 땅 윤기·낮은 안개) → 스타일 편집기에 슬라이더가 저절로 생긴다.
+- 테스트: `check.test.mjs` (적정 `post: 'grade'`, 새 fx 키 사양표), `mouse.test.mjs` (sky `tier` 줄 모양).
+- `tools/perf-bench.mjs --variants` 갈래에 `weather`·`tier` 를 더함 (`tier: 'lite' | ['snow', …]`).
+
+### 문서 세션이 반영할 문장 (반영 v1)
+- **CLAUDE.md 「렌더링 규칙」**: "셰이더 보드 효과(눈·잎 뒤 비침·젖음·낮은 안개·물 빛 그물·반짝임)는 `#define STYLE_FX_*` 로 **필요한 날만 셰이더 글자째** 넣는다 (`materials.setShaderTier`, sky `syncShaderFx` 가 오늘 예보로 고름). uniform 0 갈래도 내장 그래픽에선 비용이 있어서다 — 새 효과도 이 모양을 따른다. 낮음·매우 낮음은 넣지 않고 눈·안개만 CPU(땅 색·거리 안개)로."
+- **CLAUDE.md 「사양」**: 적정 `post: 'grade'` (색 보정 + FXAA), `shaderFx` 줄, 사양표는 이 노트 7절.
+- **docs/SHADERS.md**: 「효과마다 어디에 있나」 표에 여섯 줄 + 사양표 열 여섯 개, 「새 재질 효과 더하기」에 "갈래도 비용 — 큰 효과는 `STYLE_FX_*` 로 넣고 빼기".
+- **concept/README.md 보드 목록**·**편집기 홈 목록**: shader 보드 (아티팩트 id `6ijKYZnTxNerwg3jwTa6Vp`) 반영 v1.
+
+### 회귀 점검 · 사진
+- `node --test tests/` 468 통과 (1 건너뜀 그대로).
+- `node tools/check-clock.mjs --port=4284` 15가지 실패 0 · `node tools/check-interiors.mjs --port=4285 --hours=10,23` 문제 0 (`docs/qa/runs/2026-11-12-01-16-clock`, `…-01-17-interiors`).
+- 사진 `concept/shader/v1-<장면>-<사양>.jpg` (광장 낮·밤·비·눈 · 새벽/낮 선착장, 높음·적정·낮음 + 매우 낮음 눈·새벽). 날짜 2026-11-12 + `setWeather` 로 비·눈.
+- 브라우저에서 사양 넷을 오가며 셰이더 오류 없음 (콘솔 오류 0).

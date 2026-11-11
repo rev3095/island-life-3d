@@ -27,11 +27,18 @@ export const PARAMS = [
   { key: 'spec', label: '장난감 하이라이트', group: '빛', type: 'range', min: 0, max: 2, step: 0.01 },
   { key: 'specSize', label: '하이라이트 크기', group: '빛', type: 'range', min: 0, max: 1, step: 0.01 },
   { key: 'glow', label: '불꽃·반딧불 빛나기', group: '빛', type: 'range', min: 0, max: 3, step: 0.01 },
+  { key: 'leafLight', label: '잎 뒤 비침', group: '빛', type: 'range', min: 0, max: 2, step: 0.01 },
+  { key: 'glitter', label: '눈·젖은 땅 반짝임', group: '빛', type: 'range', min: 0, max: 2, step: 0.01 },
   // ── 움직임 ──
   { key: 'wind', label: '바람 (잎·꽃)', group: '움직임', type: 'range', min: 0, max: 2, step: 0.01 },
   { key: 'windSpeed', label: '바람 빠르기', group: '움직임', type: 'range', min: 0.2, max: 3, step: 0.01 },
   { key: 'water', label: '물결 반짝임', group: '움직임', type: 'range', min: 0, max: 2, step: 0.01 },
   { key: 'waterScale', label: '물결 무늬 크기', group: '움직임', type: 'range', min: 0.3, max: 3, step: 0.01 },
+  { key: 'caustic', label: '얕은 물 빛 그물', group: '움직임', type: 'range', min: 0, max: 1.5, step: 0.01 },
+  // ── 날씨·계절 (세기 — 실제 양은 sky 가 날씨·시각으로 곱한다) ──
+  { key: 'snow', label: '눈 쌓임 (눈 오는 날)', group: '날씨·계절', type: 'range', min: 0, max: 1.5, step: 0.01 },
+  { key: 'wetSheen', label: '젖은 땅 윤기 (비)', group: '날씨·계절', type: 'range', min: 0, max: 1.5, step: 0.01 },
+  { key: 'heightFog', label: '낮은 안개 (새벽·비)', group: '날씨·계절', type: 'range', min: 0, max: 2, step: 0.01 },
   // ── 외곽선 ──
   { key: 'outline', label: '외곽선', group: '외곽선', type: 'select', options: [['off', '없음'], ['subtle', '은은하게'], ['ink', '잉크 (예전)']] },
   { key: 'outlineScale', label: '굵기 (은은하게)', group: '외곽선', type: 'range', min: 0.1, max: 1.5, step: 0.01 },

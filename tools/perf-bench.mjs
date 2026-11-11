@@ -2,7 +2,7 @@
 // 이름 정하기·첫 장면은 실제 단추·Esc·Space 로 넘기고, 재는 동안만 플레이어를 옮기고 시계를 당긴다(미리 보기 저장 — 진짜 저장과 따로).
 // GPU 시간 = 프레임마다 EXT_disjoint_timer_query_webgl2 를 첫 renderer.render 부터 프레임 끝까지 (모듈 update 는 빼고), 쉬지 않고 연달아 그린 프레임의 가운데 값.
 // 사용: node tools/perf-bench.mjs [--port=4241] [--target=dev|artifact] [--quality=high,mid,low,min] [--scenes=plaza-day,plaza-night,market,tour] [--rounds=3] [--out=<json>] [--shots=<폴더>]
-//   [--variants=<json>]  셰이더 켜고 끄기 비교 (P48): [{ name, look: { uFoo: 1 }, style: { bloom: 0 } }] — 장소마다 기준 → 갈래마다 값을 얹어 재고 → 기준 다시, 차이는 앞뒤 기준 평균과
+//   [--variants=<json>]  셰이더 켜고 끄기 비교 (P48): [{ name, look: { uFoo: 1 }, style: { bloom: 0 }, weather: 'snow', tier: 'lite' }] — 장소마다 기준 → 갈래마다 값을 얹어 재고 → 기준 다시, 차이는 앞뒤 기준 평균과
 //   [--looks=<json> --shots=<폴더>]  비교 사진만 (재지 않음, P48 검수 보드): [{ slug, hour, weather, look: {...}, style: {...} }] — 장소마다 slug-<장소>-<사양>.png
 import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -168,8 +168,13 @@ async function driver({ scenes, rounds, shots, probe, variants = [], looks = [] 
           const old = {};
           for (const [k, x] of Object.entries(v.look ?? {})) { old[k] = look[k].value; look[k].value = x; }
           if (v.style) style.set(v.style);
+          if (v.weather) T.setWeather(v.weather, { instant: true });
+          const tier0 = c.materials.getShaderTier?.();
+          if (v.tier) c.materials.setShaderTier(v.tier);
           step(6); await wait(200);
           const g = await one();
+          if (v.weather) T.setWeather(null, { instant: true });
+          if (v.tier) c.materials.setShaderTier(tier0);
           for (const [k, x] of Object.entries(old)) look[k].value = x;
           if (v.style) style.set(base0);
           step(6); await wait(150);

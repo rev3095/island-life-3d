@@ -54,9 +54,9 @@ export function createKit(ctx) {
     m.vertexColors = true;
     if (sway) {
       const base = m.onBeforeCompile;
-      const baseKey = m.customProgramCacheKey();
+      const baseKey = m.customProgramCacheKey;   // 그때그때 읽는다 (셰이더 등급이 사양 따라 바뀜)
       m.onBeforeCompile = (sh, r) => { base.call(m, sh, r); addSway(sh); };
-      m.customProgramCacheKey = () => baseKey + '-sway';
+      m.customProgramCacheKey = () => baseKey.call(m) + '-sway';
     }
     matCache.set(key, m);
     return m;

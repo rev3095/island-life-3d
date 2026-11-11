@@ -119,6 +119,22 @@ const SEA_FRAG = /* glsl */ `
   float aa = max( fwidth( cd ), 1e-4 );
   // 얕은 물: 해안선 가까이 밝은 청록 → 바깥 꼭짓점 색(깊은 물)
   diffuseColor.rgb = mix( uShallow, diffuseColor.rgb, smoothstep( uWaterline, uWaterline + 2.6, cd ) );
+  // D136 물 빛 그물 (카우스틱): 얕은 물(물가 2칸 안)만, 구름 그림자 잡음 그림을 두 방향으로 흘려 겹친 곳이 밝은 그물. 사양 낮음 아래는 uCaustic 0 → 건너뜀
+  #ifdef STYLE_FX_CAUSTIC
+  if ( uCaustic > 0.0 ) {
+    float csh = 1.0 - smoothstep( uWaterline + 0.3, uWaterline + 2.2, cd );
+    if ( csh > 0.0 ) {
+      // 갈래 안이라 texture2D·fwidth 대신 textureLod (materials.js styleLod — 갈래가 펴지지 않게)
+      vec2 cq = vCoastXZ * 0.17;
+      float clod = styleLod( length( vViewPosition ), 0.23 );
+      float c1 = textureLod( uCloudTex, cq + vec2( uSeaTime * 0.012, uSeaTime * 0.007 ), clod ).r;
+      float c2 = textureLod( uCloudTex, cq * 1.37 + vec2( 0.37 - uSeaTime * 0.010, 0.11 + uSeaTime * 0.013 ), clod ).r;
+      float cdv = abs( c1 - c2 );
+      float cw = 1.0 - smoothstep( 0.0, 0.035 + clod * 0.02, cdv );
+      diffuseColor.rgb += cw * csh * uCaustic * 0.32;
+    }
+  }
+  #endif
   float n = coastNoise( vCoastXZ * 1.3 + vec2( uSeaTime * 0.07, -uSeaTime * 0.05 ) );
   // 물가 거품: 물가 선에서 밀려왔다 빠지는 흰 띠 (자리마다 박자가 조금씩 다르다)
   float ph = uSeaTime * 0.95 + vCoastXZ.x * 0.21 + vCoastXZ.y * 0.17;
@@ -140,13 +156,13 @@ const SEA_FRAG = /* glsl */ `
 /** 바다 재질(toonMaterial 'sea')에 해안 효과를 덧씌운다. W4 스타일 패치(물결 반짝임 등)는 그대로 먼저 돈다 */
 export function patchSea(mat, coast, { shallow = '#A6DCEA', foam = '#F4FBFF' } = {}) {
   const u = { ...coast.uniforms, uShallow: { value: new THREE.Color(shallow) }, uFoam: { value: new THREE.Color(foam) } };
-  const base = mat.onBeforeCompile, baseKey = mat.customProgramCacheKey();
+  const base = mat.onBeforeCompile, baseKey = mat.customProgramCacheKey;   // 그때그때 읽는다 (셰이더 등급이 사양 따라 바뀜)
   mat.onBeforeCompile = (sh, r) => {
     base.call(mat, sh, r);
     Object.assign(sh.uniforms, u);
     sh.vertexShader = SEA_VERT_PARS + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n' + SEA_VERT);
     sh.fragmentShader = SEA_FRAG_PARS + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n' + SEA_FRAG);
   };
-  mat.customProgramCacheKey = () => baseKey + '-coast';
+  mat.customProgramCacheKey = () => baseKey.call(mat) + '-coast';
   return u;
 }

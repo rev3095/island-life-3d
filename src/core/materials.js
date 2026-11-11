@@ -40,12 +40,40 @@ export const look = {
   uCloudTex: { value: null },
   // 물 하늘 반사: 바다·강에 하늘색이 비침 (비스듬히 볼수록 세게). 세기(render: 사양) · 하늘 색(sky, 선형)
   uSkyReflect: { value: 0 }, uSkyZenithL: { value: new THREE.Color(0.3, 0.6, 0.9) }, uSkyHorizonL: { value: new THREE.Color(0.7, 0.85, 1) },
-  // P48 셰이더 시제품 (기본 0 = 꺼짐 · 게임 모습 그대로. 비용 재기·검수 보드 shader D130–D139 용 — docs/notes/p48-shader-study.md)
-  // 눈 쌓임: 위를 보는 면에 눈 색 (세기 · 색) · 잎 뒤 비침: 바람 재질(잎·풀·꽃)에 햇빛이 비쳐 드는 빛 ·
-  // 젖은 땅 윤기: 비 올 때 땅 이름 재질의 위를 보는 면에 하늘빛 반사 · 낮은 안개: 낮은 곳에 안개 색 (세기 · 높이)
+  // 셰이더 보드 shader (D130–D137, 반영 v1 — docs/notes/p48-shader-study.md). 모두 0 이면 그 갈래를 통째로 건너뛴다 (#define 없음 → 사양마다 프로그램이 늘지 않는다)
+  // 날씨·시각으로 바뀌는 셋(눈·젖음·안개)은 sky 가 매 프레임 「세기 × 날씨」를 넣고, 세기(프리셋 × 사양 켜기)는 render 가 weatherFx 에 둔다.
+  // 눈 쌓임: 위를 보는 면에 눈 색 · 잎 뒤 비침: 바람 재질(잎·풀·꽃)에 햇빛이 비쳐 드는 빛 · 젖은 땅 윤기: 땅 이름 재질 위쪽 면에 하늘빛 ·
+  // 낮은 안개: 낮은 곳에 안개 색 (세기 · 높이) · 물 빛 그물: 얕은 바다 (world/coast.js) · 반짝임: 눈·젖은 땅 위 작은 반짝이
   uSnowCover: { value: 0 }, uSnowColor: { value: new THREE.Color('#F4F7FF') }, uLeafLight: { value: 0 }, uWetSheen: { value: 0 },
-  uHeightFog: { value: 0 }, uHeightFogTop: { value: 1.2 },
+  uHeightFog: { value: 0 }, uHeightFogTop: { value: 1.2 }, uCaustic: { value: 0 }, uGlitter: { value: 0 },
 };
+
+/** 날씨 셰이더 세기 (프리셋 값 × 사양 켜기) — render 가 넣고 sky 가 날씨·시각을 곱해 look 에 넣는다 */
+export const weatherFx = { snow: 0, wet: 0, hfog: 0 };
+
+/**
+ * 툰 셰이더 등급 (사양 QUALITY[q].shaderFx): 'full' 높음·적정 = 셰이더 보드 효과(D130–D137)를 조각마다 · 'lite' 낮음·매우 낮음 = 그 셰이더 글자를 통째로 뺀다
+ *   (낮음·매우 낮음의 눈·낮은 안개는 셰이더 없이 sky 가 땅 재질 색·거리 안개로 흉내 — sky/index.js · surfaces.js).
+ * 왜: 내장 그래픽(Intel UHD · ANGLE D3D11)은 uniform 0 으로 건너뛰는 갈래도 셰이더 글자가 길어지면 느려졌다
+ *   (P48 재 보기, 광장 — 조각 갈래로 두면 낮음 +0.55ms · 꼭짓점에서 세도 +0.27ms · 글자를 빼면 +0). docs/notes/p48-shader-study.md 「반영 v1」.
+ * 셰이더 글자가 달라서 바꾸면 툰 재질을 한 번 다시 만든다 (사양을 바꿀 때만 — 그때는 그림자·화면 효과로도 어차피 다시 만든다).
+ */
+const FX_ALL = ['snow', 'hfog', 'leaf', 'wet', 'glitter', 'caustic'];
+let shaderFx = new Set(FX_ALL), shaderKey = FX_ALL.join('.');
+const toonSet = new Set();
+/** t: 'full' (모두) · 'lite' (없음) · 효과 이름 목록 ['snow', 'hfog', …]. 바뀌면 툰 재질을 한 번 다시 만든다 */
+export function setShaderTier(t) {
+  const list = t === 'full' ? FX_ALL : t === 'lite' || !t ? [] : FX_ALL.filter(k => t.includes(k));
+  const key = list.join('.') || 'lite';
+  if (key === shaderKey) return false;
+  shaderFx = new Set(list);
+  shaderKey = key;
+  for (const m of toonSet) m.needsUpdate = true;
+  return true;
+}
+/** 지금 셰이더 등급: 'full' | 'lite' | 넣은 효과 이름을 . 으로 이은 것 */
+export const getShaderTier = () => (shaderFx.size === FX_ALL.length ? 'full' : shaderFx.size ? shaderKey : 'lite');
+export const hasShaderFx = k => shaderFx.has(k);
 
 /** 구름 그림자 무늬: 이음매 없이 반복되는 부드러운 값 잡음 64×64 (한 번만 만든다, 조각마다 그림 1번 읽기 — 계산 잡음보다 싸다) */
 look.uCloudTex.value = (() => {
@@ -82,7 +110,7 @@ export const STYLE_NAMES = {
   noAO: new Set(['sea', 'water', 'waterLight', 'waterDeep', 'cloud', 'foam', 'glow', 'flame', 'flameCore', 'window']),
   worldPaint: new Set(['sea', 'ground']),       // 월드 좌표 무늬 (안 움직이는 큰 판). 나머지는 모델 좌표라 걸어도 무늬가 안 미끄러진다
   glow: new Set(['flame', 'flameCore', 'firefly', 'sparkle']),
-  // P48 시제품: 젖은 땅 윤기 (sky/surfaces.js 의 WET 과 같은 이름) · 눈 안 쌓이는 재질
+  // 셰이더 보드: 젖은 땅 윤기 (sky/surfaces.js 의 WET 과 같은 이름) · 눈 안 쌓이는 재질
   wet: new Set(['ground', 'grass', 'grassDark', 'path', 'dirt', 'sand', 'sandDark', 'stone', 'stoneLight', 'grout', 'pebble', 'cliff', 'cliffDark']),
   noSnow: new Set(['sea', 'water', 'waterLight', 'waterDeep', 'waterfall', 'cloud', 'foam', 'glow', 'flame', 'flameCore', 'window', 'firefly', 'sparkle']),
 };
@@ -235,8 +263,12 @@ uniform float uStyleTime, uBands, uBandSoft, uShadeFloor, uWrap, uCastDark, uSha
 uniform vec3 uShadeTint, uLitTint;
 uniform float uRim, uRimChar, uRimPower, uSpec, uSpecSize, uPaint, uPaintScale, uAO, uAOHeight, uWater, uWaterScale, uGlow;
 uniform float uMatRim, uMatSpec, uMatAO, uMatPaint;     // 재질마다 (캐릭터는 림 세게, 물은 접촉 그늘 없음 …)
-uniform float uMatWet, uMatSnow, uSnowCover, uLeafLight, uWetSheen, uHeightFog, uHeightFogTop;   // P48 시제품
+uniform float uMatWet, uMatSnow, uSnowCover, uLeafLight, uWetSheen, uHeightFog, uHeightFogTop, uCaustic, uGlitter;   // 셰이더 보드 D130–D137
 uniform vec3 uSnowColor;
+float styleSnowK = 0.0;    // 이 조각의 눈 덮인 정도 (반짝임이 쓴다)
+// 갈래(if) 안에서 그림을 읽을 때는 꼭 밉 단계를 직접 준다(textureLod): texture2D·fwidth 처럼 이웃 화소 미분을 쓰는 것이 갈래 안에 있으면
+// ANGLE(D3D11) 이 갈래를 펴서 값이 0 이어도 늘 계산한다 (P48 에서 재 보니 낮음 +0.55ms · 매우 낮음 +0.28ms). 밉 단계 = 카메라 거리로 어림
+float styleLod( float dist, float k ) { return clamp( log2( dist * k * 0.13 ), 0.0, 6.0 ); }
 uniform float uCloudShadow, uCloudGate, uCloudCover, uSkyReflect;
 uniform vec2 uCloudOffset;
 uniform sampler2D uCloudTex;
@@ -318,7 +350,7 @@ const STYLE_COMPOSE = /* glsl */ `
   // 구름 그림자: 해를 받은 곳만 흘러가는 구름 모양으로 어둡게 (그림 1번 읽기 — 사양 낮음·매우 낮음은 uCloudGate 0 으로 건너뜀)
   float cloudK = uCloudShadow * uCloudGate;
   if ( cloudK > 0.0 ) {
-    float cn = texture2D( uCloudTex, vStyleWorld.xz * 0.012 + uCloudOffset ).r;
+    float cn = textureLod( uCloudTex, vStyleWorld.xz * 0.012 + uCloudOffset, styleLod( length( vViewPosition ), 0.012 ) ).r;
     float cut = mix( 0.6, 0.36, uCloudCover );
     reflectedLight.directDiffuse *= 1.0 - smoothstep( cut, cut + 0.14, cn ) * cloudK * styleSun;
   }
@@ -355,7 +387,8 @@ const STYLE_COMPOSE = /* glsl */ `
       totalEmissiveRadiance += mix( uSkyHorizonL, uSkyZenithL, 0.3 ) * ( 0.08 + 0.42 * wf ) * uSkyReflect * waterK;
     }
   #endif
-  // P48 시제품 · 잎 뒤 비침: 바람 재질(잎·풀·꽃)에서 햇빛 반대편·해를 마주 볼 때 연둣빛이 비쳐 든다
+  #ifdef STYLE_FX_LEAF
+  // D131 잎 뒤 비침: 바람 재질(잎·풀·꽃)에서 햇빛 반대편·해를 마주 볼 때 연둣빛이 비쳐 든다
   #if ( defined( STYLE_WIND ) || defined( STYLE_ATTR ) ) && NUM_DIR_LIGHTS > 0
     #ifdef STYLE_WIND
       float leafK = uLeafLight;
@@ -369,14 +402,32 @@ const STYLE_COMPOSE = /* glsl */ `
       totalEmissiveRadiance += diffuseColor.rgb * directionalLights[ 0 ].color * vec3( 1.0, 1.08, 0.62 ) * leafThin * leafK * 0.8;
     }
   #endif
-  // P48 시제품 · 젖은 땅 윤기: 위를 보는 땅 면에 하늘빛 (비스듬히 볼수록, 군데군데 물웅덩이처럼 세게 — 구름 그림자 잡음 그림 1번 읽기)
-  float wetK = uWetSheen * uMatWet;
+  #endif
+  float wetK = 0.0;
+  #ifdef STYLE_FX_WET
+  // D132 젖은 땅 윤기: 위를 보는 땅 면에 하늘빛 (비스듬히 볼수록, 군데군데 물웅덩이처럼 세게 — 구름 그림자 잡음 그림 1번 읽기)
+  wetK = uWetSheen * uMatWet;
   if ( wetK > 0.0 ) {
     float wup = smoothstep( 0.6, 0.95, wn.y );
-    float wpud = smoothstep( 0.45, 0.62, texture2D( uCloudTex, vStyleWorld.xz * 0.09 ).r );
+    float wpud = smoothstep( 0.45, 0.62, textureLod( uCloudTex, vStyleWorld.xz * 0.09, styleLod( length( vViewPosition ), 0.09 ) ).r );
     float wfr = pow( 1.0 - saturate( dot( geometryNormal, geometryViewDir ) ), 3.0 );
     totalEmissiveRadiance += mix( uSkyHorizonL, uSkyZenithL, 0.3 ) * ( 0.04 + 0.5 * wfr ) * wup * mix( 0.3, 1.0, wpud ) * wetK;
   }
+  #endif
+  #ifdef STYLE_FX_GLITTER
+  // D137 반짝임: 눈·젖은 땅 위, 월드 격자 칸마다 드문드문 작은 점이 보는 방향 따라 반짝 (높음·적정만 — 낮음 아래는 uGlitter 0)
+  if ( uGlitter > 0.0 ) {
+    float gm = max( styleSnowK, wetK * smoothstep( 0.6, 0.95, wn.y ) );
+    if ( gm > 0.05 ) {
+      vec3 gq = vStyleWorld * 9.0;
+      float gh = styleHash( floor( gq ) );
+      float gtw = fract( gh * 7.13 + dot( geometryViewDir, vec3( 2.3, 3.1, 1.7 ) ) * 1.5 );
+      float gdot = 1.0 - smoothstep( 0.12, 0.22, length( fract( gq.xz ) - 0.5 ) );
+      float gfar = 1.0 - smoothstep( 16.0, 26.0, length( vViewPosition ) );   // 멀어 칸이 화소만큼 작아지면 끈다 (지글거림 막기 — fwidth 는 갈래 안에서 안 씀)
+      totalEmissiveRadiance += vec3( 1.0, 0.98, 0.92 ) * step( 0.955, gh ) * smoothstep( 0.82, 0.96, gtw ) * gdot * gfar * gm * ( 0.3 + 0.7 * styleSun ) * uGlitter * 1.4;
+    }
+  }
+  #endif
   #ifdef STYLE_GLOW
     totalEmissiveRadiance += diffuseColor.rgb * uGlow;
   #endif
@@ -384,8 +435,9 @@ const STYLE_COMPOSE = /* glsl */ `
 }
 `;
 
-// P48 시제품 · 눈 쌓임 (normal_fragment_maps 뒤 = 조명 전 바탕색): 위를 보는 면을 눈 색으로. 붓질 잡음으로 가장자리를 흩는다
+// D130 눈 쌓임 (normal_fragment_maps 뒤 = 조명 전 바탕색): 위를 보는 면을 눈 색으로. 붓질 잡음으로 가장자리를 흩는다
 const STYLE_SNOW = /* glsl */ `
+#ifdef STYLE_FX_SNOW
 if ( uSnowCover > 0.0 && uMatSnow > 0.0 ) {
   vec3 snN = inverseTransformDirection( normal, viewMatrix );
   float snK = smoothstep( 0.35, 0.8, snN.y + vStylePaint * 0.8 ) * uSnowCover * uMatSnow;
@@ -393,11 +445,13 @@ if ( uSnowCover > 0.0 && uMatSnow > 0.0 ) {
     snK *= 1.0 - step( 1.5, vStyleKind ) * step( vStyleKind, 2.5 );     // 합친 메시의 물(aStyle 2)은 빼고
   #endif
   diffuseColor.rgb = mix( diffuseColor.rgb, uSnowColor, snK );
+  styleSnowK = snK;
 }
+#endif
 `;
-// P48 시제품 · 낮은 안개 (fog_fragment 뒤): 거리 안개 위에 낮은 곳일수록 안개 색을 더 (가까운 곳은 그대로)
+// D133 낮은 안개 (fog_fragment 뒤): 거리 안개 위에 낮은 곳일수록 안개 색을 더 (가까운 곳은 그대로)
 const STYLE_HFOG = /* glsl */ `
-#ifdef USE_FOG
+#if defined( USE_FOG ) && defined( STYLE_FX_HFOG )
   if ( uHeightFog > 0.0 ) {
     float hfK = ( 1.0 - smoothstep( -0.3, uHeightFogTop, vStyleWorld.y ) ) * smoothstep( 6.0, 32.0, vFogDepth ) * uHeightFog;
     gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, hfK );
@@ -474,6 +528,7 @@ function patch(shader, opts) {
   if (paintWorld) defs += '#define STYLE_PAINT_WORLD\n';
   if (attr) defs += '#define STYLE_ATTR\n';
   if (glow) defs += '#define STYLE_GLOW\n';
+  if (lit) for (const k of shaderFx) defs += `#define STYLE_FX_${k.toUpperCase()}\n`;   // 셰이더 보드 효과 (사양·날씨가 고른 것만 글자째 넣는다)
 
   let vs = `${defs}uniform float uCurve;\nuniform vec3 uCurveOrigin;\n${STYLE_VERT_PARS.replace('NOISE_CORE', NOISE_CORE)}` + shader.vertexShader;
   let begin = '#include <begin_vertex>\n' + WIND_GLSL;
@@ -568,12 +623,14 @@ export function toonMaterial(color, { flat = false, bend = true, name = '', char
       uMatSpec: { value: spec ?? STYLE_NAMES.spec.has(name) ? 1 : 0 },
       uMatAO: { value: STYLE_NAMES.noAO.has(name) ? 0 : character ? 0.7 : 1 },
       uMatPaint: { value: character ? 0.5 : name === 'cloud' ? 0.4 : 1 },
-      uMatWet: { value: STYLE_NAMES.wet.has(name) ? 1 : 0 },                       // P48 시제품
+      uMatWet: { value: STYLE_NAMES.wet.has(name) ? 1 : 0 },                       // 셰이더 보드 D132 · D130
       uMatSnow: { value: character || STYLE_NAMES.noSnow.has(name) ? 0 : 1 },
     };
     m.userData.style = mat;
     m.onBeforeCompile = sh => patch(sh, { ...o, lit: true, mat });
-    m.customProgramCacheKey = () => keyOf('toon', o);
+    m.customProgramCacheKey = () => `${keyOf('toon', o)}-${shaderKey}`;
+    toonSet.add(m);
+    m.addEventListener('dispose', () => toonSet.delete(m));
   }
   m.name = name;
   if (o.attr) m.defaultAttributeValues = { ...m.defaultAttributeValues, aStyle: [0] };   // aStyle 이 없는 메시에 써도 0(효과 없음)으로

@@ -38,6 +38,7 @@ async function boot() {
   let saved = null;
   try { saved = savedSpec(localStorage.getItem('island-life-save-v1')); } catch { /* 막힌 저장소 */ }
   const quality = urlQuality(location) ?? saved ?? DEFAULT_QUALITY;
+  materials.setShaderTier(QUALITY[quality].shaderFx);   // 툰 셰이더 등급은 재질을 만들기 전에 (낮음·매우 낮음 = 가벼운 등급)
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: QUALITY[quality].aa !== false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(ratioFor(quality, innerWidth, innerHeight, devicePixelRatio));
   renderer.shadowMap.enabled = true;

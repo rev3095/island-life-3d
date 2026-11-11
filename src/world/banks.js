@@ -18,9 +18,9 @@ float bankNoise( vec2 p ) {
 
 /** 재질 셰이더에 덧붙이기 (원래 onBeforeCompile 다음에) */
 function extend(mat, key, fn) {
-  const base = mat.onBeforeCompile, baseKey = mat.customProgramCacheKey();
+  const base = mat.onBeforeCompile, baseKey = mat.customProgramCacheKey;   // 그때그때 읽는다 (셰이더 등급이 사양 따라 바뀜)
   mat.onBeforeCompile = (sh, r) => { base.call(mat, sh, r); fn(sh); };
-  mat.customProgramCacheKey = () => `${baseKey}-${key}`;
+  mat.customProgramCacheKey = () => `${baseKey.call(mat)}-${key}`;
 }
 
 /**
