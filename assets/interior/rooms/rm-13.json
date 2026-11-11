@@ -1,0 +1,94 @@
+{
+  "id": "RM-13",
+  "slug": "rm-13",
+  "kind": "room",
+  "owner": "pado",
+  "ownerName": "파도",
+  "name": "파도 바다 탐험 기지",
+  "version": 1,
+  "status": "review",
+  "note": "씩씩한 바다 탐험가 펭귄 (P44). 벽에 바다 지도·낚싯대 걸이, 서핑보드 둘, 수조, 공 바구니, 창에 조개 커튼, 가운데 통나무 탁자와 의자. 하늘 체크 벽 · 연못 돌바닥.",
+  "wallpaper": "wp-03",
+  "floor": "fl-07",
+  "host": {
+    "lx": 4.5,
+    "lz": 4.6,
+    "face": "s"
+  },
+  "furniture": [
+    {
+      "item": "furn.surfboard",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.surfboard",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.fish-tank",
+      "gx": 0,
+      "gz": 2,
+      "rot": 1
+    },
+    {
+      "item": "furn.fish-tank",
+      "gx": 0,
+      "gz": 3,
+      "rot": 1
+    },
+    {
+      "item": "furn.log-table",
+      "gx": 3,
+      "gz": 1,
+      "rot": 0
+    },
+    {
+      "item": "furn.log-chair",
+      "gx": 5,
+      "gz": 2,
+      "rot": 3
+    },
+    {
+      "item": "furn.ball-basket",
+      "gx": 7,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "item": "furn.umbrella-stand",
+      "gx": 7,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.shell-curtain",
+      "wall": "n",
+      "slot": 1
+    },
+    {
+      "item": "furn.shell-curtain",
+      "wall": "n",
+      "slot": 6
+    },
+    {
+      "item": "furn.sea-chart-frame",
+      "wall": "n",
+      "slot": 3
+    },
+    {
+      "item": "furn.rod-rack",
+      "wall": "n",
+      "slot": 4
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "e",
+      "slot": 2
+    }
+  ]
+}

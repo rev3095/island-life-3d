@@ -26,6 +26,7 @@ node tools/build-web.mjs            # 게임 웹 빌드 → dist/web/ (게시용
 node tools/playtest.mjs [--target=artifact --build] [--mobile] [--novice] [--only=boot,naming]   # 처음부터 엔딩까지 자동 플레이 점검 (머리 없는 Chrome, 약 20분)
 node tools/check-events.mjs [--target=dev|artifact|both] [--only=EV-01,EV-03]   # 계절 행사 넷을 날짜 흉내로 실제 키 점검 (행사마다 새 브라우저, 하나 20초 안팎)
 node tools/perf-bench.mjs [--target=artifact] [--probe] [--editors]   # GPU 시간 재기 (머리 없는 Chrome, 광장 낮·밤·투어 × 사양, 1280×800 — docs/notes/p40-perf.md)
+node tools/check-interiors.mjs [--target=dev|artifact|both] [--hours=10,23,28] [--only=pado,shop]   # 실내 점검: 시각마다 모든 문(내 집·상점·박물관·주민 집·달빛 가게·새벽 천막) 앞 행동 키 → 들어가 사진·임시 상자 수 (docs/qa/interiors-2026-11-11.md)
 ```
 
 - 페이지: `/index.html` 게임 (`?debug` 모듈 로딩·시간/날씨 패널, `?quality=min|low|mid|high` 그래픽 사양 (게시본은 링크 끝 `#low` 등 — 아래 「사양」), `?check` 기기 점검 30초 (게시본 `#check`), `?story=<장면 id>` 장면 재생, `?date=2027-04-02` 날짜 흉내 (게시본 `#date=…`, 사양과 같이 `#low&date=…`) — 진짜 저장과 안 섞이게 저장 칸 `island-life-save-v1-preview`), `/artifact/` 게시본 조건(묶음·CSP), `/editors.html` 편집기 홈, `/res-editor.html` 리소스 편집기, `/story-editor.html` 스토리 편집기, `/elem-editor.html` 요소 편집기 (예전 `/editor.html` 캐릭터 · `/bg-editor.html` 배경 · `/map-editor.html` 섬 지도), `/concept/*-board.html` 검수 보드, `/tests/playthrough/index.html` 자동 플레이 판, `/demos/*.html` 트랙별 데모.

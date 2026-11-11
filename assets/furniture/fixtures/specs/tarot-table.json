@@ -1,0 +1,75 @@
+{
+  "id": "FU-60",
+  "slug": "tarot-table",
+  "item": "fixture.tarot-table",
+  "name": "타로 탁자",
+  "category": "fixture",
+  "kind": "tarot-table",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "새벽 천막에서 여명이 카드를 펼치는 낮은 탁자. 보라 천과 금빛 술, 위에 카드 셋과 카드 더미, 작은 초.",
+    "keywords": [
+      "보라 천",
+      "타로 카드",
+      "작은 초"
+    ],
+    "references": [
+      "점집 탁자"
+    ],
+    "avoid": [
+      "무서운 해골",
+      "어두운 공포 분위기"
+    ],
+    "notes": "P44 새벽 천막 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures) — 사용자 요청 「모델링 안된 실내 전부」. 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#6B4E7A",
+    "cloth": "#7C5BA8",
+    "fringe": "#E8C26A",
+    "trim": "#E8C26A",
+    "card": "#3E3366",
+    "cardMark": "#E8C26A",
+    "cardFace": "#FFF3DC",
+    "glow": "#FFD66B",
+    "brass": "#D9A84E",
+    "wax": "#FFF4E0",
+    "flame": "#FFB347"
+  },
+  "paletteLabels": {
+    "wood": "다리 나무",
+    "cloth": "보라 천",
+    "fringe": "술",
+    "trim": "금빛 띠",
+    "card": "카드 뒷면",
+    "cardMark": "카드 무늬",
+    "cardFace": "펼친 카드",
+    "glow": "빛나는 별",
+    "brass": "초 받침",
+    "wax": "초",
+    "flame": "불꽃"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": [
+    "flicker"
+  ]
+}
