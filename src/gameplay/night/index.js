@@ -403,8 +403,32 @@ function createNight(ctx, cfg) {
     ctx.events.emit('night:visit', { slug, up: up ?? null });
   }
 
+  // ---- 첫 방문 장면 (s20 달빛 가게 · s21 새벽 천막, 트리거 night-first) ----
+  // house/places.js enter 가 들어가기 전에 기다린다: 문 앞에서 night:first → story 가 줄을 세우면 그 장면이 끝날 때까지.
+  // 장면은 집 안에서 못 트니(story free) 섬 문 앞에서 튼다. 처음 한 번만 (state.night.visited — 장면이 없어도 표시).
+  let gate = null;            // { id, res, t, started }
+  function firstVisit(kind) {
+    if (kind !== 'moonshop' && kind !== 'tent') return null;
+    const s = st(), door = world()?.places?.[kind]?.door;
+    s.visited ??= {};
+    if (s.visited[kind] || !door) return null;
+    s.visited[kind] = now()?.dayKey ?? true;
+    if (s.met?.[kinds[kind]?.keeper]) return null;   // 장면이 생기기 전에 이미 들어가 본 저장
+    const story = S().story;
+    if (!story) return null;
+    const before = new Set(story.queue ?? []);
+    ctx.events.emit('night:first', { kind, x: door.x, z: door.z, name: kinds[kind]?.name ?? '' });
+    const id = (story.queue ?? []).find(q => !before.has(q));
+    if (!id) return null;
+    gate?.res();
+    return new Promise(res => { gate = { id, res, t: 0, started: false }; });
+  }
+  ctx.events.on('story:start', ({ id } = {}) => { if (gate?.id === id) gate.started = true; });
+  ctx.events.on('story:end', ({ id } = {}) => { if (gate?.id === id) { const g = gate; gate = null; g.res(); } });
+
   const service = {
     config: cfg,
+    firstVisit,
     get open() { return isOpen(); },
     phase: () => { const n = now(); return n ? R.phaseOf(n.hourF) : 'day'; },
     market: () => market(),
@@ -489,6 +513,8 @@ function createNight(ctx, cfg) {
 
   let clock = 0;
   function update(dt) {
+    // 첫 방문 장면이 줄에서 빠졌는데(다른 장면에 밀려 지워짐 등) 안 틀리면 그냥 들어간다
+    if (gate && !gate.started && (gate.t += dt) > 8 && !(S().story?.queue ?? []).includes(gate.id)) { const g = gate; gate = null; g.res(); }
     clock += dt;
     if (clock >= 1) { clock = 0; sync(); }
     for (const K of Object.values(keepers)) if (K.actor?.root.visible) K.actor.update(dt, true);

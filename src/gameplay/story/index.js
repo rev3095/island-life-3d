@@ -62,6 +62,8 @@ export default {
         const b = vars.booth ?? vars;
         if (Number.isFinite(b?.x) && Number.isFinite(b?.z)) return { x: b.x, z: b.z };
         // 10차 이사 장면(move-in)을 ?story= 로 미리 볼 때: 그 주민 집 문 앞, 없으면 남는 집터 문 앞
+        // M12 밤 가게 첫 방문(night-first)을 ?story= 로 미리 볼 때: 그 가게 문 앞 (밤에 건물이 서 있을 때)
+        if (vars.night) { const d = p[vars.night]?.door; if (d) return { x: d.x, z: d.z }; }
         if (vars.moveIn) { const h = p.villagerHouses?.find(x => x.slug === vars.moveIn) ?? p.spareLots?.[0]; if (h?.door) return { x: h.door.x, z: h.door.z }; }
         return p.festival ?? p.plaza ?? { x: 0, z: 0 };
       }
@@ -118,7 +120,9 @@ export default {
     // ---- 장면 틀기 ----
     async function run(sc, opts = {}) {
       const take = R.takeOf(sc, opts.take);
-      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, ...(opts.vars ?? {}) };
+      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, night: sc.trigger?.on === 'night-first' ? sc.trigger.kind : undefined, ...(opts.vars ?? {}) };
+      if (vars.night && vars.name == null) vars.name = svc().night?.config?.[vars.night === 'moonshop' ? 'shop' : 'tent']?.name;   // 미리 보기: 가게 이름
+      if (sc.trigger?.on === 'tour-first' && vars.name == null) vars.name = '무인도';
       const id = sc.id;
       if (!take) return { id, skipped: true };
       if (!take.shots?.length) {          // '연출 없음' 연출안

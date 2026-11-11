@@ -1,0 +1,194 @@
+{
+  "id": "s21-tent-first",
+  "version": 1,
+  "status": "review",
+  "chapter": "밤 · 새벽",
+  "title": "새벽 천막 첫 방문",
+  "summary": "새벽 3시, 안개와 함께 숲 끝에 선 천막. 주인 여명이 천막 앞에서 카드를 섞으며 기다리고 있다. 카드 한 장이 다음 하루를 비춘다고 알려 주고 천막 안으로 들어간다. 장면이 끝나면 그대로 들어간다.",
+  "trigger": {
+    "on": "night-first",
+    "kind": "tent"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "안개 속 카드 섞기",
+      "recommended": true,
+      "desc": "안개 낀 숲 끝 천막을 넓게 → 여명이 카드를 섞으며 돌아본다 → 수정 구슬 → 카드 한 장이 하루를 비춘다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "안개 속에 선 천막",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "dawn",
+          "caption": "안개 속에 {name}이 섰어요",
+          "actors": [
+            {
+              "who": "yeomyeong",
+              "at": [
+                -0.9,
+                0.6
+              ],
+              "face": 180,
+              "emote": "🔮",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                3.6
+              ],
+              "face": 0,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "플레이어가 다가가고 여명이 돌아본다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "yeomyeong",
+              "face": "player",
+              "emote": "🌫️",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "to": [
+                0,
+                1.8
+              ],
+              "do": "walk",
+              "face": "yeomyeong",
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "여명 — 카드를 섞어 보인다",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "yeomyeong",
+            "angle": -15,
+            "move": "orbit"
+          },
+          "caption": "새벽 천막 주인 여명",
+          "wait": true,
+          "actors": [
+            {
+              "who": "yeomyeong",
+              "face": "player",
+              "do": "happy",
+              "emote": "🃏",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "yeomyeong",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "카드 한 장이 다음 하루를 비춘다 — 여명이 천막 안으로",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": 10,
+            "move": "pull"
+          },
+          "caption": "카드 한 장이 다음 하루를 비춰요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "yeomyeong",
+              "to": [
+                0,
+                0.15
+              ],
+              "do": "walk",
+              "emote": "🌅",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "yeomyeong",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "천막 앞에서 여명이 카드를 들어 보이며 인사하고 바로 들어간다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "천막 앞의 여명",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "music": "dawn",
+          "caption": "{name}에 어서 와요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "yeomyeong",
+              "at": [
+                -0.9,
+                0.6
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🃏",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                1.8
+              ],
+              "face": "yeomyeong",
+              "emote": "👋",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

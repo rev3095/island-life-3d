@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "about": "게임 규칙 숫자 — 시작 지급·상점·채집 확률·하루 리셋·제작 레시피·생일·주민 친밀도와 부탁 보상. 표 편집기(data-editor.html) → 채팅 \"숫자 반영\". 읽는 곳 src/data/ (town 칸은 src/gameplay/town/rules.js 연결 제안 — docs/notes/m6-p5-mapdata.md)",
+  "about": "게임 규칙 숫자 — 시작 지급·상점·채집 확률·하루 리셋·제작 레시피·생일·주민 친밀도와 부탁 보상. 요소 편집기(elem-editor.html, 예전 숫자 표) → 채팅 \"숫자 반영\". 읽는 곳 src/data/ · town 칸은 src/gameplay/town/rules.js (docs/notes/m6-p5-mapdata.md · p36-elem-editor.md)",
   "starter": { "items": [["tool.rod", 1], ["tool.net", 1]], "acorns": 500 },
   "shop": { "open": 8, "close": 22, "furniturePerDay": 4, "outdoorPerDay": 1, "flowerSeedsPerDay": 2 },
   "gather": {

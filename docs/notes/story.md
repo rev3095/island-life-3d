@@ -70,7 +70,14 @@
 | `festival-part` | `festival:part` (Z5) | `n` 이 같음 | s05~s09 부품 1~5 |
 | `festival` | `festival:start` (Z5) | | s10 섬 축제 |
 | `after` | `story:end` | `id` = `trigger.scene` | s11 단체 사진, s12 섬 생활은 계속 |
+| `event-start` | `events:start` (M8) | `id` = `trigger.event`, `first` | s13~s16 계절 행사 |
+| `move-in` | `town:welcome` (M10) | `slug` = `trigger.slug` | s17~s19 이삿날 |
+| `night-first` | `night:first {kind, x, z, name}` (M12, P39) | `kind` = `trigger.kind` (`moonshop`·`tent`) | s20 달빛 가게 · s21 새벽 천막 첫 방문 |
+| `tour-first` | `tour:arrive {first, x, z, name, …}` (P35, P39) | `first` | s22 첫 섬 여행 |
 | `manual` | — | `story.play(id)` 로만 | |
+
+- **밤 가게 첫 방문 (P39)**: 장면은 집 안에서 못 트니(재생기 `free`), `house/places.js enter` 가 들어가기 전에 `night.firstVisit(kind)` 를 기다린다 → night 가 문 자리로 `night:first` 를 보내고, 줄에 선 장면이 끝나면(`story:end`) 그대로 들어간다. 처음 한 번만 (`state.night.visited`, 장면이 생기기 전에 이미 들어가 본 저장 = `met` 이 있으면 건너뜀). 장면이 줄에서 빠지면 8초 뒤 그냥 들어감. `{name}` = 가게 이름.
+- **첫 섬 여행 (P39)**: 배 떠나기 3초(배 모델·주인공이 동쪽 바다로)는 장면이 아니라 tour 의 연출(`sailAway`, 게임 dt) — 선착장 배는 world 묶음이라 움직일 수 없어, 떠날 때만 같은 모델을 따로 띄운다. 도착하면 `tour:arrive` 의 `first` 로 s22. `{name}` = 섬 모양 이름.
 
 ## 재생기 (`ctx.services.story`)
 

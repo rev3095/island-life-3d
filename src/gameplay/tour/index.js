@@ -37,9 +37,56 @@ export default {
     const boatAt = dockObj ? { x: dockObj.x + 1.55, z: dockObj.z + 3.3 } : dock ? { x: dock.x + 1.55, z: dock.z + 0.8 } : null;
     const standAt = dockObj ? { x: dockObj.x + 0.15, z: dockObj.z + 3.4 } : dock;   // 배 옆 선착장 끝
     let homeBoat = null;
-    if (boatAt) {
+    const putHomeBoat = () => {
+      if (!boatAt || home.objects.get?.('tour:home-boat')) return;
       const t = home.island.toTile(boatAt.x, boatAt.z);
       homeBoat = home.objects.add('tour-boat', t.tx, t.tz, { persist: false, id: 'tour:home-boat', at: { x: boatAt.x, z: boatAt.z, y: 0 } });
+    };
+    putHomeBoat();
+
+    // ---------- 배 떠나기 연출 (p35 「남은 것」 배 장면) ----------
+    // 선착장 배는 world 묶음이라 움직일 수 없어서, 떠날 때만 같은 모델을 따로 띄워 주인공을 태우고 바다로 민다 (cfg.boat.sail 초, 게임 dt 로 — 봇 step 에서도 돈다).
+    let sailMesh = null, sailing = null;    // sailing = { t, dur, from, res }
+    async function sailMeshOf() {
+      if (sailMesh) return sailMesh;
+      const [gltf, spec] = await Promise.all([ctx.assets.loadModel('assets/env/models/tour-boat'), ctx.assets.loadJSON('assets/env/specs/tour-boat.json').catch(() => null)]);
+      const { scene: obj } = ctx.assets.instantiate(gltf);
+      ctx.materials?.applyToonStyle?.(obj, { spec });
+      obj.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      obj.name = 'tour:sail-boat';
+      obj.visible = false;
+      ctx.scene.add(obj);
+      return (sailMesh = obj);
+    }
+    const SAIL_DIST = 7;      // 칸 (동쪽 바다로)
+    async function sailAway() {
+      if (!boatAt) return;
+      const mesh = await sailMeshOf().catch(e => { console.warn('[tour] 떠나는 배 모델', e); return null; });
+      if (!mesh) return;
+      home.objects.remove('tour:home-boat');
+      mesh.position.set(boatAt.x, 0, boatAt.z);
+      mesh.rotation.set(0, 0, 0);
+      mesh.visible = true;
+      player.teleport(boatAt.x, boatAt.z, -Math.PI / 2);   // 배에 올라 동쪽(바다)을 본다
+      sfx('splash', { volume: 0.5, pitch: 0.8 });
+      await new Promise(res => { sailing = { t: 0, dur: cfg.boat.sail ?? 3, res }; });
+    }
+    function sailStep(dt) {
+      const S0 = sailing;
+      if (!S0) return;
+      S0.t += dt;
+      const k = Math.min(1, S0.t / S0.dur), e = k * k * (3 - 2 * k);
+      const x = boatAt.x + e * SAIL_DIST, z = boatAt.z + e * 1.2, bob = Math.sin(S0.t * 4.2) * 0.04;
+      sailMesh.position.set(x, bob, z);
+      sailMesh.rotation.z = Math.sin(S0.t * 3.1) * 0.035;
+      const pp = player.position;
+      pp.set(x, 0.18 + bob, z);
+      if (k >= 1) { sailing = null; S0.res(); }
+    }
+    function dockBoat() {
+      if (sailMesh) sailMesh.visible = false;
+      if (sailing) { const r = sailing.res; sailing = null; r(); }
+      putHomeBoat();
     }
 
     // ---------- 상태 ----------
@@ -105,8 +152,9 @@ export default {
         player.freeze(true);
         if (standAt) await player.walkTo(standAt.x, standAt.z, { speed: 2.2 }).catch(() => {});
         if (boatAt) player.face(boatAt.x, boatAt.z);
-        sfx('splash', { volume: 0.5, pitch: 0.8 });
+        await sailAway();
         await ui.fade(true, 0.6, '#1E2A3A', { shape: 'circle' });
+        if (sailMesh) sailMesh.visible = false;
         toast(`⛵ 바다를 건너는 중… (${SHAPES[shape].name})`, '🌊');
         const gen = generateIslet(seed, { shape, guest: !!guest });
         await Promise.all([world.islet.enter(gen, cfg.ox), new Promise(r => setTimeout(r, cfg.boat.sail * 300))]);   // 바다 건너는 시간 (모델 받기와 같이)
@@ -119,10 +167,13 @@ export default {
         await ui.fade(false, 0.6, '#1E2A3A', { shape: 'circle' });
         toast(`무인도 「${SHAPES[shape].name}」에 도착했어요! 과일·광석·희귀한 물고기와 곤충을 찾아보세요`, '🏝️');
         if (current.guest) toast(`누군가 섬에 와 있어요… ${current.guest.name}?`, '👀');
-        events.emit('tour:arrive', { shape, seed, guest: current.guest?.slug ?? null });
+        // first = 처음 여행 (장면 s22 트리거 tour-first), x·z = 투어 섬 선착장 앞 (장면 기준 자리 event)
+        events.emit('tour:arrive', { shape, seed, guest: current.guest?.slug ?? null, first: t.total === 1, x: sp.x + cfg.ox, z: sp.z, name: SHAPES[shape].name });
       } catch (e) {
         console.error('[tour] 떠나기', e);
         cleanup();
+        dockBoat();
+        if (standAt) player.teleport(standAt.x, standAt.z - 0.4, 0);
         ui.fade(false, 0.2);
       } finally { player.freeze(false); busy = false; }
     }
@@ -154,6 +205,7 @@ export default {
         await ui.fade(true, 0.6, '#1E2A3A', { shape: 'circle' });
         if (auto) toast('날이 밝았어요. 배가 본섬으로 돌아가요', '🌅');
         cleanup();
+        dockBoat();
         const to = standAt ?? { x: 0, z: 0 };
         player.teleport(to.x, to.z - 0.4, 0);
         await new Promise(r => setTimeout(r, 300));
@@ -254,7 +306,7 @@ export default {
       if (!current && p.x > cfg.ox - 100 && standAt) player.teleport(standAt.x, standAt.z - 0.4, 0);
     });
 
-    T = { update(dt) { current?.guest?.actor?.update?.(dt); } };
+    T = { update(dt) { sailStep(dt); current?.guest?.actor?.update?.(dt); } };
     services.tour = {
       get active() { return active(); },
       get busy() { return busy; },

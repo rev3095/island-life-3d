@@ -20,4 +20,7 @@ export const SCENE_FILES = [
   'assets/story/scenes/s17-gureum-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
   'assets/story/scenes/s18-pado-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
   'assets/story/scenes/s19-dalmuri-arrival.json',   // 10차 엔딩 뒤 이사 첫 만남 (trigger move-in)
+  'assets/story/scenes/s20-moonshop-first.json',   // M12 달빛 가게 첫 방문 (trigger night-first, 문 앞에서 튼 뒤 들어감)
+  'assets/story/scenes/s21-tent-first.json',   // M12 새벽 천막 첫 방문 (trigger night-first)
+  'assets/story/scenes/s22-first-tour.json',   // P35 첫 섬 여행 (trigger tour-first)
 ];
