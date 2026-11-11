@@ -47,7 +47,7 @@ export const LINE_LABELS = {
   spring: '봄', summer: '여름', autumn: '가을', winter: '겨울', new: '처음', known: '아는 사이', friend: '친구', close: '단짝', best: '절친',
   ask: '부탁하기', accept: '들어줄게', decline: '다음에', remind: '다시 물을 때', notYet: '아직', thanks: '고마워', reward: '보상', done: '오늘은 끝',
   love: '아주 좋아함', like: '좋아함', normal: '보통', dislike: '싫어함', many: '너무 많이', back: '답례', surprise: '먼저 주기', pending: '못 준 것', full: '가방 꽉 참', cancel: '안 줄 때',
-  day: '낮', sleep: '잘 때', gift_: '선물 동봉', moving: '이사 전날', movein: '이사 온 날', playerBirthday: '내 생일', self: '자기 생일', door: '생일 문 너머', cake: '케이크', player: '내 생일 축하',
+  day: '낮', sleep: '잘 때', festivalAgain: '해마다 축제 축하', gift_: '선물 동봉', moving: '이사 전날', movein: '이사 온 날', playerBirthday: '내 생일', self: '자기 생일', door: '생일 문 너머', cake: '케이크', player: '내 생일 축하',
   // 가게 주인 (밤톨 · 느루)
   hello: '인사', keys: '키보드 안내', touch: '터치 안내', after: '그다음', list: '할 일 목록', firstday: '첫날', sell: '팔기', visit: '찾아가기', again: '다시', nightAfter: '밤 첫날 판 뒤',
   today: '오늘 들어온 가구', closed: '문 닫은 때', early: '이른 아침', welcome: '환영 편지', lot: '집터 편지',

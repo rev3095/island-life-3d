@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "about": "아이템 사전 — 이름·파는 값(price)·사는 값(buy)·출현(장소·시간·계절·희귀). 표 편집기(data-editor.html)에서 고치고 채팅 \"숫자 반영\" 으로 들어온다. 읽는 곳 src/data/items.js. 모양: docs/notes/m6-p5-mapdata.md",
   "stack": {
     "fish": 1,
@@ -148,7 +148,7 @@
     { "slug": "weed", "name": "잡초", "emoji": "🌱", "price": 10, "from": "뽑기", "code": "MA-06" },
     { "slug": "gold-ore", "name": "금광석", "emoji": "🪙", "price": 6000, "from": "무인도 광석 바위를 삽·도끼로", "code": "MA-05" },
     { "slug": "crystal", "name": "수정", "emoji": "💎", "price": 3000, "from": "무인도 광석 바위를 삽·도끼로", "code": "MA-05" },
-    { "slug": "tour-ticket", "name": "섬 여행 표", "emoji": "🎫", "price": 250, "from": "선착장 배에서 1,000 도토리", "code": "MA-09" }
+    { "slug": "tour-ticket", "name": "섬 여행 표", "emoji": "🎫", "price": 250, "buy": 1000, "from": "도토리상점 · 선착장 배에서 1,000 도토리", "code": "MA-09" }
   ],
   "acornBag": { "name": "도토리 주머니", "emoji": "💰", "price": 100, "acorns": 100, "stack": 10, "from": "나무·바위에서 가끔" },
   "tools": [

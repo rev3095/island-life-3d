@@ -1,5 +1,5 @@
 // 섬폰: 도감·지도·레시피·가방·설정·저장·보기 편하게 앱 (+ P4 의 저장 옮기기·문제 알리기 창이 있으면 그 줄). 앱 화면에서 Esc(B) 는 첫 화면으로, 첫 화면에서는 닫기.
-import { h, fmt, itemInfo, iconEl, recipeNeeds, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
+import { h, fmt, itemInfo, iconEl, recipeNeeds, clockText, nowFromDate, CATEGORY_NAME, DEX_CATEGORIES, isNightOnly } from './dom.js';
 import { panelShell, gridMove, button } from './panels.js';
 import { birthdayLabel, mmdd } from '../data/birthdays.js';
 import { TEXT_SIZES } from './access.js';
@@ -133,22 +133,25 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       panel.append(notice('📖', '도감 정보를 아직 불러올 수 없어요.', '데이터(data) 모듈이 연결되면 잡은 물고기·곤충·화석이 여기에 모여요.'));
       return;
     }
-    const caughtOf = c => new Set([...(ctx.state.encyclopedia?.[c] ?? []), ...(ctx.state.museum?.[c] ?? [])]);
+    const caughtOf = c => (c === 'night' ? new Set([...caughtOf('fish'), ...caughtOf('bug')]) : new Set([...(ctx.state.encyclopedia?.[c] ?? []), ...(ctx.state.museum?.[c] ?? [])]));
+    // B-12 「🌙 밤」 탭: 밤에만 나오는 물고기·곤충을 한데 (잡은 수·기증 수는 그 안에서 센다)
+    const TABS = [...DEX_CATEGORIES, 'night'], TAB_NAME = { ...CATEGORY_NAME, night: '🌙 밤' };
+    const listOf = c => (c === 'night' ? ['fish', 'bug'].flatMap(k => data.items.list(k) ?? []).filter(isNightOnly) : data.items.list(c) ?? []);
     function draw() {
-      const all = data.items.list(cat) ?? [];
+      const all = listOf(cat);
       const caught = caughtOf(cat);
-      const prog = data.museum?.progress?.()?.[cat];
+      const prog = cat === 'night' ? null : data.museum?.progress?.()?.[cat];
       const donated = prog?.[0] ?? all.filter(it => data.museum?.has?.(it.id)).length;
       const total = prog?.[1] ?? all.length;
       const nCaught = all.filter(it => caught.has(it.id)).length;
-      tabs.replaceChildren(...DEX_CATEGORIES.map(c => h('button', {
+      tabs.replaceChildren(...TABS.map(c => h('button', {
         type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
         onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },
-      }, CATEGORY_NAME[c])));
+      }, TAB_NAME[c])));
       panel.replaceChildren(
         bar(cat === 'fossil' ? '찾은 것' : '잡은 것', nCaught, all.length),
         bar('기증', donated, total),
-        h('ul', { class: 'pk-dex-grid', 'aria-label': `${CATEGORY_NAME[cat]} 목록` }, all.map(it => {
+        h('ul', { class: 'pk-dex-grid', 'aria-label': `${TAB_NAME[cat]} 목록` }, all.map(it => {
           const got = caught.has(it.id);
           const gave = data.museum?.has?.(it.id);
           return h('li', { class: `pk-dex-cell${got ? '' : ' is-unknown'}`, title: got ? it.name : '아직 못 만났어요' },

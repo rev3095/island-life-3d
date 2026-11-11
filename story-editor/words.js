@@ -57,9 +57,10 @@ export const LETTER_WHEN = {
   friend: '친구가 된 뒤 가끔 아침 우편함', close: '단짝이 된 뒤 가끔 아침 우편함', thanks: '부탁을 들어준 다음 날 아침', gift: '편지에 선물이 들어 있을 때 끝에 붙는 한 줄',
   birthday: '그 주민 생일 아침 — 파티 초대', playerBirthday: '내 생일 아침 (만난 주민 몇 명이)', moving: '이사 오기 전날 (집터 표지판 뒤)', movein: '이사 온 날',
   away: '섬을 떠난 뒤 며칠마다', welcome: '첫날 할 일을 마친 다음 (밤톨 환영)', lot: '빈 집터에 표지판이 선 날 (밤톨)',
+  festival: '첫 섬 축제(엔딩)가 끝난 다음 아침 — 섬 주민 모두', festivalAgain: '해마다 섬 축제가 끝난 다음 아침 (두 번째부터)',
 };
-const LETTER_ORDER = ['friend', 'close', 'thanks', 'gift', 'birthday', 'playerBirthday', 'moving', 'movein', 'away', 'welcome', 'lot'];
-const LETTER_NAME = { friend: '친구', close: '단짝', thanks: '고마워', gift: '선물 동봉', birthday: '주민 생일', playerBirthday: '내 생일', moving: '이사 전날', movein: '이사 온 날', away: '떠난 뒤', welcome: '환영 (밤톨)', lot: '집터 (밤톨)', guide: '밤톨 안내 글' };
+const LETTER_ORDER = ['friend', 'close', 'thanks', 'gift', 'birthday', 'playerBirthday', 'festival', 'festivalAgain', 'moving', 'movein', 'away', 'welcome', 'lot'];
+const LETTER_NAME = { friend: '친구', close: '단짝', thanks: '고마워', gift: '선물 동봉', birthday: '주민 생일', playerBirthday: '내 생일', moving: '이사 전날', movein: '이사 온 날', away: '떠난 뒤', welcome: '환영 (밤톨)', lot: '집터 (밤톨)', guide: '밤톨 안내 글', festival: '첫 축제 축하', festivalAgain: '해마다 축제 축하' };
 const GUIDE_POOLS = ['intro', 'firstday', 'today', 'after', 'closed'];   // 밤톨 안내 글 (편지 탭)
 
 /** 그 밖의 글: 파일 · 언제 · 글 칸 이름 */

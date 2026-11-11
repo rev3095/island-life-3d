@@ -6,6 +6,8 @@
 
 export const SEATS = {
   'outdoor-bench': { y: 0.455, step: 0.62, seats: [{ x: -0.42, z: 0.02, face: [0, 1] }, { x: 0.42, z: 0.02, face: [0, 1] }] },
+  // B-17: 섬에 처음부터 있는 광장 벤치 (배경 EN bench, build_env.py b_bench — 판 윗면 0.42 + 0.025, 등받이는 뒤 −Z)
+  bench: { y: 0.445, step: 0.62, seats: [{ x: -0.38, z: 0.02, face: [0, 1] }, { x: 0.38, z: 0.02, face: [0, 1] }] },
   // 피크닉 탁자: 양쪽 긴 의자에 둘씩, 탁자를 보고 앉는다 → 바깥(뒤쪽)에서 다가와 앉는다
   'picnic-table': { y: 0.465, step: -0.58, seats: [
     { x: -0.4, z: -0.665, face: [0, 1] }, { x: 0.4, z: -0.665, face: [0, 1] },

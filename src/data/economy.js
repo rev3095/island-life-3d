@@ -48,7 +48,9 @@ export function shopStock(dayKey, seed = 0) {
   const tools = items.list('tool').map(t => t.id);
   const seeds = sample(items.list('seed').filter(s => s.flower).map(s => s.id), SHOP_FLOWER_SEEDS_PER_DAY, rng);
   const saplings = items.list('seed').filter(s => s.tree).map(s => s.id);
-  return { furniture, outdoor: furn.outdoor, tools, seeds, saplings, all: [...furniture, ...tools, ...seeds, ...saplings] };
+  // B-14 무인도 투어 섬 여행 표: 선착장 배 말고 도토리상점에서도 늘 (사는 값 = items.json buy)
+  const tickets = items.get('mat.tour-ticket')?.buy > 0 ? ['mat.tour-ticket'] : [];
+  return { furniture, outdoor: furn.outdoor, tools, seeds, saplings, tickets, all: [...furniture, ...tools, ...seeds, ...saplings, ...tickets] };
 }
 
 /** 가방·지갑에 붙여 쓰는 판매·구매. getSeed / getDayKey 는 그때그때 상태에서 읽는다 */

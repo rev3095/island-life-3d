@@ -170,7 +170,7 @@ test('앉기 자리 표: 벤치 둘 · 피크닉 탁자 넷 · 의자 — 돌리
   assert.ok(seatSpec('log-chair') && seatSpec('sofa') && !seatSpec('furn.bookshelf'));
   for (const [slug, s] of Object.entries(SEATS)) {
     assert.ok(s.y > 0.3 && s.y < 0.7, `${slug} 앉는 면 높이`);
-    assert.ok(existsSync(new URL(`../assets/furniture/specs/${slug}.json`, import.meta.url)), `${slug} 가구 스펙`);
+    assert.ok(existsSync(new URL(`../assets/${slug === 'bench' ? 'env' : 'furniture'}/specs/${slug}.json`, import.meta.url)), `${slug} 가구 스펙`);   // bench = 광장 배경 벤치 (B-17)
   }
   const bench = seatsOf(seatSpec('outdoor-bench'), { x: 5, z: 5, y: 1, rot: 0 }, 'b');
   assert.equal(bench[0].key, 'b#0');
