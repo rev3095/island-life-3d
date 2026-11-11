@@ -148,7 +148,19 @@ export function makeScenario(bot, sk, opts = {}) {
     const miss = want.filter(m => !mods.includes(m));
     note('modules', mods);
     if (miss.length) return block(`없는 모듈: ${miss.join(', ')}`);
-    return pass(`서비스 ${mods.length}개`);
+    // 게시본(/artifact/): 사람처럼 로딩 화면의 시작 단추를 누른다 (B-50). 소리는 봇에게 필요 없어 「소리 없이 시작」
+    let started = '';
+    if (bot.$('#loader')) {
+      const shown = await bot.until(() => { const b = bot.$('#ld-start'); return !bot.$('#loader') || (b && !b.hidden); }, { timeout: 60, label: '시작 단추' });
+      const btn = bot.$('#ld-mute') ?? bot.$('#ld-sound');
+      if (shown && bot.$('#loader') && btn) {
+        await bot.click(btn);
+        const gone = await bot.until(() => { const l = bot.$('#loader'); return !l || !bot.visible(l); }, { timeout: 20, label: '로딩 화면 닫힘' });
+        if (!gone) return block('시작 단추를 눌러도 로딩 화면이 안 닫혀요');
+        started = ' · 시작 단추';
+      }
+    }
+    return pass(`서비스 ${mods.length}개${started}`);
   });
 
   add('naming', '새 게임 · 이름 정하기', async () => {
@@ -964,6 +976,7 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.settle(60);   // 첫 여행이면 장면 s22 (봇은 끝까지 본다)
     const s22 = !!S().story?.seen?.('s22-first-tour');
     await bot.shot('15-tour-arrive', `무인도 ${cur.shape}`);
+    const tag = bot.$('.pk-tour-tag')?.textContent ?? null;   // UI-23 오른쪽 위 섬 이름 칸 (B-13)
     const got = {}, inv0 = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
     // 과일나무 흔들기 (투어 섬 과일 = 망고·리치)
     const ft = w.objects.list('fruit-tree')[0];
@@ -993,9 +1006,12 @@ export function makeScenario(bot, sk, opts = {}) {
     if (backPeek === 'tour-boat') await bot.act('action', { timeout: 30 });
     bot.policy = {};
     const home = await bot.until(() => !tour().active && !tour().busy, { timeout: 25, label: '본섬 도착' });
-    note('tour', { s22, sailed, shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, free0, free, backPeek, home, pos: bot.pos() });
+    const tagGone = !bot.$('.pk-tour-tag');
+    note('tour', { s22, sailed, tag, tagGone, shape: cur.shape, guest: cur.guest, paid: acorns0 - bot.acorns(), got, oreHits, shovel, free0, free, backPeek, home, pos: bot.pos() });
     if (!home) return block(`배로 못 돌아옴 (배 앞 ${backPeek})`);
     const odd = [];
+    if (!tag) odd.push('섬 이름 칸(UI-23)이 안 보임');
+    if (!tagGone) odd.push('돌아온 뒤에도 섬 이름 칸이 남음');
     if (!Object.keys(got).some(id => /^fruit\.(mango|lychee)$/.test(id))) odd.push(`무인도 과일을 못 얻음 (가방 빈칸 ${free0} → ${free})`);
     if (shovel && !oreHits) odd.push('광석 바위를 못 침');
     if (!s22 && S().story?.scene?.('s22-first-tour')) odd.push('첫 여행인데 장면 s22 가 안 나옴');

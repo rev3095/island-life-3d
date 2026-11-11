@@ -92,12 +92,13 @@ export const ITEMS = [
   // 얻는 법(source): craft 제작, shop 상점, gift 주민 선물, friend 친밀도, museum 박물관 보상, birthday 생일 선물
   // FU-34 축제 단체 사진은 festival-items.js 의 FESTIVAL_FURN (표와 같은 순서의 줄)
   // FU-43– 행사 보상 가구는 event-items.js 의 EVENT_FURN (줄 끝의 보드 ID 가 code)
+  // 친밀도 선물 가구(source 'friend')는 items.json 의 owner = 주는 주민 slug (B-24)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
     ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
-    .map(({ slug, name, emoji, price, buy, size, source, from, id }, i) => ({
+    .map(({ slug, name, emoji, price, buy, size, source, from, id, owner }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
-    size: sizeOf(size), place: placeOf(size), sizeText: size, from, source,
+    size: sizeOf(size), place: placeOf(size), sizeText: size, from, source, ...(owner ? { owner } : {}),
     ...(OUTDOOR.has(slug) ? { outdoor: true } : {}), ...(slug === 'radio' ? { plays: 'bgm' } : {}),
     ...(slug === 'fish-tank' ? { holds: 'fish' } : {}), ...(slug === 'bug-case' ? { holds: 'bug' } : {}),
   })),

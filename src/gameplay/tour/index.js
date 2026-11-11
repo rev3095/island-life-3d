@@ -165,6 +165,7 @@ export default {
         if (guest && gen.places.guest) current.guest = await placeGuest(guest, { x: gen.places.guest.x + cfg.ox, z: gen.places.guest.z });
         spawnRare();
         await ui.fade(false, 0.6, '#1E2A3A', { shape: 'circle' });
+        showTag(SHAPES[shape].name);
         toast(`무인도 「${SHAPES[shape].name}」에 도착했어요! 과일·광석·희귀한 물고기와 곤충을 찾아보세요`, '🏝️');
         if (current.guest) toast(`누군가 섬에 와 있어요… ${current.guest.name}?`, '👀');
         // first = 처음 여행 (장면 s22 트리거 tour-first), x·z = 투어 섬 선착장 앞 (장면 기준 자리 event)
@@ -178,7 +179,22 @@ export default {
       } finally { player.freeze(false); busy = false; }
     }
 
+    // UI-23 오른쪽 위 「🏝 섬 이름」 작은 칸 (HUD 오른쪽 위 줄에 붙여서 HUD 를 숨기면 같이 숨는다)
+    let tag = null;
+    function showTag(name) {
+      hideTag();
+      const box = document.querySelector('.pk-top-right');
+      if (!box) return;
+      tag = document.createElement('div');
+      tag.className = 'pk-bubble pk-tour-tag';
+      tag.setAttribute('role', 'status');
+      tag.textContent = `🏝 ${name}`;
+      box.prepend(tag);
+    }
+    function hideTag() { tag?.remove(); tag = null; }
+
     function cleanup() {
+      hideTag();
       if (current?.guest?.actor) { ctx.scene.remove(current.guest.actor.root); }
       // 투어 섬에 떨어진 것·곤충은 치운다 (본섬 저장에 남지 않게)
       const g = gather();

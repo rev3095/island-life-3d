@@ -18,7 +18,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-05 | story | H2 town 이 `story.playing` 을 보고 기다리기 (지금은 story 가 `ui.isBlocking` 을 감싸서 대신) | 큼 | 반쯤 (감싸기로 돌아감) | — | `town/keepers.js` · `villager.js` · `story/index.js` |
 | B-06 | story | H3 엔딩 사진 뒤 주민 축하 편지 (s12-C) — `festival:end` 듣고 `mail.post(slug, 'festival')`, 편지 글 `letters.festival` 없음 | 큼 | 남음 | 스토리 s12 | `src/gameplay/town/mail.js` · `assets/villagers/*.json` |
 | B-07 | story | H4 장면 이모티콘을 Z5 이모티콘 id 로 (`emote.glyph(id)`), 말풍선 모양 맞추기 — 지금은 `EMOTES` 글자 50개 | 큼 | 남음 | Z5 축제 보드 | `story/rules.js` · `layer.js` · `story.css` |
-| B-08 | story | 장면 시작 대기열을 저장하지 않음 (부품 얻고 바로 새로고침하면 그 장면은 다음 트리거까지 안 나옴) | 작음 | 남음 | — | `src/gameplay/story/index.js` |
+| B-08 | story | 장면 시작 대기열을 저장하지 않음 (부품 얻고 바로 새로고침하면 그 장면은 다음 트리거까지 안 나옴) | 작음 | **고침 (p43)** — `state.story.queue` 에 줄 선 장면·트는 중인 장면을 적어 두고 다시 열면 이어서 | — | `src/gameplay/story/index.js` |
 | B-09 | p11-tune | 짧게 고른 사람에게도 s02(할 일 목록 건네기)가 나옴 → 트리거 `guide-done` 에 `skip` 조건 | 작음 | 남음 | wave7 D44 | `src/gameplay/story/rules.js` (또는 `s02-guide-after.json`) |
 | B-10 | m6-p0-pack | `?story=s11-ending-photo` 미리 보기에서 카메라가 나무에 붙어 보임 — 축제 자리(`places.festival`)가 생겼으니 다시 보기 | 작음 | 반쯤 (다시 볼 것) | — | `story/rules.js cameraAt` · `world/festival.js` |
 
@@ -28,7 +28,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 |---|---|---|---|---|---|---|
 | B-11 | m12-night | 야시장 노점 자리가 축제 부스(엔딩 뒤)와 겹치지 않는지 손 점검 | 작음 | 남음 | night D106·D107 | `src/gameplay/night/index.js` |
 | B-12 | m12-night | 가방·도감 「밤」 분류 탭 — 가방엔 분류 탭이 아예 없고, 도감 탭은 물고기·곤충·화석뿐 | 큼 | 남음 | night | `src/ui/bag.js` · `phone.js` · `data/night-items.js` |
-| B-13 | p35-tour | UI-23 오른쪽 위 「🏝 섬 이름」 작은 칸 (지금은 도착 알림으로 대신) | 작음 | 남음 | tour UI-23 | `src/gameplay/tour/index.js` · `ui.css` |
+| B-13 | p35-tour | UI-23 오른쪽 위 「🏝 섬 이름」 작은 칸 (지금은 도착 알림으로 대신) | 작음 | **고침 (p43)** — `.pk-tour-tag` 를 HUD 오른쪽 위 줄 맨 위에, 돌아오면 치움 (봇 tour 단계가 확인) | tour UI-23 | `src/gameplay/tour/index.js` · `ui.css` |
 | B-14 | p35-tour | 배 표를 도토리상점 진열에도 (지금은 선착장 배에서만, 없으면 1,000 도토리) | 큼 | 남음 | tour | `assets/data/rules.json shop` · `src/data/economy.js` |
 
 ### 계절 행사
@@ -49,7 +49,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-21 | p12-interiors | 상점 실내에 「오늘의 벽지·바닥」 견본 걸기 (지금은 창에서만) | 큼 | 남음 | interiors | `src/gameplay/house/places.js` · `pattern.js` |
 | B-22 | z2-interior | 밤엔 실내 따뜻한 빛 때문에 하늘 체크·흰 타일이 베이지로 보임 — 실내 값 보고 고르기 | 작음 | 남음 | interiors | `src/render/presets.js INDOOR` · `sky/indoor.js` |
 | B-23 | z2-interior | 휴대폰 화면에서 꾸미기 선택지·상점 코너 줄 높이 확인 | 작음 | 남음 | — | `src/ui/ui.css` · `house/` |
-| B-24 | z3-furniture | 친밀도 선물 가구의 주인 주민을 FURN 표 칸으로 (지금은 얻는 법 글자 `from` 에만) | 작음 | 남음 | — | `src/data/items.js` FURN |
+| B-24 | z3-furniture | 친밀도 선물 가구의 주인 주민을 FURN 표 칸으로 (지금은 얻는 법 글자 `from` 에만) | 작음 | **고침 (p43)** — items.json 친밀도 가구 6줄에 `owner` (v2), items.js 가 넘김 | — | `src/data/items.js` FURN |
 
 ### 주민·마을
 
@@ -64,7 +64,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 |---|---|---|---|---|---|---|
 | B-27 | p33-clock | HUD 날씨 아이콘이 밤에도 ☀️ — 밤엔 🌙 로 할지 | 작음 | 남음 | 다음 보드 QA 칸 후보 | `src/ui/hud.js setWeather` · `dom.js WEATHER_ICON` |
 | B-28 | m6-p6-style | 섬폰 「화면 모습」 단추가 `cozy`·`toon` 을 글자로 박아 둠 → `style.labels` 로 그리기 | 작음 | 남음 — `presets.json labels` 에 「동숲풍」이 있어 게임 화면엔 그대로 못 씀 → 게임용 짧은 이름 칸부터 | — | `src/ui/phone.js` (213줄 근처) |
-| B-29 | ui | `index.html` `.core-check` 안내가 좁은 화면에서 HUD 시계와 겹침 (world 없을 때만 보이는 개발용) | 작음 | 남음 | — | `index.html` |
+| B-29 | ui | `index.html` `.core-check` 안내가 좁은 화면에서 HUD 시계와 겹침 (world 없을 때만 보이는 개발용) | 작음 | **고침 (p43)** — 720px 아래에선 화면 아래로 | — | `index.html` |
 
 ### 렌더·성능·하늘
 
@@ -79,7 +79,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-36 | render | 겨울·봄 둑 윗면·풀/모래 경계 색을 화면으로 확인 (가을만 봄) | 작음 | 남음 | — | `src/world/banks.js` |
 | B-37 | render | 강어귀(강이 바다와 만나는 곳) 해안 앞치마·둑 판을 가까이서 보기 | 작음 | 남음 | — | `src/world/banks.js` · 해안 |
 | B-38 | render | 주민 사라지기 반투명 중 몸 안쪽 면이 비침 → 디더(`setFade`)로 바꾸기 (actor `setOpacity` 약속이 바뀜) | 큼 | 남음 | — | `src/gameplay/town/actor.js` · `core/materials.js` |
-| B-39 | p11-check | 점검의 오류 세기를 `check.js watchErrors()` 대신 `src/core/errors.js` (ctx.errors) 에서 읽기 | 작음 | 남음 | wave7 | `src/render/check.js` |
+| B-39 | p11-check | 점검의 오류 세기를 `check.js watchErrors()` 대신 `src/core/errors.js` (ctx.errors) 에서 읽기 | 작음 | **고침 (p43)** — `watchErrors(ctx.errors)` 가 오류 기록장 `on` 을 듣고, 없을 때만 예전 방식 | wave7 | `src/render/check.js` |
 
 ### 소리
 
@@ -93,7 +93,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 |---|---|---|---|---|---|---|
 | B-41 | hub-manage | 홈 「장면」 줄 `hash` 가 null → 스토리 편집기 `#scenes/<id>` 로 그 장면 열기 (편집기는 `#탭/slug` 를 받지만 장면 고르기는 안 함) | 작음 | 반쯤 | — | `tools/hub-catalog.mjs` scene · `story-editor.html fromHash` |
 | B-42 | hub-manage | 스타일 편집기 `#cozy`·`#toon` 으로 그 프리셋 열기 + 홈 목록 `style` 칸 hash | 작음 | 남음 | — | `style-editor.html` · `tools/hub-catalog.mjs` |
-| B-43 | hub-manage · m6-p1-hub | 모든 편집기 머리에 편집기 홈 링크 하나 (지금은 홈에만) | 작음 | 남음 | — | `res-` · `story-` · `sound-` · `elem-` · `style-editor.html` |
+| B-43 | hub-manage · m6-p1-hub | 모든 편집기 머리에 편집기 홈 링크 하나 (지금은 홈에만) | 작음 | **고침 (p43)** — 리소스·스토리·소리·요소·스타일 편집기 제목 옆 「🏠 편집기 홈」 | — | `res-` · `story-` · `sound-` · `elem-` · `style-editor.html` |
 | B-44 | m6-p3-traits | `rules.json about` 글이 옛 이름 — 「표 편집기(data-editor.html)」·「town 칸은 연결 제안」 → 요소 편집기 · 연결됨 | 작음 | **고침 (p39)** | — | `assets/data/rules.json` |
 | B-45 | m6-p3-traits | 테스트 이름 「주민(town) 칸은 아직 town/rules.js 가 읽지 않는다 (연결 전)」 → 연결된 지금에 맞게 | 작음 | **고침 (p39)** | — | `tests/mapdata.test.mjs` 205줄 |
 | B-46 | p36-elem-editor | claude.ai 게시본에서 직접 끌기·저장 (`window.claude` db) — 사용자가 열어 볼 때 | 작음 | 남음 (사용자 몫) | — | `elem-editor.html` |
@@ -105,26 +105,26 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
 | B-49 | board7 QA-10 | 자동 플레이 벽지 단계 (첫날 도토리로 벽지) | 작음 | 이번 p39 에서 | wave7 QA-10 · D52 | `tests/playthrough/scenario.js` |
-| B-50 | p11-check | `--target=artifact` 때 봇 `boot` 단계가 로딩 시작 단추 `#ld-sound`(또는 `#ld-mute`)를 누르기 | 작음 | 남음 | — | `tests/playthrough/scenario.js` boot · `bot.js` |
+| B-50 | p11-check | `--target=artifact` 때 봇 `boot` 단계가 로딩 시작 단추 `#ld-sound`(또는 `#ld-mute`)를 누르기 | 작음 | **고침 (p43)** — boot 단계가 로딩 화면이 있으면 「소리 없이 시작」을 누르고 닫힐 때까지 기다림 | — | `tests/playthrough/scenario.js` boot · `bot.js` |
 
 ### 문서
 
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
-| B-51 | content | CONTRACTS 에 4차 내용: `fossil.unknown`·곤충 place `under`·`shake`·`museum:appraised`·`daily.rockBugs`·`harvest.appraise` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-52 | firstday | CONTRACTS 에 '3차 X3 첫날 흐름' 절: `intro` 서비스·`intro:named/step/done/reward`·`town:firstday` 95·`flags.firstday` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-53 | mobile | CONTRACTS 에 X1: `input.enabled` getter·`input:touch`·`?touch=`·`ui.tools.open`·`--safe-*`·터치 조작 자리 | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-54 | ux | CONTRACTS 에 Y1: `interactions.peek`·`label`·`pure:false`·`input.setLabels`·`intro.rename`·`save.reset` 이 모듈 칸도 지움 | 작음 | 남음 | — | `docs/CONTRACTS.md` |
+| B-51 | content | CONTRACTS 에 4차 내용: `fossil.unknown`·곤충 place `under`·`shake`·`museum:appraised`·`daily.rockBugs`·`harvest.appraise` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-52 | firstday | CONTRACTS 에 '3차 X3 첫날 흐름' 절: `intro` 서비스·`intro:named/step/done/reward`·`town:firstday` 95·`flags.firstday` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-53 | mobile | CONTRACTS 에 X1: `input.enabled` getter·`input:touch`·`?touch=`·`ui.tools.open`·`--safe-*`·터치 조작 자리 | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-54 | ux | CONTRACTS 에 Y1: `interactions.peek`·`label`·`pure:false`·`input.setLabels`·`intro.rename`·`save.reset` 이 모듈 칸도 지움 | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
 | B-55 | z2-interior · z4-town | CONTRACTS '5차 Z2' 절 (실내 상태·행동 키·이벤트) · Z4 town 상태 표·이벤트·서비스 — 일부만 실내·10차 절에 있음 | 작음 | 반쯤 | — | `docs/CONTRACTS.md` |
-| B-56 | m6-p0-pack | CONTRACTS `assets` 줄: `url`·`urlNow`·`packed`·`packStatus()`, 「게시본에선 `fetch('assets/…')` 대신 `loadJSON`·`url`」 | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-57 | m6-p3-traits | CONTRACTS town 절: 주민 데이터 = `assets/villagers/<slug>.json`, 이모티콘 규칙 = 그 파일 `emote`, 생일 = rules.json · z5-festival 노트의 「talk.json (주민 규칙)」 줄 | 작음 | 남음 | — | `docs/CONTRACTS.md` · `docs/notes/z5-festival.md` |
-| B-58 | m6-p4-sound | CONTRACTS 「리소스 교체 약속」에 소리 절 (곡 파일·`index.json`·`files.js`·`tests/sound.test.mjs`) + `bgm` 자리 이름·`init` 이 다 읽고 끝남 | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-59 | m6-p5-mapdata | CONTRACTS data 절 「숫자 표 = items.json·rules.json (tables.js)」, world 절 `generateIsland(seed,{layout})`·`layout.json`·`layout.festival` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
+| B-56 | m6-p0-pack | CONTRACTS `assets` 줄: `url`·`urlNow`·`packed`·`packStatus()`, 「게시본에선 `fetch('assets/…')` 대신 `loadJSON`·`url`」 | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-57 | m6-p3-traits | CONTRACTS town 절: 주민 데이터 = `assets/villagers/<slug>.json`, 이모티콘 규칙 = 그 파일 `emote`, 생일 = rules.json · z5-festival 노트의 「talk.json (주민 규칙)」 줄 | 작음 | **반쯤 (p43)** — CONTRACTS 주민 데이터 소절은 넣음, `z5-festival.md` 「talk.json」 줄은 남음 | — | `docs/CONTRACTS.md` · `docs/notes/z5-festival.md` |
+| B-58 | m6-p4-sound | CONTRACTS 「리소스 교체 약속」에 소리 절 (곡 파일·`index.json`·`files.js`·`tests/sound.test.mjs`) + `bgm` 자리 이름·`init` 이 다 읽고 끝남 | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-59 | m6-p5-mapdata | CONTRACTS data 절 「숫자 표 = items.json·rules.json (tables.js)」, world 절 `generateIsland(seed,{layout})`·`layout.json`·`layout.festival` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
 | B-60 | m6-p6-style | CONTRACTS 「2차 W4」 첫 줄 `demos/style.html` → `style-editor.html` (값은 `assets/style/presets.json`) | 작음 | **고침 (p39)** | — | `docs/CONTRACTS.md` 340줄 |
 | B-61 | p11-access | CONTRACTS 「7차」: `settings` 칸 `textSize`·`shapes`·`calm`·`emoteText`·`soundText`, `<html>` 표시(`--pk-fs`·`pk-calm`…), `ui.setSetting`·`transfer`·`report` | 작음 | 반쯤 (`ui.access` 만) | wave7 | `docs/CONTRACTS.md` |
-| B-62 | p12-camera | CONTRACTS: `input.look`·`input.viewYaw`·`camera.look`·`camera.setLook(tilt, yaw)` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-63 | perf · render | CONTRACTS: `occlusion.watch/add`·`prepareFrame`·`coastDistance`·`riverDistance`·`quality:changed`·뼈대 메시 `frustumCulled`·`applyToonStyle merge`·`aFade`·`shadowDepthMaterial` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
-| B-64 | story | H7 CONTRACTS 에 스토리 재생기 서비스·이벤트·`state.story` | 작음 | 남음 | — | `docs/CONTRACTS.md` |
+| B-62 | p12-camera | CONTRACTS: `input.look`·`input.viewYaw`·`camera.look`·`camera.setLook(tilt, yaw)` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-63 | perf · render | CONTRACTS: `occlusion.watch/add`·`prepareFrame`·`coastDistance`·`riverDistance`·`quality:changed`·뼈대 메시 `frustumCulled`·`applyToonStyle merge`·`aFade`·`shadowDepthMaterial` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
+| B-64 | story | H7 CONTRACTS 에 스토리 재생기 서비스·이벤트·`state.story` | 작음 | **고침 (p43)** — CONTRACTS 에 넣음 | — | `docs/CONTRACTS.md` |
 | B-65 | z4-town | `src/core/assets.js` 주석 「캐릭터 9종」 → 지금 수 (주민 파일 13개) | 작음 | **고침 (p39)** — 목록 파일을 가리키게 | — | `src/core/assets.js` 17줄 |
 
 ### 이미 된 것

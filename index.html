@@ -30,6 +30,8 @@
   #ui > * { pointer-events: auto; }
   .core-check { position: absolute; left: 50%; top: calc(16px + var(--safe-top)); transform: translateX(-50%);
     background: var(--cream); padding: 6px 14px; border-radius: 999px; font-size: 14px; box-shadow: 0 3px 0 #E2D2AE; }
+  /* 좁은 화면: 왼쪽 위 HUD 시계와 겹치지 않게 아래로 (B-29) */
+  @media (max-width: 720px) { .core-check { top: auto; bottom: calc(16px + var(--safe-bottom)); max-width: calc(100% - 32px); text-align: center; } }
 </style>
 <script type="importmap">
 { "imports": {

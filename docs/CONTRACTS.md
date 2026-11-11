@@ -33,8 +33,8 @@ export default {
 | `renderer`, `scene`, `camera` | 카메라는 `PerspectiveCamera(32°)`. 위치는 player 모듈이 정한다 |
 | `events` | `on(name, fn) → off`, `once`, `emit(name, payload)` |
 | `state` | 저장되는 상태 (`src/core/state.js`) |
-| `input` | `move {x,z}`(화면 위 = -Z), `run`, `enabled`(UI가 창을 열면 false), `touch`, 누름은 `input:press` 이벤트 |
-| `assets` | `loadCharacter(slug)`, `loadEnv(slug)`, `instantiate(gltf)`, `loadEnvSpec(slug)`, `loadEnvIndex()` … |
+| `input` | `move {x,z}`(화면 위 = -Z), `run`, `enabled`(UI가 창을 열면 false — getter/setter, 끄면 터치 패드가 숨고 A·B 만 남는다), `touch`, 누름은 `input:press` 이벤트. 더: `look {y}`·`viewYaw`·`setLabels`·`enableTouch()`·`pointerMove` (아래 '3·4차' 절·'P12 시점' 줄) |
+| `assets` | `loadCharacter(slug)`, `loadEnv(slug)`, `instantiate(gltf)`, `loadEnvSpec(slug)`, `loadEnvIndex()`, `loadJSON(path)`, `loadModel(base)` … 그림 주소 `url(path) → Promise<주소>`·`urlNow(path) → 주소 \| null` (`<img src>` 용, 게시본은 blob URL), `packed`(게시본 묶음으로 열렸나), `packStatus() → [{path, boot, season, files, bytes, state}]`, `prefetchPacks()`. **게시본에선 에셋이 묶음 안이다** — `fetch('assets/…')`·`<img src="assets/…">` 를 바로 쓰지 말고 `loadJSON`·`loadModel`·`url`/`urlNow` (ui 는 `iconEl`) |
 | `materials` | `applyToonStyle(root, {spec})`, `toonMaterial(color)`, `outlineMaterial(width)`, `curve.uCurve` |
 | `constants` | `TILE`, `ISLAND{w:64,h:56}`, `seasonOf(month)`, `DAY_PARTS`, `VILLAGERS`, `TOOLS` |
 | `lights` | `{ hemi, sun, sunOffset }` — main 이 만들고 **sky 가 색·세기와 `sunOffset`(focus 기준 해 방향·거리)을 바꾼다**. main 이 매 프레임 `sun.position = focus + sunOffset` 으로 옮긴다 |
@@ -173,6 +173,7 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - 아이템: 카테고리 `seed` 추가 (`seed.tulip`, `seed.sapling` …). 가격은 `price` = 상점이 사 주는 값(판매가), `buyPrice` = 상점에서 살 때 값. 레시피 모양 `{ id, materials: [{ id, count }] }`.
 - spawns: `fish` habitat 에 `mouth`(하구), `bug` place 에 `shake`(나무 흔들기 벌), place 는 배열도 받는다. `rock(rng, hits)` 는 오늘 친 횟수가 6 이상이면 `null`. `treeShake` 결과의 `event: 'bees'` = 벌떼. `weather: 'rainbow'` 는 맑음처럼 다룬다.
 - 더 새 버전의 저장이 있으면 불러오지도 덮어쓰지도 않는다 (`save.blocked`) — 안내는 ui 가 띄운다.
+- (6차 M6-P5) **숫자 표** = `assets/data/items.json` (아이템 사전) · `assets/data/rules.json` (시작 지급·상점·채집 확률·하루·레시피·생일·주민·이사·시간 빠르기). `src/data/tables.js` 가 둘을 다 받을 때까지 기다린 뒤(top-level await) `items`·`spawns`·`economy` … 가 쓴다. 다른 모듈은 `data.rules` 로 읽는다. 고치는 곳은 요소 편집기 → "요소 반영".
 
 ### world · player 추가
 - **도구 숫자키**(tool1~5, toolPrev/Next/None)는 지금 player 가 처리한다. gameplay 가 가방에 있는 도구만 들게 하려면 `player.toolKeys = false` 로 끄고 직접 `setTool` 을 부른다.
@@ -180,6 +181,7 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - `objects.setVariant(id, 'picked')` = 열매를 딴 과일나무 모습, `setVariant(id, null)` 로 되돌린다.
 - **하루 리셋 연결(2차)**: world 는 `time:newday` 가 아니라 **`data:newday`** 를 듣고 `spawnTiles('shell'|'weed'|'fossil-spot')` 후보를 `data.day.pickSpots` 로 골라 `objects.add/remove` 한다.
 - `world.setSeason(season)` 은 여러 번 불려도 괜찮다 (같은 계절이면 무시). `time.seasonPalette(season).variants` (`{tree:'autumn', 'tile-grass':'autumn', ...}`) 를 그대로 써도 된다.
+- (6차 M6-P5) **섬 지도** = `assets/island/layout.json` (시드·연못·다리·경사로·건물·주민 집 자리 `[x, z]` = 섬 크기 비율, 바위, 축제 광장 `festival: { at, r }`, 나무·꽃 밀도). 빠진 칸은 `src/world/island.js` `DEFAULT_LAYOUT` (`resolveLayout`). world 가 `generateIsland(layout.seed ?? state.island.seed, { …, layout })` 로 만든다 — 생성기는 인자 시드를 쓰고 `layout.seed` 는 부르는 쪽이 고른다. 축제 광장 자리의 원본은 `layout.festival` (`world/festival.js` 가 `gen.layout.festival` 을 읽어 `world.places.festival` 을 만든다).
 
 ### ui 추가
 - `ui.confirm({ title, text, icon, buttons:[{label, value, primary}], cancelValue }) → Promise<value>` (브라우저 `confirm()` 금지).
@@ -192,6 +194,8 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 - `sfx` 이벤트 내용: `{ name, volume?, pitch?, pan?, delay? }`.
 - `speak(text, voice) → Promise<boolean>` (끝까지 말하면 true, 끊기면 false). 소리가 잠겨 있어도 같은 시간 뒤에 끝난다. `dialog:line` 에 `voice` 가 없으면 조용히 넘어간다.
 - `setVolume(kind, v)` 는 `state.settings[kind]` 에도 적는다.
+- (6차 M6-P4) `bgm(이름)` 은 곡 이름 말고 **자리 이름**도 받는다 — `assets/sound/index.json` `schedule.places` 의 열쇠 (지금 `indoor` · `festival`). 자리 곡이 빈 칸이면 바깥처럼 자동. 고르는 순서: 열린 창(`schedule.panels` — `shop`·`museum`) > 고른 곡·자리 > 날씨 > 시간대.
+- audio `init` 은 곡·효과음·목소리 데이터를 **다 읽고 끝난다** (`audio.load()` 를 기다림, 게임에서는 `assets.loadJSON`). 그래서 뒤에 init 하는 모듈은 바로 `sfx`·`bgm` 을 불러도 된다.
 
 ### time 추가
 - `now()` 에 `hourF`(소수 시각), `ms`, `weekdayName`('일'~'토'). 돌려주는 객체는 얼려 있다 — 복사해서 쓴다.
@@ -200,7 +204,7 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 ### 2차에서 정할 것
 - ~~실내 장면(P4)~~ → `time.setIndoor(bool)` + 이벤트 `scene:indoor {on}` (아래 '2차 W3 집·가구·제작' 절).
 - ~~외곽선 설정~~ → `main.js` 가 `settings:changed {key:'outline'}` 를 듣고 `userData.outline` 메시를 모두 켜고 끈다. 외곽선 메시를 새로 만들 땐 `userData.outline = true` 를 꼭 붙인다.
-- `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다.
+- `ctx.quality` = `'high'|'low'` (터치 기기·`?quality=low` 면 low: 해상도 1.5배 제한, 그림자 1024·PCF). 무거운 효과는 low 에서 줄인다. → 지금은 넷(`high`·`mid`·`low`·`min`)이고 도중에 바뀐다 — 아래 '2차 W4' 절 「사양 · 그리기 줄이기」.
 - **카메라와 하늘**: 기본 카메라에서 하늘이 잘 안 보여 구름·별·무지개가 묻힌다 — 화면 위쪽에 하늘 띠를 조금 남기는 쪽으로 조정.
 
 ---
@@ -221,6 +225,7 @@ setVolume('bgm'|'sfx'|'voice', 0~1)
 
 ### player
 - `player.camera.setBounds({ x0, x1, z0, z1 } | null)` — 카메라 중심이 머무는 네모(월드 좌표). `player.camera.setCurveScale(k)` — 곡면 월드 세기 배율(1 = 보통). 집 안에서 house 가 쓴다.
+- (P12 시점) 올려다보기·둘러보기: `player.camera.look` → `{ tilt, yaw, tiltGoal, yawGoal, dragging }` (확인용, tilt 1 = 끝까지 올려다봄 · −1 = 내려다봄) · `player.camera.setLook(tilt = 0, yaw = 0)` (−1~1·둘레 한계 안으로 자름, 조작할 수 없을 때는 무시). 키는 `ctx.input.look.y` (R·PageUp = 1, V·PageDown = −1, 누르는 동안, 창이 열리면 0) 를 camera 가 읽는다. 카메라가 둘레를 돈 각은 camera 가 `ctx.input.viewYaw` 에 넣고, input 이 키보드·패드 방향을 그만큼 돌린다 (마우스 걷기는 땅 위 점이라 그대로). 놓으면 원래 시점으로 돌아오고, 집 안·장면(`story:start`)·창이 열린 동안은 쉰다. `snap`·`setBounds` 도 시점을 원래대로 돌린다.
 
 ### data
 - 가방 칸 `variant` (선택): `{ id, count, variant }` — 가구 색·주민 사진의 주민 slug. 같은 변형끼리만 쌓인다. `inventory.add(id, n, { variant })`, `inventory.canFit(id, n, { variant })`, `collect(id, n, { variant })`. 저장·불러오기에서 남는다. 변형 없는 칸은 예전 모양 그대로.
@@ -308,6 +313,11 @@ objects.query(...) 결과에 scale 추가
 | `town:mail` | 91 | 플레이어 집 우편함 1.15칸 안, 그쪽을 볼 때 |
 | `town:knock` · `town:shop` · `town:museum` | 90 | 주민이 집에 있을 때 그 집 문 / 상점 문·밤톨 / 박물관 문·느루 |
 
+### 주민 데이터 (6차 M6-P3)
+- 주민·가게 주인 값은 **주민마다 `assets/villagers/<slug>.json` 한 파일** (성격·말버릇·선물 반응·부탁·시간표·자주 가는 곳·글 대사 `lines`·꺼 둔 대사 `linesOff`). 목록·순서는 `src/gameplay/town/files.js` `VILLAGER_FILES` (웹 빌드가 이 글자로 묶는다 — 주민을 더하거나 빼면 여기도), `town/people.js` 가 읽어 `PEOPLE`·`KEEPERS`·`LINES` 로 펼친다.
+- 이모티콘 대화의 주민 규칙 = 그 파일의 `emote` 칸 (festival 이 `judge.js withVillagers` 로 붙인다). `assets/emotes/talk.json` 에는 판정 공통 규칙만 남는다.
+- 생일은 주민 파일이 아니라 `assets/data/rules.json` `birthdays` (`src/data/birthdays.js`).
+
 ### 이벤트
 - `town:intro {done: true}` — 첫날 밤톨 안내가 끝났을 때 (`state.flags.intro = true` 와 같이).
 - `mail:new {from, kind}` — 우편함에 편지가 들어왔을 때.
@@ -358,6 +368,60 @@ stats() → { ms, passes }
 - `outlineMaterial(width, { color, bend, base, wind, styleAttr })` — 외곽선 메시엔 계속 `userData.outline = true`. 섬폰 외곽선 끄기는 메시 `visible`, 스타일 `outline: 'off'` 는 재질 `visible` 을 끈다.
 - 셰이더를 덧씌울 때: `#include <begin_vertex>` 표시를 지우지 않는다. uniform 이름 `uTime` 은 world 가 쓰므로 스타일은 `uStyleTime`.
 - 새 `ShaderMaterial` 은 화면 색(sRGB)을 그대로 내보내도 render 가 화면 효과 때 선형으로 바꿔 준다. 직접 맞추려면 sky 처럼 `linearToOutputTexel( vec4( sRGBTransferEOTF( vec4(c, 1.0) ).rgb, a ) )`.
+- (render) `applyToonStyle(root, { spec, flat, noOutline, outlineWidth, bend, merge })` — **`merge: true`** 면 뼈대 메시(캐릭터) 부품을 뼈대마다 한 메시로 합친다 (주인공·주민·옷이 쓴다). 그때 `materials[이름]` 은 부품이 나눠 쓰는 합친 재질이라 색은 `setColor(name, hex)` 로만. 돌려주는 값에 `fade`(uniform) · `setFade(v)` 가 더해진다.
+- **가림 투명(디더)**: 모든 툰·평면·외곽선 재질이 안다 — 세기 = max(재질 uniform `fade` (물체 통째로), 꼭짓점·인스턴스 속성 `aFade` 0~1 (배경 묶음의 칸마다, 없으면 0)). 끝까지 지우지 않고 `FADE_MAX` 0.7 까지, 그림자는 그대로 남는다. `applyToonStyle` 은 `root.userData.toonFade` 에 uniform 을 둔다 (`root.userData.occluder = false` 면 가림 투명에서 빠짐).
+- `shadowDepthMaterial({ wind, attr }, { key, extra })` → 바람에 흔들리는 재질의 그림자도 같이 흔들리는 `customDepthMaterial` (이름 `style-shadow`, 같은 선택지끼리 나눠 씀). 재질 `userData.shadowSway` 가 있으면 render 가 그림자 드리우는 메시에 저절로 붙인다 (직접 붙인 `customDepthMaterial` 은 건드리지 않는다). world 배경 묶음은 `extra` 로 흔들림을 더해 직접 붙인다.
+
+### 사양 · 그리기 줄이기 (perf · render)
+- `style.setQuality(q, { auto })` (`'high'|'mid'|'low'|'min'`, 예전 `'lite'` = mid) · `style.quality` · `style.qualities` · `style.autoQuality` → `ctx.quality` 도 바꾸고 이벤트 **`quality:changed {quality, auto}`**. `ctx.quality` 는 **도중에 바뀔 수 있다** — init 때 한 번 읽어 두는 모듈은 이 이벤트를 듣는다 (지금 sky · house 방·주민 방 · 기기 점검).
+- 뼈대 메시(캐릭터): `applyToonStyle` 은 `frustumCulled = false` 로 두고, render 의 culler(`src/render/cull.js`)가 처음 볼 때 `frustumCulled = true` 로 켜고 쉰 자세 구를 키워 매 프레임 넣는다. 본 카메라·그림자 카메라 둘 다 밖이면 그 뼈대의 `update` 를 건너뛴다. 늘 그려야 하는 뼈대 메시는 그 뒤에 `frustumCulled = false` 로 두면 render 가 다시 켜지 않는다. `style.culler.windShadow` (바람 그림자 켜고 끄기, 기본 true) 는 비교용.
+- render 가 그리기 직전 **`world.prepareFrame()`** 을 부른다 (배경 묶음마다 본 카메라·그림자 카메라에 걸리는 칸만 담기, 곡면 월드 반영 — 투어 섬 kit 도 같이). 부르지 않는 그리기 길에서는 world.update 가 한 프레임 늦게 대신한다.
+- world 가림 투명 `world.occlusion = { watch(getPoint) → 해제 함수, add({ box(out: Box3) → Box3|null, setFade(v) }) → 해제 함수, enabled, bottom, bottomPoint(), list() }` — `getPoint() → {x, y(발 높이), z} | null` 인 동안 카메라와 그 점 사이 나무·건물·주민·가구가 비친다 (플레이어는 늘 들어 있음). `applyToonStyle` 모델은 저절로 대상, 공유 재질 인스턴스는 `aFade` 인스턴스 속성을 두고 `add` 의 `setFade` 에서 그 칸을 바꾼다.
+- 물가 거리: `world.coastDistance(x, z)` → 부드러운 해안선에서 바다 쪽 거리 (칸, 땅 안 ≤ 0). 이 값이 `world.coastWaterline` 보다 작으면 모래 비탈 위라 물이 안 보인다. `world.riverDistance(x, z)` → 강물 칸이면 보이는 물가 선에서 물 쪽 거리 (둑 위 < 0), 아니면 `null` — 둑이 칸 경계보다 0.2칸쯤 물 쪽으로 나와 있어 낚시찌·물고기 그림자는 이 값 > 0.15 인 곳에.
+
+---
+
+## 3차 X1 휴대폰 · X3 첫날 흐름, 4차 Y1 행동 키 글자 · Y2 채집 콘텐츠
+
+배경: `docs/notes/mobile.md` · `firstday.md` · `ux.md` · `content.md`. 위 내용과 다르면 이 절이 우선한다.
+
+### input (X1 휴대폰 · Y1)
+- 터치 조작은 `(pointer: coarse)` 기기면 처음부터, 그 밖의 기기는 처음 손가락으로 만질 때 생긴다 → 이벤트 **`input:touch {on: true}`** (ui 가 듣고 `#ui` 에 `pk-touch`). coarse 기기는 `createInput` 안에서 바로 생겨 아무도 못 들을 수 있다 — 모듈은 init 때 `ctx.input.touch` 도 같이 본다. 주소 `?touch=1` = 늘 켬 · `?touch=0` = 끔. `input.enableTouch()` = 지금 켜기.
+- `input.enabled = false` 면 이동·시점 키가 0 이 되고 터치 패드가 숨는다 (A·B 는 흐리게 남음). 창을 여는 모듈은 이것(또는 `ui.confirm`·`ui.panel`)을 쓴다.
+- `input.setLabels({ action, pickup })` — 휴대폰 A·B 아래 작은 글자 (빈 값 = 기본 '행동'·'줍기'). 바뀐 것만 고쳐서 0.2초마다 불러도 된다. **ui 만 부른다** (`interactions.peek` 결과로, 아래).
+- 터치 조작 자리 (#ui DOM 이 피할 곳): 패드 = 세로 화면 왼쪽 46%·아래 40%, 가로 화면 왼쪽 38%·아래 70%. 오른쪽 아래 = A·B 단추 (오른쪽 끝에서 약 190px). 터치 CSS 는 `src/core/input.js` 가 넣는다.
+- 안전 영역(노치·홈 막대): `index.html :root` 의 CSS 변수 **`--safe-top/right/bottom/left`** (= `env(safe-area-inset-*)`). #ui 에 DOM 을 붙이는 모듈은 이것으로 가장자리를 띄운다.
+- `ui.tools.open() → Promise<{ tool } | null>` — 도구 고르기 고리 (`src/ui/toolring.js`, HUD 도구 단추). 고르면 `tool1~5`·`toolNone` 의도를 보낸다 — 드는 규칙은 gather·player 몫.
+
+### 행동 키 글자 (Y1)
+- `gameplay.interactions.peek(intent) → { name, label } | null` — 지금 그 키를 누르면 처리할 처리기와 버튼 글자 (`run` 하지 않음, 창이 열렸거나 `input.enabled` 가 false 면 null). ui 가 0.2초마다 불러 A·B 글자와 키 안내를 바꾼다.
+- 처리기 `add({ …, label?, pure? })`: `label` = 문자열 또는 `(대상, ctx) → 문자열`. 없으면 `src/gameplay/index.js` 의 `LABELS` 표, 거기도 없으면 '행동'·'줍기' (`''` = 눌러도 아무 일 없음). **`test(ctx)` 는 부작용 없이 가벼워야 한다** (소리·이벤트·상태 바꾸기는 `run` 에서). 부작용이 있으면 `pure: false` — peek 가 건너뛴다.
+
+### 첫날 흐름 (X3 — `src/gameplay/intro/`)
+- **상태**
+  | 칸 | 주인 | 내용 |
+  |---|---|---|
+  | `player.name` | intro | 플레이어 이름. player 모듈은 읽기만 |
+  | `island.name` | intro | 섬 이름 '…섬' (없으면 대사엔 '포근섬') |
+  | `flags.firstday` | intro | `{ v, done: { 단계id: dayKey\|true }, finished: dayKey\|'legacy'\|null, rewarded, hidden, legacy, collapsed, skip?, skipped? }` — 단계 7개 `intro tool gather catch sell donate home` (`intro/rules.js` `STEPS`) |
+- **서비스** `ctx.services.intro = { holding (이름을 정하기 전 — town 이 밤톨 첫 안내를 미룬다), naming, names() → {player, island}, fill(text), current() → 단계id | 'reward' | null, rewardPending(), reward: {item, acorns}, claimReward(), doorSell(), skip(), tips(), tip(id, slug), guide(), progress(), rename() → Promise<bool> }`. `claimReward` 는 town keepers 가 밤톨 선물을 준 뒤 부른다. `rename` = 섬폰 설정 「이름 다시 정하기」 (그만두면 false, 아무것도 안 바뀜). 개발용 `complete(id)`·`reset()`.
+- **이벤트**
+  | 이벤트 | 내용 | 듣는 곳 |
+  |---|---|---|
+  | `intro:named` | `{player, island}` 이름을 정했을 때. 다시 정했으면 `renamed: true, before: {player, island}` 도 | story (트리거 `newgame`, 다시 정한 건 뺌) · ui (저장 안내 미루기) |
+  | `intro:step` | `{id, n, total}` 단계 하나 끝 | — |
+  | `intro:done` | `{dayKey}` 단계를 다 끝냈거나 건너뜀(`skipped: true`) | town (밤톨 집 앞 방문) |
+  | `intro:skip` | `{why}` 목록 건너뛰기 | — |
+  | `intro:reward` | `{item, acorns}` 밤톨 선물을 받음 (`furn.radio` · 1000) | story (트리거 `firstday-done`) |
+- **행동 키** `town:firstday` **95** — 선물이 남았을 때: 집 앞에 온 밤톨 2.2칸 안, 또는 상점 문·밤톨·실내 계산대 앞 (상점 90 보다 먼저).
+- **data.save**: `reset()` 은 `createState` 에 없는 최상위 칸(`state.mail` 처럼 모듈이 만든 칸)도 지운다 (있는 칸은 같은 참조, 안쪽 값만 새로). 자기 칸을 `state` 최상위에 두는 모듈은 쓸 때마다 `??=` 로 만든다. reset 뒤 이벤트는 따로 없다.
+
+### 채집 콘텐츠 (Y2)
+- **아이템** `fossil.unknown` (FO-00, `unknown: true`) = 감정 전 화석. 분류는 `fossil` 이지만 `items.list('fossil')`·박물관·도감에는 없고 `items.get` 에는 있다. 상점에선 싸게(200) 팔린다.
+- **곤충 place** 더: `under` (바위를 칠 때만) · `shake` (나무 흔들기 때만) — 곤충 스폰이 저절로 고르지 않는 자리 (`spawns.BUG_PLACES`).
+- **data.harvest** 더: `digFossil(spotKey)` 가 이제 `'fossil.unknown'` | null 을 준다 · `appraise(rng?)` → 진짜 화석 id (가방 바꾸기는 부르는 쪽 몫) · `rockBug(rockId, { hour, month, weather, rng })` → 바위 밑에서 튀어나온 곤충 id | null (바위 하나에 하루 한 번) · `rockHitsLeft(rockId)` · `fossilsLeft()`. `spawns.treeShake` 결과 `event: 'bug'` = 곤충이 떨어져 기어 도망감 (잠자리채로 잡는다).
+- **이벤트** `museum:appraised {ids}` — 느루(town keepers)가 감정을 마친 뒤, 밝혀진 화석 id 들.
+- **상태** `island.daily.rockBugs = [바위 id]` (오늘 곤충이 나온 바위, data) · `flags.fossilAppraiseHint` (감정 안내를 한 번 했음, gather).
 
 ## 실내 검수 보드 interiors (p12-interiors)에서 추가된 약속 (2026-11-04)
 
@@ -400,7 +464,15 @@ stats() → { ms, passes }
 - **배경 `world` 칸** (게임 배치 정보, 빌더는 읽지 않는다): `collider` (충돌, 모델 원점 기준: `r` 원 · `box [가로, 세로]` · `boxes [[x0,z0,x1,z1]…]` · `circles [[x,z,r]…]`), `extent` (query 반너비 `[x, z, _, z중심이동]`), 건물 4종은 `lot` (집터 칸 수 `[가로, 세로]`, 섬 만들기가 씀). 모델 크기를 바꾸면 같은 파일의 world 값을 맞춘다 — 상자 충돌 가로가 모델 가로의 88%~+0.1, 건물 모델이 집터 안이어야 테스트가 통과한다.
 - **가구**: 배치는 스펙 `footprint`·`place`·`layer` 만 쓴다. `src/data/items.js` FURN 표의 칸 글자('2×1', '벽', '창문')는 화면 표시용이라 footprint 를 바꾸면 같이 고친다 (테스트가 어긋남을 잡는다). 벽시계 바늘 노드 `hourHand`·`minuteHand`.
 - **그대로 코드에 있는 것**: 해안선·바다·강 둑 모양(절차 생성, 색만 타일 팔레트), 집 안 작업대 칸 `[2, 1]`(house/index.js), 흔들림·그림자 제외 종류 표(world/objects.js `SWAY`·`NO_SHADOW`).
+- **소리** (6차 M6-P4, 파일 없이 Web Audio 합성 — 값만 데이터): 곡 하나 = `assets/sound/songs/<id>.json` 한 파일 (반주 모양 `arrange` 의 파트가 다 있고, 악보 길이 = 마디 × 박). 곡 목록은 `assets/sound/index.json` `songs` 와 `src/audio/files.js` `SONG_FILES` 둘 다에 적는다 (웹 빌드가 files.js 글자로 묶는다). 선곡 표(`index.json` `schedule` 의 시간대·날씨·자리·창)에 든 곡은 모두 있어야 한다. 효과음 = `sfx.json`, 목소리 = `voices.json` 의 한 칸. 반주 모양 자체는 코드 `src/audio/songs.js` `ARRANGE`. `tests/sound.test.mjs` 가 이 약속과, 고치지 않은 곡·효과음 소리가 그대로인지(지문)를 본다.
 
+
+## 스토리 재생기 (H7, `src/gameplay/story/`) — 자세히는 `docs/notes/story.md`
+- **장면 = 데이터**: 장면 하나 = `assets/story/scenes/<id>.json`, 순서 `assets/story/index.json` (`timeline`), 파일 목록 `src/gameplay/story/files.js` (웹 빌드가 이 글자로 묶는다). 트리거·카메라 계산·검사는 순수 `story/rules.js` (스토리 편집기와 같이 씀).
+- **서비스** `ctx.services.story = { play(id, { take, vars }) → Promise<{id, take, skipped}> | null (없는 장면·트는 중이면 null), preview(scene, take) (본 기록에 안 남음), stop(), playing → {id, take, shot} | null, queue → [id], scenes() → [{id, title, trigger, pick, seen}], scene(id), index(), seen(id), reset(id?) }`. 개발용 `debug()`, 주소 `?story=<id>[&take=B]` = 시작 뒤 그 장면 미리 보기.
+- **이벤트** (보내는 쪽 story): `story:start {id, take}` · `story:shot {id, take, shot, index}` · `story:choice {id, shot, emote, index}` · `story:end {id, take, skipped}`. 장면 동안 HUD 칸을 숨기려면 `story:start`·`story:end` 를 듣는다 (events·festival·night 칩, intro 카드, decor 닫기, 카메라 시점 되돌리기가 이렇게 한다).
+- **트리거** (`rules.js` `TRIGGERS` — 장면 `trigger.on` → 듣는 이벤트): `newgame` `intro:named` (다시 정한 건 뺌) · `firstday-done` `intro:reward` · `guide-done` `town:intro {done}` · `after` `story:end` (`trigger.scene`) · `newday` `data:newday` (`trigger.scene` 을 본 다음 날) · `festival-part` `festival:part {n}` · `festival` `festival:start` · `event-start` `events:start` (`first`) · `move-in` `town:welcome` · `night-first` `night:first` · `tour-first` `tour:arrive` (`first`) · `manual` (`play` 로만). 트리거가 맞으면 줄을 세우고 조금 뒤(0.5초) 튼다. 장면 기준 자리 `place` = `world.places` 이름 (`event` = 트리거가 알려 준 x·z).
+- **상태** `state.story` (주인 story, 없으면 만든다): `{ seen: { 장면id: dayKey }, queue: [{id, vars}] }` — `queue` 는 줄 선 장면 (트리거 직후 새로 고침해도 다음에 이어서 튼다). 본 장면은 다시 트리거되지 않는다 (장면에 `once: false` 면 예외). `play` 로 직접 부르면 본 장면도 튼다.
 
 ## 8차 계절 행사 (M8-P1, 보드 wave8 반영 v1) — 자세히는 `docs/notes/m8-events.md`
 - **상태** `ctx.state.events` (주인: gameplay/events): `{ told, before, runs: {"<EV-id>:<해>": { first, days, todo: {<id>: {n, day}} }}, stamps: {<EV-id>: ["<해>"]} }`.
