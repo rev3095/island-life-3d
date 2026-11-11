@@ -128,12 +128,14 @@ export function createDial({ cls = 'pk-tclock-dial', compact = false, label = '�
     nums.append(t);
   }
   const ampmText = s('text', { class: 'num', x: 100, y: 136, 'font-size': 13 });
+  // P46 FB-04: 바늘이 다음 날로 넘어가면 판 위쪽에 「내일」(모레·n일 뒤) — 끄는 동안 날짜가 바뀌는 걸 바로 보이게
+  const dayText = s('text', { class: 'num pk-dial-day', x: 100, y: compact ? 76 : 70, 'font-size': compact ? 26 : 15, 'font-weight': 700 });
   const hourHand = s('g', { class: 'h-hour', 'data-hand': 'hour' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 50 }), s('line', { class: 'hand', x1: 100, y1: 108, x2: 100, y2: compact ? 48 : 52, 'stroke-width': compact ? 16 : 8 })]);
   const minHand = s('g', { class: 'h-minute', 'data-hand': 'minute' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 22 }), s('line', { class: 'hand', x1: 100, y1: 112, x2: 100, y2: compact ? 20 : 24, 'stroke-width': compact ? 10 : 4.5 })]);
   const pin = s('circle', { cx: 100, cy: 100, r: compact ? 11 : 6 });
   const svg = s('svg', {
     class: cls, viewBox: '0 0 200 200', role: 'slider', tabindex: '0', 'aria-label': label, 'aria-valuemin': '0', 'aria-valuemax': '1439',
-  }, compact ? [face, ticks, hourHand, minHand, pin] : [face, ticks, nums, ampmText, hourHand, minHand, pin]);
+  }, compact ? [face, ticks, dayText, hourHand, minHand, pin] : [face, ticks, nums, ampmText, dayText, hourHand, minHand, pin]);
 
   const target = () => baseMs() + delta * MIN;
   const L = () => labelOf(target(), base.dayKey);
@@ -145,6 +147,7 @@ export function createDial({ cls = 'pk-tclock-dial', compact = false, label = '�
     face.setAttribute('fill', bg); face.setAttribute('stroke', 'var(--pk-edge, #E2D2AE)');
     for (const el of [ticks, nums, pin]) { el.setAttribute('stroke', ink); el.setAttribute('fill', ink); }
     ampmText.setAttribute('fill', ink); ampmText.textContent = l.ampm;
+    dayText.setAttribute('fill', l.part === 'night' ? '#F2B36B' : '#C9772E'); dayText.textContent = l.days ? l.dayLabel : '';
     hourHand.querySelector('.hand').setAttribute('stroke', ink);
     minHand.querySelector('.hand').setAttribute('stroke', l.part === 'night' ? '#F2B36B' : '#C9772E');
     svg.dataset.part = l.part;
