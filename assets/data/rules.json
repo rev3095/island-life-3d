@@ -25,6 +25,11 @@
     "weedsStart": 8,
     "weedsMax": 24
   },
+  "time": {
+    "speed": "fast",
+    "speeds": { "real": 1, "fast": 12, "faster": 30 },
+    "whenClosed": "pause"
+  },
   "recipes": [
     { "result": "tool.rod", "needs": [{ "id": "mat.branch", "n": 5 }], "note": "" },
     { "result": "tool.net", "needs": [{ "id": "mat.branch", "n": 5 }], "note": "" },

@@ -62,6 +62,11 @@ export function checkElements(W) {
     const dup = R.recipes.length !== new Set(R.recipes.map(r => r.result)).size;
     add('recipes', !badRec.length && !dup, `레시피 ${R.recipes.length}개 — 재료가 모두 있는 아이템`, dup ? '같은 것을 만드는 레시피가 둘이에요' : `없는 아이템을 쓰는 레시피: ${badRec.join(', ')}`);
     add('rules', R.day.weedsStart <= R.day.weedsMax, '처음 잡초 ≤ 잡초 최대', '처음 잡초가 최대보다 많아요');
+    if (R.time) {
+      const S = R.time.speeds ?? {};
+      add('rules', S.real === 1 && Number.isFinite(S.fast) && Number.isFinite(S.faster) && S.fast > 1 && S.faster >= S.fast && ['real', 'fast', 'faster'].includes(R.time.speed),
+        `시간 빠르기: 빠르게 ×${S.fast} · 아주 빠르게 ×${S.faster} (게임 하루 = 실제 ${Math.round(1440 / (S.fast || 1))}분 · ${Math.round(1440 / (S.faster || 1))}분)`, '빠르게 > 1, 아주 빠르게 ≥ 빠르게');
+    }
     const tiers = R.town.tiers.map(t => t[1]);
     add('town', tiers.every((v, i) => i === 0 || v > tiers[i - 1]) && tiers.at(-1) <= R.town.friendMax, '친밀도 단계가 차례대로, 최대 안에', '단계 값을 차례대로 늘려 주세요');
   }

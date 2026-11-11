@@ -105,7 +105,7 @@ const fakeGame = () => {
     services: {
       player: { position: { x: 12.345, z: -3.21 }, tool: 'net' },
       house: { inside: false },
-      time: { now: () => ({ year: 2026, month: 10, day: 31, hour: 9, minute: 5 }), weather: 'rain', indoor: false },
+      time: { now: () => ({ year: 2026, month: 10, day: 31, hour: 9, minute: 5 }), weather: 'rain', indoor: false, speed: 'fast' },
       story: { playing: null },
     },
   };
@@ -120,7 +120,7 @@ test('보고 문서 모양: 홈이 읽는 칸 (status new · kind · text · gam
   assert.equal(doc.createdAt, 1000);
   assert.equal(doc.reply, null);
   assert.deepEqual(doc.game, { build: 'dev', saveVersion: SAVE_VERSION, stateVersion: 1, page: '/', artifact: false });
-  assert.deepEqual(doc.place, { x: 12.3, z: -3.2, indoor: false, time: '2026-10-31 09:05', timeMode: 'real', weather: 'rain', story: null, tool: 'net' });
+  assert.deepEqual(doc.place, { x: 12.3, z: -3.2, indoor: false, time: '2026-10-31 09:05', timeMode: 'fast', weather: 'rain', story: null, tool: 'net' });
   assert.deepEqual(doc.device.view, { w: 390, h: 844, dpr: 3 });
   assert.equal(doc.device.touch, true);
   assert.equal(doc.device.quality, 'low');

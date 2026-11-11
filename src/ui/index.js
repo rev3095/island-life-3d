@@ -3,6 +3,7 @@
 import { h } from './dom.js';
 import { createPanels, confirmBox } from './panels.js';
 import { createHud, createToasts } from './hud.js';
+import { createHudClock } from './hudclock.js';   // p41 원형 시계 + 시간 조정 칸
 import { createDialog } from './dialog.js';
 import { createBag } from './bag.js';
 import { createPhone } from './phone.js';
@@ -128,6 +129,9 @@ export default {
     dialog = createDialog(ctx, panels);
     hud = createHud(ctx, { openBag: () => bag.open({ mode: 'view' }), openPhone: () => phone.open(), openMap: () => map.open(), openTools: () => tools.open(), setHint: v => setSetting('keyHint', v) });
     hud.showHint(state.settings.keyHint !== false);
+    // p41: 왼쪽 위 시계 칸에 원형 시계 + 그 밑 시간 조정 칸
+    const hudClock = createHudClock(ctx, { toast: (t, i) => ctx.services.ui?.toast?.(t, i), blocking: () => panels.blocking() });
+    hudClock.mount(hud.root.querySelector('.pk-clock'));
 
     root.append(hud.root, captions.root, fadeEl, irisEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
@@ -143,7 +147,8 @@ export default {
     events.on('ui:close', () => root.classList.toggle('is-busy', panels.isOpen()));
 
     // HUD 갱신
-    events.on('time:tick', ({ now } = {}) => hud.tick(now));
+    events.on('time:tick', ({ now } = {}) => { hud.tick(now); hudClock.tick(); });
+    for (const name of ['time:shift', 'time:speed', 'time:newday']) events.on(name, () => hudClock.tick());
     events.on('weather:change', ({ weather } = {}) => hud.setWeather(weather));
     events.on('wallet:changed', ({ acorns } = {}) => hud.setAcorns(acorns));
     events.on('player:tool', ({ tool } = {}) => hud.setTool(tool));
@@ -196,6 +201,7 @@ export default {
       toast,
       bag: { open: opts => bag.open(opts) },
       phone: { open: () => phone.open() },
+      hudClock,                                    // p41: 원형 시계 HUD (dial · strip · step(±1) · cycleSpeed · toggle)
       map: { open: () => map.open() },
       shop: { open: opts => shop.open(opts) },
       museum: { open: opts => museum.open(opts) },

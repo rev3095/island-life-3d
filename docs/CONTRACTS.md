@@ -466,3 +466,9 @@ stats() → { ms, passes }
 - **행동 키**: 배 `tour-boat` 95 (본섬 선착장 끝 배 1.7칸 안 → 「섬 여행」, 투어 섬 배 → 「돌아가기」) · 다른 섬 주민 `tour-guest` 99 (말 걸기 → 초대 확인 창) · 광석 바위 `tour-ore` 11 (삽·도끼를 들고 EN-13 앞, 바위 하나 하루 6번 = `ore.maxHits`, 떨어진 것은 gather drops). 투어 섬 배 앞에서 Space = 돌아가기, 새벽 5시(`data:newday`) = 저절로 돌아옴.
 - **이벤트** `tour:arrive {shape, seed, guest, first, x, z, name}` (P39: `first` = 처음 여행 → 장면 s22 `tour-first`, x·z = 투어 섬 선착장 앞, name = 섬 모양 이름) · `tour:return {auto}` · `tour:invite {slug}`.
 - **본섬 배** BD-10 `tour-boat` 는 tour 가 `world.home.objects.add('tour-boat', …, { persist: false, id: 'tour:home-boat', at })` 로 선착장 끝 동쪽 바다에 놓는다 (저장 안 함, 투어 묶음 모델 — 받는 동안 기다렸다 놓임).
+
+## P41 시간 빠르기 · 원형 시계 HUD — 자세히는 `docs/notes/p41-fast-time.md`
+- **값** `assets/data/rules.json` `time = { speed: 'real'|'fast'|'faster' (처음), speeds: { real: 1, fast: 12, faster: 30 }, whenClosed: 'pause'|'catchUp' }` (요소 편집기 「규칙 숫자」 → 시간 빠르기). data 서비스가 `ctx.services.data.rules` 로 표를 내놓고 sky 가 읽는다.
+- **상태** `state.time` (주인 sky) = `{ speed (null = rules 처음 값), offset, game, realAt, maxDay }`. 실제와 같게 = 실제 시계 + offset (닫아 둔 동안에도 흐름), 빠르게 = `game` (열려 있는 동안 실제 ms × 배수, 닫거나 숨기면 'pause' 는 멈춤). 예전 `mode: 'fast'`·`fastOffset` 은 「아주 빠르게」로 옮기고 지운다.
+- **time 서비스 더함** `speed` · `speedMult` · `speeds() → [{key, name, mult, text}]` · `whenClosed` · `setSpeed(key)` → 이벤트 **`time:speed {speed, mult}`**. `offset` = 실제 시계와의 차이(계산값). `mode`/`setMode` 는 예전 이름으로 남김. 빠르기를 바꿔도 그 순간 시각은 그대로, 날짜는 앞으로만 (11차 시계 규칙 그대로).
+- **ui** `ctx.services.ui.hudClock` (`src/ui/hudclock.js`): 왼쪽 위 `.pk-clock` 안 원형 시계(`createDial` compact — 섬폰 시계 창과 같은 판) + 조정 칸 `−1시간 · 빠르기 · +1시간 · 🕰`. 펼친 높이는 CSS 변수 **`--pk-clock-extra`** (시계 밑에 붙는 HUD 는 `top` 에 더한다). 좁은 화면(≤560px)은 접힘. 판 부품 `createDial({ cls, compact, getBase, getRange, onChange, onEnd })` 는 `src/ui/clock.js` 에서 export.

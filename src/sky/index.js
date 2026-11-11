@@ -2,7 +2,7 @@
 // ctx.services.time 을 올리고, 매 프레임 하늘 돔·조명(ctx.lights)·안개·구름·비/눈·밤 조명을 시각과 날씨에 맞춘다.
 // 약속은 docs/CONTRACTS.md 의 time 항목.
 import * as THREE from 'three';
-import { computeNow, dayHour, msAtDayHour, nightFactorAt, msAtClock, dayDiff, dayKeyOf, createTimeline } from './clock.js';
+import { computeNow, dayHour, msAtDayHour, nightFactorAt, msAtClock, dayDiff, dayKeyOf, createTimeline, timeRules, SPEED_KEYS, SPEED_NAME, dayLengthText } from './clock.js';
 import { shiftedMs } from '../core/preview.js';
 import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
@@ -41,8 +41,10 @@ export function createSky(ctx) {
   const { scene, camera, events, constants } = ctx;
   // 8차 D85-A: 날짜 흉내(#date=)면 실제 시계를 그 날짜의 지금 시각으로 옮겨 둔다 (실제 시계로 돌아가도 이 날짜)
   const baseShift = ctx.preview?.date ? shiftedMs(ctx.preview.date) - Date.now() : 0;
-  // 11차 시계: 실제 시계 = Date.now() + baseShift + state.time.offset (offset 은 섬폰 시계·setHour 가 바꾸고 저장된다) — 몸통은 clock.js createTimeline
-  const tl = createTimeline({ getTime: () => (ctx.state.time ||= {}), baseShift, extraDay: () => (ctx.preview ? null : ctx.state.island?.dayKey ?? null) });
+  // 11차 시계 + p41 시간 빠르기 — 몸통은 clock.js createTimeline:
+  //   실제와 같게 = Date.now() + baseShift + state.time.offset · 빠르게 = state.time.game (열려 있는 동안 실제 × 배수로 흐름)
+  const TR = timeRules(ctx.services.data?.rules?.time);   // rules.json time (요소 편집기) — data 가 sky 보다 먼저 뜬다
+  const tl = createTimeline({ getTime: () => (ctx.state.time ||= {}), baseShift, rules: TR, extraDay: () => (ctx.preview ? null : ctx.state.island?.dayKey ?? null) });
   let weatherOverride = null, seasonOverride = null;
   let puffs = true;                 // 북쪽 3D 솜구름 (skyFx({ puffs })) — 매우 낮음 사양은 늘 숨김 (applyPuffs)
   let flare = null;                 // 해 렌즈 빛 (flare.js, 불러온 뒤)
@@ -90,7 +92,7 @@ export function createSky(ctx) {
     Object.assign(wx, WX[currentWeather()]);
     scanIn = 0;
     step(0);
-    const info = { now: n, prevMs: prev.ms, offset: tstate().offset, days, back: n.ms < prev.ms, clamped, reason };
+    const info = { now: n, prevMs: prev.ms, offset: tl.offset(), days, back: n.ms < prev.ms, clamped, reason };
     events.emit('time:shift', info);
     return { ok: true, ...info };
   }
@@ -99,12 +101,28 @@ export function createSky(ctx) {
 
   const service = {
     now,
-    get mode() { return tstate().mode; },
-    setMode(mode) { tl.setMode(mode); memo.ms = NaN; },
+    /** 예전 이름: 'real' (실제와 같게) | 'fast' (빠르게·아주 빠르게) */
+    get mode() { return tl.speed === 'real' ? 'real' : 'fast'; },
+    setMode(mode) { service.setSpeed(mode === 'real' ? 'real' : 'fast'); },
+    // ── p41 시간 빠르기 ──
+    /** 'real' | 'fast' | 'faster' (state.time.speed, 안 골랐으면 rules.json time.speed) */
+    get speed() { return tl.speed; },
+    /** 지금 배수 (실제 1분 = 게임 몇 분) */
+    get speedMult() { return tl.mult; },
+    /** [{ key, name, mult, text }] — 섬폰 설정·HUD 가 쓴다 */
+    speeds: () => SPEED_KEYS.map(k => ({ key: k, name: SPEED_NAME[k], mult: TR.speeds[k], text: dayLengthText(TR.speeds[k]) })),
+    get whenClosed() { return TR.whenClosed; },
+    /** 빠르기 바꾸기 (지금 시각에서 끊김 없이) → time:speed { speed, mult } */
+    setSpeed(k) {
+      if (!tl.setSpeed(k)) return false;
+      memo.ms = NaN;
+      events.emit('time:speed', { speed: tl.speed, mult: tl.mult });
+      return true;
+    },
 
     // ── 11차 시계 (섬폰 「🕰 시계」 · docs/CONTRACTS.md 「11차 시계」) ──
-    /** 실제 시계에서 떨어진 정도 (ms, state.time.offset). 0 = 실제 시각 */
-    get offset() { return tstate().offset; },
+    /** 실제 시계(날짜 흉내 포함)에서 떨어진 정도 (ms). 0 = 실제 시각 */
+    get offset() { return tl.offset(); },
     /** 가 본 가장 늦은 날 — 이 날 아침 5시보다 앞으로는 못 돌린다 */
     get maxDay() { return tl.maxDay(); },
     /** 돌릴 수 있는 범위 { floor, ceil } (ms) */
@@ -112,7 +130,6 @@ export function createSky(ctx) {
     /** offset 을 바로 정한다 (범위 밖은 끝에 붙음, 빠른 시간이면 실제 시간으로) → jump 결과 */
     setOffset(ms) {
       if (!Number.isFinite(ms)) return { ok: false };
-      tl.setMode('real');
       memo.ms = NaN;
       return jumpClamped(Date.now() + baseShift + ms, 'offset');
     },
@@ -126,7 +143,7 @@ export function createSky(ctx) {
     /** 「지금 시각으로 돌아가기」: offset 0 (빠른 시간이면 실제 시간으로). 가 본 날보다 앞이면 그 날 같은 시각 → jump 결과 + caught(더한 날 수) */
     resetOffset() {
       const r = tl.resetTarget();
-      return { ...jump(() => { const t = tstate(); t.mode = 'real'; t.offset = r.offset; }, { reason: 'reset' }), caught: r.caught };
+      return { ...jump(() => tl.shiftTo(r.target), { reason: 'reset' }), caught: r.caught };
     },
     get weather() { return currentWeather(); },
     /** w: WEATHERS 중 하나. null 이면 예보대로. 다음 날이 되면 풀린다. { instant: true } 면 섞지 않고 바로 */
@@ -188,6 +205,7 @@ export function createSky(ctx) {
   }
 
   function step(dt) {
+    tl.advance();   // p41: 빠르게면 실제로 흐른 만큼 × 배수
     const n = now();
     // 이벤트
     const minute = Math.floor(n.ms / 60000);
@@ -259,7 +277,8 @@ export function createSky(ctx) {
       const t0 = tstate();
       // 11차 시계: 날짜 흉내는 시험 칸이라 그 날짜에서 새로 센다. 진짜 섬은 가 본 날보다 앞이면 그날로 맞춘다
       if (ctx.preview) { t0.maxDay = null; t0.offset = 0; }
-      else catchUp();
+      tl.start({ fresh: !!ctx.preview });   // p41: 날짜 흉내는 그 날짜 지금 시각에서, 진짜 섬은 저장 시각에서 (닫아 둔 동안: rules time.whenClosed)
+      if (!ctx.preview) catchUp();
       if (!t0.maxDay) t0.maxDay = dayKeyOf(clockMs());
       events.on('data:loaded', () => { tstate(); if (!ctx.preview) catchUp(); memo.ms = NaN; });
       try { palettes = buildSeasonPalettes(await loadEnvSpecs(ctx.assets)); }

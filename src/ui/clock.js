@@ -103,6 +103,132 @@ const s = (tag, attrs = {}, kids = []) => {
   return el;
 };
 
+/**
+ * 시계 판 부품 (섬폰 「🕰 시계」 창과 HUD 원형 시계가 같이 쓴다 — p41).
+ * getBase() → { ms, dayKey } 끌기·키보드의 기준 시각 (창 = 연 시각, HUD = 지금), getRange() → { floor, ceil }.
+ * onChange(L, { hit, low }) = 바늘이 바뀔 때 (hit = 범위 끝에 닿음, low = 앞쪽 끝), onEnd() = 끌기를 놓았을 때.
+ * compact = HUD 용 작은 판 (숫자·잔 눈금·오전/오후 글 없음, 굵은 바늘).
+ */
+export function createDial({ cls = 'pk-tclock-dial', compact = false, label = '시계 바늘 (← → 15분, ↑ ↓ 1시간)', getBase, getRange = () => ({ floor: -Infinity, ceil: Infinity }), onChange = () => {}, onEnd = () => {} } = {}) {
+  let base = getBase(), delta = 0, dragging = null;
+  const baseMs = () => Math.floor(base.ms / MIN) * MIN;
+  const face = s('circle', { class: 'face', cx: 100, cy: 100, r: 94, 'stroke-width': compact ? 10 : 6 });
+  const ticks = s('g');
+  for (let i = 0; i < 60; i++) {
+    const big = i % 5 === 0;
+    if (compact && !(i % 15 === 0)) continue;
+    const a = (i / 60) * Math.PI * 2, r1 = compact ? 72 : big ? 78 : 83, r2 = compact ? 86 : 87;
+    ticks.append(s('line', { x1: 100 + Math.sin(a) * r1, y1: 100 - Math.cos(a) * r1, x2: 100 + Math.sin(a) * r2, y2: 100 - Math.cos(a) * r2, 'stroke-width': compact ? 9 : big ? 3 : 1.2, 'stroke-linecap': 'round' }));
+  }
+  const nums = s('g');
+  if (!compact) for (let i = 1; i <= 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const t = s('text', { class: 'num', x: 100 + Math.sin(a) * 66, y: 100 - Math.cos(a) * 66 });
+    t.textContent = String(i);
+    nums.append(t);
+  }
+  const ampmText = s('text', { class: 'num', x: 100, y: 136, 'font-size': 13 });
+  const hourHand = s('g', { class: 'h-hour', 'data-hand': 'hour' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 50 }), s('line', { class: 'hand', x1: 100, y1: 108, x2: 100, y2: compact ? 48 : 52, 'stroke-width': compact ? 16 : 8 })]);
+  const minHand = s('g', { class: 'h-minute', 'data-hand': 'minute' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 22 }), s('line', { class: 'hand', x1: 100, y1: 112, x2: 100, y2: compact ? 20 : 24, 'stroke-width': compact ? 10 : 4.5 })]);
+  const pin = s('circle', { cx: 100, cy: 100, r: compact ? 11 : 6 });
+  const svg = s('svg', {
+    class: cls, viewBox: '0 0 200 200', role: 'slider', tabindex: '0', 'aria-label': label, 'aria-valuemin': '0', 'aria-valuemax': '1439',
+  }, compact ? [face, ticks, hourHand, minHand, pin] : [face, ticks, nums, ampmText, hourHand, minHand, pin]);
+
+  const target = () => baseMs() + delta * MIN;
+  const L = () => labelOf(target(), base.dayKey);
+  function draw() {
+    const l = L(), ang = handAngles(l.hour, l.minute);
+    hourHand.setAttribute('transform', `rotate(${ang.hour} 100 100)`);
+    minHand.setAttribute('transform', `rotate(${ang.minute} 100 100)`);
+    const [bg, ink] = FACE[l.part];
+    face.setAttribute('fill', bg); face.setAttribute('stroke', 'var(--pk-edge, #E2D2AE)');
+    for (const el of [ticks, nums, pin]) { el.setAttribute('stroke', ink); el.setAttribute('fill', ink); }
+    ampmText.setAttribute('fill', ink); ampmText.textContent = l.ampm;
+    hourHand.querySelector('.hand').setAttribute('stroke', ink);
+    minHand.querySelector('.hand').setAttribute('stroke', l.part === 'night' ? '#F2B36B' : '#C9772E');
+    svg.dataset.part = l.part;
+    svg.setAttribute('aria-valuenow', String(l.hour * 60 + l.minute));
+    svg.setAttribute('aria-valuetext', `${l.dayLabel} ${l.text}, ${l.partName}`);
+    return l;
+  }
+  function setDelta(v) {
+    const want = Math.round(v), c = clampDelta(want, baseMs(), getRange());
+    delta = c;
+    const l = draw();
+    onChange(l, { hit: c !== want, low: want < c });
+    return c !== want;
+  }
+
+  // ---- 끌기 ----
+  const angleOf = e => {
+    const r = svg.getBoundingClientRect();
+    return pointAngle(e.clientX, e.clientY, r.left + r.width / 2, r.top + r.height / 2);
+  };
+  function pickHand(e) {
+    const tagged = e.target.closest?.('[data-hand]')?.dataset.hand;
+    if (tagged) return tagged;
+    // 바늘 밖을 눌렀으면 각도가 가까운 바늘 (가운데 가까우면 시침 쪽으로 기운다)
+    const r = svg.getBoundingClientRect();
+    const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) / (r.width / 2);
+    const l = L(), ang = handAngles(l.hour, l.minute), a = angleOf(e);
+    const dh = Math.abs(wrapDeg(a - ang.hour)) - (dist < 0.6 ? 25 : 0), dm = Math.abs(wrapDeg(a - ang.minute));
+    return dh < dm ? 'hour' : 'minute';
+  }
+  svg.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    e.stopPropagation();   // HUD: 땅 누르기(걷기)로 새지 않게
+    svg.focus({ preventScroll: true });
+    const hand = pickHand(e);
+    const l = L(), ang = handAngles(l.hour, l.minute);
+    dragging = { hand, last: ang[hand], acc: delta, id: e.pointerId, moved: false };
+    svg.classList.add(`is-${hand}`);
+    try { svg.setPointerCapture(e.pointerId); } catch { /* 일부 브라우저 */ }
+  });
+  function move(e) {
+    if (!dragging || e.pointerId !== dragging.id) return;
+    const a = angleOf(e);
+    const d = dragMinutes(dragging.hand, dragging.last, a);
+    if (Math.abs(d) > 0.01) dragging.moved = true;
+    dragging.acc += d;
+    dragging.last = a;
+    const v = dragging.hand === 'hour' ? Math.round(dragging.acc / HOUR_SNAP) * HOUR_SNAP : dragging.acc;
+    setDelta(v);
+    // 끝에 닿았으면 쌓인 값도 그 끝으로 (되돌려 끌 때 바로 따라오게)
+    if (Math.round(v) !== delta) dragging.acc = delta;
+  }
+  const end = e => {
+    if (!dragging || e.pointerId !== dragging.id) return;
+    const moved = dragging.moved;
+    svg.classList.remove(`is-${dragging.hand}`);
+    dragging = null;
+    onEnd({ moved });
+  };
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerup', end);
+  svg.addEventListener('pointercancel', end);
+  svg.addEventListener('lostpointercapture', end);
+  draw();
+
+  return {
+    el: svg,
+    get delta() { return delta; },
+    get dragging() { return !!dragging; },
+    target, label: L, draw,
+    /** delta 를 정한다 (범위 끝에 붙음) → 끝에 닿았으면 true */
+    setDelta,
+    /** 키 하나 (KEY_STEP · Home) → 처리했으면 true */
+    key(code) {
+      if (KEY_STEP[code]) { setDelta(delta + KEY_STEP[code]); return true; }
+      if (code === 'Home') { setDelta(0); return true; }
+      return false;
+    },
+    /** 기준 시각을 다시 (HUD: 지금 시각으로) — 끄는 중이면 그대로 */
+    rebase() { if (dragging) return; base = getBase(); delta = 0; draw(); },
+  };
+}
+
 export function createClock(ctx) {
   let current = null;
 
@@ -113,9 +239,7 @@ export function createClock(ctx) {
     injectCss('clock', CSS);
     let p;
     const n0 = time?.now?.() ?? { ms: Date.now(), dayKey: dayKeyOf(Date.now()) };
-    const baseMs = Math.floor(n0.ms / MIN) * MIN;
     const baseDay = n0.dayKey;
-    let delta = 0, dragging = null;   // 창을 연 시각에서 옮긴 분 · 끄는 중 { hand, last }
 
     const shell = panelShell({ cls: 'pk-tclock', title: '🕰 시계', onClose: () => p.close(null), onOutside: () => p.close(null) });
     const dayEl = h('div', { class: 'pk-tclock-day' });
@@ -124,118 +248,38 @@ export function createClock(ctx) {
     const hints = h('ul', { class: 'pk-tclock-hints', 'aria-label': '이 시각에 할 수 있는 것' });
     const note = h('p', { class: 'pk-tclock-note', 'aria-live': 'polite' });
 
-    // 시계 판 (SVG 200×200)
-    const face = s('circle', { class: 'face', cx: 100, cy: 100, r: 94, 'stroke-width': 6 });
-    const ticks = s('g');
-    for (let i = 0; i < 60; i++) {
-      const a = (i / 60) * Math.PI * 2, big = i % 5 === 0;
-      const r1 = big ? 78 : 83, r2 = 87;
-      ticks.append(s('line', { x1: 100 + Math.sin(a) * r1, y1: 100 - Math.cos(a) * r1, x2: 100 + Math.sin(a) * r2, y2: 100 - Math.cos(a) * r2, 'stroke-width': big ? 3 : 1.2, 'stroke-linecap': 'round' }));
-    }
-    const nums = s('g');
-    for (let i = 1; i <= 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const t = s('text', { class: 'num', x: 100 + Math.sin(a) * 66, y: 100 - Math.cos(a) * 66 });
-      t.textContent = String(i);
-      nums.append(t);
-    }
-    const ampmText = s('text', { class: 'num', x: 100, y: 136, 'font-size': 13 });
-    const hourHand = s('g', { class: 'h-hour', 'data-hand': 'hour' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 50 }), s('line', { class: 'hand', x1: 100, y1: 108, x2: 100, y2: 52, 'stroke-width': 8 })]);
-    const minHand = s('g', { class: 'h-minute', 'data-hand': 'minute' }, [s('line', { class: 'hit', x1: 100, y1: 100, x2: 100, y2: 22 }), s('line', { class: 'hand', x1: 100, y1: 112, x2: 100, y2: 24, 'stroke-width': 4.5 })]);
-    const pin = s('circle', { cx: 100, cy: 100, r: 6 });
-    const dial = s('svg', {
-      class: 'pk-tclock-dial', viewBox: '0 0 200 200', role: 'slider', tabindex: '0', 'aria-label': '시계 바늘 (← → 15분, ↑ ↓ 1시간)',
-      'aria-valuemin': '0', 'aria-valuemax': '1440', 'data-autofocus': '',
-    }, [face, ticks, nums, ampmText, hourHand, minHand, pin]);
-
-    const range = () => time?.range?.() ?? { floor: -Infinity, ceil: Infinity };
-    const target = () => baseMs + delta * MIN;
-    function setDelta(v, why) {
-      const c = clampDelta(Math.round(v), baseMs, range());
-      const hit = c !== Math.round(v);
-      delta = c;
-      draw();
-      if (hit) say(why ?? (v < c ? '오늘 새벽 5시보다 앞으로는 돌릴 수 없어요 (지난 날은 다시 오지 않아요)' : '한 번에 7일 뒤까지만 돌릴 수 있어요'), true);
-      else if (why !== '') say('');
-    }
     const say = (msg, warn = false) => { note.textContent = msg; note.classList.toggle('is-warn', warn); };
-
-    function draw() {
-      const L = labelOf(target(), baseDay);
-      const ang = handAngles(L.hour, L.minute);
-      hourHand.setAttribute('transform', `rotate(${ang.hour} 100 100)`);
-      minHand.setAttribute('transform', `rotate(${ang.minute} 100 100)`);
-      const [bg, ink] = FACE[L.part];
-      face.setAttribute('fill', bg); face.setAttribute('stroke', 'var(--pk-edge, #E2D2AE)');
-      for (const el of [ticks, nums, pin]) { el.setAttribute('stroke', ink); el.setAttribute('fill', ink); }
-      ampmText.setAttribute('fill', ink); ampmText.textContent = L.ampm;
-      hourHand.querySelector('.hand').setAttribute('stroke', ink);
-      minHand.querySelector('.hand').setAttribute('stroke', L.part === 'night' ? '#F2B36B' : '#C9772E');
+    // 시계 판 (createDial — HUD 원형 시계와 같은 부품)
+    const dw = createDial({
+      getBase: () => n0,
+      getRange: () => time?.range?.() ?? { floor: -Infinity, ceil: Infinity },
+      onChange: (L, { hit, low }) => {
+        drawExtra(L);
+        if (hit) say(low ? '오늘 새벽 5시보다 앞으로는 돌릴 수 없어요 (지난 날은 다시 오지 않아요)' : '한 번에 7일 뒤까지만 돌릴 수 있어요', true);
+        else say('');
+      },
+      onEnd: () => ctx.events.emit('sfx', { name: 'menu' }),
+    });
+    const dial = dw.el;
+    dial.setAttribute('data-autofocus', '');
+    const target = () => dw.target();
+    function drawExtra(L) {
       dayEl.textContent = `${L.dayLabel}${L.days !== 0 ? ` (${dayKeyOf(target()).slice(5).replace('-', '월 ')}일)` : ''}`;
       timeEl.replaceChildren(h('small', null, L.ampm), `${L.h12}:${L.mm}`);
       partEl.textContent = `${L.icon} ${L.partName}`;
       const shopOpen = ctx.services.data?.economy?.isOpen?.(L.hour) ?? (L.hour >= 8 && L.hour < 22);
       hints.replaceChildren(...activityHints(L.hour, { shopOpen }).map(t => h('li', null, t)));
-      dial.setAttribute('aria-valuenow', String(L.hour * 60 + L.minute));
-      dial.setAttribute('aria-valuetext', `${L.dayLabel} ${L.text}, ${L.partName}`);
-      apply.disabled = delta === 0;
+      apply.disabled = dw.delta === 0;
     }
-
-    // ---- 끌기 ----
-    const angleOf = e => {
-      const r = dial.getBoundingClientRect();
-      return pointAngle(e.clientX, e.clientY, r.left + r.width / 2, r.top + r.height / 2);
-    };
-    function pickHand(e) {
-      const tagged = e.target.closest?.('[data-hand]')?.dataset.hand;
-      if (tagged) return tagged;
-      // 바늘 밖을 눌렀으면 각도가 가까운 바늘 (가운데 가까우면 시침 쪽으로 기운다)
-      const r = dial.getBoundingClientRect();
-      const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) / (r.width / 2);
-      const L = labelOf(target(), baseDay), ang = handAngles(L.hour, L.minute), a = angleOf(e);
-      const dh = Math.abs(wrapDeg(a - ang.hour)) - (dist < 0.6 ? 25 : 0), dm = Math.abs(wrapDeg(a - ang.minute));
-      return dh < dm ? 'hour' : 'minute';
-    }
-    dial.addEventListener('pointerdown', e => {
-      if (e.button !== 0 && e.pointerType === 'mouse') return;
-      e.preventDefault();
-      dial.focus({ preventScroll: true });
-      const hand = pickHand(e);
-      const L = labelOf(target(), baseDay), ang = handAngles(L.hour, L.minute);
-      dragging = { hand, last: ang[hand], acc: delta, id: e.pointerId };
-      dial.classList.add(`is-${hand}`);
-      try { dial.setPointerCapture(e.pointerId); } catch { /* 일부 브라우저 */ }
-      move(e);
-    });
-    function move(e) {
-      if (!dragging || e.pointerId !== dragging.id) return;
-      const a = angleOf(e);
-      dragging.acc += dragMinutes(dragging.hand, dragging.last, a);
-      dragging.last = a;
-      const v = dragging.hand === 'hour' ? Math.round(dragging.acc / HOUR_SNAP) * HOUR_SNAP : dragging.acc;
-      setDelta(v);
-      // 끝에 닿았으면 쌓인 값도 그 끝으로 (되돌려 끌 때 바로 따라오게)
-      if (Math.round(v) !== delta) dragging.acc = delta;
-    }
-    const end = e => {
-      if (!dragging || e.pointerId !== dragging.id) return;
-      dial.classList.remove(`is-${dragging.hand}`);
-      dragging = null;
-      ctx.events.emit('sfx', { name: 'menu' });
-    };
-    dial.addEventListener('pointermove', move);
-    dial.addEventListener('pointerup', end);
-    dial.addEventListener('pointercancel', end);
-    dial.addEventListener('lostpointercapture', end);
 
     // ---- 단추 ----
     const apply = button('적용', { primary: true, onclick: () => doApply() });
     const reset = button('지금 시각으로 돌아가기', { onclick: () => doReset() });
     const offsetEl = h('p', { class: 'pk-tclock-help' });
-    const showOffset = () => { offsetEl.textContent = offsetText(time?.offset ?? 0); reset.disabled = !time?.resetOffset || ((time?.offset ?? 0) === 0 && time?.mode !== 'fast'); };
+    const showOffset = () => { offsetEl.textContent = offsetText(time?.offset ?? 0); reset.disabled = !time?.resetOffset || Math.abs(time?.offset ?? 0) < MIN; };
 
     function doApply() {
-      if (!time?.jumpTo || delta === 0) return;
+      if (!time?.jumpTo || dw.delta === 0) return;
       const L = labelOf(target(), baseDay);
       const r = time.jumpTo(target());
       ctx.events.emit('sfx', { name: 'menu' });
@@ -254,15 +298,14 @@ export function createClock(ctx) {
     shell.foot.append(h('div', { class: 'pk-btn-row' }, apply, reset), offsetEl,
       h('p', { class: 'pk-tclock-help' }, '바늘을 끌어 돌려요 · 새벽 5시에 날이 바뀌어요'));
     if (!time?.jumpTo) say('시간(sky) 모듈이 없어 돌릴 수 없어요', true);
-    draw();
+    drawExtra(dw.label());
     showOffset();
 
     p = ui.panel('clock', shell.root, {
       initialFocus: () => dial,
       onKey(e) {
         if (e.target !== dial) return false;
-        if (KEY_STEP[e.code]) { setDelta(delta + KEY_STEP[e.code]); return true; }
-        if (e.code === 'Home') { setDelta(0); return true; }
+        if (dw.key(e.code)) return true;
         if ((e.code === 'Enter' || e.code === 'NumpadEnter') && !e.repeat) { doApply(); return true; }
         return false;
       },

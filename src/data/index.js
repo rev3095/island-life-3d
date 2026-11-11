@@ -96,6 +96,7 @@ export function createDataService(ctx, opts = {}) {
     museum,
     recipes,
     economy: { ...economy, rules: economyRules },
+    rules: RULES,   // p41: 다른 모듈이 읽는 표 (sky 가 time — 시간 빠르기)
     /** M12 D112-A: 그날 보너스 (타로·달빛 가게). set(fn) — fn() → { 열쇠: 값 } | null, get(열쇠) → 숫자. 열쇠 표는 luck.js */
     luck: { set: setLuck, get: luck },
     save,

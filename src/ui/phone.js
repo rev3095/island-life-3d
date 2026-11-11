@@ -197,13 +197,19 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       return h('div', { class: 'pk-set-row' }, h('span', { id }, label), b);
     };
     const time = ctx.services.time;
-    const timeRow = h('div', { class: 'pk-seg', role: 'group', 'aria-label': '시간 흐름' });
+    // p41 시간 빠르기: 실제와 같게 · 빠르게 · 아주 빠르게 (배수는 rules.json time — 요소 편집기). 고르면 state.time.speed
+    const timeRow = h('div', { class: 'pk-seg', role: 'group', 'aria-label': '시간 빠르기' });
+    const timeNote = h('p', { class: 'pk-muted pk-small' });
     const drawTime = () => {
-      const mode = time?.mode ?? ctx.state.time?.mode ?? 'real';
-      timeRow.replaceChildren(...[['real', '실제 시간'], ['fast', '빠른 시간']].map(([m, t]) => h('button', {
-        type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(mode === m), disabled: !time?.setMode,
-        onclick: () => { time.setMode(m); drawTime(); timeRow.querySelector('[aria-pressed="true"]')?.focus(); toast(m === 'fast' ? '빠른 시간: 1분이 1시간이에요' : '실제 시계와 같이 흘러요', '⏰'); },
-      }, t)));
+      const list = time?.speeds?.() ?? [{ key: 'real', name: '실제와 같게', mult: 1, text: '실제 시계와 같아요' }];
+      const cur = time?.speed ?? 'real';
+      timeRow.replaceChildren(...list.map(sp => h('button', {
+        type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(cur === sp.key), disabled: !time?.setSpeed, dataset: { speed: sp.key },
+        onclick: () => { time.setSpeed(sp.key); drawTime(); timeRow.querySelector('[aria-pressed="true"]')?.focus(); toast(`시간 빠르기: ${sp.name}${sp.mult > 1 ? ` (${sp.text})` : ''}`, '⏰'); },
+      }, sp.mult > 1 ? `${sp.name} ×${sp.mult}` : sp.name)));
+      const c = list.find(x => x.key === cur);
+      const closed = time?.whenClosed === 'catchUp' ? '닫아 둔 동안에도 흐른 만큼 따라잡아요.' : '게임을 닫아 두면 멈췄다가 이어서 흘러요.';
+      timeNote.textContent = c?.mult > 1 ? `실제 1분 = 게임 ${c.mult}분 · ${c.text}. ${closed}` : '실제 시계와 똑같이 흘러요 (닫아 둔 동안에도).';
     };
     drawTime();
     // 화면 모습 (스타일 셰이더 프리셋): 고른 값은 state.settings.style 로 저장되고 render 가 settings:changed 로 따라간다
@@ -241,7 +247,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       nameRows(),
       birthdayRows(),
       h('h3', { class: 'pk-set-head' }, '소리'), slider('bgm', '배경음'), slider('sfx', '효과음'), slider('voice', '목소리'),
-      h('h3', { class: 'pk-set-head' }, '시간'), timeRow,
+      h('h3', { class: 'pk-set-head' }, '시간 빠르기'), timeRow, timeNote,
       !time?.setMode && h('p', { class: 'pk-muted pk-small' }, '시간(sky) 모듈이 연결되면 바꿀 수 있어요.'),
       h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, style && h('h3', { class: 'pk-set-head' }, '그래픽 사양'), style && specRow, style && specNote, toggle('outline', '외곽선'), fullscreenRow(),
       !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
