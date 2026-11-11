@@ -73,7 +73,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
   const size = { w: 1, h: 1 };
 
   function ensurePost() {
-    if (!post) { post = createPost(renderer, scene, camera, { quality }); post.setSize(size.w, size.h); }
+    if (!post) { post = createPost(renderer, scene, camera, { quality, lite: QUALITY[quality]?.post === 'grade' }); post.setSize(size.w, size.h); }
     return post;
   }
 
@@ -94,6 +94,13 @@ export function createView(ctx, { preset: startPreset } = {}) {
     if (look.uCloudGate) look.uCloudGate.value = on('cloudShadow');       // 구름 그림자 (세기·구름 양은 sky 가)
     if (look.uSkyReflect) look.uSkyReflect.value = on('skyReflect');      // 물 하늘 반사 (하늘 색은 sky 가)
     look.uGlow.value = p.glow;
+    // 셰이더 보드 shader v1: 늘 같은 값은 바로, 날씨·시각으로 바뀌는 셋은 세기만 두고 sky 가 곱한다 (materials.weatherFx)
+    look.uLeafLight.value = p.leafLight * on('leaf');
+    look.uCaustic.value = p.caustic * on('caustic');
+    look.uGlitter.value = p.glitter * on('glitter');
+    materials.weatherFx.snow = p.snow * on('snow');
+    materials.weatherFx.wet = p.wetSheen * on('wet');
+    materials.weatherFx.hfog = p.heightFog * on('hfog');
     // 외곽선: ink = 예전 갈색 잉크 그대로, subtle = 가늘고 물체 색을 어둡게, off = 재질째 숨김 (섬폰 외곽선 끄기와는 따로)
     const ink = p.outline === 'ink';
     look.uOutlineScale.value = ink ? 1 : p.outlineScale;
@@ -143,6 +150,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
       quality = q;
       ctx.quality = q;
       const cfg = QUALITY[q];
+      materials.setShaderTier(cfg.shaderFx);       // 툰 셰이더 등급 (낮음 아래 = 가벼운 등급 — 바뀌면 툰 재질을 한 번 다시 만든다)
       const sun = ctx.lights?.sun;
       if (sun) sun.castShadow = cfg.shadows !== false;   // 빛 수가 바뀌어 재질은 three 가 알아서 다시 만든다 (한 번 잠깐 멈춤)
       if (sun && sun.shadow.mapSize.x !== cfg.shadowSize) {

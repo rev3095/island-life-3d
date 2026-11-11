@@ -7,6 +7,7 @@ import * as THREE from 'three';
 const NIGHT = new Set(['glow', 'window']);
 const WET = new Set(['ground', 'grass', 'grassDark', 'path', 'dirt', 'sand', 'sandDark', 'stone', 'stoneLight', 'grout', 'pebble', 'cliff', 'cliffDark']);
 const WARM = new THREE.Color('#FFD27A');
+const SNOW = new THREE.Color('#EEF2FA');      // 셰이더 보드 D130: 낮음·매우 낮음은 셰이더 대신 땅 재질 색을 눈 색으로
 const WINDOW_LIT = new THREE.Color('#FFD98F');
 const MAX_HALOS = 96;
 
@@ -65,6 +66,10 @@ void main() {
 export function createSurfaces(curve) {
   const night = new Map();   // material → { base, baseEmissive, flat, kind }
   const wet = new Map();     // material → { dry, written }
+  // 셰이더 보드 D130 (낮음·매우 낮음): 섬 땅처럼 색이 꼭짓점 색에 든 땅 메시는 재질 색으로는 하얘지지 않는다(곱하기라)
+  // → 꼭짓점 색을 위를 보는 만큼 눈 색 쪽으로 섞는다 (섬 땅 + world 배경 묶음 kit-toon — 풀 타일·지붕·나무 위). 눈 양이 0.05 넘게 바뀔 때만 다시 써서 GPU 몫은 없다
+  const snowGeo = new Map();  // geometry → { dry: Float32Array, ver, k }
+  const SNOW_LIN = SNOW.clone();
   const tmpBox = new THREE.Box3(), tmpV = new THREE.Vector3(), tmpM = new THREE.Matrix4(), tmpC = new THREE.Color();
   const haloU = { uCurve: curve.uCurve, uCurveOrigin: curve.uCurveOrigin, uScale: { value: 600 }, uTime: { value: 0 }, uOn: { value: 0 } };
   const hp = new Float32Array(MAX_HALOS * 3), hs = new Float32Array(MAX_HALOS), hk = new Float32Array(MAX_HALOS), hph = new Float32Array(MAX_HALOS);
@@ -135,6 +140,7 @@ export function createSurfaces(curve) {
             night.set(m, { base: m.color.clone(), baseEmissive: m.emissive?.clone() ?? null, written: null, kind: m.name });
           }
           if (WET.has(m.name) && !wet.has(m)) wet.set(m, { dry: m.color.clone(), written: null });
+          if ((WET.has(m.name) || m.name === 'kit-toon') && m.vertexColors && o.geometry?.attributes.color?.array instanceof Float32Array && !o.geometry.attributes.color.normalized && o.geometry.attributes.normal && !snowGeo.has(o.geometry)) snowGeo.set(o.geometry, { dry: null, ver: -1, k: 0 });
           // 등불·불꽃 둘레 빛무리
           const kind = m.name === 'glow' ? 'lamp' : m.name === 'flame' ? 'flame' : null;
           if (!kind) continue;
@@ -159,8 +165,8 @@ export function createSurfaces(curve) {
       for (const a of ['position', 'aSize', 'aKind', 'aPhase']) hg.attributes[a].needsUpdate = true;
       pools.instanceMatrix.needsUpdate = true;
     },
-    /** lightsOn 0~1 (밤 정도), wetness 0~1 */
-    update(time, lightsOn, wetness, viewScale) {
+    /** lightsOn 0~1 (밤 정도), wetness 0~1, snow 0~1 (사양 낮음 아래에서만 — 땅 재질 색을 눈 색으로) */
+    update(time, lightsOn, wetness, viewScale, snow = 0) {
       haloU.uTime.value = time;
       haloU.uOn.value = lightsOn;
       haloU.uScale.value = viewScale;
@@ -184,15 +190,42 @@ export function createSurfaces(curve) {
       }
       for (const [m, s] of wet) {
         if (!s.written || !m.color.equals(s.written)) s.dry.copy(m.color);   // 우리가 쓴 색이 아니면 그게 마른 색
-        if (wetness < 0.001) {
+        if (wetness < 0.001 && snow < 0.001) {
           if (s.written) { m.color.copy(s.dry); s.written = null; }          // 다 말랐으면 손 뗀다
           continue;
         }
-        m.color.copy(s.dry).multiplyScalar(1 - 0.3 * wetness);
+        m.color.copy(s.dry).lerp(SNOW, m.vertexColors ? 0 : Math.min(1, snow) * 0.85).multiplyScalar(1 - 0.3 * wetness);   // 꼭짓점 색 땅은 snowVerts 가
         m.color.b += (s.dry.b * 1.06 - s.dry.b) * wetness * 0.6;         // 젖으면 살짝 푸르스름
         (s.written ??= new THREE.Color()).copy(m.color);
       }
     },
-    counts: () => ({ night: night.size, wet: wet.size, halos: hg.drawRange.count }),
+    /** 꼭짓점 색 땅에 눈 섞기 (낮음·매우 낮음에서 sky 가 매 프레임 — 0.05 단위로만 다시 쓴다) */
+    snowVerts(snow, budget = 30000) {
+      // 프레임마다 꼭짓점 budget 개까지만 (한 번에 다 쓰면 내장 그래픽 노트북 CPU 로 20ms 넘게 걸려 눈이 쌓이는 동안 멈칫한다)
+      const k = Math.round(Math.min(1, snow) * 20) / 20;
+      for (const [g, s] of snowGeo) {
+        if (budget <= 0) return;
+        const col = g.attributes.color, nor = g.attributes.normal;
+        if (!col || !nor) { snowGeo.delete(g); continue; }
+        if (s.dry && col.version !== s.ver) { s.dry = null; s.k = 0; }             // 다른 곳(계절 색 등)이 고쳤다 → 그게 새 기준
+        if (s.k === k) continue;
+        if (k === 0) {
+          if (s.dry) { col.array.set(s.dry); col.needsUpdate = true; s.dry = null; s.ver = col.version; budget -= col.count; }
+          s.k = 0;
+          continue;
+        }
+        if (!s.dry) s.dry = Float32Array.from(col.array);
+        const a = col.array, d = s.dry, n = col.count, sz = col.itemSize, st = g.attributes.aStyle;   // 배경 묶음: aStyle 2 = 물은 빼고
+        for (let i = 0; i < n; i++) {
+          const up = st && Math.round(st.getX(i)) === 2 ? 0 : Math.min(1, Math.max(0, (nor.getY(i) - 0.45) / 0.4));       // 위를 보는 면만
+          const t = k * 0.85 * up, o = i * sz;
+          a[o] = d[o] + (SNOW_LIN.r - d[o]) * t; a[o + 1] = d[o + 1] + (SNOW_LIN.g - d[o + 1]) * t; a[o + 2] = d[o + 2] + (SNOW_LIN.b - d[o + 2]) * t;
+        }
+        col.needsUpdate = true;
+        s.ver = col.version; s.k = k;
+        budget -= n;
+      }
+    },
+    counts: () => ({ night: night.size, wet: wet.size, snowGeo: snowGeo.size, halos: hg.drawRange.count }),
   };
 }

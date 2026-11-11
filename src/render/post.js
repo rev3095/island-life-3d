@@ -119,7 +119,8 @@ void main() {
 /**
  * quality: 'high' | 'low'. low 는 빛 번짐(1/8)·틸트시프트 흐림(1/4)을 한 단계 더 작은 해상도에서 만들고, 화소가 촘촘하면 FXAA 를 끈다.
  */
-export function createPost(renderer, scene, camera, { quality = 'high' } = {}) {
+export function createPost(renderer, scene, camera, { quality = 'high', lite = false } = {}) {
+  // lite (적정, 셰이더 보드 D134-A): 빛 번짐·흐림 패스는 만들지 않고 장면 → 색 보정 → FXAA 만 (적정에서도 편집기 색감·비네트)
   const low = quality === 'low';
   const size = renderer.getSize(new THREE.Vector2());
   const pr = renderer.getPixelRatio();
@@ -128,14 +129,17 @@ export function createPost(renderer, scene, camera, { quality = 'high' } = {}) {
   const composer = new EffectComposer(renderer, rt);
 
   const scenePass = new RenderPass(scene, camera);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x * pr, size.y * pr), 0.35, 0.5, 1.05);
-  // 빛 번짐은 원래 1/2 해상도에서 시작한다 → 1/4 (low 는 1/8) 로 줄인다. 흐린 빛무리라 차이가 거의 안 보이고 1920×1200 에서 약 1ms 아낀다
-  { const set = bloom.setSize.bind(bloom), k = low ? 0.25 : 0.5; bloom.setSize = (w, h) => set(Math.max(4, w * k), Math.max(4, h * k)); }
-  const tilt = new TiltBlurPass(low ? 0.25 : 0.5);
+  let bloom = null, tilt = null;
+  if (!lite) {
+    bloom = new UnrealBloomPass(new THREE.Vector2(size.x * pr, size.y * pr), 0.35, 0.5, 1.05);
+    // 빛 번짐은 원래 1/2 해상도에서 시작한다 → 1/4 (low 는 1/8) 로 줄인다. 흐린 빛무리라 차이가 거의 안 보이고 1920×1200 에서 약 1ms 아낀다
+    { const set = bloom.setSize.bind(bloom), k = low ? 0.25 : 0.5; bloom.setSize = (w, h) => set(Math.max(4, w * k), Math.max(4, h * k)); }
+    tilt = new TiltBlurPass(low ? 0.25 : 0.5);
+  }
   const grade = new ShaderPass(GradeShader);
-  grade.uniforms.tBlur.value = tilt.texture;
+  grade.uniforms.tBlur.value = tilt?.texture ?? null;
   const fxaa = new ShaderPass(FXAAShader);
-  for (const p of [scenePass, bloom, tilt, grade, fxaa]) composer.addPass(p);
+  for (const p of [scenePass, bloom, tilt, grade, fxaa]) if (p) composer.addPass(p);
 
   const state = { width: size.x, height: size.y };
   function setSize(w, h) {
@@ -150,16 +154,20 @@ export function createPost(renderer, scene, camera, { quality = 'high' } = {}) {
 
   /** 스타일 값(p) → 패스 켜기·uniform */
   function apply(p) {
-    bloom.enabled = p.bloom > 0.001;
-    bloom.strength = p.bloom;
-    bloom.radius = p.bloomRadius;
-    bloom.threshold = p.bloomThreshold;
-    tilt.enabled = p.tiltTop > 0.001 || p.tiltBottom > 0.001;
-    // 탭 간격(픽셀) = 흐림 값 × 화면 높이 비율 → 해상도가 달라도 같은 정도로 흐려 보인다
-    const k = Math.max(1, state.height * renderer.getPixelRatio() / 900);
-    tilt.setProfile(p.tiltTop * k, p.tiltBottom * k, p.tiltFocus, p.tiltRange);
+    if (bloom) {
+      bloom.enabled = p.bloom > 0.001;
+      bloom.strength = p.bloom;
+      bloom.radius = p.bloomRadius;
+      bloom.threshold = p.bloomThreshold;
+    }
+    if (tilt) {
+      tilt.enabled = p.tiltTop > 0.001 || p.tiltBottom > 0.001;
+      // 탭 간격(픽셀) = 흐림 값 × 화면 높이 비율 → 해상도가 달라도 같은 정도로 흐려 보인다
+      const k = Math.max(1, state.height * renderer.getPixelRatio() / 900);
+      tilt.setProfile(p.tiltTop * k, p.tiltBottom * k, p.tiltFocus, p.tiltRange);
+    }
     const g = grade.uniforms;
-    g.uTiltOn.value = tilt.enabled ? 1 : 0; g.uFocus.value = p.tiltFocus; g.uRange.value = p.tiltRange;
+    g.uTiltOn.value = tilt?.enabled ? 1 : 0; g.uFocus.value = p.tiltFocus; g.uRange.value = p.tiltRange;
     g.uExposure.value = p.exposure; g.uShoulder.value = p.shoulder; g.uWarmth.value = p.warmth;
     g.uSat.value = p.saturation; g.uContrast.value = p.contrast; g.uLift.value = p.lift; g.uLiftTint.value.set(p.liftTint);
     g.uGamma.value = p.gamma; g.uGain.value = p.gain; g.uVignette.value = p.vignette; g.uVigSoft.value = p.vignetteSoft;
@@ -171,6 +179,6 @@ export function createPost(renderer, scene, camera, { quality = 'high' } = {}) {
     composer, passes: { scene: scenePass, bloom, tilt, grade, fxaa },
     setSize, apply,
     render(dt) { composer.render(dt); },
-    dispose() { composer.dispose?.(); tilt.dispose(); rt.dispose(); },
+    dispose() { composer.dispose?.(); tilt?.dispose(); rt.dispose(); },
   };
 }

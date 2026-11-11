@@ -14,16 +14,20 @@
  *  outlines: 외곽선 껍데기 (그리기 호출·삼각형이 그만큼 더) · fps: 초당 장수 상한 (0 = 화면 주사율대로)
  *  aa: 계단 무늬 줄이기(MSAA) — 렌더러를 만들 때만 정할 수 있어서, 처음 사양(주소·저장된 사양)으로 정하고 바꾸면 다시 열 때 걸린다
  *  fx: 셰이더 켜고 끄기 (uniform 이라 셰이더를 다시 만들지 않는다, render/index.js apply):
- *    cloudShadow 구름 그림자 · skyReflect 물 하늘 반사 · flare 해 렌즈 빛(sky) · spec 하이라이트 · rim 가장자리 빛 · ao 접촉 그늘 · water 물결 무늬 · puffs 북쪽 3D 솜구름(sky) */
+ *    cloudShadow 구름 그림자 · skyReflect 물 하늘 반사 · flare 해 렌즈 빛(sky) · spec 하이라이트 · rim 가장자리 빛 · ao 접촉 그늘 · water 물결 무늬 · puffs 북쪽 3D 솜구름(sky)
+ *    셰이더 보드 shader v1 (D130–D137): snow 눈 쌓임 · hfog 낮은 안개 (모든 사양 — 낮음 아래는 셰이더 없이 땅 색·거리 안개로) · wet 젖은 땅 (높음·적정 윤기, 낮음은 예전처럼 어둡게만, 매우 낮음 끔) · leaf 잎 뒤 비침 · caustic 물 빛 그물 (높음·적정) · glitter 반짝임 (높음만 — 적정은 눈·젖음과 같이 넣으면 +0.6ms 라 뺌)
+ *    셰이더에 실제로 넣는 것은 sky 가 오늘 날씨로 고른다 (sky/index.js syncShaderFx — 눈·젖음·반짝임은 그 날씨인 날만)
+ *  shaderFx: 툰 셰이더 등급 'full' | 'lite' (core/materials.js setShaderTier — 낮음 아래는 셰이더 보드 효과를 꼭짓점에서, 반짝임·물 빛 그물 뺌)
+ *  post: true = 화면 효과 다섯 단 · 'grade' = 색 보정 + FXAA 만 (적정, D134-A — 빛 번짐·흐림 없음) · false = 바로 그리기 */
 export const QUALITY = {
-  high: { maxRatio: 2, maxPixels: Infinity, shadowSize: 2048, shadows: true, post: true, outlines: true, fps: 0, aa: true,
-    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true } },
-  mid: { maxRatio: 1, maxPixels: Infinity, shadowSize: 1024, shadows: false, post: false, outlines: true, fps: 0, aa: true,
-    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true } },
-  low: { maxRatio: 1, maxPixels: 750_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 0, aa: false,
-    fx: { cloudShadow: 0, skyReflect: 1, flare: false, spec: 0, rim: 1, ao: 0, water: 1, puffs: true } },
-  min: { maxRatio: 1, maxPixels: 400_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 30, aa: false,
-    fx: { cloudShadow: 0, skyReflect: 0, flare: false, spec: 0, rim: 0, ao: 0, water: 0, puffs: false } },
+  high: { maxRatio: 2, maxPixels: Infinity, shadowSize: 2048, shadows: true, post: true, outlines: true, fps: 0, aa: true, shaderFx: 'full',
+    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true, snow: 1, leaf: 1, wet: 1, hfog: 1, caustic: 1, glitter: 1 } },
+  mid: { maxRatio: 1, maxPixels: Infinity, shadowSize: 1024, shadows: false, post: 'grade', outlines: true, fps: 0, aa: true, shaderFx: 'full',
+    fx: { cloudShadow: 1, skyReflect: 1, flare: true, spec: 1, rim: 1, ao: 1, water: 1, puffs: true, snow: 1, leaf: 1, wet: 1, hfog: 1, caustic: 1, glitter: 0 } },
+  low: { maxRatio: 1, maxPixels: 750_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 0, aa: false, shaderFx: 'lite',
+    fx: { cloudShadow: 0, skyReflect: 1, flare: false, spec: 0, rim: 1, ao: 0, water: 1, puffs: true, snow: 1, leaf: 0, wet: 1, hfog: 1, caustic: 0, glitter: 0 } },
+  min: { maxRatio: 1, maxPixels: 400_000, shadowSize: 1024, shadows: false, post: false, outlines: false, fps: 30, aa: false, shaderFx: 'lite',
+    fx: { cloudShadow: 0, skyReflect: 0, flare: false, spec: 0, rim: 0, ao: 0, water: 0, puffs: false, snow: 1, leaf: 0, wet: 0, hfog: 1, caustic: 0, glitter: 0 } },
 };
 /** 저장 글(localStorage 'island-life-save-v1' 의 JSON 글자)에서 섬폰 「그래픽 사양」만 빨리 꺼낸다 → 사양 이름 | null.
  *  main.js 가 렌더러를 만들기 전에(저장을 다 읽기 전) 계단 무늬 줄이기를 정하려고 쓴다 */

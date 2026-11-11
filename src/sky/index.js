@@ -55,6 +55,7 @@ export function createSky(ctx) {
   const last = { minute: null, part: null, dayKey: null, season: null, weather: null };
   const wx = { ...WX.clear };
   let elapsed = 0, scanIn = 0;
+  let snowAcc = null, snowLite = 0;        // 셰이더 보드 D130: 땅에 쌓인 눈 0~1 (눈 오는 동안 쌓이고 그치면 녹는다). null = 다음 프레임에 지금 날씨로 바로
 
   const tstate = tl.state;
   const clockMs = tl.clockMs;
@@ -77,6 +78,25 @@ export function createSky(ctx) {
   }
   const autoWeather = n => weatherAt(forecastFor(n.dayKey, seasonOfDay(n)), dayHour(n.hourF));
   const currentWeather = () => weatherOverride ?? autoWeather(now());
+  /**
+   * 셰이더 보드 효과 중 오늘 셰이더에 넣을 것 (사양 높음·적정만 — 낮음 아래는 render 가 'lite' = 하나도 안 넣음).
+   * 잎 뒤 비침·낮은 안개·물 빛 그물은 늘, 눈은 오늘 예보에 눈이 있을 때, 젖은 땅은 비(무지개)가 있을 때, 반짝임은 그 둘 중 하나와 같이 (높음만).
+   * 왜: 효과를 셰이더 글자로 늘 넣어 두면 값이 0 이어도 내장 그래픽이 느려진다 (적정 광장 +1.27ms) — 그날 필요한 것만 넣으면 맑은 날 +0.36ms.
+   * 다시 만드는 때: 처음 · 하루가 바뀔 때 · 날씨를 직접 바꿀 때(setWeather) · 사양을 바꿀 때 (그때만 툰 재질을 한 번 다시 만든다)
+   */
+  function syncShaderFx() {
+    const q = QUALITY[ctx.quality];
+    if (!q || q.shaderFx !== 'full' || !ctx.materials?.setShaderTier) return;
+    const n = now(), fx = q.fx ?? {};
+    const ws = new Set(forecastFor(n.dayKey, seasonOfDay(n)).map(s => s.weather));
+    ws.add(currentWeather());
+    const list = ['leaf', 'hfog', 'caustic'].filter(k => fx[k]);
+    const snow = !!fx.snow && ws.has('snow'), wet = !!fx.wet && (ws.has('rain') || ws.has('rainbow'));
+    if (snow) list.push('snow');
+    if (wet) list.push('wet');
+    if (fx.glitter && (snow || wet)) list.push('glitter');
+    if (ctx.materials.setShaderTier(list)) console.info(`[sky] 셰이더 효과: ${list.join(' · ') || '없음'}`);
+  }
 
   /**
    * 11차 시계: 시계를 옮기고(move) 바로 하늘·조명·이벤트를 맞춘 뒤 time:shift 를 보낸다.
@@ -149,7 +169,8 @@ export function createSky(ctx) {
     /** w: WEATHERS 중 하나. null 이면 예보대로. 다음 날이 되면 풀린다. { instant: true } 면 섞지 않고 바로 */
     setWeather(w, { instant = false } = {}) {
       weatherOverride = WEATHERS.includes(w) ? w : null;
-      if (instant) Object.assign(wx, WX[currentWeather()]);
+      if (instant) { Object.assign(wx, WX[currentWeather()]); snowAcc = null; }
+      syncShaderFx();
     },
     get nightFactor() { return nightFactorAt(now().hourF); },
     /** 계절 팔레트 { grass, grassDark, leaf, trunk, evergreen, snow, variants:{slug: 변형이름}, bySlug:{slug:{색}} } */
@@ -215,6 +236,7 @@ export function createSky(ctx) {
       last.dayKey = n.dayKey;
       tl.mark(n.dayKey);   // 11차 시계: 가 본 가장 늦은 날
       weatherOverride = null;
+      syncShaderFx();
       events.emit('time:newday', { dayKey: n.dayKey });
     }
     if (n.season !== last.season) { last.season = n.season; syncSeason(n.season); }
@@ -260,12 +282,32 @@ export function createSky(ctx) {
       L.uCloudOffset.value.y = (L.uCloudOffset.value.y + dt * CLOUD_DRIFT[1]) % 1;
       L.uSkyZenithL.value.setRGB(look.zenith[0], look.zenith[1], look.zenith[2], THREE.SRGBColorSpace);
       L.uSkyHorizonL.value.setRGB(look.horizon[0], look.horizon[1], look.horizon[2], THREE.SRGBColorSpace);
+      // 셰이더 보드 shader v1: 날씨·시각으로 바뀌는 셋 = 세기(render 가 프리셋 × 사양으로 weatherFx 에) × 지금 날씨. 집 안은 0
+      const W = ctx.materials.weatherFx;
+      if (W && L.uSnowCover) {
+        // D130-B 눈 오는 날만: 눈이 오면 40초에 걸쳐 쌓이고, 그치면 150초에 걸쳐 녹는다 (처음·날씨 바로 바꾸기는 그 자리에서)
+        snowAcc = snowAcc == null ? wx.snow : snowAcc + (wx.snow - snowAcc) * (1 - Math.exp(-dt / (wx.snow > snowAcc ? 40 : 150)));
+        snowLite = !ctx.materials.hasShaderFx?.('snow') && !indoor ? W.snow * snowAcc : 0;   // 셰이더에 눈이 없으면(낮음 아래): 땅 재질 색으로 (surfaces)
+        L.uSnowCover.value = indoor ? 0 : W.snow * snowAcc;
+        // D132-A 비 올 때 또렷하게: 젖음(비 그친 뒤 천천히 마름)을 그대로
+        L.uWetSheen.value = indoor ? 0 : W.wet * wx.wet;
+        // D133-A 새벽(4–8시) 0.6 · 비 0.4
+        const h = n.hourF % 24, sm = THREE.MathUtils.smoothstep;
+        const dawn = sm(h, 4, 5) * (1 - sm(h, 7, 8.5));
+        L.uHeightFog.value = indoor ? 0 : W.hfog * Math.min(1, 0.6 * dawn + 0.4 * wx.rain);
+        // 낮음·매우 낮음(셰이더 글자 없음): 낮은 안개 대신 거리 안개를 가까이 당긴다 (이미 있는 안개 계산이라 GPU 몫 0)
+        if (!indoor && !ctx.materials.hasShaderFx?.('hfog') && L.uHeightFog.value > 0) {
+          scene.fog.near *= 1 - 0.45 * L.uHeightFog.value;
+          scene.fog.far *= 1 - 0.3 * L.uHeightFog.value;
+        }
+      }
     }
     flare?.update(camera, look.sunSky, flareStrength({ enabled: !!QUALITY[ctx.quality]?.fx?.flare, indoor, sunVis: look.sunVis, overcast: wx.overcast }), Math.min(1, look.weights.dawn + look.weights.dusk));
     precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf) }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
 
     if ((scanIn -= dt) <= 0) { scanIn = SCAN_EVERY; surfaces.scan(scene); }
-    surfaces.update(elapsed, indoor ? nf : Math.max(nf, 0.4 * wx.rain), wx.wet, viewScale);   // 집 안 불빛은 비와 상관없이 밤에만
+    surfaces.update(elapsed, indoor ? nf : Math.max(nf, 0.4 * wx.rain), wx.wet, viewScale, snowLite);
+    surfaces.snowVerts(snowLite);   // 집 안 불빛은 비와 상관없이 밤에만
     debug?.update();
   }
 
@@ -291,7 +333,7 @@ export function createSky(ctx) {
       Object.assign(wx, WX[last.weather]);
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
-      const tier = q => { dome.setQuality(q); applyPuffs(); };
+      const tier = q => { dome.setQuality(q); applyPuffs(); syncShaderFx(); };
       events.on('quality:changed', ({ quality }) => tier(quality));
       tier(ctx.quality);              // 처음 사양 (주소·저장된 사양). 바꾸면 quality:changed 로
       // 해 렌즈 빛 (three.js 예제 Lensflare) — 못 불러와도 하늘은 그대로

@@ -178,7 +178,7 @@ test('사양: 넷 — 높음·적정·낮음·매우 낮음, 처음은 적정, �
   assert.equal(DEFAULT_QUALITY, 'mid');
   // 높음만 그림자·화면 효과, 적정까지 외곽선, 매우 낮음만 초당 30장
   assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].shadows), [true, false, false, false]);
-  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].post), [true, false, false, false]);
+  assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].post), [true, 'grade', false, false]);   // 적정 = 색 보정 + FXAA 만 (셰이더 보드 D134-A)
   assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].outlines), [true, true, false, false]);
   assert.deepEqual(QUALITY_ORDER.map(q => QUALITY[q].fps), [0, 0, 0, 30]);
   assert.equal(lowerQuality('high'), 'mid');
@@ -274,6 +274,13 @@ test('사양: 셰이더 켜고 끄기 — 구름 그림자·렌즈 빛은 높음
   assert.deepEqual(QUALITY_ORDER.map(q => fx(q).water), [1, 1, 1, 0]);
   assert.deepEqual(QUALITY_ORDER.map(q => fx(q).puffs), [true, true, true, false]);
   for (const q of QUALITY_ORDER) for (const k of ['cloudShadow', 'skyReflect', 'flare', 'spec', 'rim', 'ao', 'water', 'puffs']) assert.ok(k in fx(q), `${q}.${k}`);
+  // 셰이더 보드 shader v1 (D130–D137 사양 칸): 눈·안개 모든 사양 · 젖음 매우 낮음 끔 · 물 빛 그물·반짝임 높음·적정만
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).snow), [1, 1, 1, 1]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).hfog), [1, 1, 1, 1]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).leaf), [1, 1, 0, 0]);   // 낮음: 보드는 켬(hml)이지만 저사양 우선 — 셰이더 글자를 빼서 없음
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).wet), [1, 1, 1, 0]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).caustic), [1, 1, 0, 0]);
+  assert.deepEqual(QUALITY_ORDER.map(q => fx(q).glitter), [1, 0, 0, 0]);   // 적정: 보드는 켬(hm)이지만 재 보니 +0.6ms 라 높음만
   const render = read('src/render/index.js');
   assert.match(render, /look\.uCloudGate\.value = on\('cloudShadow'\)/);
   assert.match(render, /look\.uWater\.value = p\.water \* on\('water'\)/);
