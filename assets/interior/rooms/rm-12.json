@@ -1,0 +1,96 @@
+{
+  "id": "RM-12",
+  "slug": "rm-12",
+  "kind": "room",
+  "owner": "gureum",
+  "ownerName": "구름",
+  "name": "구름 바닷가 화실",
+  "version": 1,
+  "status": "review",
+  "note": "수줍은 그림쟁이 양 (P44). 창가에 이젤 둘, 벽에 그림 액자·바다 지도, 가운데 둥근 깔개와 그림 그리다 쉬는 통나무 의자, 구석에 화분·꽃 화분. 크림 줄무늬 벽 · 밝은 판자.",
+  "wallpaper": "wp-01",
+  "floor": "fl-02",
+  "host": {
+    "lx": 4.5,
+    "lz": 4.6,
+    "face": "s"
+  },
+  "furniture": [
+    {
+      "item": "furn.paint-easel",
+      "gx": 2,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.paint-easel",
+      "gx": 5,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.log-chair",
+      "gx": 4,
+      "gz": 1,
+      "rot": 0
+    },
+    {
+      "item": "furn.flower-pots",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.bookshelf",
+      "gx": 0,
+      "gz": 3,
+      "rot": 1
+    },
+    {
+      "item": "furn.cushion-bed",
+      "gx": 6,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "item": "furn.floor-lamp",
+      "gx": 0,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "n",
+      "slot": 3
+    },
+    {
+      "item": "furn.sea-chart-frame",
+      "wall": "n",
+      "slot": 4
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "w",
+      "slot": 1
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "e",
+      "slot": 1
+    }
+  ]
+}

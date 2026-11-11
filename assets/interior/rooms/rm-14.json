@@ -1,0 +1,85 @@
+{
+  "id": "RM-14",
+  "slug": "rm-14",
+  "kind": "room",
+  "owner": "dalmuri",
+  "ownerName": "달무리",
+  "name": "달무리 별 관측실",
+  "version": 1,
+  "status": "review",
+  "note": "밤에 깨어 있는 별 보기 좋아하는 부엉이 (P44). 창가에 별 망원경, 바닥에 별 깔개, 달 램프·별빛 램프·반딧불이 병, 책장 둘(별자리 책), 낮잠용 쿠션 침대. 연보라 꽃무늬 벽 · 짙은 판자. (밤하늘 벽지 WP-08 은 상점 한정이라 안 씀)",
+  "wallpaper": "wp-04",
+  "floor": "fl-05",
+  "host": {
+    "lx": 3.5,
+    "lz": 4.6,
+    "face": "s"
+  },
+  "furniture": [
+    {
+      "item": "furn.star-telescope",
+      "gx": 1,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.star-telescope",
+      "gx": 6,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.star-rug",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.moon-lamp",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.glow-star-lamp",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.bookshelf",
+      "gx": 3,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.cushion-bed",
+      "gx": 6,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.firefly-jar",
+      "gx": 0,
+      "gz": 3,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.log-chair",
+      "gx": 2,
+      "gz": 2,
+      "rot": 1
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "w",
+      "slot": 2
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "e",
+      "slot": 4
+    }
+  ]
+}

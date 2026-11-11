@@ -1562,6 +1562,83 @@ def b_crystal_ball(M):
     m.add(ellipsoid(C + V((-0.08, -0.15, 0.09)), (0.04, 0.015, 0.025), rot=rot_xyz(y=0.6), seg=10, rings=6), 'glow', outline=False)
 
 
+# ================================================================ 새벽 천막 붙박이 (P44 — assets/furniture/fixtures)
+def b_tarot_table(M):
+    """FU-60 타로 탁자 (2×1, 높이 0.42): 여명(키 0.8)이 뒤에서 보이게 낮다. 보라 천을 덮고 앞에 술 장식,
+    위에 카드 셋(뒤집힌 둘 · 펼친 하나) · 카드 더미 · 작은 초(flame, 깜빡임)"""
+    W, D, H = 1.9, 0.72, 0.42
+    m = M.part('table')
+    m.add(box((0, 0.02, 0.04), (W - 0.12, D - 0.12, 0.08), bevel=0.02), 'wood')
+    m.add(box((0, 0, H / 2), (W - 0.1, D - 0.1, H - 0.06), bevel=0.04), 'wood')
+    m.add(box((0, 0, H), (W + 0.06, D + 0.06, 0.05), bevel=0.02), 'cloth')
+    m.add(box((0, -D / 2 - 0.02, H - 0.14), (W + 0.06, 0.03, 0.3), bevel=0.012), 'cloth')   # 앞으로 늘어진 천
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 + 0.02), 0, H - 0.14), (0.03, D + 0.06, 0.3), bevel=0.012), 'cloth')
+    n = 13
+    for k in range(n):   # 앞 술 장식
+        x = -W / 2 + (k + 0.5) * W / n
+        m.add(ellipsoid((x, -D / 2 - 0.04, H - 0.3), (0.035, 0.02, 0.045), seg=10, rings=6), 'fringe')
+    m.add(box((0, -D / 2 - 0.036, H - 0.1), (W * 0.62, 0.01, 0.05), bevel=0.004), 'trim')
+    for k, x in enumerate((-0.42, 0.0, 0.42)):   # 앞 띠의 작은 별 셋
+        m.add(star_shape(V((x, -D / 2 - 0.045, H - 0.1)), 0.035, 0.008, puff=0.2), 'trim')
+    t = M.part('cards')
+    zt = H + 0.03
+    for i, (x, rz) in enumerate(((-0.32, 0.12), (0.0, 0.0), (0.32, -0.12))):
+        t.add(box((x, -0.05, zt), (0.16, 0.26, 0.008), bevel=0.003, rot=rot_xyz(z=rz)), 'card' if i != 1 else 'cardFace')
+        if i == 1:
+            t.add(star_shape(V((x, -0.05, zt + 0.006)), 0.045, 0.004, rot=rot_xyz(x=-math.pi / 2), puff=0.1), 'glow', outline=False)
+        else:
+            t.add(box((x, -0.05, zt + 0.005), (0.11, 0.2, 0.003), bevel=0.001, rot=rot_xyz(z=rz)), 'cardMark', outline=False)
+    for k in range(5):   # 카드 더미
+        t.add(box((-0.7, 0.08, zt + 0.006 * k), (0.15, 0.24, 0.006), bevel=0.002, rot=rot_xyz(z=0.05 * k)), 'card')
+    cx = 0.72   # 작은 초
+    t.add(cylinder((cx, 0.1, zt - 0.01), (cx, 0.1, zt + 0.01), 0.07, seg=16), 'brass')
+    t.add(cylinder((cx, 0.1, zt + 0.01), (cx, 0.1, zt + 0.16), 0.03, seg=14), 'wax')
+    f = M.part('flame', pivot=(cx, 0.1, zt + 0.16))
+    f.add(cone((cx, 0.1, zt + 0.16), (cx, 0.1, zt + 0.25), 0.022, 0.0, seg=10), 'flame')
+
+
+def b_candle_stand(M):
+    """FU-61 촛대 (1×1): 금빛 세 갈래 촛대 · 초 셋 · 불꽃(flame, 깜빡임) · 바닥 받침"""
+    m = M.part('stand')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.04), 0.2, 0.18, seg=24), 'metal')
+    m.add(cylinder((0, 0, 0.04), (0, 0, 0.95), 0.025, seg=10), 'metal')
+    m.add(ellipsoid((0, 0, 0.5), (0.05, 0.05, 0.04), seg=12, rings=6), 'metal')
+    tops = []
+    for k, (dx, h) in enumerate(((-0.2, 0.95), (0.0, 1.08), (0.2, 0.95))):
+        if dx:
+            m.add(tube(bezier(V((0, 0, 0.82)), V((dx * 0.4, 0, 0.8)), V((dx, 0, 0.84)), V((dx, 0, h - 0.04)), 8), [0.016] * 9, seg=8), 'metal')
+        m.add(cylinder((dx, 0, h - 0.04), (dx, 0, h), 0.05, 0.06, seg=14), 'metal')
+        m.add(cylinder((dx, 0, h), (dx, 0, h + 0.16), 0.028, seg=12), 'wax')
+        tops.append((dx, h + 0.16))
+    f = M.part('flame', pivot=(0, 0, 1.24))
+    for dx, z in tops:
+        f.add(cone((dx, 0, z), (dx, 0, z + 0.1), 0.022, 0.0, seg=10), 'flame')
+        f.add(ellipsoid((dx, -0.002, z + 0.03), (0.01, 0.01, 0.02), seg=8, rings=5), 'flameCore', outline=False)
+
+
+def b_star_drape(M):
+    """FU-62 별 휘장 (벽): 금빛 막대에 남보라 천 · 세로 주름 · 금빛 별·달 · 아래 술. 원점 = 벽면 바닥"""
+    m = M.part('drape')
+    top, y, W, H = 1.95, -0.06, 0.74, 1.3
+    m.add(cylinder((-W / 2 - 0.08, y, top), (W / 2 + 0.08, y, top), 0.02, seg=12), 'metal')
+    for sx in (1, -1):
+        m.add(ellipsoid((sx * (W / 2 + 0.1), y, top), (0.035, 0.035, 0.035), seg=10, rings=6), 'metal')
+    m.add(box((0, -0.035, top - H / 2 - 0.02), (W, 0.02, H), bevel=0.006), 'drape')
+    for k in range(6):   # 세로 주름
+        x = -W / 2 + (k + 0.5) * W / 6
+        m.add(ellipsoid((x, -0.05, top - H / 2 - 0.02), (0.07, 0.014, H * 0.5), seg=12, rings=8), 'drape')
+    for k in range(9):   # 아래 술
+        x = -W / 2 + (k + 0.5) * W / 9
+        m.add(cone((x, -0.05, top - H - 0.02), (x, -0.05, top - H - 0.12), 0.02, 0.006, seg=8), 'fringe')
+    s = M.part('stars')
+    rnd = random.Random(62)
+    for x, z, r in ((-0.22, 1.55, 0.055), (0.2, 1.65, 0.045), (0.04, 1.3, 0.065), (-0.15, 1.05, 0.04), (0.24, 1.0, 0.045)):
+        s.add(star_shape(V((x, -0.07, z)), r, 0.008, rot=rot_xyz(y=rnd.uniform(-0.3, 0.3)), puff=0.2), 'glow', outline=False)
+    s.add(ellipsoid((-0.25, -0.07, 1.25), (0.07, 0.008, 0.07), seg=16, rings=8), 'moon', outline=False)
+    s.add(ellipsoid((-0.225, -0.075, 1.27), (0.06, 0.008, 0.06), seg=16, rings=8), 'drape')
+
+
 BUILDERS = {
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
@@ -1583,6 +1660,7 @@ BUILDERS = {
     'display-stand': b_display_stand, 'shop-counter': b_shop_counter, 'museum-desk': b_museum_desk, 'fossil-pedestal': b_fossil_pedestal,
     'tool-stand': b_tool_stand, 'seed-shelf': b_seed_shelf, 'long-tank': b_long_tank, 'long-terrarium': b_long_terrarium,
     'clothes-rack': b_clothes_rack,   # 11차 D102-A 도토리상점 옷 진열대 FU-54
+    'tarot-table': b_tarot_table, 'candle-stand': b_candle_stand, 'star-drape': b_star_drape,   # P44 새벽 천막 붙박이 FU-60–62
 }
 
 

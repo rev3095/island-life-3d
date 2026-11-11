@@ -1,0 +1,60 @@
+{
+  "id": "FU-62",
+  "slug": "star-drape",
+  "item": "fixture.star-drape",
+  "name": "별 휘장",
+  "category": "fixture",
+  "kind": "star-drape",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "천막 벽에 거는 남보라 천 휘장. 금빛 별과 초승달, 아래 술.",
+    "keywords": [
+      "남보라 천",
+      "금빛 별",
+      "초승달"
+    ],
+    "references": [
+      "천막 휘장"
+    ],
+    "avoid": [
+      "너무 반짝이는 반짝이"
+    ],
+    "notes": "P44 새벽 천막 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures) — 사용자 요청 「모델링 안된 실내 전부」. 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#D9A84E",
+    "drape": "#4B3F7A",
+    "fringe": "#E8C26A",
+    "glow": "#FFD66B",
+    "moon": "#FFE9A8"
+  },
+  "paletteLabels": {
+    "metal": "막대",
+    "drape": "휘장 천",
+    "fringe": "술",
+    "glow": "별",
+    "moon": "달"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

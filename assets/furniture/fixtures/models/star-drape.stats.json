@@ -1,0 +1,53 @@
+{
+  "id": "FU-62",
+  "slug": "star-drape",
+  "item": "fixture.star-drape",
+  "name": "별 휘장",
+  "category": "fixture",
+  "kind": "star-drape",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2260,
+  "parts": 2,
+  "materials": [
+    "drape",
+    "fringe",
+    "glow",
+    "metal",
+    "moon"
+  ],
+  "objects": [
+    "drape",
+    "stars"
+  ],
+  "animations": {},
+  "size": [
+    1.01,
+    0.07,
+    1.99
+  ],
+  "bounds": [
+    [
+      -0.503,
+      -0.095,
+      0.53
+    ],
+    [
+      0.503,
+      -0.025,
+      1.985
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 46756,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-drape_front.png",
+    "star-drape_main.png",
+    "star-drape_thumb.png",
+    "star-drape_top.png"
+  ]
+}

@@ -164,6 +164,36 @@
       "status": "approved",
       "wallpaper": "wp-01",
       "floor": "fl-05"
+    },
+    {
+      "id": "RM-12",
+      "slug": "rm-12",
+      "owner": "gureum",
+      "name": "구름 바닷가 화실",
+      "version": 1,
+      "status": "review",
+      "wallpaper": "wp-01",
+      "floor": "fl-02"
+    },
+    {
+      "id": "RM-13",
+      "slug": "rm-13",
+      "owner": "pado",
+      "name": "파도 바다 탐험 기지",
+      "version": 1,
+      "status": "review",
+      "wallpaper": "wp-03",
+      "floor": "fl-07"
+    },
+    {
+      "id": "RM-14",
+      "slug": "rm-14",
+      "owner": "dalmuri",
+      "name": "달무리 별 관측실",
+      "version": 1,
+      "status": "review",
+      "wallpaper": "wp-04",
+      "floor": "fl-05"
     }
   ]
 }

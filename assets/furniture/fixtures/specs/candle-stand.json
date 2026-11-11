@@ -1,0 +1,60 @@
+{
+  "id": "FU-61",
+  "slug": "candle-stand",
+  "item": "fixture.candle-stand",
+  "name": "세 갈래 촛대",
+  "category": "fixture",
+  "kind": "candle-stand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "천막 구석을 밝히는 금빛 세 갈래 촛대. 초 셋에 작은 불꽃.",
+    "keywords": [
+      "금빛 촛대",
+      "초 셋"
+    ],
+    "references": [
+      "오래된 촛대"
+    ],
+    "avoid": [
+      "녹아내린 초",
+      "검은 철"
+    ],
+    "notes": "P44 새벽 천막 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures) — 사용자 요청 「모델링 안된 실내 전부」. 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#D9A84E",
+    "wax": "#FFF4E0",
+    "flame": "#FFB347",
+    "flameCore": "#FFF2B0"
+  },
+  "paletteLabels": {
+    "metal": "금빛 쇠",
+    "wax": "초",
+    "flame": "불꽃",
+    "flameCore": "불꽃 속"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": [
+    "flicker"
+  ]
+}

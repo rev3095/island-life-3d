@@ -1,0 +1,57 @@
+{
+  "id": "FU-61",
+  "slug": "candle-stand",
+  "item": "fixture.candle-stand",
+  "name": "세 갈래 촛대",
+  "category": "fixture",
+  "kind": "candle-stand",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1062,
+  "parts": 2,
+  "materials": [
+    "flame",
+    "flameCore",
+    "metal",
+    "wax"
+  ],
+  "objects": [
+    "flame",
+    "stand"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    0.52,
+    0.4,
+    1.34
+  ],
+  "bounds": [
+    [
+      -0.258,
+      -0.2,
+      0.0
+    ],
+    [
+      0.258,
+      0.2,
+      1.34
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 24816,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "candle-stand_front.png",
+    "candle-stand_main.png",
+    "candle-stand_thumb.png",
+    "candle-stand_top.png"
+  ]
+}

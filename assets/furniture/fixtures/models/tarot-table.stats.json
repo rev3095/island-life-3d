@@ -1,0 +1,65 @@
+{
+  "id": "FU-60",
+  "slug": "tarot-table",
+  "item": "fixture.tarot-table",
+  "name": "타로 탁자",
+  "category": "fixture",
+  "kind": "tarot-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3426,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "card",
+    "cardFace",
+    "cardMark",
+    "cloth",
+    "flame",
+    "fringe",
+    "glow",
+    "trim",
+    "wax",
+    "wood"
+  ],
+  "objects": [
+    "cards",
+    "flame",
+    "table"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    1.97,
+    0.81,
+    0.7
+  ],
+  "bounds": [
+    [
+      -0.985,
+      -0.42,
+      0.0
+    ],
+    [
+      0.985,
+      0.39,
+      0.7
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 72400,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tarot-table_front.png",
+    "tarot-table_main.png",
+    "tarot-table_thumb.png",
+    "tarot-table_top.png"
+  ]
+}

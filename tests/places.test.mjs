@@ -205,12 +205,12 @@ test('단풍 방 RM-07: 이사 온 단풍의 집이 빈 기본 방이 아니라 
   assert.ok(room.furniture.some(f => f.item === 'furn.bookshelf') && room.furniture.some(f => f.item === 'furn.dino-model'), '수집가 방 (책장 · 공룡 모형)');
 });
 
-test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차): 스펙 = 목록 = 모델, 아이템 표 밖, 크기가 발자국 안 · 배치의 box 와 같은 칸', () => {
+test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60–62 (P44): 스펙 = 목록 = 모델, 아이템 표 밖, 크기가 발자국 안 · 배치의 box 와 같은 칸', () => {
   assert.equal(FIXTURE_INDEX, `${FIXTURE_BASE}/index.json`);
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54']);
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62']);
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);
@@ -237,7 +237,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차): 스펙 = 목록 = 모�
       used++;
     }
   }
-  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 8 + 2 + 3 + 2, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 탁자·받침');
+  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 8 + 2 + 3 + 8, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44)');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');

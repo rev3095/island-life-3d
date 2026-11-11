@@ -4,9 +4,9 @@
   "kind": "place",
   "place": "tent",
   "name": "새벽 천막",
-  "version": 1,
+  "version": 2,
   "status": "review",
-  "note": "밤·새벽 검수 보드 D111-A: 새벽 3–5시에만 나타나는 보라 천막 안. 낮은 탁자(계산대 자리) 뒤에 여명(CH-15), 오른쪽 받침에 수정 구슬(FU-59). 말을 걸면 타로 카드 뽑기(UI-20). 벽지 WP-04 연보라 · 바닥 FL-03 폭신 카펫. 붙박이 FU-35·36 다시 씀 (탁자는 낮게).",
+  "note": "밤·새벽 검수 보드 D111-A: 새벽 3–5시에만 나타나는 보라 천막 안. 낮은 탁자(계산대 자리) 뒤에 여명(CH-15), 오른쪽 받침에 수정 구슬(FU-59). 말을 걸면 타로 카드 뽑기(UI-20). 벽지 WP-04 연보라 · 바닥 FL-03 폭신 카펫. 붙박이 FU-35·36 다시 씀 (탁자는 낮게). — P44: 계산대 대신 타로 탁자 FU-60 · 앞 두 구석 세 갈래 촛대 FU-61 · 북·동·서 벽 별 휘장 FU-62 (상점 계산대의 도토리 저울이 천막과 안 맞았음).",
   "size": [6, 6],
   "wallpaper": "wp-04",
   "floor": "fl-03",
@@ -15,10 +15,16 @@
   "keeper": { "slug": "yeomyeong", "lx": 3, "lz": 0.5, "face": "s" },
   "talk": { "lx": 3, "lz": 2.45 },
   "furniture": [
-    { "fu": "FU-36", "name": "카드 탁자", "box": [2, 1, 0.6], "color": "#7A6A9A", "gx": 2, "gz": 1, "rot": 0, "role": "counter", "scale": [1, 0.7, 1] },
+    { "fu": "FU-60", "name": "타로 탁자", "box": [2, 1, 0.42], "color": "#7C5BA8", "gx": 2, "gz": 1, "rot": 0, "role": "counter" },
     { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#7A6A9A", "gx": 4, "gz": 3, "rot": 0 },
-    { "item": "furn.floor-lamp", "gx": 0, "gz": 0, "rot": 0, "deco": true },
-    { "item": "furn.plant-pot", "gx": 5, "gz": 0, "rot": 0, "deco": true }
+    { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 5, "gz": 0, "rot": 0 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "n", "slot": 1 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "n", "slot": 4 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "w", "slot": 2 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "e", "slot": 1 },
+    { "item": "furn.plant-pot", "gx": 0, "gz": 3, "rot": 0, "deco": true },
+    { "item": "furn.star-rug", "gx": 2, "gz": 3, "rot": 0 }
   ],
   "stock": [
     { "group": "furniture", "lx": 5, "lz": 4, "y": 0.18, "fit": 1.4, "count": 1 }
