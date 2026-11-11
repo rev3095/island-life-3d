@@ -47,6 +47,8 @@ export function instantiate(gltf) {
   return { scene: cloneSkinned(gltf.scene), animations: gltf.animations };
 }
 
+/** 확인용 (P40 성능 재기): 지금까지 읽은 모델·JSON 수 */
+export const cacheStats = () => ({ models: gltfCache.size, json: jsonCache.size });
 export const loadCharacter = slug => loadModel(PATHS.character(slug));
 export const loadEnv = slug => loadModel(PATHS.env(slug));
 export const loadCharacterSpec = slug => loadJSON(PATHS.characterSpec(slug));
