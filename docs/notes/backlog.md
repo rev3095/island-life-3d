@@ -43,10 +43,10 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
 | B-17 | m9-decor | 주민이 벤치·피크닉 탁자에 앉는 동작 (지금은 앞에 서기만) | 큼 | **이미 됨 (M10-P1) + p50** — 놓은 벤치·피크닉 탁자·의자엔 10차부터 주민이 앉음(`villager.js trySit`). 이번에 광장 배경 벤치도 자리 (`seats.js bench`, 엔딩 전 광장) | wave9 | `assets/specs/*.json` animations · `town/actor.js` |
-| B-18 | m9-decor | 꾸밈 옮기기 (들어서 다른 칸으로 — 지금은 치우고 다시 놓기) | 큼 | 남음 | wave9 | `src/gameplay/decor/` |
-| B-19 | m9-decor | 휴대폰에서 놓을 칸을 손가락으로 고르기 (지금은 앞 칸) | 큼 | 남음 | wave9 | `src/gameplay/decor/` · `core/input.js` |
+| B-18 | m9-decor | 꾸밈 옮기기 (들어서 다른 칸으로 — 지금은 치우고 다시 놓기) | 큼 | **이미 됨 (M10 D95-A)** — 고치기 모드에서 C·「옮기기」로 들어 옮기기, Esc 취소 (`decor/index.js pickUp·drop`) | wave9 | `src/gameplay/decor/` |
+| B-19 | m9-decor | 휴대폰에서 놓을 칸을 손가락으로 고르기 (지금은 앞 칸) | 큼 | **이미 됨 (M10 D96-A)** — 꾸미기 동안 땅을 짧게 누르면(손가락 톡 포함) 그 칸 (`mouse.js setClickHandler` · `decor onCell`) | wave9 | `src/gameplay/decor/` · `core/input.js` |
 | B-20 | m9-decor | 상점 가구 후보가 넷 늘어 하루 진열이 섞임 — 밸런스 정하기 | 큼 | 남음 | wave9 D92 | `assets/data/rules.json shop` |
-| B-21 | p12-interiors | 상점 실내에 「오늘의 벽지·바닥」 견본 걸기 (지금은 창에서만) | 큼 | 남음 | interiors | `src/gameplay/house/places.js` · `pattern.js` |
+| B-21 | p12-interiors | 상점 실내에 「오늘의 벽지·바닥」 견본 걸기 (지금은 창에서만) | 큼 | **고침 (p51)** — 상점 북쪽 벽 6번에 견본 판 (위 벽지 · 아래 바닥), 판 앞 「보기」로 골라 사기·바로 붙이기 (`places.js sampleJob`, shop.json `sample`) | interiors | `src/gameplay/house/places.js` · `pattern.js` |
 | B-22 | z2-interior | 밤엔 실내 따뜻한 빛 때문에 하늘 체크·흰 타일이 베이지로 보임 — 실내 값 보고 고르기 | 작음 | 남음 | interiors | `src/render/presets.js INDOOR` · `sky/indoor.js` |
 | B-23 | z2-interior | 휴대폰 화면에서 꾸미기 선택지·상점 코너 줄 높이 확인 | 작음 | 남음 | — | `src/ui/ui.css` · `house/` |
 | B-24 | z3-furniture | 친밀도 선물 가구의 주인 주민을 FURN 표 칸으로 (지금은 얻는 법 글자 `from` 에만) | 작음 | **고침 (p43)** — items.json 친밀도 가구 6줄에 `owner` (v2), items.js 가 넘김 | — | `src/data/items.js` FURN |

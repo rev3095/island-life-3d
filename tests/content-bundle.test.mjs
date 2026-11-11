@@ -40,3 +40,11 @@ test('B-17: 광장 배경 벤치도 앉는 자리 둘 (돌린 대로 바라봄)'
   assert.equal(seats.length, 2);
   for (const s of seats) assert.ok(Math.hypot(s.stand.x - s.x, s.stand.z - s.z) > 0.5, '일어날 자리는 앞쪽');
 });
+
+test('B-21: 상점 견본 판 자리는 북쪽 벽 빈 칸 (창·다른 벽 가구와 안 겹침)', () => {
+  const shop = json('assets/interior/places/shop.json');
+  const s = shop.sample;
+  assert.ok(s && s.wall === 'n' && Number.isInteger(s.slot));
+  assert.ok(!(shop.windows ?? []).includes(`n:${s.slot}`), '창 자리 아님');
+  assert.ok(!shop.furniture.some(f => f.wall === 'n' && f.slot === s.slot), '다른 벽 가구와 안 겹침');
+});

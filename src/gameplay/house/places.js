@@ -14,6 +14,7 @@ import { PLACE_ROOMS, buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } 
 import { resolveFurniture, FACE, DEFAULT } from './interior.js';
 import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, EXHIBIT_KINDS, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
 import { createFurnitureKit } from './furniture.js';
+import { patternTexture } from './pattern.js';
 
 const PUSH_TIME = 0.2;
 const WALL_Y = 1.15;                    // 임시 벽 가구 아래 끝 높이 (visit.js 와 같다)
@@ -86,7 +87,8 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   I.add({ name: 'house-place-out', intent: 'action', priority: 90, label: '나가기', test: () => (free() && P.where && onDoormat() ? true : null), run: () => leave() });
   I.add({ name: 'house-place-idle', intent: 'action', priority: 20, label: '', test: () => (P.where ? true : null), run: () => {} });
   // P45 (동물의 숲처럼): 가게 진열품 앞에서 바로 「보기」 → 설명·값 → 사기, 박물관 전시물 앞에서 「살펴보기」 → 설명판. 계산대 말 걸기(90)·문(90)보다 아래
-  I.add({ name: 'house-place-look', intent: 'action', priority: 85, label: t => (t.meta.exhibit ? '살펴보기' : '보기'), test: () => (free() && P.where ? shownInFront() : null), run: t => lookAt(t) });
+  I.add({ name: 'house-place-look', intent: 'action', priority: 91,   // 91: 계산대 옆 견본 판(B-21) 앞에서도 「보기」 (진열품이 바로 앞에 있을 때만 뜸)
+     label: t => (t.meta.exhibit ? '살펴보기' : '보기'), test: () => (free() && P.where ? shownInFront() : null), run: t => lookAt(t) });
 
   /** 플레이어 앞(0.9칸)에 있는 진열품·전시물 → shown 하나 | null */
   function shownInFront(reach = 0.9) {
@@ -116,6 +118,23 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
 📍 ${when}` : ''}
 
 — 기증해 준 ${ctx.services.intro?.fill?.('{player}') ?? '친구'}에게 고마워요.`, buttons: [{ label: '다 봤어요', value: true, primary: true }], cancelValue: true });
+        return;
+      }
+      if (m.group === 'decor') {   // B-21 견본 판: 벽지·바닥 골라 사기 (상점 창 buyDecor 와 같은 규칙)
+        const inter = ctx.services.house?.interior, w = d.wallet;
+        const NAME = { wallpaper: '벽지', floor: '바닥' };
+        const opts = (m.decor ?? []).map(x => ({ label: `${NAME[x.kind]} ${x.name}${inter?.owns?.(x.slug) ? ' (가짐)' : ` 🌰 ${fmt(x.price)}`}`, value: x.slug }));
+        const pick = await ui.confirm({ title: '오늘의 벽지·바닥', icon: '🧱', text: '도토리상점에서 오늘 파는 벽지와 바닥이에요.\n산 것은 집 안에서 벽·바닥을 보고 행동 키로 바꿀 수 있어요.', buttons: [...opts, { label: '그만둘래요', value: false }], cancelValue: false });
+        const x = (m.decor ?? []).find(v => v.slug === pick);
+        if (!x || !inter || !w) return;
+        if (inter.owns(x.slug)) { ui.toast?.(`이미 가진 ${NAME[x.kind]}예요. 집에서 바꿀 수 있어요`, '🧱'); return; }
+        const how = await ui.confirm({ title: `${NAME[x.kind]} ${x.name}`, icon: '🧱', text: `🌰 ${fmt(x.price)}에 살까요?`, buttons: [{ label: '사서 바로 붙일게요', value: 'apply', primary: true }, { label: '사기만 할게요', value: 'buy' }, { label: '그만둘래요', value: false }], cancelValue: false });
+        if (!how) return;
+        if (!w.spend(x.price)) { ui.toast?.('도토리가 모자라요', '🌰'); return; }
+        if (!inter.add(x.slug)) { w.add(x.price); return; }
+        if (how === 'apply') inter.apply?.(x.kind, x.slug);
+        ctx.events.emit('sfx', { name: 'acorn' });
+        ui.toast?.(how === 'apply' ? `${NAME[x.kind]}를 ${x.name}(으)로 바꿨어요!` : `${NAME[x.kind]} ${x.name} 샀어요!`, '🧱');
         return;
       }
       if (m.group === 'clothes') {   // 옷: 입어 본 모습 → 사기 (상점 창 「오늘의 옷」 과 같은 규칙)
@@ -299,7 +318,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
   /** 지금 보여 줄 것의 열쇠 (같으면 다시 놓지 않는다) */
   function shownKey(R) {
-    if (!EXHIBIT_KINDS.includes(R.kind)) return `${R.kind}:${JSON.stringify(stockGroupsOf(R.kind))}`;
+    if (!EXHIBIT_KINDS.includes(R.kind)) return `${R.kind}:${JSON.stringify(stockGroupsOf(R.kind))}:${R.spec.sample ? todayDecor().map(d => d.slug).join(',') : ''}`;
     const mu = ctx.services.data?.museum;
     return `museum:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).length).join(',')}:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).join('|')).join('/')}`;
   }
@@ -323,9 +342,47 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     }
     return ctx.services.night?.stockGroups?.(kind) ?? {};
   }
+  /** B-21 오늘의 벽지·바닥 (house.interior.today — 상점 창 「오늘의 벽지·바닥」과 같은 둘) */
+  const todayDecor = () => { try { return ctx.services.house?.interior?.today?.() ?? []; } catch { return []; } };
+  /**
+   * B-21 상점 견본 판: 방 배치 sample { wall, slot } 자리에 나무 틀 판 하나 — 위 칸 오늘의 벽지 · 아래 칸 오늘의 바닥 (무늬 실제 크기대로).
+   * 판 앞에서 「보기」 → 벽지·바닥 골라 사기 (lookAt 의 decor 갈래)
+   */
+  function sampleJob(R) {
+    const s = R.spec.sample, today = todayDecor();
+    if (!s || !today.length) return [];
+    const m = wallMount(s.wall, s.slot, R.corner);
+    const g = new THREE.Group();
+    g.name = 'place-decor-sample';
+    const W = 0.86, H = 0.62, y0 = 0.95;   // 칸 하나 크기 (벽지 위 · 바닥 아래)
+    const wood = materials.toonMaterial('#B98A5A', { name: 'wood' });
+    const shown = [];
+    [today.find(d => d.kind === 'wallpaper'), today.find(d => d.kind === 'floor')].forEach((d, i) => {
+      if (!d) return;
+      const spec = interior.specs.get(d.slug);
+      const geo = new THREE.PlaneGeometry(W, H);
+      const uv = geo.attributes.uv;
+      for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * W, uv.getY(k) * H);   // m 단위 → 무늬 실제 크기
+      const mat = materials.toonMaterial('#FFFFFF', { name: 'sample' });
+      if (spec?.pattern) { mat.map = patternTexture(THREE, spec, ctx.renderer); mat.needsUpdate = true; }
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(0, y0 + (1 - i) * (H + 0.06) + H / 2, 0.03);
+      g.add(mesh);
+      shown.push(d);
+    });
+    const bar = (w, h, x, y) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), wood); b.position.set(x, y, 0.02); g.add(b); };
+    const top = y0 + 2 * H + 0.12;
+    bar(W + 0.1, 0.05, 0, top); bar(W + 0.1, 0.05, 0, y0 - 0.02); bar(W + 0.1, 0.04, 0, y0 + H + 0.03);
+    bar(0.05, top - y0 + 0.02, -W / 2 - 0.03, (top + y0) / 2); bar(0.05, top - y0 + 0.02, W / 2 + 0.03, (top + y0) / 2);
+    g.position.set(m.x, 0, m.z);
+    g.rotation.y = m.rotY;
+    const ax = m.x + Math.sin(m.rotY) * 0.05, az = m.z + Math.cos(m.rotY) * 0.05;   // 판 바로 앞 — 「보기」가 잡는 자리
+    return [Promise.resolve({ root: g, meta: { id: 'decor-sample', group: 'decor', decor: shown, x: ax, z: az }, tick() {},
+      dispose() { g.removeFromParent(); g.traverse(o => { o.geometry?.dispose?.(); o.material?.map?.dispose?.(); }); } })];
+  }
   function stockJobs(R) {
     const groups = stockGroupsOf(R.kind);
-    return stockPlan(R.spec, groups).map(async s => {
+    return [...sampleJob(R), ...stockPlan(R.spec, groups).map(async s => {
       const tag = o => (o ? Object.assign(o, { meta: { id: s.id, group: s.group, x: R.x0 + s.lx, z: R.z0 + s.lz } }) : o);   // P45 진열품 앞 「보기」
       try {
         if (s.group === 'clothes') {   // 11차 옷: 윗옷은 가로대(hang)에 걸고, 모자·신발은 아래 단(y)에
@@ -355,7 +412,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
         m.root.position.set(R.x0 + s.lx, s.y, R.z0 + s.lz);
         return tag({ root: m.root, tick() {}, dispose() { m.root.removeFromParent(); } });
       } catch (e) { console.warn('[house] 진열 물건을 못 놓았어요', s.id, e); return null; }
-    });
+    })];
   }
   function exhibitJobs(R) {
     const data = ctx.services.data, mu = data?.museum;

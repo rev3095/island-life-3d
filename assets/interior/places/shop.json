@@ -4,7 +4,7 @@
   "kind": "place",
   "place": "shop",
   "name": "도토리상점",
-  "version": 4,
+  "version": 5,
   "status": "approved",
   "note": "실내 검수 보드 D69-A: 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 오늘의 실내 가구 셋(앞 받침에 둘), 가운데 오른쪽 받침에 오늘의 야외 가구 하나(10차 D99-A), 오른쪽에 도구 다섯·꽃씨, 문 오른쪽에 오늘의 옷 둘(11차 D102-A 옷 진열대 FU-54 — 윗옷은 가로대에 걸고 모자·신발은 아래 단). 붙박이 모델(assets/furniture/fixtures): 진열 받침 FU-35 · 계산대 FU-36 · 도구 받침 FU-39 · 씨앗 진열대 FU-40 · 옷 진열대 FU-54 (box·color 는 모델을 못 읽을 때 임시 상자).",
   "size": [10, 7],
@@ -31,6 +31,7 @@
     { "item": "furn.picture-frame", "wall": "n", "slot": 3 },
     { "item": "furn.rod-rack", "wall": "e", "slot": 2 }
   ],
+  "sample": { "wall": "n", "slot": 6, "note": "B-21 오늘의 벽지·바닥 견본 판 (위 벽지 · 아래 바닥, 판 앞 「보기」로 사기)" },
   "stock": [
     { "group": "furniture", "lx": 1, "lz": 1.5, "y": 0.18, "fit": 0.95, "count": 2, "dz": 1 },
     { "group": "furniture", "from": 2, "lx": 1, "lz": 5, "y": 0.18, "fit": 1.7, "count": 1 },
