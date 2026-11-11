@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* 리소스 편집기 (p36): 게임에 들어가는 모델·그림 리소스 전부 — 캐릭터 · 배경 · 가구(붙박이 포함) · 아이템 · 벽지/바닥 무늬.
+/* 리소스 편집기 (p36): 게임에 들어가는 모델·그림 리소스 전부 — 캐릭터 · 배경 · 가구(붙박이 포함) · 아이템 · 벽지/바닥 무늬 · 옷(11차, 주인공이 입은 모습).
    위: 영역·주제·상태 거르기 + 요소 격자. 아래: 고른 요소 한 화면 — 왼쪽 3D·렌더·버전 비교, 오른쪽 상태 · 바꾸는 방법(스펙 값 / 로컬 생성 / 만든 파일 교체) · 레퍼런스 · 교체 약속 검사 · 요청.
    요청은 저장소 res-requests 에 남고, 채팅 "리소스 요청 확인" 으로 Claude 가 처리한다 (docs/notes/p36-res-editor.md). */
 :root {
@@ -175,7 +175,7 @@ ol.flow { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.
   <header>
     <p class="id">RESOURCES · p36</p>
     <h1>리소스 편집기</h1>
-    <p class="muted">게임에 들어가는 모델·그림 리소스를 한곳에서 — 캐릭터 · 배경 · 가구 · 아이템 · 벽지/바닥 무늬 (행사·밤·투어 모델 포함). 요소마다 스펙 값을 고치거나, 로컬에서 새로 만들어 보거나, 만든 파일로 바꾸는 요청을 남기면 채팅 <b>"리소스 요청 확인"</b> 때 Claude 가 처리해요.</p>
+    <p class="muted">게임에 들어가는 모델·그림 리소스를 한곳에서 — 캐릭터 · 배경 · 가구 · 아이템 · 벽지/바닥 무늬 · 옷 (행사·밤·투어 모델 포함). 요소마다 스펙 값을 고치거나, 로컬에서 새로 만들어 보거나, 만든 파일로 바꾸는 요청을 남기면 채팅 <b>"리소스 요청 확인"</b> 때 Claude 가 처리해요.</p>
     <div class="pills" id="pills"></div>
     <p class="small muted" id="storeState">저장소 연결 중…</p>
     <div class="small" id="appliedHead"></div>
@@ -246,6 +246,7 @@ ol.flow { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.
           <div class="field" id="palField"><span class="ctl-label">색 (바로 보기)</span><div class="palette" id="palette"></div></div>
           <div class="field" id="sliderField"><span class="ctl-label" id="sliderLabel">크기·모양 수치</span><div class="sliders" id="sliders"></div></div>
           <div class="field"><label for="concept">컨셉 (스펙 prompt.concept)</label><textarea id="concept" rows="2"></textarea></div>
+          <p class="note" id="buildNote"></p>
         </div>
 
         <div id="paneLocal" hidden>
@@ -325,6 +326,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { checkResource, glbInfo, summary } from './tools/res-contracts.mjs';
+// 옷 끼우는 틀 — 게임(player/outfit.js)과 같은 모듈 (three 만 씀)
+import { bindClothes, setBaseTop, SLOT_LABEL } from './src/player/wear.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -342,15 +345,17 @@ const AREA = {
   fixture: { label: '붙박이', idx: 'assets/interior/editor-index.json', list: d => d.fixtures, models: 'assets/furniture/fixtures/', specDir: 'assets/furniture/fixtures/specs/' },
   item: { label: '아이템', idx: 'assets/items/editor-index.json', models: 'assets/items/', specDir: 'assets/items/specs/' },
   pattern: { label: '무늬', idx: 'assets/interior/editor-index.json', list: d => d.models.filter(m => m.kind === 'wallpaper' || m.kind === 'floor'), specDir: 'assets/interior/specs/' },
+  // 11차 옷: 묶음은 assets/res/ 에 (목록·썸네일 editor-clothes.json · 모델 editor-clothes-models.json · 렌더 editor-clothes-renders-<n>.json). 3D 는 주인공(캐릭터 묶음 player)에 입혀서
+  clothes: { label: '옷', idx: 'assets/res/editor-clothes.json', renders: 'assets/res/', renderFile: n => `assets/res/editor-clothes-renders-${n}.json`, specDir: 'assets/clothes/specs/' },
 };
-const TABS = [['all', '전체'], ['character', '캐릭터'], ['env', '배경'], ['furniture', '가구'], ['item', '아이템'], ['pattern', '무늬']];
+const TABS = [['all', '전체'], ['character', '캐릭터'], ['env', '배경'], ['furniture', '가구'], ['item', '아이템'], ['pattern', '무늬'], ['clothes', '옷']];
 const tabOf = area => area === 'fixture' ? 'furniture' : area;
 const THEME = { event: '계절 행사', festival: '축제', night: '밤·새벽', tour: '무인도 투어' };
 const STATE_FILTER = [['all', '전체'], ['review', '검수 대기'], ['approved', '확정'], ['asked', '요청 있음'], ['issue', '약속 △·✗']];
 const CAT_LABEL = { character: '캐릭터', nature: '자연', prop: '소품', building: '건물', tile: '타일', furniture: '가구', fixture: '상점·박물관 붙박이',
   fish: '물고기', bug: '곤충', fossil: '화석', tool: '도구', mat: '재료', seed: '씨앗', fruit: '과일', shell: '조개', flower: '꽃', event: '행사', night: '밤', tour: '투어',
-  wallpaper: '벽지', floor: '바닥' };
-const NEW_CATS = { character: ['character'], env: ['nature', 'prop', 'building', 'tile'], furniture: ['furniture'], item: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower', 'event', 'night', 'tour'], pattern: ['wallpaper', 'floor'] };
+  wallpaper: '벽지', floor: '바닥', hat: '모자', top: '윗옷', shoes: '신발' };
+const NEW_CATS = { character: ['character'], env: ['nature', 'prop', 'building', 'tile'], furniture: ['furniture'], item: ['fish', 'bug', 'fossil', 'tool', 'mat', 'seed', 'fruit', 'shell', 'flower', 'event', 'night', 'tour'], pattern: ['wallpaper', 'floor'], clothes: ['hat', 'top', 'shoes'] };
 const MODEL_STATUS = { review: ['wait', '검수 대기'], approved: ['ok', '확정'] };
 const REQ_STATUS = { new: ['st-new', '새 요청'], working: ['st-working', '작업 중'], done: ['st-done', '반영 완료'], cancelled: ['', '취소'] };
 const KIND_LABEL = { edit: '스펙 고치기', swap: '교체', add: '새 리소스', rollback: '되돌리기', approve: '확정', reopen: '다시 열기' };
@@ -362,25 +367,35 @@ const PAL_LABEL = { fur: '털', marking: '무늬', muzzle: '주둥이·배', inn
   shell: '등껍질', apron: '앞치마', bowtie: '나비넥타이', glasses: '안경', iris: '눈동자 색', wing: '날개', wingBone: '날개 뼈', wingSpot: '날개 무늬', wingSpotCore: '무늬 가운데', antenna: '더듬이', ruff: '목털',
   base: '바탕', thin: '가는 줄', check: '체크', petal: '꽃잎', heart: '꽃술', petalLight: '연한 꽃잎', groove: '홈', shine: '빛', knot: '옹이',
   tile: '타일', drop: '빗방울', dropGreen: '초록 빗방울', star: '별', twinkle: '반짝이', light: '밝은 판', gap: '틈', dot: '점', stone: '돌', line: '선', grain: '알갱이',
-  edge: '앞 턱', wainscot: '징두리', molding: '몰딩', baseboard: '걸레받이' };
+  edge: '앞 턱', wainscot: '징두리', molding: '몰딩', baseboard: '걸레받이',
+  // 11차 옷
+  straw: '밀짚', hatBand: '모자 띠', beanie: '털모자', beanieRib: '털모자 단', pompom: '방울', pinPetal: '핀 꽃잎', pinCenter: '핀 꽃술', pinLeaf: '핀 잎',
+  cap: '모자', capBand: '모자 띠', tee: '티', teeStripe: '티 줄무늬', denim: '멜빵 천', shirtIn: '안 셔츠', button: '단추', knit: '뜨개', knitBand: '뜨개 띠', rib: '소매·밑단',
+  coat: '비옷', vest: '조끼', vestShirt: '조끼 안 셔츠', vestTrim: '조끼 테두리', ribbon: '리본', shoe: '신발', sole: '밑창', lace: '끈', boot: '장화', bootRim: '장화 테두리',
+  sandalSole: '샌들 밑창', sandalStrap: '샌들 끈' };
 const PROP = [
   ['height', '키', 0.8, 1.2, true], ['headScale', '머리 크기', 0.8, 1.3, true], ['limbLength', '팔다리 길이', 0.7, 1.5, false],
   ['earSize', '귀 크기', 0.6, 1.5, false], ['tailLength', '꼬리 길이', 0.5, 1.6, false], ['bodyWidth', '몸 너비', 0.8, 1.3, false],
   ['earPointiness', '귀 뾰족함', 0.6, 2.0, false], ['eyeSize', '눈 크기', 0.7, 1.5, false], ['eyeSpacing', '눈 간격', 0.8, 1.2, false],
 ];
-const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기', sit: '앉기', sit_down: '앉는 중', stand_up: '일어나기', sway: '흔들림', shake: '나무 흔들기', flicker: '일렁임' };
+const ANIM_LABEL = { idle: '가만히', walk: '걷기', run: '달리기', happy: '기뻐하기', sit: '앉기', sit_down: '앉는 중', stand_up: '일어나기', sway: '흔들림', shake: '나무 흔들기', flicker: '일렁임', spin: '한 바퀴 (옷 보기)', sparkler: '손 불꽃', push: '밀기', place: '내려놓기' };
 const RENDER_LABEL = { main: '3/4', front: '정면', top: '위', three_quarter: '3/4', side: '옆', back: '뒤', hero: '장면' };
 // 로컬 생성 (docs/notes/local-resources.md 3절) — 3D 생성은 뼈 없는 것만 (캐릭터는 자동 뼈 심기가 지금 뼈 이름·동작과 안 맞음)
 const GENERATORS = [
   { id: 'comfy-sdxl', label: 'ComfyUI 그림 (SDXL)', kind: 'image', uses: ['ref', 'spec'] },
   { id: 'comfy-tile', label: 'ComfyUI 이음매 없는 무늬 (seamless-tiling)', kind: 'image', uses: ['ref', 'spec', 'texture'], only: ['pattern'] },
-  { id: 'hunyuan3d-2.1', label: 'Hunyuan3D-2.1 모양 (텍스처 없이)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern'] },
-  { id: 'trellis', label: 'TRELLIS 모양 (12GB 에선 빠듯)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern'] },
+  { id: 'hunyuan3d-2.1', label: 'Hunyuan3D-2.1 모양 (텍스처 없이)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern', 'clothes'] },
+  { id: 'trellis', label: 'TRELLIS 모양 (12GB 에선 빠듯)', kind: '3d', uses: ['shape', 'ref'], not: ['character', 'pattern', 'clothes'] },
 ];
 const USE_LABEL = { ref: '레퍼런스 그림으로만 (스펙은 Claude 가 맞춤)', spec: '보고 스펙 숫자·색 맞추기', shape: '모양을 가져와 바꿔 끼우기 (build_import)', texture: '무늬 그림으로 직접 (색 4–6개로 줄여)' };
 const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
 const MAX_BYTES = 20 * 1024 * 1024;
 const COL = { refs: 'res-refs', requests: 'res-requests' };
+// 스펙을 고친 뒤 다시 만드는 명령 (Claude 가 "리소스 요청 확인" 때 돌림) — 기본 윗옷 CL-00 은 몸 모델 안이라 player 를 다시 빌드
+const BUILD_CMD = { character: s => `node tools/build-character.mjs ${s}`, env: s => `node tools/build-env.mjs ${s}`, furniture: s => `node tools/build-furniture.mjs ${s}`,
+  fixture: s => `node tools/build-furniture.mjs ${s} --fixtures`, item: s => `node tools/build-item.mjs ${s}`, pattern: () => 'Blender 없이 스펙 JSON 만 (interior/index.json version·status 도)',
+  clothes: (s, sp) => sp?.builtin ? 'node tools/build-character.mjs player (몸 모델의 player_top — 색은 assets/specs/player.json palette shirt) → node tools/build-clothes.mjs --index' : `node tools/build-clothes.mjs ${s}` };
+const buildCmd = (area, slug, sp) => BUILD_CMD[area]?.(slug ?? '<slug>', sp) ?? '';
 
 /* ---------- 목록 ---------- */
 let ROWS = [], index = null;
@@ -393,13 +408,13 @@ function loadArea(area) {
     for (const m of list) {
       const key = keyOf(area, m.slug);
       if (area === 'item') thumbs[key] = m.items?.[0]?.thumb;
-      if (area === 'fixture') thumbs[key] = m.thumb;
+      if (area === 'fixture' || area === 'clothes') thumbs[key] = m.thumb;
       if (area === 'pattern') try { thumbs[key] = swatchURL(m.spec, { px: 128 }); } catch {}
     }
     return { raw: d, map };
   }).catch(e => { delete areaData[area]; throw e; });
 }
-const keyOf = (area, slug) => ({ furniture: 'furn-', fixture: 'fix-', item: 'item-' }[area] ?? '') + slug;
+const keyOf = (area, slug) => ({ furniture: 'furn-', fixture: 'fix-', item: 'item-', clothes: 'cloth-' }[area] ?? '') + slug;
 const thumbPacks = {};
 function needThumbs(area) {
   if (thumbPacks[area]) return;
@@ -545,11 +560,15 @@ function fillForm() {
   $('genUse').innerHTML = g.uses.map(u => `<option value="${u}"${u === draft.local.use ? ' selected' : ''}>${esc(USE_LABEL[u])}</option>`).join('');
   $('genPrompt').value = draft.local.prompt; $('genSeed').value = draft.local.seed; $('genDec').value = draft.local.dec;
   $('decField').hidden = g.kind !== '3d';
-  $('localNote').innerHTML = area === 'character'
+  $('localNote').innerHTML = area === 'clothes'
+    ? '옷은 <b>그림 생성만</b> 돼요 — 3D 생성 결과에는 주인공 뼈대(뼈 이름·무게)가 없어 움직이면 몸을 뚫어요. 입은 모습 그림을 레퍼런스로 두고 스펙(색·params)을 맞춰 <code>build-clothes.mjs</code> 로 다시 만들어요.'
+    : area === 'character'
     ? '캐릭터는 <b>그림 생성만</b> 돼요 — 3D 생성의 자동 뼈 심기가 지금 뼈 이름·동작과 맞지 않아 걷기·표정이 깨져요. 컨셉 시트(앞·옆·뒤)를 만들어 비율을 정하는 기준 그림으로 써요.'
     : area === 'pattern' ? '무늬는 9차 시험(WP-04)에서 스크립트 무늬가 더 어울렸어요 — 로컬 그림은 레퍼런스·밑그림으로 쓰는 걸 추천해요. 텍스처로 직접 넣으면 색 4–6개로 줄이고 칸을 2–3배 크게.'
     : '3D 모양은 <b>텍스처는 버리고 모양만</b> 가져와 Blender 에서 팔레트 재질로 다시 칠해요 (재질 이름 = 팔레트 키). 이 PC(RTX 4080 12GB)에서 Hunyuan3D-2.1 모양 단계가 들어가요. 처음엔 모델 내려받기(수 GB) 승인이 필요해요.';
   $('filePath').value = draft.file.path; $('fileFrom').value = draft.file.from;
+  const cmd = buildCmd(area, row?.slug, spec);
+  $('buildNote').hidden = !cmd; $('buildNote').innerHTML = cmd ? `다시 만드는 명령: <code>${esc(cmd)}</code>` : '';
   for (const b of $('methods').querySelectorAll('[data-method]')) b.setAttribute('aria-pressed', String(b.dataset.method === method));
   $('paneBlender').hidden = method !== 'blender'; $('paneLocal').hidden = method !== 'local'; $('paneFile').hidden = method !== 'file';
   $('askApprove').disabled = !row || row.status === 'approved'; $('askReopen').disabled = !row || row.status !== 'approved';
@@ -598,7 +617,12 @@ function renderStats() {
   const cells = [];
   if (row.tri) cells.push([row.tri.toLocaleString('ko-KR'), '삼각형']);
   if (size) cells.push([size.map(n => (+n).toFixed(2)).join(' × '), '크기 m (가로×깊이×높이)']);
-  if (st.bones) cells.push([st.bones, '뼈']);
+  if (row.area === 'clothes') {
+    cells.push([`${SLOT_LABEL[spec?.slot] ?? spec?.slot}${spec?.builtin ? ' · 기본' : ''}`, '칸']);
+    cells.push([`${(spec?.buy ?? 0).toLocaleString('ko-KR')} / ${(spec?.sell ?? 0).toLocaleString('ko-KR')}`, '사는 값 / 파는 값']);
+    cells.push([Object.keys(spec?.variants ?? {}).length || '없음', '색 변형']);
+    cells.push([spec?.builtin ? 'player (player_top)' : (st.bones ?? []).join(' · '), spec?.builtin ? '모델 (몸 안의 메시)' : '따라가는 뼈']);
+  } else if (st.bones) cells.push([st.bones, '뼈']);
   if (Object.keys(st.animations ?? {}).length) cells.push([Object.keys(st.animations).length, '동작']);
   if (spec?.footprint) cells.push([spec.footprint.join('×'), `칸 (${spec.place === 'wall' ? '벽' : spec.place === 'window' ? '창문' : '바닥'})`]);
   if (spec?.pattern) cells.push([`${spec.pattern.size.join('×')}m`, '무늬 한 칸']);
@@ -609,16 +633,20 @@ function renderStats() {
 
 /* ---------- 렌더 · 버전 비교 ---------- */
 const renderPacks = {};
-function renderPack(area, n) { const k = `${area}|${n}`; return renderPacks[k] ??= loadJSON(`${AREA[area].renders}editor-renders-${n}.json`).catch(e => { delete renderPacks[k]; throw e; }); }
+function renderPack(area, n) { const k = `${area}|${n}`; return renderPacks[k] ??= loadJSON(AREA[area].renderFile?.(n) ?? `${AREA[area].renders}editor-renders-${n}.json`).catch(e => { delete renderPacks[k]; throw e; }); }
+// 기본 윗옷(CL-00)은 몸 모델 그대로라 캐릭터 묶음의 player 를 쓴다 (모델·렌더)
+const playerRec = () => loadArea('character').then(d => d.map.player);
 let mainRender = null;
 async function renderStrip() {
   mainRender = null;
   const box = $('strip');
   if (!row) { box.innerHTML = '<p class="small muted">—</p>'; $('renderNote').textContent = ''; return; }
-  const files = (rec?.stats?.renders ?? []).filter(f => !f.endsWith('_thumb.png'));
+  let src = { area: row.area, rec, slug: row.slug };
+  if (row.area === 'clothes' && rec?.builtin) { try { src = { area: 'character', rec: await playerRec(), slug: 'player' }; } catch {} }
+  const files = (src.rec?.stats?.renders ?? []).filter(f => !f.endsWith('_thumb.png'));
   if (row.area === 'pattern') { $('renderNote').textContent = '무늬는 그림 파일 없이 스펙 도형으로 그려요 (위 그림이 게임과 같은 그림)'; box.innerHTML = ''; $('renderCard').hidden = true; return; }
   $('renderCard').hidden = false;
-  if (!rec?.renders || !AREA[row.area].renders) {
+  if (!src.rec?.renders || !AREA[src.area].renders) {
     $('renderNote').textContent = row.area === 'item' ? '아이템은 아이콘만 (큰 렌더는 파일 수 때문에 안 올림)' : '썸네일만';
     box.innerHTML = thumbs[row.key] ? `<figure><img src="${esc(thumbs[row.key])}" alt="${esc(row.name)}" data-zoom><figcaption>썸네일</figcaption></figure>` : '<p class="small muted">렌더 없음</p>';
     (rec?.items ?? []).slice(1).forEach(it => box.insertAdjacentHTML('beforeend', `<figure><img src="${esc(it.thumb)}" alt="" data-zoom><figcaption>${esc(it.variant ?? it.code)}</figcaption></figure>`));
@@ -627,12 +655,13 @@ async function renderStrip() {
   $('renderNote').textContent = '불러오는 중…';
   const want = key;
   try {
-    const pack = await renderPack(row.area, rec.renders);
+    const pack = await renderPack(src.area, src.rec.renders);
     if (key !== want) return;
     const shown = files.filter(f => pack[f]);
     mainRender = pack[shown.find(f => /_(main|three_quarter)\.png$/.test(f)) ?? shown[0]] ?? null;
-    $('renderNote').textContent = `${shown.length}장 · 눌러서 크게`;
-    box.innerHTML = shown.map(f => `<figure><img src="${esc(pack[f])}" alt="${esc(f)}" data-zoom><figcaption>${esc(RENDER_LABEL[f.replace(`${row.slug}_`, '').replace('.png', '')] ?? f.replace(`${row.slug}_`, '').replace('.png', ''))}</figcaption></figure>`).join('') || '<p class="small muted">렌더 없음</p>';
+    $('renderNote').textContent = `${shown.length}장 · 눌러서 크게${row.area === 'clothes' ? (rec?.builtin ? ' · 주인공 기본 모습 (몸 모델 렌더)' : ' · 주인공이 입은 모습') : ''}`;
+    const nm = f => f.replace(`${src.slug}_`, '').replace('.png', '');
+    box.innerHTML = shown.map(f => `<figure><img src="${esc(pack[f])}" alt="${esc(f)}" data-zoom><figcaption>${esc(RENDER_LABEL[nm(f)] ?? nm(f))}</figcaption></figure>`).join('') || '<p class="small muted">렌더 없음</p>';
   } catch { if (key === want) { $('renderNote').textContent = '렌더 묶음을 불러오지 못했어요'; box.innerHTML = ''; } }
   renderCompare();
 }
@@ -895,6 +924,7 @@ function buildRequest(kind = kindOf(), extra = {}) {
     if (val.length) out.push('', area === 'character' ? '■ 비율 변경 (proportions)' : area === 'pattern' ? '■ 무늬 간격 변경 (pattern.size, m)' : '■ 수치 변경 (params)', ...val.map(([k, [a, b]]) => `- ${k}(${defs[k]?.label ?? k}): ${a} → ${b}`));
     if (c.concept != null) out.push('', '■ 컨셉', c.concept);
     if (row && !pal.length && !val.length && c.concept == null && !draft.request.trim() && !refs.length) out.push('', '(바뀐 값이 없어요.)');
+    else if (row) out.push('', `■ 다시 빌드: ${buildCmd(area, row.slug, spec)}`);
   }
   if (method === 'local') {
     const g = GENERATORS.find(x => x.id === draft.local.gen);
@@ -1039,7 +1069,7 @@ function onModel(gltf, s, candidate = false) {
     meshes.push(o);
   });
   for (const o of meshes) {
-    if (NO_OUTLINE.has(o.material.name) || s?.style?.noOutline?.includes(o.material.name)) continue;
+    if (!o.visible || NO_OUTLINE.has(o.material.name) || s?.style?.noOutline?.includes(o.material.name)) continue;   // 숨긴 기본 윗옷(옷 입힘)은 외곽선도 없이
     const ol = o.isSkinnedMesh ? new THREE.SkinnedMesh(o.geometry, outlineMat) : new THREE.Mesh(o.geometry, outlineMat);
     if (o.isSkinnedMesh) ol.bind(o.skeleton, o.bindMatrix);
     ol.userData.outline = true; ol.visible = $('outlineOn').checked;
@@ -1066,7 +1096,30 @@ function modelData(r, m) {
   return bundles[k].then(b => b[r.slug]);
 }
 const parseGLB = data => new Promise((ok, no) => new GLTFLoader().parse(Uint8Array.from(atob(data), c => c.charCodeAt(0)).buffer, '', ok, no));
+// 옷: 주인공 모델(캐릭터 묶음 player)에 입혀서 — wear.js bindClothes 로 주인공 뼈에 다시 묶고, 윗옷이면 기본 윗옷(player_top)을 숨긴다
+let clothesModels = null;
+const loadPlayer = () => playerRec().then(p => modelData({ area: 'character', slug: 'player' }, p)).then(d => { if (!d) throw new Error('player'); return parseGLB(d); });
+function wearOn(player, clothes, slot) {
+  const group = clothes ? bindClothes(player.scene, clothes.scene) : null;
+  if (clothes && !group) return null;   // 뼈 이름이 안 맞음 — 부른 쪽이 옷만 따로 보인다
+  if (group) player.scene.add(group);
+  if (group && slot === 'top') setBaseTop(player.scene, false);
+  return { scene: player.scene, animations: player.animations };
+}
+function loadClothes(want, r, m) {
+  const seq = loadSeq;
+  $('viewerMsg').hidden = false; $('viewerMsg').textContent = '주인공에 입혀 보는 중…';
+  const cl = m?.builtin ? Promise.resolve(null) : (clothesModels ??= loadJSON('assets/res/editor-clothes-models.json').catch(e => { clothesModels = null; throw e; })).then(b => { if (!b[r.slug]) throw new Error('model'); return parseGLB(b[r.slug]); });
+  Promise.all([loadPlayer(), cl]).then(([player, clothes]) => {
+    if (seq !== loadSeq || key !== want) return;
+    const worn = wearOn(player, clothes, m?.slot ?? spec?.slot);
+    if (!worn) { onModel(clothes, spec); $('viewerMsg').hidden = false; $('viewerMsg').textContent = '주인공 뼈대에 묶지 못해 옷만 보여요 (뼈 이름을 확인해 주세요).'; return; }
+    onModel(worn, spec);
+    play('idle');
+  }).catch(() => { if (seq === loadSeq) $('viewerMsg').textContent = '옷이나 주인공 모델을 불러오지 못했어요. 새로고침해 보시고, 계속되면 채팅으로 알려 주세요.'; });
+}
 function loadModel(want, r, m) {
+  if (r.area === 'clothes') return loadClothes(want, r, m);
   const seq = loadSeq;
   $('viewerMsg').hidden = false;
   $('viewerMsg').textContent = m?.bundle && !bundles[AREA[r.area].models + m.bundle] ? '모델 묶음 불러오는 중… (1.5MB 안팎, 처음 한 번만)' : '3D 모델 불러오는 중…';
@@ -1077,7 +1130,21 @@ function loadModel(want, r, m) {
 }
 function showCandidate(gltf) {
   showViewer(true);
+  if (row?.area === 'clothes') {
+    // 바꿀 옷 파일도 주인공에 입혀 본다 (뼈대가 안 맞으면 옷만)
+    const seq = ++loadSeq;
+    loadPlayer().then(player => {
+      if (seq !== loadSeq) return;
+      const worn = wearOn(player, gltf, spec?.slot);
+      onModel(worn ?? gltf, spec, true);
+      if (worn) play('idle');
+      $('candTag').textContent = worn ? '바꿀 파일 보는 중 (주인공에 입힘)' : '바꿀 파일 보는 중 (뼈대가 안 맞아 옷만)';
+      $('candTag').hidden = false; $('candBack').hidden = false;
+    }).catch(() => { onModel(gltf, spec, true); $('candTag').hidden = false; $('candBack').hidden = false; });
+    return;
+  }
   onModel(gltf, spec, true);
+  $('candTag').textContent = '바꿀 파일 보는 중';
   $('candTag').hidden = false; $('candBack').hidden = false;
 }
 function resize() { const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
@@ -1094,7 +1161,7 @@ renderer.setAnimationLoop(() => {
       const p0 = spec?.proportions ?? {}, k = n => (draft.values[n] ?? p0[n] ?? 1) / (p0[n] || 1);
       holder.scale.setScalar(k('height'));
       headBone?.scale.setScalar(k('headScale'));
-    } else if (defs.scale) holder.scale.setScalar((draft.values.scale ?? defs.scale?.value ?? 1) / (defs.scale?.value || 1));
+    } else if (defs.scale && row?.area !== 'clothes') holder.scale.setScalar((draft.values.scale ?? defs.scale?.value ?? 1) / (defs.scale?.value || 1));
   }
   controls.update();
   renderer.render(scene, camera);

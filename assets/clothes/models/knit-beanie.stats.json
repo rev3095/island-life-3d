@@ -1,0 +1,29 @@
+{
+  "id": "CL-02",
+  "slug": "knit-beanie",
+  "name": "털모자",
+  "slot": "hat",
+  "version": "0.1",
+  "triangles": 1436,
+  "vertices": 741,
+  "bones": [
+    "head"
+  ],
+  "materials": [
+    "beanie",
+    "beanieRib",
+    "pompom"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 46952,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "knit-beanie_back.png",
+    "knit-beanie_front.png",
+    "knit-beanie_side.png",
+    "knit-beanie_three_quarter.png",
+    "knit-beanie_thumb.png",
+    "knit-beanie_walk.png"
+  ]
+}

@@ -550,6 +550,7 @@ export default {
       const spec = H.views.get(rec.id)?.obj?.spec;
       const variants = Object.keys(spec?.variants ?? {});
       const opts = [];
+      if (rec.item === 'furn.wardrobe' && ctx.services.outfit && ui.closet) opts.push(['dress', '갈아입기']);   // 11차 D100-A 옷장 창 UI-19
       if (!rec.wall && info(rec.item).layer !== 'rug') opts.push(['rotate', '돌리기']);
       opts.push(['move', '옮기기']);
       if (variants.length > 1) opts.push(['color', '색 바꾸기']);
@@ -560,6 +561,7 @@ export default {
       if (it?.holds) opts.push(rec.holds ? ['take', `${nameOf(rec.holds)} 꺼내기`] : ['put', it.holds === 'fish' ? '물고기 넣기' : '곤충 넣기']);
       opts.push(['store', '가방에 넣기'], ['cancel', '그만두기']);
       let line = `${josa(name, '을/를')} 어떻게 할까요?`;
+      if (opts[0]?.[0] === 'dress') line = '옷장이에요. 무엇을 할까요?';
       if (rec.holds) line = `${josa(nameOf(rec.holds), '이/가')} ${it.holds === 'fish' ? '헤엄치고' : '쉬고'} 있어요. 어떻게 할까요?`;
       else if (it?.plays === 'bgm' && S.radio) line = `라디오에서 ${RADIO[S.radio]} 곡이 나오고 있어요.`;
       H.busy = true;
@@ -567,6 +569,11 @@ export default {
       try { pick = await ui.dialog.open({ speaker: name, color: '#C99B68', lines: [line], choices: opts.map(o => o[1]) }); }
       finally { H.busy = false; }
       const what = pick == null ? 'cancel' : opts[pick][0];
+      if (what === 'dress') {
+        H.busy = true;
+        try { await ui.closet.open(); } finally { H.busy = false; }
+        return;
+      }
       if (what === 'rotate') {
         const next = rotateInPlace([...S.furniture, WORKBENCH], rec, info, { reserved: RESERVED, blockCells: new Set([playerCell()]) });
         if (!next) { toast('돌릴 자리가 없어요', it?.icon); return; }

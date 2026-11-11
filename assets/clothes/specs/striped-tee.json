@@ -1,0 +1,55 @@
+{
+  "id": "CL-05",
+  "slug": "striped-tee",
+  "name": "줄무늬 티",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "striped-tee",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1400,
+  "sell": 350,
+  "prompt": {
+    "concept": "흰 바탕에 가로 줄 세 줄, 소매 끝에도 한 줄. 반소매.",
+    "keywords": [
+      "가로 줄 셋",
+      "반소매"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "stripes": {
+      "value": 3,
+      "min": 2,
+      "max": 5,
+      "label": "줄 수"
+    }
+  },
+  "palette": {
+    "tee": "#F5F1E6",
+    "teeStripe": "#3E6FB0"
+  },
+  "variants": {
+    "sea": {
+      "label": "바다 줄무늬 (기본)",
+      "palette": {}
+    },
+    "berry": {
+      "label": "딸기 줄무늬",
+      "palette": {
+        "teeStripe": "#D2546A"
+      }
+    }
+  }
+}

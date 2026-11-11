@@ -15,6 +15,12 @@ SPEC_PATH, ASSETS = os.path.abspath(args[0]), os.path.abspath(args[1])
 DO_RENDER = '--no-render' not in args
 
 spec = json.load(open(SPEC_PATH, encoding='utf-8'))
+# 11차 M11-P2 (D100-A · D101-A): 몸 · 옷 나누기. 스펙 "clothes": {"split": true, "top": "basic-tee"} 이면 윗옷(shirt·stripe 면)을
+# 따로 된 메시 <slug>_top (= 기본 옷 CL-00) 으로 뗀다 — 모양·법선은 그대로라 처음 모습이 같다. 게임은 다른 윗옷을 입으면 이 메시를 숨긴다.
+# build_clothes.py 가 이 파일을 exec 로 부를 때는 WEAR = {spec, palette, build(ns), glb, renders} 를 넘긴다 → 같은 뼈대에 옷만 만들어 assets/clothes/ 에 내보낸다.
+CLOTHES = spec.get('clothes', {})
+WEAR = globals().get('WEAR')
+TOP_MATS = ('shirt', 'stripe')
 SLUG = spec['slug']
 P = {'height': 1.0, 'headScale': 1.0, 'bodyWidth': 1.0, 'limbLength': 1.0, 'earSize': 1.0,
      'earPointiness': 1.0, 'tailLength': 1.0, 'eyeSize': 1.0, 'eyeSpacing': 1.0, **spec.get('proportions', {})}
@@ -656,13 +662,52 @@ if 'bowtie' in ACC:
 # 마무리: 법선 정리, 키 적용
 bmesh.ops.recalc_face_normals(B.bm, faces=B.bm.faces[:])
 bmesh.ops.scale(B.bm, vec=V((H, H, H)), verts=B.bm.verts[:])
-me = bpy.data.meshes.new(SLUG)
-B.bm.to_mesh(me)
-B.bm.free()
-body = bpy.data.objects.new(SLUG, me)
-scene.collection.objects.link(body)
-for g in B.groups:
-    body.vertex_groups.new(name=g)
+
+
+def mesh_part(name, bm, keep_face, normals):
+    """bm 의 복사본에서 keep_face 인 면만 남긴 메시 객체. normals = 원래 꼭짓점 번호 → 합친 몸에서 잰 법선 (자른 자리 음영이 같게)"""
+    c = bm.copy()
+    oi = c.verts.layers.int.get('orig')
+    bmesh.ops.delete(c, geom=[f for f in c.faces if not keep_face(f)], context='FACES')
+    bmesh.ops.delete(c, geom=[v for v in c.verts if not v.link_faces], context='VERTS')
+    c.verts.index_update()
+    vn = [normals[v[oi]] for v in c.verts]
+    m = bpy.data.meshes.new(name)
+    c.to_mesh(m)
+    c.free()
+    try:
+        m.normals_split_custom_set_from_vertices(vn)
+    except Exception as e:   # 예전 Blender: 자동 법선 (자른 자리 음영이 아주 조금 다를 수 있다)
+        print('[build] 사용자 법선을 못 넣음:', e)
+    o = bpy.data.objects.new(name, m)
+    scene.collection.objects.link(o)
+    for g in B.groups:
+        o.vertex_groups.new(name=g)
+    return o, m
+
+
+TOP = None   # (객체, 메시) — 기본 윗옷 CL-00
+if CLOTHES.get('split'):
+    oi = B.bm.verts.layers.int.new('orig')
+    for i, v in enumerate(B.bm.verts):
+        v[oi] = i
+    tmp_me = bpy.data.meshes.new('_normals')
+    B.bm.to_mesh(tmp_me)
+    NORMALS = [v.normal.copy() for v in tmp_me.vertices]
+    bpy.data.meshes.remove(tmp_me)
+    top_i = {i for i, n in enumerate(B.mats) if n in TOP_MATS}
+    body, me = mesh_part(SLUG, B.bm, lambda f: f.material_index not in top_i, NORMALS)
+    TOP = mesh_part(SLUG + '_top', B.bm, lambda f: f.material_index in top_i, NORMALS)
+    B.bm.free()
+else:
+    me = bpy.data.meshes.new(SLUG)
+    B.bm.to_mesh(me)
+    B.bm.free()
+    body = bpy.data.objects.new(SLUG, me)
+    scene.collection.objects.link(body)
+    for g in B.groups:
+        body.vertex_groups.new(name=g)
+PARTS = [(body, me)] + ([TOP] if TOP else [])
 
 
 def make_mat(name):
@@ -683,8 +728,10 @@ def make_mat(name):
     return m
 
 
-for name in B.mats:
-    me.materials.append(make_mat(name))
+MATS = {name: make_mat(name) for name in B.mats}
+for _o, _m in PARTS:   # 나눈 메시도 재질 칸 순서는 같다 (면의 material_index 그대로)
+    for name in B.mats:
+        _m.materials.append(MATS[name])
 
 # ---------------------------------------------------------------- 리그
 arm_data = bpy.data.armatures.new(SLUG + '_rig')
@@ -723,9 +770,20 @@ elif TAIL:
 bpy.ops.object.mode_set(mode='OBJECT')
 
 
-body.parent = rig
-mod = body.modifiers.new('Armature', 'ARMATURE')
-mod.object = rig
+for _o, _m in PARTS:
+    _o.parent = rig
+    _o.modifiers.new('Armature', 'ARMATURE').object = rig
+mod = body.modifiers['Armature']
+
+# 11차 옷 (build_clothes.py): 같은 뼈대 · 같은 몸 수치로 옷 메시를 만든다 → [(객체, 메시)]. 윗옷이면 기본 윗옷은 렌더에서 숨긴다
+WORN = []
+if WEAR:
+    WORN = WEAR['build'](globals())
+    for _o, _m in WORN:
+        _o.parent = rig
+        _o.modifiers.new('Armature', 'ARMATURE').object = rig
+    if TOP and WEAR['spec'].get('slot') == 'top':
+        TOP[0].hide_render = True
 
 # ---------------------------------------------------------------- 애니메이션
 TAU = math.pi * 2
@@ -911,9 +969,23 @@ def stand_up(t):
     return p
 
 
+def spin(t):
+    """AN-12 빙글 돌기 (한 번, 1.1초): 새 옷을 입고 제자리에서 한 바퀴 — 팔을 살짝 벌리고 가볍게 뜬다. 끝 자세 = 서기"""
+    k = smooth(min(1.0, t / 0.9))
+    up = sin(math.pi * min(1.0, t / 0.9))
+    return {
+        'root': ((0, TAU * k, 0), None),
+        'hips': ((0, 0, 0), (0, 0.035 * up, 0)),
+        'spine': ((-0.06 * up, 0, 0), None),
+        'head': ((-0.1 * up, 0, 0), None),
+        'arm.L': ((0, 0, 0.6 * up), None), 'arm.R': ((0, 0, -0.6 * up), None),
+        'leg.L': ((-0.12 * up, 0, 0), None), 'leg.R': ((0.06 * up, 0, 0), None),
+    }
+
+
 ANIMS = {'idle': (48, idle), 'walk': (24, walk), 'run': (16, run), 'happy': (36, happy),
          'sparkler': (36, sparkler), 'push': (28, push), 'place': (30, place),
-         'sit_down': (14, sit_down), 'sit': (48, sit), 'stand_up': (12, stand_up)}
+         'sit_down': (14, sit_down), 'sit': (48, sit), 'stand_up': (12, stand_up), 'spin': (26, spin)}
 ANIMS = {k: v for k, v in ANIMS.items() if k in spec.get('animations', ANIMS)}
 
 
@@ -976,27 +1048,42 @@ if 'sit' in ANIMS:
 
 # ---------------------------------------------------------------- glb 내보내기
 glb_path = os.path.join(ASSETS, 'models', SLUG + '.glb')
+EXPORT = [rig] + [o for o, _ in PARTS]
+if WEAR:   # 옷: 뼈대 + 옷 메시만, 동작 없이 (게임은 주인공 뼈대에 다시 묶는다)
+    glb_path = WEAR['glb']
+    EXPORT = [rig] + [o for o, _ in WORN]
 for o in scene.objects:
-    o.select_set(o in (rig, body))
+    o.select_set(o in EXPORT)
 bpy.context.view_layer.objects.active = rig
 export_kw = dict(filepath=glb_path, export_format='GLB', use_selection=True, export_apply=False,
-                 export_animations=True, export_skins=True, export_animation_mode='ACTIONS', export_yup=True, export_extras=True)
+                 export_animations=not WEAR, export_skins=True, export_animation_mode='ACTIONS', export_yup=True, export_extras=True)
 try:
     bpy.ops.export_scene.gltf(**export_kw)
 except TypeError as e:
     print('[build] 일부 내보내기 옵션을 지원하지 않아 기본값으로 다시 시도:', e)
     bpy.ops.export_scene.gltf(filepath=glb_path, export_format='GLB', use_selection=True)
 
-me.calc_loop_triangles()
+for _o, _m in PARTS + WORN:
+    _m.calc_loop_triangles()
 stats = {
     'id': spec['id'], 'slug': SLUG, 'name': spec.get('name'), 'species': SPECIES, 'version': spec.get('version'),
-    'triangles': len(me.loop_triangles), 'vertices': len(me.vertices),
+    'triangles': sum(len(_m.loop_triangles) for _o, _m in PARTS), 'vertices': sum(len(_m.vertices) for _o, _m in PARTS),
     'bones': len(arm_data.bones), 'materials': [m.name for m in me.materials],
     'animations': {k: {'frames': v[0], 'seconds': round(v[0] / 24, 2)} for k, v in ANIMS.items()},
     'height': H, 'glbBytes': os.path.getsize(glb_path), 'blender': bpy.app.version_string,
 }
 if SIT:
     stats['sit'] = SIT
+if TOP:   # 11차: 몸 · 기본 윗옷 나눈 것 (삼각형은 합친 값이 위 triangles)
+    stats['parts'] = {o.name: len(m.loop_triangles) for o, m in PARTS}
+    stats['clothes'] = {'top': CLOTHES.get('top', 'basic-tee')}
+if WEAR:
+    ws = WEAR['spec']
+    stats = {'id': ws['id'], 'slug': ws['slug'], 'name': ws.get('name'), 'slot': ws.get('slot'), 'version': ws.get('version'),
+             'triangles': sum(len(_m.loop_triangles) for _o, _m in WORN), 'vertices': sum(len(_m.vertices) for _o, _m in WORN),
+             'bones': sorted({g.name for _o, _m in WORN for g in _o.vertex_groups if g.name != 'outline'}),
+             'materials': sorted({m.name for _o, _m in WORN for m in _m.materials}),
+             'body': SLUG, 'bodyVersion': spec.get('version'), 'glbBytes': os.path.getsize(glb_path), 'blender': bpy.app.version_string}
 
 # ---------------------------------------------------------------- 렌더 (툰 셰이딩 + 외곽선)
 TOON_SHADOW = (0.76, 0.72, 0.82, 1.0)
@@ -1038,37 +1125,41 @@ def mat_for(name, hexstr, flat=False):
 
 
 if DO_RENDER:
-    for m in me.materials:
-        toon_material(m, lin('#FFFFFF') if m.name == 'eyeHighlight' else lin(PAL[m.name]),
+    RPAL = {**PAL, **(WEAR['palette'] if WEAR else {})}
+    for m in {m for _o, _m in PARTS + WORN for m in _m.materials}:
+        toon_material(m, lin('#FFFFFF') if m.name == 'eyeHighlight' else lin(RPAL[m.name]),
                       flat=m.name in ('eye', 'eyeHighlight', 'blush', *STYLE.get('flat', [])))
 
     if STYLE.get('outline', True):
-        # 뒤집은 껍데기(inverted hull) 외곽선: 법선을 뒤집은 복제 메시를 바깥으로 살짝 부풀린다
-        hull_me = me.copy()
-        bm = bmesh.new()
-        bm.from_mesh(hull_me)
-        bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
-        bm.to_mesh(hull_me)
-        bm.free()
-        hull = body.copy()
-        hull.data = hull_me
-        hull.name = SLUG + '_outline'
-        scene.collection.objects.link(hull)
+        # 뒤집은 껍데기(inverted hull) 외곽선: 법선을 뒤집은 복제 메시를 바깥으로 살짝 부풀린다 (나눈 메시·옷마다)
         omat = mat_for('outline', PAL.get('outline', '#4A3B32'), flat=True)
         omat.use_backface_culling = True
-        hull_me.materials.clear()
-        hull_me.materials.append(omat)
-        for poly in hull_me.polygons:
-            poly.material_index = 0
-        disp = hull.modifiers.new('Hull', 'DISPLACE')
-        disp.direction = 'NORMAL'
-        disp.mid_level = 0.0
-        disp.strength = -STYLE.get('outlineWidth', 0.006) * H
-        disp.vertex_group = 'outline'
-        try:
-            hull.visible_shadow = False
-        except AttributeError:
-            pass
+        for src_o, src_m in PARTS + WORN:
+            if src_o.hide_render:
+                continue
+            hull_me = src_m.copy()
+            bm = bmesh.new()
+            bm.from_mesh(hull_me)
+            bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
+            bm.to_mesh(hull_me)
+            bm.free()
+            hull = src_o.copy()
+            hull.data = hull_me
+            hull.name = src_o.name + '_outline'
+            scene.collection.objects.link(hull)
+            hull_me.materials.clear()
+            hull_me.materials.append(omat)
+            for poly in hull_me.polygons:
+                poly.material_index = 0
+            disp = hull.modifiers.new('Hull', 'DISPLACE')
+            disp.direction = 'NORMAL'
+            disp.mid_level = 0.0
+            disp.strength = -STYLE.get('outlineWidth', 0.006) * H
+            disp.vertex_group = 'outline'
+            try:
+                hull.visible_shadow = False
+            except AttributeError:
+                pass
 
     try:
         scene.render.engine = 'BLENDER_EEVEE'
@@ -1118,14 +1209,16 @@ if DO_RENDER:
         assign_action(bpy.data.actions[action])
         scene.frame_set(frame)
 
+    RDIR, RNAME = (WEAR['renders'], WEAR['spec']['slug']) if WEAR else (os.path.join(ASSETS, 'renders'), SLUG)
+
     def shot(fname, w, h):
         scene.render.resolution_x, scene.render.resolution_y = w, h
-        scene.render.filepath = os.path.join(ASSETS, 'renders', f'{SLUG}_{fname}.png')
+        scene.render.filepath = os.path.join(RDIR, f'{RNAME}_{fname}.png')
         bpy.ops.render.render(write_still=True)
         if fname == 'front':   # 편집기 모델 버튼용 작은 썸네일
             img = bpy.data.images.load(scene.render.filepath)
             img.scale(240, round(img.size[1] * 240 / img.size[0]))
-            img.filepath_raw = os.path.join(ASSETS, 'renders', f'{SLUG}_thumb.png')
+            img.filepath_raw = os.path.join(RDIR, f'{RNAME}_thumb.png')
             img.file_format = 'PNG'
             img.save()
             bpy.data.images.remove(img)
@@ -1134,7 +1227,7 @@ if DO_RENDER:
     scene.render.film_transparent = True
     cam_data.type = 'ORTHO'
     # 모델 크기에 맞춰 화면을 잡는다 (토끼 귀, 다람쥐 꼬리처럼 튀어나온 부분 포함)
-    xs, ys, zs = zip(*((v.co.x, v.co.y, v.co.z) for v in me.vertices))
+    xs, ys, zs = zip(*((v.co.x, v.co.y, v.co.z) for _o, _m in PARTS for v in _m.vertices))
     top = max(zs)
     reach = max(max(abs(min(xs)), max(xs)), max(abs(min(ys)), max(ys))) * 2
     cam_data.ortho_scale = max(top, reach) * 1.16
@@ -1145,15 +1238,15 @@ if DO_RENDER:
         rig.rotation_euler = (0, 0, math.radians(yaw))
         shot(fname, 800, 860)
 
-    # 포즈: 3/4 각도
+    # 포즈: 3/4 각도 (옷은 걷기만)
     rig.rotation_euler = (0, 0, math.radians(30))
-    for fname, action, frame in (('walk', 'walk', 6), ('run', 'run', 4), ('happy', 'happy', 4), ('sparkler', 'sparkler', 9), ('push', 'push', 7), ('place', 'place', 12)):
+    for fname, action, frame in (('walk', 'walk', 6),) if WEAR else (('walk', 'walk', 6), ('run', 'run', 4), ('happy', 'happy', 4), ('sparkler', 'sparkler', 9), ('push', 'push', 7), ('place', 'place', 12)):
         if action in ANIMS:
             set_pose(action, frame)
             shot(fname, 800, 860)
 
     # 앉기 (AN-11): 계산한 sit.hip 높이의 나무 걸상을 받쳐 두고 찍는다 → 엉덩이가 걸상 위에 딱 닿는지 그림으로 확인
-    if SIT:
+    if SIT and not WEAR:
         sb = bmesh.new()
         bmesh.ops.create_cube(sb, size=1.0)
         bmesh.ops.transform(sb, matrix=Matrix.Translation(V((0, -SIT['forward'] + 0.02 * H, SIT['hip'] / 2)))
@@ -1176,47 +1269,53 @@ if DO_RENDER:
         bpy.data.objects.remove(seat, do_unlink=True)
         rig.rotation_euler = (0, 0, math.radians(30))
 
-    # 히어로 컷: 가을 잔디 위
-    def toon_obj(name, bm, hexstr, smooth=True):
-        m = bpy.data.meshes.new(name)
-        for f in bm.faces:
-            f.smooth = smooth
-        bm.to_mesh(m)
-        bm.free()
-        m.materials.append(mat_for(name, hexstr))
-        o = bpy.data.objects.new(name, m)
-        scene.collection.objects.link(o)
-        return o
+    if not WEAR:   # 옷은 히어로 컷 없이
+        # 히어로 컷: 가을 잔디 위
+        def toon_obj(name, bm, hexstr, smooth=True):
+            m = bpy.data.meshes.new(name)
+            for f in bm.faces:
+                f.smooth = smooth
+            bm.to_mesh(m)
+            bm.free()
+            m.materials.append(mat_for(name, hexstr))
+            o = bpy.data.objects.new(name, m)
+            scene.collection.objects.link(o)
+            return o
 
-    g = bmesh.new()
-    bmesh.ops.create_cone(g, cap_ends=True, cap_tris=False, segments=64, radius1=4.0, radius2=4.0, depth=0.1)
-    bmesh.ops.translate(g, vec=Vector((0, 0, -0.05)), verts=g.verts)
-    toon_obj('ground', g, '#A9C46A', smooth=False)
-    tr = capsule(Vector((1.6, 2.3, 0)), Vector((1.6, 2.3, 0.6)), 0.075)
-    toon_obj('trunk', tr, '#9A6B45')
-    for i, (x, y, z, r) in enumerate(((1.6, 2.3, 0.92, 0.38), (1.37, 2.22, 0.74, 0.26), (1.83, 2.38, 0.76, 0.26))):
-        toon_obj(f'leaves{i}', ellipsoid(Vector((x, y, z)), (r, r, r * 0.92), seg=24, rings=14), '#E8913A')
-    for i, (x, y) in enumerate(((-0.45, -0.25), (0.35, -0.45), (-0.2, 0.4), (0.55, 0.1))):
-        toon_obj(f'leaf{i}', ellipsoid(Vector((x, y, 0.004)), (0.05, 0.03, 0.006), seg=12, rings=6), '#D9583B')
-    toon_obj('pebble', ellipsoid(Vector((-0.6, 0.15, 0.02)), (0.08, 0.06, 0.05), seg=14, rings=8), '#B8B2A6')
+        g = bmesh.new()
+        bmesh.ops.create_cone(g, cap_ends=True, cap_tris=False, segments=64, radius1=4.0, radius2=4.0, depth=0.1)
+        bmesh.ops.translate(g, vec=Vector((0, 0, -0.05)), verts=g.verts)
+        toon_obj('ground', g, '#A9C46A', smooth=False)
+        tr = capsule(Vector((1.6, 2.3, 0)), Vector((1.6, 2.3, 0.6)), 0.075)
+        toon_obj('trunk', tr, '#9A6B45')
+        for i, (x, y, z, r) in enumerate(((1.6, 2.3, 0.92, 0.38), (1.37, 2.22, 0.74, 0.26), (1.83, 2.38, 0.76, 0.26))):
+            toon_obj(f'leaves{i}', ellipsoid(Vector((x, y, z)), (r, r, r * 0.92), seg=24, rings=14), '#E8913A')
+        for i, (x, y) in enumerate(((-0.45, -0.25), (0.35, -0.45), (-0.2, 0.4), (0.55, 0.1))):
+            toon_obj(f'leaf{i}', ellipsoid(Vector((x, y, 0.004)), (0.05, 0.03, 0.006), seg=12, rings=6), '#D9583B')
+        toon_obj('pebble', ellipsoid(Vector((-0.6, 0.15, 0.02)), (0.08, 0.06, 0.05), seg=14, rings=8), '#B8B2A6')
 
-    scene.render.film_transparent = False
-    cam_data.type = 'PERSP'
-    cam_data.lens = 50
-    cam.location = (-1.25 * H, -2.9 * H, 1.25 * H)
-    target = bpy.data.objects.new('target', None)
-    target.location = (0.12, 0, 0.42 * H)
-    scene.collection.objects.link(target)
-    con = cam.constraints.new('TRACK_TO')
-    con.target = target
-    con.track_axis = 'TRACK_NEGATIVE_Z'
-    con.up_axis = 'UP_Y'
-    rig.rotation_euler = (0, 0, math.radians(-20))
-    set_pose('happy' if 'happy' in ANIMS else 'idle', 4)
-    shot('hero', 1280, 800)
-    set_pose('idle', 0)
-    rig.rotation_euler = (0, 0, 0)
+        scene.render.film_transparent = False
+        cam_data.type = 'PERSP'
+        cam_data.lens = 50
+        cam.location = (-1.25 * H, -2.9 * H, 1.25 * H)
+        target = bpy.data.objects.new('target', None)
+        target.location = (0.12, 0, 0.42 * H)
+        scene.collection.objects.link(target)
+        con = cam.constraints.new('TRACK_TO')
+        con.target = target
+        con.track_axis = 'TRACK_NEGATIVE_Z'
+        con.up_axis = 'UP_Y'
+        rig.rotation_euler = (0, 0, math.radians(-20))
+        set_pose('happy' if 'happy' in ANIMS else 'idle', 4)
+        shot('hero', 1280, 800)
+        set_pose('idle', 0)
+        rig.rotation_euler = (0, 0, 0)
 
+if WEAR:   # 옷: .blend 는 남기지 않는다 (스크립트로 다시 만든다), 통계·렌더 목록은 assets/clothes/
+    stats['renders'] = sorted(f for f in os.listdir(WEAR['renders']) if f.startswith(WEAR['spec']['slug'] + '_')) if DO_RENDER else []
+    json.dump(stats, open(WEAR['stats'], 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+    print('[build] 옷 완료:', json.dumps(stats, ensure_ascii=False))
+    raise SystemExit(0)
 blend_path = os.path.join(ASSETS, 'blender', SLUG + '.blend')
 bpy.ops.wm.save_as_mainfile(filepath=blend_path)
 stats['renders'] = sorted(f for f in os.listdir(os.path.join(ASSETS, 'renders')) if f.startswith(SLUG + '_'))

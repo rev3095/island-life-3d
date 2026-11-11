@@ -1,0 +1,38 @@
+{
+  "id": "CL-00",
+  "slug": "basic-tee",
+  "name": "기본 티셔츠",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "tee",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 0,
+  "sell": 0,
+  "prompt": {
+    "concept": "주인공이 처음 입고 있는 민무늬 반소매 티. 몸 모델(player)의 player_top 메시라 따로 빌드하지 않는다.",
+    "keywords": [
+      "민무늬",
+      "반소매"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {},
+  "palette": {
+    "shirt": "#5DB7A8"
+  },
+  "builtin": true,
+  "part": "player_top",
+  "note": "11차 M11-P2: 몸 모델 assets/specs/player.json 의 clothes.split 로 뗀 기본 윗옷. 색은 player 팔레트 shirt."
+}

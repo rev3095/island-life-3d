@@ -1,0 +1,29 @@
+{
+  "id": "CL-03",
+  "slug": "flower-pin",
+  "name": "꽃 머리핀",
+  "slot": "hat",
+  "version": "0.1",
+  "triangles": 1040,
+  "vertices": 534,
+  "bones": [
+    "head"
+  ],
+  "materials": [
+    "pinCenter",
+    "pinLeaf",
+    "pinPetal"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 35444,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-pin_back.png",
+    "flower-pin_front.png",
+    "flower-pin_side.png",
+    "flower-pin_three_quarter.png",
+    "flower-pin_thumb.png",
+    "flower-pin_walk.png"
+  ]
+}

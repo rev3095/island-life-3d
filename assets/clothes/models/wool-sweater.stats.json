@@ -1,0 +1,32 @@
+{
+  "id": "CL-07",
+  "slug": "wool-sweater",
+  "name": "털 스웨터",
+  "slot": "top",
+  "version": "0.1",
+  "triangles": 2644,
+  "vertices": 1355,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "hips",
+    "spine"
+  ],
+  "materials": [
+    "knit",
+    "knitBand",
+    "rib"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 84028,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wool-sweater_back.png",
+    "wool-sweater_front.png",
+    "wool-sweater_side.png",
+    "wool-sweater_three_quarter.png",
+    "wool-sweater_thumb.png",
+    "wool-sweater_walk.png"
+  ]
+}

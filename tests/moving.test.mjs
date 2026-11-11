@@ -33,10 +33,12 @@ test('이사 오기: 엔딩 뒤 7일마다, 입주 5일 전에 시작 (표지판
   assert.equal(planArrival({ ...o, today: addDays(END, 40) }).start, addDays(END, 2));
 });
 
-test('이사 오기: 섬 최대 10명 · 오는 중이면 하나만 · 빈 집터·차례·빈 집터가 늦게 생기면 그날부터', () => {
+test('이사 오기: 섬 최대 12명 (11차 D103-A) · 오는 중이면 하나만 · 빈 집터·차례·빈 집터가 늦게 생기면 그날부터', () => {
   const M = movingState({});
   const o = { M, endedDay: END, today: addDays(END, 20), movers: ['gureum', 'pado', 'dalmuri'], freeLots: ['spare-1'] };
-  assert.equal(planArrival({ ...o, count: 10 }), null, '10명이면 안 온다');
+  assert.equal(MOVING.max, 12);
+  assert.equal(planArrival({ ...o, count: 12 }), null, '12명이면 안 온다');
+  assert.ok(planArrival({ ...o, count: 11 }), '11명이면 온다 (새 주민 셋이 모두 함께 산다)');
   assert.equal(planArrival({ ...o, count: 9, freeLots: [] }), null, '빈 집터가 없으면 안 온다');
   M.coming = 'gureum';
   assert.equal(planArrival({ ...o, count: 9 }), null, '오는 중');
@@ -123,21 +125,28 @@ test('떠나지 않는 주민 = 섬 축제 부스 주인 + 계절 행사 주인�
   for (const s of MOVERS) assert.ok(!VILLAGERS.includes(s), `${s} 는 처음부터 사는 주민이 아니다`);
 });
 
-test('남는 집터: 섬에 하나, 다른 집·건물과 안 겹치고 처음 물체 목록은 그 자리 풀·나무만 빠진다', () => {
+test('남는 집터: 섬에 셋 (11차 D103-A), 다른 집·건물·서로 안 겹치고 처음 물체 목록은 그 자리 풀·나무만 빠진다', () => {
   const specs = Object.fromEntries(BUILDING_KINDS.map(k => [k, json(`assets/env/specs/${k}.json`)]));
   const layout = json('assets/island/layout.json');
   const g = generateIsland(20261028, { ...ISLAND, villagers: VILLAGERS, lots: lotsOf(specs), layout });
-  assert.equal(g.places.spareLots.length, SPARE_LOTS.length);
-  const sp = g.places.spareLots[0];
-  assert.equal(sp.slug, null);
-  assert.ok(sp.lot && sp.site && sp.lot.pad.off, '빈 집터 · 계단 꺼짐');
-  for (const b of g.buildings.filter(b => b.data !== sp && !b.data?.spare)) {
-    const sep = sp.lot.tx + sp.lot.fw + 1 <= b.tx0 || b.tx0 + b.fw + 1 <= sp.lot.tx || sp.lot.tz + sp.lot.fd + 1 <= b.tz0 || b.tz0 + b.fd + 1 <= sp.lot.tz;
-    assert.ok(sep, `${b.kind} 와 떨어져 있다`);
-  }
-  for (const o of g.objects) {
-    const inLot = o.tx >= sp.lot.tx && o.tx < sp.lot.tx + sp.lot.fw && o.tz >= sp.lot.tz && o.tz < sp.lot.tz + sp.lot.fd;
-    assert.ok(!inLot, `집터 안 물체 ${o.id}`);
+  assert.equal(SPARE_LOTS.length, 3);
+  assert.equal(g.places.spareLots.length, SPARE_LOTS.length, '기본 섬에서 셋 다 찾는다');
+  assert.deepEqual(g.places.spareLots.map(s => s.id), ['spare-1', 'spare-2', 'spare-3']);
+  // 앞 집터는 10차 그대로 (예전 저장의 spare-1 이사 주민이 같은 자리)
+  assert.deepEqual([g.places.spareLots[0].x, g.places.spareLots[0].z], [8.5, 5.5]);
+  // 처음 주민 7 + 남는 집터 3 = 새 주민 셋이 모두 들어갈 자리
+  assert.ok(g.places.villagerHouses.length + g.places.spareLots.length >= VILLAGERS.length + MOVERS.length);
+  for (const sp of g.places.spareLots) {
+    assert.equal(sp.slug, null);
+    assert.ok(sp.lot && sp.site && sp.lot.pad.off, `${sp.id} 빈 집터 · 계단 꺼짐`);
+    for (const b of g.buildings.filter(b => !(b.tx0 === sp.lot.tx && b.tz0 === sp.lot.tz))) {
+      const sep = sp.lot.tx + sp.lot.fw + 1 <= b.tx0 || b.tx0 + b.fw + 1 <= sp.lot.tx || sp.lot.tz + sp.lot.fd + 1 <= b.tz0 || b.tz0 + b.fd + 1 <= sp.lot.tz;
+      assert.ok(sep, `${sp.id} 가 ${b.kind} (${b.data?.owner ?? ''}) 와 떨어져 있다`);
+    }
+    for (const o of g.objects) {
+      const inLot = o.tx >= sp.lot.tx && o.tx < sp.lot.tx + sp.lot.fw && o.tz >= sp.lot.tz && o.tz < sp.lot.tz + sp.lot.fd;
+      assert.ok(!inLot, `${sp.id} 집터 안 물체 ${o.id}`);
+    }
   }
   // 처음부터 있는 집에도 site (떠나면 빈 집터로)
   for (const h of g.places.villagerHouses) assert.ok(h.site && Number.isInteger(h.site.cx), h.slug);

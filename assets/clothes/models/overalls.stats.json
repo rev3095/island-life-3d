@@ -1,0 +1,32 @@
+{
+  "id": "CL-06",
+  "slug": "overalls",
+  "name": "멜빵",
+  "slot": "top",
+  "version": "0.1",
+  "triangles": 2260,
+  "vertices": 1196,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "hips",
+    "spine"
+  ],
+  "materials": [
+    "button",
+    "denim",
+    "shirtIn"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 71912,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "overalls_back.png",
+    "overalls_front.png",
+    "overalls_side.png",
+    "overalls_three_quarter.png",
+    "overalls_thumb.png",
+    "overalls_walk.png"
+  ]
+}

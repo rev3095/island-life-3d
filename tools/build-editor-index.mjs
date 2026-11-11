@@ -7,6 +7,7 @@
 // - (p36 리소스 편집기) assets/models/editor-index.json · editor-models-<n>.json + assets/renders/editor-renders-<n>.json · editor-thumbs.json: 캐릭터 15
 //   assets/res/editor-index.json: 모든 리소스의 교체 약속 검사 결과(tools/res-contracts.mjs)·주제(행사·밤·투어·축제)·예전 버전 표시
 //   assets/res/editor-prev.json: 요소마다 바로 전 버전의 썸네일 (git 기록에서, 무늬는 예전 스펙) — 버전 비교 칸
+//   (11차 옷) assets/res/editor-clothes.json: 옷 13벌 목록·스펙·통계·썸네일 + editor-clothes-models.json (모델 base64 하나) + editor-clothes-renders-<n>.json (보기 넷)
 // 배경·리소스 편집기를 게시하기 전에(스펙·모델을 고친 뒤) 한 번 돌린다: node tools/build-editor-index.mjs
 //   → 게시 파일 목록 dist/bg-editor/publish.json ({ files: [{ as, path }] } — publish_files 에 그대로, as 'index.html' = bg-editor.html)
 //     · dist/res-editor/publish.json (as 'index.html' = res-editor.html)
@@ -160,6 +161,35 @@ for (const dir of ["assets/env", "assets/furniture"]) {
   console.log(`${dir}/editor-index.json — 캐릭터 ${models.length}명`);
 }
 
+// 11차 옷 (assets/clothes): 목록·스펙·통계·썸네일은 editor-clothes.json 하나, 모델은 editor-clothes-models.json 하나 (한 벌 40–80KB),
+// 렌더는 보기 넷(3/4·정면·옆·뒤 — 걷기는 3D 뷰어가 직접 튼다)만 editor-clothes-renders-<n>.json 에. 묶음은 모두 assets/res/ (gitignore) — 옷마다 파일을 두지 않는다.
+// 기본 윗옷 CL-00(builtin, 몸 모델 player 의 player_top)은 모델·렌더가 따로 없다 → 편집기가 캐릭터 묶음의 player 를 쓴다 (썸네일만 player_thumb).
+{
+  const dir = "assets/clothes", out = "assets/res";
+  mkdirSync(resolve(root, out), { recursive: true });
+  for (const f of readdirSync(resolve(root, out))) if (/^editor-clothes-renders-\d+\.json$/.test(f)) rmSync(resolve(root, out, f));
+  const index = json(`${dir}/index.json`);
+  const VIEWS = /_(three_quarter|front|side|back)\.png$/;
+  const models = {}, packs = [];
+  let size = 0;
+  const clothes = index.models.map(c => {
+    const spec = json(`${dir}/specs/${c.slug}.json`);
+    if (c.builtin) return { ...c, spec, stats: null, renders: null, thumb: dataURL("assets/renders/player_thumb.png") };
+    const stats = json(`${dir}/models/${c.slug}.stats.json`);
+    models[c.slug] = json(`${dir}/models/${c.slug}.glb.json`).data;
+    const urls = (stats.renders ?? []).filter(f => VIEWS.test(f)).map(f => [f, dataURL(`${dir}/renders/${f}`)]);
+    const bytes = urls.reduce((n, [, u]) => n + u.length, 0);
+    if (!packs.length || (size && size + bytes > RENDER_CHUNK)) { packs.push({}); size = 0; }
+    for (const [f, u] of urls) packs.at(-1)[f] = u;
+    size += bytes;
+    return { ...c, spec, stats, renders: packs.length, thumb: stats.renders?.includes(`${c.slug}_thumb.png`) ? dataURL(`${dir}/renders/${c.slug}_thumb.png`) : null };
+  });
+  const mn = write(`${out}/editor-clothes-models.json`, models);
+  const sizes = packs.map((p, i) => write(`${out}/editor-clothes-renders-${i + 1}.json`, p));
+  const n = write(`${out}/editor-clothes.json`, { ...index, renderBundles: packs.length, models: clothes });
+  console.log(`${out}/editor-clothes.json — 옷 ${clothes.length}벌 (${mb(n)}) · 모델 ${Object.keys(models).length}벌 editor-clothes-models.json ${mb(mn)} · 렌더 editor-clothes-renders-1…${packs.length}.json 합 ${mb(sizes.reduce((a, b) => a + b, 0))}`);
+}
+
 // 리소스 목록 (모든 영역 한 줄씩): 편집기 주소 끝 key · 교체 약속 검사 · 주제 · 예전 버전
 const RES = [
   { area: "character", index: "assets/models/index.json", specs: "assets/specs", models: "assets/models", renders: "assets/renders", key: m => m.slug },
@@ -168,6 +198,8 @@ const RES = [
   { area: "fixture", index: "assets/furniture/fixtures/index.json", specs: "assets/furniture/fixtures/specs", models: "assets/furniture/fixtures/models", renders: "assets/furniture/fixtures/renders", key: m => "fix-" + m.slug },
   { area: "item", index: "assets/items/index.json", specs: "assets/items/specs", models: "assets/items/models", renders: "assets/items/renders", key: m => "item-" + m.slug },
   { area: "pattern", index: "assets/interior/index.json", specs: "assets/interior/specs", models: null, renders: null, key: m => m.slug, only: m => m.kind === "wallpaper" || m.kind === "floor" },
+  // 11차 옷: 분류(cat) = 칸 hat·top·shoes, 기본 윗옷(builtin)은 모델 없이 목록·상태·색만 검사
+  { area: "clothes", index: "assets/clothes/index.json", specs: "assets/clothes/specs", models: "assets/clothes/models", renders: "assets/clothes/renders", key: m => "cloth-" + m.slug },
 ];
 // 주제: 그 설정 파일이 slug(또는 아이템 id)를 부르면 그 주제 — 행사·밤·투어·축제 모델을 따로 걸러 보게
 const THEMES = [["event", "assets/events/events.json"], ["festival", "assets/festival/config.json"], ["night", "assets/night/night.json"], ["tour", "assets/tour/tour.json"]];
@@ -212,14 +244,16 @@ function catFiles(list) {
 {
   const rows = [], ask = [];
   for (const S of RES) {
-    for (const m of json(S.index).models.filter(S.only ?? (() => true))) {
+    const ix = json(S.index);
+    for (const m of (S.list ? S.list(ix) : ix.models).filter(S.only ?? (() => true))) {
       const spec = json(`${S.specs}/${m.slug}.json`);
-      const stats = S.models ? json(`${S.models}/${m.slug}.stats.json`) : null;
-      const info = S.models ? glbInfo(Buffer.from(json(`${S.models}/${m.slug}.glb.json`).data, "base64")) : null;
+      const hasModel = S.models && !m.builtin;
+      const stats = hasModel ? json(`${S.models}/${m.slug}.stats.json`) : null;
+      const info = hasModel ? glbInfo(Buffer.from(json(`${S.models}/${m.slug}.glb.json`).data, "base64")) : null;
       const item = S.area === "furniture" ? ITEMS.find(i => i.id === m.item) : null;
       const checks = checkResource({ area: S.area, spec, row: m, stats, info, extra: { item } });
-      const thumb = S.area === "item" ? (m.items?.[0]?.icon ?? null) : S.renders ? `${S.renders}/${m.slug}_thumb.png` : null;
-      const r = { key: S.key(m), area: S.area, cat: S.area === "item" ? m.group : S.area === "pattern" ? m.kind : (spec.category ?? S.area), id: m.id, slug: m.slug, name: m.name,
+      const thumb = S.area === "item" ? (m.items?.[0]?.icon ?? null) : m.builtin ? "assets/renders/player_thumb.png" : S.renders ? `${S.renders}/${m.slug}_thumb.png` : null;
+      const r = { key: S.key(m), area: S.area, cat: S.area === "item" ? m.group : S.area === "pattern" ? m.kind : S.area === "clothes" ? m.slot : (spec.category ?? S.area), id: m.id, slug: m.slug, name: m.name,
         status: m.status, version: m.version, themes: themesOf(spec), checks, sum: summary(checks), tri: stats?.triangles ?? null, size: stats?.size ?? null,
         specFile: `${S.specs}/${m.slug}.json`, thumbFile: thumb };
       rows.push(r);
@@ -248,15 +282,17 @@ function catFiles(list) {
   const pn = write("assets/res/editor-prev.json", prev);
   console.log(`assets/res/editor-index.json — 리소스 ${rows.length}개 · 약속 어긋남 ${fails.length} · 손볼 것 ${warns.length} (${mb(n)}) · editor-prev.json 예전 버전 ${Object.keys(prev).length}개 (${mb(pn)})`);
   for (const r of fails) console.log(`  ✗ ${r.key}: ${r.checks.filter(c => c.state === "fail").map(c => c.detail).join(" / ")}`);
+  for (const r of warns) console.log(`  △ ${r.key}: ${r.checks.filter(c => c.state === "warn").map(c => c.detail).join(" / ")}`);
 }
 
 // 리소스 편집기 게시 파일 목록: 페이지 + 검사 모듈 + 반영 기록 도구 + 영역마다 묶음 (배경 편집기와 같은 묶음을 같이 쓴다)
 {
   const DIRS = ["assets/models", "assets/renders", "assets/env", "assets/furniture", "assets/furniture/fixtures", "assets/items", "assets/interior", "assets/res"];
-  const files = [{ as: "index.html", path: "res-editor.html" }, { as: "tools/res-contracts.mjs", path: "tools/res-contracts.mjs" }, { as: "concept/board-kit.js", path: "concept/board-kit.js" }];
+  // 옷 3D 보기는 게임과 같은 끼우는 틀(src/player/wear.js — three 만 씀)을 그대로 불러온다
+  const files = [{ as: "index.html", path: "res-editor.html" }, { as: "tools/res-contracts.mjs", path: "tools/res-contracts.mjs" }, { as: "concept/board-kit.js", path: "concept/board-kit.js" }, { as: "src/player/wear.js", path: "src/player/wear.js" }];
   for (const dir of DIRS) {
     for (const f of readdirSync(resolve(root, dir)).sort((a, b) => a.localeCompare(b, "en", { numeric: true })))
-      if (/^editor-[a-z]+(-\d+)?\.json$/.test(f)) files.push({ as: `${dir}/${f}`, path: `${dir}/${f}` });
+      if (/^editor-[a-z]+(-[a-z]+)*(-\d+)?\.json$/.test(f)) files.push({ as: `${dir}/${f}`, path: `${dir}/${f}` });
   }
   const out = resolve(root, "dist/res-editor");
   rmSync(out, { recursive: true, force: true });

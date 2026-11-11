@@ -1,0 +1,33 @@
+{
+  "id": "CL-09",
+  "slug": "festival-vest",
+  "name": "축제 조끼",
+  "slot": "top",
+  "version": "0.1",
+  "triangles": 2112,
+  "vertices": 1132,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "hips",
+    "spine"
+  ],
+  "materials": [
+    "ribbon",
+    "vest",
+    "vestShirt",
+    "vestTrim"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 70976,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "festival-vest_back.png",
+    "festival-vest_front.png",
+    "festival-vest_side.png",
+    "festival-vest_three_quarter.png",
+    "festival-vest_thumb.png",
+    "festival-vest_walk.png"
+  ]
+}

@@ -1,6 +1,7 @@
 // 도토리상점: 사기(진열 목록) / 팔기(가방 팔기 모드). 거래는 data 서비스(wallet·inventory)로 한다.
 // 사기 탭 아래 '오늘의 벽지·바닥' 코너 (5차 Z2): house.interior.today() 가 날마다 하나씩 고른 것. 산 것은 가방이 아니라 집 꾸미기 목록(house.interior.add)에 들어간다.
-import { h, fmt, itemInfo, iconEl } from './dom.js';
+// 11차 D102-A '오늘의 옷' 코너 (clothes: true — 도토리상점만): outfit.today() 의 옷 둘. 산 옷은 가방이 아니라 옷장(outfit 옷장 목록)에, 첫 옷이면 옷장 가구도.
+import { h, fmt, itemInfo, iconEl, josa } from './dom.js';
 import { panelShell, button, confirmBox } from './panels.js';
 import { itemPhrase } from './bag.js';
 import { notice } from './phone.js';
@@ -14,7 +15,7 @@ export function createShop(ctx, panels, { bag, toast }) {
   let current = null;
 
   /** only = 'sell' 이면 팔기 탭만 (첫날 밤 문 너머 장사, 7차 D51-A), greet = 주인 한 줄 */
-  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab, only = null, greet = ' 어서 와요! 천천히 둘러봐요.' } = {}) {
+  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab, only = null, clothes = false, greet = ' 어서 와요! 천천히 둘러봐요.' } = {}) {
     if (current) return current.p.result;
     let p, tab = only === 'sell' || startTab === 'sell' ? 'sell' : 'buy';
     const data = () => ctx.services.data;
@@ -38,6 +39,8 @@ export function createShop(ctx, panels, { bag, toast }) {
       else if (tab === 'buy') {
         const corner = decorCorner();   // 날마다 바뀌는 것이라 맨 위에
         if (corner) view.append(corner);
+        const cl = clothes ? clothesCorner() : null;
+        if (cl) view.append(cl);
         if (!stock.length) view.append(notice('📦', '오늘은 물건이 다 팔렸어요.', '내일 다시 와 주세요.'));
         else view.append(h('ul', { class: 'pk-stock' }, stock.map(id => {
           const it = itemInfo(ctx, id);
@@ -87,6 +90,45 @@ export function createShop(ctx, panels, { bag, toast }) {
           h('span', { class: 'pk-stock-name' }, `${d.name} ${kind}`, d.shopOnly ? h('small', { style: { display: 'block', fontSize: '12px', opacity: '.7' } }, '상점 한정') : null),
           h('span', { class: 'pk-price', style: d.owned ? { opacity: '.6' } : null }, d.owned ? '가지고 있어요' : `🌰 ${fmt(d.price)}`)));
         })));
+    }
+
+    // ── 11차 오늘의 옷 (옷 진열대 FU-54) ──
+    const outfit = () => ctx.services.outfit;
+    function clothesCorner() {
+      let today = [];
+      try { today = outfit()?.today?.() ?? []; } catch (e) { console.warn('[shop] 오늘의 옷', e); }
+      if (!today.length) return null;
+      return h('section', { class: 'pk-shop-decor pk-shop-clothes', 'aria-label': '오늘의 옷', style: { marginBottom: '14px' } },
+        h('p', { class: 'pk-keeper', style: { margin: '0 0 8px' } }, h('b', null, '오늘의 옷'), ' 문 옆 옷 진열대 · 날마다 바뀌어요'),
+        h('ul', { class: 'pk-stock' }, today.map(c => {
+          const short = !c.owned && c.buy > acorns();
+          return h('li', null, h('button', { type: 'button', class: `pk-stock-item${short ? ' is-short' : ''}${c.owned ? ' is-owned' : ''}`, dataset: { clothes: c.id }, onclick: () => buyClothes(c),
+            'aria-label': `${c.slotName} ${c.name}, ${c.owned ? '옷장에 있어요' : `${fmt(c.buy)}도토리${short ? ', 도토리가 모자라요' : ''}`}` },
+          c.thumb ? iconEl(c.thumb, 'pk-stock-icon pk-stock-thumb') : iconEl('👕', 'pk-stock-icon'),
+          h('span', { class: 'pk-stock-name' }, c.name, h('small', { style: { display: 'block', fontSize: '12px', opacity: '.7' } }, c.slotName)),
+          h('span', { class: 'pk-price', style: c.owned ? { opacity: '.6' } : null }, c.owned ? '옷장에 있어요' : `🌰 ${fmt(c.buy)}`)));
+        })));
+    }
+
+    async function buyClothes(c) {
+      if (p.fresh()) return;
+      const O = outfit();
+      if (!O) return;
+      if (O.owns(c.id)) { toast(`이미 옷장에 있는 ${josa(c.slotName, '이에요/예요')}. 집 옷장에서 갈아입을 수 있어요`, '👕'); return; }
+      if (c.buy > acorns()) { toast('도토리가 모자라요', '🌰'); return; }
+      O.preview({ [c.slot]: c.id });   // 사기 전에 입어 본 모습 (창 뒤 주인공)
+      const now = await confirmBox(panels, { title: '사기', icon: c.thumb ?? '👕', text: `${josa(c.name, '을/를')} 🌰 ${fmt(c.buy)}에 살까요?
+산 옷은 집 옷장에 걸려요.`,
+        buttons: [{ label: '사서 바로 입을게요', value: 'wear', primary: true }, { label: '사기만 할게요', value: 'buy' }, { label: '그만둘래요', value: false }], cancelValue: false });
+      if (!now || p.closed) { O.revert(); return; }
+      const r = O.buy(c.id);
+      if (r.result !== 'ok') { O.revert(); toast(r.result === 'money' ? '도토리가 모자라요' : '살 수 없는 옷이에요', '🌰'); return; }
+      if (now === 'wear') await O.wear({ [c.slot]: r.info.id }, { spin: true });
+      else O.revert();
+      ctx.events.emit('sfx', { name: 'acorn' });
+      toast(now === 'wear' ? `${josa(c.name, '을/를')} 사서 입었어요!` : `${c.name} 샀어요! 옷장에 걸어 둘게요`, c.thumb ?? '👕');
+      if (r.gift) setTimeout(() => toast('밤톨이 옷장을 덤으로 줬어요 — 집에 놓고 「갈아입기」 해 봐요', '🚪'), 900);
+      draw(`[data-clothes="${CSS.escape(c.id)}"]`);
     }
 
     async function buyDecor(d) {

@@ -1,0 +1,44 @@
+{
+  "id": "CL-04",
+  "slug": "sailor-cap",
+  "name": "선원 모자",
+  "category": "clothes",
+  "slot": "hat",
+  "kind": "sailor-cap",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1600,
+  "sell": 400,
+  "prompt": {
+    "concept": "하얀 원통 선원 모자, 남색 띠와 뒤로 늘어진 리본 둘. 선착장 산책용.",
+    "keywords": [
+      "하얀 원통",
+      "남색 띠",
+      "리본"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "width": {
+      "value": 0.92,
+      "min": 0.85,
+      "max": 1.05,
+      "label": "모자 넓이"
+    }
+  },
+  "palette": {
+    "cap": "#F7F5EE",
+    "capBand": "#2F4A7A"
+  }
+}

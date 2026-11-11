@@ -1,0 +1,30 @@
+{
+  "id": "CL-10",
+  "slug": "sneakers",
+  "name": "운동화",
+  "slot": "shoes",
+  "version": "0.1",
+  "triangles": 1728,
+  "vertices": 884,
+  "bones": [
+    "shin.L",
+    "shin.R"
+  ],
+  "materials": [
+    "lace",
+    "shoe",
+    "sole"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 54916,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sneakers_back.png",
+    "sneakers_front.png",
+    "sneakers_side.png",
+    "sneakers_three_quarter.png",
+    "sneakers_thumb.png",
+    "sneakers_walk.png"
+  ]
+}

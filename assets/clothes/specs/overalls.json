@@ -1,0 +1,50 @@
+{
+  "id": "CL-06",
+  "slug": "overalls",
+  "name": "멜빵",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "overalls",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 2200,
+  "sell": 550,
+  "prompt": {
+    "concept": "안에 흰 티, 앞 가슴받이와 바지가 이어진 멜빵 + 금빛 단추 둘, 가슴 주머니.",
+    "keywords": [
+      "가슴받이",
+      "어깨끈",
+      "금빛 단추"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {},
+  "palette": {
+    "denim": "#4F78A8",
+    "shirtIn": "#F6EFE0",
+    "button": "#E3B54A"
+  },
+  "variants": {
+    "denim": {
+      "label": "청 멜빵 (기본)",
+      "palette": {}
+    },
+    "acorn": {
+      "label": "도토리색 멜빵",
+      "palette": {
+        "denim": "#B97A45"
+      }
+    }
+  }
+}

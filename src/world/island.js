@@ -67,8 +67,10 @@ export function resolveLayout(layout) {
   };
 }
 
-// 10차 M10-P4: 엔딩 뒤 새 주민이 들어올 남는 집터 자리 (섬 크기 비율, 이 자리 가까운 빈 풀밭부터). 섬 최대 10명 = 지금 9명 + 1 이라 하나
-export const SPARE_LOTS = [[0.6, 0.64]];
+// 10차 M10-P4: 엔딩 뒤 새 주민이 들어올 남는 집터 자리 (섬 크기 비율, 이 자리 가까운 빈 풀밭부터).
+// 11차 D103-A: 섬 최대 12명 = 지금 9명 + 새 주민 셋이라 셋 (spare-1 상점·단풍 집 사이 강가 · spare-2 서쪽 모찌 집 옆 · spare-3 동쪽 단풍 집 옆).
+// 차례대로 찾고 앞 집터 자리는 예약 칸이 되니, 앞 것을 지우거나 순서를 바꾸면 뒤 집터 자리가 바뀐다 — 늘 끝에만 더한다.
+export const SPARE_LOTS = [[0.6, 0.64], [0.3, 0.7], [0.7, 0.75]];
 
 // 건물 집터(칸 수 [가로, 세로])는 배경 스펙의 world.lot 에서 받는다 (lots = { 종류: [가로, 세로] }). 문은 +Z(남쪽)를 본다.
 export const BUILDING_KINDS = ['house-player', 'house-villager', 'shop', 'museum'];

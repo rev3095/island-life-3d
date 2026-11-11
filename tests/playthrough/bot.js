@@ -166,7 +166,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     if (!el) return null;
     const card = el.querySelector?.('.pk-card');
     const kind = el.classList.contains('pk-dialog') ? 'dialog' : el.classList.contains('fe-talk') ? 'emote' : el.classList.contains('fe-rhythm') ? 'rhythm'
-      : card ? ['confirm', 'bag', 'shop', 'museum', 'craft', 'phone', 'map'].find(k => card.classList.contains(`pk-${k}`)) ?? 'card' : 'other';
+      : card ? ['confirm', 'bag', 'shop', 'museum', 'craft', 'phone', 'map', 'closet'].find(k => card.classList.contains(`pk-${k}`)) ?? 'card' : 'other';
     return { kind, el, card };
   };
   bot.dialogText = () => bot.$('.pk-dialog .pk-dlg-text')?.textContent ?? '';

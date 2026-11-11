@@ -250,13 +250,25 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
   /** 진열할 오늘의 물건 묶음: 도토리상점 = economy, M12 달빛 가게·새벽 천막 = night 서비스 */
   function stockGroupsOf(kind) {
-    if (kind === 'shop') return ctx.services.data?.economy?.stockGroups?.() ?? {};
+    if (kind === 'shop') {   // + 11차 D102-A 옷 진열대 (outfit.today — 옷장에 있는 옷도 진열은 그대로)
+      const g = ctx.services.data?.economy?.stockGroups?.() ?? {};
+      const clothes = ctx.services.outfit?.today?.().map(c => c.id) ?? [];
+      return clothes.length ? { ...g, clothes } : g;
+    }
     return ctx.services.night?.stockGroups?.(kind) ?? {};
   }
   function stockJobs(R) {
     const groups = stockGroupsOf(R.kind);
     return stockPlan(R.spec, groups).map(async s => {
       try {
+        if (s.group === 'clothes') {   // 11차 옷: 윗옷은 가로대(hang)에 걸고, 모자·신발은 아래 단(y)에
+          const m = await ctx.services.outfit?.displayModel?.(s.id);
+          if (!m) return null;
+          const b = m.size, cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2;
+          const top = m.slot === 'top' && s.hang != null;
+          m.root.position.set(R.x0 + s.lx - cx, top ? s.hang - b.max.y : s.y - b.min.y, R.z0 + s.lz - cz);
+          return m;
+        }
         if (s.group === 'furniture' && kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구)
           const obj = await kit.make(s.id);
           const fp = kit.info(s.id).footprint ?? [1, 1];

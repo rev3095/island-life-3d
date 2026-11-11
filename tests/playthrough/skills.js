@@ -258,10 +258,10 @@ export function createSkills(bot) {
     return !S().house.places.where;
   };
   /** 상점: mode 'sell' | 'buy'. sellTest(item, slot) → 팔 개수(0 = 안 팜). buy = [id...] */
-  sk.shop = async ({ sell = null, buy = [], decor = null } = {}) => {
+  sk.shop = async ({ sell = null, buy = [], decor = null, clothes = null } = {}) => {   // clothes = 'auto' | 옷 이름 (11차 오늘의 옷 — 사기만, 옷장에서 갈아입는다)
     if (!(await sk.toDoor('shop', '상점'))) return null;
     const inside = await sk.enterPlace('shop', '상점');
-    const result = { sold: 0, earned: 0, bought: [], decor: null };
+    const result = { sold: 0, earned: 0, bought: [], decor: null, clothes: null };
     const w0 = bot.acorns();
     let shopOpened = false;
     const buyQueue = [...buy];
@@ -279,6 +279,12 @@ export function createSkills(bot) {
           if (cur !== '사기') { bot.click(tabs.find(t => t.textContent === '사기')); return true; }
           const b = card.querySelector(`[data-decor="${decor}"]`) ?? [...card.querySelectorAll('[data-decor]')].find(x => !x.classList.contains('is-owned') && !x.classList.contains('is-short'));
           result.decor = b?.dataset.decor ?? 'none';
+          if (b) { bot.click(b); return true; }
+        }
+        if (clothes && !result.clothes) {
+          if (cur !== '사기') { bot.click(tabs.find(t => t.textContent === '사기')); return true; }
+          const b = card.querySelector(`[data-clothes="${clothes}"]`) ?? [...card.querySelectorAll('[data-clothes]')].find(x => !x.classList.contains('is-owned') && !x.classList.contains('is-short'));
+          result.clothes = b?.dataset.clothes ?? 'none';
           if (b) { bot.click(b); return true; }
         }
         if (buyQueue.length) {
@@ -315,6 +321,7 @@ export function createSkills(bot) {
           return n > 1 && all >= 0 ? all : one >= 0 ? one : 0;
         }
         if (/벽지|바닥/.test(info.title + info.text)) return Math.max(0, info.buttons.findIndex(b => /바로 붙일게요/.test(b)));
+        if (/옷장에 걸려요/.test(info.text)) return Math.max(0, info.buttons.findIndex(b => /사기만/.test(b)));   // 11차: 옷장에서 갈아입으려고
         return 0;
       },
     };
@@ -391,6 +398,49 @@ export function createSkills(bot) {
     await bot.act('action');
     bot.policy = {};
     return (house().furniture?.length ?? 0) > before;
+  };
+
+  /**
+   * 11차 옷장 「갈아입기」 (UI-19): 집 안에서 옷장(FU-12) 앞 → 행동 키 → 메뉴 「갈아입기」 → 옷장 창에서 옷 고르기 → 「입기」.
+   * 옷장이 가방에 있으면(첫 옷 덤) 먼저 놓는다. → { placed, opened, wore }
+   */
+  sk.changeClothes = async id => {
+    const res = { placed: false, opened: false, wore: false };
+    if (!(await sk.enterHome())) return res;
+    sk.homeEntry = bot.pos();
+    const recOf = () => (house().furniture ?? []).find(r => r.item === 'furn.wardrobe');
+    if (!recOf() && bot.has('furn.wardrobe')) {
+      await bot.walkLocal({ x: bot.pos().x, z: bot.pos().z - 1.6 });
+      res.placed = await sk.placeFurniture(s => s.id === 'furn.wardrobe');
+    }
+    if (!recOf()) { bot.issue('minor', 'house', '집에 옷장이 없어 갈아입을 수 없어요'); await sk.leaveHome(); return res; }
+    // 방금 놓았으면 바로 앞. 아니면 옷장 앞쪽 칸으로 가서 바라본다
+    // 방금 놓았으면 바로 앞 — 아니면 네 방향을 돌아보며 가구 메뉴가 뜨는 쪽을 찾는다
+    if (bot.peek() !== 'house-furniture') {
+      for (const deg of [0, 90, -90, 180]) { await bot.faceDir(deg); if (bot.peek() === 'house-furniture') break; }
+    }
+    res.peek = bot.peek();
+    const e = S().outfit?.info(id);
+    bot.policy = {
+      dialog: texts => Math.max(0, texts.findIndex(t => /갈아입기/.test(t))),
+      card: (kind, el, card) => {
+        if (kind !== 'closet') return false;
+        res.opened = true;
+        const tab = card.querySelector(`[role="tab"][data-slot="${e?.slot}"]`);
+        if (tab && tab.getAttribute('aria-selected') !== 'true') { bot.click(tab); return true; }
+        const b = card.querySelector(`[data-wear="${id}"]`);
+        if (b && b.getAttribute('aria-pressed') !== 'true') { bot.click(b); return true; }
+        bot.click(card.querySelector('.pk-closet-wear'));
+        return true;
+      },
+    };
+    await bot.act('action', { timeout: 30 });
+    bot.policy = {};
+    await bot.wait(1.5);
+    res.wore = S().outfit?.worn()?.[e?.slot] === id;
+    if (res.wore) await bot.shot('closet-wear', `옷장에서 ${e?.name} 입기`);
+    await sk.leaveHome();
+    return res;
   };
 
   /** 집 작업대에서 만들기 (want = 레시피 id = 만들어지는 아이템 id) → 만들었으면 true */

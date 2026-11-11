@@ -1,0 +1,56 @@
+{
+  "id": "CL-08",
+  "slug": "raincoat",
+  "name": "비옷",
+  "category": "clothes",
+  "slot": "top",
+  "kind": "raincoat",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 2000,
+  "sell": 500,
+  "prompt": {
+    "concept": "엉덩이까지 오는 긴소매 비옷, 앞 단추 셋, 목 뒤에 접은 모자. 비 오는 날용.",
+    "keywords": [
+      "긴소매",
+      "단추 셋",
+      "접은 모자"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "hemDrop": {
+      "value": 0.07,
+      "min": 0.04,
+      "max": 0.1,
+      "label": "밑단 내림"
+    }
+  },
+  "palette": {
+    "coat": "#F2C73E",
+    "button": "#6B4A33"
+  },
+  "variants": {
+    "yellow": {
+      "label": "노란 비옷 (기본)",
+      "palette": {}
+    },
+    "pink": {
+      "label": "분홍 비옷",
+      "palette": {
+        "coat": "#E98AA8"
+      }
+    }
+  }
+}

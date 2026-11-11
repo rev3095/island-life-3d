@@ -1,0 +1,31 @@
+{
+  "id": "CL-05",
+  "slug": "striped-tee",
+  "name": "줄무늬 티",
+  "slot": "top",
+  "version": "0.1",
+  "triangles": 1116,
+  "vertices": 591,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "hips",
+    "spine"
+  ],
+  "materials": [
+    "tee",
+    "teeStripe"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 45800,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "striped-tee_back.png",
+    "striped-tee_front.png",
+    "striped-tee_side.png",
+    "striped-tee_three_quarter.png",
+    "striped-tee_thumb.png",
+    "striped-tee_walk.png"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "CL-04",
+  "slug": "sailor-cap",
+  "name": "선원 모자",
+  "slot": "hat",
+  "version": "0.1",
+  "triangles": 700,
+  "vertices": 356,
+  "bones": [
+    "head"
+  ],
+  "materials": [
+    "cap",
+    "capBand"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 24492,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sailor-cap_back.png",
+    "sailor-cap_front.png",
+    "sailor-cap_side.png",
+    "sailor-cap_three_quarter.png",
+    "sailor-cap_thumb.png",
+    "sailor-cap_walk.png"
+  ]
+}

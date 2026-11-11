@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "slots": [
+    "hat",
+    "top",
+    "shoes"
+  ],
+  "models": [
+    {
+      "id": "CL-00",
+      "slug": "basic-tee",
+      "name": "기본 티셔츠",
+      "slot": "top",
+      "kind": "tee",
+      "version": "0.1",
+      "status": "review",
+      "buy": 0,
+      "sell": 0,
+      "palette": {
+        "shirt": "#5DB7A8"
+      },
+      "builtin": true,
+      "part": "player_top"
+    },
+    {
+      "id": "CL-01",
+      "slug": "straw-hat",
+      "name": "밀짚모자",
+      "slot": "hat",
+      "kind": "straw-hat",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1400,
+      "sell": 350,
+      "palette": {
+        "straw": "#E8C77A",
+        "hatBand": "#C2523F"
+      },
+      "model": "assets/clothes/models/straw-hat.glb.json",
+      "triangles": 1708,
+      "bones": [
+        "head"
+      ]
+    },
+    {
+      "id": "CL-02",
+      "slug": "knit-beanie",
+      "name": "털모자",
+      "slot": "hat",
+      "kind": "beanie",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1200,
+      "sell": 300,
+      "palette": {
+        "beanie": "#D9604E",
+        "beanieRib": "#B8473A",
+        "pompom": "#F4EDE1"
+      },
+      "model": "assets/clothes/models/knit-beanie.glb.json",
+      "triangles": 1436,
+      "bones": [
+        "head"
+      ]
+    },
+    {
+      "id": "CL-03",
+      "slug": "flower-pin",
+      "name": "꽃 머리핀",
+      "slot": "hat",
+      "kind": "flower-pin",
+      "version": "0.1",
+      "status": "review",
+      "buy": 900,
+      "sell": 225,
+      "palette": {
+        "pinPetal": "#F49AB8",
+        "pinCenter": "#F7D45B",
+        "pinLeaf": "#6FAE5B"
+      },
+      "model": "assets/clothes/models/flower-pin.glb.json",
+      "triangles": 1040,
+      "bones": [
+        "head"
+      ]
+    },
+    {
+      "id": "CL-04",
+      "slug": "sailor-cap",
+      "name": "선원 모자",
+      "slot": "hat",
+      "kind": "sailor-cap",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1600,
+      "sell": 400,
+      "palette": {
+        "cap": "#F7F5EE",
+        "capBand": "#2F4A7A"
+      },
+      "model": "assets/clothes/models/sailor-cap.glb.json",
+      "triangles": 700,
+      "bones": [
+        "head"
+      ]
+    },
+    {
+      "id": "CL-05",
+      "slug": "striped-tee",
+      "name": "줄무늬 티",
+      "slot": "top",
+      "kind": "striped-tee",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1400,
+      "sell": 350,
+      "palette": {
+        "tee": "#F5F1E6",
+        "teeStripe": "#3E6FB0"
+      },
+      "variants": {
+        "sea": {
+          "label": "바다 줄무늬 (기본)",
+          "palette": {}
+        },
+        "berry": {
+          "label": "딸기 줄무늬",
+          "palette": {
+            "teeStripe": "#D2546A"
+          }
+        }
+      },
+      "model": "assets/clothes/models/striped-tee.glb.json",
+      "triangles": 1116,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "hips",
+        "spine"
+      ]
+    },
+    {
+      "id": "CL-06",
+      "slug": "overalls",
+      "name": "멜빵",
+      "slot": "top",
+      "kind": "overalls",
+      "version": "0.1",
+      "status": "review",
+      "buy": 2200,
+      "sell": 550,
+      "palette": {
+        "denim": "#4F78A8",
+        "shirtIn": "#F6EFE0",
+        "button": "#E3B54A"
+      },
+      "variants": {
+        "denim": {
+          "label": "청 멜빵 (기본)",
+          "palette": {}
+        },
+        "acorn": {
+          "label": "도토리색 멜빵",
+          "palette": {
+            "denim": "#B97A45"
+          }
+        }
+      },
+      "model": "assets/clothes/models/overalls.glb.json",
+      "triangles": 2260,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "hips",
+        "spine"
+      ]
+    },
+    {
+      "id": "CL-07",
+      "slug": "wool-sweater",
+      "name": "털 스웨터",
+      "slot": "top",
+      "kind": "sweater",
+      "version": "0.1",
+      "status": "review",
+      "buy": 2400,
+      "sell": 600,
+      "palette": {
+        "knit": "#C96E4E",
+        "knitBand": "#F1E3C8",
+        "rib": "#A8553B"
+      },
+      "variants": {
+        "maple": {
+          "label": "단풍 스웨터 (기본)",
+          "palette": {}
+        },
+        "mint": {
+          "label": "민트 스웨터",
+          "palette": {
+            "knit": "#7DB7A0",
+            "rib": "#5E9884"
+          }
+        }
+      },
+      "model": "assets/clothes/models/wool-sweater.glb.json",
+      "triangles": 2644,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "hips",
+        "spine"
+      ]
+    },
+    {
+      "id": "CL-08",
+      "slug": "raincoat",
+      "name": "비옷",
+      "slot": "top",
+      "kind": "raincoat",
+      "version": "0.1",
+      "status": "review",
+      "buy": 2000,
+      "sell": 500,
+      "palette": {
+        "coat": "#F2C73E",
+        "button": "#6B4A33"
+      },
+      "variants": {
+        "yellow": {
+          "label": "노란 비옷 (기본)",
+          "palette": {}
+        },
+        "pink": {
+          "label": "분홍 비옷",
+          "palette": {
+            "coat": "#E98AA8"
+          }
+        }
+      },
+      "model": "assets/clothes/models/raincoat.glb.json",
+      "triangles": 3048,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "hips",
+        "spine"
+      ]
+    },
+    {
+      "id": "CL-09",
+      "slug": "festival-vest",
+      "name": "축제 조끼",
+      "slot": "top",
+      "kind": "vest",
+      "version": "0.1",
+      "status": "review",
+      "buy": 2600,
+      "sell": 650,
+      "palette": {
+        "vestShirt": "#F6EFE0",
+        "vest": "#3C8C7A",
+        "vestTrim": "#E8B84A",
+        "ribbon": "#D9534F"
+      },
+      "variants": {
+        "pine": {
+          "label": "솔잎 조끼 (기본)",
+          "palette": {}
+        },
+        "plum": {
+          "label": "자두 조끼",
+          "palette": {
+            "vest": "#8E4F8C"
+          }
+        }
+      },
+      "model": "assets/clothes/models/festival-vest.glb.json",
+      "triangles": 2112,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "hips",
+        "spine"
+      ]
+    },
+    {
+      "id": "CL-10",
+      "slug": "sneakers",
+      "name": "운동화",
+      "slot": "shoes",
+      "kind": "sneakers",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1200,
+      "sell": 300,
+      "palette": {
+        "shoe": "#E5584F",
+        "sole": "#F4F1EA",
+        "lace": "#FFFFFF"
+      },
+      "model": "assets/clothes/models/sneakers.glb.json",
+      "triangles": 1728,
+      "bones": [
+        "shin.L",
+        "shin.R"
+      ]
+    },
+    {
+      "id": "CL-11",
+      "slug": "rain-boots",
+      "name": "장화",
+      "slot": "shoes",
+      "kind": "rain-boots",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1500,
+      "sell": 375,
+      "palette": {
+        "boot": "#F2C73E",
+        "bootRim": "#E0A82E"
+      },
+      "model": "assets/clothes/models/rain-boots.glb.json",
+      "triangles": 1904,
+      "bones": [
+        "leg.L",
+        "leg.R",
+        "shin.L",
+        "shin.R"
+      ]
+    },
+    {
+      "id": "CL-12",
+      "slug": "sandals",
+      "name": "샌들",
+      "slot": "shoes",
+      "kind": "sandals",
+      "version": "0.1",
+      "status": "review",
+      "buy": 1000,
+      "sell": 250,
+      "palette": {
+        "sandalSole": "#B98957",
+        "sandalStrap": "#6B4A33"
+      },
+      "model": "assets/clothes/models/sandals.glb.json",
+      "triangles": 844,
+      "bones": [
+        "shin.L",
+        "shin.R"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "CL-02",
+  "slug": "knit-beanie",
+  "name": "털모자",
+  "category": "clothes",
+  "slot": "hat",
+  "kind": "beanie",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 1200,
+  "sell": 300,
+  "prompt": {
+    "concept": "접어 올린 단이 있는 털모자, 꼭대기에 방울. 겨울 눈사람 날에 어울린다.",
+    "keywords": [
+      "접은 단",
+      "방울"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": ""
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "front": {
+      "value": 0.36,
+      "min": 0.2,
+      "max": 0.5,
+      "label": "앞 내림"
+    }
+  },
+  "palette": {
+    "beanie": "#D9604E",
+    "beanieRib": "#B8473A",
+    "pompom": "#F4EDE1"
+  }
+}

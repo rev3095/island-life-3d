@@ -1000,6 +1000,29 @@ def b_display_stand(M):
         t.add(box((x + 0.04, y - 0.022, 0.44 - k * 0.04), (0.08, 0.004, 0.012), bevel=0.002), 'woodDark')
 
 
+def b_clothes_rack(M):
+    """FU-54 옷 진열대 (2×1, 11차 D102-A): 낮은 나무 단(윗면 0.14 — 모자·신발) + 양쪽 기둥 + 가로대(1.12 — 윗옷 걸기) + 옷걸이 둘 + 값표"""
+    m = M.part('rack')
+    W, D = 1.86, 0.84
+    m.add(box((0, 0, 0.03), (W - 0.08, D - 0.08, 0.06), bevel=0.012), 'woodDark')
+    m.add(box((0, 0, 0.1), (W, D, 0.08), bevel=0.025), 'wood')
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - 0.07), 0.12, 0.66), (0.07, 0.07, 1.04), bevel=0.012), 'wood')
+        m.add(box((sx * (W / 2 - 0.07), 0.12, 1.2), (0.11, 0.11, 0.05), bevel=0.012), 'woodDark')
+    m.add(cylinder((-W / 2 + 0.07, 0.12, 1.12), (W / 2 - 0.07, 0.12, 1.12), 0.022, seg=12), 'brass')
+    for x in (-0.45, 0.45):   # 옷걸이 (윗옷이 여기 걸린다)
+        m.add(cylinder((x, 0.12, 1.12), (x, 0.12, 1.06), 0.008, seg=6), 'brass')
+        m.add(cylinder((x - 0.17, 0.12, 0.98), (x, 0.12, 1.06), 0.009, seg=6), 'hanger')
+        m.add(cylinder((x + 0.17, 0.12, 0.98), (x, 0.12, 1.06), 0.009, seg=6), 'hanger')
+        m.add(cylinder((x - 0.17, 0.12, 0.98), (x + 0.17, 0.12, 0.98), 0.008, seg=6), 'hanger')
+    t = M.part('tag')
+    x, y = W / 2 - 0.2, -D / 2 + 0.08
+    t.add(cylinder((x, y, 0.14), (x, y, 0.3), 0.012, seg=8), 'woodDark')
+    t.add(box((x, y - 0.01, 0.36), (0.22, 0.02, 0.13), bevel=0.01), 'tag')
+    t.add(ellipsoid((x - 0.05, y - 0.024, 0.35), (0.028, 0.01, 0.034), seg=10, rings=6), 'acorn')
+    t.add(ellipsoid((x - 0.05, y - 0.024, 0.38), (0.032, 0.012, 0.016), seg=10, rings=6), 'acornCap')
+
+
 def counter_body(M, W, D, H, body, top, trim):
     """계산대·안내대 몸통: 아래 받침 · 몸통 · 상판 · 앞 널 두 장"""
     m = M.part('counter')
@@ -1559,6 +1582,7 @@ BUILDERS = {
     # 상점·박물관 붙박이 (assets/furniture/fixtures, --out)
     'display-stand': b_display_stand, 'shop-counter': b_shop_counter, 'museum-desk': b_museum_desk, 'fossil-pedestal': b_fossil_pedestal,
     'tool-stand': b_tool_stand, 'seed-shelf': b_seed_shelf, 'long-tank': b_long_tank, 'long-terrarium': b_long_terrarium,
+    'clothes-rack': b_clothes_rack,   # 11차 D102-A 도토리상점 옷 진열대 FU-54
 }
 
 

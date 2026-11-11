@@ -2,7 +2,7 @@
   "version": 1,
   "about": "게임 규칙 숫자 — 시작 지급·상점·채집 확률·하루 리셋·제작 레시피·생일·주민 친밀도와 부탁 보상. 요소 편집기(elem-editor.html, 예전 숫자 표) → 채팅 \"숫자 반영\". 읽는 곳 src/data/ · town 칸은 src/gameplay/town/rules.js (docs/notes/m6-p5-mapdata.md · p36-elem-editor.md)",
   "starter": { "items": [["tool.rod", 1], ["tool.net", 1]], "acorns": 500 },
-  "shop": { "open": 8, "close": 22, "furniturePerDay": 4, "outdoorPerDay": 1, "flowerSeedsPerDay": 2 },
+  "shop": { "open": 8, "close": 22, "furniturePerDay": 4, "outdoorPerDay": 1, "flowerSeedsPerDay": 2, "clothesPerDay": 2, "clothesGiftWardrobe": true },
   "gather": {
     "fruitPerTree": 5,
     "coconutPerPalm": 2,
@@ -65,7 +65,7 @@
     "requestReward": { "furnitureChance": 0.4, "valueDefault": 200, "valueMult": 1.2, "valuePlus": 250, "bagMin": 2, "bagMax": 12 }
   },
   "moving": {
-    "every": 7, "max": 10, "minStay": 30, "quiet": 7, "chanceStep": 0.02, "chanceMax": 0.35, "askDays": 5, "calmDays": 30,
+    "every": 7, "max": 12, "minStay": 30, "quiet": 7, "chanceStep": 0.02, "chanceMax": 0.35, "askDays": 5, "calmDays": 30,
     "boxesAfter": 1, "goneAfter": 2, "letters": { "first": 3, "every": 12, "max": 4 }, "catchUp": 120
   }
 }

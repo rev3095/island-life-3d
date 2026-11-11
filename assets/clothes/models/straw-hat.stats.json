@@ -1,0 +1,28 @@
+{
+  "id": "CL-01",
+  "slug": "straw-hat",
+  "name": "밀짚모자",
+  "slot": "hat",
+  "version": "0.1",
+  "triangles": 1708,
+  "vertices": 875,
+  "bones": [
+    "head"
+  ],
+  "materials": [
+    "hatBand",
+    "straw"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 53392,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "straw-hat_back.png",
+    "straw-hat_front.png",
+    "straw-hat_side.png",
+    "straw-hat_three_quarter.png",
+    "straw-hat_thumb.png",
+    "straw-hat_walk.png"
+  ]
+}
