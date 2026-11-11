@@ -40,6 +40,11 @@ export const look = {
   uCloudTex: { value: null },
   // 물 하늘 반사: 바다·강에 하늘색이 비침 (비스듬히 볼수록 세게). 세기(render: 사양) · 하늘 색(sky, 선형)
   uSkyReflect: { value: 0 }, uSkyZenithL: { value: new THREE.Color(0.3, 0.6, 0.9) }, uSkyHorizonL: { value: new THREE.Color(0.7, 0.85, 1) },
+  // P48 셰이더 시제품 (기본 0 = 꺼짐 · 게임 모습 그대로. 비용 재기·검수 보드 shader D130–D139 용 — docs/notes/p48-shader-study.md)
+  // 눈 쌓임: 위를 보는 면에 눈 색 (세기 · 색) · 잎 뒤 비침: 바람 재질(잎·풀·꽃)에 햇빛이 비쳐 드는 빛 ·
+  // 젖은 땅 윤기: 비 올 때 땅 이름 재질의 위를 보는 면에 하늘빛 반사 · 낮은 안개: 낮은 곳에 안개 색 (세기 · 높이)
+  uSnowCover: { value: 0 }, uSnowColor: { value: new THREE.Color('#F4F7FF') }, uLeafLight: { value: 0 }, uWetSheen: { value: 0 },
+  uHeightFog: { value: 0 }, uHeightFogTop: { value: 1.2 },
 };
 
 /** 구름 그림자 무늬: 이음매 없이 반복되는 부드러운 값 잡음 64×64 (한 번만 만든다, 조각마다 그림 1번 읽기 — 계산 잡음보다 싸다) */
@@ -77,6 +82,9 @@ export const STYLE_NAMES = {
   noAO: new Set(['sea', 'water', 'waterLight', 'waterDeep', 'cloud', 'foam', 'glow', 'flame', 'flameCore', 'window']),
   worldPaint: new Set(['sea', 'ground']),       // 월드 좌표 무늬 (안 움직이는 큰 판). 나머지는 모델 좌표라 걸어도 무늬가 안 미끄러진다
   glow: new Set(['flame', 'flameCore', 'firefly', 'sparkle']),
+  // P48 시제품: 젖은 땅 윤기 (sky/surfaces.js 의 WET 과 같은 이름) · 눈 안 쌓이는 재질
+  wet: new Set(['ground', 'grass', 'grassDark', 'path', 'dirt', 'sand', 'sandDark', 'stone', 'stoneLight', 'grout', 'pebble', 'cliff', 'cliffDark']),
+  noSnow: new Set(['sea', 'water', 'waterLight', 'waterDeep', 'waterfall', 'cloud', 'foam', 'glow', 'flame', 'flameCore', 'window', 'firefly', 'sparkle']),
 };
 
 /**
@@ -227,6 +235,8 @@ uniform float uStyleTime, uBands, uBandSoft, uShadeFloor, uWrap, uCastDark, uSha
 uniform vec3 uShadeTint, uLitTint;
 uniform float uRim, uRimChar, uRimPower, uSpec, uSpecSize, uPaint, uPaintScale, uAO, uAOHeight, uWater, uWaterScale, uGlow;
 uniform float uMatRim, uMatSpec, uMatAO, uMatPaint;     // 재질마다 (캐릭터는 림 세게, 물은 접촉 그늘 없음 …)
+uniform float uMatWet, uMatSnow, uSnowCover, uLeafLight, uWetSheen, uHeightFog, uHeightFogTop;   // P48 시제품
+uniform vec3 uSnowColor;
 uniform float uCloudShadow, uCloudGate, uCloudCover, uSkyReflect;
 uniform vec2 uCloudOffset;
 uniform sampler2D uCloudTex;
@@ -345,11 +355,54 @@ const STYLE_COMPOSE = /* glsl */ `
       totalEmissiveRadiance += mix( uSkyHorizonL, uSkyZenithL, 0.3 ) * ( 0.08 + 0.42 * wf ) * uSkyReflect * waterK;
     }
   #endif
+  // P48 시제품 · 잎 뒤 비침: 바람 재질(잎·풀·꽃)에서 햇빛 반대편·해를 마주 볼 때 연둣빛이 비쳐 든다
+  #if ( defined( STYLE_WIND ) || defined( STYLE_ATTR ) ) && NUM_DIR_LIGHTS > 0
+    #ifdef STYLE_WIND
+      float leafK = uLeafLight;
+    #else
+      float leafK = uLeafLight * step( 0.5, vStyleKind ) * step( vStyleKind, 1.5 );
+    #endif
+    if ( leafK > 0.0 ) {
+      vec3 leafL = directionalLights[ 0 ].direction;
+      float leafBack = saturate( dot( - geometryViewDir, leafL ) );
+      float leafThin = saturate( - dot( geometryNormal, leafL ) ) * 0.6 + leafBack * leafBack;
+      totalEmissiveRadiance += diffuseColor.rgb * directionalLights[ 0 ].color * vec3( 1.0, 1.08, 0.62 ) * leafThin * leafK * 0.8;
+    }
+  #endif
+  // P48 시제품 · 젖은 땅 윤기: 위를 보는 땅 면에 하늘빛 (비스듬히 볼수록, 군데군데 물웅덩이처럼 세게 — 구름 그림자 잡음 그림 1번 읽기)
+  float wetK = uWetSheen * uMatWet;
+  if ( wetK > 0.0 ) {
+    float wup = smoothstep( 0.6, 0.95, wn.y );
+    float wpud = smoothstep( 0.45, 0.62, texture2D( uCloudTex, vStyleWorld.xz * 0.09 ).r );
+    float wfr = pow( 1.0 - saturate( dot( geometryNormal, geometryViewDir ) ), 3.0 );
+    totalEmissiveRadiance += mix( uSkyHorizonL, uSkyZenithL, 0.3 ) * ( 0.04 + 0.5 * wfr ) * wup * mix( 0.3, 1.0, wpud ) * wetK;
+  }
   #ifdef STYLE_GLOW
     totalEmissiveRadiance += diffuseColor.rgb * uGlow;
   #endif
   totalEmissiveRadiance += reflectedLight.directSpecular;
 }
+`;
+
+// P48 시제품 · 눈 쌓임 (normal_fragment_maps 뒤 = 조명 전 바탕색): 위를 보는 면을 눈 색으로. 붓질 잡음으로 가장자리를 흩는다
+const STYLE_SNOW = /* glsl */ `
+if ( uSnowCover > 0.0 && uMatSnow > 0.0 ) {
+  vec3 snN = inverseTransformDirection( normal, viewMatrix );
+  float snK = smoothstep( 0.35, 0.8, snN.y + vStylePaint * 0.8 ) * uSnowCover * uMatSnow;
+  #ifdef STYLE_ATTR
+    snK *= 1.0 - step( 1.5, vStyleKind ) * step( vStyleKind, 2.5 );     // 합친 메시의 물(aStyle 2)은 빼고
+  #endif
+  diffuseColor.rgb = mix( diffuseColor.rgb, uSnowColor, snK );
+}
+`;
+// P48 시제품 · 낮은 안개 (fog_fragment 뒤): 거리 안개 위에 낮은 곳일수록 안개 색을 더 (가까운 곳은 그대로)
+const STYLE_HFOG = /* glsl */ `
+#ifdef USE_FOG
+  if ( uHeightFog > 0.0 ) {
+    float hfK = ( 1.0 - smoothstep( -0.3, uHeightFogTop, vStyleWorld.y ) ) * smoothstep( 6.0, 32.0, vFogDepth ) * uHeightFog;
+    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, hfK );
+  }
+#endif
 `;
 
 // 가림 투명(디더): 화면 점마다 4×4 바이어 문턱을 달리해 그만큼 구멍을 낸다 → 정렬·반투명 없이 뒤가 비친다.
@@ -445,7 +498,9 @@ function patch(shader, opts) {
       .replace('#include <lights_toon_pars_fragment>', STYLE_LIGHTS)
       .replace('#include <lights_fragment_begin>', styledLightsBegin())
       .replace('#include <color_fragment>', `#include <color_fragment>\n${STYLE_PAINT}`)
-      .replace('#include <aomap_fragment>', `#include <aomap_fragment>\n${STYLE_COMPOSE}`);
+      .replace('#include <aomap_fragment>', `#include <aomap_fragment>\n${STYLE_COMPOSE}`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${STYLE_SNOW}`)
+      .replace('#include <fog_fragment>', `#include <fog_fragment>\n${STYLE_HFOG}`);
   } else if (water || glow) {
     // 평면(빛 안 받는) 재질: 물(폭포 판)은 고정 밝기로 반짝임, 스스로 빛나기(반딧불·반짝이)는 작아서 세게 밝혀야 빛 번짐이 보인다
     let add = '';
@@ -513,6 +568,8 @@ export function toonMaterial(color, { flat = false, bend = true, name = '', char
       uMatSpec: { value: spec ?? STYLE_NAMES.spec.has(name) ? 1 : 0 },
       uMatAO: { value: STYLE_NAMES.noAO.has(name) ? 0 : character ? 0.7 : 1 },
       uMatPaint: { value: character ? 0.5 : name === 'cloud' ? 0.4 : 1 },
+      uMatWet: { value: STYLE_NAMES.wet.has(name) ? 1 : 0 },                       // P48 시제품
+      uMatSnow: { value: character || STYLE_NAMES.noSnow.has(name) ? 0 : 1 },
     };
     m.userData.style = mat;
     m.onBeforeCompile = sh => patch(sh, { ...o, lit: true, mat });

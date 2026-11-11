@@ -2,6 +2,8 @@
 // 이름 정하기·첫 장면은 실제 단추·Esc·Space 로 넘기고, 재는 동안만 플레이어를 옮기고 시계를 당긴다(미리 보기 저장 — 진짜 저장과 따로).
 // GPU 시간 = 프레임마다 EXT_disjoint_timer_query_webgl2 를 첫 renderer.render 부터 프레임 끝까지 (모듈 update 는 빼고), 쉬지 않고 연달아 그린 프레임의 가운데 값.
 // 사용: node tools/perf-bench.mjs [--port=4241] [--target=dev|artifact] [--quality=high,mid,low,min] [--scenes=plaza-day,plaza-night,market,tour] [--rounds=3] [--out=<json>] [--shots=<폴더>]
+//   [--variants=<json>]  셰이더 켜고 끄기 비교 (P48): [{ name, look: { uFoo: 1 }, style: { bloom: 0 } }] — 장소마다 기준 → 갈래마다 값을 얹어 재고 → 기준 다시, 차이는 앞뒤 기준 평균과
+//   [--looks=<json> --shots=<폴더>]  비교 사진만 (재지 않음, P48 검수 보드): [{ slug, hour, weather, look: {...}, style: {...} }] — 장소마다 slug-<장소>-<사양>.png
 import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -32,7 +34,7 @@ const SCENES = {
 };
 
 // ---- 페이지 안에서 도는 쪽 (문자열로 보낸다) ----
-async function driver({ scenes, rounds, shots, probe }) {
+async function driver({ scenes, rounds, shots, probe, variants = [], looks = [] }) {
   const PROBE = probe;
   const out = { scenes: {}, errors: [], device: null };
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -130,6 +132,54 @@ async function driver({ scenes, rounds, shots, probe }) {
       res.heapMB = performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null;
       res.villagers = c.services.town?.villagers?.length ?? c.services.town?.debug?.villagers?.length ?? null;
       if (name === 'market') res.market = c.services.night?.debug?.placed?.()?.market?.length ?? 0;
+      if (looks.length) {
+        // 비교 사진: 시각·날씨·값을 얹고 → 찍고 → 되돌린다 (재지 않음)
+        const look = c.materials.look, style = c.services.style, base0 = style.get();
+        for (const v of looks) {
+          const old = {};
+          if (v.weather) T.setWeather(v.weather, { instant: true });
+          if (v.hour != null) { T.setHour(v.hour); c.events.emit('time:tick', { now: T.now() }); }
+          const at = v.at ? W.places[v.at] : W.places.plaza;
+          if (at) P.teleport(at.x + (v.dx ?? 0), at.z + (v.dz ?? (v.at ? 0 : 2.5)));
+          step(30); await wait(250);
+          for (const [k, x] of Object.entries(v.look ?? {})) { old[k] = look[k].value; look[k].value = x; }
+          // 화면 글자·단추는 숨기고 찍는다 (캔버스를 담은 것만 남김)
+          const hid = [...document.body.children].filter(e => !e.querySelector('canvas') && e.tagName !== 'CANVAS' && e.style.visibility !== 'hidden');
+          for (const e of hid) e.style.visibility = 'hidden';
+          if (v.style) style.set(v.style);
+          step(4); await wait(150); step(2);
+          window.__perfShot = `${v.slug}-${name}`; for (let i = 0; i < 100 && window.__perfShot; i++) await wait(100);
+          for (const e of hid) e.style.visibility = '';
+          for (const [k, x] of Object.entries(old)) look[k].value = x;
+          if (v.style) style.set(base0);
+          if (v.weather) T.setWeather(null, { instant: true });
+        }
+        out.scenes[name] = { looks: looks.length };
+        continue;
+      }
+      if (variants.length) {
+        // 갈래 비교: look uniform(materials.look) · 스타일 값(style.set)을 얹어 재고 되돌린다
+        const look = c.materials.look, style = c.services.style;
+        const base0 = style.get();
+        const one = async () => { const g = []; for (let r = 0; r < rounds; r++) { g.push((await measure()).gpu); await wait(150); } return median(g); };
+        const before = await one();
+        res.variants = [];
+        for (const v of variants) {
+          const old = {};
+          for (const [k, x] of Object.entries(v.look ?? {})) { old[k] = look[k].value; look[k].value = x; }
+          if (v.style) style.set(v.style);
+          step(6); await wait(200);
+          const g = await one();
+          for (const [k, x] of Object.entries(old)) look[k].value = x;
+          if (v.style) style.set(base0);
+          step(6); await wait(150);
+          res.variants.push({ name: v.name, gpu: +g?.toFixed(2) });
+        }
+        const after = await one();
+        const b = (before + after) / 2;
+        res.variantBase = { before: +before.toFixed(2), after: +after.toFixed(2) };
+        for (const r of res.variants) r.d = +(r.gpu - b).toFixed(2);
+      }
       if (PROBE) {
         // 쪼개 보기: 장면 맨 위 자식(과 world 묶음 종류)을 하나씩 숨기고 GPU 차이
         const base = (await measure(60)).gpu;
@@ -223,7 +273,7 @@ async function main() {
           const t0 = Date.now();
           await cdp.send('Page.navigate', { url });
           const hours = Object.fromEntries(list.map(s => [s, SCENES[s].hour]));
-          const expr = `(async () => { const SC_HOUR = ${JSON.stringify(hours)}; ${driver.toString().replace(/^async function driver/, 'const driver = async function')}; return JSON.stringify(await driver(${JSON.stringify({ scenes: list, rounds, shots: !!shots, probe: !!arg('probe') })})); })()`;
+          const expr = `(async () => { const SC_HOUR = ${JSON.stringify(hours)}; ${driver.toString().replace(/^async function driver/, 'const driver = async function')}; return JSON.stringify(await driver(${JSON.stringify({ scenes: list, rounds, shots: !!shots, probe: !!arg('probe'), variants: arg('variants') ? JSON.parse(await readFile(arg('variants'), 'utf8')) : [], looks: arg('looks') ? JSON.parse(await readFile(arg('looks'), 'utf8')) : [] })})); })()`;
           const run = cdp.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true, timeout: 600000 });
           if (shots) {
             await mkdir(shots, { recursive: true });
@@ -240,7 +290,8 @@ async function main() {
           }
           const r = JSON.parse((await run).result.value ?? '{}');
           r.openMs = Date.now() - t0;
-          for (const [s, v] of Object.entries(r.scenes ?? {})) { (results[s] ??= {})[q] = v; say(`${q.padEnd(4)} ${s.padEnd(12)} GPU ${v.gpu}ms (${v.rounds.join(' / ')}) · cpu ${v.cpu} · ${v.calls}c · ${v.ktris}k · 뼈대 메시 ${v.skinned} · 뼈대 ${v.skeletons} · 지오 ${v.mem.geo} · 텍스처 ${v.mem.tex} · 모델 ${v.models ?? '-'} · 힙 ${v.heapMB}MB${v.market != null ? ` · 노점 ${v.market}` : ''}`); }
+          for (const [s, v] of Object.entries(r.scenes ?? {})) { (results[s] ??= {})[q] = v; if (v.looks != null) { say(`${q.padEnd(4)} ${s.padEnd(12)} 사진 ${v.looks}장`); continue; } say(`${q.padEnd(4)} ${s.padEnd(12)} GPU ${v.gpu}ms (${v.rounds.join(' / ')}) · cpu ${v.cpu} · ${v.calls}c · ${v.ktris}k · 뼈대 메시 ${v.skinned} · 뼈대 ${v.skeletons} · 지오 ${v.mem.geo} · 텍스처 ${v.mem.tex} · 모델 ${v.models ?? '-'} · 힙 ${v.heapMB}MB${v.market != null ? ` · 노점 ${v.market}` : ''}`); }
+          for (const [s, v] of Object.entries(r.scenes ?? {})) if (v.variants) { say(`  ${s} 갈래 (기준 앞 ${v.variantBase.before} · 뒤 ${v.variantBase.after}ms)`); for (const x of v.variants) say(`    ${String(x.d).padStart(6)}ms  ${x.gpu}ms  ${x.name}`); }
           for (const [s, v] of Object.entries(r.scenes ?? {})) if (v.probe) { say(`  쪼개 보기 (기준 ${v.probe.base}ms)`); for (const x of v.probe.rows) say(`    ${String(x.d).padStart(6)}ms  ${x.ktris}k  ${x.label}`); }
           if (r.errors?.length) say(`  오류: ${r.errors.join(' / ')}`);
           results.device ??= r.device;
