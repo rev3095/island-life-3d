@@ -1245,6 +1245,12 @@ export function makeScenario(bot, sk, opts = {}) {
     const KIT = 'tool.scuba-kit', price = bot.item(KIT)?.buy ?? 0;
     if (!bot.has(KIT)) {
       if (bot.acorns() < price) await sellSurplus();
+      // 단계만 골라 돌릴 때(?only=)는 앞 단계 벌이가 없으니 준비로만 도토리를 채운다 (check-interiors 의 「준비만 직접」과 같은 뜻 — 전체 실행은 그대로)
+      if (bot.acorns() < price && new URLSearchParams(window.location.search).get('only')) {
+        const short = price - bot.acorns();
+        S().data.wallet.add(short);
+        note('dive-setup', { topUp: short });
+      }
       if (bot.acorns() < price) return awk(`도토리가 모자라 스쿠버 키트를 못 사요 (🌰 ${bot.acorns()} < ${price})`);
       const w0 = bot.acorns();
       await sk.shop({ buy: [KIT] });
