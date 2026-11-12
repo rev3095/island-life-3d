@@ -6,7 +6,7 @@
   "category": "item",
   "kind": "art-painting",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "items": [
     {
       "item": "art.star-river",

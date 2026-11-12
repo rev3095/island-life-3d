@@ -3,9 +3,9 @@
   "slug": "wetsuit",
   "name": "잠수복",
   "slot": "suit",
-  "version": "0.1",
-  "triangles": 2530,
-  "vertices": 1317,
+  "version": "0.2",
+  "triangles": 2810,
+  "vertices": 1469,
   "bones": [
     "arm.L",
     "arm.R",
@@ -27,8 +27,8 @@
     "tankValve"
   ],
   "body": "player",
-  "bodyVersion": "0.2.0",
-  "glbBytes": 88000,
+  "bodyVersion": "0.2.1",
+  "glbBytes": 96376,
   "blender": "5.2.3 LTS",
   "renders": [
     "wetsuit_back.png",

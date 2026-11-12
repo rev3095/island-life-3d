@@ -356,8 +356,8 @@
       "name": "잠수복",
       "slot": "suit",
       "kind": "wetsuit",
-      "version": "0.1",
-      "status": "review",
+      "version": "0.2",
+      "status": "approved",
       "buy": 0,
       "sell": 0,
       "palette": {
@@ -370,7 +370,7 @@
         "tankValve": "#9AA4AC"
       },
       "model": "assets/clothes/models/wetsuit.glb.json",
-      "triangles": 2530,
+      "triangles": 2810,
       "bones": [
         "arm.L",
         "arm.R",

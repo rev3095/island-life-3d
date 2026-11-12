@@ -4,7 +4,7 @@
   "name": "바닷가재",
   "group": "sea",
   "kind": "shrimp",
-  "version": "0.1",
+  "version": "0.2",
   "items": [
     "sea.lobster"
   ],
@@ -26,23 +26,23 @@
     "shrimp"
   ],
   "size": [
-    0.244,
-    0.593,
-    0.13
+    0.51,
+    0.857,
+    0.208
   ],
   "bounds": [
     [
-      -0.122,
-      -0.297,
-      -0.065
+      -0.255,
+      -0.428,
+      -0.104
     ],
     [
-      0.122,
-      0.297,
-      0.065
+      0.255,
+      0.428,
+      0.104
     ]
   ],
-  "glbBytes": 96192,
+  "glbBytes": 96184,
   "blender": "5.2.3 LTS",
   "renders": [
     "sea-lobster_main.png",

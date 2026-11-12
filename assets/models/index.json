@@ -8,7 +8,7 @@
       "role": "주인공",
       "category": "character",
       "version": "0.2.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0523,
         "forward": -0.0041
@@ -218,7 +218,7 @@
       "role": "떠돌이 행상 · 고슴도치",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-17",
@@ -228,7 +228,7 @@
       "role": "밤에 오는 수상한 여우 상인 (미술품)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0534,
         "forward": -0.0042

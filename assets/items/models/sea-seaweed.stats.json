@@ -4,12 +4,12 @@
   "name": "미역",
   "group": "sea",
   "kind": "seaweed",
-  "version": "0.1",
+  "version": "0.2",
   "items": [
     "sea.seaweed"
   ],
   "hold": true,
-  "triangles": 2896,
+  "triangles": 5112,
   "parts": 1,
   "materials": [
     "holdfast",
@@ -21,23 +21,23 @@
     "seaweed"
   ],
   "size": [
-    0.368,
-    0.366,
-    0.402
+    0.447,
+    0.4,
+    0.603
   ],
   "bounds": [
     [
-      -0.184,
-      -0.183,
-      -0.201
+      -0.224,
+      -0.2,
+      -0.302
     ],
     [
-      0.184,
-      0.183,
-      0.201
+      0.224,
+      0.2,
+      0.302
     ]
   ],
-  "glbBytes": 60576,
+  "glbBytes": 100276,
   "blender": "5.2.3 LTS",
   "renders": [
     "sea-seaweed_main.png",

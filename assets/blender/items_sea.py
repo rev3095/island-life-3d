@@ -80,26 +80,62 @@ def b_seaweed(M):
         a = TAU * k / 6 + 0.3
         d = V((math.cos(a), math.sin(a), 0))
         m.add(rail([d * 0.02, d * 0.055 + V((0, 0, -0.018)), d * 0.08 + V((0, 0, -0.03))], [0.01, 0.008, 0.005], seg=6), 'holdfast')
-    top = V((0, 0, H * 0.16))
-    m.add(rail([V((0, 0, 0.01)), V((0.006, 0, H * 0.08)), top], [0.016, 0.013, 0.012], seg=8), 'kelpDark')
+    top = V((0, 0, H * 0.12))
+    m.add(rail([V((0, 0, 0.01)), V((0.006, 0, H * 0.06)), top], [0.014, 0.012, 0.011], seg=8), 'kelpDark')
     W = H * pv('width', 0.11)
-    for i in range(n):
-        a = TAU * i / n + rnd.uniform(-0.25, 0.25)
+    ruf = pv('ruffle', 0.6)
+    for i in range(n):   # M17-P1: 넓은 잎 풀 → 길고 가장자리가 주름진 갈색 띠 (가운데 굵은 잎맥)
+        a = TAU * i / n + rnd.uniform(-0.3, 0.3)
         d = V((math.cos(a), math.sin(a), 0))
         side = V((-d.y, d.x, 0))
-        ln = H * rnd.uniform(0.72, 0.95)
-        lean = rnd.uniform(0.22, 0.42)
-        w = W * rnd.uniform(0.85, 1.15)
-        N = 16
-        pts, radii = [], []
+        ln = H * (1.0 if i == 0 else rnd.uniform(0.62, 0.85))
+        lean = rnd.uniform(0.18, 0.34) * (0.6 if i == 0 else 1.0)
+        w = W * rnd.uniform(0.85, 1.1)
+        N = 28
+        pts, wid = [], []
         for j in range(N + 1):
             t = j / N
-            wave = math.sin(t * math.pi * 3.2 + i * 1.7) * 0.09 * H * t
-            p = top + d * (ln * (lean * t + 0.28 * t * t)) + V((0, 0, ln * (t - 0.18 * t * t))) + side * wave
+            wave = math.sin(t * math.pi * 2.4 + i * 1.7) * 0.07 * H * t
+            p = top + d * (ln * (lean * t + 0.3 * t * t)) + V((0, 0, ln * (t - 0.2 * t * t))) + side * wave
             pts.append(p)
-            radii.append(w * (0.16 + 0.84 * math.sin(math.pi * min(1.0, t ** 0.8)) ** 0.6))
-        m.add(rail(pts, radii, seg=10, flat=0.13, side=side), 'kelp' if i % 2 == 0 else 'kelpLight')
-        m.add(rail(pts[:-2], [max(r * 0.12, 0.004) for r in radii[:-2]], seg=6), 'kelpDark', outline=False)   # 가운데 잎맥
+            wid.append(w * (0.25 + 0.75 * min(1.0, t / 0.12)) * (1 - 0.55 * max(0.0, (t - 0.75) / 0.25) ** 1.5))
+        m.add(ruffle_strip(pts, wid, side, ruf * w * 0.6, 13 + i * 1.7, i * 1.1, thick=0.0035), 'kelp' if i % 2 == 0 else 'kelpLight', smooth=True)
+        m.add(rail(pts[:-2], [max(wd * 0.11, 0.0035) for wd in wid[:-2]], seg=6, flat=0.6, side=side), 'kelpDark', outline=False)   # 가운데 잎맥
+
+
+def ruffle_strip(pts, widths, side_hint, amp, freq, phase, thick=0.004, K=10):
+    """가장자리가 물결치는 얇은 띠 (미역): 가운데 선 pts · 반폭 widths. 가운데는 평평하고 가장자리로 갈수록
+    앞뒤로 출렁인다 (u² × sin). 앞뒤 두 장 + 옆 테두리 + 끝 마구리로 닫힌 메시."""
+    bm = bmesh.new()
+    N = len(pts) - 1
+    top, bot = [], []
+    for j, p in enumerate(pts):
+        t = j / N
+        T = (pts[min(j + 1, N)] - pts[max(j - 1, 0)]).normalized()
+        S = (V(side_hint) - T * T.dot(V(side_hint))).normalized()
+        Nn = T.cross(S).normalized()
+        rt, rb = [], []
+        for k in range(K + 1):
+            u = -1 + 2 * k / K
+            sgn = 1 if u >= 0 else -1
+            off = amp * u * u * math.sin(freq * t * TAU / 3 + phase + sgn * 1.3) * min(1.0, t * 5)
+            c = p + S * u * widths[j] + Nn * off
+            rt.append(bm.verts.new(c + Nn * thick / 2))
+            rb.append(bm.verts.new(c - Nn * thick / 2))
+        top.append(rt)
+        bot.append(rb)
+    for j in range(N):
+        for k in range(K):
+            bm.faces.new([top[j][k], top[j][k + 1], top[j + 1][k + 1], top[j + 1][k]])
+            bm.faces.new([bot[j][k], bot[j + 1][k], bot[j + 1][k + 1], bot[j][k + 1]])
+        for k in (0, K):   # 옆 테두리
+            a, b = (top, bot) if k == 0 else (bot, top)
+            bm.faces.new([a[j][k], a[j + 1][k], b[j + 1][k], b[j][k]])
+    for j in (0, N):   # 끝 마구리
+        ring = top[j] + list(reversed(bot[j]))
+        bm.faces.new(ring if j == N else list(reversed(ring)))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return bm
 
 
 def b_urchin(M):
@@ -491,10 +527,11 @@ def b_shrimp(M):
         c, d, up = along(pts, 0.1)
         for sx in (1, -1):
             root = c + V((sx * R0 * 0.6, 0, 0)) - up * R0 * 0.4
-            elbow = root + V((sx * L * 0.13, -L * 0.07, R0 * 0.2))
-            wrist = elbow + V((sx * L * 0.02, -L * 0.15, R0 * 0.15))
-            joint_rail(m, [root, elbow, wrist], R0 * 0.32, R0 * 0.36, 'claw')
-            pincer(m, wrist, (wrist - elbow).normalized() + V((-sx * 0.1, 0, 0)), L * 0.3 * claw, sx, open_=0.3)
+            k = max(1.0, claw)   # M17-P1: 집게가 클수록 팔을 굵게 · 양옆으로 벌려 두 집게가 겹치지 않게
+            elbow = root + V((sx * L * 0.13 * k, -L * 0.07, R0 * 0.2))
+            wrist = elbow + V((sx * L * 0.05 * (k - 1), -L * 0.15, R0 * 0.15))
+            joint_rail(m, [root, elbow, wrist], R0 * 0.32 * (0.7 + 0.3 * k), R0 * 0.36 * (0.7 + 0.3 * k), 'claw')
+            pincer(m, wrist, (wrist - elbow).normalized() + V((sx * 0.12 * (k - 1) - sx * 0.1, 0, 0)), L * 0.3 * claw, sx, open_=0.3)
 
 
 def b_mantis_shrimp(M):

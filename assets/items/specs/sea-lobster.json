@@ -5,8 +5,8 @@
   "group": "sea",
   "category": "item",
   "kind": "shrimp",
-  "version": "0.1",
-  "status": "review",
+  "version": "0.2",
+  "status": "approved",
   "items": [
     {
       "item": "sea.lobster",
@@ -15,7 +15,7 @@
   ],
   "hold": true,
   "prompt": {
-    "concept": "큰 집게 둘 달린 붉은 새우형, 곧은 몸과 넓은 꼬리부채",
+    "concept": "큰 집게 둘이 몸 앞을 크게 차지하는 붉은 바닷가재, 곧은 굵은 몸과 넓은 꼬리부채",
     "keywords": [
       "바다",
       "잠수"
@@ -24,7 +24,7 @@
     "avoid": [
       "실제 브랜드·다른 게임의 디자인"
     ],
-    "notes": "M16 잠수 (D160–D164)"
+    "notes": "M16 잠수 (D160–D164) · M17-P1: 더 크게, 집게를 크게"
   },
   "style": {
     "shading": "toon",
@@ -42,7 +42,7 @@
     },
     "length": {
       "label": "몸 길이",
-      "value": 0.36,
+      "value": 0.44,
       "min": 0.12,
       "max": 0.6,
       "step": 0.01,
@@ -58,7 +58,7 @@
     },
     "girth": {
       "label": "굵기 비",
-      "value": 0.13,
+      "value": 0.14,
       "min": 0.06,
       "max": 0.2,
       "step": 0.005,
@@ -74,15 +74,15 @@
     },
     "claw": {
       "label": "큰 집게 (0 = 없음)",
-      "value": 1,
+      "value": 1.7,
       "min": 0,
-      "max": 1.5,
+      "max": 2,
       "step": 0.01,
       "live": false
     },
     "antenna": {
       "label": "더듬이 길이",
-      "value": 1.2,
+      "value": 1,
       "min": 0.3,
       "max": 1.6,
       "step": 0.01,
@@ -128,7 +128,7 @@
     "eyeHighlight": "눈 빛"
   },
   "render": {
-    "yaw": -70,
-    "pitch": 18
+    "yaw": -40,
+    "pitch": 28
   }
 }

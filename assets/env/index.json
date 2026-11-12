@@ -130,7 +130,7 @@
       "category": "prop",
       "kind": "peddler-cart",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FP-01",
@@ -463,7 +463,7 @@
       "category": "prop",
       "kind": "gift-balloon",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-34",
@@ -472,7 +472,7 @@
       "category": "prop",
       "kind": "sea-bottle",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-35",
@@ -481,7 +481,7 @@
       "category": "prop",
       "kind": "gift-box",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-40",
@@ -490,7 +490,7 @@
       "category": "prop",
       "kind": "telescope-stand",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -580,7 +580,7 @@
       "category": "building",
       "kind": "house-grown",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-12-2",
@@ -589,7 +589,7 @@
       "category": "building",
       "kind": "house-grown",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-12-3",
@@ -598,7 +598,7 @@
       "category": "building",
       "kind": "house-grown",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-13",
@@ -607,7 +607,7 @@
       "category": "building",
       "kind": "odd-tent",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-14",
@@ -616,7 +616,7 @@
       "category": "building",
       "kind": "fox-shop",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-15",
@@ -625,7 +625,7 @@
       "category": "building",
       "kind": "fortune-booth",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-16",
@@ -634,7 +634,7 @@
       "category": "building",
       "kind": "museum",
       "version": "0.2",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-01",
@@ -796,7 +796,7 @@
       "category": "tile",
       "kind": "built-bridge",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "TI-14",
@@ -805,7 +805,7 @@
       "category": "tile",
       "kind": "built-ramp",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

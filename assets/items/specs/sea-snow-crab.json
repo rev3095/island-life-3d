@@ -5,8 +5,8 @@
   "group": "sea",
   "category": "item",
   "kind": "crab",
-  "version": "0.1",
-  "status": "review",
+  "version": "0.2",
+  "status": "approved",
   "items": [
     {
       "item": "sea.snow-crab",
@@ -15,7 +15,7 @@
   ],
   "hold": true,
   "prompt": {
-    "concept": "작고 둥근 주황 등딱지 + 대나무 마디처럼 곧고 아주 긴 다리",
+    "concept": "넓고 납작한 모래 황갈색 등딱지 + 짧고 굵은 마디 다리 (키다리게와 실루엣·색이 확실히 다르게)",
     "keywords": [
       "바다",
       "잠수"
@@ -24,7 +24,7 @@
     "avoid": [
       "실제 브랜드·다른 게임의 디자인"
     ],
-    "notes": "M16 잠수 (D160–D164)"
+    "notes": "M16 잠수 (D160–D164) · M17-P1: 작은 아이콘에서 키다리게와 구별되게 — 넓고 납작한 몸, 황갈색"
   },
   "style": {
     "shading": "toon",
@@ -42,7 +42,7 @@
     },
     "width": {
       "label": "등딱지 너비",
-      "value": 0.17,
+      "value": 0.26,
       "min": 0.08,
       "max": 0.4,
       "step": 0.01,
@@ -50,7 +50,7 @@
     },
     "bodyLength": {
       "label": "등딱지 길이 비",
-      "value": 0.9,
+      "value": 0.78,
       "min": 0.4,
       "max": 1.4,
       "step": 0.01,
@@ -58,7 +58,7 @@
     },
     "bodyHeight": {
       "label": "등딱지 높이 비",
-      "value": 0.3,
+      "value": 0.17,
       "min": 0.15,
       "max": 0.5,
       "step": 0.01,
@@ -74,7 +74,7 @@
     },
     "pear": {
       "label": "앞이 좁은 정도",
-      "value": 0.15,
+      "value": 0.05,
       "min": 0,
       "max": 0.6,
       "step": 0.01,
@@ -82,7 +82,7 @@
     },
     "legLength": {
       "label": "다리 길이",
-      "value": 0.3,
+      "value": 0.19,
       "min": 0.08,
       "max": 0.45,
       "step": 0.01,
@@ -90,7 +90,7 @@
     },
     "legThick": {
       "label": "다리 굵기",
-      "value": 0.014,
+      "value": 0.017,
       "min": 0.004,
       "max": 0.025,
       "step": 0.001,
@@ -98,7 +98,7 @@
     },
     "kneeLift": {
       "label": "무릎 높이",
-      "value": 0.3,
+      "value": 0.22,
       "min": 0.1,
       "max": 0.8,
       "step": 0.01,
@@ -106,7 +106,7 @@
     },
     "claw": {
       "label": "집게 크기",
-      "value": 0.6,
+      "value": 0.75,
       "min": 0.2,
       "max": 1.6,
       "step": 0.01,
@@ -130,7 +130,7 @@
     },
     "bumps": {
       "label": "등 돌기 수",
-      "value": 18,
+      "value": 14,
       "min": 0,
       "max": 40,
       "step": 1,
@@ -138,12 +138,12 @@
     }
   },
   "palette": {
-    "carapace": "#E07A3C",
-    "spot": "#C45E2A",
-    "belly": "#F4E2C8",
-    "leg": "#E8894A",
-    "claw": "#E07A3C",
-    "clawTip": "#F4E2C8",
+    "carapace": "#C99252",
+    "spot": "#9C6A34",
+    "belly": "#F3E4C6",
+    "leg": "#D6A564",
+    "claw": "#C99252",
+    "clawTip": "#F3E4C6",
     "eye": "#2F2A26",
     "eyeHighlight": "#FFFFFF"
   },

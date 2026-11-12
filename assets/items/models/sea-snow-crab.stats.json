@@ -4,12 +4,12 @@
   "name": "대게",
   "group": "sea",
   "kind": "crab",
-  "version": "0.1",
+  "version": "0.2",
   "items": [
     "sea.snow-crab"
   ],
   "hold": true,
-  "triangles": 5112,
+  "triangles": 4968,
   "parts": 1,
   "materials": [
     "belly",
@@ -25,23 +25,23 @@
     "crab"
   ],
   "size": [
-    0.717,
-    0.485,
-    0.187
+    0.588,
+    0.47,
+    0.127
   ],
   "bounds": [
     [
-      -0.358,
-      -0.242,
-      -0.093
+      -0.294,
+      -0.235,
+      -0.063
     ],
     [
-      0.358,
-      0.242,
-      0.093
+      0.294,
+      0.235,
+      0.063
     ]
   ],
-  "glbBytes": 103208,
+  "glbBytes": 100476,
   "blender": "5.2.3 LTS",
   "renders": [
     "sea-snow-crab_main.png",

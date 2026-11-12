@@ -6,7 +6,7 @@
   "ownerName": "나",
   "name": "넓힌 1층",
   "version": 1,
-  "status": "review",
+  "status": "approved",
   "floorIndex": 0,
   "note": "M14 집 증축 1단계 「방 넓히기」부터의 1층 (10×10). 2단계부터 동쪽 벽에 2층 계단 FU-67. 처음 집(8×8) 가구는 가운데를 지키며 한 칸씩 옮겨진다 (home.js growShift).",
   "wallpaper": null,
