@@ -488,13 +488,16 @@ export function createSkills(bot) {
       if (!V.talkable) { bot.log(`  ${slug}: 말 걸 수 없음 (mode ${V.mode} · 보임 ${V.actor.visible} · 불투명 ${V.actor.opacity.toFixed(2)})`); return false; }
       const q = V.actor.position;
       if (bot.dist(q) > 1.0) await bot.walkTo(q, { near: 0.95, timeout: 6, label: V.person.name, allowTeleport: false, quiet: true });
+      // 칸 가운데 길찾기로는 1칸 안까지 못 붙는 자리(물가·나무 사이에 선 주민): 0.25칸 격자로 마저 다가간다 (M17-P5 「코코에게 다가가 말 걸기가 오래 걸려요」)
+      if (bot.dist(q) > 1.0 && bot.dist(q) < 3) await bot.walkLocal({ x: q.x, z: q.z }, { near: 0.95, timeout: 3, label: V.person.name, quiet: true });
       if (bot.dist(q) < 1.25) {
         await bot.face(q, { timeout: 0.5 });
         if (bot.peek() === 'town:talk') return true;
       }
       await bot.frames(2);
     }
-    bot.issue('minor', 'town', `${V.person.name}에게 다가가 말 걸기가 오래 걸려요 (${timeout}초)`);
+    const p = V.actor.position;
+    bot.issue('minor', 'town', `${V.person.name}에게 다가가 말 걸기가 오래 걸려요 (${timeout}초)`, { at: bot.pos(), to: { x: p.x, z: p.z }, dist: +bot.dist(p).toFixed(2), peek: bot.peek(), mode: V.mode, talkable: V.talkable });
     return false;
   };
 

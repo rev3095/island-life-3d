@@ -20,6 +20,7 @@ export function createNav(island, { roadAt = null } = {}) {
   /** 이웃 칸으로 한 걸음 (대각선은 양옆이 다 열려 있어야) */
   function step(ax, az, bx, bz) {
     if (!walkable(bx, bz) || !island.passable(ax, az, bx, bz)) return false;
+    if (island.edgeClear && !island.edgeClear(ax, az, bx, bz)) return false;   // 칸 경계의 얇은 벽 (M17-P5, world/index.js)
     if (ax !== bx && az !== bz) {
       if (!walkable(bx, az) || !walkable(ax, bz)) return false;
       if (!island.passable(ax, az, bx, az) || !island.passable(ax, az, ax, bz)) return false;
@@ -77,7 +78,9 @@ export function createNav(island, { roadAt = null } = {}) {
       const x = ax + ((bx - ax) * k) / n, z = az + ((bz - az) * k) / n;
       const t = island.toTile(x, z);
       if (t.tx !== prev.tx || t.tz !== prev.tz) {
-        if (!walkable(t.tx, t.tz) || !island.passable(prev.tx, prev.tz, t.tx, t.tz)) return false;
+        // 대각선으로 칸이 바뀌면(모서리를 자르면) 옆 두 칸도 열려 있어야 한다 — findPath 의 step 과 같은 규칙.
+        // 예전엔 섬의 L자 통과만 봐서 다리 끝·물가 모서리를 대각선으로 자르는 직선이 나왔고, 몸(반지름 0.28)이 물 칸 모서리에 걸려 멈췄다 (M17-P5 행상 수레)
+        if (Math.abs(t.tx - prev.tx) > 1 || Math.abs(t.tz - prev.tz) > 1 || !step(prev.tx, prev.tz, t.tx, t.tz)) return false;
         prev = t;
       }
       // 칸 안쪽이라도 물체(줄기·울타리)에 닿으면 안 된다
