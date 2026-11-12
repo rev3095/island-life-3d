@@ -22,4 +22,4 @@ export const CHARACTERS = ['player', 'coco', 'bori', 'mochi', 'dubu', 'pong', 'c
 export const VILLAGERS = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'danpung'];
 export const NEWCOMERS = ['danpung'];
 
-export const TOOLS = ['rod', 'net', 'shovel', 'axe', 'can'];   // 낚싯대, 잠자리채, 삽, 도끼, 물뿌리개
+export const TOOLS = ['rod', 'net', 'shovel', 'axe', 'can', 'sling'];   // 낚싯대, 잠자리채, 삽, 도끼, 물뿌리개, 새총 (M13 TO-07 풍선 맞히기 — 숫자키 6)

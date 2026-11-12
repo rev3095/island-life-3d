@@ -1,0 +1,38 @@
+{
+  "id": "PR-34",
+  "slug": "sea-bottle",
+  "name": "유리병",
+  "category": "prop",
+  "kind": "sea-bottle",
+  "version": "0.1",
+  "triangles": 1000,
+  "parts": 1,
+  "materials": [
+    "cork",
+    "glass",
+    "glassLight",
+    "paper",
+    "pebble",
+    "ribbon",
+    "sand"
+  ],
+  "animations": {},
+  "size": [
+    0.83,
+    0.61,
+    0.19
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 23424,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-bottle_front.png",
+    "sea-bottle_hero.jpg",
+    "sea-bottle_main.png",
+    "sea-bottle_thumb.png",
+    "sea-bottle_top.png"
+  ]
+}

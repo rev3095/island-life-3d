@@ -1,0 +1,29 @@
+{
+  "id": "RM-20",
+  "slug": "fortune",
+  "kind": "place",
+  "place": "fortune",
+  "name": "운세 부스",
+  "version": 1,
+  "status": "review",
+  "note": "P54 밤 특별 상점 D168-A: 밤 8시–새벽 3시 광장 남서쪽에 서는 운세 부스 안. 둥근 운세 탁자(FU-77) 뒤에 여명(CH-15 — 새벽 3시엔 숲 끝 새벽 천막으로 옮겨 간다), 말을 걸면 타로 카드 뽑기 UI-20 (새벽 천막과 하루 한 장을 같이 쓴다). 오른쪽 진열 받침에 점괘 등 FU-76, 북쪽 벽에 타로 액자 FU-78. 벽지 WP-08 밤하늘 별 · 바닥 FL-03 폭신 카펫.",
+  "size": [6, 6],
+  "wallpaper": "wp-08",
+  "floor": "fl-03",
+  "windows": [],
+  "door": { "gx0": 2, "gx1": 3 },
+  "keeper": { "slug": "yeomyeong", "lx": 3, "lz": 0.62, "face": "s" },
+  "talk": { "lx": 3, "lz": 3.2 },
+  "furniture": [
+    { "fu": "FU-77", "name": "운세 탁자", "box": [2, 2, 1.05], "color": "#2E3466", "gx": 2, "gz": 1, "rot": 0, "role": "counter" },
+    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#4B3F7A", "gx": 4, "gz": 3, "rot": 0 },
+    { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "w", "slot": 2 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "e", "slot": 1 },
+    { "item": "furn.tarot-frame", "wall": "n", "slot": 4 },
+    { "item": "furn.star-rug", "gx": 1, "gz": 3, "rot": 0 }
+  ],
+  "stock": [
+    { "group": "furniture", "lx": 5, "lz": 4, "y": 0.18, "fit": 1.2, "count": 1 }
+  ]
+}

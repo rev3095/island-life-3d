@@ -3,7 +3,7 @@
   "slug": "player",
   "name": "플레이어",
   "species": "human",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "triangles": 10604,
   "vertices": 5435,
   "bones": 10,
@@ -60,10 +60,14 @@
     "spin": {
       "frames": 26,
       "seconds": 1.08
+    },
+    "wish": {
+      "frames": 52,
+      "seconds": 2.17
     }
   },
   "height": 1,
-  "glbBytes": 407172,
+  "glbBytes": 415548,
   "blender": "5.2.3 LTS",
   "sit": {
     "hip": 0.0523,

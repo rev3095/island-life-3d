@@ -124,6 +124,15 @@
       "status": "approved"
     },
     {
+      "id": "BD-11",
+      "slug": "peddler-cart",
+      "name": "행상 수레",
+      "category": "prop",
+      "kind": "peddler-cart",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FP-01",
       "slug": "festival-part-lantern",
       "name": "반딧불 등불",
@@ -448,6 +457,42 @@
       "status": "approved"
     },
     {
+      "id": "PR-33",
+      "slug": "gift-balloon",
+      "name": "선물 풍선",
+      "category": "prop",
+      "kind": "gift-balloon",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-34",
+      "slug": "sea-bottle",
+      "name": "유리병",
+      "category": "prop",
+      "kind": "sea-bottle",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-35",
+      "slug": "gift-box",
+      "name": "선물 상자",
+      "category": "prop",
+      "kind": "gift-box",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-40",
+      "slug": "telescope-stand",
+      "name": "망원경대",
+      "category": "prop",
+      "kind": "telescope-stand",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -471,15 +516,6 @@
       "name": "도토리상점",
       "category": "building",
       "kind": "shop",
-      "version": "0.1",
-      "status": "approved"
-    },
-    {
-      "id": "BD-04",
-      "slug": "museum",
-      "name": "박물관",
-      "category": "building",
-      "kind": "museum",
       "version": "0.1",
       "status": "approved"
     },
@@ -536,6 +572,42 @@
       "kind": "tour-boat",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-13",
+      "slug": "odd-tent",
+      "name": "이상한 천막",
+      "category": "building",
+      "kind": "odd-tent",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-14",
+      "slug": "fox-shop",
+      "name": "여우 상인 가게",
+      "category": "building",
+      "kind": "fox-shop",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-15",
+      "slug": "fortune-booth",
+      "name": "운세 부스",
+      "category": "building",
+      "kind": "fortune-booth",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-16",
+      "slug": "museum",
+      "name": "박물관",
+      "category": "building",
+      "kind": "museum",
+      "version": "0.2",
+      "status": "review"
     },
     {
       "id": "FB-01",

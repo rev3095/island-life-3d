@@ -1,0 +1,51 @@
+{
+  "id": "IC-AR-06",
+  "slug": "art-rain-umbrella",
+  "name": "「빗속의 노란 우산」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.rain-umbrella"
+  ],
+  "hold": false,
+  "triangles": 1580,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "frame",
+    "frameTrim",
+    "ground",
+    "handle",
+    "puddle",
+    "rain",
+    "stand",
+    "umbrella"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 37576,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-rain-umbrella_main.png",
+    "art-rain-umbrella_thumb.png"
+  ]
+}

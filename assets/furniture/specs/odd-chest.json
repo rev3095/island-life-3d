@@ -1,0 +1,65 @@
+{
+  "id": "FU-75",
+  "slug": "odd-chest",
+  "item": "furn.odd-chest",
+  "name": "수상한 궤짝",
+  "category": "furniture",
+  "kind": "odd-chest",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "헝겊을 덧대고 가죽 띠를 두른 낡은 나무 궤짝. 자물쇠는 삐뚤게 걸려 있고, 살짝 들린 뚜껑 틈으로 별빛이 새어 나와 작은 별이 빠져나온다.",
+    "keywords": [
+      "낡은 궤짝",
+      "덧댄 헝겊",
+      "새어 나오는 별빛"
+    ],
+    "references": [],
+    "avoid": [
+      "보물 상자처럼 번쩍이는 금",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#8C6440",
+    "woodDark": "#5A3E2A",
+    "metal": "#7E8088",
+    "strap": "#6B4A3A",
+    "patch": "#7A9A6A",
+    "patch2": "#B86A7A",
+    "stitch": "#F4E6C8",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "발·열쇠 구멍",
+    "metal": "쇠 장식·자물쇠",
+    "strap": "가죽 띠",
+    "patch": "헝겊 1",
+    "patch2": "헝겊 2",
+    "stitch": "바늘땀",
+    "glow": "별빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

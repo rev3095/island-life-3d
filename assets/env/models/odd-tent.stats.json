@@ -1,0 +1,42 @@
+{
+  "id": "BD-13",
+  "slug": "odd-tent",
+  "name": "이상한 천막",
+  "category": "building",
+  "kind": "odd-tent",
+  "version": "0.1",
+  "triangles": 2996,
+  "parts": 1,
+  "materials": [
+    "door",
+    "foundation",
+    "glow",
+    "metal",
+    "patchA",
+    "patchB",
+    "patchC",
+    "patchD",
+    "pole",
+    "rope",
+    "rug"
+  ],
+  "animations": {},
+  "size": [
+    2.52,
+    2.72,
+    2.79
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 74272,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "odd-tent_front.png",
+    "odd-tent_hero.jpg",
+    "odd-tent_main.png",
+    "odd-tent_thumb.png",
+    "odd-tent_top.png"
+  ]
+}

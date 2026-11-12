@@ -1,0 +1,67 @@
+{
+  "id": "FU-87",
+  "slug": "art-frame",
+  "item": "fixture.art-frame",
+  "name": "그림 액자",
+  "category": "fixture",
+  "kind": "art-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "미술관 벽에 거는 금빛 테 액자 (그림 가운데 높이 1.5). 빈 캔버스 위에 게임이 기증한 미술품 그림을 얹는다. 위에 작은 그림 등(밤에 켜짐), 아래 놋쇠 이름판.",
+    "keywords": [
+      "금빛 액자",
+      "그림 등",
+      "이름판"
+    ],
+    "references": [
+      "작은 시골 박물관",
+      "동네 미술관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "요청 9 박물관 재단장·증축 — 관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "canvas",
+      "glow"
+    ],
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "gold": "#D9B25A",
+    "canvas": "#F3EBD8",
+    "brass": "#C99A45",
+    "glow": "#FFE7A0"
+  },
+  "paletteLabels": {
+    "gold": "금빛 테",
+    "canvas": "빈 캔버스",
+    "brass": "놋쇠",
+    "glow": "그림 등(밤)"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

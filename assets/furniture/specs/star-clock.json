@@ -1,0 +1,59 @@
+{
+  "id": "FU-64",
+  "slug": "star-clock",
+  "item": "furn.star-clock",
+  "name": "별빛 벽시계",
+  "category": "furniture",
+  "kind": "star-clock",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "남색 둥근 판에 금빛 테, 12시 자리에 큰 별이 달리고 시각 자리마다 작은 별. 바늘이 지금 시각을 가리킨다.",
+    "keywords": [
+      "남색 판",
+      "금빛 별",
+      "벽"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D146-A · 별 조각 레시피로만 (유리병·풍선·일지로 레시피가 열림)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "rim": "#C9A84C",
+    "face": "#2E3A66",
+    "tick": "#F7E6A8",
+    "glow": "#FFE38A",
+    "hand": "#FBF7F2"
+  },
+  "paletteLabels": {
+    "rim": "테",
+    "face": "판",
+    "tick": "시각 별",
+    "glow": "큰 별",
+    "hand": "바늘"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

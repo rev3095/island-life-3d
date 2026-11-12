@@ -1,0 +1,86 @@
+{
+  "id": "CH-17",
+  "slug": "salang",
+  "name": "살랑",
+  "species": "fox",
+  "role": "밤에 오는 수상한 여우 상인 (미술품)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤에만 섬에 찾아와 미술품을 파는 떠돌이 여우 상인. 은회색 털에 귀 끝이 짙고, 동그란 금테 안경 너머로 실눈처럼 웃는다. 수상해 보이지만 말투는 상냥하고 친절하다. 가끔 가품을 섞어 판다.",
+    "keywords": [
+      "동글동글",
+      "소프트비닐 피규어",
+      "2.5등신",
+      "큰 머리",
+      "은회색 여우",
+      "귀 끝 짙은 색",
+      "흰 주둥이",
+      "꼬리 끝 흰색",
+      "금테 안경",
+      "나비넥타이",
+      "남보라 옷"
+    ],
+    "references": [
+      "매끈한 소프트비닐 토이 피규어의 표면감",
+      "단풍(CH-10) 여우 부품을 다시 쓰고 색·소품만 바꿈"
+    ],
+    "avoid": [
+      "사실적인 털 표현",
+      "무섭거나 날카로운 인상",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기. 여우 부품(단풍과 같음) + 안경·나비넥타이. 눈은 조금 작게(eyeSize 0.86) — 빌더에 반쯤 감은 눈 부품은 없다."
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 1.02,
+    "headScale": 1,
+    "bodyWidth": 1,
+    "limbLength": 1,
+    "earSize": 1.12,
+    "earPointiness": 1.3,
+    "tailLength": 1.1,
+    "eyeSize": 0.86,
+    "eyeSpacing": 1.02
+  },
+  "palette": {
+    "fur": "#A9A7B3",
+    "tail": "#9E9CA9",
+    "tailTip": "#F4F2F0",
+    "earTip": "#3A3440",
+    "muzzle": "#F1EEEA",
+    "innerEar": "#DCCBD6",
+    "eye": "#2E2636",
+    "nose": "#2E2636",
+    "blush": "#E8A8B8",
+    "shirt": "#4A3F78",
+    "pants": "#2E2A4E",
+    "glasses": "#C9A24A",
+    "bowtie": "#9E3A4E",
+    "outline": "#3A3440"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "accessories": [
+    "glasses",
+    "bowtie"
+  ],
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

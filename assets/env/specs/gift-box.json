@@ -1,0 +1,63 @@
+{
+  "id": "PR-35",
+  "slug": "gift-box",
+  "name": "선물 상자",
+  "category": "prop",
+  "kind": "gift-box",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "리본을 십자로 두르고 위에 나비 리본을 단 분홍 포장 상자. 위에 작은 반짝임.",
+    "keywords": [
+      "포장 상자",
+      "리본",
+      "반짝임"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "너무 큰 상자"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "box": "#F4A6C0",
+    "dot": "#FBF7F2",
+    "ribbon": "#E0B85A",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "box": "포장지",
+    "dot": "무늬 점",
+    "ribbon": "리본",
+    "glow": "반짝임"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.22
+    },
+    "extent": [
+      0.5,
+      0.5
+    ]
+  }
+}

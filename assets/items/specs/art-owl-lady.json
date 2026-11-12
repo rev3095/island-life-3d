@@ -1,0 +1,108 @@
+{
+  "id": "IC-AR-04",
+  "slug": "art-owl-lady",
+  "name": "「조용한 부엉이 부인」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.owl-lady",
+      "code": "IC-AR-04"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "꽃 달린 모자를 쓴 점잖은 부엉이 부인의 초상화. 보라 옷에 흰 깃, 크고 동그란 눈.",
+    "keywords": [
+      "초상화",
+      "부엉이 부인",
+      "꽃 모자"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "dress",
+      "collar",
+      "feather",
+      "face",
+      "eye",
+      "beak",
+      "hat",
+      "ribbon",
+      "flower",
+      "flower2"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "lady",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#9FB89A",
+    "dress": "#7A5AA8",
+    "collar": "#FBF7F2",
+    "feather": "#9A7556",
+    "face": "#F4E6C8",
+    "eye": "#3A2A22",
+    "beak": "#E8A23C",
+    "hat": "#4E3A5E",
+    "ribbon": "#E0B85A",
+    "flower": "#F4A6C0",
+    "flower2": "#FBF7F2",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "배경",
+    "dress": "옷",
+    "collar": "흰 깃",
+    "feather": "깃털",
+    "face": "얼굴",
+    "eye": "눈",
+    "beak": "부리",
+    "hat": "모자",
+    "ribbon": "모자 띠",
+    "flower": "꽃",
+    "flower2": "흰 꽃",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  }
+}

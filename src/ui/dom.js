@@ -97,8 +97,9 @@ const TOOL_SVG = {
   shovel: `${stick('M10 10 L28 28', '#B98957')}${stick('M5 13 L13 5', '#B98957')}<path d="M26 31 L31 26 L41 34 Q44 40 40 43 Q35 45 32 41 Z" fill="#C5CDD4" ${O}/>`,
   axe: `${stick('M13 42 L33 9', '#B98957')}<path d="M26 10 Q33 3 41 9 Q40 18 33 21 Z" fill="#C5CDD4" ${O}/>`,
   can: `<path d="M14 21 Q21 7 29 21" fill="none" stroke="#4A3B32" stroke-width="3"/>${stick('M31 29 L41 18', '#8FC0D8')}<circle cx="42" cy="17" r="3.4" fill="#8FC0D8" ${O}/><rect x="9" y="20" width="24" height="19" rx="5" fill="#8FC0D8" ${O}/><path d="M13 26 h16" stroke="#fff" stroke-width="2" opacity=".7"/>`,
+  sling: `${stick('M24 43 L24 27', '#B98957')}${stick('M24 28 L14 9', '#B98957')}${stick('M24 28 L34 9', '#B98957')}<path d="M14 11 Q24 26 34 11" fill="none" stroke="#E8604F" stroke-width="2.4"/><ellipse cx="24" cy="18.5" rx="5" ry="3.4" fill="#8A5A3A" ${O}/>`,
 };
-export const TOOL_NAME = { none: '맨손', rod: '낚싯대', net: '잠자리채', shovel: '삽', axe: '도끼', can: '물뿌리개' };
+export const TOOL_NAME = { none: '맨손', rod: '낚싯대', net: '잠자리채', shovel: '삽', axe: '도끼', can: '물뿌리개', sling: '새총' };
 export const toolSvg = id => `<svg viewBox="0 0 48 48" aria-hidden="true">${TOOL_SVG[id ?? 'none'] ?? TOOL_SVG.none}</svg>`;
 
 // ---------- 주민·말하는 사람 ----------

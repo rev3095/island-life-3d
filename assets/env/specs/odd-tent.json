@@ -1,0 +1,98 @@
+{
+  "id": "BD-13",
+  "slug": "odd-tent",
+  "name": "이상한 천막",
+  "category": "building",
+  "kind": "odd-tent",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤에만 나타나는 수상한 상인의 천막. 서너 가지 색 헝겊을 기워 만든 살짝 삐뚤어진 육각 천막, 꼭대기가 한쪽으로 기울었다. 옆에 기운 장대에 등불이 매달리고, 입구 위 나무판에 초승달과 물음표 모양(글자 아님)이 빛난다.",
+    "keywords": [
+      "헝겊 기운 천막",
+      "기운 꼭대기",
+      "매달린 등불",
+      "초승달·물음표 간판"
+    ],
+    "references": [],
+    "avoid": [
+      "서커스 천막처럼 큰 것",
+      "무서운 분위기",
+      "글자 간판"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.02,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "foundation": "#8E8478",
+    "patchA": "#7A5AA8",
+    "patchB": "#D98A4E",
+    "patchC": "#4E8A8A",
+    "patchD": "#C9B27A",
+    "rope": "#F1E4C8",
+    "pole": "#6A4A33",
+    "metal": "#5A5560",
+    "door": "#3E3366",
+    "rug": "#B85A5A",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "foundation": "바닥 테",
+    "patchA": "헝겊 보라",
+    "patchB": "헝겊 주황",
+    "patchC": "헝겊 청록",
+    "patchD": "헝겊 겨자",
+    "rope": "바늘땀·끈",
+    "pole": "장대·간판",
+    "metal": "등불 테",
+    "door": "천 문",
+    "rug": "입구 깔개",
+    "glow": "등불·간판 빛"
+  },
+  "animations": [],
+  "world": {
+    "lot": [
+      3,
+      3
+    ],
+    "collider": {
+      "boxes": [
+        [
+          -1.2,
+          -1.05,
+          1.2,
+          1.0
+        ],
+        [
+          -0.48,
+          1.0,
+          0.48,
+          1.28
+        ]
+      ]
+    },
+    "door": {
+      "side": "+Z",
+      "x": 0,
+      "width": 0.6,
+      "tile": "집터 앞 가운데 칸 바로 앞 (tx0 + 1, tz0 + 3)"
+    }
+  }
+}

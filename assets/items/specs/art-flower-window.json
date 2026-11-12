@@ -1,0 +1,123 @@
+{
+  "id": "IC-AR-05",
+  "slug": "art-flower-window",
+  "name": "「창가의 꽃병」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.flower-window",
+      "code": "IC-AR-05",
+      "variant": "real"
+    },
+    {
+      "item": "art.flower-window-fake",
+      "code": "IC-AR-05",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "하늘이 보이는 창 앞 탁자에 파란 꽃병, 빨강·노랑 꽃 세 송이. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "창가",
+      "파란 꽃병",
+      "꽃 세 송이"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "sill",
+      "pane",
+      "cloud",
+      "table",
+      "vase",
+      "stem",
+      "petal",
+      "petal2",
+      "petalCenter"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "vase",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#F1E4C8",
+    "sill": "#FFFFFF",
+    "pane": "#BFE0F2",
+    "cloud": "#FFFFFF",
+    "table": "#B98957",
+    "vase": "#4E7FC4",
+    "stem": "#5E9F4F",
+    "petal": "#E8504F",
+    "petal2": "#F6C84C",
+    "petalCenter": "#8C6440",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "벽",
+    "sill": "창틀",
+    "pane": "창 너머 하늘",
+    "cloud": "구름",
+    "table": "탁자",
+    "vase": "꽃병",
+    "stem": "줄기",
+    "petal": "빨간 꽃",
+    "petal2": "노란 꽃",
+    "petalCenter": "꽃술",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "vase": "#8A5AB8"
+      }
+    }
+  }
+}

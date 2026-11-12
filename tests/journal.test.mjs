@@ -8,7 +8,7 @@ import * as items from '../src/data/items.js';
 const cfg = JSON.parse(readFileSync(new URL('../assets/journal/journal.json', import.meta.url), 'utf8'));
 
 test('일지 설정: 할 일 id 겹침 없음 · 셀 일은 모듈이 세는 것만 · 교환 물건은 있는 아이템', () => {
-  const ON = new Set(['fish', 'bug', 'shake', 'dig', 'weed', 'water', 'plant', 'talk', 'sell', 'craft', 'donate', 'allDone']);
+  const ON = new Set(['fish', 'bug', 'shake', 'dig', 'weed', 'water', 'plant', 'talk', 'sell', 'craft', 'donate', 'allDone', 'wish', 'balloon', 'bottle']);   // M13 wish·balloon·bottle 은 daily 가 journal.count 로
   const ids = cfg.tasks.map(t => t.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const t of cfg.tasks) { assert.ok(ON.has(t.on), t.id); assert.ok(t.need >= 1 && t.pts > 0, t.id); }

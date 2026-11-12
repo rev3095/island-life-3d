@@ -67,6 +67,16 @@
       "shopOnly": true
     },
     {
+      "id": "WP-09",
+      "slug": "wp-09",
+      "kind": "wallpaper",
+      "name": "들꽃 수레",
+      "version": 1,
+      "status": "review",
+      "price": 0,
+      "peddler": true
+    },
+    {
       "id": "FL-01",
       "slug": "fl-01",
       "kind": "floor",

@@ -1084,6 +1084,86 @@
       "status": "approved"
     },
     {
+      "id": "FU-63",
+      "slug": "star-lamp",
+      "item": "furn.star-lamp",
+      "name": "별 조각 램프",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.48,
+        0.4,
+        1.15
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-64",
+      "slug": "star-clock",
+      "item": "furn.star-clock",
+      "name": "별빛 벽시계",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.56,
+        0.11,
+        1.96
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-65",
+      "slug": "star-chair",
+      "item": "furn.star-chair",
+      "name": "별 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.57,
+        0.54,
+        1.07
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-66",
+      "slug": "star-mobile",
+      "item": "furn.star-mobile",
+      "name": "별 모빌",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.47,
+        0.69,
+        1.52
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-71",
       "slug": "album-frame",
       "item": "furn.album-frame",
@@ -1117,6 +1197,86 @@
         0.84,
         0.09,
         1.95
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-73",
+      "slug": "fox-lantern",
+      "item": "furn.fox-lantern",
+      "name": "여우불 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.48,
+        0.42,
+        0.96
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-75",
+      "slug": "odd-chest",
+      "item": "furn.odd-chest",
+      "name": "수상한 궤짝",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.75,
+        0.66,
+        0.68
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-76",
+      "slug": "fortune-lamp",
+      "item": "furn.fortune-lamp",
+      "name": "점괘 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.44,
+        0.44,
+        0.9
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-78",
+      "slug": "tarot-frame",
+      "item": "furn.tarot-frame",
+      "name": "타로 액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.86,
+        0.08,
+        1.94
       ],
       "variants": [],
       "animations": [],

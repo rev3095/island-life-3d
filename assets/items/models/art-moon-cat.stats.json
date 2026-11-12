@@ -1,0 +1,51 @@
+{
+  "id": "IC-AR-10",
+  "slug": "art-moon-cat",
+  "name": "「달을 보는 고양이」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.moon-cat"
+  ],
+  "hold": false,
+  "triangles": 1676,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "cat",
+    "frame",
+    "frameTrim",
+    "moon",
+    "moonShade",
+    "roof",
+    "stand",
+    "star"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 38784,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-moon-cat_main.png",
+    "art-moon-cat_thumb.png"
+  ]
+}

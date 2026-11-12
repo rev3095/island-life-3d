@@ -137,9 +137,17 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     }
     const caughtOf = c => (c === 'night' ? new Set([...caughtOf('fish'), ...caughtOf('bug')]) : new Set([...(ctx.state.encyclopedia?.[c] ?? []), ...(ctx.state.museum?.[c] ?? [])]));
     // B-12 「🌙 밤」 탭: 밤에만 나오는 물고기·곤충을 한데 (잡은 수·기증 수는 그 안에서 센다)
-    const TABS = [...DEX_CATEGORIES, 'night'], TAB_NAME = { ...CATEGORY_NAME, night: '🌙 밤' };
+    const TABS = [...DEX_CATEGORIES, 'night', ...(ctx.services.stars?.dexPanel ? ['star'] : [])], TAB_NAME = { ...CATEGORY_NAME, night: '🌙 밤', star: '⭐ 별자리' };   // 요청 8: 별자리 칸은 gameplay/stars 가 그린다
     const listOf = c => (c === 'night' ? ['fish', 'bug'].flatMap(k => data.items.list(k) ?? []).filter(isNightOnly) : data.items.list(c) ?? []);
     function draw() {
+      if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–12)
+        tabs.replaceChildren(...TABS.map(c => h('button', {
+          type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
+          onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },
+        }, TAB_NAME[c])));
+        ctx.services.stars.dexPanel(panel, { bar });
+        return;
+      }
       const all = listOf(cat);
       const caught = caughtOf(cat);
       const prog = cat === 'night' ? null : data.museum?.progress?.()?.[cat];
