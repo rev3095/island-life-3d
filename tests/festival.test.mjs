@@ -208,13 +208,15 @@ test('부품에 필요한 것: 모자라면 null, 맞으면 가방 칸·개수',
   assert.equal(takeWithOne(bag([['fruit.pear', 2]]), items, it => it.category === 'fruit', 2, it => it.id === 'fruit.cherry'), null);
 });
 
-test('마음 열기·상태: 친구 단계 + 기쁨 두 번, 다섯 다 모으면 끝', () => {
-  assert.ok(!heartOpen({ friendship: 40, emote: { wins: 1 } }));
-  assert.ok(!heartOpen({ friendship: 20, emote: { wins: 5 } }));
-  assert.ok(heartOpen({ friendship: 30, emote: { wins: 2 } }));
+test('마음 열기·상태: 친구 단계 + 마음이 통한 일 parts.open.wins 번 (M17-P3 에 2 → 10), 다섯 다 모으면 끝', () => {
+  const W = CONFIG.parts.open.wins;
+  assert.ok(!heartOpen({ friendship: 40, emote: { wins: W - 1 } }));
+  assert.ok(!heartOpen({ friendship: 20, emote: { wins: W + 3 } }));
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: W } }));
   // 7차 D50-A: 좋아하는 선물·부탁도 마음이 통한 일 (이모티콘이 서툴러도 엔딩까지)
-  assert.ok(heartOpen({ friendship: 30, emote: { wins: 0 }, bonds: { gift: 1, favor: 1 } }));
-  assert.ok(heartOpen({ friendship: 30, emote: { wins: 1 }, bonds: { gift: 1, favor: 0 } }));
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: W - 2 }, bonds: { gift: 1, favor: 1 } }));
+  assert.ok(heartOpen({ friendship: 30, emote: { wins: W - 1 }, bonds: { gift: 1, favor: 0 } }));
+  assert.ok(!heartOpen({ friendship: 30, emote: { wins: W - 2 }, bonds: { gift: 1, favor: 0 } }));
   assert.ok(!heartOpen({ friendship: 20, emote: { wins: 0 }, bonds: { gift: 3, favor: 3 } }), '친밀도는 그대로 필요');
   const st = {};
   const f = festState(st);
