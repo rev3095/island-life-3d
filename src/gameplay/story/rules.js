@@ -14,6 +14,8 @@ export const TRIGGERS = {
   'move-in': { label: '새 주민이 이사 온 날 저녁 (10차 — trigger.slug = 주민, town/moving.js 가 보내는 town:welcome)', event: 'town:welcome', test: (p, t) => !!t.slug && p?.slug === t.slug },
   'night-first': { label: '밤 가게에 처음 들어갈 때 (M12 — trigger.kind = moonshop · tent, night 가 문 앞에서 보내는 night:first)', event: 'night:first', test: (p, t) => !!t.kind && p?.kind === t.kind },
   'tour-first': { label: '무인도에 처음 도착했을 때 (P35 — tour 가 보내는 tour:arrive 의 first)', event: 'tour:arrive', test: p => !!p?.first },
+  'meteor-first': { label: '처음 유성우가 떨어질 때 (M13 — daily 가 보내는 daily:meteor 의 first)', event: 'daily:meteor', test: p => !!p?.first },
+  'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);

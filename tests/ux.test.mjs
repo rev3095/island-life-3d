@@ -45,7 +45,7 @@ test('도구 글자: 든 도구에 따라', () => {
   let tool = 'rod';
   add({ name: 'gather-tool', intent: 'action', priority: 10, test: () => tool });
   for (const [t, label] of Object.entries(TOOL_LABEL)) { tool = t; assert.equal(I.api.peek('action').label, label); }
-  assert.deepEqual(TOOL_LABEL, { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기' });
+  assert.deepEqual(TOOL_LABEL, { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기', sling: '쏘기' });   // + M13 새총
 });
 
 test('처리기가 준 label 이 표보다 먼저, 표에 없으면 기본 글자', () => {

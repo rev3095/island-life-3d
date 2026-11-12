@@ -102,7 +102,7 @@ test('상점: 같은 날은 같은 물건, 가구 4 (실내 3 + 야외 1, D99-A)
     const s = shopStock(`2026-11-${String(d).padStart(2, '0')}`, 99);
     assert.equal(s.furniture.filter(id => items.get(id).outdoor).length, 1, `11-${d} 야외 하나`);
   }
-  assert.equal(a.tools.length, 5);
+  assert.equal(a.tools.length, 6);   // + M13 새총
   assert.equal(a.seeds.length, 2);
   assert.ok(a.saplings.length >= 1);
   for (const id of a.all) assert.ok(items.get(id).buy > 0, id);

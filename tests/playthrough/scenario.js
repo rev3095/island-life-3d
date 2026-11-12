@@ -1022,6 +1022,120 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`${cur.shape} · 얻은 것 ${Object.entries(got).map(([k, v]) => `${k}×${v}`).join(', ')} · 광석 ${shovel ? `${oreHits}번` : '삽 없음'}`);
   });
 
+  add('daily', 'M13 매일 할 거리: 바닷가 유리병 → 레시피 쪽지 · 새총으로 선물 풍선 · 유성우 밤 소원 → 다음 날 별 조각 · 수·일 행상', async () => {
+    const D = () => S().daily;
+    if (!D()) return block('매일 할 거리(daily) 서비스가 없어요');
+    if (!D().open) await bot.nextDay(9);   // 단계만 돌릴 때: 첫날 안내 다음 날부터 열린다
+    if (!D().open) return skip('아직 안 열림 (첫날 안내 다음 날부터)');
+    const odd = [], res = {};
+    await bot.tool(null);
+    // ① 아침 바닷가 유리병 → 쪽지 → 레시피 하나 열림 (확인 창은 「좋아요」)
+    await bot.setHour(9);
+    await bot.frames(30);
+    bot.policy = { confirm: info => (/레시피 쪽지/.test(info.title) ? 0 : null) };
+    const known0 = D().recipes.known().length, sp = D().bottle.spot();
+    if (sp) {
+      await bot.walkTo({ x: sp.x, z: sp.z + 0.9 }, { near: 0.35, label: '바닷가 유리병' });
+      await bot.face(sp);
+      res.bottlePeek = bot.peek();
+      if (res.bottlePeek === 'daily:bottle') { await bot.act('action'); await bot.settle(10); }
+      res.bottle = D().bottle.opened();
+      res.recipes = D().recipes.known().length - known0;
+      if (!res.bottle) odd.push(`유리병을 못 엶 (${res.bottlePeek})`);
+      await bot.shot('16-daily-bottle', `유리병 · 새 레시피 ${res.recipes}`);
+    } else odd.push(D().bottle.opened() ? '오늘 유리병은 이미 열었음' : '바닷가에 유리병이 없음');
+    bot.policy = {};
+    // ② 새총: 가방에 없으면 도토리상점에서 (도구 진열) — 안 되면 쪽지로 연 레시피로
+    const hasSling = () => !!S().data.inventory.hasTool?.('sling');
+    if (!hasSling()) await sk.shop({ buy: ['tool.sling'] });
+    if (!hasSling() && D().recipes.known().includes('tool.sling')) await sk.craft('tool.sling');
+    res.sling = hasSling();
+    // ③ 선물 풍선: 오늘 계획에서 아직 안 한 것의 시각으로 → 풍선 밑으로 따라가 새총 Space
+    if (res.sling) {
+      const plan = D().balloons.plan().filter(e => !D().balloons.done().includes(e.i));
+      const e = plan[0];
+      if (e) {
+        await bot.setHour(e.at + 0.05);
+        const seen = await bot.until(() => D().balloons.list().length > 0, { timeout: 15, label: '풍선 나타남' });
+        res.balloonSeen = seen;
+        if (seen) {
+          await bot.tool('sling');
+          let shots = 0;
+          for (let k = 0; k < 14 && !D().balloons.done().includes(e.i); k++) {
+            const b = D().balloons.list()[0];
+            if (!b) break;
+            if (!D().balloons.canHit()) { await bot.walkTo({ x: b.x + (b.x > bot.pos().x ? 1.2 : -1.2), z: b.z + 0.8 }, { near: 0.9, timeout: 5, quiet: true, label: '풍선 밑' }); await bot.face(b); }
+            if (D().balloons.canHit() && bot.peek() === 'daily:sling') { bot.press('action'); shots++; await bot.wait(1.2); }
+          }
+          await bot.until(() => D().balloons.done().includes(e.i), { timeout: 8, label: '풍선 맞힘' });
+          res.balloon = { shots, hit: D().balloons.done().includes(e.i) && !D().balloons.list().some(x => x.i === e.i) };
+          if (res.balloon.hit) { await bot.shot('16-daily-balloon', '풍선 선물'); await sk.pickupAround(3.5); }
+          else odd.push(`풍선을 못 맞힘 (쏜 수 ${shots})`);
+          await bot.tool(null);
+        } else odd.push('풍선 시각인데 풍선이 안 나옴');
+      }
+    } else odd.push('새총을 못 구함');
+    // ④ 유성우 밤: 이번 주·다음 주 유성우 날까지 넘기고 21시 밖에서 올려다보기(R 꾹) + Space
+    let met = null;
+    for (let d = 0; d < 9 && !met; d++) {
+      if (D().meteor.tonight()) { met = bot.day(); break; }
+      await bot.nextDay(9);
+    }
+    res.meteorDay = met;
+    if (met) {
+      await bot.setHour(21);
+      await bot.frames(20);
+      const on = await bot.until(() => D().meteor.active, { timeout: 10, label: '별똥별' });
+      if (await bot.until(() => S().story?.playing?.id === 's23-first-meteor', { timeout: 3 })) { await bot.wait(4); await bot.shot('16-daily-s23', '장면 s23 첫 유성우'); }
+      await bot.settle(40);
+      res.meteor = on;
+      bot.key('KeyR', { up: false });
+      await bot.until(() => D().meteor.canWish(), { timeout: 4, label: '올려다보기' });
+      res.wishPeek = bot.peek();
+      for (let k = 0; k < 2 && bot.peek() === 'daily:wish'; k++) { bot.press('action'); await bot.wait(2.4); }
+      await bot.shot('16-daily-wish', '올려다보고 소원');
+      bot.keyUp('KeyR');
+      res.wishes = D().meteor.wishes();
+      if (!res.wishes) odd.push(`소원을 못 빎 (${res.wishPeek})`);
+      // 다음 날 아침 바닷가 별 조각
+      const before = bot.has('mat.star-yellow') + bot.has('mat.star-pink') + bot.has('mat.star-blue');
+      await bot.nextDay(8);
+      await bot.frames(30);
+      const stars = S().gather.drops.list.filter(dd => /^mat\.star-/.test(dd.rec.item));
+      res.starsOnBeach = stars.length;
+      for (const s of stars.slice(0, 3)) { await bot.walkTo({ x: s.x, z: s.z + 0.5 }, { near: 0.5, quiet: true, label: '별 조각' }); await sk.pickupAround(1.5); }
+      res.starsGot = bot.has('mat.star-yellow') + bot.has('mat.star-pink') + bot.has('mat.star-blue') - before;
+      if (res.wishes && !stars.length) odd.push('소원을 빌었는데 다음 날 별 조각이 없음');
+    } else odd.push('9일 안에 맑은 유성우 밤이 없음');
+    // ⑤ 행상: 수·일까지 넘기고 낮 11시 광장 수레 → 구경 → 하나 사기
+    for (let d = 0; d < 7 && !D().peddler.today(); d++) await bot.nextDay(9);
+    await bot.setHour(11);
+    await bot.frames(30);
+    const ps = D().peddler.spot();
+    res.peddler = !!ps;
+    if (ps) {
+      await bot.walkTo({ x: ps.front.x, z: ps.front.z + 0.4 }, { near: 0.4, label: '행상 수레' });
+      if (await bot.until(() => S().story?.playing?.id === 's24-peddler-first', { timeout: 3 })) { await bot.wait(4); await bot.shot('16-daily-s24', '장면 s24 행상 첫 방문'); }
+      await bot.settle(40);
+      await bot.face({ x: ps.keeper.x, z: ps.keeper.z });
+      res.peddlerPeek = bot.peek();
+      const w0 = bot.acorns();
+      let menu = 0;
+      bot.policy = {
+        dialog: texts => { const i = texts.findIndex(t => /구경/.test(t)); if (i >= 0) return i; if (texts.some(t => /🌰/.test(t))) { menu++; return menu === 1 ? 0 : texts.length - 1; } return texts.length - 1; },
+        confirm: info => (/사기/.test(info.title) ? Math.max(0, info.buttons.findIndex(b => /살게요/.test(b))) : 0),
+      };
+      if (res.peddlerPeek === 'daily:peddler') { await bot.act('action', { timeout: 60 }); await bot.settle(20); }
+      bot.policy = {};
+      res.peddlerSpent = w0 - bot.acorns();
+      await bot.shot('16-daily-peddler', '행상 송이 수레');
+      if (res.peddlerPeek !== 'daily:peddler') odd.push(`행상 앞 행동 키가 ${res.peddlerPeek}`);
+      else if (!res.peddlerSpent) odd.push('행상에게서 아무것도 못 삼');
+    } else odd.push('행상 수레가 안 나옴');
+    note('daily', res);
+    return odd.length ? awk(odd.join(' · ')) : pass(`레시피 +${res.recipes} · 풍선 ${res.balloon?.shots ?? 0}발 · 소원 ${res.wishes} → 별 조각 ${res.starsGot} · 행상 🌰${res.peddlerSpent}`);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;

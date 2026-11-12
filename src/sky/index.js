@@ -338,7 +338,8 @@ export function createSky(ctx) {
       Object.assign(wx, WX[last.weather]);
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
-      const tier = q => { dome.setQuality(q); meteors.setQuality(q); applyPuffs(); syncShaderFx(); };
+      const tier = q => { dome.setQuality(q); applyPuffs(); syncShaderFx(); };
+      events.on('quality:changed', ({ quality }) => meteors.setQuality(quality));   // M13 별똥별 사양
       events.on('quality:changed', ({ quality }) => tier(quality));
       tier(ctx.quality);              // 처음 사양 (주소·저장된 사양). 바꾸면 quality:changed 로
       // 해 렌즈 빛 (three.js 예제 Lensflare) — 못 불러와도 하늘은 그대로
