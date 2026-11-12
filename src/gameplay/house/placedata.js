@@ -11,6 +11,9 @@ import { resolveFurniture, FACE } from './interior.js';
 // M12 밤·새벽 (보드 night D109-A · D111-A): 달빛 가게 moonshop RM-10 · 새벽 천막 tent RM-11 — 건물은 gameplay/night 가 밤에 섬에 놓고 world.places 에 문을 알린다
 export const PLACE_FILES = ['assets/interior/places/shop.json', 'assets/interior/places/museum.json', 'assets/interior/places/moonshop.json', 'assets/interior/places/tent.json'];
 export const PLACE_KINDS = ['shop', 'museum', 'moonshop', 'tent'];
+// P54 밤 특별 상점 (D166–D168): 운세 부스 fortune RM-20 · 여우 상인 가게 foxshop RM-18 · 이상한 천막 oddtent RM-19 — 달빛 가게처럼 gameplay/night 가 섬에 놓는다
+PLACE_FILES.push('assets/interior/places/fortune.json', 'assets/interior/places/foxshop.json', 'assets/interior/places/oddtent.json');
+PLACE_KINDS.push('fortune', 'foxshop', 'oddtent');
 /** 진열(stock) 대신 박물관 전시(cases)를 쓰는 곳 */
 export const EXHIBIT_KINDS = ['museum'];
 /** 상점·박물관 붙박이 모델 (FU-35–42, tools/build-furniture.mjs --fixtures) — 가구 목록·아이템 표 밖 */
@@ -18,6 +21,7 @@ export const FIXTURE_BASE = 'assets/furniture/fixtures';
 export const FIXTURE_INDEX = 'assets/furniture/fixtures/index.json';
 /** 섬 건물 모델 slug (door.js 가 문 크기를 읽는다) */
 export const PLACE_BUILDING = { shop: 'shop', museum: 'museum', moonshop: 'night-shop', tent: 'dawn-tent' };
+Object.assign(PLACE_BUILDING, { fortune: 'fortune-booth', foxshop: 'fox-shop', oddtent: 'odd-tent' });   // P54
 export const MUSEUM_CATS = ['fish', 'bug', 'fossil'];
 /** 케이스 안쪽 여백 (m) */
 const CASE_PAD = 0.22;

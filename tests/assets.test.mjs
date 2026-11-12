@@ -19,9 +19,9 @@ const gltfOf = p => {
 };
 
 const SETS = [
-  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 15 },   // + 10차 새 주민 CH-11–13 + 12차 별밤(박쥐)·여명(나방) CH-14–15
-  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 76 },   // + P35 무인도 투어 BD-10 여행 배 · EN-13 광석 바위   // + 12차 달빛 가게 BD-08 · 새벽 천막 BD-09 · 등불 줄 PR-30 · 「자는 중」 쪽지 PR-32 + 9차 길 TI-09–12 · 울타리 PR-24–25 · 행사 소품 PR-26–29   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18 · 가을 PR-19·PR-20 · 겨울 PR-21·PR-22,
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 50 },   // + 12차 밤·새벽 가구 FU-55–59 + 10차 좋아하는 가구 FU-51–53   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
+  { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 16 },   // + P54 여우 상인 살랑 CH-17   // + 10차 새 주민 CH-11–13 + 12차 별밤(박쥐)·여명(나방) CH-14–15
+  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 80 },   // + P54 이상한 천막 BD-13 · 여우 상인 가게 BD-14 · 운세 부스 BD-15 · 선물 상자 PR-35   // + P35 무인도 투어 BD-10 여행 배 · EN-13 광석 바위   // + 12차 달빛 가게 BD-08 · 새벽 천막 BD-09 · 등불 줄 PR-30 · 「자는 중」 쪽지 PR-32 + 9차 길 TI-09–12 · 울타리 PR-24–25 · 행사 소품 PR-26–29   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18 · 가을 PR-19·PR-20 · 겨울 PR-21·PR-22,
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 54 },   // + P54 여우불 등 FU-73 · 수상한 궤짝 FU-75 · 점괘 등 FU-76 · 타로 액자 FU-78   // + 12차 밤·새벽 가구 FU-55–59 + 10차 좋아하는 가구 FU-51–53   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;

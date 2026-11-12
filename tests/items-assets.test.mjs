@@ -21,12 +21,12 @@ const DIR = 'assets/items';
 const LIST = json(`${DIR}/index.json`).models;
 const SPECS = Object.fromEntries(readdirSync(resolve(root, `${DIR}/specs`)).filter(f => f.endsWith('.json')).map(f => [f.slice(0, -5), json(`${DIR}/specs/${f}`)]));
 const NOT_FURN = ITEMS.filter(i => i.category !== 'furn');
-const GROUP = { tool: 'tool', mat: 'mat', seed: 'seed', fruit: 'fruit', shell: 'shell', flower: 'flower', fish: 'fish', bug: 'bug', fossil: 'fossil', festival: 'festival', event: 'event', night: 'night' };
+const GROUP = { tool: 'tool', mat: 'mat', seed: 'seed', fruit: 'fruit', shell: 'shell', flower: 'flower', fish: 'fish', bug: 'bug', fossil: 'fossil', festival: 'festival', event: 'event', night: 'night', art: 'art' };
 const HOLD = new Set(['fish', 'bug', 'fossil']);       // 잡아서 들어 보이는 것 (gather/results.js)
 const FIXED_MATERIALS = new Set(['eyeHighlight']);
 
 test('아이템 아이콘: 가구를 뺀 93개가 모두 렌더 썸네일이고 글자용 emoji 가 남아 있다', () => {
-  assert.equal(NOT_FURN.length, 116);   // 93 + 5차 Z5 축제 4 (IC-FE) + 8차 행사 채집 6 (IC-EV) + 12차 야시장 먹거리 4 (IC-NT) + P35 무인도 투어 9 (IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01)
+  assert.equal(NOT_FURN.length, 140);   // + P54 미술품 24 (진품 16 IC-AR-01–16 · 가품 8 — 같은 모델의 색 변형) · 93 + 5차 Z5 축제 4 (IC-FE) + 8차 행사 채집 6 (IC-EV) + 12차 야시장 먹거리 4 (IC-NT) + P35 무인도 투어 9 (IC-FR-07–08 · IC-MA-09–10 · IC-FS-21–22 · IC-BG-23–24 · IC-TR-01)
   for (const it of NOT_FURN) {
     assert.match(it.icon, /^assets\/items\/renders\/[\w-]+_thumb\.png$/, `${it.id}: icon 이 썸네일 경로가 아님`);
     assert.ok(has(it.icon), `${it.id}: 썸네일 없음 ${it.icon} (node tools/build-item.mjs)`);
@@ -35,7 +35,7 @@ test('아이템 아이콘: 가구를 뺀 93개가 모두 렌더 썸네일이고 
 });
 
 test('아이템 모델 목록: 스펙 82개가 빠짐없이 빌드되어 있고 id·version·status 가 스펙과 같다', () => {
-  assert.equal(Object.keys(SPECS).length, 103, '스펙 개수 (고유 모델 103 = 아이콘 116 − 같은 모델의 색 변형 13)');
+  assert.equal(Object.keys(SPECS).length, 119, '스펙 개수 (고유 모델 119 = 아이콘 140 − 같은 모델의 색 변형 21 — P54 미술품 가품 8 포함)');
   assert.equal(LIST.length, Object.keys(SPECS).length, '목록에 없는 스펙이 있다 (node tools/build-item.mjs <slug>)');
   const ids = new Set();
   for (const m of LIST) {
@@ -46,7 +46,7 @@ test('아이템 모델 목록: 스펙 82개가 빠짐없이 빌드되어 있고 
     assert.equal(sp.version, m.version, `${m.slug}: 목록 version`);
     assert.equal(sp.status ?? 'review', m.status, `${m.slug}: 목록 status (--index)`);
     assert.ok(['review', 'approved'].includes(m.status));
-    assert.match(m.id, /^IC-(TL|MA|SD|FR|SH|FL|FS|BG|FO|FE|EV|NT|TR)-\d\d$/, `${m.slug}: 검수 보드 ID`);   // FE = 5차 Z5 축제 · EV = 8차 계절 행사 · NT = 12차 밤 야시장 · TR = P35 투어 표
+    assert.match(m.id, /^IC-(TL|MA|SD|FR|SH|FL|FS|BG|FO|FE|EV|NT|TR|AR)-\d\d$/, `${m.slug}: 검수 보드 ID`);   // FE = 5차 Z5 축제 · EV = 8차 계절 행사 · NT = 12차 밤 야시장 · TR = P35 투어 표 · AR = P54 미술품
     assert.ok(!ids.has(m.id), `id 겹침 ${m.id}`);
     ids.add(m.id);
     for (const f of [`${DIR}/models/${m.slug}.glb.json`, `${DIR}/models/${m.slug}.stats.json`, `${DIR}/renders/${m.slug}_thumb.png`]) assert.ok(has(f), `${m.slug}: ${f} 없음`);
@@ -75,7 +75,7 @@ test('아이템 모델 목록: 아이템마다 모델이 하나, 아이콘 경�
     if (vars.length) assert.equal(m.items.length, vars.length, `${m.slug}: 변형마다 아이템 하나`);
   }
   for (const it of NOT_FURN) assert.ok(seen.has(it.id), `${it.id}: 아이템 모델 없음`);
-  assert.equal(seen.size, 116);
+  assert.equal(seen.size, 140);
 });
 
 test('아이템 모델: 재질 이름은 모두 스펙 팔레트 키 (리소스 교체 약속)', () => {

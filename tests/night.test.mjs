@@ -147,14 +147,16 @@ test('D108-A 야행성 달무리: 19시–5시 깨어 있고 낮엔 잠, 새벽�
 });
 
 test('달빛 가게 RM-10 · 새벽 천막 RM-11: 실내 자리 · 건물 · 방 자리가 겹치지 않음', () => {
-  assert.deepEqual(PLACE_KINDS.slice(2), ['moonshop', 'tent']);
+  assert.deepEqual(PLACE_KINDS.slice(2, 4), ['moonshop', 'tent']);
+  assert.deepEqual(PLACE_KINDS.slice(4), ['fortune', 'foxshop', 'oddtent'], 'P54 운세 부스 · 여우 상인 · 이상한 천막');
+  for (const [k, c] of [['fortune', CFG.fortune], ['foxshop', CFG.fox], ['oddtent', CFG.odd]]) assert.equal(PLACE_BUILDING[k], c.building, k);
   assert.equal(PLACE_BUILDING.moonshop, CFG.shop.building);
   assert.equal(PLACE_BUILDING.tent, CFG.tent.building);
   for (const [i, k] of PLACE_KINDS.entries()) assert.equal(json(PLACE_FILES[i]).place, k);
   const src = readFileSync(resolve(root, 'src/gameplay/house/room.js'), 'utf8');   // room.js 는 three 를 불러서 글로 읽는다
-  const xs = [...src.match(/PLACE_ROOMS = \{([^}]*\}){4,}[^;]*;/)[0].matchAll(/x: (\d+)/g)].map(m => Number(m[1])).sort((a, b) => a - b);
-  assert.equal(xs.length, 4);
-  for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 32, '실내끼리 32 넘게 떨어짐 (방 가장 큰 16칸 × 2)');
+  const rooms = [...src.matchAll(/(\w+): \{ x: (\d+), z: (\d+) \}/g)].map(m => ({ k: m[1], x: +m[2], z: +m[3] }));
+  assert.ok(rooms.length >= 7, `방 자리 ${rooms.length} (상점·박물관·달빛 가게·천막 + P54 셋)`);
+  for (const a of rooms) for (const b of rooms) if (a !== b) assert.ok(Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z)) >= 32, `실내끼리 32 넘게 떨어짐 (${a.k}·${b.k})`);
   assert.equal(json('assets/interior/places/moonshop.json').keeper.slug, CFG.shop.keeper);
   assert.equal(json('assets/interior/places/tent.json').keeper.slug, CFG.tent.keeper);
 });
@@ -196,4 +198,118 @@ test('건물 자리: 달빛 가게(광장 북쪽 언덕) · 새벽 천막(남동
     const d = isl.toTile(s.door.x - 0.01, s.door.z);
     assert.ok(isl.isWalkableTile(d.tx, d.tz), '문 앞 칸을 걸을 수 있다');
   }
+});
+
+// ---- P54 밤 특별 상점 (D165–D169): 미술품 · 여우 상인 · 이상한 천막 · 운세 부스 · 선물 상자 ----
+const dayAt = d => new Date(Date.UTC(2027, 0, 1 + d)).toISOString().slice(0, 10);
+
+test('P54 설정: 운세 부스 20–3시(새벽 천막 앞) · 여우 상인·이상한 천막은 오는 밤만 · 선물 상자 · 대사 · 밤 묶음', () => {
+  assert.deepEqual(CFG.fortune.hours, [20, 27]);
+  assert.equal(CFG.fortune.hours[1], CFG.tent.hours[0], '운세 부스가 닫을 때 여명이 새벽 천막으로 옮겨 간다');
+  assert.equal(CFG.fortune.keeper, CFG.tent.keeper, '부스 점쟁이 = 새벽 천막 여명 (CH-15)');
+  assert.equal(CFG.fox.keeper, 'salang');
+  assert.equal(CFG.odd.keeper, null, '이상한 천막은 주인 없음');
+  for (const c of [CFG.fox, CFG.odd]) assert.ok(c.chance > 0 && c.chance < 1 && c.guarantee >= 3 && c.hours[1] <= 29, c.id);
+  for (const id of [...CFG.fox.stock, ...CFG.odd.stock, ...CFG.fortune.stock, ...CFG.gift.items]) assert.ok(itemsMod.get(id), `없는 아이템 ${id}`);
+  assert.ok(CFG.lines.salang.real.length && CFG.lines.salang.fake.length && CFG.lines.salang.first.length, '여우 감정 대사');
+  assert.ok(CFG.lines.yeomyeong.firstBooth.length, '여명 부스 첫 대사');
+  for (const s of ['odd-tent', 'fox-shop', 'fortune-booth', 'gift-box']) assert.ok(CFG.assets.env.includes(s) && existsSync(resolve(root, `assets/env/specs/${s}.json`)), `밤 묶음 env ${s}`);
+  assert.ok(CFG.assets.characters.includes('salang') && existsSync(resolve(root, 'assets/specs/salang.json')));
+});
+
+test('P54 미술품: 진품 16 (그림 10 · 조각 6) · 가품 8 은 list 밖 · 박물관은 진품만 받는다', async () => {
+  const art = itemsMod.list('art');
+  assert.equal(art.length, 16);
+  assert.deepEqual(art.map(a => a.code), Array.from({ length: 16 }, (_, i) => `IC-AR-${String(i + 1).padStart(2, '0')}`));
+  assert.equal(art.filter(a => a.artKind === 'painting').length, 10);
+  const fakes = itemsMod.ITEMS.filter(it => it.fake);
+  assert.equal(fakes.length, 8);
+  for (const f of fakes) {
+    const g = itemsMod.get(f.genuine);
+    assert.ok(g && g.name === f.name && f.category === 'art' && f.tell, `${f.id}: 이름은 진품과 같고 차이(tell)가 있다`);
+    assert.ok(f.price < g.price && f.buy === g.buy, `${f.id}: 파는 값만 싸다`);
+    assert.notEqual(f.icon, g.icon, `${f.id}: 아이콘이 다르다 (색 변형)`);
+  }
+  assert.ok(itemsMod.COLLECTIBLE.includes('art'));
+  const { createMuseum } = await import('../src/data/museum.js');
+  const m = createMuseum({});
+  assert.equal(m.donate('art.sea-morning-fake'), false, '가품은 안 받음');
+  assert.equal(m.donate('art.sea-morning'), true);
+  assert.equal(m.donate('art.sea-morning'), false, '같은 것은 한 번만');
+  assert.deepEqual(m.progress().art, [1, 16]);
+});
+
+test('P54 서는 날 · 진열 · 선물 상자: 같은 날엔 늘 같고, 여우는 첫 밤 꼭 · 며칠 안 오면 꼭', () => {
+  const works = itemsMod.list('art').map(a => ({ id: a.id, fake: itemsMod.get(`${a.id}-fake`) ? `${a.id}-fake` : null }));
+  assert.equal(R.visitsToday('2027-05-15', 7, CFG.fox, {}), true, '처음 (열린 첫날 밤)');
+  assert.equal(R.visitsToday('2027-05-15', 7, CFG.odd, {}), false, '천막은 기준 날(since)이 없으면 오지 않는다');
+  assert.equal(R.visitsToday('2027-05-20', 7, CFG.fox, { last: '2027-05-14' }), true, '6일 넘게 안 옴 → 꼭');
+  assert.equal(R.visitsToday('2027-05-20', 7, CFG.odd, { since: '2027-05-13' }), true, '열린 지 7일 → 꼭');
+  let days = 0;
+  for (let d = 1; d < 401; d++) days += R.visitsToday(dayAt(d), 7, CFG.fox, { last: dayAt(d - 1) }) ? 1 : 0;
+  assert.ok(days > 80 && days < 220, `여우 오는 날 ${days}/400 (35%)`);
+  const a = R.foxStock(works, '2027-05-15', 7, CFG.fox), b = R.foxStock(works, '2027-05-15', 7, CFG.fox);
+  assert.deepEqual(a, b, '같은 날 같은 진열');
+  assert.ok(a.length >= 2 && a.length <= 3);
+  assert.equal(new Set(a.map(id => id.replace(/-fake$/, ''))).size, a.length, '같은 작품 둘 없음');
+  let fakes = 0, all = 0, gifts = 0, giftArt = 0;
+  const odd = { art: 0, furniture: 0 };
+  for (let d = 0; d < 300; d++) {
+    for (const id of R.foxStock(works, dayAt(d), 7, CFG.fox)) { all++; if (itemsMod.get(id)?.fake) fakes++; assert.ok(itemsMod.get(id), id); }
+    const o = R.oddStock(works, dayAt(d), 7, CFG.odd);
+    odd[o.group]++;
+    assert.ok(itemsMod.get(o.id), o.id);
+    const g = R.giftPlan(works, dayAt(d), 7, CFG.gift);
+    if (!g.today) continue;
+    gifts++;
+    if (g.contents.kind === 'art') giftArt++;
+    else if (g.contents.kind === 'item') assert.ok(itemsMod.get(g.contents.id));
+    else assert.ok(g.contents.n >= CFG.gift.acorns[0] && g.contents.n <= CFG.gift.acorns[1]);
+  }
+  assert.ok(fakes > all * 0.1 && fakes < all * 0.45, `여우 가품 ${fakes}/${all}`);
+  assert.ok(odd.art > odd.furniture, `이상한 천막 미술품 ${odd.art} · 궤짝 ${odd.furniture}`);
+  assert.ok(gifts > 100 && gifts < 200 && giftArt > 10, `선물 상자 ${gifts}/300 · 미술품 ${giftArt}`);
+});
+
+test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽) · 이상한 천막(북서쪽)이 지금 섬에서 서로·달빛 가게와 안 겹치고 문 앞이 열려 있다', () => {
+  const spec = slug => json(`assets/env/specs/${slug}.json`);
+  const layout = json('assets/island/layout.json');
+  const fruitId = nativeFruitOf(layout.seed), fruit = fruitId ? (itemsMod.get(fruitId)?.variant ?? fruitId.split('.')[1]) : null;
+  const gen = generateIsland(layout.seed, { ...C.ISLAND, villagers: C.VILLAGERS, nativeFruit: fruit, layout, lots: lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)]))) });
+  carveFestival(gen, { config: json('assets/festival/config.json'), specs: { 'festival-stage': spec('festival-stage') } });
+  const isl = createIslandApi(gen);
+  const at = new Map(gen.objects.map(o => [`${o.tx},${o.tz}`, o.kind]));
+  const doors = R.doorsOf(gen.places);
+  const land = (tx, tz) => !['water', 'sea', 'cliff', 'ramp'].includes(isl.tileAt(tx, tz));
+  const soft = (tx, tz) => !at.has(`${tx},${tz}`) || R.SOFT_KINDS.has(at.get(`${tx},${tz}`));
+  const spots = [];
+  const floor = (tx, tz) => { const w = isl.toWorld(tx, tz); return isl.tileAt(tx, tz) === 'grass' && soft(tx, tz) && !R.nearDoor(doors, w) && spots.every(s => Math.hypot(w.x - s.x, w.z - s.z) > 6); };
+  const opts = { isOpen: land, isClear: (tx, tz) => land(tx, tz) && soft(tx, tz), levelAt: (tx, tz) => isl.levelAt(tx, tz), toTile: isl.toTile, toWorld: isl.toWorld, reach: 18 };
+  const plaza = gen.places.plaza;
+  const plan = [
+    ['moonshop', { x: plaza.x + CFG.shop.offset[0], z: plaza.z + CFG.shop.offset[1] }, 'night-shop'],
+    ['fortune', { x: plaza.x + CFG.fortune.offset[0], z: plaza.z + CFG.fortune.offset[1] }, CFG.fortune.building],
+    ['foxshop', { x: gen.w * CFG.fox.spot[0], z: gen.h * CFG.fox.spot[1] }, CFG.fox.building],
+    ['oddtent', { x: gen.w * CFG.odd.spot[0], z: gen.h * CFG.odd.spot[1] }, CFG.odd.building],
+  ];
+  for (const [kind, anchor, b] of plan) {
+    const s = R.buildingSpot(anchor, spec(b).world.lot, { ...opts, isFree: floor });
+    assert.ok(s, `${kind} 자리`);
+    assert.ok(doors.every(d => Math.hypot(d.x - s.x, d.z - s.z) > 3), `${kind}: 다른 건물 문 앞을 막지 않음`);
+    const d = isl.toTile(s.door.x - 0.01, s.door.z);
+    assert.ok(isl.isWalkableTile(d.tx, d.tz), `${kind}: 문 앞 칸을 걸을 수 있다`);
+    spots.push(s);
+  }
+  assert.ok(spots[2].x < 0, `여우 상인은 섬 서쪽 (${spots[2].x.toFixed(1)})`);
+  assert.ok(spots[3].z < 0, `이상한 천막은 섬 북쪽 (${spots[3].z.toFixed(1)})`);
+});
+
+test('P54 실내: 운세 부스 RM-20 · 여우 상인 RM-18 · 이상한 천막 RM-19 — 주인·진열 자리', () => {
+  const fox = json('assets/interior/places/foxshop.json'), odd = json('assets/interior/places/oddtent.json'), fort = json('assets/interior/places/fortune.json');
+  assert.deepEqual([fox.id, odd.id, fort.id], ['RM-18', 'RM-19', 'RM-20']);
+  assert.equal(fox.keeper.slug, CFG.fox.keeper);
+  assert.equal(fort.keeper.slug, CFG.fortune.keeper);
+  assert.equal(odd.keeper, undefined);
+  assert.equal(fox.stock.filter(r => r.group === 'art').reduce((n, r) => n + r.count, 0), CFG.fox.artCount[1], '받침 = 미술품 많을 때 수');
+  assert.ok(odd.stock.some(r => r.group === 'art') && odd.stock.some(r => r.group === 'furniture'));
 });

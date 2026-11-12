@@ -46,6 +46,61 @@
     "stock": ["furn.crystal-ball"],
     "side": "east"
   },
+  "fortune": {
+    "id": "D168-A",
+    "name": "운세 부스",
+    "building": "fortune-booth",
+    "keeper": "yeomyeong",
+    "hours": [20,27],
+    "stock": ["furn.fortune-lamp","furn.tarot-frame"],
+    "near": "plaza",
+    "offset": [-12,8],
+    "about": "밤 8시–새벽 3시 광장 남서쪽. 여명이 저녁엔 여기서 카드를 펼치고 새벽 3시엔 숲 끝 새벽 천막으로 옮겨 간다 (카드는 둘이 합쳐 하루 한 장)"
+  },
+  "fox": {
+    "id": "D167-A",
+    "name": "여우 상인 가게",
+    "building": "fox-shop",
+    "keeper": "salang",
+    "hours": [20,29],
+    "chance": 0.35,
+    "guarantee": 6,
+    "firstNight": true,
+    "artCount": [2,3],
+    "fakeChance": 0.5,
+    "perNight": 1,
+    "stock": ["furn.fox-lantern"],
+    "spot": [-0.27,0.02],
+    "tag": "fox",
+    "about": "밤 8시–새벽 5시, 밤 콘텐츠가 열린 첫날 밤 · 그 뒤로는 35% (6일 넘게 안 왔으면 꼭). 미술품 2–3점, 가품이 있는 작품은 반쯤 가품. 한 밤에 한 점만 판다"
+  },
+  "odd": {
+    "id": "D166-A",
+    "name": "이상한 천막",
+    "building": "odd-tent",
+    "keeper": null,
+    "hours": [21,29],
+    "chance": 0.3,
+    "guarantee": 7,
+    "artChance": 0.6,
+    "fakeChance": 0.4,
+    "stock": ["furn.odd-chest"],
+    "spot": [-0.12,-0.3],
+    "tag": "odd",
+    "about": "밤 9시–새벽 5시, 30% (7일 넘게 안 섰으면 꼭). 주인 없음 — 받침 하나에 미술품(60%, 가품 40%) 또는 수상한 궤짝"
+  },
+  "gift": {
+    "id": "D169-A",
+    "name": "선물 상자",
+    "prop": "gift-box",
+    "chance": 0.5,
+    "artChance": 0.25,
+    "fakeChance": 0.5,
+    "itemChance": 0.5,
+    "items": ["furn.odd-chest","furn.fox-lantern","night.star-candy"],
+    "acorns": [200,600],
+    "about": "낮·밤, 날마다 50% 섬 어딘가 풀밭에 하나. 열면 미술품(25%, 가품 반) · 가구·별사탕 · 도토리"
+  },
   "nocturnal": {
     "id": "D108-A · D110-A",
     "villagers": ["dalmuri"],
@@ -87,7 +142,43 @@
       "already": ["오늘의 카드는 이미 너와 함께 있단다스르륵. 내일 새벽에 또 오렴."],
       "after": ["좋은 하루가 되길스르륵.", "카드의 기운은 다음 새벽까지란다스르륵."],
       "bye": ["안개가 걷히기 전에 또 보자스르륵."],
-      "closed": ["(천막은 아직 안개 속에 없어요)"]
+      "closed": ["(천막은 아직 안개 속에 없어요)"],
+      "firstBooth": ["…스르륵. 처음 보는 얼굴이구나. 나는 여명.","밤 8시부터 새벽 3시까지는 여기 운세 부스에서, 3시가 넘으면 숲 끝 새벽 천막에서 카드를 펼친단다.","하루에 한 장, 카드를 뒤집어 보렴. 다음 날 하루에 작은 좋은 일이 생길 거야스르륵."],
+      "goods": " 별빛을 담은 물건들이란다스르륵."
+    },
+    "salang": {
+      "name": "살랑",
+      "color": "#7A6A8E",
+      "voice": "dubu",
+      "first": ["어이쿠, 손님이시구먼콩. 나는 살랑, 떠돌이 미술품 상인이지.","밤에만 슬쩍 왔다 가니까, 마음에 드는 게 있으면 그날 데려가야 해콩.","내 물건은 하나같이 귀한 진품… 대부분은 말이야. 후후콩."],
+      "greet": ["오늘 밤도 좋은 물건이 들어왔지콩.","쉿, 다른 데선 못 구하는 것들이야콩.","눈이 높은 손님이 오셨구먼콩. 한번 둘러봐."],
+      "menu": ["미술품 보기","여우불 등 사기","그만"],
+      "pickAsk": "어느 걸로 할 거야콩?",
+      "real": ["이 「{name}」 말이지? 내 꼬리를 걸고 말하는데 아주 귀한 거야콩.","「{name}」… 보는 눈이 있구먼. 오늘 들어온 것 중 최고지콩.","「{name}」라면 박물관도 탐낼걸콩. 진짜라니까."],
+      "fake": ["이 「{name}」 말이지? 색이 아주 특별하지콩? 흔히 보는 거랑은 좀 달라서 더 귀하다니까.","「{name}」… 어디 보자, 이건 아주아주 독특한 판이야콩. 남들 거랑 같으면 재미없잖아?","「{name}」라면 오늘만 이 값이야콩. 자세히 보면 볼수록 묘한 맛이 있다니까."],
+      "price": "🌰 {price}개면 넘기지콩. 어때?",
+      "bought": ["좋은 선택이야콩. 잘 모셔 둬.","거래 성사! 후후, 또 보자콩."],
+      "soldOut": ["오늘 밤은 한 점만 팔기로 했거든콩. 다음에 또 와."],
+      "empty": ["오늘 가져온 건 다 팔렸어콩. 다음에 또 보자고."],
+      "money": ["도토리가 모자라는구먼콩. 다음에 오면 그때 보자고."],
+      "full": ["가방이 꽉 찼구먼콩. 자리를 좀 비우고 와."],
+      "bye": ["밤길 조심해콩. 나는 또 언제 올지 몰라."],
+      "closed": ["(문에 쪽지가 붙어 있어요) 여우 상인 — 밤 8시부터 새벽 5시까지, 오는 날만"]
+    },
+    "odd": {
+      "toast": "🎪 어딘가에 이상한 천막이 섰어요… (오늘 밤만)",
+      "closed": ["(천막 입구가 꽁꽁 묶여 있어요) 밤 9시가 지나면 열리는 것 같아요"]
+    },
+    "fox": {
+      "toast": "🦊 오늘 밤 수상한 여우 상인이 섬에 왔대요 (밤 8시부터)"
+    },
+    "gift": {
+      "label": "선물 상자 열기",
+      "open": "리본이 달린 선물 상자예요. 열어 볼까요?",
+      "art": "상자 안에 미술품 「{name}」이(가) 들어 있었어요!",
+      "item": "상자 안에 {name}이(가) 들어 있었어요!",
+      "acorns": "상자 안에 도토리 {n}개가 들어 있었어요!",
+      "full": "가방이 꽉 차서 못 꺼냈어요. 자리를 비우고 다시 열어 봐요."
     },
     "market": {
       "start": "🏮 토요일 밤 야시장이 열렸어요! 광장으로 가 보세요 (밤 12시까지)",
@@ -102,7 +193,7 @@
     }
   },
   "assets": {
-    "env": ["night-shop", "dawn-tent", "night-lanterns", "sleep-note"],
-    "characters": ["byeolbam", "yeomyeong"]
+    "env": ["night-shop", "dawn-tent", "night-lanterns", "sleep-note", "odd-tent", "fox-shop", "fortune-booth", "gift-box"],
+    "characters": ["byeolbam", "yeomyeong", "salang"]
   }
 }

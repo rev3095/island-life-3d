@@ -23,4 +23,6 @@ export const SCENE_FILES = [
   'assets/story/scenes/s20-moonshop-first.json',   // M12 달빛 가게 첫 방문 (trigger night-first, 문 앞에서 튼 뒤 들어감)
   'assets/story/scenes/s21-tent-first.json',   // M12 새벽 천막 첫 방문 (trigger night-first)
   'assets/story/scenes/s22-first-tour.json',   // P35 첫 섬 여행 (trigger tour-first)
+  'assets/story/scenes/s27-fox-first.json',   // P54 수상한 여우 상인 첫 만남 (trigger night-first kind foxshop)
+  'assets/story/scenes/s28-odd-tent-first.json',   // P54 이상한 천막 첫 방문 (trigger night-first kind oddtent)
 ];
