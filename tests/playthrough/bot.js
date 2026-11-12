@@ -454,6 +454,16 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
    * 안 되면 남쪽을 보고 행동 키. 문 매트 자리는 house.doormat() (없는 예전 게임이면 내 집 x 500 · 주민 방 x 540, 방 8×8 의 z 3.35)
    */
   bot.exitRoom = async () => {
+    // 실내 전수: 상점 딸린 방(정원 코너·지하 밤 코너)이면 문 매트로 먼저 1층에 나온 뒤 1층 문 매트로 (방 둘)
+    for (let n = 0; n < 2 && S().house?.places?.parentOf?.(S().house?.places?.where); n++) {
+      const m = S().house.doormat();
+      await bot.walkLocal({ x: m.x, z: m.z }, { near: 0.12, label: '딸린 방 문 매트' });
+      const from = S().house.places.where;
+      bot.stick(0, 1, false);
+      await bot.until(() => S().house.places.where !== from && !S().house.passing, { timeout: 4, ui: false });
+      bot.release();
+      await bot.settle?.(5);
+    }
     if (!inZone()) return true;
     const mat = S().house?.doormat?.();
     const cx = mat?.x ?? (Math.abs(bot.pos().x - 540) < 10 ? 540 : 500);

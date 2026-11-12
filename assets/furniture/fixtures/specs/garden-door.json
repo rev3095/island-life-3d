@@ -1,0 +1,75 @@
+{
+  "id": "FU-81",
+  "slug": "garden-door",
+  "item": "fixture.garden-door",
+  "name": "정원 코너 문",
+  "category": "fixture",
+  "kind": "garden-door",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "도토리상점 1층 벽의 연두 문 — 정원 용품·도구 코너로. 창살 유리, 문틀을 감는 덩굴 잎, 위 화분 팻말.",
+    "keywords": [
+      "연두 문",
+      "덩굴 잎",
+      "화분 팻말"
+    ],
+    "references": [
+      "동네 잡화점·작은 가게 지하"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#7A5A3E",
+    "leaf": "#8CC084",
+    "trim": "#6E9E66",
+    "brass": "#D9A84E",
+    "window": "#CDEBF5",
+    "stem": "#5B8A4A",
+    "leaf2": "#7DBE5A",
+    "leafDark": "#4E8A44",
+    "sign": "#FFF3DC",
+    "pot": "#C8714A",
+    "flower": "#F29BB5",
+    "center": "#F2C94C"
+  },
+  "paletteLabels": {
+    "frame": "문틀",
+    "leaf": "문짝",
+    "trim": "문 판",
+    "brass": "놋쇠",
+    "window": "유리",
+    "stem": "덩굴",
+    "leaf2": "잎",
+    "leafDark": "짙은 잎",
+    "sign": "팻말",
+    "pot": "화분",
+    "flower": "꽃",
+    "center": "꽃술"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

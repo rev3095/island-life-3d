@@ -267,7 +267,7 @@ export function createSkills(bot) {
     const buyQueue = [...buy];
     bot.policy = {
       dialog: texts => {
-        const i = texts.findIndex(t => (sell && !buy.length ? /팔래요/ : /살래요/).test(t));
+        const i = texts.findIndex(t => (sell && !buy.length ? /팔래요/ : /살래요|주문할래요/).test(t));   // 실내 전수: 밤톨 = 팔래요 · 주문할래요
         return i >= 0 ? i : 0;
       },
       card: (kind, el, card) => {
@@ -276,19 +276,19 @@ export function createSkills(bot) {
         const tabs = [...card.querySelectorAll('.pk-tab')];
         const cur = tabs.find(t => t.getAttribute('aria-selected') === 'true')?.textContent;
         if (decor && !result.decor) {
-          if (cur !== '사기') { bot.click(tabs.find(t => t.textContent === '사기')); return true; }
+          if (!/^(사기|주문)$/.test(cur)) { bot.click(tabs.find(t => /^(사기|주문)$/.test(t.textContent))); return true; }
           const b = card.querySelector(`[data-decor="${decor}"]`) ?? [...card.querySelectorAll('[data-decor]')].find(x => !x.classList.contains('is-owned') && !x.classList.contains('is-short'));
           result.decor = b?.dataset.decor ?? 'none';
           if (b) { bot.click(b); return true; }
         }
         if (clothes && !result.clothes) {
-          if (cur !== '사기') { bot.click(tabs.find(t => t.textContent === '사기')); return true; }
+          if (!/^(사기|주문)$/.test(cur)) { bot.click(tabs.find(t => /^(사기|주문)$/.test(t.textContent))); return true; }
           const b = card.querySelector(`[data-clothes="${clothes}"]`) ?? [...card.querySelectorAll('[data-clothes]')].find(x => !x.classList.contains('is-owned') && !x.classList.contains('is-short'));
           result.clothes = b?.dataset.clothes ?? 'none';
           if (b) { bot.click(b); return true; }
         }
         if (buyQueue.length) {
-          if (cur !== '사기') { bot.click(tabs.find(t => t.textContent === '사기')); return true; }
+          if (!/^(사기|주문)$/.test(cur)) { bot.click(tabs.find(t => /^(사기|주문)$/.test(t.textContent))); return true; }
           const id = buyQueue.shift();
           const b = card.querySelector(`[data-id="${id}"]`);
           if (!b) { bot.issue('minor', 'shop', `상점에 ${items().get(id)?.name ?? id} 이(가) 없어요 (오늘 목록)`); return true; }

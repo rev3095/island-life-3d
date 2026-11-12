@@ -1,0 +1,59 @@
+{
+  "id": "FU-83",
+  "slug": "honesty-box",
+  "item": "fixture.honesty-box",
+  "name": "무인 계산함",
+  "category": "fixture",
+  "kind": "honesty-box",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1516,
+  "parts": 2,
+  "materials": [
+    "acorn",
+    "acornCap",
+    "brass",
+    "glow",
+    "lamp",
+    "paper",
+    "plaque",
+    "slot",
+    "top",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "box",
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.6,
+    0.79
+  ],
+  "bounds": [
+    [
+      -0.3,
+      -0.3,
+      0.0
+    ],
+    [
+      0.3,
+      0.3,
+      0.79
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 34372,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "honesty-box_front.png",
+    "honesty-box_main.png",
+    "honesty-box_thumb.png",
+    "honesty-box_top.png"
+  ]
+}

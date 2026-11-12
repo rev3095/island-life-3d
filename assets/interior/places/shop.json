@@ -4,41 +4,233 @@
   "kind": "place",
   "place": "shop",
   "name": "도토리상점",
-  "version": 5,
-  "status": "approved",
-  "note": "실내 검수 보드 D69-A: 안쪽 가운데 계산대 뒤에 밤톨, 왼쪽 진열 받침 둘에 오늘의 실내 가구 셋(앞 받침에 둘), 가운데 오른쪽 받침에 오늘의 야외 가구 하나(10차 D99-A), 오른쪽에 도구 다섯·꽃씨, 문 오른쪽에 오늘의 옷 둘(11차 D102-A 옷 진열대 FU-54 — 윗옷은 가로대에 걸고 모자·신발은 아래 단). 붙박이 모델(assets/furniture/fixtures): 진열 받침 FU-35 · 계산대 FU-36 · 도구 받침 FU-39 · 씨앗 진열대 FU-40 · 옷 진열대 FU-54 (box·color 는 모델을 못 읽을 때 임시 상자).",
-  "size": [10, 7],
+  "version": 6,
+  "status": "review",
+  "note": "실내 전수 (사용자 요청 7번 「상점은 낮/밤마다 파는 품목·갈 수 있는 공간이 다르게」): 같은 건물 1층. 늘 — 안쪽 가운데 계산대 뒤 밤톨 · 문 오른쪽 옷 진열대(FU-54) · 북쪽 벽 오늘의 벽지·바닥 견본 판 · 동쪽 벽 실내 문 둘(FU-81 정원 코너 문 · FU-80 지하 계단 문). 낮(8–22시, phases.day) — 왼쪽 진열 받침 둘에 오늘의 실내 가구 셋, 정원 코너 문이 열림(RM-22 정원 용품·도구 코너). 밤(그 밖, phases.night) — 진열 받침에 덮개 천(FU-79)을 씌워 가구 코너를 닫고, 지하 계단 문이 열림(RM-21 밤 코너). 예전(v5)의 도구 받침·씨앗 진열대·야외 가구 받침은 정원 코너로 옮김.",
+  "size": [
+    10,
+    7
+  ],
   "wallpaper": "wp-05",
   "floor": "fl-02",
-  "windows": ["n:1", "n:8"],
-  "door": { "gx0": 4, "gx1": 5 },
-  "keeper": { "slug": "bamtol", "lx": 5, "lz": 0.5, "face": "s" },
-  "talk": { "lx": 5, "lz": 2.45 },
-  "furniture": [
-    { "fu": "FU-36", "name": "계산대", "box": [2, 1, 0.6], "color": "#D9B382", "gx": 4, "gz": 1, "rot": 0, "role": "counter" },
-    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 1, "rot": 0 },
-    { "fu": "FU-35", "name": "진열 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 0, "gz": 4, "rot": 0 },
-    { "fu": "FU-35", "name": "야외 가구 받침", "box": [2, 2, 0.18], "color": "#C99A63", "gx": 6, "gz": 3, "rot": 0 },
-    { "fu": "FU-39", "name": "도구 받침", "box": [1, 3, 0.12], "color": "#B98A5A", "gx": 9, "gz": 1, "rot": 0 },
-    { "fu": "FU-40", "name": "씨앗 진열대", "box": [1, 2, 0.6], "color": "#C99A63", "gx": 9, "gz": 4, "rot": 0 },
-    { "fu": "FU-54", "name": "옷 진열대", "box": [2, 1, 1.2], "color": "#C99A63", "gx": 6, "gz": 6, "rot": 0 },
-    { "item": "furn.round-rug", "gx": 3, "gz": 3, "rot": 0 },
-    { "item": "furn.plant-pot", "gx": 2, "gz": 0, "rot": 0, "deco": true },
-    { "item": "furn.floor-lamp", "gx": 7, "gz": 0, "rot": 0, "deco": true },
-    { "item": "furn.bookshelf", "gx": 8, "gz": 0, "rot": 0 },
-    { "item": "furn.umbrella-stand", "gx": 2, "gz": 6, "rot": 0, "deco": true },
-    { "item": "furn.wall-clock", "wall": "n", "slot": 5 },
-    { "item": "furn.picture-frame", "wall": "n", "slot": 3 },
-    { "item": "furn.rod-rack", "wall": "e", "slot": 2 }
+  "windows": [
+    "n:1",
+    "n:8"
   ],
-  "sample": { "wall": "n", "slot": 6, "note": "B-21 오늘의 벽지·바닥 견본 판 (위 벽지 · 아래 바닥, 판 앞 「보기」로 사기)" },
+  "door": {
+    "gx0": 4,
+    "gx1": 5
+  },
+  "keeper": {
+    "slug": "bamtol",
+    "lx": 5,
+    "lz": 0.5,
+    "face": "s"
+  },
+  "talk": {
+    "lx": 5,
+    "lz": 2.45
+  },
+  "furniture": [
+    {
+      "fu": "FU-36",
+      "name": "계산대",
+      "box": [
+        2,
+        1,
+        0.6
+      ],
+      "color": "#D9B382",
+      "gx": 4,
+      "gz": 1,
+      "rot": 0,
+      "role": "counter"
+    },
+    {
+      "fu": "FU-54",
+      "name": "옷 진열대",
+      "box": [
+        2,
+        1,
+        1.2
+      ],
+      "color": "#C99A63",
+      "gx": 6,
+      "gz": 6,
+      "rot": 0
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 3,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 2,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.floor-lamp",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.bookshelf",
+      "gx": 8,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.umbrella-stand",
+      "gx": 2,
+      "gz": 6,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "n",
+      "slot": 5
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "n",
+      "slot": 3
+    },
+    {
+      "fu": "FU-81",
+      "name": "정원 코너 문",
+      "wall": "e",
+      "slot": 2
+    },
+    {
+      "fu": "FU-80",
+      "name": "지하 계단 문",
+      "wall": "e",
+      "slot": 5
+    }
+  ],
+  "sample": {
+    "wall": "n",
+    "slot": 6,
+    "note": "B-21 오늘의 벽지·바닥 견본 판 (위 벽지 · 아래 바닥, 판 앞 「보기」로 사기)"
+  },
   "stock": [
-    { "group": "furniture", "lx": 1, "lz": 1.5, "y": 0.18, "fit": 0.95, "count": 2, "dz": 1 },
-    { "group": "furniture", "from": 2, "lx": 1, "lz": 5, "y": 0.18, "fit": 1.7, "count": 1 },
-    { "group": "furniture", "from": 3, "lx": 7, "lz": 4, "y": 0.18, "fit": 1.7, "count": 1 },
-    { "group": "tools", "lx": 9.5, "lz": 1.35, "y": 0.12, "dz": 0.55, "count": 5 },
-    { "group": "seeds", "lx": 9.5, "lz": 4.3, "y": 0.6, "dz": 0.45, "count": 3 },
-    { "group": "saplings", "lx": 9.5, "lz": 5.65, "y": 0.6, "dz": 0.4, "count": 1 },
-    { "group": "clothes", "lx": 6.55, "lz": 6.55, "dx": 0.9, "y": 0.14, "hang": 1.06, "count": 2 }
-  ]
+    {
+      "group": "clothes",
+      "lx": 6.55,
+      "lz": 6.55,
+      "dx": 0.9,
+      "y": 0.14,
+      "hang": 1.06,
+      "count": 2
+    }
+  ],
+  "inner": [
+    {
+      "to": "shop-garden",
+      "wall": "e",
+      "slot": 2,
+      "phase": "day",
+      "name": "정원·도구 코너"
+    },
+    {
+      "to": "shop-night",
+      "wall": "e",
+      "slot": 5,
+      "phase": "night",
+      "name": "지하 밤 코너"
+    }
+  ],
+  "phases": {
+    "day": {
+      "name": "낮 매장",
+      "furniture": [
+        {
+          "fu": "FU-35",
+          "name": "진열 받침",
+          "box": [
+            2,
+            2,
+            0.18
+          ],
+          "color": "#C99A63",
+          "gx": 0,
+          "gz": 1,
+          "rot": 0
+        },
+        {
+          "fu": "FU-35",
+          "name": "진열 받침",
+          "box": [
+            2,
+            2,
+            0.18
+          ],
+          "color": "#C99A63",
+          "gx": 0,
+          "gz": 4,
+          "rot": 0
+        }
+      ],
+      "stock": [
+        {
+          "group": "indoor",
+          "lx": 1,
+          "lz": 1.5,
+          "y": 0.18,
+          "fit": 0.95,
+          "count": 2,
+          "dz": 1
+        },
+        {
+          "group": "indoor",
+          "from": 2,
+          "lx": 1,
+          "lz": 5,
+          "y": 0.18,
+          "fit": 1.7,
+          "count": 1
+        }
+      ]
+    },
+    "night": {
+      "name": "밤 매장",
+      "note": "가구 코너는 덮개 천으로 닫힘 (옷·벽지 견본은 그대로)",
+      "furniture": [
+        {
+          "fu": "FU-79",
+          "name": "진열 덮개 천",
+          "box": [
+            2,
+            2,
+            0.3
+          ],
+          "color": "#5A6A9C",
+          "gx": 0,
+          "gz": 1,
+          "rot": 0
+        },
+        {
+          "fu": "FU-79",
+          "name": "진열 덮개 천",
+          "box": [
+            2,
+            2,
+            0.3
+          ],
+          "color": "#5A6A9C",
+          "gx": 0,
+          "gz": 4,
+          "rot": 0
+        }
+      ],
+      "stock": []
+    }
+  }
 }

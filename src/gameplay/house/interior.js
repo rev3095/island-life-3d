@@ -132,14 +132,15 @@ export function resolveFurniture(entry, furnIndex, i = 0) {
 }
 
 /**
- * 주민 집 문 규칙 (Z4 town 약속): 'open' 들어간다 | 'locked' 외출 중 | null 문이 없거나 노크(town:knock 이 맡음).
- * town.residents() 에 없으면(이사 오기 전) 문이 없다. town.atHome(slug) 'home' → open, 'out' → locked, 'sleep'·'room' → null. atHome 이 없으면 언제나 open.
+ * 주민 집 문 규칙 (Z4 town 약속, 실내 전수에서 바꿈 — 사용자 요청 6번 「실내 무조건 전부 들어갈 수 있게」):
+ *  'open' 주민이 집에 있다 → 들어가면 방 안에 주민 · 'away' 외출 중 → 들어가면 빈 방 (조용히 구경) · 'asleep' 자는 중 → 살금살금 들어가면 빈 방(주민은 안쪽에서 잔다)
+ *  · null 문이 없음(이사 오기 전) 또는 플레이어가 이미 그 방에 있음('room'). 예전의 'locked'(외출 중 잠김)·노크만 되던 'sleep' 은 없앴다. atHome 이 없으면 언제나 open.
  */
 export function visitRule(town, slug) {
   if (town?.residents && !town.residents().includes(slug)) return null;
   const at = town?.atHome?.(slug);
   if (at === undefined) return 'open';
-  return at === 'home' ? 'open' : at === 'out' ? 'locked' : null;
+  return at === 'home' ? 'open' : at === 'out' ? 'away' : at === 'sleep' ? 'asleep' : null;
 }
 
 /** 문 매트 칸 (가구를 두지 않는다) — house/index.js 의 RESERVED 와 같다 */

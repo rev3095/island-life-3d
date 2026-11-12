@@ -1,0 +1,67 @@
+{
+  "id": "FU-84",
+  "slug": "lantern-shelf",
+  "item": "fixture.lantern-shelf",
+  "name": "등불 진열장",
+  "category": "fixture",
+  "kind": "lantern-shelf",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "지하 밤 코너의 두 단 진열장 (윗면 0.78 에 밤 간식). 뒤쪽 위 종이 등불 셋, 아랫단 바구니.",
+    "keywords": [
+      "두 단 진열장",
+      "종이 등불",
+      "바구니"
+    ],
+    "references": [
+      "동네 잡화점·작은 가게 지하"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#7A5A3E",
+    "woodDark": "#4E3626",
+    "top": "#9C7650",
+    "basket": "#C9A06A",
+    "string": "#3A2E28",
+    "lamp": "#F2A65A",
+    "lamp2": "#F2D16B",
+    "glow": "#FFE08A"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "top": "윗판",
+    "basket": "바구니",
+    "string": "끈",
+    "lamp": "주황 등불",
+    "lamp2": "노랑 등불",
+    "glow": "불빛"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

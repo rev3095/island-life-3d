@@ -1,0 +1,73 @@
+{
+  "id": "FU-82",
+  "slug": "plant-shelf",
+  "item": "fixture.plant-shelf",
+  "name": "화분 선반",
+  "category": "fixture",
+  "kind": "plant-shelf",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "정원 코너 북쪽 벽의 세 단 계단 선반. 작은 화분 아홉 (새싹·꽃·다육).",
+    "keywords": [
+      "계단 선반",
+      "작은 화분",
+      "새싹"
+    ],
+    "references": [
+      "동네 잡화점·작은 가게 지하"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99A63",
+    "woodDark": "#8C6440",
+    "pot": "#C8714A",
+    "potLight": "#E2A27A",
+    "soil": "#6B4A33",
+    "stem": "#5B8A4A",
+    "leaf2": "#7DBE5A",
+    "leafDark": "#4E8A44",
+    "flower": "#F29BB5",
+    "flower2": "#F2E3A0",
+    "center": "#F2C94C"
+  },
+  "paletteLabels": {
+    "wood": "선반",
+    "woodDark": "짙은 나무",
+    "pot": "화분",
+    "potLight": "밝은 화분",
+    "soil": "흙",
+    "stem": "줄기",
+    "leaf2": "잎",
+    "leafDark": "다육",
+    "flower": "분홍 꽃",
+    "flower2": "노랑 꽃",
+    "center": "꽃술"
+  },
+  "footprint": [
+    2,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

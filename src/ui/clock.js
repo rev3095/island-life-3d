@@ -58,10 +58,10 @@ export function offsetText(offsetMs) {
   return `실제 시각보다 ${parts} ${m > 0 ? '빨라요' : '느려요'}`;
 }
 /** 그 시각에 할 수 있는 것 (짧은 안내) */
-export function activityHints(hour, { shopOpen } = {}) {
+export function activityHints(hour, { shopOpen, phase = null } = {}) {   // phase (실내 전수): 상점이 늘 열 때 'day' 낮 매장 | 'night' 밤 매장
   const hh = hour < 5 ? hour + 24 : hour;
   const out = [];
-  out.push(shopOpen ? '🛒 상점 열림' : '🛒 상점 닫힘');
+  out.push(phase === 'night' ? '🛒 상점 밤 매장 (지하 밤 코너)' : phase === 'day' ? '🛒 상점 낮 매장 (정원 코너)' : shopOpen ? '🛒 상점 열림' : '🛒 상점 닫힘');
   if (hh >= 19) out.push('🔭 별 보기', '🦗 밤 곤충');
   else if (hh >= 17) out.push('🔥 저녁 모임');
   else if (hh < 8) out.push('🌅 아침 산책');
@@ -273,7 +273,8 @@ export function createClock(ctx) {
       timeEl.replaceChildren(h('small', null, L.ampm), `${L.h12}:${L.mm}`);
       partEl.textContent = `${L.icon} ${L.partName}`;
       const shopOpen = ctx.services.data?.economy?.isOpen?.(L.hour) ?? (L.hour >= 8 && L.hour < 22);
-      hints.replaceChildren(...activityHints(L.hour, { shopOpen }).map(t => h('li', null, t)));
+      const phase = ctx.services.house?.places?.info?.('shop') ? ctx.services.data?.economy?.phase?.(L.hour) ?? null : null;   // 실내 전수: 상점은 늘 연다
+      hints.replaceChildren(...activityHints(L.hour, { shopOpen, phase }).map(t => h('li', null, t)));
       apply.disabled = dw.delta === 0;
     }
 

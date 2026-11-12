@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { checkPlace, exhibitPlan, stockPlan, caseSlots, blockersOf, boundsOf, doormatOf, sizeOf, reachable, PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, FIXTURE_BASE, FIXTURE_INDEX } from '../src/gameplay/house/placedata.js';
+import { checkPlace, exhibitPlan, stockPlan, caseSlots, blockersOf, boundsOf, doormatOf, sizeOf, reachable, PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, MUSEUM_CATS, FIXTURE_BASE, FIXTURE_INDEX,
+  OUTER_KINDS, phaseSpec, phaseGroups } from '../src/gameplay/house/placedata.js';
 import { resolveFurniture } from '../src/gameplay/house/interior.js';
 import { inBox } from '../src/gameplay/house/grid.js';
 import { leafLook, walkPlan, doorFront, TIMING, DOOR_STYLE, OPEN_ANGLE } from '../src/gameplay/house/door.js';
@@ -39,8 +40,11 @@ test('실내 배치 파일: 폴더 = PLACE_FILES, 상점 RM-08 · 박물관 RM-0
   assert.equal(specs.museum.keeper.slug, 'neuru');
 });
 
-test('실내 배치 검사: 두 방 모두 통과 (가구·창·문 매트·계산대·주인·말 거는 자리·케이스·길)', () => {
-  for (const k of PLACE_KINDS) assert.deepEqual(checkPlace(specs[k], furn), [], k);
+test('실내 배치 검사: 모든 방 · 낮/밤 매장 갈래마다 통과 (가구·창·문 매트·계산대·주인·말 거는 자리·케이스·길·실내 문)', () => {
+  for (const k of PLACE_KINDS) {
+    assert.deepEqual(checkPlace(specs[k], furn), [], k);
+    for (const ph of Object.keys(specs[k].phases ?? {})) assert.deepEqual(checkPlace(phaseSpec(specs[k], ph), furn), [], `${k} ${ph}`);
+  }
 });
 
 test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
@@ -84,24 +88,40 @@ test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은
   assert.deepEqual([one.lx, one.lz, one.y], [1, 1, 0.5]);
 });
 
-test('상점 진열: 오늘의 가구 4 (실내 3 + 야외 1) · 도구 5 · 꽃씨 · 묘목이 진열 자리에, 방 안 · 막는 상자 위', () => {
+test('상점 진열 (실내 전수 낮/밤 매장): 낮 = 1층 실내 가구 3 + 정원 코너 야외 가구 1 · 도구 5 · 꽃씨 · 묘목 · 늘 파는 것, 밤 = 지하 밤 코너 밤 가구 · 밤 도구 · 밤 간식 · 늘 파는 것 — 모두 방 안 · 막는 상자 위', () => {
   const groups = shopStock('2026-11-04', 12345);
-  const plan = stockPlan(specs.shop, groups);
-  assert.deepEqual(plan.filter(s => s.group === 'furniture').map(s => s.id), groups.furniture);
-  assert.deepEqual(plan.filter(s => s.group === 'tools').map(s => s.id), groups.tools.slice(0, 5));
-  assert.ok(plan.some(s => s.group === 'seeds') && plan.some(s => s.group === 'saplings'));
-  const [w, d] = sizeOf(specs.shop), boxes = blockersOf(specs.shop, listOf(specs.shop));
-  for (const s of plan) {
-    assert.ok(s.lx > 0 && s.lx < w && s.lz > 0 && s.lz < d - 1, `${s.id} 방 안`);
-    assert.ok(boxes.some(b => inBox(b, s.lx, s.lz)), `${s.id} 는 받침·진열대 위 (바닥에 굴러다니지 않게)`);
+  const rooms = { day: [phaseSpec(specs.shop, 'day'), specs['shop-garden']], night: [phaseSpec(specs.shop, 'night'), specs['shop-night']] };
+  const plans = {};
+  for (const [ph, list] of Object.entries(rooms)) {
+    plans[ph] = [];
+    for (const spec of list) {
+      const plan = stockPlan(spec, phaseGroups(groups, ph));
+      plans[ph].push(...plan);
+      const [w, d] = sizeOf(spec), boxes = blockersOf(spec, listOf(spec));
+      for (const s of plan) {
+        assert.ok(s.lx > 0 && s.lx < w && s.lz > 0 && s.lz < d - 1, `${spec.slug} ${s.id} 방 안`);
+        assert.ok(boxes.some(b => inBox(b, s.lx, s.lz)), `${spec.slug} ${s.id} 는 받침·진열대 위 (바닥에 굴러다니지 않게)`);
+      }
+    }
   }
-  // 다른 날이면 가구가 바뀔 수 있어도 자리 수는 같다
-  assert.equal(stockPlan(specs.shop, shopStock('2026-11-05', 12345)).length, plan.length);
+  const ids = (ph, g) => plans[ph].filter(s => s.group === g).map(s => s.id);
+  assert.deepEqual(ids('day', 'indoor'), groups.indoor, '낮 1층: 오늘의 실내 가구 셋');
+  assert.deepEqual(ids('day', 'outdoor'), groups.outdoor, '낮 정원 코너: 야외 가구');
+  assert.deepEqual(ids('day', 'tools'), groups.tools.slice(0, 5));
+  assert.ok(ids('day', 'seeds').length && ids('day', 'saplings').length);
+  assert.ok(ids('day', 'always').includes('mat.tour-ticket'), '늘 파는 것 (섬 여행 표)');
+  assert.ok(!plans.night.some(s => ['indoor', 'outdoor', 'tools', 'seeds', 'saplings'].includes(s.group)), '밤엔 낮 코너 물건이 안 보인다 (1층 가구 코너는 덮개 천)');
+  assert.deepEqual(ids('night', 'night-furniture'), groups.night.furniture);
+  assert.ok(ids('night', 'night-tools').length && ids('night', 'night-snacks').length, '밤 도구 · 밤 간식');
+  assert.ok(ids('night', 'always').includes('mat.tour-ticket'));
+  // 다른 날이면 물건이 바뀌어도 자리 수는 같다
+  const next = shopStock('2026-11-05', 12345);
+  for (const [ph, list] of Object.entries(rooms)) assert.equal(list.reduce((n, sp) => n + stockPlan(sp, phaseGroups(next, ph)).length, 0), plans[ph].length, ph);
 });
 
 test('실내: 문 매트 → 계산대 앞 → 주인 자리 앞까지 걸어갈 수 있고, 주인은 막는 상자 뒤', () => {
-  for (const k of PLACE_KINDS) {
-    const spec = specs[k], list = listOf(spec), m = doormatOf(spec), B = boundsOf(spec);
+  for (const k of OUTER_KINDS) for (const ph of specs[k].phases ? Object.keys(specs[k].phases) : [null]) {
+    const spec = ph ? phaseSpec(specs[k], ph) : specs[k], list = listOf(spec), m = doormatOf(spec), B = boundsOf(spec);
     assert.ok(m.entry > B.z0 && m.entry < B.z1, `${k} 들어와서 서는 곳`);
     assert.ok(reachable(spec, list, { lx: m.lx, lz: m.entry }, spec.talk), `${k} 계산대 앞까지`);
     if (spec.unattended) continue;   // P54 이상한 천막: 주인 없음 (talk = 진열 받침 앞)
@@ -206,12 +226,12 @@ test('단풍 방 RM-07: 이사 온 단풍의 집이 빈 기본 방이 아니라 
   assert.ok(room.furniture.some(f => f.item === 'furn.bookshelf') && room.furniture.some(f => f.item === 'furn.dino-model'), '수집가 방 (책장 · 공룡 모형)');
 });
 
-test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60–62 (P44): 스펙 = 목록 = 모델, 아이템 표 밖, 크기가 발자국 안 · 배치의 box 와 같은 칸', () => {
+test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60–62 (P44) + 상점 낮/밤 FU-79–84 (실내 전수): 스펙 = 목록 = 모델, 아이템 표 밖, 크기가 발자국 안 · 배치의 box 와 같은 칸', () => {
   assert.equal(FIXTURE_INDEX, `${FIXTURE_BASE}/index.json`);
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-67', 'FU-68', 'FU-69', 'FU-70', 'FU-74', 'FU-77', 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 붙박이 FU-85–88   // + M14 내 집 계단 FU-67–70
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-67', 'FU-68', 'FU-69', 'FU-70', 'FU-74', 'FU-77', ...Array.from({ length: 6 }, (_, i) => `FU-${79 + i}`), 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 + 실내 전수 상점 낮/밤 FU-79–84
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);
@@ -225,10 +245,11 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
   // 배치가 고른 붙박이: 모델을 못 읽을 때의 임시 상자 칸 = 모델 칸, 케이스 모델 = 케이스 상자 크기
   let used = 0;
   for (const k of PLACE_KINDS) {
-    for (const e of specs[k].furniture) {
+    for (const e of [...specs[k].furniture, ...Object.values(specs[k].phases ?? {}).flatMap(P => P.furniture ?? [])]) {
       const m = fixtures.models.find(x => x.id === e.fu);
       if (!m) continue;
       used++;
+      if (m.place === 'wall') { assert.ok(e.wall, `${k} ${e.fu}: 벽 붙박이는 wall·slot`); continue; }
       assert.deepEqual(e.box.slice(0, 2), m.footprint, `${k} ${e.fu}: box 칸 = 모델 칸`);
     }
     for (const c of specs[k].cases ?? []) {
@@ -238,18 +259,19 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
       used++;
     }
   }
-  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 3 + 8 + 5 + 4 + 4, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 로비 안내대 (요청 9: 화석 받침·케이스는 관 RM-25–30 으로) · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스 탁자·받침·촛대·휘장 둘 · 여우 상인 계산대·미술품 받침 셋 · 이상한 천막 받침·촛대 둘·휘장');
+  assert.equal(used, 1 + 1 + 2 + 2 + 2 + 1 + 3 + 8 + 5 + 4 + 4 + 5 + 4, '상점 1층 계산대·옷 진열대(11차)·실내 문 둘 + 낮 진열 받침 둘 + 밤 덮개 천 둘 · 박물관 로비 안내대 (요청 9: 화석 받침·케이스는 관 RM-25–30 으로) · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스·여우 상인·이상한 천막 (5 + 4 + 4) · 실내 전수 정원 코너 도구 받침·씨앗 진열대 둘·받침·화분 선반 · 지하 밤 코너 등불 진열장·받침·도구 받침·무인 계산함');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - json('assets/interior/halls/fossil.json').racks[0].spots[0][2]) < 0.02, '화석 받침 윗면 = 화석관 받침 자리 높이 (요청 9)');
-  for (const row of specs.shop.stock) if (row.group === 'tools') assert.ok(row.y >= 0.1 && row.y <= 0.14);
+  for (const k of ['shop-garden', 'shop-night']) for (const row of specs[k].stock) if (/tools|always/.test(row.group) && row.lx > 7) assert.ok(row.y >= 0.1 && row.y <= 0.14, `${k} 도구 받침 윗면`);
+  assert.equal(specs['shop-night'].stock.find(row => row.group === 'night-snacks').y, 0.78, '등불 진열장 윗면 0.78 (등불은 뒤쪽 위)');
 });
 
 test('방 셋 확정: 단풍 방 RM-07 · 상점 RM-08 · 박물관 RM-09 status approved', () => {
   const index = json('assets/interior/index.json');
   assert.equal(index.rooms.find(r => r.id === 'RM-07').status, 'approved');
   assert.equal(json('assets/interior/rooms/rm-07.json').status, 'approved');
-  assert.equal(specs.shop.status, 'approved', 'shop');
   assert.ok(['review', 'approved'].includes(specs.museum.status), 'museum: 요청 9 로비 RM-09 v3 은 다시 검수 대기');
+  for (const k of ['shop', 'shop-garden', 'shop-night']) assert.ok(['review', 'approved'].includes(specs[k].status), `${k}: 실내 전수 낮/밤 매장 (v6 · RM-21 · RM-22) 검수 대기`);
   for (const k of ['moonshop', 'tent']) assert.ok(['review', 'approved'].includes(specs[k].status), `${k}: M12 새 방은 검수 대기`);
 });
