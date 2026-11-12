@@ -56,7 +56,7 @@ export function createPickup(ctx, kit, { drops, results, fx, act, garden }) {
     if (t.type === 'weed') fx.chips({ x: t.x, y: t.y + 0.1, z: t.z }, 'leaf', 4);
     if (!got) return;
     results.gain(got, 1, { verb: t.type === 'weed' ? '뽑았다' : '주웠다' });
-    kit.sfx('pickup');
+    kit.sfx('pickup', { kind: t.type });   // kind: 섬 일지(M13-P1)가 잡초 뽑기를 센다
   }
 
   return {

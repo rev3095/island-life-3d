@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈)",
+  "daily": 5,
+  "allDoneBonus": 50,
+  "afterIntro": true,
+  "tasks": [
+    { "id": "fish3", "on": "fish", "need": 3, "pts": 30, "icon": "🎣", "label": "물고기 3마리 낚기" },
+    { "id": "fish1", "on": "fish", "need": 1, "pts": 15, "icon": "🐟", "label": "물고기 한 마리 낚기" },
+    { "id": "bug2", "on": "bug", "need": 2, "pts": 25, "icon": "🦋", "label": "곤충 2마리 잡기" },
+    { "id": "shake3", "on": "shake", "need": 3, "pts": 15, "icon": "🌳", "label": "나무 3그루 흔들기" },
+    { "id": "talk2", "on": "talk", "need": 2, "pts": 20, "icon": "💬", "label": "주민 2명과 이야기하기" },
+    { "id": "talk4", "on": "talk", "need": 4, "pts": 35, "icon": "🗨️", "label": "주민 4명과 이야기하기" },
+    { "id": "water", "on": "water", "need": 3, "pts": 20, "icon": "💧", "label": "꽃 3송이에 물 주기" },
+    { "id": "plant", "on": "plant", "need": 1, "pts": 15, "icon": "🌱", "label": "씨앗이나 묘목 하나 심기" },
+    { "id": "dig", "on": "dig", "need": 1, "pts": 20, "icon": "🦴", "label": "화석 하나 파내기" },
+    { "id": "sell", "on": "sell", "need": 1, "pts": 15, "icon": "🌰", "label": "도토리상점에서 물건 팔기" },
+    { "id": "craft", "on": "craft", "need": 1, "pts": 30, "icon": "🔨", "label": "작업대에서 하나 만들기" },
+    { "id": "donate", "on": "donate", "need": 1, "pts": 30, "icon": "🏛️", "label": "박물관에 하나 기증하기" },
+    { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" }
+  ],
+  "goals": [
+    { "id": "angler", "on": "fish", "steps": [10, 50, 200], "pts": [100, 300, 800], "icon": "🎣", "label": "낚시 솜씨" },
+    { "id": "bugger", "on": "bug", "steps": [10, 50, 200], "pts": [100, 300, 800], "icon": "🦋", "label": "곤충 채집" },
+    { "id": "friend", "on": "talk", "steps": [20, 100, 300], "pts": [100, 300, 800], "icon": "💬", "label": "섬 이웃" },
+    { "id": "garden", "on": "water", "steps": [20, 100, 300], "pts": [100, 300, 800], "icon": "💧", "label": "꽃 가꾸기" },
+    { "id": "maker", "on": "craft", "steps": [5, 20, 60], "pts": [100, 300, 800], "icon": "🔨", "label": "만들기 장인" },
+    { "id": "curator", "on": "donate", "steps": [5, 30, 80], "pts": [100, 300, 800], "icon": "🏛️", "label": "박물관 친구" },
+    { "id": "diary", "on": "allDone", "steps": [3, 10, 30], "pts": [150, 400, 1000], "icon": "📔", "label": "일지 다 채운 날" }
+  ],
+  "shop": [
+    { "id": "acorns", "kind": "acorns", "n": 300, "cost": 100, "icon": "🌰", "label": "도토리 300" },
+    { "id": "seeds", "kind": "item", "item": "seed.cosmos", "n": 3, "cost": 60, "label": "코스모스 씨앗 3" },
+    { "id": "sapling", "kind": "item", "item": "seed.cedar-sapling", "n": 1, "cost": 120, "label": "삼나무 묘목" },
+    { "id": "ticket", "kind": "item", "item": "mat.tour-ticket", "n": 1, "cost": 300, "label": "섬 여행 표" },
+    { "id": "crystal", "kind": "item", "item": "mat.crystal", "n": 1, "cost": 600, "label": "수정" },
+    { "id": "star-rug", "kind": "item", "item": "furn.star-rug", "n": 1, "cost": 500, "label": "별자리 깔개" },
+    { "id": "telescope", "kind": "item", "item": "furn.star-telescope", "n": 1, "cost": 900, "label": "별 망원경" },
+    { "id": "gold", "kind": "item", "item": "mat.gold-ore", "n": 1, "cost": 1500, "label": "금광석" }
+  ]
+}
