@@ -375,13 +375,13 @@ test('보관함 계산 (HubLogic.archiveDoc · archiveRows · tools/hub-archive.
   assert.equal(cd.source, 'docs');
   assert.equal(cd.picksFrom, 'recommended');
   assert.equal(cd.applied.version, 0);
-  // 화면: 차례 순서, 저장소 문서가 있으면 그것, 차례에 없는 새 문서(15차)는 끝에
-  const rows = plain(H.archiveRows(AINDEX, LIST, { '07-wave7': doc, '15-wave15': { seq: 17, cha: 15, label: '15차', board: 'wave15', name: '15차', history: [] } }));
+  // 화면: 차례 순서, 저장소 문서가 있으면 그것, 차례에 없는 새 문서(16차)는 끝에
+  const rows = plain(H.archiveRows(AINDEX, LIST, { '07-wave7': doc, '16-wave16': { seq: 18, cha: 16, label: '16차', board: 'wave16', name: '16차', history: [] } }));
   assert.equal(rows.length, AINDEX.length + 1);
   assert.deepEqual(rows.slice(0, AINDEX.length).map(r => r.id), AINDEX.map(a => a.id));
   assert.equal(rows.find(r => r.id === '07-wave7').stored, true);
   assert.equal(rows.find(r => r.id === '05-wave5').stored, false, '저장소 문서 없으면 차례만 (stored false)');
-  assert.equal(rows.at(-1).id, '15-wave15');
+  assert.equal(rows.at(-1).id, '16-wave16');
 
   const { buildArchive } = await import('../tools/hub-archive.mjs');
   const boards = Object.fromEntries(AINDEX.filter(a => a.kind !== 'concept').map(a => [a.board, { applied: { ...v1, board: a.board }, history: [{ ...v1, board: a.board }] }]));
