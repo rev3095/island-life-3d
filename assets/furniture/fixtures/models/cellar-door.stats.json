@@ -1,0 +1,57 @@
+{
+  "id": "FU-80",
+  "slug": "cellar-door",
+  "item": "fixture.cellar-door",
+  "name": "지하 계단 문",
+  "category": "fixture",
+  "kind": "cellar-door",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2168,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "frame",
+    "glow",
+    "lamp",
+    "leaf",
+    "moon",
+    "sign",
+    "trim"
+  ],
+  "objects": [
+    "door",
+    "lamp",
+    "sign"
+  ],
+  "animations": {},
+  "size": [
+    0.92,
+    0.17,
+    2.32
+  ],
+  "bounds": [
+    [
+      -0.46,
+      -0.145,
+      -0.02
+    ],
+    [
+      0.46,
+      0.02,
+      2.32
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 45780,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cellar-door_front.png",
+    "cellar-door_main.png",
+    "cellar-door_thumb.png",
+    "cellar-door_top.png"
+  ]
+}

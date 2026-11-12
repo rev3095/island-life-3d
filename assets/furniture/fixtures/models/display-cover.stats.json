@@ -1,0 +1,55 @@
+{
+  "id": "FU-79",
+  "slug": "display-cover",
+  "item": "fixture.display-cover",
+  "name": "진열 덮개 천",
+  "category": "fixture",
+  "kind": "display-cover",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2812,
+  "parts": 3,
+  "materials": [
+    "cloth",
+    "clothDark",
+    "moon",
+    "tag",
+    "trim",
+    "woodDark"
+  ],
+  "objects": [
+    "cloth",
+    "stand",
+    "tag"
+  ],
+  "animations": {},
+  "size": [
+    2.02,
+    2.01,
+    0.68
+  ],
+  "bounds": [
+    [
+      -1.009,
+      -1.007,
+      -0.16
+    ],
+    [
+      1.009,
+      1.007,
+      0.68
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 56584,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "display-cover_front.png",
+    "display-cover_main.png",
+    "display-cover_thumb.png",
+    "display-cover_top.png"
+  ]
+}

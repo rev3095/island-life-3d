@@ -1,0 +1,73 @@
+{
+  "id": "FU-83",
+  "slug": "honesty-box",
+  "item": "fixture.honesty-box",
+  "name": "무인 계산함",
+  "category": "fixture",
+  "kind": "honesty-box",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "지하 밤 코너의 나무 계산함 — 고른 물건 값을 넣는 틈, 도토리 패, 위 작은 초롱, 쪽지.",
+    "keywords": [
+      "나무 상자",
+      "도토리 패",
+      "초롱"
+    ],
+    "references": [
+      "동네 잡화점·작은 가게 지하"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99A63",
+    "woodDark": "#8C6440",
+    "top": "#D9B382",
+    "slot": "#2A1F1B",
+    "plaque": "#E9D7A8",
+    "acorn": "#B5743F",
+    "acornCap": "#7A4E2B",
+    "paper": "#FFF3DC",
+    "brass": "#D9A84E",
+    "lamp": "#F4E6C8",
+    "glow": "#FFD66B"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "top": "윗판",
+    "slot": "틈",
+    "plaque": "패",
+    "acorn": "도토리",
+    "acornCap": "도토리 모자",
+    "paper": "쪽지",
+    "brass": "놋쇠",
+    "lamp": "초롱",
+    "glow": "불빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

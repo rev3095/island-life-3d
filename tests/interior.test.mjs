@@ -157,8 +157,8 @@ test('state.house 벽지·바닥 칸: 예전 저장·모르는 slug·안 가진 
 test('주민 집 문: 집에 있으면 들어가고, 외출이면 잠기고, 자면 노크(town), 이사 전이면 문이 없다', () => {
   const town = at => ({ residents: () => ['coco', 'bori'], atHome: () => at });
   assert.equal(visitRule(town('home'), 'coco'), 'open');
-  assert.equal(visitRule(town('out'), 'coco'), 'locked');
-  assert.equal(visitRule(town('sleep'), 'coco'), null);
+  assert.equal(visitRule(town('out'), 'coco'), 'away', '실내 전수: 외출 중이어도 들어간다 (빈 방)');
+  assert.equal(visitRule(town('sleep'), 'coco'), 'asleep', '실내 전수: 자는 중이어도 살금살금');
   assert.equal(visitRule(town('room'), 'coco'), null);
   assert.equal(visitRule(town('home'), 'danpung'), null, '입주 전');
   assert.equal(visitRule({ villagers: [] }, 'coco'), 'open', 'atHome 이 없는 town');

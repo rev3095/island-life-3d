@@ -1,0 +1,136 @@
+{
+  "id": "RM-21",
+  "slug": "shop-night",
+  "kind": "place",
+  "place": "shop-night",
+  "parent": "shop",
+  "phase": "night",
+  "name": "지하 밤 코너",
+  "version": 1,
+  "status": "review",
+  "note": "실내 전수: 도토리상점 1층 동쪽 지하 계단 문(FU-80)으로 내려가는 밤(22–8시) 방. 창 없는 지하 · 벽지 WP-08 밤하늘 별(상점 한정) · 바닥 FL-05 짙은 판자. 북쪽 등불 진열장(FU-84)에 밤 간식, 서쪽 받침에 오늘의 밤 가구 둘, 동쪽 도구 받침에 밤낚시·밤 곤충 도구 + 늘 파는 것(잠수 용품 · 섬 여행 표), 문 옆 무인 계산함(FU-83 — 밤톨은 1층 계산대에 있다). 진열품 앞 「보기」로 산다. 진열표 rules.json shop.night · shop.always.",
+  "size": [
+    8,
+    6
+  ],
+  "wallpaper": "wp-08",
+  "floor": "fl-05",
+  "windows": [],
+  "door": {
+    "gx0": 3,
+    "gx1": 4
+  },
+  "honesty": true,
+  "furniture": [
+    {
+      "fu": "FU-84",
+      "name": "등불 진열장",
+      "box": [
+        2,
+        1,
+        0.78
+      ],
+      "color": "#7A5A3E",
+      "gx": 3,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-35",
+      "name": "밤 가구 받침",
+      "box": [
+        2,
+        2,
+        0.18
+      ],
+      "color": "#4F5F94",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-39",
+      "name": "도구 받침",
+      "box": [
+        1,
+        3,
+        0.12
+      ],
+      "color": "#7A5A3E",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-83",
+      "name": "무인 계산함",
+      "box": [
+        1,
+        1,
+        0.8
+      ],
+      "color": "#9C7650",
+      "gx": 6,
+      "gz": 4,
+      "rot": 0
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.floor-lamp",
+      "gx": 0,
+      "gz": 4,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "w",
+      "slot": 3
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "n",
+      "slot": 6
+    }
+  ],
+  "stock": [
+    {
+      "group": "night-snacks",
+      "lx": 3.5,
+      "lz": 0.45,
+      "y": 0.78,
+      "dx": 1,
+      "count": 2
+    },
+    {
+      "group": "night-furniture",
+      "lx": 1,
+      "lz": 0.5,
+      "y": 0.18,
+      "fit": 0.95,
+      "dz": 1,
+      "count": 2
+    },
+    {
+      "group": "night-tools",
+      "lx": 7.5,
+      "lz": 0.35,
+      "y": 0.12,
+      "dz": 0.55,
+      "count": 2
+    },
+    {
+      "group": "always",
+      "lx": 7.5,
+      "lz": 1.45,
+      "y": 0.12,
+      "dz": 0.55,
+      "count": 3
+    }
+  ]
+}

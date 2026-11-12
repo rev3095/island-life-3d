@@ -148,14 +148,15 @@ test('D108-A 야행성 달무리: 19시–5시 깨어 있고 낮엔 잠, 새벽�
 
 test('달빛 가게 RM-10 · 새벽 천막 RM-11: 실내 자리 · 건물 · 방 자리가 겹치지 않음', () => {
   assert.deepEqual(PLACE_KINDS.slice(2, 4), ['moonshop', 'tent']);
-  assert.deepEqual(PLACE_KINDS.slice(4), ['fortune', 'foxshop', 'oddtent'], 'P54 운세 부스 · 여우 상인 · 이상한 천막');
+  assert.deepEqual(PLACE_KINDS.slice(-3), ['fortune', 'foxshop', 'oddtent'], 'P54 운세 부스 · 여우 상인 · 이상한 천막');
   for (const [k, c] of [['fortune', CFG.fortune], ['foxshop', CFG.fox], ['oddtent', CFG.odd]]) assert.equal(PLACE_BUILDING[k], c.building, k);
   assert.equal(PLACE_BUILDING.moonshop, CFG.shop.building);
   assert.equal(PLACE_BUILDING.tent, CFG.tent.building);
   for (const [i, k] of PLACE_KINDS.entries()) assert.equal(json(PLACE_FILES[i]).place, k);
   const src = readFileSync(resolve(root, 'src/gameplay/house/room.js'), 'utf8');   // room.js 는 three 를 불러서 글로 읽는다
-  const rooms = [...src.matchAll(/(\w+): \{ x: (\d+), z: (\d+) \}/g)].map(m => ({ k: m[1], x: +m[2], z: +m[3] }));
-  assert.ok(rooms.length >= 7, `방 자리 ${rooms.length} (상점·박물관·달빛 가게·천막 + P54 셋)`);
+  // 실내 전수: 상점 딸린 방(정원 코너·지하 밤 코너)은 x 580 에 z ±40 · P54 셋은 z 60 줄 — 실내끼리 (x, z) 가 32 넘게 떨어짐
+  const rooms = [...src.matchAll(/'?([\w-]+)'?: \{ x: (-?\d+), z: (-?\d+) \}/g)].map(m => ({ k: m[1], x: +m[2], z: +m[3] }));
+  assert.equal(rooms.length, PLACE_KINDS.length, `방 자리 ${rooms.length} = 실내 종류 수`);
   for (const a of rooms) for (const b of rooms) if (a !== b) assert.ok(Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z)) >= 32, `실내끼리 32 넘게 떨어짐 (${a.k}·${b.k})`);
   assert.equal(json('assets/interior/places/moonshop.json').keeper.slug, CFG.shop.keeper);
   assert.equal(json('assets/interior/places/tent.json').keeper.slug, CFG.tent.keeper);

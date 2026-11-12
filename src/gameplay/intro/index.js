@@ -323,7 +323,7 @@ export default {
       const hour = S().time?.now?.().hour ?? new Date().getHours();
       return {
         touch: !!ctx.input?.touch,
-        shopOpen: d?.economy?.isOpen?.(hour) ?? true,
+        shopOpen: S().house?.places?.info?.('shop') ? true : d?.economy?.isOpen?.(hour) ?? true,   // 실내 전수: 실내가 있으면 상점은 늘 연다 (밤 매장)
         canSell: slots.some(s => s && itemCat(s.id) !== 'tool'),
         canDonate: slots.some(s => s && d.museum?.canDonate?.(s.id)),
         inside: !!S().house?.inside,

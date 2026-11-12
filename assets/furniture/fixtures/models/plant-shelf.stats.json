@@ -1,0 +1,59 @@
+{
+  "id": "FU-82",
+  "slug": "plant-shelf",
+  "item": "fixture.plant-shelf",
+  "name": "화분 선반",
+  "category": "fixture",
+  "kind": "plant-shelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3684,
+  "parts": 2,
+  "materials": [
+    "center",
+    "flower",
+    "flower2",
+    "leaf2",
+    "leafDark",
+    "pot",
+    "potLight",
+    "soil",
+    "stem",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "pots",
+    "shelf"
+  ],
+  "animations": {},
+  "size": [
+    1.84,
+    0.76,
+    1.23
+  ],
+  "bounds": [
+    [
+      -0.92,
+      -0.38,
+      0.0
+    ],
+    [
+      0.92,
+      0.38,
+      1.226
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 78476,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "plant-shelf_front.png",
+    "plant-shelf_main.png",
+    "plant-shelf_thumb.png",
+    "plant-shelf_top.png"
+  ]
+}

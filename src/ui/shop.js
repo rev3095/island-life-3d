@@ -1,5 +1,6 @@
 // 도토리상점: 사기(진열 목록) / 팔기(가방 팔기 모드). 거래는 data 서비스(wallet·inventory)로 한다.
 // 사기 탭 아래 '오늘의 벽지·바닥' 코너 (5차 Z2): house.interior.today() 가 날마다 하나씩 고른 것. 산 것은 가방이 아니라 집 꾸미기 목록(house.interior.add)에 들어간다.
+// 실내 전수 (UI-31): 도토리상점에선 진열품을 매장에서 앞에 서서 「보기」로 사고, 밤톨과 말하면 이 창 — 탭 이름 buyLabel '주문'(그 매장에서 오늘 파는 것 목록) · 팔기, 제목에 floor '낮 매장'/'밤 매장'.
 // 11차 D102-A '오늘의 옷' 코너 (clothes: true — 도토리상점만): outfit.today() 의 옷 둘. 산 옷은 가방이 아니라 옷장(outfit 옷장 목록)에, 첫 옷이면 옷장 가구도.
 import { h, fmt, itemInfo, iconEl, josa } from './dom.js';
 import { panelShell, button, confirmBox } from './panels.js';
@@ -15,13 +16,13 @@ export function createShop(ctx, panels, { bag, toast }) {
   let current = null;
 
   /** only = 'sell' 이면 팔기 탭만 (첫날 밤 문 너머 장사, 7차 D51-A), greet = 주인 한 줄 */
-  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab, only = null, clothes = false, greet = ' 어서 와요! 천천히 둘러봐요.' } = {}) {
+  function open({ stock = [], title = '도토리상점', keeper = '밤톨', color = '#C7743E', tab: startTab, only = null, clothes = false, greet = ' 어서 와요! 천천히 둘러봐요.', buyLabel = '사기', floor = null } = {}) {
     if (current) return current.p.result;
     let p, tab = only === 'sell' || startTab === 'sell' ? 'sell' : 'buy';
     const data = () => ctx.services.data;
-    const shell = panelShell({ cls: 'pk-shop', title, tagColor: color, onClose: () => p.close(null), onOutside: () => p.close(null) });
+    const shell = panelShell({ cls: 'pk-shop', title: floor ? `${title} · ${floor}` : title, tagColor: color, onClose: () => p.close(null), onOutside: () => p.close(null) });
     const wallet = h('span', { class: 'pk-wallet' });
-    const tabs = h('div', { class: 'pk-tabs', role: 'tablist', 'aria-label': '사기 팔기' });
+    const tabs = h('div', { class: 'pk-tabs', role: 'tablist', 'aria-label': `${buyLabel} 팔기` });
     const view = h('div', { class: 'pk-shop-view', role: 'tabpanel' });
     shell.body.append(h('p', { class: 'pk-keeper' }, h('b', null, keeper), greet), tabs, view);
     shell.foot.append(wallet);
@@ -30,7 +31,7 @@ export function createShop(ctx, panels, { bag, toast }) {
     function draw(focusSel) {
       wallet.textContent = `🌰 ${fmt(acorns())}`;
       wallet.setAttribute('aria-label', `가진 도토리 ${fmt(acorns())}개`);
-      tabs.replaceChildren(...[['buy', '사기'], ['sell', '팔기']].filter(([id]) => !only || id === only).map(([id, t]) => h('button', {
+      tabs.replaceChildren(...[['buy', buyLabel], ['sell', '팔기']].filter(([id]) => !only || id === only).map(([id, t]) => h('button', {
         type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(tab === id), tabindex: tab === id ? '0' : '-1',
         onclick: () => { tab = id; draw('[role="tab"][aria-selected="true"]'); },
       }, t)));

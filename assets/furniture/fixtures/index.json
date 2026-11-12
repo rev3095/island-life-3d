@@ -367,6 +367,126 @@
       "status": "review"
     },
     {
+      "id": "FU-79",
+      "slug": "display-cover",
+      "item": "fixture.display-cover",
+      "name": "진열 덮개 천",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        2.02,
+        2.01,
+        0.68
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-80",
+      "slug": "cellar-door",
+      "item": "fixture.cellar-door",
+      "name": "지하 계단 문",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.92,
+        0.17,
+        2.32
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-81",
+      "slug": "garden-door",
+      "item": "fixture.garden-door",
+      "name": "정원 코너 문",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.92,
+        0.16,
+        2.11
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-82",
+      "slug": "plant-shelf",
+      "item": "fixture.plant-shelf",
+      "name": "화분 선반",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.84,
+        0.76,
+        1.23
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-83",
+      "slug": "honesty-box",
+      "item": "fixture.honesty-box",
+      "name": "무인 계산함",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.6,
+        0.6,
+        0.79
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-84",
+      "slug": "lantern-shelf",
+      "item": "fixture.lantern-shelf",
+      "name": "등불 진열장",
+      "place": "floor",
+      "footprint": [
+        2,
+        1
+      ],
+      "size": [
+        1.86,
+        0.76,
+        1.4
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-85",
       "slug": "glass-case",
       "item": "fixture.glass-case",

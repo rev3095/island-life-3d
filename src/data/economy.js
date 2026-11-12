@@ -9,7 +9,6 @@ export const SHOP_HOURS = { open: RULES.shop.open, close: RULES.shop.close };   
 export const SHOP_FURNITURE_PER_DAY = RULES.shop.furniturePerDay;
 export const SHOP_OUTDOOR_PER_DAY = RULES.shop.outdoorPerDay ?? 0;   // 10차 D99-A: 하루 가구 중 야외 가구 몫 (실내 셋 + 야외 하나)
 export const SHOP_FLOWER_SEEDS_PER_DAY = RULES.shop.flowerSeedsPerDay;
-export const SHOP_ALWAYS = RULES.shop.always ?? [];   // M16: 늘 파는 것 (아이템 id 목록)
 
 const FRUIT_TREES = items.list('fruit').filter(f => f.variant && !f.islet).map(f => f.id);   // 무인도 과일(P35)은 섬 특산이 되지 않는다
 /** 섬 특산 과일: 섬 시드로 정해진다. 특산 과일은 싸게(nativePrice 100), 나머지는 비싸게(500) 팔린다 */
@@ -27,6 +26,10 @@ export function sellPrice(id, { native = null } = {}) {
 export const buyPrice = id => items.get(id)?.buy ?? 0;
 
 export const isShopOpen = hour => hour >= SHOP_HOURS.open && hour < SHOP_HOURS.close;
+/** 실내 전수 (낮/밤 매장): 영업 시각(open–close) = 'day' 낮 매장, 그 밖 = 'night' 밤 매장. 상점은 늘 들어갈 수 있고 매장(진열·열린 방)만 바뀐다 */
+export const shopPhase = hour => (isShopOpen(hour) ? 'day' : 'night');
+const NIGHT = RULES.shop.night ?? {};
+const ALWAYS = RULES.shop.always ?? [];
 
 /**
  * 오늘의 가구 (10차 D99-A): 상점 가구 후보(source 'shop') 중 야외 가구(outdoor) outdoor 개 + 나머지 실내 가구 → [실내…, 야외…].
@@ -41,19 +44,29 @@ export function pickShopFurniture(pool, rng, { total = SHOP_FURNITURE_PER_DAY, o
   return { indoor: ins, outdoor: outs, all: [...ins, ...outs] };
 }
 
-/** 그날의 상점 물건: 가구 4 (실내 3 + 야외 1) + 도구 5 + 꽃씨 2 + 묘목 + 섬 여행 표 + 늘 파는 것(스쿠버 키트). furniture = [실내…, 야외…] (진열 받침 순서, assets/interior/places/shop.json stock) */
+/** 그날의 상점 물건: 가구 4 (실내 3 + 야외 1) + 도구 5 + 꽃씨 2 + 묘목. furniture = [실내…, 야외…] (진열 받침 순서, assets/interior/places/shop.json stock) */
 export function shopStock(dayKey, seed = 0) {
   const rng = rngFor(seed, dayKey, 'shop');
   const furn = pickShopFurniture(items.list('furn').filter(f => f.source === 'shop'), rng);
   const furniture = furn.all;
-  const tools = items.list('tool').filter(t => t.tool).map(t => t.id);   // 손에 드는 도구 다섯 (스쿠버 키트는 아래 always)
+  const tools = items.list('tool').map(t => t.id);
   const seeds = sample(items.list('seed').filter(s => s.flower).map(s => s.id), SHOP_FLOWER_SEEDS_PER_DAY, rng);
   const saplings = items.list('seed').filter(s => s.tree).map(s => s.id);
   // B-14 무인도 투어 섬 여행 표: 선착장 배 말고 도토리상점에서도 늘 (사는 값 = items.json buy)
   const tickets = items.get('mat.tour-ticket')?.buy > 0 ? ['mat.tour-ticket'] : [];
-  // M16 잠수: 날마다 바뀌지 않고 늘 파는 것 (rules.json shop.always — 지금 스쿠버 키트 tool.scuba-kit)
-  const always = SHOP_ALWAYS.filter(id => items.get(id)?.buy > 0 && !tools.includes(id) && !tickets.includes(id));
-  return { furniture, outdoor: furn.outdoor, tools, seeds, saplings, tickets, always, all: [...furniture, ...tools, ...seeds, ...saplings, ...tickets, ...always] };
+  // 실내 전수: 낮/밤 늘 파는 것 (rules.json shop.always — 잠수 트랙 tool.scuba-kit 처럼 다른 트랙이 더하는 아이템은 표에 있고 값이 있을 때만)
+  const always = ALWAYS.filter(id => items.get(id)?.buy > 0);
+  const dayTools = tools.filter(id => !always.includes(id));
+  // 밤 매장 (지하 밤 코너 RM-21): 밤 가구 후보에서 날마다 몇 개 · 밤 도구 · 밤 간식 (모두 표에 있고 값이 있는 것만)
+  const sold = id => items.get(id)?.buy > 0;
+  const night = {
+    furniture: sample((NIGHT.furniture ?? []).filter(sold), NIGHT.furniturePerDay ?? 2, rngFor(seed, dayKey, 'shop-night')),
+    tools: (NIGHT.tools ?? []).filter(id => sold(id) && !always.includes(id)),
+    snacks: (NIGHT.snacks ?? []).filter(sold),
+  };
+  const dayAll = [...new Set([...furniture, ...dayTools, ...seeds, ...saplings, ...tickets, ...always])];
+  const nightAll = [...new Set([...night.furniture, ...night.tools, ...night.snacks, ...always])];
+  return { furniture, indoor: furn.indoor, outdoor: furn.outdoor, tools: dayTools, seeds, saplings, tickets, always, night, all: dayAll, nightAll };
 }
 
 /** 가방·지갑에 붙여 쓰는 판매·구매. getSeed / getDayKey 는 그때그때 상태에서 읽는다 */
@@ -63,13 +76,17 @@ export function createEconomy({ inventory, wallet, getSeed = () => 0, getDayKey 
   const catOf = id => items.get(id)?.category ?? null;
   const price = id => { const v = sellPrice(id, { native: native() }); return v > 0 ? Math.round(v * sellMult(catOf(id))) : v; };
   const buyNow = id => { const v = buyPrice(id); return v > 0 ? Math.round(v * buyMult(catOf(id))) : v; };
-  const stock = (dayKey = getDayKey()) => shopStock(dayKey, getSeed()).all;
+  /** 그날 파는 물건 목록 (상점 주인 「주문」 창). phase 'night' 면 밤 매장 것 */
+  const stock = (dayKey = getDayKey(), phase = 'day') => { const g = shopStock(dayKey, getSeed()); return phase === 'night' ? g.nightAll : g.all; };
 
   return {
     sellPrice: price,
     buyPrice: buyNow,
     nativeFruit: native,
     isOpen: isShopOpen,
+    phase: shopPhase,
+    /** 낮 매장 시각 { open, close } (rules.json shop) */
+    hours: SHOP_HOURS,
     stock,
     stockGroups: (dayKey = getDayKey()) => shopStock(dayKey, getSeed()),
     /** 가방 칸 팔기 → 받은 도토리 (0 = 못 팜). 가구·도구도 팔린다 */

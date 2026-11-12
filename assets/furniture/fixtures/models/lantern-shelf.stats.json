@@ -1,0 +1,56 @@
+{
+  "id": "FU-84",
+  "slug": "lantern-shelf",
+  "item": "fixture.lantern-shelf",
+  "name": "등불 진열장",
+  "category": "fixture",
+  "kind": "lantern-shelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2112,
+  "parts": 2,
+  "materials": [
+    "basket",
+    "glow",
+    "lamp",
+    "lamp2",
+    "string",
+    "top",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "lanterns",
+    "shelf"
+  ],
+  "animations": {},
+  "size": [
+    1.86,
+    0.76,
+    1.4
+  ],
+  "bounds": [
+    [
+      -0.93,
+      -0.36,
+      0.0
+    ],
+    [
+      0.93,
+      0.405,
+      1.4
+    ]
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 46520,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lantern-shelf_front.png",
+    "lantern-shelf_main.png",
+    "lantern-shelf_thumb.png",
+    "lantern-shelf_top.png"
+  ]
+}
