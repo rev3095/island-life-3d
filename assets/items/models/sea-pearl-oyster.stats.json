@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-19",
+  "slug": "sea-pearl-oyster",
+  "name": "진주조개",
+  "group": "sea",
+  "kind": "pearl-oyster",
+  "version": "0.1",
+  "items": [
+    "sea.pearl-oyster"
+  ],
+  "hold": true,
+  "triangles": 1904,
+  "parts": 1,
+  "materials": [
+    "nacre",
+    "nacreB",
+    "nacreC",
+    "pearl",
+    "pearlShine",
+    "shell",
+    "shellLine"
+  ],
+  "objects": [
+    "pearl"
+  ],
+  "size": [
+    0.239,
+    0.2,
+    0.126
+  ],
+  "bounds": [
+    [
+      -0.119,
+      -0.1,
+      -0.063
+    ],
+    [
+      0.119,
+      0.1,
+      0.063
+    ]
+  ],
+  "glbBytes": 55508,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-pearl-oyster_main.png",
+    "sea-pearl-oyster_thumb.png"
+  ]
+}

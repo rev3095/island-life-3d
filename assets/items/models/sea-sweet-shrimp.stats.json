@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-09",
+  "slug": "sea-sweet-shrimp",
+  "name": "단새우",
+  "group": "sea",
+  "kind": "shrimp",
+  "version": "0.1",
+  "items": [
+    "sea.sweet-shrimp"
+  ],
+  "hold": true,
+  "triangles": 3650,
+  "parts": 1,
+  "materials": [
+    "antenna",
+    "band",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fan",
+    "leg"
+  ],
+  "objects": [
+    "shrimp"
+  ],
+  "size": [
+    0.114,
+    0.205,
+    0.148
+  ],
+  "bounds": [
+    [
+      -0.057,
+      -0.102,
+      -0.074
+    ],
+    [
+      0.057,
+      0.102,
+      0.074
+    ]
+  ],
+  "glbBytes": 76040,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sweet-shrimp_main.png",
+    "sea-sweet-shrimp_thumb.png"
+  ]
+}

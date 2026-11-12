@@ -1,0 +1,53 @@
+{
+  "id": "IC-TL-06",
+  "slug": "tool-scuba-kit",
+  "name": "스쿠버 키트",
+  "group": "tool",
+  "kind": "scuba",
+  "version": "0.1",
+  "items": [
+    "tool.scuba-kit"
+  ],
+  "hold": false,
+  "triangles": 3358,
+  "parts": 1,
+  "materials": [
+    "fin",
+    "finDark",
+    "hose",
+    "lens",
+    "mask",
+    "metal",
+    "metalDark",
+    "snorkel",
+    "strap",
+    "tank",
+    "tankBand"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.676,
+    0.529,
+    0.204
+  ],
+  "bounds": [
+    [
+      -0.338,
+      -0.265,
+      0.0
+    ],
+    [
+      0.338,
+      0.265,
+      0.204
+    ]
+  ],
+  "glbBytes": 77412,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-scuba-kit_main.png",
+    "tool-scuba-kit_thumb.png"
+  ]
+}

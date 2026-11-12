@@ -16,18 +16,20 @@ const catalog = json('assets/clothes/index.json');
 const specs = readdirSync(new URL('assets/clothes/specs/', ROOT)).map(f => json(`assets/clothes/specs/${f}`));
 const player = json('assets/specs/player.json');
 
-test('옷 목록 = 스펙 13벌 (CL-00 기본 + 모자 넷 · 윗옷 다섯 · 신발 셋), 검수 대기', () => {
-  assert.equal(specs.length, 13);
-  assert.deepEqual(catalog.models.map(m => m.id), Array.from({ length: 13 }, (_, i) => `CL-${String(i).padStart(2, '0')}`));
+test('옷 목록 = 스펙 14벌 (CL-00 기본 + 모자 넷 · 윗옷 다섯 · 신발 셋 + M16 잠수복 CL-13), 검수 대기', () => {
+  assert.equal(specs.length, 14);
+  assert.deepEqual(catalog.models.map(m => m.id), Array.from({ length: 14 }, (_, i) => `CL-${String(i).padStart(2, '0')}`));
   assert.deepEqual(catalog.models.map(m => m.slug).sort(), specs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-clothes.mjs --index)');
   const count = slot => catalog.models.filter(m => m.slot === slot && !m.builtin).length;
-  assert.deepEqual([count('hat'), count('top'), count('shoes')], [4, 5, 3]);
+  assert.deepEqual([count('hat'), count('top'), count('shoes'), count('suit')], [4, 5, 3, 1]);
+  assert.deepEqual(catalog.slots, SLOTS, '목록 slots = 옷장·상점 세 칸 (잠수복 suit 칸은 빠진다)');
   for (const s of specs) {
     const m = catalog.models.find(x => x.slug === s.slug);
     assert.equal(m.version, s.version, s.slug);
     assert.equal(m.status, s.status, s.slug);
     assert.ok(['review', 'approved'].includes(s.status), s.slug);
-    assert.ok(SLOTS.includes(s.slot), s.slug);
+    assert.ok(SLOTS.includes(s.slot) || s.slot === 'suit', s.slug);   // suit = M16 잠수복 (바다에서만, 옷장·상점 밖)
+    if (s.slot === 'suit') assert.ok(!(s.buy > 0) && !(s.sell > 0), `${s.slug}: 잠수복은 팔고 사지 않는다`);
     for (const [k, v] of Object.entries({ ...s.palette, ...Object.assign({}, ...Object.values(s.variants ?? {}).map(v => v.palette)) })) assert.match(v, /^#[0-9A-F]{6}$/i, `${s.slug} ${k}`);
   }
   const base = entryOf(catalog, BASE_TOP_ID);
@@ -92,6 +94,11 @@ test('저장 칸 고르기: 모르는 옷·칸이 다른 옷·안 가진 옷은 
   assert.deepEqual(addToCloset(closet, 'raincoat@pink', catalog), [...closet, 'raincoat@pink']);
   assert.equal(addToCloset(closet, 'straw-hat', catalog), closet, '이미 있음');
   assert.equal(addToCloset(closet, BASE_TOP_ID, catalog), closet, '기본 옷은 늘 가진 것');
+  // M16 잠수복 (slot suit): 옷장·칸·저장 정규화에 새지 않는다
+  assert.deepEqual(normalizeCloset(['wetsuit', 'straw-hat'], catalog), ['straw-hat'], '잠수복은 옷장 목록에서 빠진다');
+  assert.equal(addToCloset(closet, 'wetsuit', catalog), closet, '잠수복은 옷장에 안 들어간다');
+  assert.deepEqual(Object.keys(closetBySlot(['wetsuit'], catalog)), SLOTS);
+  assert.deepEqual(normalizeOutfit({ hat: 'wetsuit', top: 'wetsuit' }, catalog, ['wetsuit']), DEFAULT_OUTFIT);
 });
 
 test('상점 하루 옷 둘 (D102-A): 같은 날 같은 옷 · 같은 옷 다른 색은 같은 날 안 나옴 · 날마다 바뀜 · 기본 옷은 안 팖', () => {
@@ -99,6 +106,7 @@ test('상점 하루 옷 둘 (D102-A): 같은 날 같은 옷 · 같은 옷 다른
   const pool = shopPool(catalog);
   assert.equal(pool.length, 4 + 5 * 2 + 3, '모자 넷 + 윗옷 다섯 × 색 둘 + 신발 셋');
   assert.ok(!pool.includes(BASE_TOP_ID));
+  assert.ok(!pool.some(id => parseWear(id).slug === 'wetsuit'), '잠수복은 안 판다');
   const a = pickShopClothes(catalog, '2027-03-01', 20261028, 2);
   assert.equal(a.length, 2);
   assert.deepEqual(pickShopClothes(catalog, '2027-03-01', 20261028, 2), a, '같은 날 = 같은 옷');

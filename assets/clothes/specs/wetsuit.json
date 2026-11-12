@@ -1,0 +1,56 @@
+{
+  "id": "CL-13",
+  "slug": "wetsuit",
+  "name": "잠수복",
+  "category": "clothes",
+  "slot": "suit",
+  "kind": "wetsuit",
+  "version": "0.1",
+  "status": "review",
+  "body": "player",
+  "buy": 0,
+  "sell": 0,
+  "prompt": {
+    "concept": "몸통·팔·다리를 다 덮는 남색 잠수복 + 하늘색 옆줄, 눈 앞에 쓴 물안경, 등에 작은 노란 공기통. 바다에서 헤엄칠 때만 게임이 입힌다 (옷장·상점에는 안 나옴).",
+    "keywords": [
+      "남색 잠수복",
+      "하늘색 옆줄",
+      "물안경 (눈 앞)",
+      "노란 공기통"
+    ],
+    "references": [],
+    "avoid": [
+      "물안경을 이마 위로 올리기",
+      "실제 브랜드 무늬·로고",
+      "다른 게임의 옷 디자인"
+    ],
+    "notes": "M16 잠수 — 칸 suit (모자·윗옷·신발과 별개), buy 0 · sell 0"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "cuff": {
+      "label": "소매 끝 고리 (끄면 옆줄 색 띠로)",
+      "value": false
+    },
+    "stripe": {
+      "label": "옆줄 반폭",
+      "value": 0.022,
+      "min": 0.01,
+      "max": 0.04,
+      "step": 0.001
+    }
+  },
+  "palette": {
+    "suit": "#2C3E6B",
+    "suitStripe": "#7CC8EA",
+    "maskFrame": "#3FA7B8",
+    "maskLens": "#E8F8FF",
+    "maskStrap": "#22304E",
+    "tank": "#F2C53D",
+    "tankValve": "#9AA4AC"
+  }
+}

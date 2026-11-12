@@ -1,0 +1,76 @@
+{
+  "id": "IC-SE-17",
+  "slug": "sea-horseshoe-crab",
+  "name": "투구게",
+  "group": "sea",
+  "category": "item",
+  "kind": "horseshoe-crab",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.horseshoe-crab",
+      "code": "IC-SE-17"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "둥근 투구 등판 + 가시 난 뒷판 + 긴 꼬리 가시, 올리브 갈색",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이 (꼬리 뺌)",
+      "value": 0.3,
+      "min": 0.18,
+      "max": 0.45,
+      "step": 0.01,
+      "live": false
+    },
+    "tail": {
+      "label": "꼬리 가시 길이",
+      "value": 0.22,
+      "min": 0.1,
+      "max": 0.35,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "carapace": "#7A6A3A",
+    "carapaceDark": "#5A4C28",
+    "belly": "#B8A070",
+    "tail": "#6A5A30",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "carapace": "등판",
+    "carapaceDark": "등줄·가시",
+    "belly": "배",
+    "tail": "꼬리",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

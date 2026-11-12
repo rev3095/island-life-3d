@@ -1,0 +1,48 @@
+{
+  "id": "IC-SE-17",
+  "slug": "sea-horseshoe-crab",
+  "name": "투구게",
+  "group": "sea",
+  "kind": "horseshoe-crab",
+  "version": "0.1",
+  "items": [
+    "sea.horseshoe-crab"
+  ],
+  "hold": true,
+  "triangles": 2194,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "carapace",
+    "carapaceDark",
+    "eye",
+    "eyeHighlight",
+    "tail"
+  ],
+  "objects": [
+    "horseshoe"
+  ],
+  "size": [
+    0.3,
+    0.484,
+    0.072
+  ],
+  "bounds": [
+    [
+      -0.15,
+      -0.242,
+      -0.036
+    ],
+    [
+      0.15,
+      0.242,
+      0.036
+    ]
+  ],
+  "glbBytes": 49692,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-horseshoe-crab_main.png",
+    "sea-horseshoe-crab_thumb.png"
+  ]
+}

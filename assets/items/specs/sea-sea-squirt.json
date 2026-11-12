@@ -1,0 +1,62 @@
+{
+  "id": "IC-SE-04",
+  "slug": "sea-sea-squirt",
+  "name": "멍게",
+  "group": "sea",
+  "category": "item",
+  "kind": "sea-squirt",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sea-squirt",
+      "code": "IC-SE-04"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "주황빨강 울퉁불퉁 덩이에 혹 돌기, 위에 + 자국 난 구멍 둘",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "키",
+      "value": 0.2,
+      "min": 0.12,
+      "max": 0.35,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "squirt": "#E0583A",
+    "squirtLight": "#F08A5A",
+    "squirtDark": "#9E3424"
+  },
+  "paletteLabels": {
+    "squirt": "몸",
+    "squirtLight": "밝은 혹",
+    "squirtDark": "구멍 자국·밑동"
+  }
+}

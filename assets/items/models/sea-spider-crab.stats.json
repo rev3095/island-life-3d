@@ -1,0 +1,50 @@
+{
+  "id": "IC-SE-16",
+  "slug": "sea-spider-crab",
+  "name": "키다리게",
+  "group": "sea",
+  "kind": "crab",
+  "version": "0.1",
+  "items": [
+    "sea.spider-crab"
+  ],
+  "hold": true,
+  "triangles": 4408,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "carapace",
+    "claw",
+    "clawTip",
+    "eye",
+    "eyeHighlight",
+    "leg",
+    "spot"
+  ],
+  "objects": [
+    "crab"
+  ],
+  "size": [
+    0.821,
+    0.603,
+    0.255
+  ],
+  "bounds": [
+    [
+      -0.41,
+      -0.301,
+      -0.128
+    ],
+    [
+      0.41,
+      0.301,
+      0.128
+    ]
+  ],
+  "glbBytes": 90840,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-spider-crab_main.png",
+    "sea-spider-crab_thumb.png"
+  ]
+}

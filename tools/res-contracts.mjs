@@ -12,8 +12,9 @@ export const BONES = ['arm.L', 'arm.R', 'spine', 'head'];            // player/m
 // 삼각형 예산 (docs/notes/local-resources.md 1절 — 지금 가장 큰 것 근처, Intel UHD 기준). 넘으면 warn
 export const BUDGET = { character: 12500, env: 8000, furniture: 8000, fixture: 8000, item: 6000, clothes: 3000 };   // 옷은 한 벌 (주인공 몸 10.6k 위에 얹힘)
 // 11차 옷 (assets/clothes): src/player/wear.js 와 같은 값 — 게시본에 src/ 를 import 하지 않으려고 옮겨 둔다 (tests/res-editor.test.mjs 가 둘이 같은지 본다)
-export const SLOT_BONES = { hat: ['head'], top: ['hips', 'spine', 'arm.L', 'arm.R'], shoes: ['shin.L', 'shin.R', 'leg.L', 'leg.R'] };
-export const SLOT_LABEL = { hat: '모자', top: '윗옷', shoes: '신발' };
+export const SLOT_BONES = { hat: ['head'], top: ['hips', 'spine', 'arm.L', 'arm.R'], shoes: ['shin.L', 'shin.R', 'leg.L', 'leg.R'],
+  suit: ['hips', 'spine', 'arm.L', 'arm.R', 'leg.L', 'leg.R', 'shin.L', 'shin.R', 'head'] };   // M16 잠수복 칸 (바다에서만)
+export const SLOT_LABEL = { hat: '모자', top: '윗옷', shoes: '신발', suit: '잠수복' };
 export const PLAYER_BONES = ['root', 'hips', 'spine', 'head', 'arm.L', 'arm.R', 'leg.L', 'leg.R', 'shin.L', 'shin.R'];   // 주인공 뼈대 (player.glb) — 옷 뼈대가 이름으로 다시 묶인다
 // 주인공 몸 재질 이름 (assets/specs/player.json palette 키 + 빌더 고정 eyeHighlight·외곽선) — 옷 재질이 같은 이름이면 몸 색 바꾸기에 같이 칠해진다
 export const BODY_MATERIALS = ['fur', 'hair', 'shirt', 'pants', 'eye', 'blush', 'outline', 'eyeHighlight'];
@@ -209,7 +210,7 @@ export function checkResource({ area, spec, row: r, stats, info, extra = {} }) {
 function checkClothes(spec, info, stats) {
   if (spec.builtin) return [];
   const out = [], keys = paletteKeys(spec), allowed = SLOT_BONES[spec.slot];
-  if (!allowed) return [row('wear', 'fail', `칸 slot 이 이상해요: ${spec.slot} (hat · top · shoes)`)];
+  if (!allowed) return [row('wear', 'fail', `칸 slot 이 이상해요: ${spec.slot} (hat · top · shoes · suit)`)];
   const mats = info ? [...new Set(info.materials)] : [];
   if (info) {
     const extra = mats.filter(m => !keys.has(m));

@@ -1,0 +1,47 @@
+{
+  "id": "IC-SE-11",
+  "slug": "sea-moon-jellyfish",
+  "name": "보름달물해파리",
+  "group": "sea",
+  "kind": "jellyfish",
+  "version": "0.1",
+  "items": [
+    "sea.moon-jellyfish"
+  ],
+  "hold": true,
+  "triangles": 3440,
+  "parts": 1,
+  "materials": [
+    "bell",
+    "bellRim",
+    "gonad",
+    "oralArm",
+    "tentacle"
+  ],
+  "objects": [
+    "jelly"
+  ],
+  "size": [
+    0.29,
+    0.292,
+    0.126
+  ],
+  "bounds": [
+    [
+      -0.145,
+      -0.146,
+      -0.063
+    ],
+    [
+      0.145,
+      0.146,
+      0.063
+    ]
+  ],
+  "glbBytes": 70100,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-moon-jellyfish_main.png",
+    "sea-moon-jellyfish_thumb.png"
+  ]
+}

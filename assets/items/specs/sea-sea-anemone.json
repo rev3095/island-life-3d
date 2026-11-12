@@ -1,0 +1,84 @@
+{
+  "id": "IC-SE-12",
+  "slug": "sea-sea-anemone",
+  "name": "말미잘",
+  "group": "sea",
+  "category": "item",
+  "kind": "anemone",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sea-anemone",
+      "code": "IC-SE-12"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "분홍 기둥 몸 위에 끝이 둥근 촉수 왕관이 두 겹",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "기둥 키",
+      "value": 0.15,
+      "min": 0.08,
+      "max": 0.25,
+      "step": 0.005,
+      "live": false
+    },
+    "radius": {
+      "label": "기둥 반지름",
+      "value": 0.065,
+      "min": 0.04,
+      "max": 0.1,
+      "step": 0.005,
+      "live": false
+    },
+    "tentacles": {
+      "label": "바깥 촉수 수",
+      "value": 20,
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "live": false
+    }
+  },
+  "palette": {
+    "column": "#D8708A",
+    "columnDark": "#B85470",
+    "disk": "#E890A4",
+    "mouth": "#8A3A50",
+    "tentacle": "#F2A0B8",
+    "tentacleTip": "#FBD4E0"
+  },
+  "paletteLabels": {
+    "column": "기둥",
+    "columnDark": "기둥 줄",
+    "disk": "입판",
+    "mouth": "입",
+    "tentacle": "촉수",
+    "tentacleTip": "촉수 끝"
+  }
+}

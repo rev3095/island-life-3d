@@ -1,0 +1,70 @@
+{
+  "id": "IC-SE-14",
+  "slug": "sea-mantis-shrimp",
+  "name": "갯가재",
+  "group": "sea",
+  "category": "item",
+  "kind": "mantis-shrimp",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.mantis-shrimp",
+      "code": "IC-SE-14"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "긴 납작 몸 마디(초록) + 접힌 사마귀 같은 앞발(주황) + 자루 눈 + 꼬리 판 파란 점",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이",
+      "value": 0.34,
+      "min": 0.2,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#5FA05A",
+    "bodyDark": "#3E7A44",
+    "limb": "#F08A3A",
+    "limbTip": "#E85A6A",
+    "accent": "#3E8FD8",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "bodyDark": "짙은 마디",
+    "limb": "다리·테",
+    "limbTip": "앞발 낫",
+    "accent": "파란 점",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

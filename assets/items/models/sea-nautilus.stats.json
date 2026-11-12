@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-18",
+  "slug": "sea-nautilus",
+  "name": "앵무조개",
+  "group": "sea",
+  "kind": "nautilus",
+  "version": "0.1",
+  "items": [
+    "sea.nautilus"
+  ],
+  "hold": true,
+  "triangles": 3568,
+  "parts": 1,
+  "materials": [
+    "eye",
+    "eyeHighlight",
+    "hood",
+    "shell",
+    "shellDark",
+    "stripe",
+    "tentacle"
+  ],
+  "objects": [
+    "nautilus"
+  ],
+  "size": [
+    0.085,
+    0.201,
+    0.14
+  ],
+  "bounds": [
+    [
+      -0.042,
+      -0.1,
+      -0.07
+    ],
+    [
+      0.042,
+      0.1,
+      0.07
+    ]
+  ],
+  "glbBytes": 77872,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-nautilus_main.png",
+    "sea-nautilus_thumb.png"
+  ]
+}

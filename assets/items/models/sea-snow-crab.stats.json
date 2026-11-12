@@ -1,0 +1,50 @@
+{
+  "id": "IC-SE-15",
+  "slug": "sea-snow-crab",
+  "name": "대게",
+  "group": "sea",
+  "kind": "crab",
+  "version": "0.1",
+  "items": [
+    "sea.snow-crab"
+  ],
+  "hold": true,
+  "triangles": 5112,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "carapace",
+    "claw",
+    "clawTip",
+    "eye",
+    "eyeHighlight",
+    "leg",
+    "spot"
+  ],
+  "objects": [
+    "crab"
+  ],
+  "size": [
+    0.717,
+    0.485,
+    0.187
+  ],
+  "bounds": [
+    [
+      -0.358,
+      -0.242,
+      -0.093
+    ],
+    [
+      0.358,
+      0.242,
+      0.093
+    ]
+  ],
+  "glbBytes": 103208,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-snow-crab_main.png",
+    "sea-snow-crab_thumb.png"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-13",
+  "slug": "sea-sea-slug",
+  "name": "갯민숭달팽이",
+  "group": "sea",
+  "kind": "sea-slug",
+  "version": "0.1",
+  "items": [
+    "sea.sea-slug"
+  ],
+  "hold": true,
+  "triangles": 3588,
+  "parts": 1,
+  "materials": [
+    "eye",
+    "eyeHighlight",
+    "foot",
+    "gill",
+    "rhino",
+    "rim",
+    "slug"
+  ],
+  "objects": [
+    "slug"
+  ],
+  "size": [
+    0.114,
+    0.285,
+    0.084
+  ],
+  "bounds": [
+    [
+      -0.057,
+      -0.142,
+      -0.042
+    ],
+    [
+      0.057,
+      0.142,
+      0.042
+    ]
+  ],
+  "glbBytes": 74388,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-slug_main.png",
+    "sea-sea-slug_thumb.png"
+  ]
+}

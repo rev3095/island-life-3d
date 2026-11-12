@@ -1,0 +1,80 @@
+{
+  "id": "IC-SE-01",
+  "slug": "sea-seaweed",
+  "name": "미역",
+  "group": "sea",
+  "category": "item",
+  "kind": "seaweed",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.seaweed",
+      "code": "IC-SE-01"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "바위 뿌리 덩이에서 물결치며 올라가는 넓은 띠 잎 몇 갈래, 짙은 올리브 녹색",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "height": {
+      "label": "키",
+      "value": 0.4,
+      "min": 0.2,
+      "max": 0.7,
+      "step": 0.01,
+      "live": false
+    },
+    "blades": {
+      "label": "잎 갈래 수",
+      "value": 5,
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "live": false
+    },
+    "width": {
+      "label": "잎 너비 비",
+      "value": 0.11,
+      "min": 0.05,
+      "max": 0.2,
+      "step": 0.005,
+      "live": false
+    }
+  },
+  "palette": {
+    "kelp": "#5E6B2E",
+    "kelpLight": "#76843A",
+    "kelpDark": "#3F4A1E",
+    "holdfast": "#6A5434"
+  },
+  "paletteLabels": {
+    "kelp": "잎",
+    "kelpLight": "밝은 잎",
+    "kelpDark": "줄기·잎맥",
+    "holdfast": "뿌리"
+  }
+}

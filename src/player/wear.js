@@ -6,12 +6,14 @@
 
 /** 칸: 모자 · 윗옷 · 신발 (CONTRACTS 「11차 옷」) */
 export const SLOTS = ['hat', 'top', 'shoes'];
-export const SLOT_LABEL = { hat: '모자', top: '윗옷', shoes: '신발' };
+export const SLOT_LABEL = { hat: '모자', top: '윗옷', shoes: '신발', suit: '잠수복' };
 /** 칸마다 옷이 써도 되는 뼈 (tests 가 옷 통계 bones 로 본다) */
 export const SLOT_BONES = {
   hat: ['head'],
   top: ['hips', 'spine', 'arm.L', 'arm.R'],
   shoes: ['shin.L', 'shin.R', 'leg.L', 'leg.R'],
+  // M16 잠수복 CL-13: SLOTS(옷장·상점 세 칸) 밖의 칸 — 바다에서 헤엄칠 때만 게임이 입힌다. 몸 전체 + 물안경(head)
+  suit: ['hips', 'spine', 'arm.L', 'arm.R', 'leg.L', 'leg.R', 'shin.L', 'shin.R', 'head'],
 };
 /** 주인공 모델에 든 기본 윗옷 메시 이름 (player.json clothes.split → build_character.py) */
 export const BASE_TOP = 'player_top';

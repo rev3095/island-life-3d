@@ -1,0 +1,48 @@
+{
+  "id": "IC-SE-03",
+  "slug": "sea-sea-cucumber",
+  "name": "해삼",
+  "group": "sea",
+  "kind": "sea-cucumber",
+  "version": "0.1",
+  "items": [
+    "sea.sea-cucumber"
+  ],
+  "hold": true,
+  "triangles": 2288,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "body",
+    "bump",
+    "eye",
+    "eyeHighlight",
+    "tentacle"
+  ],
+  "objects": [
+    "cucumber"
+  ],
+  "size": [
+    0.146,
+    0.319,
+    0.119
+  ],
+  "bounds": [
+    [
+      -0.073,
+      -0.16,
+      -0.059
+    ],
+    [
+      0.073,
+      0.16,
+      0.059
+    ]
+  ],
+  "glbBytes": 48964,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-cucumber_main.png",
+    "sea-sea-cucumber_thumb.png"
+  ]
+}

@@ -1588,6 +1588,8 @@ BUILDERS = {
 # 렌더 방향 (스펙 render 칸이 없을 때): 물고기는 옆모습(머리 왼쪽), 곤충은 위에서 비스듬히
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
           'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50), 'night': (-25, 32)}
+exec(compile(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'items_sea.py'), encoding='utf-8').read(), 'items_sea.py', 'exec'))   # M16 바다 생물 + 스쿠버 키트
+BUILDERS.update(SEA_BUILDERS)
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
 
 

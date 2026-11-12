@@ -46,12 +46,15 @@ export function normalizeOutfit(saved, catalog, closet = []) {
   return out;
 }
 
-/** 옷장 목록 고르게 (모르는 것·겹친 것 빼기, 기본 윗옷 빼기) */
+/** 옷장 칸에 들어가는 옷인가 (M16 잠수복 slot 'suit' 처럼 SLOTS 밖의 칸은 옷장·상점에 안 나온다 — 바다에서 게임이 입힘) */
+const closetSlot = (catalog, id) => SLOTS.includes(entryOf(catalog, id)?.slot);
+
+/** 옷장 목록 고르게 (모르는 것·겹친 것 빼기, 기본 윗옷 빼기, 옷장 칸이 아닌 옷 빼기) */
 export function normalizeCloset(list, catalog) {
   const seen = new Set();
   for (const id of Array.isArray(list) ? list : []) {
     const c = canonical(catalog, id);
-    if (c && c !== BASE_TOP_ID && !entryOf(catalog, c)?.builtin) seen.add(c);
+    if (c && c !== BASE_TOP_ID && !entryOf(catalog, c)?.builtin && closetSlot(catalog, c)) seen.add(c);
   }
   return [...seen];
 }
@@ -102,6 +105,6 @@ export function pickShopClothes(catalog, dayKey, seed = 0, perDay = CLOTHES_PER_
 /** 옷장에 더하기 → 새 목록 (이미 있으면 그대로) */
 export function addToCloset(closet, id, catalog) {
   const c = canonical(catalog, id);
-  if (!c || c === BASE_TOP_ID || closet.includes(c)) return closet;
+  if (!c || c === BASE_TOP_ID || closet.includes(c) || !closetSlot(catalog, c)) return closet;
   return [...closet, c];
 }

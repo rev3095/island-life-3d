@@ -1,0 +1,72 @@
+{
+  "id": "IC-SE-20",
+  "slug": "sea-mussel",
+  "name": "홍합",
+  "group": "sea",
+  "category": "item",
+  "kind": "mussel",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.mussel",
+      "code": "IC-SE-20"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "길쭉한 물방울꼴 검푸른 껍데기, 이음매 테와 결 줄, 실 같은 수염",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "shine"
+    ],
+    "flat": [
+      "shine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "껍데기 길이",
+      "value": 0.2,
+      "min": 0.12,
+      "max": 0.32,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#2E3A4E",
+    "shellRib": "#3C4A62",
+    "shellEdge": "#5A5A80",
+    "shine": "#C8D8F0",
+    "byssus": "#8A7454"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "결 줄",
+    "shellEdge": "이음매 테",
+    "shine": "반짝임",
+    "byssus": "수염"
+  }
+}

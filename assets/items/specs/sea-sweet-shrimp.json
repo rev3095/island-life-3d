@@ -1,0 +1,130 @@
+{
+  "id": "IC-SE-09",
+  "slug": "sea-sweet-shrimp",
+  "name": "단새우",
+  "group": "sea",
+  "category": "item",
+  "kind": "shrimp",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sweet-shrimp",
+      "code": "IC-SE-09"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "작고 분홍빛인 새우 — 둥글게 굽은 몸, 긴 더듬이, 꼬리부채",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이",
+      "value": 0.22,
+      "min": 0.12,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "curl": {
+      "label": "몸 말림",
+      "value": 0.6,
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "girth": {
+      "label": "굵기 비",
+      "value": 0.11,
+      "min": 0.06,
+      "max": 0.2,
+      "step": 0.005,
+      "live": false
+    },
+    "head": {
+      "label": "머리가슴 길이 비",
+      "value": 0.36,
+      "min": 0.25,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "claw": {
+      "label": "큰 집게 (0 = 없음)",
+      "value": 0,
+      "min": 0,
+      "max": 1.5,
+      "step": 0.01,
+      "live": false
+    },
+    "antenna": {
+      "label": "더듬이 길이",
+      "value": 1,
+      "min": 0.3,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "rostrum": {
+      "label": "이마뿔 길이",
+      "value": 0.14,
+      "min": 0.02,
+      "max": 0.25,
+      "step": 0.01,
+      "live": false
+    },
+    "fan": {
+      "label": "꼬리부채 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#F4A0A0",
+    "band": "#F8C4BC",
+    "fan": "#E8706A",
+    "leg": "#F2B4AA",
+    "antenna": "#E8706A",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "band": "마디 띠",
+    "fan": "꼬리부채",
+    "leg": "다리",
+    "antenna": "더듬이",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -70,
+    "pitch": 18
+  }
+}

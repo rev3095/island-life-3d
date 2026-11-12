@@ -1,0 +1,76 @@
+{
+  "id": "IC-SE-03",
+  "slug": "sea-sea-cucumber",
+  "name": "해삼",
+  "group": "sea",
+  "category": "item",
+  "kind": "sea-cucumber",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sea-cucumber",
+      "code": "IC-SE-03"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "길쭉하고 통통한 갈색 몸에 오돌토돌 돌기, 앞쪽에 작은 촉수와 귀여운 눈",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이",
+      "value": 0.3,
+      "min": 0.15,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "girth": {
+      "label": "굵기 비",
+      "value": 0.19,
+      "min": 0.1,
+      "max": 0.3,
+      "step": 0.005,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#7A5638",
+    "belly": "#A88466",
+    "bump": "#94694A",
+    "tentacle": "#C9A27E",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "belly": "배",
+    "bump": "돌기",
+    "tentacle": "입 촉수",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

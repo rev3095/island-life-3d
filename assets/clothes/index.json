@@ -349,6 +349,39 @@
         "shin.L",
         "shin.R"
       ]
+    },
+    {
+      "id": "CL-13",
+      "slug": "wetsuit",
+      "name": "잠수복",
+      "slot": "suit",
+      "kind": "wetsuit",
+      "version": "0.1",
+      "status": "review",
+      "buy": 0,
+      "sell": 0,
+      "palette": {
+        "suit": "#2C3E6B",
+        "suitStripe": "#7CC8EA",
+        "maskFrame": "#3FA7B8",
+        "maskLens": "#E8F8FF",
+        "maskStrap": "#22304E",
+        "tank": "#F2C53D",
+        "tankValve": "#9AA4AC"
+      },
+      "model": "assets/clothes/models/wetsuit.glb.json",
+      "triangles": 2530,
+      "bones": [
+        "arm.L",
+        "arm.R",
+        "head",
+        "hips",
+        "leg.L",
+        "leg.R",
+        "shin.L",
+        "shin.R",
+        "spine"
+      ]
     }
   ]
 }

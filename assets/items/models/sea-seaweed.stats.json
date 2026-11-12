@@ -1,0 +1,46 @@
+{
+  "id": "IC-SE-01",
+  "slug": "sea-seaweed",
+  "name": "미역",
+  "group": "sea",
+  "kind": "seaweed",
+  "version": "0.1",
+  "items": [
+    "sea.seaweed"
+  ],
+  "hold": true,
+  "triangles": 2896,
+  "parts": 1,
+  "materials": [
+    "holdfast",
+    "kelp",
+    "kelpDark",
+    "kelpLight"
+  ],
+  "objects": [
+    "seaweed"
+  ],
+  "size": [
+    0.368,
+    0.366,
+    0.402
+  ],
+  "bounds": [
+    [
+      -0.184,
+      -0.183,
+      -0.201
+    ],
+    [
+      0.184,
+      0.183,
+      0.201
+    ]
+  ],
+  "glbBytes": 60576,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-seaweed_main.png",
+    "sea-seaweed_thumb.png"
+  ]
+}
