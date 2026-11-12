@@ -358,7 +358,7 @@ export function makeScenario(bot, sk, opts = {}) {
       const st = H.status(hall), shown = H.shown(hall);
       got[hall] = { shown, donated: st.donated, total: st.total, soon: st.soon };
       if (hall !== 'star' && shown !== st.donated) odd.push(`${hall} 전시 ${shown} ≠ 기증 ${st.donated}`);
-      if (hall === 'star' && shown !== 12) odd.push(`별자리관 액자 ${shown}/12`);
+      if (hall === 'star' && shown !== 18) odd.push(`별자리관 액자 ${shown}/18`);   // M18-P2 별자리 18
       await bot.shot(`museum-hall-${hall}`, `박물관 ${hall} 관`);
       // 나가기: 문 매트로 가서 아래로 민다 (사람처럼)
       const m = H.doormat();
@@ -604,7 +604,7 @@ export function makeScenario(bot, sk, opts = {}) {
     const odd = [];
     if (!tab) odd.push('도감에 별자리 탭이 없음');
     else if (cells !== ST.count()) odd.push(`도감 별자리 칸 ${cells} ≠ 찍은 수 ${ST.count()}`);
-    return odd.length ? awk(odd.join(' · ')) : pass(`${c.name} 찰칵 · 도감 ${ST.count()}/12`);
+    return odd.length ? awk(odd.join(' · ')) : pass(`${c.name} 찰칵 · 도감 ${ST.count()}/18`);
   });
 
   // P54 밤 특별 상점 (D165–D169): 운세 부스(20–3시)에서 여명에게 카드 → 여우 상인 살랑(오는 밤만)에게 미술품 감정·사기 → 이상한 천막(오는 밤만) 들어가 진열 보기

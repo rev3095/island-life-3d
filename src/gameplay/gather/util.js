@@ -23,6 +23,7 @@ export function createKit(ctx) {
     get data() { return data(); },
     get world() { return ctx.services.world; },
     get player() { return ctx.services.player; },
+    get services() { return ctx.services; },   // M18-P2: daily.special.rainBoost 등
     sfx(name, opts = {}) { events.emit('sfx', { name, ...opts }); },
     toast(text, icon) { events.emit('toast', { text, icon }); },
     item(id) { return data()?.items?.get?.(id) ?? null; },

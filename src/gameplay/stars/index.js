@@ -1,5 +1,5 @@
 // 별자리 (요청 8): 박물관 앞 공용 망원경(망원경대 PR-40) · 망원경 보기(UI-32) · 찍은 결과(UI-33) · 별자리 도감 · 별자리관에 줄 그림.
-//  - 별자리 12개(IC-ST-01–12)와 그리기는 src/sky/starmap.js (순수). 3D 밤하늘의 별자리 별은 src/sky/stars.js.
+//  - 별자리 18개(IC-ST-01–12 · M18-P2 IC-ST-13–18)와 그리기는 src/sky/starmap.js (순수). 3D 밤하늘의 별자리 별은 src/sky/stars.js.
 //  - 망원경대는 world 물체 'telescope-stand' 로 박물관 문 오른쪽 앞마당 밖에 하나 (persist: false — 들어올 때마다 같은 자리에 다시 놓는다,
 //    자리는 state.stars.spot 에 둔다). 섬에 놓은 별 망원경 가구 FU-53(decor/telescope.js)도 같은 보기를 연다 (stars.open).
 //  - 행동 키: 망원경대 앞 「망원경 보기」 85 (문 90 아래 · 가구 80 위 — telescope.js 와 같은 자리). 밤(19–5시)만, 낮엔 안내 한 줄.
@@ -106,7 +106,7 @@ function open({ where = '박물관 앞 망원경' } = {}) {
   return true;
 }
 
-/** 섬폰 도감 「⭐ 별자리」 칸 (ui/phone.js 가 부른다): panel 에 12칸을 그린다 */
+/** 섬폰 도감 「⭐ 별자리」 칸 (ui/phone.js 가 부른다): panel 에 별자리 수(18)만큼 칸을 그린다 */
 function dexPanel(panel, { bar } = {}) {
   const n = count();
   const grid = document.createElement('ul');

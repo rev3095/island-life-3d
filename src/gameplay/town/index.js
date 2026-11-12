@@ -17,6 +17,7 @@ import { createParty } from './party.js';
 import LINES from './lines/index.js';
 import { createCompanion } from './companion.js';   // M15 같이 낚시·산책
 import { createSong } from './song.js';             // M15 저녁 광장 주민 노래 (s26)
+import { createUmbrellas } from './umbrella.js';   // M18-P2 장마·태풍 날 우산 쓴 주민
 import { createAlbum } from '../../ui/album.js';    // M15 UI-27 추억 앨범 · 액자 FU-71–72
 
 const TALK_DIST = 1.3;
@@ -332,7 +333,7 @@ export default {
     gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, umbrellas: createUmbrellas(ctx) };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** 지금 섬에 사는 주민 slug 목록 (새 주민은 입주한 뒤부터) */
@@ -394,6 +395,7 @@ export default {
       const p = V.actor.position;
       V.update(dt, now, weather, Math.hypot(p.x - f.x, p.z - f.z) < ANIM_DIST);
     }
+    T.umbrellas.update(!!ctx.services.daily?.special?.umbrella?.() && !time?.indoor, villagers);
     keepers.update(dt, now);
     chatter.update(dt);
     if (!solid) pushPlayer(ctx, [...villagers.map(V => V.actor), ...keepers.all.map(K => K.actor)]);

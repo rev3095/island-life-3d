@@ -152,7 +152,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       return n ? [TAB_NAME[c], h('span', { class: 'pk-tab-new', title: `이번 달 새로 ${n}`, 'aria-label': `이번 달 새로 ${n}` }, String(n))] : TAB_NAME[c];
     };
     function draw() {
-      if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–12)
+      if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–18, M18-P2 +6)
         tabs.replaceChildren(...TABS.map(c => h('button', {
           type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
           onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },

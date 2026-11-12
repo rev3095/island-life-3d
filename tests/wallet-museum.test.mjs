@@ -64,11 +64,11 @@ test('박물관: progress', () => {
   m.donate('bug.moth');
   const p = m.progress();
   assert.deepEqual(p.fish, [0, 22]);   // + P35 무인도 물고기 둘
-  assert.deepEqual(p.bug, [2, 24]);    // + P35 무인도 곤충 둘
+  assert.deepEqual(p.bug, [2, 25]);    // + P35 무인도 곤충 둘 + M18-P2 청개구리
   assert.deepEqual(p.fossil, [0, 8]);
   assert.deepEqual(p.art, [0, 16]);   // P54 미술품 진품 16 (가품은 안 받음)
   assert.deepEqual(p.sea, [0, 38]);    // M16 잠수 바다 생물 20 + M18-P1 18
-  assert.deepEqual(p.total, [2, 108]);   // + M18-P1 계절 바다 생물 18
+  assert.deepEqual(p.total, [2, 109]);   // + M18-P1 계절 바다 생물 18 + M18-P2 청개구리
   assert.equal(p.complete, false);
 });
 

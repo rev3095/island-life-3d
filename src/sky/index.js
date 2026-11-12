@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { computeNow, dayHour, msAtDayHour, nightFactorAt, msAtClock, dayDiff, dayKeyOf, createTimeline, timeRules, SPEED_KEYS, SPEED_NAME, dayLengthText } from './clock.js';
 import { shiftedMs } from '../core/preview.js';
 import { forecast, weatherAt, WEATHERS } from './weather.js';
+import { applySpecial, specialOf, specialDays, snowDepthAt } from './special.js';   // M18-P2 그날만 날씨 (장마·태풍·첫눈·큰 유성우)
+import { createFootprints } from './footprints.js';   // M18-P2 FX-04 눈 발자국 (판)
 import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
 import { createDome, SKY_FX } from './dome.js';
@@ -75,7 +77,7 @@ export function createSky(ctx) {
 
   function forecastFor(dayKey, season) {
     const key = `${dayKey}|${season}`;
-    if (fc.key !== key) fc = { key, segs: forecast(dayKey, season, ctx.state.island?.seed ?? 0) };
+    if (fc.key !== key) fc = { key, segs: applySpecial(dayKey, forecast(dayKey, season, ctx.state.island?.seed ?? 0)) };
     return fc.segs;
   }
   const autoWeather = n => weatherAt(forecastFor(n.dayKey, seasonOfDay(n)), dayHour(n.hourF));
@@ -168,6 +170,13 @@ export function createSky(ctx) {
       return { ...jump(() => tl.shiftTo(r.target), { reason: 'reset' }), caught: r.caught };
     },
     get weather() { return currentWeather(); },
+    // ── M18-P2 그날만 날씨 (src/sky/special.js) ──
+    /** 그날(기본 오늘)이 특별한 날인가 → { kind: monsoon|typhoon|after-typhoon|first-snow|big-meteor, name, emoji, heavy, dayKey } | null */
+    special: (dayKey = now().dayKey) => specialOf(dayKey),
+    /** 그 해의 특별한 날 { 'YYYY-MM-DD': kind } */
+    specialDays: (year = +now().dayKey.slice(0, 4)) => ({ ...specialDays(year) }),
+    /** 지금 땅에 쌓인 눈 0~1 (집 안이어도 바깥 값) */
+    get snowCover() { return snowAcc ?? 0; },
     /** w: WEATHERS 중 하나. null 이면 예보대로. 다음 날이 되면 풀린다. { instant: true } 면 섞지 않고 바로 */
     setWeather(w, { instant = false } = {}) {
       weatherOverride = WEATHERS.includes(w) ? w : null;
@@ -214,11 +223,13 @@ export function createSky(ctx) {
   const starSky = createStarSky(dome);
   const meteors = createMeteors({ quality: ctx.quality });
   dome.group.add(meteors.group);   // 실내에선 돔과 같이 숨는다
-  service.meteors = { set: on => meteors.set(on), get on() { return meteors.on; } };
+  service.meteors = { set: (on, opt) => meteors.set(on, opt), get on() { return meteors.on; }, get big() { return meteors.big; } };   // M18-P2 opt.big = 큰 유성우 밤 (별똥별 두 배)
   const clouds = createClouds(ctx.materials);
   /** 북쪽 3D 솜구름 보이기 = 보드 값(puffs) · 사양(매우 낮음은 숨김 — 그리기 호출·삼각형 아끼기) · 집 밖 */
   const applyPuffs = () => { clouds.group.visible = puffs && !indoor && QUALITY[ctx.quality]?.fx?.puffs !== false; };
-  const precip = createPrecip(ctx.materials.curve);
+  const precip = createPrecip(ctx.materials.curve, { quality: ctx.quality });
+  const footprints = createFootprints(ctx.materials, { quality: ctx.quality });
+  precip.group.add(footprints.object);   // 집 안에선 비·눈과 같이 숨는다
   const surfaces = createSurfaces(ctx.materials.curve);
   let debug = null;
 
@@ -294,6 +305,9 @@ export function createSky(ctx) {
       if (W && L.uSnowCover) {
         // D130-B 눈 오는 날만: 눈이 오면 40초에 걸쳐 쌓이고, 그치면 150초에 걸쳐 녹는다 (처음·날씨 바로 바꾸기는 그 자리에서)
         snowAcc = snowAcc == null ? wx.snow : snowAcc + (wx.snow - snowAcc) * (1 - Math.exp(-dt / (wx.snow > snowAcc ? 40 : 150)));
+        // M18-P2 FX-04 첫눈 하루: 눈이 오기 시작한 8시부터 여섯 시간에 걸쳐 차오른다 (게임 시각 — 시계를 돌려도 그 시각의 깊이)
+        const depth = weatherOverride ? null : snowDepthAt(n.dayKey, n.hourF);
+        if (depth != null) snowAcc = depth;
         snowLite = !ctx.materials.hasShaderFx?.('snow') && !indoor ? W.snow * snowAcc : 0;   // 셰이더에 눈이 없으면(낮음 아래): 땅 재질 색으로 (surfaces)
         L.uSnowCover.value = indoor ? 0 : W.snow * snowAcc;
         // D132-A 비 올 때 또렷하게: 젖음(비 그친 뒤 천천히 마름)을 그대로
@@ -310,7 +324,9 @@ export function createSky(ctx) {
       }
     }
     flare?.update(camera, look.sunSky, flareStrength({ enabled: !!QUALITY[ctx.quality]?.fx?.flare, indoor, sunVis: look.sunVis, overcast: wx.overcast }), Math.min(1, look.weights.dawn + look.weights.dusk));
-    precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf) }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
+    const heavy = !weatherOverride && !!specialOf(n.dayKey)?.heavy;   // M18-P2 FX-03 장마·태풍 굵은 비
+    precip.update(dt, elapsed, ctx.focus, camera, { rain: wx.rain, snow: wx.snow, rainbow: wx.rainbow * (1 - nf), heavy: heavy ? wx.rain : 0, storm: heavy && specialOf(n.dayKey).kind === 'typhoon' }, viewH, ctx.renderer?.getPixelRatio() ?? 1);
+    if (!indoor) footprints.update(dt, { snow: snowAcc ?? 0, player: ctx.services.player, island: ctx.services.world?.island });
 
     if ((scanIn -= dt) <= 0) { scanIn = SCAN_EVERY; surfaces.scan(scene); }
     surfaces.update(elapsed, indoor ? nf : Math.max(nf, 0.4 * wx.rain), wx.wet, viewScale, snowLite);
@@ -341,7 +357,7 @@ export function createSky(ctx) {
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
       const tier = q => { dome.setQuality(q); applyPuffs(); syncShaderFx(); };
-      events.on('quality:changed', ({ quality }) => meteors.setQuality(quality));   // M13 별똥별 사양
+      events.on('quality:changed', ({ quality }) => { meteors.setQuality(quality); precip.setQuality(quality); footprints.setQuality(quality); });   // M13 별똥별 · M18-P2 굵은 비·발자국 사양
       events.on('quality:changed', ({ quality }) => tier(quality));
       tier(ctx.quality);              // 처음 사양 (주소·저장된 사양). 바꾸면 quality:changed 로
       // 해 렌즈 빛 (three.js 예제 Lensflare) — 못 불러와도 하늘은 그대로

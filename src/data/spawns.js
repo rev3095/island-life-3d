@@ -68,7 +68,8 @@ export function sea({ rng = Math.random, ...opts } = {}) {
 export const shadowOf = id => items.get(id)?.shadow ?? 0;
 
 /** 지금 이 장소에 나올 수 있는 곤충과 가중치. place 는 하나 또는 배열 (예: 물가 꽃밭 ['flower', 'water']) */
-export function bugPool({ place = 'flower', hour = 12, month = 1, weather = 'clear', islet = false } = {}) {
+/** rainBoost: 비 오는 날 생물(달팽이·청개구리) 가중치 배수 — M18-P2 장마 하루엔 daily.special.rainBoost() (3) */
+export function bugPool({ place = 'flower', hour = 12, month = 1, weather = 'clear', islet = false, rainBoost = 1 } = {}) {
   const base = Array.isArray(place) ? place : [place];
   const places = islet ? [...base, ...base.map(p => `islet-${p}`)] : base;
   const wet = WET.has(weather);
@@ -78,7 +79,7 @@ export function bugPool({ place = 'flower', hour = 12, month = 1, weather = 'cle
     if (!inHours(it.hours, hour) || !it.months.includes(month)) continue;
     if (it.rainOnly && weather !== 'rain') continue;            // 달팽이는 비 올 때만
     if (wet && it.flying) continue;                             // 비·눈 오면 날벌레는 숨는다
-    out.push({ item: it, weight: it.weight });
+    out.push({ item: it, weight: it.rainOnly ? it.weight * rainBoost : it.weight });
   }
   return out;
 }

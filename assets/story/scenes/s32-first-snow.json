@@ -1,0 +1,176 @@
+{
+  "id": "s32-first-snow",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절이 깊어진다",
+  "title": "첫눈 아침",
+  "summary": "12월 첫눈 하루. 잿빛 하늘에서 첫눈이 내리기 시작하고 땅이 조금씩 하얘진다. 밤톨이 달려와 눈 위에 발자국을 찍어 보이고, 첫눈 기념 눈사람 등 만드는 법을 알려 준다.",
+  "trigger": {
+    "on": "special-day",
+    "kind": "first-snow"
+  },
+  "place": "playerHouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "밤톨과 첫 발자국",
+      "recommended": true,
+      "desc": "첫눈 내리는 섬을 넓게 → 밤톨이 달려와 발자국 → 눈사람 등 레시피 → 둘이 하늘 보기.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "첫눈이 내리기 시작한 섬",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "morning",
+          "caption": "첫눈이 내려요",
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "밤톨이 눈 위로 달려와 발자국을 남긴다",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "caption": "첫눈이다! 봐, 발자국이 찍혀!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "bamtol",
+              "at": [
+                3.2,
+                1.4
+              ],
+              "to": [
+                1.1,
+                0.4
+              ],
+              "do": "run",
+              "face": "player",
+              "emote": "😄",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "bamtol",
+              "emote": "😊",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "눈사람 등 레시피",
+          "dur": 4,
+          "cam": {
+            "size": "medium",
+            "target": "bamtol",
+            "angle": 15,
+            "move": "static"
+          },
+          "caption": "눈 결정 셋이랑 나무 둘이면 눈사람 등을 만들 수 있어. 작업대에서 만들어 봐!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "bamtol",
+              "do": "happy",
+              "face": "player",
+              "emote": "💡",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "bamtol",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "둘이 나란히 눈 오는 하늘을 본다",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "caption": "눈이 쌓이는 만큼 섬이 하얘져요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "bamtol",
+              "face": 0,
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "🙌",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 안내",
+      "desc": "첫눈 내리는 섬 한 컷 + 안내 글.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "첫눈 내리는 섬",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "morning",
+          "caption": "첫눈 하루 — 눈이 쌓이면 발자국이 남고, 눈사람 등 레시피를 알게 돼요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

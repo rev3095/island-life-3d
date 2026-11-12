@@ -11,6 +11,7 @@ import * as R from './rules.js';
 import { createMeteor } from './meteor.js';
 import { createBalloons } from './balloon.js';
 import { createPeddler } from './peddler.js';
+import { createSpecial } from './special.js';   // M18-P2 그날만 날씨 (장마·태풍 다음 날·첫눈)
 import { RECIPE_NOTE } from '../../data/daily-items.js';
 
 export const CONFIG_FILE = 'assets/daily/daily.json';
@@ -172,6 +173,7 @@ function createDaily(ctx, cfg) {
   const meteor = createMeteor(K);
   const balloons = createBalloons(K);
   const peddler = createPeddler(K);
+  const special = createSpecial(K);
 
   let last = { day: null };
   function sync() {
@@ -182,6 +184,7 @@ function createDaily(ctx, cfg) {
     meteor.sync(n);
     balloons.sync(n);
     peddler.sync(n);
+    special.sync(n);
   }
 
   const service = {
@@ -192,6 +195,7 @@ function createDaily(ctx, cfg) {
     meteor: meteor.service,
     balloons: balloons.service,
     peddler: peddler.service,
+    special: special.service,
     debug: { sync, sandCells: () => sandCells().length, state: () => JSON.parse(JSON.stringify(st())) },
   };
 
@@ -216,6 +220,7 @@ function createDaily(ctx, cfg) {
     meteor.update(dt);
     balloons.update(dt);
     peddler.update(dt);
+    special.update(dt);
   }
 
   return { service, register, init, update, sync };

@@ -12,6 +12,8 @@ export const METEOR_QUALITY = {
   low: { n: 2, shader: false },
   min: { n: 2, shader: false },
 };
+/** M18-P2 큰 유성우 밤(8월·12월 하루씩)의 별똥별 배수 */
+export const BIG_METEOR = 2;
 const R = 100;                 // 하늘 반지름 (돔 120 안쪽)
 const LIFE = 0.9;              // 한 줄이 그어지는 시간 (초)
 
@@ -116,19 +118,22 @@ export function createMeteors({ quality = 'mid' } = {}) {
   const group = new THREE.Group();
   group.name = 'sky-meteors-group';
   group.visible = false;
-  let on = false, q = quality, fx = null, t = 0;
+  let on = false, big = false, q = quality, fx = null, t = 0;
   const build = () => {
     if (fx) { group.remove(fx.object); fx.dispose(); fx = null; }
     if (!on) return;
     const c = METEOR_QUALITY[q] ?? METEOR_QUALITY.mid;
-    fx = c.shader ? shaderStreaks(c.n) : cpuStreaks(c.n);
+    const k = big ? BIG_METEOR : 1;   // M18-P2 큰 유성우 밤: 줄 수 두 배 (낮은 사양도 CPU 선 4개)
+    fx = c.shader ? shaderStreaks(c.n * k) : cpuStreaks(c.n * k);
     group.add(fx.object);
   };
   return {
     group,
     get on() { return on; },
-    /** 유성우 켜기·끄기 (켤 때만 만든다, 끄면 지운다) */
-    set(v) { v = !!v; if (v === on) return; on = v; build(); group.visible = on; },
+    get big() { return on && big; },
+    get count() { return fx ? (fx.object.geometry.attributes.aSeed?.count ?? fx.object.geometry.attributes.position.count / 2 * 4) / 4 : 0; },
+    /** 유성우 켜기·끄기 (켤 때만 만든다, 끄면 지운다). opt.big = 큰 유성우 밤 (M18-P2) */
+    set(v, { big: b = false } = {}) { v = !!v; b = v && !!b; if (v === on && b === big) return; on = v; big = b; build(); group.visible = on; },
     setQuality(next) { if (!METEOR_QUALITY[next] || next === q) return; q = next; if (on) build(); },
     /** night 밤 정도 0~1, cover 구름 0~1 */
     update(dt, camera, { night = 1, cover = 0 } = {}) {

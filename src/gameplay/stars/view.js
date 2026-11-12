@@ -4,7 +4,7 @@
 //  찍기: 아직 못 찍은 별자리를 시야 가운데(알맞은 크기)에 CAPTURE.hold 초 두면 저절로 「찰칵」 → UI-33 카드. Space/Enter/A 는 바로 찍기(맞을 때만)
 //  닫기: Esc · B · 「그만 보기」
 // 그리기는 게임 update(dt) 가 부른다 (봇이 ctx.step 으로 돌려도 같은 화면).
-import { drawSky, visibleNow, aimTarget, aimCheck, FOV, CAPTURE, SEASON_NAME, CLOUDY, byId, dirOf, basisOf } from '../../sky/starmap.js';
+import { drawSky, visibleNow, aimTarget, aimCheck, FOV, CAPTURE, SEASON_NAME, CLOUDY, byId, dirOf, basisOf, CONSTELLATIONS } from '../../sky/starmap.js';
 
 const STYLE_ID = 'pk-scope-style';
 const CSS = `
@@ -179,7 +179,7 @@ export function openScope(ctx, { stars, where = '망원경', onClose = () => {} 
     const n = stars.count();
     const card = el('div', { class: 'pk-scope-card', role: 'alertdialog', 'aria-label': `${c.name} 찰칵` },
       el('div', {}, '📸 찰칵!'), pic, el('h3', {}, c.name), el('div', { class: 'pk-scope-season' }, `${SEASON_NAME[c.season]} 밤하늘 · ${c.id}`),
-      el('p', {}, `${c.desc}\n\n📖 별자리 도감에 적었어요 (${n}/12). 박물관 별자리관에도 걸려요.`), ok);
+      el('p', {}, `${c.desc}\n\n📖 별자리 도감에 적었어요 (${n}/${CONSTELLATIONS.length}). 박물관 별자리관에도 걸려요.`), ok);
     card.querySelector('p').style.whiteSpace = 'pre-line';
     ok.addEventListener('click', () => closeCard());
     root.append(card);
@@ -228,7 +228,7 @@ export function openScope(ctx, { stars, where = '망원경', onClose = () => {} 
     ring.style.opacity = tgt ? '1' : '0.45';
     zoomTxt.textContent = `×${(FOV.max / V.fov).toFixed(1)}`;
     hint.textContent = list.length
-      ? `${SEASON_NAME[n.season]} 밤하늘 · 별자리 ${list.length}개 중 ${list.length - todo.length}개 찍음 · 도감 ${stars.count()}/12`
+      ? `${SEASON_NAME[n.season]} 밤하늘 · 별자리 ${list.length}개 중 ${list.length - todo.length}개 찍음 · 도감 ${stars.count()}/${CONSTELLATIONS.length}`
       : '해가 지면 별자리가 떠요';
     let m = '';
     if (cloudy) m = wx === 'rain' ? '비구름에 가려 별이 안 보여요' : wx === 'snow' ? '눈구름에 가려 별이 안 보여요' : '구름이 많아 별자리가 흐려요 — 맑은 밤에 다시 봐요';

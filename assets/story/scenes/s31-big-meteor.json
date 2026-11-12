@@ -1,0 +1,181 @@
+{
+  "id": "s31-big-meteor",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절이 깊어진다",
+  "title": "큰 유성우 밤",
+  "summary": "8월·12월에 한 번씩 오는 「큰 유성우」 밤. 별똥별이 비처럼 쏟아지고, 달무리가 오늘 밤 소원은 별 조각이 두 배라고 알려 준다. 둘이 올려다보며 소원을 빈다.",
+  "trigger": {
+    "on": "meteor-big"
+  },
+  "place": "museum",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "달무리와 쏟아지는 별똥별",
+      "recommended": true,
+      "desc": "쏟아지는 별똥별을 넓게 → 달무리가 날아와 큰 유성우 안내 → 소원 두 배 → 둘이 소원.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "별똥별이 쏟아지는 밤하늘, 주인공이 올려다본다",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "별똥별이 비처럼 쏟아지는 밤",
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                2.8,
+                1.6
+              ],
+              "face": -90,
+              "emote": "",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "달무리가 다가와 큰 유성우라고 알린다",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "caption": "오늘은 일 년에 두 번 있는 큰 유성우 밤이부엉!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "to": [
+                1.1,
+                0.4
+              ],
+              "do": "walk",
+              "face": "player",
+              "emote": "🌙",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "소원이 두 배",
+          "dur": 4,
+          "cam": {
+            "size": "medium",
+            "target": "dalmuri",
+            "angle": 15,
+            "move": "static"
+          },
+          "caption": "오늘 밤 소원은 별 조각이 두 배로 떨어진대 — 하늘을 올려다보고 빌어 봐",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "do": "happy",
+              "face": 0,
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "💡",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "둘이 나란히 소원",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "caption": "R·V 키(두 손가락)로 올려다보고 Space 로 소원",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": 0,
+              "emote": "🙏",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "🙏",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 안내",
+      "desc": "쏟아지는 별똥별 한 컷 + 안내 글.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "별똥별이 쏟아지는 밤하늘",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "큰 유성우 밤 — 오늘 소원은 별 조각이 두 배예요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

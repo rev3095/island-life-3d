@@ -106,6 +106,7 @@
     { "slug": "bell-cricket", "name": "방울벌레", "place": "풀밭", "time": "밤", "season": "가을", "price": 430, "rare": false, "flying": false, "emoji": "🦗", "desc": "작은 방울을 흔드는 듯 맑게 우는 곤충. 소리는 들려도 모습은 잘 안 보인다." },
     { "slug": "ant", "name": "개미", "place": "떨어진 과일", "time": "종일", "season": "연중", "price": 80, "rare": false, "flying": false, "emoji": "🐜", "desc": "떨어진 과일 냄새를 맡고 줄지어 온다. 자기보다 무거운 것도 거뜬히 든다." },
     { "slug": "snail", "name": "달팽이", "place": "바위", "time": "비 올 때", "season": "5~9월", "price": 250, "rare": false, "flying": false, "emoji": "🐌", "desc": "비 오는 날 바위 위로 느릿느릿 산책을 나온다. 집을 등에 지고 다닌다." },
+    { "slug": "tree-frog", "name": "청개구리", "place": "풀밭", "time": "비 올 때", "season": "여름", "price": 520, "rare": false, "flying": false, "emoji": "🐸", "desc": "비 오는 날 풀잎 위에서 개굴개굴. 장마 하루엔 섬 곳곳에서 노래한다. (M18-P2)" },
     { "slug": "pill-bug", "name": "쥐며느리", "place": "바위 밑", "time": "종일", "season": "연중", "price": 250, "rare": false, "flying": false, "emoji": "🪲", "desc": "바위를 들추면 동그랗게 몸을 마는 작은 친구. 축축한 곳을 좋아한다." },
     { "slug": "pond-skater", "name": "소금쟁이", "place": "강 위", "time": "낮", "season": "여름", "price": 130, "rare": false, "flying": false, "emoji": "🦟", "desc": "긴 다리로 물 위를 미끄러지듯 걷는다. 물에 빠지지 않는 신기한 곤충이다." },
     { "slug": "moth", "name": "나방", "place": "가로등·창문", "time": "밤", "season": "연중", "price": 130, "rare": false, "flying": true, "emoji": "🦋", "desc": "밤이면 가로등과 창문 불빛으로 모여든다. 날개에 고운 가루가 묻어 있다." },

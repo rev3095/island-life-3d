@@ -5,9 +5,10 @@ import * as items from './items.js';
 import { RULES } from './tables.js';
 
 /** 레시피 id = 만들어지는 아이템 id. unlock = 처음엔 모르는 레시피 (M13 D146-A: 레시피 쪽지로 하나씩 열림 — 지금 있던 레시피는 그대로 앎) */
-export const RECIPES = RULES.recipes.map(({ result, needs, count, unlock }) => Object.freeze({ id: result, count: count ?? 1, result, needs, ...(unlock ? { unlock: true } : {}) }));
+// special = 쪽지가 아니라 그날 열리는 레시피 (M18-P2: 'first-snow' 첫눈 하루 눈 장식) — 쪽지로 여는 차례(locked)에는 안 든다
+export const RECIPES = RULES.recipes.map(({ result, needs, count, unlock, special }) => Object.freeze({ id: result, count: count ?? 1, result, needs, ...(unlock ? { unlock: true } : {}), ...(special ? { special } : {}) }));
 /** 쪽지로 여는 레시피 id (표 순서 = 여는 순서) */
-export const LOCKED = RECIPES.filter(r => r.unlock).map(r => r.id);
+export const LOCKED = RECIPES.filter(r => r.unlock && !r.special).map(r => r.id);
 
 const BY_ID = new Map(RECIPES.map(r => [r.id, r]));
 
@@ -69,7 +70,9 @@ export function createRecipes(inventory, { known = null } = {}) {
     list: () => RECIPES.filter(open),
     get: id => BY_ID.get(id) ?? null,
     /** 잠긴 레시피 중 아직 모르는 것 (여는 순서대로) */
-    locked: () => RECIPES.filter(r => r.unlock && !open(r)).map(r => r.id),
+    locked: () => RECIPES.filter(r => r.unlock && !r.special && !open(r)).map(r => r.id),
+    /** 그날 열리는 잠긴 레시피 (M18-P2 special) → [id] */
+    lockedSpecial: (tag = null) => RECIPES.filter(r => r.special && (!tag || r.special === tag) && !open(r)).map(r => r.id),
     isOpen: id => open(BY_ID.get(id)),
     missing, canCraft, craft,
   };

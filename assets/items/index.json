@@ -1214,6 +1214,32 @@
       "status": "approved"
     },
     {
+      "id": "IC-BG-25",
+      "slug": "bug-tree-frog",
+      "name": "청개구리",
+      "group": "bug",
+      "kind": "frog",
+      "hold": true,
+      "items": [
+        {
+          "item": "bug.tree-frog",
+          "code": "IC-BG-25",
+          "icon": "assets/items/renders/bug-tree-frog_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.132,
+        0.135,
+        0.068
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-EV-01",
       "slug": "event-petal",
       "name": "벚꽃잎",

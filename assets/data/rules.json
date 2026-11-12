@@ -55,7 +55,8 @@
     { "result": "furn.star-lamp", "needs": [{ "id": "mat.star-yellow", "n": 2 }, { "id": "mat.iron", "n": 1 }], "unlock": true, "note": "M13 별 조각 가구 FU-63" },
     { "result": "furn.star-clock", "needs": [{ "id": "mat.star-blue", "n": 2 }, { "id": "mat.wood", "n": 3 }], "unlock": true, "note": "M13 별 조각 가구 FU-64" },
     { "result": "furn.star-chair", "needs": [{ "id": "mat.star-yellow", "n": 1 }, { "id": "mat.star-pink", "n": 1 }, { "id": "mat.wood", "n": 4 }], "unlock": true, "note": "M13 별 조각 가구 FU-65" },
-    { "result": "furn.star-mobile", "needs": [{ "id": "mat.star-yellow", "n": 1 }, { "id": "mat.star-pink", "n": 1 }, { "id": "mat.star-blue", "n": 1 }, { "id": "mat.branch", "n": 3 }], "unlock": true, "note": "M13 별 조각 가구 FU-66" }
+    { "result": "furn.star-mobile", "needs": [{ "id": "mat.star-yellow", "n": 1 }, { "id": "mat.star-pink", "n": 1 }, { "id": "mat.star-blue", "n": 1 }, { "id": "mat.branch", "n": 3 }], "unlock": true, "note": "M13 별 조각 가구 FU-66" },
+    { "result": "furn.snowman-lamp", "needs": [{ "id": "event.snow-crystal", "n": 3 }, { "id": "mat.wood", "n": 2 }], "unlock": true, "special": "first-snow", "note": "M18-P2 D193-A 첫눈 하루 눈 장식 레시피 — 쪽지가 아니라 첫눈 날에 열림 (FU-46 눈사람 등)" }
   ],
   "birthdays": {
     "dates": { "coco": "07-14", "bori": "03-21", "mochi": "04-08", "dubu": "11-03", "pong": "09-27", "chorong": "06-18", "danpung": null, "gureum": "05-16", "pado": "08-11", "dalmuri": "10-29" },

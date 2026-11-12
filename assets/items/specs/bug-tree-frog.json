@@ -1,0 +1,72 @@
+{
+  "id": "IC-BG-25",
+  "slug": "bug-tree-frog",
+  "name": "청개구리",
+  "group": "bug",
+  "category": "item",
+  "kind": "frog",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "bug.tree-frog",
+      "code": "IC-BG-25"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "비 오는 날 풀잎 위에 나와 개굴개굴 우는 손톱만 한 청개구리. 장마 하루엔 섬 곳곳에서 보인다.",
+    "keywords": [
+      "풀밭",
+      "비 올 때",
+      "여름",
+      "장마"
+    ],
+    "references": [
+      "동요 속 청개구리"
+    ],
+    "avoid": [
+      "징그러운 피부 질감"
+    ],
+    "notes": "M18-P2 D193-A 장마 하루 비 오는 날 생물"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "크기 (몸·날개 너비)",
+      "value": 0.22,
+      "min": 0.1,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "eye": "#2E2A26",
+    "eyeHighlight": "#FFFFFF",
+    "body": "#7CC35A",
+    "belly": "#E7F0C8"
+  },
+  "paletteLabels": {
+    "eye": "눈·입",
+    "eyeHighlight": "눈 빛",
+    "body": "몸",
+    "belly": "배·발"
+  },
+  "render": {
+    "yaw": -60,
+    "pitch": 30
+  }
+}

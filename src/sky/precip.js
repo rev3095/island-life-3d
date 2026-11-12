@@ -116,7 +116,12 @@ void main() {
   gl_FragColor = skyOut(band(t), a);
 }`;
 
-export function createPrecip(curve) {
+/** M18-P2 FX-03 굵은 비 (장마·태풍 날만): 높음·적정 = 굵은 빗줄기 한 겹 더(같은 비 셰이더, 그날만 만듦) + 물방울 튀김 진하게,
+ *  낮음·매우 낮음 = 새 그리기 없이 지금 비 줄만 길고 진하게 (점·판 규칙 — GPU 몫은 그대로) */
+export const HEAVY_QUALITY = { high: { layer: 2200 }, mid: { layer: 1400 }, low: { layer: 0 }, min: { layer: 0 } };
+
+export function createPrecip(curve, { quality = 'mid' } = {}) {
+  let q = HEAVY_QUALITY[quality] ? quality : 'mid';
   const group = new THREE.Group();
   group.name = 'sky-precip';
   const shared = { uCurve: curve.uCurve, uCurveOrigin: curve.uCurveOrigin, uFocus: { value: new THREE.Vector3() }, uTime: { value: 0 } };
@@ -168,9 +173,33 @@ export function createPrecip(curve) {
 
   for (const o of [rain, splash, snow, bow]) { o.frustumCulled = false; o.visible = false; group.add(o); }
 
+  // FX-03 굵은 빗줄기 겹: 굵은 비가 오는 동안에만 만들고 그치면 지운다 (다른 날엔 셰이더·물체 없음)
+  let heavy = null;
+  const heavyU = { ...shared, uBox: { value: new THREE.Vector3(28, 18, 28) }, uSpeed: { value: 30 }, uLen: { value: 1.5 }, uAlpha: { value: 0 },
+    uWind: rainU.uWind, uColor: { value: new THREE.Color('#E6F0FB') } };
+  function buildHeavy(on) {
+    const n = on ? HEAVY_QUALITY[q].layer : 0;
+    if (heavy && (!n || heavy.n !== n)) { group.remove(heavy.obj); heavy.obj.geometry.dispose(); heavy.obj.material.dispose(); heavy = null; }
+    if (!n || heavy) return;
+    const hp = new Float32Array(n * 6), he = new Float32Array(n * 2);
+    let s2 = 977;
+    const r2 = () => ((s2 = (s2 * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < n; i++) { const x = r2() * 400, y = r2() * 18, z = r2() * 400; hp.set([x, y, z, x, y, z], i * 6); he[i * 2 + 1] = 1; }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(hp, 3));
+    g.setAttribute('aEnd', new THREE.BufferAttribute(he, 1));
+    const obj = new THREE.LineSegments(g, new THREE.ShaderMaterial({ uniforms: heavyU, vertexShader: RAIN_VS, fragmentShader: RAIN_FS, transparent: true, depthWrite: false, fog: false }));
+    obj.name = 'sky-rain-heavy';
+    obj.frustumCulled = false;
+    group.add(obj);
+    heavy = { n, obj };
+  }
+
   return {
     group,
-    /** amounts: { rain, snow, rainbow } 0~1 */
+    get heavy() { return heavy ? heavy.n : 0; },
+    setQuality(next) { if (!HEAVY_QUALITY[next] || next === q) return; q = next; if (heavy) { buildHeavy(false); buildHeavy(true); } },
+    /** amounts: { rain, snow, rainbow, heavy (굵은 비 0~1), storm (태풍 바람) } 0~1 */
     update(dt, time, focus, camera, amounts, viewHeight, pixelRatio = 1) {
       snowU.uPixel.value = pixelRatio;
       shared.uTime.value = time;
@@ -178,8 +207,14 @@ export function createPrecip(curve) {
       // 화면 높이에 맞춘 점 크기 비율 (월드 크기 → 픽셀)
       const scale = viewHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
       splashU.uScale.value = snowU.uScale.value = scale;
-      rainU.uAlpha.value = 0.55 * amounts.rain;
-      splashU.uAlpha.value = 0.5 * amounts.rain;
+      const hv = amounts.heavy ?? 0, lite = !HEAVY_QUALITY[q].layer;
+      rainU.uAlpha.value = 0.55 * amounts.rain + (lite ? 0.25 * hv : 0.1 * hv);
+      rainU.uLen.value = 0.75 + (lite ? 0.55 : 0.25) * hv;
+      rainU.uSpeed.value = 21 + 6 * hv;
+      rainU.uWind.value.set(amounts.storm ? -6.5 : -1.6 - 1.2 * hv, amounts.storm ? 2.2 : 0.6);
+      splashU.uAlpha.value = 0.5 * amounts.rain + 0.35 * hv;
+      buildHeavy(hv > 0.01);
+      if (heavy) { heavyU.uAlpha.value = 0.6 * hv; heavy.obj.visible = hv > 0.01; }
       snowU.uAlpha.value = 0.95 * amounts.snow;
       rain.visible = splash.visible = amounts.rain > 0.01;
       snow.visible = amounts.snow > 0.01;

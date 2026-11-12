@@ -1,4 +1,4 @@
-// 요청 9 박물관 재단장·증축 (관 여섯 RM-25–30) · 요청 8 별자리 (IC-ST-01–12) 규칙 테스트
+// 요청 9 박물관 재단장·증축 (관 여섯 RM-25–30) · 요청 8 별자리 (IC-ST-01–12, M18-P2 +6 = 18) 규칙 테스트
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -52,14 +52,15 @@ test('곧 열려요: 분류에 아이템이 없으면 soon, 생기면 저절로 
   assert.ok(plan.filter(e => e.kind === 'spots').every(e => e.id.startsWith('art.s')), '조각은 받침에');
 });
 
-test('별자리관: 액자 열둘 = 별자리 12개', () => {
-  assert.equal(framesOf(halls[5]).length, 12);
+test('별자리관: 액자 열여덟 = 별자리 18개 (M18-P2 +6)', () => {
+  assert.equal(framesOf(halls[5]).length, CONSTELLATIONS.length);
+  assert.equal(CONSTELLATIONS.length, 18);
 });
 
-test('별자리 12개: id · 계절마다 셋 · 선이 별을 가리킴 · 하늘 위', () => {
-  assert.deepEqual(CONSTELLATIONS.map(c => c.id), Array.from({ length: 12 }, (_, i) => `IC-ST-${String(i + 1).padStart(2, '0')}`));
-  for (const s of ['spring', 'summer', 'autumn', 'winter']) assert.equal(inSeason(s).length, 3, s);
-  assert.equal(new Set(CONSTELLATIONS.map(c => c.name)).size, 12);
+test('별자리 18개: id · 계절마다 4–5 · 선이 별을 가리킴 · 하늘 위', () => {
+  assert.deepEqual(CONSTELLATIONS.map(c => c.id), Array.from({ length: 18 }, (_, i) => `IC-ST-${String(i + 1).padStart(2, '0')}`));
+  for (const s of ['spring', 'summer', 'autumn', 'winter']) assert.ok([4, 5].includes(inSeason(s).length), s);
+  assert.equal(new Set(CONSTELLATIONS.map(c => c.name)).size, 18);
   for (const c of CONSTELLATIONS) {
     for (const [a, b] of c.lines) assert.ok(c.stars[a] && c.stars[b], `${c.id} 선`);
     for (let i = 0; i < c.stars.length; i++) assert.ok(starDir(c, i)[1] > 0.2, `${c.id} 별 ${i} 가 지평선 가까이`);
@@ -80,7 +81,7 @@ test('찍기 판정: 가운데·크기 · 밤에만 · 바탕 별은 dome 과 �
   assert.equal(aimTarget({ az: c.az, alt: c.alt, fov: 40 }, inSeason('spring')).c.id, c.id);
   assert.equal(isStarHour(22), true);
   assert.equal(isStarHour(12), false);
-  assert.equal(visibleNow({ season: 'winter', hourF: 3 }).length, 3);
+  assert.equal(visibleNow({ season: 'winter', hourF: 3 }).length, inSeason('winter').length);   // M18-P2: 겨울 5 (셋 + 군고구마·썰매)
   assert.equal(visibleNow({ season: 'winter', hourF: 9 }).length, 0);
   assert.equal(fieldStars().length, 3600);
 });
