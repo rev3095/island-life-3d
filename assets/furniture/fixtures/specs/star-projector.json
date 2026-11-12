@@ -1,0 +1,66 @@
+{
+  "id": "FU-88",
+  "slug": "star-projector",
+  "item": "fixture.star-projector",
+  "name": "천체 투영기",
+  "category": "fixture",
+  "kind": "star-projector",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "별자리관(천체 투영실) 한가운데 2칸 투영기. 둥근 받침·기둥 위 양쪽으로 별 공 둘, 작은 구멍 점이 밤하늘처럼 빛난다.",
+    "keywords": [
+      "천체 투영기",
+      "별 공",
+      "놋쇠 고리"
+    ],
+    "references": [
+      "작은 시골 박물관",
+      "동네 미술관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "요청 9 박물관 재단장·증축 — 관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "glow"
+    ],
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#3D4660",
+    "brass": "#D8A84B",
+    "projector": "#283252",
+    "glow": "#FFE7A0"
+  },
+  "paletteLabels": {
+    "metal": "받침·기둥",
+    "brass": "놋쇠",
+    "projector": "별 공",
+    "glow": "별 점"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

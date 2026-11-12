@@ -11,6 +11,7 @@ const PARTS = [
   ['events', './events/index.js'],       // 8차 M8 계절 행사 (assets/events/, 보드 wave8)
   ['decor', './decor/index.js'],         // 9차 M9 섬 꾸미기 (assets/decor/, 보드 wave9 D86-A)
   ['telescope', './decor/telescope.js'], // 10차 M10-P5 섬에 놓은 별 망원경 — 밤에 하늘 올려다보기 (FU-53)
+  ['stars', './stars/index.js'],         // 요청 8 별자리: 박물관 앞 망원경 · 망원경 보기 UI-32 · 찍기 UI-33 · 별자리 도감 (IC-ST-01–12)
   ['night', './night/index.js'],         // M12 밤·새벽: 야시장 · 달빛 가게 · 새벽 천막 타로 · 야행성 주민 (assets/night/, 보드 night)
   ['tour', './tour/index.js'],           // P35 무인도 투어 (assets/tour/, 보드 tour D120–D128)
   ['journal', './journal/index.js'],     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)

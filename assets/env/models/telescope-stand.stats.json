@@ -1,0 +1,38 @@
+{
+  "id": "PR-40",
+  "slug": "telescope-stand",
+  "name": "망원경대",
+  "category": "prop",
+  "kind": "telescope-stand",
+  "version": "0.1",
+  "triangles": 1442,
+  "parts": 1,
+  "materials": [
+    "brass",
+    "glow",
+    "lens",
+    "metal",
+    "stone",
+    "stoneDark",
+    "tube"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.94,
+    1.41
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 32720,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "telescope-stand_front.png",
+    "telescope-stand_hero.jpg",
+    "telescope-stand_main.png",
+    "telescope-stand_thumb.png",
+    "telescope-stand_top.png"
+  ]
+}

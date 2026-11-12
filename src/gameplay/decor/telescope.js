@@ -3,6 +3,7 @@
 //   낮엔 짧은 안내만. 아무 키나 누르거나 걸으면 바로 끝나고, 놓으면 LOOK.back 대로 원래 시점으로 돌아온다.
 // 섬 꾸미기 하위 모듈이 아니라 gameplay/index.js PARTS 의 한 줄로 불린다 (decor/index.js 는 고치지 않음).
 // 실내(집 안 가구로 놓은 망원경)는 house 의 「살피기」가 맡는다 — 여기는 섬에 놓은 것(world 물체 'fu:star-telescope')만.
+// 요청 8 (별자리): 별자리 모듈(gameplay/stars)이 있으면 올려다보기 대신 박물관 앞 망원경과 같은 망원경 보기(UI-32)를 연다 — 별자리 찍기도 그대로 된다.
 import { FURN_KIND } from '../../world/variants.js';
 import { dirOfFacing } from './rules.js';
 
@@ -42,6 +43,7 @@ function start(ctx) {
     toast('해가 지면 별을 볼 수 있어요. 저녁 7시부터예요', '🔭');
     return;
   }
+  if (sv.stars?.open) { sv.stars.open({ where: '별 망원경' }); return; }
   S.view = { left: LOOK_SECONDS, fresh: true };
   sv.player?.camera?.setLook?.(1, 0);
   toast('별이 반짝여요 ✨', '🔭');
@@ -54,7 +56,7 @@ export default {
     S.ctx = ctx;
     ctx.services.gameplay?.interactions?.add({
       name: 'decor:telescope', intent: 'action', priority: 85,   // 문(90)보다 아래, 실내 가구(80)보다 위 — 섬에서만 맞는다
-      label: () => (S.view ? '그만 보기' : '별 보기'),
+      label: () => (S.view ? '그만 보기' : ctx.services.stars ? '망원경 보기' : '별 보기'),
       test: () => (S.view ? 'stop' : telescopeInFront(ctx)),
       run: target => (target === 'stop' ? stop() : start(ctx)),
     });

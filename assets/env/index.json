@@ -448,6 +448,15 @@
       "status": "approved"
     },
     {
+      "id": "PR-40",
+      "slug": "telescope-stand",
+      "name": "망원경대",
+      "category": "prop",
+      "kind": "telescope-stand",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -471,15 +480,6 @@
       "name": "도토리상점",
       "category": "building",
       "kind": "shop",
-      "version": "0.1",
-      "status": "approved"
-    },
-    {
-      "id": "BD-04",
-      "slug": "museum",
-      "name": "박물관",
-      "category": "building",
-      "kind": "museum",
       "version": "0.1",
       "status": "approved"
     },
@@ -536,6 +536,15 @@
       "kind": "tour-boat",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-16",
+      "slug": "museum",
+      "name": "박물관",
+      "category": "building",
+      "kind": "museum",
+      "version": "0.2",
+      "status": "review"
     },
     {
       "id": "FB-01",

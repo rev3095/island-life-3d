@@ -1,0 +1,53 @@
+{
+  "id": "FU-85",
+  "slug": "glass-case",
+  "item": "fixture.glass-case",
+  "name": "유리 진열장",
+  "category": "fixture",
+  "kind": "glass-case",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1728,
+  "parts": 2,
+  "materials": [
+    "brass",
+    "caseGlass",
+    "cloth",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "case",
+    "glass"
+  ],
+  "animations": {},
+  "size": [
+    0.88,
+    0.88,
+    1.24
+  ],
+  "bounds": [
+    [
+      -0.44,
+      -0.442,
+      0.0
+    ],
+    [
+      0.44,
+      0.44,
+      1.235
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 34536,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "glass-case_front.png",
+    "glass-case_main.png",
+    "glass-case_thumb.png",
+    "glass-case_top.png"
+  ]
+}
