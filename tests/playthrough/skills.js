@@ -74,6 +74,8 @@ export function createSkills(bot) {
       }
       if (!stood) { log('  닿는 그림자가 안 보여요'); continue; }
       await bot.tool('rod');
+      // 선착장 배 앞이면 행동 키가 「섬 여행」(95) — 던지면 여행 창이 떠 무인도로 간다. 사람처럼 자리를 옮긴다
+      if (bot.peek() !== 'gather-tool') { log(`  여기선 행동 키가 ${bot.peek()} — 자리 옮김`); await wander(); continue; }
       const before = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
       const got = await castAndWait();
       if (got) {
