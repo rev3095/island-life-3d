@@ -5,9 +5,11 @@ import * as items from './items.js';
 import { RULES } from './tables.js';
 
 /** 레시피 id = 만들어지는 아이템 id. unlock = 처음엔 모르는 레시피 (M13 D146-A: 레시피 쪽지로 하나씩 열림 — 지금 있던 레시피는 그대로 앎) */
-export const RECIPES = RULES.recipes.map(({ result, needs, count, unlock }) => Object.freeze({ id: result, count: count ?? 1, result, needs, ...(unlock ? { unlock: true } : {}) }));
-/** 쪽지로 여는 레시피 id (표 순서 = 여는 순서) */
-export const LOCKED = RECIPES.filter(r => r.unlock).map(r => r.id);
+export const RECIPES = RULES.recipes.map(({ result, needs, count, unlock, season }) => Object.freeze({ id: result, count: count ?? 1, result, needs, ...(unlock ? { unlock: true } : {}), ...(season ? { season } : {}) }));
+/** 쪽지로 여는 레시피 id (표 순서 = 여는 순서) — M18-P4 계절 레시피(season)는 빠진다: 그 계절 유리병·주민 선물로만 열린다 */
+export const LOCKED = RECIPES.filter(r => r.unlock && !r.season).map(r => r.id);
+/** M18-P4 (D196-A) 계절 레시피 id: { spring: [...], summer, autumn, winter } (표 순서 = 여는 순서) */
+export const SEASON_RECIPES = RECIPES.filter(r => r.season).reduce((o, r) => ((o[r.season] ??= []).push(r.id), o), {});
 
 const BY_ID = new Map(RECIPES.map(r => [r.id, r]));
 
@@ -68,8 +70,10 @@ export function createRecipes(inventory, { known = null } = {}) {
   return {
     list: () => RECIPES.filter(open),
     get: id => BY_ID.get(id) ?? null,
-    /** 잠긴 레시피 중 아직 모르는 것 (여는 순서대로) */
-    locked: () => RECIPES.filter(r => r.unlock && !open(r)).map(r => r.id),
+    /** 잠긴 레시피 중 아직 모르는 것 (여는 순서대로) — 레시피 쪽지가 여는 것만 (계절 레시피는 seasonLocked) */
+    locked: () => RECIPES.filter(r => r.unlock && !r.season && !open(r)).map(r => r.id),
+    /** M18-P4: 그 계절 레시피 중 아직 모르는 것 (season 을 안 주면 모든 계절) */
+    seasonLocked: season => RECIPES.filter(r => r.season && (!season || r.season === season) && !open(r)).map(r => r.id),
     isOpen: id => open(BY_ID.get(id)),
     missing, canCraft, craft,
   };

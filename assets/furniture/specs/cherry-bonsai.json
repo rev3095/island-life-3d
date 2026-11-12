@@ -1,0 +1,58 @@
+{
+  "id": "FU-94",
+  "slug": "cherry-bonsai",
+  "item": "furn.cherry-bonsai",
+  "name": "벚꽃 분재",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "cherry-bonsai",
+  "season": "spring",
+  "prompt": {
+    "concept": "낮은 네모 화분에 굽은 줄기, 분홍 꽃 덩이 셋.",
+    "keywords": [
+      "봄",
+      "분재"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 봄 벚꽃 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "pot": "#5E7A9E",
+    "soil": "#6E5040",
+    "branch": "#6E4A36",
+    "bloom": "#F9C3D3",
+    "petal": "#FFE0E8",
+    "center": "#E07898"
+  },
+  "paletteLabels": {
+    "pot": "화분",
+    "soil": "흙",
+    "branch": "가지",
+    "bloom": "꽃 덩이",
+    "petal": "꽃잎",
+    "center": "꽃술"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor"
+}

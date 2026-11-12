@@ -1,0 +1,54 @@
+{
+  "id": "FU-98",
+  "slug": "shell-mirror",
+  "item": "furn.shell-mirror",
+  "name": "조개 벽 거울",
+  "category": "furniture",
+  "kind": "shell-mirror",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2984,
+  "parts": 1,
+  "materials": [
+    "glint",
+    "mirror",
+    "pearl",
+    "sand",
+    "shell",
+    "shellPink",
+    "star"
+  ],
+  "objects": [
+    "mirror"
+  ],
+  "animations": {},
+  "size": [
+    0.72,
+    0.1,
+    1.9
+  ],
+  "bounds": [
+    [
+      -0.36,
+      -0.1,
+      1.13
+    ],
+    [
+      0.36,
+      0.0,
+      1.905
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 58984,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-mirror_front.png",
+    "shell-mirror_main.png",
+    "shell-mirror_thumb.png",
+    "shell-mirror_top.png"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "FU-93",
+  "slug": "cherry-table",
+  "item": "furn.cherry-table",
+  "name": "벚꽃 탁자",
+  "category": "furniture",
+  "kind": "cherry-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2964,
+  "parts": 1,
+  "materials": [
+    "branch",
+    "center",
+    "petal",
+    "vase",
+    "wood",
+    "woodLight"
+  ],
+  "objects": [
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.8,
+    0.8,
+    1.07
+  ],
+  "bounds": [
+    [
+      -0.4,
+      -0.4,
+      0.0
+    ],
+    [
+      0.4,
+      0.4,
+      1.07
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 59904,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-table_front.png",
+    "cherry-table_main.png",
+    "cherry-table_thumb.png",
+    "cherry-table_top.png"
+  ]
+}

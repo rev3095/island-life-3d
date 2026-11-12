@@ -1,0 +1,59 @@
+{
+  "id": "FU-96",
+  "slug": "shell-lamp",
+  "item": "furn.shell-lamp",
+  "name": "조개 등",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "shell-lamp",
+  "season": "summer",
+  "prompt": {
+    "concept": "모래빛 받침 위 크게 벌어진 가리비, 안에 둥근 진주 불빛.",
+    "keywords": [
+      "밤에 빛남",
+      "여름"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 여름 조개 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "sand": "#EBD9B0",
+    "pebble": "#B8C4C8",
+    "shell": "#FBE9DA",
+    "shellRib": "#E8C2A8",
+    "glow": "#FFF2C0"
+  },
+  "paletteLabels": {
+    "sand": "모래빛",
+    "pebble": "조약돌",
+    "shell": "조개",
+    "shellRib": "조개 골",
+    "glow": "불빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor"
+}

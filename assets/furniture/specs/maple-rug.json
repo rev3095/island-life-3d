@@ -1,0 +1,57 @@
+{
+  "id": "FU-100",
+  "slug": "maple-rug",
+  "item": "furn.maple-rug",
+  "name": "단풍잎 깔개",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "maple-rug",
+  "season": "autumn",
+  "prompt": {
+    "concept": "크림 바탕 둥근 깔개에 커다란 단풍잎 하나와 작은 잎 넷.",
+    "keywords": [
+      "깔개",
+      "가을"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 가을 단풍 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "rugBase": "#F3E2C4",
+    "rugEdge": "#C98A4E",
+    "leaf": "#E0602E",
+    "leafDeep": "#B8362A",
+    "leafGold": "#E8B23C"
+  },
+  "paletteLabels": {
+    "rugBase": "깔개 바탕",
+    "rugEdge": "깔개 테",
+    "leaf": "단풍",
+    "leafDeep": "짙은 단풍",
+    "leafGold": "노란 잎"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "layer": "rug"
+}

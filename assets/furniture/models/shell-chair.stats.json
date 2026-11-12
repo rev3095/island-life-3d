@@ -1,0 +1,52 @@
+{
+  "id": "FU-97",
+  "slug": "shell-chair",
+  "item": "furn.shell-chair",
+  "name": "조개 의자",
+  "category": "furniture",
+  "kind": "shell-chair",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1332,
+  "parts": 1,
+  "materials": [
+    "cushion",
+    "pearl",
+    "sea",
+    "shell",
+    "shellRib"
+  ],
+  "objects": [
+    "chair"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.5,
+    1.06
+  ],
+  "bounds": [
+    [
+      -0.3,
+      -0.25,
+      0.0
+    ],
+    [
+      0.3,
+      0.25,
+      1.056
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 28620,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "shell-chair_front.png",
+    "shell-chair_main.png",
+    "shell-chair_thumb.png",
+    "shell-chair_top.png"
+  ]
+}

@@ -1,5 +1,6 @@
 // M13-P5 방문 행상 (13차 보드 D145-A): 수·일 낮(9–17시) 광장 한쪽에 수레 BD-11 + 행상 송이 CH-16 (고슴도치 — 지금 섬에 없는 종족).
 // 오늘의 진열 = 희귀 꽃 모종(교배로만 피는 넷째 색 꽃 — 심을 수 있다) 둘 · 묘목 하나 · 다른 곳에서 안 파는 벽지 하나 (wp-09, 목록 값 0 이라 도토리상점 코너엔 안 나옴).
+// M18-P4 (D196-A): 그 계절 꽃씨 묶음(cfg.seasonal.seedPack 개) · 계절 벽지 WP-10–13 하나를 더 가져온다 (R.peddlerSeasonal).
 // 사기는 대화 고르기 + 확인 창 (상점 창 ui/shop.js 는 실내 트랙 몫이라 건드리지 않음). 밤 상인(달빛 가게·여우)은 다른 트랙 — 여기는 낮만.
 // 수레는 world 물체 persist:false (저장 안 함), 자리는 한 번 정하면 state.daily.peddler.spot. 처음 다가가면 daily:peddler { first } → 장면 s24 (트리거 peddler-first).
 import * as R from './rules.js';
@@ -80,9 +81,18 @@ export function createPeddler(K) {
     if (!n) return [];
     const items = S().data?.items;
     const list = R.peddlerStock(n.dayKey, seed(), cfg, pools()).map(id => { const it = items.get(id); return { kind: 'item', id, name: it.name, emoji: it.emoji ?? '🌱', price: R.peddlerPrice(it, cfg) }; });
-    const wp = cfg.wallpaper, house = S().house?.interior;
-    const entry = wp && house?.index?.models?.find?.(m => m.slug === wp.slug);
-    if (entry) list.push({ kind: 'wallpaper', id: wp.slug, name: `${entry.name} 벽지`, emoji: '🖼️', price: wp.price, owned: !!house.owns?.(wp.slug) });
+    // M18-P4 계절 꽃씨 묶음
+    const season = n.season ?? ctx.constants?.seasonOf?.(n.month);
+    const sea = R.peddlerSeasonal(season, cfg);
+    for (const id of sea.seeds) {
+      const it = items.get(id);
+      if (it) list.push({ kind: 'item', id, n: sea.n, season: true, name: `${it.name} ${sea.n}개`, emoji: '🌱', price: R.peddlerPrice(it, cfg) * sea.n });
+    }
+    const house = S().house?.interior;
+    for (const [wp, season] of [[cfg.wallpaper, false], [sea.wallpaper, true]]) {
+      const entry = wp && house?.index?.models?.find?.(m => m.slug === wp.slug);
+      if (entry) list.push({ kind: 'wallpaper', id: wp.slug, season, name: `${entry.name} 벽지`, emoji: season ? '🎐' : '🖼️', price: wp.price, owned: !!house.owns?.(wp.slug) });
+    }
     return list;
   }
 
@@ -98,21 +108,21 @@ export function createPeddler(K) {
     if (a !== 0) { await say([pick(L.bye)]); return; }
     for (;;) {
       const list = stock(n);
-      const labels = list.map(e => `${e.emoji} ${e.name} · 🌰 ${e.price.toLocaleString()}${e.owned ? ' (가지고 있음)' : ''}`);
+      const labels = list.map(e => `${e.emoji} ${e.name}${e.season ? ' (계절)' : ''} · 🌰 ${e.price.toLocaleString()}${e.owned ? ' (가지고 있음)' : ''}`);
       const quit = labels.push('그만') - 1;
-      const i = await say([L.pick], labels);
+      const i = await say(list.some(e => e.season) && L.season ? [L.season, L.pick] : [L.pick], labels);
       if (i == null || i === quit) break;
       const e = list[i];
       if (e.owned) { await say([L.owned]); continue; }
       const d = S().data;
       if ((d?.wallet?.get?.() ?? 0) < e.price) { await say([L.short]); continue; }
-      if (e.kind === 'item' && d.inventory?.canFit && !(d.inventory.canFit(e.id, 1) > 0)) { await say([L.full]); continue; }
+      if (e.kind === 'item' && d.inventory?.canFit && !(d.inventory.canFit(e.id, e.n ?? 1) >= (e.n ?? 1))) { await say([L.full]); continue; }
       const ok = await ui.confirm({ title: '사기', icon: e.emoji, text: `${e.name}을(를) 🌰 ${e.price.toLocaleString()}에 살까요?`,
         buttons: [{ label: '살게요', value: true, primary: true }, { label: '그만둘래요', value: false }], cancelValue: false });
       if (!ok) continue;
       if (!d.wallet.spend(e.price)) { await say([L.short]); continue; }
       if (e.kind === 'wallpaper') S().house?.interior?.add?.(e.id);
-      else if (!(d.inventory.add(e.id, 1) > 0)) { d.wallet.add(e.price); await say([L.full]); continue; }
+      else { const got = d.inventory.add(e.id, e.n ?? 1); if (!(got > 0)) { d.wallet.add(e.price); await say([L.full]); continue; } }
       ctx.events.emit('sfx', { name: 'acorn' });
       toast(`${e.name} 샀어요!`, e.emoji);
       emit('daily:peddler-buy', { id: e.id, kind: e.kind, price: e.price });

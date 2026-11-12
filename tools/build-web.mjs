@@ -29,7 +29,7 @@ const TEXT_EXT = /\.(html|js|mjs|css|json|svg|txt|md)$/i;
 export const PACK_BYTES = 3 * MB;
 // 계절 행사 묶음 (최적화, p29-perf): 행사 하나에만 쓰는 배경·아이템 모델 (assets/events/events.json list[].assets) → season-<slug>.
 // 처음에 받지 않고, 미리 받기(prefetchPacks)도 그 행사가 열렸거나 곧 열릴 때만. 여럿이 같이 쓰는 것(행사 간판)은 섬 묶음에 남는다.
-// 보상 가구·아이템 아이콘은 행사가 끝나도 집·가방에 남아서 가구·아이콘 묶음 그대로.
+// 보상 가구·아이템 아이콘은 행사가 끝나도 집·가방에 남아서 가구·아이콘 묶음 그대로. M18-P4 계절 가구(스펙 season) 모델은 그 계절 묶음 (집에 놓으면 그때 받음).
 export const SEASON_FILES = (() => {
   const list = JSON.parse(readFileSync(join(ROOT, 'assets/events/events.json'), 'utf8')).list ?? [];
   const uses = new Map();   // 경로 → [행사 slug]
@@ -37,6 +37,12 @@ export const SEASON_FILES = (() => {
   for (const ev of list) {
     for (const k of ev.assets?.env ?? []) { use(`assets/env/models/${k}.glb.json`, ev.slug); use(`assets/env/specs/${k}.json`, ev.slug); }
     for (const k of ev.assets?.items ?? []) use(`assets/items/models/${k}.glb.json`, ev.slug);
+  }
+  // M18-P4 (D196-A · D197-A): 계절 가구 FU-92–104 모델(스펙 season)은 그 계절 묶음 — 썸네일은 icons, 스펙은 furniture 묶음 그대로
+  const furnSpecs = join(ROOT, 'assets/furniture/specs');
+  for (const f of readdirSync(furnSpecs).filter(f => f.endsWith('.json'))) {
+    const sp = JSON.parse(readFileSync(join(furnSpecs, f), 'utf8'));
+    if (sp.season && list.some(ev => ev.slug === sp.season)) use(`assets/furniture/models/${sp.slug}.glb.json`, sp.season);
   }
   return new Map([...uses].filter(([, s]) => s.length === 1).map(([p, [slug]]) => [p, slug]));
 })();

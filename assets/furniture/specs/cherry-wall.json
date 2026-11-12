@@ -1,0 +1,52 @@
+{
+  "id": "FU-95",
+  "slug": "cherry-wall",
+  "item": "furn.cherry-wall",
+  "name": "벚꽃 가지 장식",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "cherry-wall",
+  "season": "spring",
+  "prompt": {
+    "concept": "벽에 비스듬히 건 벚꽃 가지, 꽃잎 둘이 떨어지는 중.",
+    "keywords": [
+      "벽",
+      "봄"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 봄 벚꽃 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "branch": "#6E4A36",
+    "petal": "#FFD3DF",
+    "center": "#F28CB0"
+  },
+  "paletteLabels": {
+    "branch": "가지",
+    "petal": "꽃잎",
+    "center": "꽃술"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall"
+}

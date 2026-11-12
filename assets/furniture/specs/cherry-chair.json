@@ -1,0 +1,56 @@
+{
+  "id": "FU-92",
+  "slug": "cherry-chair",
+  "item": "furn.cherry-chair",
+  "name": "벚꽃 의자",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "cherry-chair",
+  "season": "spring",
+  "prompt": {
+    "concept": "연한 나무 의자에 분홍 방석, 둥근 등받이 위에 벚꽃 세 송이.",
+    "keywords": [
+      "앉기",
+      "봄"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 봄 벚꽃 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#E8C9A0",
+    "woodLight": "#F3DFC2",
+    "cushion": "#F7B8C8",
+    "petal": "#FFD3DF",
+    "center": "#F28CB0"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodLight": "연한 나무",
+    "cushion": "방석",
+    "petal": "꽃잎",
+    "center": "꽃술"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor"
+}

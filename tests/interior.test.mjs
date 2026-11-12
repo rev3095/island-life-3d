@@ -18,7 +18,7 @@ const WINDOWS = new Set(['n:1', 'n:6']);   // room.js WINDOWS
 
 test('벽지 8 · 바닥 8 · 방 틀 스펙이 있고 무늬·색이 맞다', () => {
   const wp = specs.filter(s => s.kind === 'wallpaper'), fl = specs.filter(s => s.kind === 'floor');
-  assert.deepEqual(wp.map(s => s.id).sort(), ['WP-01', 'WP-02', 'WP-03', 'WP-04', 'WP-05', 'WP-06', 'WP-07', 'WP-08', 'WP-09']);   // + M13 행상 벽지
+  assert.deepEqual(wp.map(s => s.id).sort(), ['WP-01', 'WP-02', 'WP-03', 'WP-04', 'WP-05', 'WP-06', 'WP-07', 'WP-08', 'WP-09', 'WP-10', 'WP-11', 'WP-12', 'WP-13']);   // + M18-P4 행상 계절 벽지 WP-10–13 + M13 행상 벽지
   assert.deepEqual(fl.map(s => s.id).sort(), ['FL-01', 'FL-02', 'FL-03', 'FL-04', 'FL-05', 'FL-06', 'FL-07', 'FL-08']);
   for (const s of [...wp, ...fl]) {
     assert.deepEqual(checkPattern(s), [], s.slug);
@@ -134,7 +134,7 @@ test('상점 오늘의 벽지·바닥: 같은 날엔 같고, 처음 가진 것�
   assert.ok(!seen.wallpaper.has('wp-01') && !seen.floor.has('fl-01'), '처음 가진 것은 안 판다');
   assert.equal(seen.wallpaper.size, 7, '벽지 7가지 모두 언젠가 나온다 (WP-08 포함)');
   assert.equal(seen.floor.size, 7);
-  assert.equal(listOf(index, 'wallpaper').length, 9);   // + M13 WP-09 (값 0 — 상점 코너엔 안 나옴)
+  assert.equal(listOf(index, 'wallpaper').length, 13);   // + M13 WP-09 · M18-P4 계절 WP-10–13 (값 0 — 상점 코너엔 안 나옴)
 });
 
 test('state.house 벽지·바닥 칸: 예전 저장·모르는 slug·안 가진 것을 바로잡는다', () => {

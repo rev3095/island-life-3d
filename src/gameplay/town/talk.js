@@ -7,6 +7,7 @@ import {
   makeRequest, matchesRequest, currentRequest, requestReward, receiveGift, giftBack, surpriseGift,
   REQUEST_POINTS, FRIEND_MAX, josa, noteBond,
 } from './rules.js';
+import { artStep } from './artwish.js';   // M18-P4 미술품 주고받기 (D195-A)
 
 export const MENU = ['잡담', '부탁 있어?', '선물 주기', '잘 가'];
 export const TOGETHER_MENU = '같이 놀자';   // M15 (친구 이상일 때 잘 가 앞에)
@@ -155,6 +156,15 @@ export function createTalk(ctx, { lines, party = null, companion = null }) {
       }
     }
 
+    // M18-P4 (D195-A): 오늘 이 주민이 보고 싶은 미술품이 있으면 인사 뒤에 꺼낸다 (보여 주기 · 바꿔 주기)
+    if (L.art) {
+      try {
+        let pre = greet;   // 인사는 첫 말에 붙여 한 번만
+        const sayArt = (a, b, e, ce) => { if (!pre.length) return say(a, b, e, ce); const g = pre; pre = []; return say([...g, ...[a].flat()], b, [gE[0], ...(e ?? []).slice(1)], ce); };
+        if (await artStep({ ctx, V, v, L, say: sayArt, vars, r, recent, note, addFriendship, pickLines, giveItem, giveLater, E, dayKey: c.dayKey })) { greet = []; gE = []; }
+      } catch (e) { console.warn('[town] 미술품 부탁', e); }
+    }
+
     // 말 걸기만으로 친밀도가 꽉 찼으면 사진은 인사 때 준다
     if (v.friendship >= FRIEND_MAX && !v.photo) { await givePhoto(greet); greet = []; gE = []; }
 
@@ -289,6 +299,11 @@ export function createTalk(ctx, { lines, party = null, companion = null }) {
       if (bday && res.reaction !== 'dislike' && v.giftsToday <= 3) said.push(...pickLines(B.gift, r, recent));   // 생일 선물은 더 기뻐한다
       const saidE = v.giftsToday > 3 ? ['sweat', 'gift'] : { love: ['love', 'sparkle'], like: ['grin', 'heart'], normal: ['smile'], dislike: ['sweat', 'dots'] }[res.reaction] ?? ['smile'];
       await say(said, null, bday && res.reaction !== 'dislike' ? [...saidE.slice(0, 2), 'party'] : saidE);
+      // M18-P4 (D196-A): 친구 이상 주민이 좋아하는 선물을 받으면 가끔 그 계절 레시피를 알려 준다 (창은 대화가 끝난 뒤 daily 가 띄움)
+      if ((res.reaction === 'love' || res.reaction === 'like') && v.friendship >= 30 && v.seasonRecipeDay !== c.dayKey) {
+        const rid = ctx.services.daily?.recipes?.fromVillager?.(P.name, r);
+        if (rid) { v.seasonRecipeDay = c.dayKey; vars.item = itemName(rid); await say(pickLines(L.art?.recipe, r, recent), null, ['sparkle', `item:${rid}`]); }
+      }
       const back = giftBack(v, P, res.reaction, c.dayKey, r);
       if (back) {
         vars.item = itemName(back);

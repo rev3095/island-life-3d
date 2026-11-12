@@ -157,3 +157,21 @@ export function peddlerStock(dayKey, seed, cfg, pools) {
 
 /** 행상 값: 아이템의 살 값(buy) 이 있으면 그것, 없으면 파는 값 × markup */
 export const peddlerPrice = (it, cfg) => (it?.buy > 0 ? it.buy : Math.round((it?.price ?? 0) * (cfg.markup ?? 4) / 10) * 10);
+
+// ───────────────────────── M18-P4 계절 레시피 · 행상 계절 진열 (15차 보드 D196-A)
+
+/** 오늘 유리병에 계절 레시피가 들어 있나 (같은 날 같은 섬이면 늘 같다) — 그 계절 레시피가 남았는지는 부르는 쪽이 본다 */
+export const seasonBottle = (dayKey, seed, cfg) => !!cfg && rngOf('season-bottle', dayKey, seed)() < (cfg.bottleChance ?? 0.3);
+
+/** 행상 계절 진열: cfg.seasonal[season] = { seeds: [id], wallpaper: { slug, price } } → { seeds: [id], wallpaper } (없으면 빈 것) */
+export function peddlerSeasonal(season, cfg) {
+  const s = cfg?.seasonal?.[season];
+  return { seeds: [...(s?.seeds ?? [])], wallpaper: s?.wallpaper ?? null, n: cfg?.seasonal?.seedPack ?? 5 };
+}
+
+/** 받침에 맞는 조사 붙이기: withJosa('퐁', '이', '가') → '퐁이' · ('코코', …) → '코코가' */
+export function withJosa(word, a, b) {
+  const ch = String(word ?? '').slice(-1).charCodeAt(0);
+  const has = ch >= 0xac00 && ch <= 0xd7a3 && (ch - 0xac00) % 28 > 0;
+  return `${word}${has ? a : b}`;
+}

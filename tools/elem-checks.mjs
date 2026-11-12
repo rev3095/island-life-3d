@@ -10,6 +10,10 @@ export const ART_KIND_KO = { painting: '그림', sculpture: '조각' };
 
 /** items.json 밖(src/data/daily-items.js)에 있는 아이템 — 레시피가 쓴다 (M13 별 조각 · 레시피 쪽지 · 별 조각 가구 FU-63–66). tests/daily.test.mjs 가 daily-items.js 와 맞는지 본다 */
 export const CODE_ITEMS = ['mat.star-yellow', 'mat.star-pink', 'mat.star-blue', 'mat.recipe-note', 'furn.star-lamp', 'furn.star-clock', 'furn.star-chair', 'furn.star-mobile'];
+/** M18-P4 계절 가구 FU-92–104 + 그 레시피 재료 행사 채집 (src/data/seasonal-items.js SEASON_FURN — tests/seasonal.test.mjs 가 맞는지 본다) */
+export const SEASON_ITEMS = ['furn.cherry-chair', 'furn.cherry-table', 'furn.cherry-bonsai', 'furn.cherry-wall', 'furn.shell-lamp', 'furn.shell-chair', 'furn.shell-mirror',
+  'furn.maple-shelf', 'furn.maple-rug', 'furn.maple-lamp', 'furn.snowflake-lamp', 'furn.snowflake-table', 'furn.snowflake-wall',
+  'event.petal', 'event.snow-crystal'];   // 계절 레시피 재료로 쓰는 행사 채집 (src/data/event-items.js)
 
 /** 아이템 표 → [{ cat, id, name, emoji }] (레시피 재료 고르기·없는 아이템 검사) */
 export function itemList(T) {
@@ -50,7 +54,7 @@ export function checkElements(W) {
   const out = [];
   const add = (tab, ok, label, why = '') => out.push({ tab, ok: !!ok, label, why: ok ? '' : why });
   const T = W.items, R = W.rules;
-  const ids = new Set([...itemList(T ?? {}).map(i => i.id), ...CODE_ITEMS]);
+  const ids = new Set([...itemList(T ?? {}).map(i => i.id), ...CODE_ITEMS, ...SEASON_ITEMS]);
 
   /* ---- 상점 ---- */
   if (R?.shop) {

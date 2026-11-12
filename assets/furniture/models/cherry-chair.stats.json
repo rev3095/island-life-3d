@@ -1,0 +1,52 @@
+{
+  "id": "FU-92",
+  "slug": "cherry-chair",
+  "item": "furn.cherry-chair",
+  "name": "벚꽃 의자",
+  "category": "furniture",
+  "kind": "cherry-chair",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3120,
+  "parts": 1,
+  "materials": [
+    "center",
+    "cushion",
+    "petal",
+    "wood",
+    "woodLight"
+  ],
+  "objects": [
+    "chair"
+  ],
+  "animations": {},
+  "size": [
+    0.46,
+    0.44,
+    1.05
+  ],
+  "bounds": [
+    [
+      -0.23,
+      -0.22,
+      -0.001
+    ],
+    [
+      0.23,
+      0.22,
+      1.053
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 61716,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-chair_front.png",
+    "cherry-chair_main.png",
+    "cherry-chair_thumb.png",
+    "cherry-chair_top.png"
+  ]
+}

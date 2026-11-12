@@ -1,0 +1,57 @@
+{
+  "id": "FU-99",
+  "slug": "maple-shelf",
+  "item": "furn.maple-shelf",
+  "name": "단풍 선반",
+  "category": "furniture",
+  "kind": "maple-shelf",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4388,
+  "parts": 1,
+  "materials": [
+    "acorn",
+    "basket",
+    "book",
+    "jar",
+    "leaf",
+    "leafDeep",
+    "leafGold",
+    "pumpkin",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "shelf"
+  ],
+  "animations": {},
+  "size": [
+    0.8,
+    0.36,
+    1.02
+  ],
+  "bounds": [
+    [
+      -0.4,
+      -0.18,
+      0.0
+    ],
+    [
+      0.4,
+      0.18,
+      1.022
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 88616,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "maple-shelf_front.png",
+    "maple-shelf_main.png",
+    "maple-shelf_thumb.png",
+    "maple-shelf_top.png"
+  ]
+}

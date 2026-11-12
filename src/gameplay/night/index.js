@@ -332,6 +332,7 @@ function createNight(ctx, cfg) {
     if (!s.met.salang) { s.met.salang = n.dayKey; await say(L.first); ctx.events.emit('night:met', { slug: 'salang' }); }
     const a = await say([pick(L.greet)], L.menu);
     if (a === 1) { await ui.shop.open({ stock: stockGroups('foxshop').furniture, title: c.name, keeper: K.person.name, color: K.person.color, greet: ' 여우불은 밤길 친구지콩.' }); return; }
+    if (a === 2 && L.menu.length > 3) { await buyBackFake(K, L, say); return; }   // M18-P4 (D195-A) 가품 되사기
     if (a !== 0) { await say(L.bye); return; }
     if (s.fox.day !== n.dayKey) s.fox = { day: n.dayKey, ids: [] };
     if (s.fox.ids.length >= (c.perNight ?? 1)) { await say(L.soldOut); return; }
@@ -352,6 +353,27 @@ function createNight(ctx, cfg) {
     ui.toast?.(`${it.name}을(를) 샀어요`, it.icon);
     ctx.events.emit('night:art', { id, fake: !!it.fake, from: 'fox' });
     await say([pick(L.bought)]);
+  }
+
+  /** M18-P4 (D195-A): 살랑이 가품을 반값에 되산다 — 값 = 그 작품 여우 값(buy)의 반 (R.foxBuyBack) */
+  async function buyBackFake(K, L, say) {
+    const d = S().data, ui = S().ui, B = L.buyBack ?? {};
+    const fakes = (d.inventory?.slots ?? []).map((s, i) => (s && d.items.get(s.id)?.fake ? i : -1)).filter(i => i >= 0);
+    if (!fakes.length) { await say([pick(B.none ?? L.bye)]); return; }
+    const slot = await ui.bag.open({ mode: 'pick', title: `${K.person.name}에게 가품 되팔기`, hint: '되팔 가품을 골라 주세요 (반값)', filter: s => !!d.items.get(s.id)?.fake });
+    if (slot == null) { await say([pick(B.cancel ?? L.bye)]); return; }
+    const sl = d.inventory.slots[slot], it = sl && d.items.get(sl.id);
+    if (!it?.fake) return;
+    const price = R.foxBuyBack(it);
+    const fill = t => t.replaceAll('{name}', it.name).replaceAll('{price}', price.toLocaleString('ko-KR'));
+    const ok = await say([fill(pick(B.ask ?? ['{name}… 🌰 {price}에 사 주지콩.']))], ['팔게요', '그만둘래요']);
+    if (ok !== 0) { await say([pick(B.cancel ?? L.bye)]); return; }
+    if (!(d.inventory.remove(slot, 1) > 0)) return;
+    d.wallet.add(price);
+    ctx.events.emit('sfx', { name: 'acorn' });
+    ui.toast?.(`${it.name}(가품)을 🌰 ${price.toLocaleString('ko-KR')}에 팔았어요`, '🦊');
+    ctx.events.emit('night:art-buyback', { id: sl.id, price });
+    await say([fill(pick(B.done ?? L.bought))]);
   }
 
   // ── P54 선물 상자 PR-35 (D169-A): 낮·밤, 오늘 섬 풀밭 어딘가에 하나 ──

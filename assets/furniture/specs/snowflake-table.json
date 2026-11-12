@@ -1,0 +1,57 @@
+{
+  "id": "FU-103",
+  "slug": "snowflake-table",
+  "item": "furn.snowflake-table",
+  "name": "눈 결정 탁자",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "snowflake-table",
+  "season": "winter",
+  "prompt": {
+    "concept": "얼음빛 육각 유리 상판에 눈 결정 무늬, 하얀 다리 셋, 찻잔 하나.",
+    "keywords": [
+      "겨울"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 겨울 눈 결정 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "snow": "#F6FAFF",
+    "metal": "#B8C4D4",
+    "ice": "#CFE8F6",
+    "crystal": "#FFFFFF",
+    "cup": "#F28C8C",
+    "tea": "#C9864E"
+  },
+  "paletteLabels": {
+    "snow": "눈빛",
+    "metal": "은빛",
+    "ice": "얼음 유리",
+    "crystal": "눈 결정",
+    "cup": "찻잔",
+    "tea": "차"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor"
+}

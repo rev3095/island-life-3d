@@ -1,0 +1,61 @@
+{
+  "id": "FU-101",
+  "slug": "maple-lamp",
+  "item": "furn.maple-lamp",
+  "name": "단풍 등",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "maple-lamp",
+  "season": "autumn",
+  "prompt": {
+    "concept": "통나무 받침, 휜 가지 끝에 단풍잎 모양 종이 등.",
+    "keywords": [
+      "밤에 빛남",
+      "가을"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 가을 단풍 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#A8764E",
+    "woodDark": "#6E4A36",
+    "string": "#5E4636",
+    "glow": "#FFD28A",
+    "leaf": "#E0602E",
+    "leafGold": "#E8B23C"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "woodDark": "짙은 나무",
+    "string": "끈",
+    "glow": "불빛",
+    "leaf": "단풍",
+    "leafGold": "노란 잎"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor"
+}
