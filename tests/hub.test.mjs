@@ -313,3 +313,92 @@ test('게임 저장소 처리 순서가 문서에 있다 (D47: 고침 → done, 
   for (const [name, doc] of [['CLAUDE.md', claude], ['README', readme]]) for (const k of ['reports', 'checks', 'hub-game.mjs', 'status/game', "'board'", 'D47']) assert.ok(doc.includes(k), `${name} 에 ${k}`);
   for (const k of ['assets/review/game-reports.json', 'assets/review/checks.json', 'hub-game.mjs']) assert.ok(note.includes(k), `hub-manage 노트에 ${k}`);
 });
+
+/* ---------- 검수 보드 보관함 (archive-index → 홈 저장소 archive/<n차 id>, docs/notes/board-archive.md) ---------- */
+const AINDEX = JSON.parse(home.match(/<script type="application\/json" id="archive-index">([\s\S]*?)<\/script>/)[1]);
+const dRange = s => { const m = /^D(\d+)–D(\d+)$/.exec(s); return m ? [+m[1], +m[2]] : null; };
+
+test('보관함 차례: 모든 보드가 한 번씩, 결정 번호 순서 = n차 순서, id = <두 자리 차수>-<보드 id>', () => {
+  const boards = LIST.filter(e => e.group === 'board' || (e.group === 'archive' && e.file.startsWith('concept/'))).map(e => e.id).sort();
+  assert.deepEqual(AINDEX.map(a => a.board).sort(), boards, '홈 목록의 보드(지난 보드 포함) = 보관함 차례 (새 보드는 차례 끝에 한 줄)');
+  assert.deepEqual(AINDEX.map(a => a.seq), AINDEX.map((_, i) => i + 1), 'seq 는 1부터 빈틈없이 줄 순서대로');
+  const readme = read('concept/README.md');
+  const dRow = readme.split('\n').find(l => l.startsWith('| D | 결정 |'));
+  const span = {};   // README ID 표 D 줄: 'D36–D48 (wave7) · D49–D57 (wave7 QA 결과)' → 보드마다 [처음, 끝]
+  for (const m of dRow.matchAll(/D(\d+)–D(\d+) \(([\w.]+)/g)) {
+    const id = m[3] === 'v0.1' ? 'concept' : m[3];
+    span[id] = [Math.min(span[id]?.[0] ?? Infinity, +m[1]), Math.max(span[id]?.[1] ?? 0, +m[2])];
+  }
+  let lastD = 0, lastCha = 0;
+  for (const a of AINDEX) {
+    assert.match(a.id, /^\d{2}-[a-z0-9-]+$/);
+    assert.equal(a.id, `${String(a.cha).padStart(2, '0')}-${a.board}`, `${a.id}: id = 차수 두 자리 + 보드 id`);
+    assert.ok(['concept', 'main', 'theme'].includes(a.kind), `${a.id}: kind`);
+    assert.ok(a.label.startsWith(`${a.cha}차`), `${a.id}: 이름은 「${a.cha}차」로 시작`);
+    if (a.kind === 'theme') assert.ok(a.label.includes(' · '), `${a.id}: 주제 보드는 「n차 · 주제」`);
+    assert.match(a.made, /^\d{4}-\d{2}-\d{2}$/);
+    const r = dRange(a.decisions);
+    assert.ok(r, `${a.id}: 결정 범위 'Dn–Dm'`);
+    assert.deepEqual(r, span[a.board], `${a.id}: 결정 범위가 concept/README.md ID 표 D 줄과 같다`);
+    assert.ok(r[0] > lastD, `${a.id}: 결정 번호 순서대로`);
+    assert.ok(a.cha >= lastCha, `${a.id}: 차수는 줄어들지 않는다`);
+    if (a.kind === 'theme') assert.equal(a.cha, lastCha, `${a.id}: 주제 보드는 바로 앞 본 보드의 차수에 붙는다`);
+    lastD = r[1]; lastCha = a.cha;
+    const file = byId[a.board].file;
+    if (a.kind !== 'concept') assert.ok(read(file).includes(`id: '${a.board}'`), `${file} 는 저장소가 있는 보드 (window.BOARD)`);
+    else assert.ok(a.fallback?.from && a.fallback.summary && Object.keys(a.fallback.picks).length === r[1] - r[0] + 1, `${a.id}: 저장 없는 보드는 문서 기록(fallback)으로 결정 전부`);
+  }
+  // 13차는 wave13 (보드 이름 「13차 검수 보드」와 같은 번호)
+  for (const a of AINDEX.filter(x => /^wave\d+$/.test(x.board))) assert.equal(a.cha, +a.board.slice(4), `${a.board} = ${a.board.slice(4)}차`);
+});
+
+test('보관함 계산 (HubLogic.archiveDoc · archiveRows · tools/hub-archive.mjs): 보드 저장소 기록 → archive 문서 → 화면 줄', async () => {
+  const H = loadLogic();
+  assert.equal(H.pickSummary({ D8: 'B', D9: 'A', D10: 'A', D13: 'CH10' }), 'D8-B · D13-CH10 · 나머지 A (4개)');
+  assert.equal(H.pickSummary({ D58: 'A', D59: 'A' }), '모두 A (2개)');
+  assert.equal(H.pickSummary({ D130: 'B', 'D130-spec': 'all', D131: 'A', D132: 'A' }), 'D130-B · 나머지 A (3개 · 사양 고르기 1)');
+  assert.equal(H.pickSummary(null), '');
+  const en = AINDEX.find(a => a.board === 'wave7');
+  const v1 = { board: 'wave7', version: 1, appliedAt: 10, summary: '첫 반영', commit: 'aaaaaaa', picks: { D36: 'A', D37: 'B' }, notes: { D41: '임시' } };
+  const v2 = { ...v1, version: 2, appliedAt: '2026-11-04T00:00:00Z', summary: '확정', commit: 'bbbbbbb', picks: { D36: 'A', D37: 'B', D49: 'A' } };
+  const doc = plain(H.archiveDoc(en, byId.wave7, { applied: { ...v2, commit: undefined }, history: [v1, v2] }, 5));
+  assert.equal(doc.id, '07-wave7');
+  assert.equal(doc.source, 'store');
+  assert.deepEqual(doc.applied, { version: 2, appliedAt: Date.parse('2026-11-04T00:00:00Z'), summary: '확정', commit: 'bbbbbbb' }, 'applied 에 commit 이 없으면 같은 버전 history 의 commit');
+  assert.deepEqual(doc.history.map(h => h.version), [2, 1], '기록은 새 것부터');
+  assert.deepEqual(doc.commits, ['aaaaaaa', 'bbbbbbb'], '반영 커밋은 오래된 것부터');
+  assert.equal(doc.picksSummary, 'D37-B · 나머지 A (3개)');
+  assert.equal(doc.notesCount, 1);
+  assert.equal(doc.url, byId.wave7.url);
+  const concept = AINDEX.find(a => a.kind === 'concept');
+  const cd = plain(H.archiveDoc(concept, byId.concept, null, 5));
+  assert.equal(cd.source, 'docs');
+  assert.equal(cd.picksFrom, 'recommended');
+  assert.equal(cd.applied.version, 0);
+  // 화면: 차례 순서, 저장소 문서가 있으면 그것, 차례에 없는 새 문서(14차)는 끝에
+  const rows = plain(H.archiveRows(AINDEX, LIST, { '07-wave7': doc, '14-wave14': { seq: 16, cha: 14, label: '14차', board: 'wave14', name: '14차', history: [] } }));
+  assert.equal(rows.length, AINDEX.length + 1);
+  assert.deepEqual(rows.slice(0, AINDEX.length).map(r => r.id), AINDEX.map(a => a.id));
+  assert.equal(rows.find(r => r.id === '07-wave7').stored, true);
+  assert.equal(rows.find(r => r.id === '05-wave5').stored, false, '저장소 문서 없으면 차례만 (stored false)');
+  assert.equal(rows.at(-1).id, '14-wave14');
+
+  const { buildArchive } = await import('../tools/hub-archive.mjs');
+  const boards = Object.fromEntries(AINDEX.filter(a => a.kind !== 'concept').map(a => [a.board, { applied: { ...v1, board: a.board }, history: [{ ...v1, board: a.board }] }]));
+  const { docs, missing } = buildArchive({ boards, now: 1 });
+  assert.deepEqual(Object.keys(docs), AINDEX.map(a => a.id));
+  assert.deepEqual(missing, []);
+  for (const d of Object.values(docs)) {
+    assert.ok(Buffer.byteLength(JSON.stringify(d)) < 64 * 1024, `${d.id}: 문서 하나는 작게`);
+    for (const k of ['id', 'seq', 'cha', 'label', 'board', 'name', 'url', 'made', 'decisions', 'source', 'applied', 'picks', 'picksSummary', 'history', 'commits', 'builtAt', 'by']) assert.ok(k in d, `${d.id}: ${k}`);
+  }
+  assert.equal(buildArchive({}).missing.length, AINDEX.length - 1, '기록을 안 주면 컨셉 보드(문서 기록) 밖은 모두 기록 없음');
+});
+
+test('보관함: 홈이 archive 를 구독하고 로컬은 hub-archive 를 읽으며, 규칙과 노트가 있다', () => {
+  assert.ok(home.includes("db.collection('archive').onSnapshot"), '홈 저장소 archive 구독');
+  assert.ok(home.includes("'hub-archive'"), '로컬 흉내 api/db/hub-archive');
+  assert.ok(home.includes('id="archive-boards"') && home.includes('href="#archive-boards"'), '보관함 칸과 목차 링크');
+  const note = read('docs/notes/board-archive.md');
+  for (const k of ['archive/<', 'hub-archive.mjs', 'archive-index', '문서 세션이 반영할 문장', '"path":"archive"']) assert.ok(note.includes(k), `노트에 ${k}`);
+});
