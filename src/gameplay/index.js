@@ -13,7 +13,8 @@ const PARTS = [
   ['telescope', './decor/telescope.js'], // 10차 M10-P5 섬에 놓은 별 망원경 — 밤에 하늘 올려다보기 (FU-53)
   ['night', './night/index.js'],         // M12 밤·새벽: 야시장 · 달빛 가게 · 새벽 천막 타로 · 야행성 주민 (assets/night/, 보드 night)
   ['tour', './tour/index.js'],           // P35 무인도 투어 (assets/tour/, 보드 tour D120–D128)
-  ['journal', './journal/index.js'],     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)
+  ['journal', './journal/index.js'],
+  ['rating', './rating/index.js'],       // M14 섬 별점 평가: 섬폰 ⭐ · 별 상 · s25 (assets/rating/, 결정 D152-A)     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

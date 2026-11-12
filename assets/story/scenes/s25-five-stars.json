@@ -1,0 +1,72 @@
+{
+  "id": "s25-five-stars",
+  "version": 1,
+  "status": "review",
+  "chapter": "섬이 자란다",
+  "title": "별 다섯 섬",
+  "summary": "섬 평가에서 처음으로 별 다섯을 받은 날. 광장에 주민들이 모여 섬을 둘러보고, 밤톨이 상(도토리)을 건넨다. 하늘에서 섬 전체를 한 바퀴 보여 주고 끝 (M14 결정 D152-A).",
+  "trigger": {
+    "on": "rating-five"
+  },
+  "place": "plaza",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "하늘에서 한 바퀴 → 광장 축하",
+      "recommended": true,
+      "desc": "섬 전체를 하늘에서 천천히 돈다 → 광장의 주인공이 기뻐한다 → 밤톨이 다가와 별 다섯을 알려 준다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "다 꾸민 섬 — 하늘에서 한 바퀴",
+          "dur": 4,
+          "cam": { "size": "overhead", "target": "place", "angle": 0, "move": "orbit" },
+          "transition": "fade",
+          "music": "auto",
+          "caption": "섬 평가 ★★★★★",
+          "actors": [ { "who": "player", "at": [0, 0.6], "face": 180, "text": "" } ]
+        },
+        {
+          "id": "c2",
+          "note": "광장에서 기뻐하는 주인공",
+          "dur": 3,
+          "cam": { "size": "full", "target": "player", "angle": 0, "move": "push" },
+          "actors": [ { "who": "player", "do": "happy", "face": 180, "emote": "⭐", "text": "" } ]
+        },
+        {
+          "id": "c3",
+          "note": "밤톨이 다가와 축하",
+          "dur": 3.5,
+          "cam": { "size": "group", "target": "player", "angle": 15, "move": "static" },
+          "caption": "처음 오른 별마다 도토리 상이 있어요",
+          "wait": true,
+          "actors": [
+            { "who": "player", "face": 90, "emote": "😊", "text": "" },
+            { "who": "bamtol", "at": [2.2, 0.8], "to": [1.1, 0.6], "do": "walk", "face": -90, "emote": "🌟", "text": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "광장만 짧게",
+      "recommended": false,
+      "desc": "광장에서 주인공이 기뻐하고 별 다섯 글자만 보여 준다 (짧은 판).",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "광장에서 기뻐하기",
+          "dur": 3,
+          "cam": { "size": "full", "target": "player", "angle": 0, "move": "push" },
+          "transition": "fade",
+          "music": "auto",
+          "caption": "섬 평가 ★★★★★",
+          "wait": true,
+          "actors": [ { "who": "player", "at": [0, 0.6], "do": "happy", "face": 180, "emote": "⭐", "text": "" } ]
+        }
+      ]
+    }
+  ]
+}
