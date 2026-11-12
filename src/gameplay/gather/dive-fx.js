@@ -39,6 +39,7 @@ export function createDiveFx(ctx) {
   mesh.name = 'dive-bubbles';
   mesh.frustumCulled = false;
   mesh.count = 0;
+  mesh.visible = false;   // 방울이 없으면 그리기 호출도 없게
   mesh.renderOrder = 3;
   scene.add(mesh);
   const live = [];   // { x, y, z, r, t, life, vy }
@@ -92,6 +93,7 @@ export function createDiveFx(ctx) {
         mesh.setMatrixAt(n++, m4.compose(pv, q, sv));
       }
       mesh.count = n;
+      mesh.visible = n > 0;
       if (n) mesh.instanceMatrix.needsUpdate = true;
       // 물속 화면
       const fog = scene.fog;
@@ -103,6 +105,6 @@ export function createDiveFx(ctx) {
       overlay.visible = shade;
       if (shade) { overlayMat.uniforms.uTime.value += dt; overlayMat.uniforms.uK.value = under; }
     },
-    clear() { live.length = 0; mesh.count = 0; under = 0; overlay.visible = false; },
+    clear() { live.length = 0; mesh.count = 0; mesh.visible = false; under = 0; overlay.visible = false; },
   };
 }

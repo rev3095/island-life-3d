@@ -99,6 +99,7 @@ export function createDive(ctx, kit, { results }) {
   // ---------- 바다 생물 ----------
   const group = new T.Group();
   group.name = 'gather-sea';
+  group.visible = false;   // 헤엄칠 때만 (그림자·내 그림자)
   scene.add(group);
   const shadowMat = Object.assign(materials.toonMaterial('#163246', { flat: true, name: 'seaShadow' }), { transparent: true, opacity: 0.38, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
   const disc = new T.CircleGeometry(1, 18).rotateX(-Math.PI / 2);
@@ -330,6 +331,7 @@ export function createDive(ctx, kit, { results }) {
       if (S.warnT > 0) S.warnT -= dt;
       fx.update(paused ? 0 : dt);
       const sw = swim;
+      group.visible = S.mode !== 'land';
       if (S.mode === 'land' && !sw?.active) { fx.underwater = 0; return; }
       const p = kit.player;
       sw?.update(paused ? 0 : dt, p?.speed ?? 0);
