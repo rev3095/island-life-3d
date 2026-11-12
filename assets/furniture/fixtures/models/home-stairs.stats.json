@@ -20,18 +20,18 @@
   "animations": {},
   "size": [
     1.89,
-    3.06,
+    2.98,
     2.48
   ],
   "bounds": [
     [
       -0.96,
-      -1.55,
+      -1.51,
       0.0
     ],
     [
       0.93,
-      1.51,
+      1.47,
       2.48
     ]
   ],
@@ -39,7 +39,7 @@
     2,
     3
   ],
-  "glbBytes": 32508,
+  "glbBytes": 32540,
   "blender": "5.2.3 LTS",
   "renders": [
     "home-stairs_front.png",

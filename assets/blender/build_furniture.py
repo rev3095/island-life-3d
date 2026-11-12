@@ -1653,7 +1653,7 @@ def _rail_line(m, a, b, h=0.78, posts=3, mat='wood'):
 def b_home_stairs(M):
     """FU-67 나무 계단 (2×3, 1층 → 2층): 남쪽(-Y)에서 올라 북쪽 벽 쪽 1.7 높이에서 끝난다. 서쪽에 난간. 원점 = 발자국 가운데 바닥"""
     m = M.part('stairs')
-    n, top, L, W = 6, 1.7, 3.0, 1.8
+    n, top, L, W = 6, 1.7, 2.92, 1.8
     run = L / n
     for i in range(n):
         y0 = -L / 2 + i * run
@@ -1702,7 +1702,7 @@ def _hole(m, w, d, steps, top=1.7):
 def b_stair_rail(M):
     """FU-69 계단 난간 (2×3, 2층의 내려가는 곳): 아래층 계단 구멍 + 남쪽·서쪽 난간. 서쪽 북쪽 끝(1칸)은 열려 있어 그쪽으로 걸어 내려간다"""
     m = M.part('rail')
-    w, d = 1.8, 3.0
+    w, d = 1.8, 2.86
     _hole(m, w, d, 4)
     _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (w / 2, -d / 2, 0), posts=3)
     _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (-w / 2 - 0.02, d / 2 - 1.15, 0), posts=3)
@@ -1711,7 +1711,7 @@ def b_stair_rail(M):
 def b_attic_hatch(M):
     """FU-70 다락 문 난간 (1×2, 다락의 내려가는 곳): 2층 계단 구멍 + 남쪽·동쪽 난간. 동쪽 북쪽 끝은 열려 있다"""
     m = M.part('rail')
-    w, d = 0.84, 2.0
+    w, d = 0.84, 1.88
     _hole(m, w, d, 3)
     _rail_line(m, (-w / 2, -d / 2, 0), (w / 2 + 0.02, -d / 2, 0), posts=2)
     _rail_line(m, (w / 2 + 0.02, -d / 2, 0), (w / 2 + 0.02, d / 2 - 0.95, 0), posts=2)

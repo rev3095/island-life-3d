@@ -12,7 +12,8 @@ const json = p => JSON.parse(readFileSync(new URL(p, ROOT), 'utf8'));
 const index = json('assets/interior/index.json');
 const furn = json('assets/furniture/index.json');
 const specs = readdirSync(new URL('assets/interior/specs/', ROOT)).map(f => json(`assets/interior/specs/${f}`));
-const rooms = readdirSync(new URL('assets/interior/rooms/', ROOT)).map(f => json(`assets/interior/rooms/${f}`));
+const allRooms = readdirSync(new URL('assets/interior/rooms/', ROOT)).map(f => json(`assets/interior/rooms/${f}`));
+const rooms = allRooms.filter(r => r.owner !== 'player');   // 주민 방 (M14 내 집 방 RM-15–17 은 tests/home.test.mjs)
 const WINDOWS = new Set(['n:1', 'n:6']);   // room.js WINDOWS
 
 test('벽지 8 · 바닥 8 · 방 틀 스펙이 있고 무늬·색이 맞다', () => {
@@ -57,8 +58,8 @@ test('목록 index.json 이 스펙·방과 같다 (id·version·status·이름·
     assert.equal(!!m.shopOnly, !!s.shopOnly, `${s.slug}.shopOnly`);
     assert.ok(['review', 'approved'].includes(s.status));
   }
-  assert.equal(index.rooms.length, rooms.length);
-  for (const r of rooms) {
+  assert.equal(index.rooms.length, allRooms.length);
+  for (const r of allRooms) {
     const m = index.rooms.find(x => x.slug === r.slug);
     assert.ok(m, `목록에 ${r.slug}`);
     for (const k of ['id', 'owner', 'name', 'version', 'status', 'wallpaper', 'floor']) assert.equal(m[k], r[k], `${r.slug}.${k}`);

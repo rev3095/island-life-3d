@@ -1461,10 +1461,10 @@ def b_house_grown(M):
     """BD-12 커진 내 집 (집 증축 단계 params.stage 1 방 넓히기 · 2 2층 · 3 다락). 문은 언제나 집터 가운데(x 0) 앞 —
     BD-01 과 같은 집터 3×3, 같은 문 자리라 door.js 문짝이 그대로 맞는다. 원점 = 집터 가운데 바닥"""
     st = int(P.get('stage', 1))
-    W, D = 2.3, 2.2
+    W, D = 2.1, 2.2
     Hh = 1.5 if st == 1 else 2.55
     roofH = 1.0 if st < 3 else 1.45
-    bx = -0.32                                   # 본채는 서쪽으로 조금, 동쪽에 덧붙인 방(날개)
+    bx = -0.3                                   # 본채는 서쪽으로 조금, 동쪽에 덧붙인 방(날개)
     m = M.part('house')
     m.add(box((bx, 0, 0.1), (W + 0.14, D + 0.14, 0.2), bevel=0.04), 'foundation')
     m.add(box((bx, 0, 0.2 + Hh / 2), (W, D, Hh), bevel=0.06), 'wall')
@@ -1494,15 +1494,15 @@ def b_house_grown(M):
     # 굴뚝
     m.add(box((bx + W * 0.25, D * 0.2, top + roofH * 0.6), (0.24, 0.24, 0.7 + (0.25 if st >= 3 else 0)), bevel=0.03), 'foundation')
     # 동쪽 날개 (넓힌 방): 낮은 벽 + 한쪽 지붕
-    ww, wd, wh = 0.86, 1.7, 1.25
+    ww, wd, wh = 0.7, 1.7, 1.25
     wx = bx + W / 2 + ww / 2 - 0.02
     m.add(box((wx, 0.1, 0.1), (ww + 0.12, wd + 0.12, 0.2), bevel=0.04), 'foundation')
     m.add(box((wx, 0.1, 0.2 + wh / 2), (ww, wd, wh), bevel=0.05), 'wall')
-    m.add(box((wx + 0.04, 0.1, 0.2 + wh + 0.13), (ww + 0.26, wd + 0.3, 0.1), bevel=0.03, rot=rot_xyz(y=-0.32)), 'roof')
+    m.add(box((wx + 0.02, 0.1, 0.2 + wh + 0.13), (ww + 0.16, wd + 0.3, 0.1), bevel=0.03, rot=rot_xyz(y=-0.32)), 'roof')
     window(m, wx, 0.1 - wd / 2 - 0.02, 0.2 + wh * 0.55, w=0.44, h=0.42)
     if st >= 2:   # 2층부터 날개 앞 작은 화분
-        m.add(cylinder((wx + 0.28, -wd / 2 - 0.15, 0.0), (wx + 0.28, -wd / 2 - 0.15, 0.24), 0.11, 0.13, seg=14), 'foundation')
-        m.add(ellipsoid((wx + 0.28, -wd / 2 - 0.15, 0.32), (0.15, 0.15, 0.14), seg=14, rings=8), 'leaf')
+        m.add(cylinder((wx + 0.2, -wd / 2 - 0.15, 0.0), (wx + 0.2, -wd / 2 - 0.15, 0.24), 0.11, 0.13, seg=14), 'foundation')
+        m.add(ellipsoid((wx + 0.2, -wd / 2 - 0.15, 0.32), (0.15, 0.15, 0.14), seg=14, rings=8), 'leaf')
 
 
 def b_built_bridge(M):
