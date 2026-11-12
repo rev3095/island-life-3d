@@ -1456,7 +1456,98 @@ def b_tour_boat(M):
     hull.add(tube([V((-W * 0.45, -L * 0.3, zc + 0.26)), V((-W * 0.75, -L * 0.25, zc + 0.12)), V((-W * 1.05, -L * 0.2, zc + 0.36))], [0.018] * 3, seg=6), 'rope')
 
 
+# ================================================================ M13 매일 할 거리 (13차 보드 wave13 D142–D145 A)
+def b_gift_balloon(M):
+    """PR-33 선물 풍선: 큰 풍선 하나 · 줄 · 줄 끝에 매단 리본 선물 상자 (원점 = 상자 바닥 가운데). 색 셋은 게임이 balloon 재질 색만 바꾼다.
+    부품을 'balloon'·'gift' 둘로 나눠 두어 맞혔을 때 게임이 상자만 떨어뜨린다."""
+    b = M.part('balloon')
+    c = V((0, 0, 1.25))
+    b.add(ellipsoid(c, (0.3, 0.3, 0.36), seg=28, rings=16), 'balloon')
+    b.add(cone(c - V((0, 0, 0.35)), c - V((0, 0, 0.42)), 0.02, 0.045, seg=10), 'balloon')
+    b.add(ellipsoid(c + V((-0.11, -0.22, 0.13)), (0.05, 0.02, 0.09), rot=rot_xyz(y=0.4, z=0.5), seg=12, rings=6), 'shine', outline=False)
+    knot = V((0, 0, 0.27))
+    s = bezier(c - V((0, 0, 0.42)), c - V((0, 0, 0.6)), knot + V((0.06, 0, 0.3)), knot, 14)
+    b.add(tube(s, [0.007] * len(s), seg=5), 'string', outline=False)
+    g = M.part('gift')
+    gc = V((0, 0, 0.12))
+    g.add(box(gc, (0.24, 0.24, 0.24), bevel=0.02), 'gift')
+    g.add(box(gc, (0.25, 0.05, 0.245), bevel=0.01), 'ribbon')
+    g.add(box(gc, (0.05, 0.25, 0.245), bevel=0.01), 'ribbon')
+    for sx in (1, -1):
+        g.add(ellipsoid(knot + V((sx * 0.045, 0, -0.005)), (0.05, 0.022, 0.035), rot=rot_xyz(y=-sx * 0.5), seg=12, rings=6), 'ribbon')
+
+
+def b_sea_bottle(M):
+    """PR-34 유리병: 바닷가 모래에 반쯤 묻혀 비스듬히 누운 병 · 코르크 마개 · 속에 말아 넣은 쪽지와 리본 · 둘레 모래 둔덕"""
+    m = M.part('bottle')
+    m.add(jitter(ellipsoid((0, 0, 0.0), (0.42, 0.3, 0.07), seg=18, rings=8), 0.01, 3, keep_bottom=0.0), 'sand')
+    R = rot_xyz(y=math.pi / 2 - 0.18, z=0.35)
+    base = V((-0.17, 0.05, 0.06))
+    ax = R @ V((0, 0, 1))
+    m.add(cylinder(base, base + ax * 0.26, 0.085, 0.085, seg=20), 'glass')
+    m.add(ellipsoid(base + ax * 0.26, (0.085, 0.085, 0.05), rot=R, seg=20, rings=8), 'glass')
+    m.add(cylinder(base + ax * 0.28, base + ax * 0.38, 0.035, 0.03, seg=14), 'glass')
+    m.add(cylinder(base + ax * 0.38, base + ax * 0.43, 0.032, 0.036, seg=12), 'cork')
+    m.add(cylinder(base + ax * 0.05, base + ax * 0.22, 0.045, seg=12), 'paper')
+    m.add(cylinder(base + ax * 0.13, base + ax * 0.145, 0.05, seg=12), 'ribbon')
+    m.add(ellipsoid(base + ax * 0.12 + V((0, -0.06, 0.04)), (0.02, 0.012, 0.05), rot=R, seg=8, rings=4), 'glassLight', outline=False)
+    for x, y in ((0.25, -0.12), (0.28, 0.1)):   # 둘레 작은 조개 · 자갈
+        m.add(ellipsoid((x, y, 0.05), (0.04, 0.035, 0.02), seg=10, rings=5), 'pebble')
+
+
+def b_peddler_cart(M):
+    """BD-11 행상 수레: 바퀴 둘 달린 나무 수레 · 줄무늬 차양 · 꽃 화분·묘목·말아 둔 벽지 · 작은 간판. 앞(-Y)이 손님 쪽 (원점 = 바닥 가운데)"""
+    m = M.part('cart')
+    W, D, H = 1.6, 0.8, 0.62
+    m.add(box((0, 0, H), (W, D, 0.08), bevel=0.02), 'wood')
+    for sy in (1, -1):
+        m.add(box((0, sy * (D / 2 - 0.03), H + 0.14), (W, 0.05, 0.22), bevel=0.015), 'woodDark')
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - 0.03), 0, H + 0.14), (0.05, D, 0.22), bevel=0.015), 'woodDark')
+        c = V((sx * 0.52, 0, 0.32))   # 바퀴
+        m.add(cylinder(c + V((0, -D / 2 - 0.06, 0)), c + V((0, -D / 2 - 0.0, 0)), 0.32, seg=24), 'wheel')
+        m.add(cylinder(c + V((0, D / 2 + 0.0, 0)), c + V((0, D / 2 + 0.06, 0)), 0.32, seg=24), 'wheel')
+        for yy in (-D / 2 - 0.07, D / 2 + 0.07):
+            m.add(cylinder(c + V((0, yy - 0.01, 0)), c + V((0, yy + 0.01, 0)), 0.07, seg=12), 'woodDark')
+        for k in range(2):   # 바퀴살
+            a = math.pi / 4 + k * math.pi / 2
+            for yy in (-D / 2 - 0.03, D / 2 + 0.03):
+                m.add(box(c + V((0, yy, 0)), (0.5, 0.025, 0.04), bevel=0.005, rot=rot_xyz(y=a)), 'woodDark')
+    for sx in (1, -1):   # 손잡이 (뒤쪽 +Y 로 뻗음)
+        m.add(cylinder((sx * 0.4, D / 2, H), (sx * 0.4, D / 2 + 0.75, H - 0.25), 0.03, seg=8), 'woodDark')
+    for sx in (1, -1):   # 차양 기둥
+        for sy in (1, -1):
+            m.add(cylinder((sx * (W / 2 - 0.06), sy * (D / 2 - 0.06), H), (sx * (W / 2 - 0.06), sy * (D / 2 - 0.06), 1.85), 0.025, seg=8), 'woodDark')
+    aw = M.part('awning')
+    for k in range(8):   # 줄무늬 차양: 앞으로 비스듬히
+        x0 = -W / 2 - 0.05 + (W + 0.1) * k / 8
+        aw.add(box((x0 + (W + 0.1) / 16, -0.05, 1.9), ((W + 0.1) / 8, D + 0.3, 0.04), bevel=0.004, rot=rot_xyz(x=-0.18)), 'canvas' if k % 2 == 0 else 'canvasStripe')
+    for k in range(8):   # 앞 물결 가장자리
+        x0 = -W / 2 - 0.05 + (W + 0.1) * (k + 0.5) / 8
+        aw.add(ellipsoid((x0, -D / 2 - 0.2, 1.84), ((W + 0.1) / 16, 0.025, 0.07), seg=10, rings=6), 'canvasStripe' if k % 2 == 0 else 'canvas')
+    g = M.part('goods')
+    for i, (x, col) in enumerate(((-0.55, 'flower'), (-0.3, 'flowerB'), (0.55, 'flower'))):   # 꽃 화분
+        p = V((x, -0.18, H + 0.04))
+        g.add(cylinder(p, p + V((0, 0, 0.16)), 0.08, 0.1, seg=14), 'pot')
+        g.add(ellipsoid(p + V((0, 0, 0.2)), (0.09, 0.09, 0.06), seg=12, rings=6), 'leaf')
+        for k in range(3):
+            a = TAU * k / 3 + i
+            g.add(ellipsoid(p + V((math.cos(a) * 0.05, math.sin(a) * 0.05, 0.25)), (0.035, 0.035, 0.03), seg=10, rings=6), col)
+    sp = V((0.15, 0.15, H + 0.04))   # 묘목 (뿌리 감싼 자루)
+    g.add(ellipsoid(sp + V((0, 0, 0.08)), (0.1, 0.1, 0.09), seg=14, rings=8), 'sack')
+    g.add(cylinder(sp + V((0, 0, 0.15)), sp + V((0, 0, 0.5)), 0.018, seg=8), 'woodDark')
+    for z, r in ((0.5, 0.13), (0.62, 0.1)):
+        g.add(cone(sp + V((0, 0, z - 0.06)), sp + V((0, 0, z + 0.14)), r, 0.0, seg=10), 'leaf')
+    for k, col in enumerate(('roll', 'rollB')):   # 말아 둔 벽지 두루마리
+        g.add(cylinder((-0.2 + 0.1 * k, 0.12, H + 0.1), (0.05 + 0.1 * k, 0.12, H + 0.1), 0.05, seg=14), col)
+    sg = M.part('sign')
+    sg.add(box((0, -D / 2 - 0.02, H + 0.38), (0.55, 0.03, 0.2), bevel=0.01), 'sign')
+    sg.add(star_shape((-0.18, -D / 2 - 0.045, H + 0.38), 0.05, 0.015, puff=0.2), 'flower')
+    sg.add(box((0.06, -D / 2 - 0.04, H + 0.38), (0.28, 0.006, 0.03), bevel=0.0), 'woodDark', outline=False)
+
+
 BUILDERS = {
+    'gift-balloon': b_gift_balloon, 'sea-bottle': b_sea_bottle, 'peddler-cart': b_peddler_cart,
     'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
     'fence-wood': b_deco_fence, 'fence-picket': b_deco_fence,

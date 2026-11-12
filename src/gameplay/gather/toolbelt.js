@@ -1,4 +1,4 @@
-// 도구 들기: 가방에 있는 도구만 손에 든다. 숫자키 1~5 · Q/E · 0 을 player 대신 받는다 (player.toolKeys = false).
+// 도구 들기: 가방에 있는 도구만 손에 든다. 숫자키 1~6 · Q/E · 0 을 player 대신 받는다 (player.toolKeys = false).
 // 쓸 때마다 data.inventory.useTool 로 내구도를 깎고, 부서지면 알림을 띄우고 맨손이 된다.
 import { iga } from './util.js';
 
@@ -35,7 +35,7 @@ export function createToolbelt(ctx, kit, { isBusy }) {
     const p = player();
     if (!p || p.toolKeys) return;
     if (ctx.services.ui?.isBlocking?.() || ctx.input.enabled === false || p.frozen || isBusy()) return;
-    const n = /^tool([1-5])$/.exec(intent);
+    const n = /^tool([1-6])$/.exec(intent);
     if (n) {
       const tool = TOOLS[n[1] - 1];
       if (p.tool === tool) return set(null);

@@ -1082,6 +1082,86 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-63",
+      "slug": "star-lamp",
+      "item": "furn.star-lamp",
+      "name": "별 조각 램프",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.48,
+        0.4,
+        1.15
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-64",
+      "slug": "star-clock",
+      "item": "furn.star-clock",
+      "name": "별빛 벽시계",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.56,
+        0.11,
+        1.96
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-65",
+      "slug": "star-chair",
+      "item": "furn.star-chair",
+      "name": "별 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.57,
+        0.54,
+        1.07
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-66",
+      "slug": "star-mobile",
+      "item": "furn.star-mobile",
+      "name": "별 모빌",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.47,
+        0.69,
+        1.52
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

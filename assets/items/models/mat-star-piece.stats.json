@@ -1,0 +1,52 @@
+{
+  "id": "IC-MA-11",
+  "slug": "mat-star-piece",
+  "name": "별 조각",
+  "group": "mat",
+  "kind": "star-piece",
+  "version": "0.1",
+  "items": [
+    "mat.star-yellow",
+    "mat.star-pink",
+    "mat.star-blue"
+  ],
+  "hold": false,
+  "triangles": 316,
+  "parts": 1,
+  "materials": [
+    "star",
+    "starLight"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.385,
+    0.19,
+    0.313
+  ],
+  "bounds": [
+    [
+      -0.193,
+      -0.095,
+      0.0
+    ],
+    [
+      0.193,
+      0.095,
+      0.313
+    ]
+  ],
+  "glbBytes": 13528,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-star-piece_blue_main.png",
+    "mat-star-piece_blue_thumb.png",
+    "mat-star-piece_main.png",
+    "mat-star-piece_pink_main.png",
+    "mat-star-piece_pink_thumb.png",
+    "mat-star-piece_thumb.png",
+    "mat-star-piece_yellow_main.png",
+    "mat-star-piece_yellow_thumb.png"
+  ]
+}

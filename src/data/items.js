@@ -11,6 +11,8 @@ import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
 // 12차 밤·새벽 분류(야시장 먹거리 IC-NT)·달빛 가게·새벽 천막 가구 FU-55–59 는 night-items.js 에서
 import { NIGHT_CATEGORY as NC, NIGHT_FURN, nightItems } from './night-items.js';
+// M13 매일 할 거리: 별 조각 IC-MA-11 · 레시피 쪽지 IC-MA-12 · 별 조각 가구 FU-63–66 은 daily-items.js 에서
+import { DAILY_FURN, dailyItems } from './daily-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
@@ -95,7 +97,7 @@ export const ITEMS = [
   // 친밀도 선물 가구(source 'friend')는 items.json 의 owner = 주는 주민 slug (B-24)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id, owner }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source, ...(owner ? { owner } : {}),
@@ -110,6 +112,7 @@ export const ITEMS = [
 ITEMS.push(...festivalItems(itemIcon));   // IC-FE-01–04 축제 부스에서 만드는 것 (5차 Z5)
 ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8차 M8)
 ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
+ITEMS.push(...dailyItems(itemIcon));      // IC-MA-11 별 조각 셋 · IC-MA-12 레시피 쪽지 (M13)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {

@@ -1,0 +1,54 @@
+{
+  "id": "FU-64",
+  "slug": "star-clock",
+  "item": "furn.star-clock",
+  "name": "별빛 벽시계",
+  "category": "furniture",
+  "kind": "star-clock",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 1188,
+  "parts": 3,
+  "materials": [
+    "face",
+    "glow",
+    "hand",
+    "rim",
+    "tick"
+  ],
+  "objects": [
+    "clock",
+    "hourHand",
+    "minuteHand"
+  ],
+  "animations": {},
+  "size": [
+    0.56,
+    0.11,
+    1.96
+  ],
+  "bounds": [
+    [
+      -0.28,
+      -0.11,
+      1.27
+    ],
+    [
+      0.28,
+      0.0,
+      1.96
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 26072,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-clock_front.png",
+    "star-clock_main.png",
+    "star-clock_thumb.png",
+    "star-clock_top.png"
+  ]
+}

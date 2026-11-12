@@ -1,0 +1,47 @@
+{
+  "id": "IC-MA-12",
+  "slug": "mat-recipe-note",
+  "name": "레시피 쪽지",
+  "group": "mat",
+  "kind": "recipe-note",
+  "version": "0.1",
+  "items": [
+    "mat.recipe-note"
+  ],
+  "hold": false,
+  "triangles": 668,
+  "parts": 1,
+  "materials": [
+    "ink",
+    "paper",
+    "paperDark",
+    "ribbon",
+    "seal"
+  ],
+  "objects": [
+    "mat"
+  ],
+  "size": [
+    0.355,
+    0.243,
+    0.062
+  ],
+  "bounds": [
+    [
+      -0.178,
+      -0.121,
+      0.0
+    ],
+    [
+      0.178,
+      0.121,
+      0.062
+    ]
+  ],
+  "glbBytes": 18748,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "mat-recipe-note_main.png",
+    "mat-recipe-note_thumb.png"
+  ]
+}

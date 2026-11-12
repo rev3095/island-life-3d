@@ -19,7 +19,7 @@ const PARTS = [
 /** 맞는 처리기가 없을 때 버튼 글자 */
 export const INTENT_LABEL = { action: '행동', pickup: '줍기' };
 /** 맨손이 아닐 때 행동 키 = 든 도구 쓰기 */
-export const TOOL_LABEL = { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기' };
+export const TOOL_LABEL = { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기', sling: '쏘기' };
 /**
  * 처리기 이름 → 버튼 글자 (문자열 또는 (대상, ctx) → 문자열). 처리기가 스스로 label 을 주면 그것이 먼저다.
  * '' = 누르면 아무 일도 없다 (화면은 기본 글자)
