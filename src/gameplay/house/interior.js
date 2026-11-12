@@ -21,6 +21,7 @@ export const WEB_FILES = [
   'assets/interior/index.json', 'assets/interior/specs/wp-01.json', 'assets/interior/specs/wp-02.json',
   'assets/interior/specs/wp-03.json', 'assets/interior/specs/wp-04.json', 'assets/interior/specs/wp-05.json',
   'assets/interior/specs/wp-06.json', 'assets/interior/specs/wp-07.json', 'assets/interior/specs/wp-08.json', 'assets/interior/specs/wp-09.json',   // M13 행상 벽지 WP-09 (목록 값 0 — 상점 코너엔 안 나옴)
+  'assets/interior/specs/wp-10.json', 'assets/interior/specs/wp-11.json', 'assets/interior/specs/wp-12.json', 'assets/interior/specs/wp-13.json',   // M18-P4 행상 계절 벽지 WP-10–13 (목록 값 0)
  
   'assets/interior/specs/fl-01.json', 'assets/interior/specs/fl-02.json', 'assets/interior/specs/fl-03.json',
   'assets/interior/specs/fl-04.json', 'assets/interior/specs/fl-05.json', 'assets/interior/specs/fl-06.json',

@@ -1,0 +1,52 @@
+{
+  "id": "FU-100",
+  "slug": "maple-rug",
+  "item": "furn.maple-rug",
+  "name": "단풍잎 깔개",
+  "category": "furniture",
+  "kind": "maple-rug",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2672,
+  "parts": 1,
+  "materials": [
+    "leaf",
+    "leafDeep",
+    "leafGold",
+    "rugBase",
+    "rugEdge"
+  ],
+  "objects": [
+    "rug"
+  ],
+  "animations": {},
+  "size": [
+    1.9,
+    1.9,
+    0.06
+  ],
+  "bounds": [
+    [
+      -0.95,
+      -0.95,
+      -0.005
+    ],
+    [
+      0.95,
+      0.95,
+      0.057
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 53784,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "maple-rug_front.png",
+    "maple-rug_main.png",
+    "maple-rug_thumb.png",
+    "maple-rug_top.png"
+  ]
+}

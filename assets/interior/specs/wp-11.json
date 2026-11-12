@@ -1,0 +1,84 @@
+{
+  "id": "WP-11",
+  "slug": "wp-11",
+  "kind": "wallpaper",
+  "name": "조개 모래",
+  "version": 1,
+  "status": "review",
+  "price": 0,
+  "peddler": true,
+  "season": "summer",
+  "pattern": {
+    "tile": [
+      32,
+      32
+    ],
+    "size": [
+      0.64,
+      0.64
+    ],
+    "base": "base",
+    "shapes": [
+      {
+        "path": "M4 13 Q8 3 12 13 Z",
+        "fill": "shell",
+        "stroke": "shellLine"
+      },
+      {
+        "path": "M8 13 L8 6",
+        "stroke": "shellLine"
+      },
+      {
+        "path": "M6 13 L7 7",
+        "stroke": "shellLine"
+      },
+      {
+        "path": "M10 13 L9 7",
+        "stroke": "shellLine"
+      },
+      {
+        "path": "M24 22 L25.2 25.4 L28.8 25.5 L25.9 27.6 L27 31 L24 29 L21 31 L22.1 27.6 L19.2 25.5 L22.8 25.4 Z",
+        "fill": "star"
+      },
+      {
+        "path": "M0 20 Q4 17 8 20 T16 20",
+        "stroke": "wave"
+      },
+      {
+        "circle": [
+          27,
+          6,
+          0.8
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          14,
+          28,
+          0.8
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          3,
+          28,
+          0.6
+        ],
+        "fill": "dot"
+      }
+    ]
+  },
+  "palette": {
+    "base": "#F6EAD0",
+    "shell": "#FBE0CF",
+    "shellLine": "#E2A98C",
+    "star": "#F49A6A",
+    "wave": "#8CCBDC",
+    "dot": "#E5D3AE",
+    "wainscot": "#8CCBDC",
+    "molding": "#5E9AB0",
+    "baseboard": "#4E7E92"
+  }
+}

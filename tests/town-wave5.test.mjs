@@ -13,7 +13,7 @@ import { ISLAND, VILLAGERS, NEWCOMERS, CHARACTERS } from '../src/core/constants.
 const lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, JSON.parse(readFileSync(new URL(`../assets/env/specs/${k}.json`, import.meta.url), 'utf8'))])));
 const strings = v => (typeof v === 'string' ? [v] : Array.isArray(v) ? v.flatMap(strings) : v && typeof v === 'object' ? Object.values(v).flatMap(strings) : []);
 const get = (o, path) => path.split('.').reduce((a, k) => a?.[k], o);
-const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat', 'other', 'player', 'island']);
+const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat', 'other', 'player', 'island', 'art']);   // art = M18-P4 미술품 이름
 
 test('상수: 단풍은 주민·캐릭터이고 처음엔 이사 올 주민', () => {
   assert.ok(CHARACTERS.includes('danpung') && VILLAGERS.includes('danpung'));

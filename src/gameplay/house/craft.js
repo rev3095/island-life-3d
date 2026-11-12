@@ -28,9 +28,12 @@ const textIcon = it => it?.emoji ?? (/\.(svg|png|webp|jpe?g)$/i.test(it?.icon ??
 function choiceLabel(data, r) {
   const it = data.items.get(r.result ?? r.id);
   const short = needsOf(data, r).filter(x => x.have < x.n).map(x => `${x.name} ${x.n - x.have}`);
-  const note = r.unlock ? '📜' : '';   // M13 D146-A: 레시피 쪽지로 연 레시피
+  const note = r.season ? SEASON_MARK[r.season] ?? '📜' : r.unlock ? '📜' : '';   // M13 D146-A: 레시피 쪽지로 연 레시피 · M18-P4 계절 레시피는 계절 표시
   return short.length ? `${note}${textIcon(it)} ${it?.name ?? r.id} · ${short.join(', ')} 모자람` : `${note}${textIcon(it)} ${it?.name ?? r.id}  ✔`;
 }
+
+/** M18-P4 (D196-A) 계절 레시피 표시 */
+const SEASON_MARK = { spring: '🌸', summer: '🐚', autumn: '🍁', winter: '❄️' };
 
 /** 작업대를 연다. 무언가 만들었으면 true */
 export async function openWorkbench(ctx) {

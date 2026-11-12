@@ -60,7 +60,7 @@ test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
   assert.ok(errs.some(e => e.includes('talk')), errs.join('\n'));
   // 문 매트에서 계산대 앞까지 길이 막히면
   const walled = structuredClone(specs.museum);
-  walled.furniture.push({ fu: 'FU-99', box: [12, 1, 0.5], gx: 0, gz: 6, rot: 0 });   // 모델 없는 번호 = box 크기 임시 상자
+  walled.furniture.push({ fu: 'FU-199', box: [12, 1, 0.5], gx: 0, gz: 6, rot: 0 });   // 모델 없는 번호 (FU-99 는 M18-P4 단풍 선반이 됨) = box 크기 임시 상자
   assert.ok(checkPlace(walled, furn).some(e => e.includes('걸어갈 수 없어요')));
 });
 

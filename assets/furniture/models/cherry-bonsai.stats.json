@@ -1,0 +1,53 @@
+{
+  "id": "FU-94",
+  "slug": "cherry-bonsai",
+  "item": "furn.cherry-bonsai",
+  "name": "벚꽃 분재",
+  "category": "furniture",
+  "kind": "cherry-bonsai",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 9900,
+  "parts": 1,
+  "materials": [
+    "bloom",
+    "branch",
+    "center",
+    "petal",
+    "pot",
+    "soil"
+  ],
+  "objects": [
+    "bonsai"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.36,
+    0.91
+  ],
+  "bounds": [
+    [
+      -0.27,
+      -0.18,
+      0.0
+    ],
+    [
+      0.332,
+      0.18,
+      0.907
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 186288,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-bonsai_front.png",
+    "cherry-bonsai_main.png",
+    "cherry-bonsai_thumb.png",
+    "cherry-bonsai_top.png"
+  ]
+}

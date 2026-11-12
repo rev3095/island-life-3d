@@ -1,0 +1,53 @@
+{
+  "id": "FU-101",
+  "slug": "maple-lamp",
+  "item": "furn.maple-lamp",
+  "name": "단풍 등",
+  "category": "furniture",
+  "kind": "maple-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2152,
+  "parts": 1,
+  "materials": [
+    "glow",
+    "leaf",
+    "leafGold",
+    "string",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.5,
+    0.36,
+    1.07
+  ],
+  "bounds": [
+    [
+      -0.18,
+      -0.18,
+      0.0
+    ],
+    [
+      0.32,
+      0.18,
+      1.066
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 44716,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "maple-lamp_front.png",
+    "maple-lamp_main.png",
+    "maple-lamp_thumb.png",
+    "maple-lamp_top.png"
+  ]
+}

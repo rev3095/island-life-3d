@@ -227,6 +227,107 @@
       "status": "approved"
     },
     {
+      "id": "FU-100",
+      "slug": "maple-rug",
+      "item": "furn.maple-rug",
+      "name": "단풍잎 깔개",
+      "place": "floor",
+      "layer": "rug",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.9,
+        1.9,
+        0.06
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-101",
+      "slug": "maple-lamp",
+      "item": "furn.maple-lamp",
+      "name": "단풍 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.5,
+        0.36,
+        1.07
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-102",
+      "slug": "snowflake-lamp",
+      "item": "furn.snowflake-lamp",
+      "name": "눈 결정 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.5,
+        0.4,
+        1.16
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-103",
+      "slug": "snowflake-table",
+      "item": "furn.snowflake-table",
+      "name": "눈 결정 탁자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.82,
+        0.8,
+        0.67
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-104",
+      "slug": "snowflake-wall",
+      "item": "furn.snowflake-wall",
+      "name": "눈 결정 벽 장식",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.69,
+        0.06,
+        1.93
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-11",
       "slug": "sofa",
       "item": "furn.sofa",
@@ -1337,6 +1438,166 @@
         0.43,
         0.43,
         0.83
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-92",
+      "slug": "cherry-chair",
+      "item": "furn.cherry-chair",
+      "name": "벚꽃 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.46,
+        0.44,
+        1.05
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-93",
+      "slug": "cherry-table",
+      "item": "furn.cherry-table",
+      "name": "벚꽃 탁자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.8,
+        0.8,
+        1.07
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-94",
+      "slug": "cherry-bonsai",
+      "item": "furn.cherry-bonsai",
+      "name": "벚꽃 분재",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.6,
+        0.36,
+        0.91
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-95",
+      "slug": "cherry-wall",
+      "item": "furn.cherry-wall",
+      "name": "벚꽃 가지 장식",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.91,
+        0.09,
+        1.78
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-96",
+      "slug": "shell-lamp",
+      "item": "furn.shell-lamp",
+      "name": "조개 등",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.5,
+        0.44,
+        0.6
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-97",
+      "slug": "shell-chair",
+      "item": "furn.shell-chair",
+      "name": "조개 의자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.6,
+        0.5,
+        1.06
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-98",
+      "slug": "shell-mirror",
+      "item": "furn.shell-mirror",
+      "name": "조개 벽 거울",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.72,
+        0.1,
+        1.9
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-99",
+      "slug": "maple-shelf",
+      "item": "furn.maple-shelf",
+      "name": "단풍 선반",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.8,
+        0.36,
+        1.02
       ],
       "variants": [],
       "animations": [],

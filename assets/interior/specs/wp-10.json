@@ -1,0 +1,138 @@
+{
+  "id": "WP-10",
+  "slug": "wp-10",
+  "kind": "wallpaper",
+  "name": "벚꽃 비",
+  "version": 1,
+  "status": "review",
+  "price": 0,
+  "peddler": true,
+  "season": "spring",
+  "pattern": {
+    "tile": [
+      32,
+      32
+    ],
+    "size": [
+      0.64,
+      0.64
+    ],
+    "base": "base",
+    "shapes": [
+      {
+        "circle": [
+          8,
+          8,
+          1.3
+        ],
+        "fill": "center"
+      },
+      {
+        "ellipse": [
+          8,
+          5.4,
+          1.6,
+          1.1
+        ],
+        "fill": "petal"
+      },
+      {
+        "ellipse": [
+          10.6,
+          7.2,
+          1.6,
+          1.1
+        ],
+        "fill": "petal"
+      },
+      {
+        "ellipse": [
+          9.6,
+          10.2,
+          1.6,
+          1.1
+        ],
+        "fill": "petal"
+      },
+      {
+        "ellipse": [
+          6.4,
+          10.2,
+          1.6,
+          1.1
+        ],
+        "fill": "petal"
+      },
+      {
+        "ellipse": [
+          5.4,
+          7.2,
+          1.6,
+          1.1
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          8,
+          8,
+          1.0
+        ],
+        "fill": "center"
+      },
+      {
+        "ellipse": [
+          24,
+          20,
+          1.4,
+          0.8
+        ],
+        "fill": "petalDark"
+      },
+      {
+        "ellipse": [
+          20,
+          27,
+          1.1,
+          0.7
+        ],
+        "fill": "petal"
+      },
+      {
+        "ellipse": [
+          27,
+          9,
+          1.0,
+          0.6
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          15,
+          24,
+          0.8
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          29,
+          29,
+          0.8
+        ],
+        "fill": "dot"
+      }
+    ]
+  },
+  "palette": {
+    "base": "#FBEFF2",
+    "petal": "#F7B8C8",
+    "petalDark": "#E88AA6",
+    "center": "#F6D36A",
+    "dot": "#F2C9D4",
+    "wainscot": "#E8C9A0",
+    "molding": "#B88A68",
+    "baseboard": "#8A6244"
+  }
+}

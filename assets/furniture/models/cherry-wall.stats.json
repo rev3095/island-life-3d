@@ -1,0 +1,50 @@
+{
+  "id": "FU-95",
+  "slug": "cherry-wall",
+  "item": "furn.cherry-wall",
+  "name": "벚꽃 가지 장식",
+  "category": "furniture",
+  "kind": "cherry-wall",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 5272,
+  "parts": 1,
+  "materials": [
+    "branch",
+    "center",
+    "petal"
+  ],
+  "objects": [
+    "branch"
+  ],
+  "animations": {},
+  "size": [
+    0.91,
+    0.09,
+    1.78
+  ],
+  "bounds": [
+    [
+      -0.436,
+      -0.088,
+      1.009
+    ],
+    [
+      0.478,
+      -0.0,
+      1.779
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 99800,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "cherry-wall_front.png",
+    "cherry-wall_main.png",
+    "cherry-wall_thumb.png",
+    "cherry-wall_top.png"
+  ]
+}

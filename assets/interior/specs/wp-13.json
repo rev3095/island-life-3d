@@ -1,0 +1,81 @@
+{
+  "id": "WP-13",
+  "slug": "wp-13",
+  "kind": "wallpaper",
+  "name": "눈 결정",
+  "version": 1,
+  "status": "review",
+  "price": 0,
+  "peddler": true,
+  "season": "winter",
+  "pattern": {
+    "tile": [
+      32,
+      32
+    ],
+    "size": [
+      0.64,
+      0.64
+    ],
+    "base": "base",
+    "shapes": [
+      {
+        "path": "M8 2 L8 14 M2.8 5 L13.2 11 M2.8 11 L13.2 5 M8 4 L6.6 2.8 M8 4 L9.4 2.8 M8 12 L6.6 13.2 M8 12 L9.4 13.2",
+        "stroke": "flake"
+      },
+      {
+        "circle": [
+          8,
+          8,
+          1.2
+        ],
+        "fill": "flake"
+      },
+      {
+        "path": "M24 18 L24 28 M19.7 20.5 L28.3 25.5 M19.7 25.5 L28.3 20.5",
+        "stroke": "flakeBlue"
+      },
+      {
+        "circle": [
+          24,
+          23,
+          0.9
+        ],
+        "fill": "flakeBlue"
+      },
+      {
+        "circle": [
+          28,
+          6,
+          0.8
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          4,
+          25,
+          0.9
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          16,
+          16,
+          0.6
+        ],
+        "fill": "flake"
+      }
+    ]
+  },
+  "palette": {
+    "base": "#E6EFF8",
+    "flake": "#FFFFFF",
+    "flakeBlue": "#B8D4EE",
+    "dot": "#CFE0F2",
+    "wainscot": "#9FB8D4",
+    "molding": "#6E88A8",
+    "baseboard": "#56708E"
+  }
+}

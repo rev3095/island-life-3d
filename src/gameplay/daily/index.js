@@ -5,6 +5,9 @@
 //  - P4 유리병·레시피 (D143-A · D146-A, 이 파일): 날마다 아침 바닷가에 유리병 PR-34 → 레시피 쪽지 IC-MA-12. 쪽지가 가방에 들어오면 읽고
 //    (하나 빠짐) 잠긴 새 레시피(rules.json recipes 의 unlock) 하나를 연다 — 지금 있던 레시피는 그대로. 별 조각 가구 FU-63–66.
 //  - P5 방문 행상 (D145-A, peddler.js): 수·일 낮 광장 수레 BD-11 + 행상 송이 CH-16 · 희귀 꽃 모종·묘목·벽지 하나 · 첫 방문 장면 s24.
+//  - M18-P4 계절 레시피 (15차 보드 D196-A): 벚꽃·조개·단풍·눈 결정 가구 FU-92–104 의 레시피(rules.json recipes 의 season)는 쪽지로 안 열리고,
+//    그 계절 유리병(cfg.seasonal.bottleChance) · 친구 이상 주민 선물(town/talk.js → recipes.fromVillager) 로 하나씩 바로 열린다 (창은 대화가 끝난 뒤).
+//    행상 송이는 계절 꽃씨 · 계절 벽지(WP-10–13)를 가져온다 (cfg.peddler.seasonal).
 // 시각은 언제나 ctx.services.time.now() (시계 바늘·빠르기·날짜 흉내를 따라옴). 저장 칸 state.daily (이 모듈 몫) · 열린 레시피 state.recipes.known.
 // 섬 일지(journal) 셀 일: 'wish' · 'balloon' · 'bottle' 을 journal.count 로 직접 센다. 첫날 안내를 마친 다음 날부터 열린다 (밤 콘텐츠와 같음).
 import * as R from './rules.js';
@@ -120,6 +123,35 @@ function createDaily(ctx, cfg) {
     if (d.inventory.count(RECIPE_NOTE) && d.recipes.locked().length) notesPending = true;
   }
 
+  // ── M18-P4 계절 레시피 (D196-A): 그 계절 유리병 · 주민 선물로 바로 열림 ──
+  const seasonNow = () => { const n = now(); return n ? (n.season ?? ctx.constants?.seasonOf?.(n.month) ?? null) : null; };
+  const announce = [];   // 열었는데 아직 창을 못 띄운 것 [{ id, by }]
+  let announcing = false;
+  /** 지금 계절의 잠긴 계절 레시피 하나를 연다 → id (없으면 null). by = 'bottle' | 주민 이름 */
+  function unlockSeason(by = 'bottle', season = seasonNow()) {
+    const d = S().data;
+    const id = R.nextRecipe(d?.recipes?.seasonLocked?.(season) ?? []);
+    if (!id || !unlock(id)) return null;
+    announce.push({ id, by });
+    emit('daily:season-recipe', { id, season, by });
+    return id;
+  }
+  async function showAnnounce() {
+    const ui = S().ui, d = S().data, C = cfg.seasonal ?? {};
+    if (announcing || !announce.length || ui?.isBlocking?.() || S().story?.playing) return;
+    announcing = true;
+    try {
+      const { id, by } = announce.shift();
+      const it = d.items.get(id), r = d.recipes.get(id);
+      const needs = (r?.needs ?? []).map(x => (x.id ? `${d.items.get(x.id)?.name ?? x.id} ${x.n}` : `${d.items.categoryName?.(x.category) ?? x.category} 아무거나 ${x.n}`)).join(' · ');
+      const head = (by === 'bottle' ? C.bottle : C.villager ?? '').replaceAll('{name}', it?.name ?? id).replaceAll('{who}이(가)', R.withJosa(by, '이', '가')).replaceAll('{who}', by);
+      ctx.events.emit('sfx', { name: 'bag-open' });
+      if (ui?.confirm) await ui.confirm({ title: `${C.mark?.[r?.season] ?? '📜'} 계절 레시피`, icon: it?.icon ?? '📜', text: `${head} (재료: ${needs})`,
+        buttons: [{ label: '좋아요', value: true, primary: true }], cancelValue: true });
+      else toast(head, '📜');
+    } finally { announcing = false; }
+  }
+
   // ── 유리병 (D143-A) ──
   const bottle = { id: null, day: null, spot: null };
   function syncBottle(n) {
@@ -155,6 +187,15 @@ function createDaily(ctx, cfg) {
     takeBottle();
     ctx.events.emit('sfx', { name: 'pickup' });
     S().player?.play?.('place');
+    // M18-P4: 그 계절 레시피가 남았으면 가끔(seasonal.bottleChance) 쪽지 대신 계절 레시피가 들어 있다
+    const season = seasonNow();
+    if (R.seasonBottle(n.dayKey, seed(), cfg.seasonal) && R.nextRecipe(d?.recipes?.seasonLocked?.(season) ?? [])) {
+      toast(cfg.seasonal.found, '🍾');
+      unlockSeason('bottle', season);
+      count('bottle');
+      emit('daily:bottle', { dayKey: n.dayKey, note: false, season: true });
+      return;
+    }
     const canNote = !!R.nextRecipe(d?.recipes?.locked?.() ?? []);
     if (canNote) {
       toast(cfg.bottle.found, '🍾');
@@ -190,7 +231,14 @@ function createDaily(ctx, cfg) {
   const service = {
     config: cfg,
     get open() { return isOpen(); },
-    recipes: { known: () => [...known()], unlock, read: () => readNotes() },
+    recipes: {
+      known: () => [...known()], unlock, read: () => readNotes(),
+      /** M18-P4: 지금 계절 레시피 중 아직 모르는 것 */
+      seasonLocked: () => S().data?.recipes?.seasonLocked?.(seasonNow()) ?? [],
+      /** M18-P4: 친구 이상 주민이 선물로 계절 레시피를 알려 줌 (town/talk.js) — 열었으면 id, 아니면 null. 창은 대화가 끝난 뒤 */
+      fromVillager: (name, r = Math.random) => (r() < (cfg.seasonal?.villagerChance ?? 0.35) ? unlockSeason(name) : null),
+      unlockSeason: by => unlockSeason(by),
+    },
     bottle: { spot: () => (bottle.spot ? { ...bottle.spot } : null), opened: () => !!st().bottle?.opened },
     meteor: meteor.service,
     balloons: balloons.service,
@@ -217,6 +265,7 @@ function createDaily(ctx, cfg) {
     clock += dt;
     if (clock >= 1) { clock = 0; sync(); }
     if (notesPending && !reading) readNotes();
+    if (announce.length && !announcing) showAnnounce();
     meteor.update(dt);
     balloons.update(dt);
     peddler.update(dt);

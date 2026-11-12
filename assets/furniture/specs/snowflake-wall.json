@@ -1,0 +1,58 @@
+{
+  "id": "FU-104",
+  "slug": "snowflake-wall",
+  "item": "furn.snowflake-wall",
+  "name": "눈 결정 벽 장식",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "snowflake-wall",
+  "season": "winter",
+  "prompt": {
+    "concept": "은빛 둥근 테 안에 큰 눈 결정 하나와 작은 결정 셋.",
+    "keywords": [
+      "벽",
+      "밤에 빛남",
+      "겨울"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 겨울 눈 결정 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "metal": "#C4CEDC",
+    "night": "#3E5A86",
+    "glow": "#CFEAFF",
+    "crystal": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "metal": "은빛",
+    "night": "밤빛 바탕",
+    "glow": "불빛",
+    "crystal": "눈 결정"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall"
+}

@@ -139,7 +139,7 @@ test('대사 데이터: 주민마다 필요한 묶음이 다 있고 자리 이�
     'chatting', 'banter', 'letters.friend', 'letters.close', 'letters.thanks', 'letters.gift'];
   const get = (o, path) => path.split('.').reduce((a, k) => a?.[k], o);
   const strings = v => (typeof v === 'string' ? [v] : Array.isArray(v) ? v.flatMap(strings) : v && typeof v === 'object' ? Object.values(v).flatMap(strings) : []);
-  const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat', 'other', 'player', 'island']);   // player·island 는 intro 가 대화창에서 채운다
+  const KEYS = new Set(['item', 'want', 'reward', 'furn', 'n', 'cat', 'other', 'player', 'island', 'art']);   // art = M18-P4 미술품 이름   // player·island 는 intro 가 대화창에서 채운다
   for (const slug of ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong']) {
     const L = LINES[slug];
     for (const p of need) assert.ok(get(L, p)?.length, `${slug}.${p}`);

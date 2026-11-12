@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "note": "M13 매일 할 거리 P2–P5 (13차 검수 보드 wave13 D142–D147 모두 A). 규칙 src/gameplay/daily/rules.js, 모듈 src/gameplay/daily/index.js. 시각은 게임 하루 시각 5~29 (28 = 다음 날 새벽 4시).",
   "opensAfterDay": 1,
   "meteor": {
@@ -99,6 +99,15 @@
     "read": "레시피 쪽지를 펼쳤어요 — 「{name}」 만드는 법이 적혀 있어요! 작업대에서 만들 수 있어요.",
     "all": "아는 레시피가 다 모였어요. 쪽지는 기념으로 둘게요"
   },
+  "seasonal": {
+    "note": "M18-P4 D196-A 계절 레시피: 벚꽃·조개·단풍·눈 결정 가구 FU-92–104 (rules.json recipes 의 season). 레시피 쪽지로는 안 열리고 그 계절 유리병(bottleChance)·친구 이상 주민 선물(villagerChance, 좋아하는 선물을 받았을 때)로 하나씩",
+    "bottleChance": 0.3,
+    "villagerChance": 0.35,
+    "found": "유리병 속에 계절 레시피가 들어 있어요!",
+    "bottle": "이번 계절에만 찾을 수 있는 레시피예요 — 「{name}」 만드는 법! 작업대에서 만들 수 있어요.",
+    "villager": "{who}이(가) 「{name}」 만드는 법을 알려 줬어요! 작업대에서 만들 수 있어요.",
+    "mark": { "spring": "🌸", "summer": "🐚", "autumn": "🍁", "winter": "❄️" }
+  },
   "peddler": {
     "note": "D145-A 행상 하나 · 주 2회 — 수·일 낮(9–17시) 광장 한쪽 수레 BD-11 + 행상 송이 CH-16 (고슴도치). 희귀 꽃 모종 · 묘목 · 다른 곳에서 안 파는 벽지 하나",
     "weekdays": [3, 0],
@@ -114,6 +123,14 @@
     "markup": 4,
     "saplingPool": ["seed.sapling", "seed.cedar-sapling"],
     "wallpaper": { "slug": "wp-09", "price": 2600 },
+    "seasonal": {
+      "note": "M18-P4 D196-A 행상 계절 진열: 그 계절 꽃씨 묶음(seedPack 개) · 계절 벽지 하나 (WP-10–13, 값 0 + peddler — 도토리상점 코너엔 안 나옴). 들꽃 수레 WP-09 는 늘",
+      "seedPack": 5,
+      "spring": { "seeds": ["seed.tulip", "seed.pansy"], "wallpaper": { "slug": "wp-10", "price": 2400 } },
+      "summer": { "seeds": ["seed.cosmos"], "wallpaper": { "slug": "wp-11", "price": 2400 } },
+      "autumn": { "seeds": ["seed.cosmos", "seed.pansy"], "wallpaper": { "slug": "wp-12", "price": 2400 } },
+      "winter": { "seeds": ["seed.pansy"], "wallpaper": { "slug": "wp-13", "price": 2400 } }
+    },
     "arrive": "🛒 떠돌이 행상 송이가 광장에 수레를 세웠어요 (오후 5시까지)",
     "lines": {
       "first": ["안녕하세송! 나는 섬과 섬 사이를 떠도는 행상, 송이송.", "수요일이랑 일요일 낮에 이 광장에 들를게송. 다른 데서 못 보는 걸 가져왔송!"],
@@ -123,6 +140,7 @@
       "short": "도토리가 조금 모자라송…",
       "full": "가방이 꽉 찼송. 조금 비우고 와송",
       "owned": "그 벽지는 이미 가지고 있송!",
+      "season": "이번 계절에만 가져오는 꽃씨랑 벽지도 있송!",
       "bye": ["또 보자송! 다음엔 다른 걸 가져올게송", "바람 좋은 날 또 올게송~"],
       "closed": "수레가 비어 있어요 (행상은 수·일 낮 9–17시)"
     }

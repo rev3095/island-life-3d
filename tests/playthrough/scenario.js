@@ -777,6 +777,49 @@ export function makeScenario(bot, sk, opts = {}) {
     return pass(`${S().data.items.get(id)?.name} — 「${told[0].tell}」`);
   });
 
+  // M18-P4 (D195-A) 미술품 주고받기: 친구 이상 주민이 「○○ 보고 싶어요」 하는 날을 기다렸다가 (최대 8일) 그 주민에게 말 걸기 —
+  // 가방에 그 진품이 있으면 「보여 줄게요」(친밀도 +), 없으면 「다음에요」. 이벤트 town:art (ask|remind|show|trade|fake) 로 확인. 상태는 읽기만.
+  add('art-wish', '미술품 부탁: 친구 이상 주민이 「○○ 보고 싶어요」 → 진품이 있으면 보여 주기 · 없으면 다음에', async () => {
+    const T = S().town;
+    if (!T?.art) return block('town.art 서비스가 없어요');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    const min = T.art.config?.minFriendship ?? 30;
+    if (!residents().some(s => T.state(s).friendship >= min)) return skip('친구 이상 주민이 없음');
+    let w = null, days = 0;
+    for (; days < 8 && !w; days++) {
+      if (days) await bot.nextDay(8);
+      await bot.setHour(10);
+      await bot.settle(20);
+      w = T.art.today();
+    }
+    if (!w) return awk(`${days}일 동안 미술품 부탁이 없음`);
+    const it = S().data.items.get(w.id);
+    const has = S().data.inventory.count(w.id) > 0;
+    const ev = [];
+    const off = bot.on('town:art', e => ev.push(e));
+    const f0 = T.state(w.slug).friendship;
+    let reached = false;
+    if (sk.villager(w.slug)?.talkable) reached = await sk.reach(w.slug);
+    if (reached) {
+      const want = has ? /보여 줄게요/ : /다음에요/;
+      bot.policy = {
+        dialog: texts => { const i = texts.findIndex(t => want.test(t)); if (i >= 0) return i; const j = texts.findIndex(t => /잘 가/.test(t)); return j >= 0 ? j : texts.length - 1; },
+        emoteChoice: () => (has ? 0 : 2), emote: () => null,
+      };
+      bot.press('action');
+      await bot.frames(3);
+      await bot.settle(60, 0.5);
+      bot.policy = {};
+    }
+    off();
+    note('artWish', { day: bot.day(), days, wish: w, has, reached, ev, f0, f1: T.state(w.slug).friendship });
+    if (!reached) return awk(`${w.slug} 에게 말을 못 걸음 (부탁 ${it?.name ?? w.id})`);
+    if (!ev.some(e => e.kind === 'ask' || e.kind === 'remind')) return awk(`${w.slug} 가 「${it?.name}」 얘기를 안 꺼냄`);
+    if (has && !ev.some(e => e.kind === 'show')) return awk(`진품이 있는데 보여 주기가 안 됨`);
+    return pass(`${days}일째 ${w.slug} 「${it?.name}」${has ? ` 보여 줌 (친밀도 ${f0}→${T.state(w.slug).friendship})` : ' — 진품이 없어 다음에'}`);
+  });
+
   add('festival-loop', '부품 5개 모으기 (주민 마음 열기 → 🎉 → 채집 → 전달), 날마다 반복', async () => {
     const maxDays = opts.maxDays ?? 10;
     const log = [];

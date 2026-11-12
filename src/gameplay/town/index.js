@@ -3,6 +3,7 @@
 // 5차 Z4: 새 주민 이사(movein.js), 생일(party.js), 주민 방(house:enter {owner} 를 받으면 집에 있던 주인을 방 안에 세운다).
 import { createNav } from './path.js';
 import { PEOPLE } from './people.js';
+import { createArtWish } from './artwish.js';   // M18-P4 미술품 주고받기 (D195-A)
 import { createVillager } from './villager.js';
 import { RADIUS } from './actor.js';
 import { createKeepers } from './keepers.js';
@@ -209,6 +210,7 @@ export default {
     town.nav = nav;
     const companion = createCompanion(ctx, { town, lines: LINES, toast });
     const talk = createTalk(ctx, { lines: LINES, party, companion });
+    const art = createArtWish(ctx, { residents, people: PEOPLE, lines: LINES });
     const song = createSong(ctx, { town, lines: LINES, villagers: () => villagers, companion });
     const chatter = createChatter(villagers, LINES);
 
@@ -338,6 +340,8 @@ export default {
     T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, umbrellas: createUmbrellas(ctx) };
     ctx.services.town = {
       villagers, keepers: keepers.all,
+      /** M18-P4 미술품 주고받기: today() → 오늘 미술품을 바라는 { slug, id } | null · wishes() · config */
+      art,
       /** 지금 섬에 사는 주민 slug 목록 (새 주민은 입주한 뒤부터) */
       residents,
       /** 상점·박물관 문 (실내 보드): 'open' | 'closed' | null — house.places 가 문 쪽으로 밀 때 묻는다 */

@@ -1,0 +1,60 @@
+{
+  "id": "FU-98",
+  "slug": "shell-mirror",
+  "item": "furn.shell-mirror",
+  "name": "조개 벽 거울",
+  "category": "furniture",
+  "version": "0.1",
+  "status": "review",
+  "animations": [],
+  "kind": "shell-mirror",
+  "season": "summer",
+  "prompt": {
+    "concept": "둥근 거울 둘레에 작은 조개와 불가사리 테.",
+    "keywords": [
+      "벽",
+      "여름"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "15차 보드 wave15 D196-A · 여름 조개 계절 레시피로만 (그 계절 유리병·주민 선물) · M18-P4"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "sand": "#EBD9B0",
+    "mirror": "#CFE6EE",
+    "glint": "#FFFFFF",
+    "shell": "#FBE9DA",
+    "shellPink": "#FFC8C0",
+    "star": "#F49A6A",
+    "pearl": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "sand": "모래빛",
+    "mirror": "거울",
+    "glint": "반짝임",
+    "shell": "조개",
+    "shellPink": "분홍 조개",
+    "star": "불가사리",
+    "pearl": "진주"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall"
+}

@@ -1,0 +1,51 @@
+{
+  "id": "FU-104",
+  "slug": "snowflake-wall",
+  "item": "furn.snowflake-wall",
+  "name": "눈 결정 벽 장식",
+  "category": "furniture",
+  "kind": "snowflake-wall",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2744,
+  "parts": 1,
+  "materials": [
+    "crystal",
+    "glow",
+    "metal",
+    "night"
+  ],
+  "objects": [
+    "deco"
+  ],
+  "animations": {},
+  "size": [
+    0.69,
+    0.06,
+    1.93
+  ],
+  "bounds": [
+    [
+      -0.318,
+      -0.056,
+      1.07
+    ],
+    [
+      0.376,
+      0.0,
+      1.93
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 58784,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "snowflake-wall_front.png",
+    "snowflake-wall_main.png",
+    "snowflake-wall_thumb.png",
+    "snowflake-wall_top.png"
+  ]
+}

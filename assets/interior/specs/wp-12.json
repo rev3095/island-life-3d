@@ -1,0 +1,73 @@
+{
+  "id": "WP-12",
+  "slug": "wp-12",
+  "kind": "wallpaper",
+  "name": "단풍 바람",
+  "version": 1,
+  "status": "review",
+  "price": 0,
+  "peddler": true,
+  "season": "autumn",
+  "pattern": {
+    "tile": [
+      32,
+      32
+    ],
+    "size": [
+      0.64,
+      0.64
+    ],
+    "base": "base",
+    "shapes": [
+      {
+        "path": "M8 2 L9.5 6 L13 5 L11 8.5 L14 10 L10 11 L10.5 14 L8 12 L5.5 14 L6 11 L2 10 L5 8.5 L3 5 L6.5 6 Z",
+        "fill": "leaf"
+      },
+      {
+        "path": "M8 12 L8 16",
+        "stroke": "stem"
+      },
+      {
+        "path": "M24 18 L25 21 L27.5 20.3 L26 22.8 L28.2 24 L25.3 24.7 L25.6 27 L24 25.5 L22.4 27 L22.7 24.7 L19.8 24 L22 22.8 L20.5 20.3 L23 21 Z",
+        "fill": "leafGold"
+      },
+      {
+        "ellipse": [
+          26,
+          6,
+          1.6,
+          0.8
+        ],
+        "fill": "leafDeep"
+      },
+      {
+        "ellipse": [
+          6,
+          26,
+          1.4,
+          0.7
+        ],
+        "fill": "leafGold"
+      },
+      {
+        "circle": [
+          16,
+          20,
+          0.7
+        ],
+        "fill": "dot"
+      }
+    ]
+  },
+  "palette": {
+    "base": "#F8EAD6",
+    "leaf": "#E0602E",
+    "leafDeep": "#B8362A",
+    "leafGold": "#E8B23C",
+    "stem": "#8A5A3A",
+    "dot": "#EAD2B0",
+    "wainscot": "#A8764E",
+    "molding": "#6E4A36",
+    "baseboard": "#5E3C28"
+  }
+}

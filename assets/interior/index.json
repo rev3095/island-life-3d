@@ -77,6 +77,50 @@
       "peddler": true
     },
     {
+      "id": "WP-10",
+      "slug": "wp-10",
+      "kind": "wallpaper",
+      "name": "벚꽃 비",
+      "version": 1,
+      "status": "review",
+      "price": 0,
+      "peddler": true,
+      "season": "spring"
+    },
+    {
+      "id": "WP-11",
+      "slug": "wp-11",
+      "kind": "wallpaper",
+      "name": "조개 모래",
+      "version": 1,
+      "status": "review",
+      "price": 0,
+      "peddler": true,
+      "season": "summer"
+    },
+    {
+      "id": "WP-12",
+      "slug": "wp-12",
+      "kind": "wallpaper",
+      "name": "단풍 바람",
+      "version": 1,
+      "status": "review",
+      "price": 0,
+      "peddler": true,
+      "season": "autumn"
+    },
+    {
+      "id": "WP-13",
+      "slug": "wp-13",
+      "kind": "wallpaper",
+      "name": "눈 결정",
+      "version": 1,
+      "status": "review",
+      "price": 0,
+      "peddler": true,
+      "season": "winter"
+    },
+    {
       "id": "FL-01",
       "slug": "fl-01",
       "kind": "floor",

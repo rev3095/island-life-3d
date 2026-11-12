@@ -227,3 +227,6 @@ export function pickCell(rng, w, h, ok, tries = 400) {
   }
   return null;
 }
+
+/** M18-P4 (D195-A): 여우 상인 살랑이 가품을 되사는 값 = 그 작품 여우 값(buy)의 반 (10 단위 내림, 가품 파는 값보다는 많이) */
+export const foxBuyBack = (it, ratio = 0.5) => Math.max(it?.price ?? 0, Math.floor(((it?.buy ?? 0) * ratio) / 10) * 10);

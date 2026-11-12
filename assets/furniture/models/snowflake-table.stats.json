@@ -1,0 +1,53 @@
+{
+  "id": "FU-103",
+  "slug": "snowflake-table",
+  "item": "furn.snowflake-table",
+  "name": "눈 결정 탁자",
+  "category": "furniture",
+  "kind": "snowflake-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1076,
+  "parts": 1,
+  "materials": [
+    "crystal",
+    "cup",
+    "ice",
+    "metal",
+    "snow",
+    "tea"
+  ],
+  "objects": [
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.82,
+    0.8,
+    0.67
+  ],
+  "bounds": [
+    [
+      -0.41,
+      -0.4,
+      -0.003
+    ],
+    [
+      0.41,
+      0.4,
+      0.67
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 26008,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "snowflake-table_front.png",
+    "snowflake-table_main.png",
+    "snowflake-table_thumb.png",
+    "snowflake-table_top.png"
+  ]
+}
