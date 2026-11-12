@@ -284,12 +284,12 @@ test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽
   const soft = (tx, tz) => !at.has(`${tx},${tz}`) || R.SOFT_KINDS.has(at.get(`${tx},${tz}`));
   const spots = [];
   const floorOf = (grounds = ['grass']) => (tx, tz) => { const w = isl.toWorld(tx, tz); return grounds.includes(isl.tileAt(tx, tz)) && soft(tx, tz) && !R.nearDoor(doors, w) && spots.every(s => Math.hypot(w.x - s.x, w.z - s.z) > 6); };
-  const opts = { isOpen: land, isClear: (tx, tz) => land(tx, tz) && soft(tx, tz), levelAt: (tx, tz) => isl.levelAt(tx, tz), toTile: isl.toTile, toWorld: isl.toWorld, reach: 18 };
+  const opts = { isOpen: land, isClear: (tx, tz) => land(tx, tz) && soft(tx, tz), levelAt: (tx, tz) => isl.levelAt(tx, tz), toTile: isl.toTile, toWorld: isl.toWorld, reach: 30 };
   const plaza = gen.places.plaza;
   const plan = [
     ['moonshop', { x: plaza.x + CFG.shop.offset[0], z: plaza.z + CFG.shop.offset[1] }, 'night-shop'],
-    ['fortune', { x: plaza.x + CFG.fortune.offset[0], z: plaza.z + CFG.fortune.offset[1] }, CFG.fortune.building],
-    ['foxshop', { x: gen.w * CFG.fox.spot[0], z: gen.h * CFG.fox.spot[1] }, CFG.fox.building],
+    ['fortune', { x: plaza.x + CFG.fortune.offset[0], z: plaza.z + CFG.fortune.offset[1] }, CFG.fortune.building, CFG.fortune.ground],
+    ['foxshop', { x: gen.w * CFG.fox.spot[0], z: gen.h * CFG.fox.spot[1] }, CFG.fox.building, CFG.fox.ground],
     ['oddtent', { x: gen.w * CFG.odd.spot[0], z: gen.h * CFG.odd.spot[1] }, CFG.odd.building, CFG.odd.ground],
   ];
   for (const [kind, anchor, b, grounds] of plan) {

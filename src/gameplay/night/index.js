@@ -98,14 +98,18 @@ function createNight(ctx, cfg) {
     return { x: I.w * 0.29, z: I.h * 0.26 };   // 섬 가운데가 (0,0) — 남동쪽 숲 끝 (보드 D111-A)
   }
   async function spotOf(kind, building) {
+    // P54: 앞 순서 건물(달빛 가게·새벽 천막…)의 자리를 먼저 정해 둔다 — 아직 안 선 건물 자리를 새 건물이 가로채지 않게
+    for (const k of NIGHT_PLACES.slice(0, NIGHT_PLACES.indexOf(kind))) if (!st().spots[k]) await spotOf(k, kinds[k].building);
     const s = st().spots[kind];
     const free0 = cellFn('floor', kinds[kind]?.ground);
     // 다른 밤 건물(지금 서 있지 않아도 자리를 정해 둔 것)과 떨어지게 (FAR 칸 안쪽은 건물 바닥으로 안 씀) — 천막은 달빛 가게와, P54 건물은 서로·모두와
-    const I = isl(), others = Object.entries(st().spots).filter(([k, v]) => k !== kind && v && (kind !== 'tent' || k === 'moonshop')).map(([, v]) => v);
+    // 앞 순서(NIGHT_PLACES: 달빛 가게 → 천막 → 운세 부스 → 여우 → 이상한 천막)의 정해 둔 자리 + 지금 서 있는 건물만 피한다 (뒤 순서끼리 서로 막아 둘 다 못 서는 일이 없게)
+    const order = NIGHT_PLACES.indexOf(kind);
+    const I = isl(), others = Object.entries(st().spots).filter(([k, v]) => k !== kind && v && (NIGHT_PLACES.indexOf(k) < order || placed[k])).map(([, v]) => v);
     const free = others.length ? (tx, tz) => free0(tx, tz) && others.every(o => Math.hypot(I.toWorld(tx, tz).x - o.x, I.toWorld(tx, tz).z - o.z) > FAR) : free0;
     if (s && occupiedOk(s, free)) return s;
     const lot = await lotOf(building);
-    const spot = R.buildingSpot(anchorOf(kind), lot, { isFree: free, isOpen: cellFn('open'), isClear: cellFn('clear'), levelAt: (tx, tz) => I.levelAt(tx, tz), toTile: I.toTile, toWorld: I.toWorld, reach: 18 });
+    const spot = R.buildingSpot(anchorOf(kind), lot, { isFree: free, isOpen: cellFn('open'), isClear: cellFn('clear'), levelAt: (tx, tz) => I.levelAt(tx, tz), toTile: I.toTile, toWorld: I.toWorld, reach: kinds[kind]?.reach ?? 18 });
     if (spot) st().spots[kind] = spot;
     return spot;
   }
@@ -115,21 +119,27 @@ function createNight(ctx, cfg) {
     return true;
   }
   const pending = new Set();
-  async function putBuilding(kind, building) {
-    if (placed[kind] || pending.has(kind)) return;
+  const warned = new Set();
+  let placing = Promise.resolve();   // P54: 건물 자리 찾기를 하나씩 (같은 틱에 둘이 같은 자리를 고르지 않게 — 앞 건물 자리가 st().spots 에 들어간 뒤 다음)
+  function putBuilding(kind, building) {
+    if (placed[kind] || pending.has(kind)) return placing;
     pending.add(kind);
-    try {
+    placing = placing.then(() => placeOne(kind, building)).catch(e => console.warn('[night] 건물을 못 놓았어요', kind, e)).finally(() => pending.delete(kind));
+    return placing;
+  }
+  async function placeOne(kind, building) {
+    {
       const W = world();
       if (!W?.objects) return;
       const s = await spotOf(kind, building);
-      if (!s) { console.warn('[night] 건물 자리를 못 찾았어요', kind); return; }
+      if (!s) { if (!warned.has(kind)) { warned.add(kind); console.warn('[night] 건물 자리를 못 찾았어요 (섬에 빈 곳이 없음)', kind); } return; }
       const t = isl().toTile(s.x, s.z);
       const id = W.objects.add(building, t.tx, t.tz, { persist: false, at: { x: s.x, z: s.z } });
       if (!id) return;
       placed[kind] = id;
       const tile = isl().toTile(s.door.x, s.door.z);
       W.places[kind] = { x: s.x, z: s.z, door: { ...s.door }, tx: tile.tx, tz: tile.tz };
-    } finally { pending.delete(kind); }
+    }
   }
   function takeBuilding(kind) {
     if (!placed[kind]) return;
@@ -616,6 +626,7 @@ function createNight(ctx, cfg) {
     places: () => NIGHT_PLACES.slice(),
     /** P54 선물 상자 자리 (오늘 섬에 있으면 {x, z}) */
     giftSpot: () => (placed.gift ? { x: placed.gift.x, z: placed.gift.z } : null),
+  };
 
   function register(gp) {
     gp.add({

@@ -55,6 +55,8 @@
     "stock": ["furn.fortune-lamp","furn.tarot-frame"],
     "near": "plaza",
     "offset": [-12,8],
+    "ground": ["grass","plaza","sand"],
+    "reach": 30,
     "about": "밤 8시–새벽 3시 광장 남서쪽. 여명이 저녁엔 여기서 카드를 펼치고 새벽 3시엔 숲 끝 새벽 천막으로 옮겨 간다 (카드는 둘이 합쳐 하루 한 장)"
   },
   "fox": {
@@ -71,6 +73,8 @@
     "perNight": 1,
     "stock": ["furn.fox-lantern"],
     "spot": [-0.27,0.02],
+    "ground": ["grass","sand","plaza","path"],
+    "reach": 30,
     "tag": "fox",
     "about": "밤 8시–새벽 5시, 밤 콘텐츠가 열린 첫날 밤 · 그 뒤로는 35% (6일 넘게 안 왔으면 꼭). 미술품 2–3점, 가품이 있는 작품은 반쯤 가품. 한 밤에 한 점만 판다"
   },
@@ -86,7 +90,8 @@
     "fakeChance": 0.4,
     "stock": ["furn.odd-chest"],
     "spot": [0.24,0.01],
-    "ground": ["grass","sand"],
+    "ground": ["grass","sand","plaza","path"],
+    "reach": 30,
     "tag": "odd",
     "about": "밤 9시–새벽 5시, 30% (7일 넘게 안 섰으면 꼭). 주인 없음 — 받침 하나에 미술품(60%, 가품 40%) 또는 수상한 궤짝"
   },
