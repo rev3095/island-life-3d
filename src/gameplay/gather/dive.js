@@ -89,6 +89,11 @@ export function createDive(ctx, kit, { results }) {
       if (swimmable(x, fz0)) return { x, z: fz0 };
       if (swimmable(fx0, z)) return { x: fx0, z };
       const isl = home();
+      // 지금 자리가 이미 헤엄 칸 밖(얕은 물 — 잡아 들어 보이기 등으로 밀린 경우)이면 갇히지 않게: 뭍 칸·바깥 바다만 아니면 움직인다
+      if (isl && !swimmable(fx0, fz0) && inSea(x, z, isl.w, isl.h)) {
+        const { tx, tz } = isl.toTile(x, z);
+        if (!isl.isWalkableTile(tx, tz)) return { x, z };
+      }
       if (isl && !inSea(x, z, isl.w, isl.h) && S.warnT <= 0) { S.warnT = 8; kit.toast('더 먼 바다는 물살이 세서 못 가요', '🌊'); }
       return { x: fx0, z: fz0 };
     },
@@ -208,7 +213,7 @@ export function createDive(ctx, kit, { results }) {
   /** 물에서 앞쪽 뭍 자리 (나올 곳) | null */
   function exitPoint() {
     const p = kit.player;
-    for (let d = 0.8; d <= 2.6; d += 0.3) {
+    for (let d = 0.8; d <= 3.2; d += 0.3) {
       const q = p.pointInFront(d);
       if (landAt(q.x, q.z)) { const r = p.pointInFront(d + 0.45); return landAt(r.x, r.z) ? r : q; }
     }

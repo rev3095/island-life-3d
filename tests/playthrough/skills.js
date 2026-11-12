@@ -722,9 +722,10 @@ export function createSkills(bot) {
         out.caught.push(got?.id ?? 'sea');
       }
     }
-    // 들어온 물가로 헤엄쳐 가서 나오기
+    // 들어온 물가로 헤엄쳐 가서 나오기 — 먼저 들어온 자리 앞바다(sea)로, 거기서 물가를 똑바로 (비스듬히 가면 얕은 물 띠가 넓어 앞에 뭍이 안 잡힘)
     const back = out.spot;
-    for (let k = 0; k < 900 && D.mode === 'swim'; k++) {
+    for (let k = 0; k < 600 && D.mode === 'swim' && toward(back.sea) > 0.4; k++) await bot.frames(1);
+    for (let k = 0; k < 600 && D.mode === 'swim'; k++) {
       toward(back);
       await bot.frames(1);
       if (D.exitPoint()) break;
