@@ -5,7 +5,7 @@
   "place": "museum",
   "name": "박물관",
   "version": 3,
-  "status": "review",
+  "status": "approved",
   "note": "요청 9 재단장: 박물관 로비. 가운데 안내대(FU-37) 뒤 느루 — 기증·설명은 느루와 말할 때만. 벽마다 관 입구(아치) 여섯 halls[]: 서쪽 물고기관·바다 생물관, 동쪽 곤충관·미술관, 북쪽 화석관·별자리관. 아치 옆 안내판(행동 키 → 그 관 설명). 관 실내는 assets/interior/halls/*.json (RM-25–30, src/gameplay/house/museum-hall.js).",
   "size": [
     14,

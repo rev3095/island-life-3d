@@ -5,8 +5,8 @@
   "group": "sea",
   "category": "item",
   "kind": "seaweed",
-  "version": "0.1",
-  "status": "review",
+  "version": "0.2",
+  "status": "approved",
   "items": [
     {
       "item": "sea.seaweed",
@@ -15,7 +15,7 @@
   ],
   "hold": true,
   "prompt": {
-    "concept": "바위 뿌리 덩이에서 물결치며 올라가는 넓은 띠 잎 몇 갈래, 짙은 올리브 녹색",
+    "concept": "바위 뿌리 덩이에서 올라가는 길고 가장자리가 주름진 갈색 띠 몇 가닥 (가운데 굵은 잎맥), 짙은 갈색~황갈색",
     "keywords": [
       "바다",
       "잠수"
@@ -24,7 +24,7 @@
     "avoid": [
       "실제 브랜드·다른 게임의 디자인"
     ],
-    "notes": "M16 잠수 (D160–D164)"
+    "notes": "M16 잠수 (D160–D164) · M17-P1: 넓은 잎 풀처럼 보여서 길고 주름진 갈색 띠로"
   },
   "style": {
     "shading": "toon",
@@ -42,34 +42,42 @@
     },
     "height": {
       "label": "키",
-      "value": 0.4,
+      "value": 0.6,
       "min": 0.2,
-      "max": 0.7,
+      "max": 0.8,
       "step": 0.01,
       "live": false
     },
     "blades": {
       "label": "잎 갈래 수",
-      "value": 5,
-      "min": 3,
+      "value": 3,
+      "min": 2,
       "max": 8,
       "step": 1,
       "live": false
     },
     "width": {
       "label": "잎 너비 비",
-      "value": 0.11,
-      "min": 0.05,
+      "value": 0.075,
+      "min": 0.04,
       "max": 0.2,
       "step": 0.005,
+      "live": false
+    },
+    "ruffle": {
+      "label": "가장자리 주름",
+      "value": 0.9,
+      "min": 0,
+      "max": 1.2,
+      "step": 0.05,
       "live": false
     }
   },
   "palette": {
-    "kelp": "#5E6B2E",
-    "kelpLight": "#76843A",
-    "kelpDark": "#3F4A1E",
-    "holdfast": "#6A5434"
+    "kelp": "#5E4423",
+    "kelpLight": "#76572C",
+    "kelpDark": "#3E2C16",
+    "holdfast": "#5A4630"
   },
   "paletteLabels": {
     "kelp": "잎",

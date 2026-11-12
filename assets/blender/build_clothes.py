@@ -269,30 +269,58 @@ def build(ns):
             bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.calc_center_median().z < ankle], context='FACES')
             bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
             B.add(bm, lambda c, x=x, sx=sx: 'suitStripe' if c.z < ankle + 0.022 or ((c.x - x) * sx > 0.035 and abs(c.y) < half) else 'suit', leg_w(side))
-        # 물안경: 두 눈 앞 테 + 가운데 다리 + 머리 뒤로 두른 끈 (이마 위로 올리지 않는다)
-        EYES, hs, frame = ns['EYES'], ns['hs'], ns['surface_frame']
-        RW, RH = 0.062 * hs, 0.056 * hs
-        ends = {}
-        for side in ('L', 'R'):
-            p, n = EYES[side]
-            r_, u_ = frame(n)
-            c = p + n * 0.016 * hs
-            B.add(tube([c + r_ * math.cos(a) * RW + u_ * math.sin(a) * RH for a in (TAU * i / 16 for i in range(16))], [0.011 * hs] * 16, seg=6, closed=True), 'maskFrame', 'head')
-            B.add(ellipsoid(c + (r_ * 0.028 + u_ * 0.03) * hs + n * 0.004, (0.012 * hs, 0.004 * hs, 0.008 * hs), rot=ns['decal'](n), seg=8, rings=4), 'maskLens', 'head', outline=False)
-            ends[side] = (c - r_ * RW if side == 'L' else c + r_ * RW, c + r_ * RW if side == 'L' else c - r_ * RW)   # (안쪽 끝, 바깥 끝)
-        mid = (ends['L'][0] + ends['R'][0]) / 2 + V((0, -0.006, 0))
-        B.add(tube([ends['L'][0], mid, ends['R'][0]], [0.008 * hs] * 3, seg=6), 'maskFrame', 'head')
+        # 물안경 (M17-P1): 두 눈을 한 장으로 덮는 작은 마스크 — 얼굴 겉을 따라 도는 둥근 네모 테 + 코 위 홈 +
+        # 렌즈 반짝임 둘 + 머리 뒤로 두른 끈. 예전 두 고리 안경은 커서 「큰 안경」처럼 보였다 (이마 위로 올리지 않는다)
+        EYES, hs = ns['EYES'], ns['hs']
+        MR = tuple(r * 1.0 for r in HEAD_R)
+
+        def eye_angles(p):   # 머리 타원체에서 눈 자리의 (yaw, pitch)
+            d = p - HEAD_C
+            return math.atan2(d.x / MR[0], -d.y / MR[1]), math.asin(max(-1.0, min(1.0, d.z / MR[2])))
+        ey, ep = eye_angles(EYES['L'][0])
+        ey = abs(ey)
+        YW, PH = ey + prm('maskSide', 0.12), prm('maskHeight', 0.2)   # 테 반폭(yaw) · 반높이(pitch)
+        lift = 0.013 * hs
+
+        def mask_pt(t, grow=0.0):
+            c, s = math.cos(t), math.sin(t)
+            yaw = (YW + grow) * math.copysign(abs(c) ** 0.5, c)        # 둥근 네모 (superellipse k=4)
+            pit = (PH + grow) * math.copysign(abs(s) ** 0.5, s)
+            if s < 0:   # 아래 가운데는 코 위로 살짝 올라간 홈
+                pit += PH * 0.55 * math.exp(-(yaw / 0.14) ** 2) * min(1.0, -s * 2)
+            p, n = ell_point(HEAD_C, MR, yaw, ep + pit)
+            return p + n * lift, n
+        loop = [mask_pt(TAU * i / 28)[0] for i in range(28)]
+        B.add(tube(loop, [0.0105 * hs] * 28, seg=5, closed=True), 'maskFrame', 'head')
+        for sx in (1, -1):   # 렌즈 반짝임 (눈은 테 사이로 그대로 보인다)
+            p, n = ell_point(HEAD_C, MR, sx * ey * 0.55, ep + PH * 0.55)
+            B.add(ellipsoid(p + n * (lift + 0.002), (0.014 * hs, 0.004 * hs, 0.007 * hs), rot=ns['decal'](n), seg=8, rings=4), 'maskLens', 'head', outline=False)
+        endL, _ = mask_pt(0.0)
+        endR, _ = mask_pt(math.pi)
         SR = tuple(r * 1.02 for r in HR)
-        strap = [ell_point(HC, SR, 0.62 + (TAU - 1.24) * i / 12, 0.06 + 0.24 * math.sin(math.pi * i / 12))[0] for i in range(13)]
-        B.add(tube([ends['L'][1]] + strap + [ends['R'][1]], [0.008 * hs] * 15, seg=5), 'maskStrap', 'head')
-        # 등 공기통 (작은 노란 통 + 밸브) + 어깨 끈 둘
-        ty, tz0, tz1 = BODY_R[1] + 0.022, BODY_C.z - 0.05, bodyTop - 0.015
-        B.add(capsule(V((0, ty, tz0)), V((0, ty, tz1)), 0.05, seg=16, rings=8), 'tank', 'spine')
-        B.add(cone(V((0, ty, tz1 + 0.04)), V((0, ty, tz1 + 0.07)), 0.015, 0.015, seg=10), 'tankValve', 'spine')
-        B.add(cone(V((0, ty, tz1 + 0.07)), V((0, ty, tz1 + 0.08)), 0.026, 0.026, seg=10), 'tankValve', 'spine')
-        for sx in (1, -1):
-            pts = [V((sx * 0.045, ty - 0.03, tz1 - 0.02)), V((sx * 0.075, 0.03, bodyTop + 0.004)), front_point(sx * 0.075, bodyTop - 0.05, DS + 0.006)]
-            B.add(tube(pts, [0.009] * 3, seg=6), 'maskStrap', 'spine')
+        y0 = YW + 0.08
+        strap = [ell_point(HC, SR, y0 + (TAU - 2 * y0) * i / 12, ep + 0.05 + 0.2 * math.sin(math.pi * i / 12))[0] for i in range(13)]
+        B.add(tube([endL] + strap + [endR], [0.0075 * hs] * 15, seg=5), 'maskStrap', 'head')
+        # 등 공기통 (M17-P1): 등 곡면에 붙도록 높이마다 몸 뒤 겉(y)을 재서 기울여 세우고, 받침판 + 허리띠로 묶는다.
+        # 예전엔 곧게 세운 통이 등 윗부분에서 떨어져 옆에서 떠 보였다
+        def back_y(z, d):
+            Rz = (BODY_R[2] + d) * (0.82 if z < BODY_C.z else 1)
+            return (BODY_R[1] + d) * math.sqrt(max(0.0, 1 - ((z - BODY_C.z) / Rz) ** 2))
+        TR = prm('tankRadius', 0.044)
+        tz0, tz1 = BODY_C.z - 0.06, bodyTop - 0.045
+        sink = 0.012   # 통 앞면이 몸(받침판) 속으로 묻히는 깊이
+        a0, a1 = V((0, back_y(tz0, DS) + TR - sink, tz0)), V((0, back_y(tz1, DS) + TR - sink, tz1))
+        B.add(capsule(a0, a1, TR, seg=16, rings=8), 'tank', 'spine')
+        ax = (a1 - a0).normalized()
+        v0, v1 = a1 + ax * (TR + 0.004), a1 + ax * (TR + 0.03)
+        B.add(cone(v0, v1, 0.014, 0.014, seg=10), 'tankValve', 'spine')
+        B.add(cone(v1, v1 + ax * 0.012, 0.024, 0.024, seg=10), 'tankValve', 'spine')
+        torso(DS + 0.005, lambda c: c.y > BODY_R[1] * 0.45 and abs(c.x) < 0.06 and tz0 - 0.03 < c.z < tz1 + 0.02, 'maskStrap', seg=28, rings=18)   # 받침판
+        body_ring(BODY_C.z - 0.045, DS + 0.003, 0.009, 'maskStrap', seg=20)   # 허리띠 (통 아래쪽을 묶음)
+        for sx in (1, -1):   # 어깨 끈: 통 위 → 어깨 → 가슴 앞
+            top = a1 + V((sx * 0.035, -TR * 0.6, 0))
+            pts = [top, V((sx * 0.075, 0.03, bodyTop + 0.004)), front_point(sx * 0.075, bodyTop - 0.05, DS + 0.006), front_point(sx * 0.07, BODY_C.z - 0.045, DS + 0.006)]
+            B.add(tube(pts, [0.009] * 4, seg=6), 'maskStrap', 'spine')
     else:
         raise SystemExit(f'[clothes] 모르는 kind: {kind}')
 

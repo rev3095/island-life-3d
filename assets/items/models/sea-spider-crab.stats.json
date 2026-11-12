@@ -4,12 +4,12 @@
   "name": "키다리게",
   "group": "sea",
   "kind": "crab",
-  "version": "0.1",
+  "version": "0.2",
   "items": [
     "sea.spider-crab"
   ],
   "hold": true,
-  "triangles": 4408,
+  "triangles": 4120,
   "parts": 1,
   "materials": [
     "belly",
@@ -25,23 +25,23 @@
     "crab"
   ],
   "size": [
-    0.821,
-    0.603,
-    0.255
+    0.843,
+    0.62,
+    0.276
   ],
   "bounds": [
     [
-      -0.41,
-      -0.301,
-      -0.128
+      -0.422,
+      -0.31,
+      -0.138
     ],
     [
-      0.41,
-      0.301,
-      0.128
+      0.422,
+      0.31,
+      0.138
     ]
   ],
-  "glbBytes": 90840,
+  "glbBytes": 85436,
   "blender": "5.2.3 LTS",
   "renders": [
     "sea-spider-crab_main.png",
