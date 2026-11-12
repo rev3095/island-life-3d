@@ -1,0 +1,113 @@
+{
+  "kind": "hall",
+  "version": 1,
+  "status": "review",
+  "windows": [],
+  "door": {
+    "gx0": 5,
+    "gx1": 6
+  },
+  "size": [
+    12,
+    8
+  ],
+  "id": "RM-26",
+  "slug": "hall-bug",
+  "hall": "bug",
+  "cats": [
+    "bug"
+  ],
+  "name": "곤충관",
+  "wallpaper": "wp-06",
+  "floor": "fl-08",
+  "intro": "작은 온실이에요. 나비·풍뎅이·매미… 기증한 곤충이 흙과 잎 사이에 앉아 있어요.",
+  "note": "양쪽 벽 곤충 유리 상자(FU-42) 둘 · 가운데 화분 선반. 곤충은 아이템 표 순서로 (두 층).",
+  "furniture": [
+    {
+      "fu": "FU-42",
+      "name": "곤충 유리 상자",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-42",
+      "name": "곤충 유리 상자",
+      "gx": 10,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.flower-shelf",
+      "gx": 5,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.terrarium",
+      "gx": 3,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.terrarium",
+      "gx": 8,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 3,
+      "gz": 3,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 8,
+      "gz": 3,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 0,
+      "gz": 7,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 11,
+      "gz": 7,
+      "rot": 0,
+      "deco": true
+    }
+  ],
+  "racks": [
+    {
+      "cat": "bug",
+      "kind": "line",
+      "x0": 0.25,
+      "x1": 1.75,
+      "z0": 0.3,
+      "z1": 5.7,
+      "levels": [
+        0.16,
+        0.86
+      ]
+    },
+    {
+      "cat": "bug",
+      "kind": "line",
+      "x0": 10.25,
+      "x1": 11.75,
+      "z0": 0.3,
+      "z1": 5.7,
+      "levels": [
+        0.16,
+        0.86
+      ]
+    }
+  ]
+}

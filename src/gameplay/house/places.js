@@ -15,6 +15,7 @@ import { resolveFurniture, FACE, DEFAULT } from './interior.js';
 import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, EXHIBIT_KINDS, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
 import { createFurnitureKit } from './furniture.js';
 import { patternTexture } from './pattern.js';
+import { createMuseumHalls } from './museum-hall.js';   // 요청 9: 박물관 로비 아치로 들어가는 관 여섯 (RM-25–30)
 
 const PUSH_TIME = 0.2;
 const WALL_Y = 1.15;                    // 임시 벽 가구 아래 끝 높이 (visit.js 와 같다)
@@ -52,6 +53,9 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     try { rooms[kind] = makePlace(kind, await ctx.assets.loadJSON(PLACE_FILES[i])); }
     catch (e) { console.warn('[house] 실내 배치를 못 읽었어요', kind, e); }
   }));
+  // 요청 9 박물관 관: 로비(rooms.museum) 벽 아치 → 관 RM-25–30. 관 안에서도 P.where 는 'museum'
+  const halls = rooms.museum ? await createMuseumHalls(ctx, { H, P, kit, fixtures, interior, doors, saveSoon, lobby: () => rooms.museum, free: () => free() })
+    .catch(e => { console.warn('[house] 박물관 관을 못 만들었어요', e); return null; }) : null;
 
   /** 방 하나의 자리·충돌 (짓기는 처음 들어갈 때) */
   function makePlace(kind, spec) {
@@ -490,6 +494,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   /** quiet: 저장 불러오기 등으로 밖에 나와 있을 때 (자리를 옮기지 않는다). spot = 섬에 설 곳 (door.js — 문간) */
   function goOut({ quiet = false, spot = null } = {}) {
     const kind = P.where, R = rooms[kind];
+    if (kind === 'museum') halls?.drop();   // 요청 9: 관 안에서 밖으로 옮겨졌을 때
     P.where = null;
     S.place = null;
     player.camera?.setBounds?.(null);   // 범위를 먼저 풀어야 순간이동 때 카메라가 바로 섬으로 온다
@@ -515,7 +520,9 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     const p = state.player, lx = p.x - R.x0, lz = p.z - R.z0;
     const B = boundsOf(R.spec), m = doormatOf(R.spec);
     const ok = Number.isFinite(lx) && lx > B.x0 && lx < B.x1 && lz > B.z0 && lz < B.z1 && blockersOf(R.spec, R.list).every(b => !inBox(b, lx, lz));
+    const p0 = { x: p.x, z: p.z, facing: p.facing };
     goIn(kind, ok ? { lx, lz, facing: p.facing ?? 0 } : { lx: m.lx, lz: m.entry, facing: 0 });
+    if (kind === 'museum' && halls) await halls.resume(p0);   // 요청 9: 관 안에서 저장했으면 그 관으로
   }
 
   function update(dt) {
@@ -524,7 +531,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     const blocked = ctx.services.ui?.isBlocking?.() || input.enabled === false;
     const R = rooms[P.where];
     // 저장 불러오기·처음부터 하기로 플레이어가 방 밖에 옮겨졌으면 조용히 나온다
-    if (R && free()) {
+    if (R && free() && !halls?.inside) {   // 요청 9: 박물관 관 안은 로비 밖이어도 실내
       const p = player.position;
       if (Math.abs(p.x - R.origin.x) > R.w || Math.abs(p.z - R.origin.z) > R.d) goOut({ quiet: true });
     }
@@ -553,6 +560,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       if (ctx.quality !== 'min') for (const o of R.shown) o.tick?.(dt, now);   // 매우 낮음: 전시 물고기·곤충은 가만히
       R.room.setNight(ctx.services.time?.nightFactor ?? 0);
     }
+    halls?.update(dt);
   }
 
   const api = {
@@ -570,12 +578,14 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     /** 진열품·전시물 자리 (P45 「보기」·「살펴보기」 — 봇·점검이 앞에 서 볼 곳) → [{ id, group, x, z, exhibit? }] */
     shownSpots: kind => (rooms[kind]?.shown ?? []).filter(o => o.meta).map(o => ({ ...o.meta })),
     fixtures: () => fixtures.list.map(m => m.slug),
+    /** 요청 9 박물관 관 (museum-hall.js api) | null */
+    halls: halls?.api ?? null,
     placeholders: kind => (rooms[kind]?.list ?? []).filter(r => !r.real).map(r => r.fu ?? r.key),
   };
 
   return {
     get where() { return P.where; },
     enter, leave, resume, update, api,
-    doormat: () => (P.where ? api.info(P.where).doormat : null),
+    doormat: () => (P.where ? (halls?.inside ? halls.doormat() : api.info(P.where).doormat) : null),
   };
 }

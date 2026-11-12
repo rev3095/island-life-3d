@@ -4,36 +4,135 @@
   "kind": "place",
   "place": "museum",
   "name": "박물관",
-  "version": 2,
-  "status": "approved",
-  "note": "실내 검수 보드 D70-A · D71-A: 한 홀을 셋으로 — 왼쪽 벽 긴 수조(물고기), 오른쪽 벽 긴 유리 상자(곤충), 가운데 안쪽 받침 여덟(화석)과 공룡 모형. 입구 앞 안내대 뒤에 느루. 붙박이 모델(assets/furniture/fixtures): 안내대 FU-37 · 화석 받침 FU-38 · 긴 수조 FU-41 · 곤충 유리 상자 FU-42 (box·color·코드 상자는 모델을 못 읽을 때). 기증한 것만 그 자리에 아이템 모델이 놓인다.",
-  "size": [12, 8],
+  "version": 3,
+  "status": "review",
+  "note": "요청 9 재단장: 박물관 로비. 가운데 안내대(FU-37) 뒤 느루 — 기증·설명은 느루와 말할 때만. 벽마다 관 입구(아치) 여섯 halls[]: 서쪽 물고기관·바다 생물관, 동쪽 곤충관·미술관, 북쪽 화석관·별자리관. 아치 옆 안내판(행동 키 → 그 관 설명). 관 실내는 assets/interior/halls/*.json (RM-25–30, src/gameplay/house/museum-hall.js).",
+  "size": [
+    14,
+    9
+  ],
   "wallpaper": "wp-01",
   "floor": "fl-07",
-  "windows": ["n:5", "n:6"],
-  "door": { "gx0": 5, "gx1": 6 },
-  "keeper": { "slug": "neuru", "lx": 6, "lz": 3.45, "face": "s" },
-  "talk": { "lx": 6, "lz": 5.5 },
+  "windows": [
+    "n:6",
+    "n:7"
+  ],
+  "door": {
+    "gx0": 6,
+    "gx1": 7
+  },
+  "keeper": {
+    "slug": "neuru",
+    "lx": 7,
+    "lz": 4.45,
+    "face": "s"
+  },
+  "talk": {
+    "lx": 7,
+    "lz": 6.5
+  },
   "furniture": [
-    { "fu": "FU-37", "name": "안내대", "box": [2, 1, 0.6], "color": "#E9E2D2", "gx": 5, "gz": 4, "rot": 0, "role": "counter" },
-    { "item": "furn.dino-model", "gx": 5, "gz": 0, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 3, "gz": 0, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 4, "gz": 0, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 7, "gz": 0, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 8, "gz": 0, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 3, "gz": 2, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 4, "gz": 2, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 7, "gz": 2, "rot": 0 },
-    { "fu": "FU-38", "name": "화석 받침", "box": [1, 1, 0.55], "look": [0.62, 0.62], "color": "#E9E2D2", "gx": 8, "gz": 2, "rot": 0 },
-    { "item": "furn.plant-pot", "gx": 3, "gz": 6, "rot": 0, "deco": true },
-    { "item": "furn.plant-pot", "gx": 8, "gz": 6, "rot": 0, "deco": true },
-    { "item": "furn.picture-frame", "wall": "n", "slot": 3, "deco": true },
-    { "item": "furn.picture-frame", "wall": "n", "slot": 8, "deco": true }
+    {
+      "fu": "FU-37",
+      "name": "안내대",
+      "box": [
+        2,
+        1,
+        0.6
+      ],
+      "color": "#E9E2D2",
+      "gx": 6,
+      "gz": 5,
+      "rot": 0,
+      "role": "counter"
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 2,
+      "gz": 4,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 9,
+      "gz": 4,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 13,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 0,
+      "gz": 8,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 13,
+      "gz": 8,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.outdoor-bench",
+      "gx": 6,
+      "gz": 2,
+      "rot": 0
+    }
   ],
-  "cases": [
-    { "kind": "tank", "cat": "fish", "name": "긴 수조", "fixture": "long-tank", "lx0": 0.12, "lz0": 0.45, "lx1": 1.5, "lz1": 6.4, "h": 1.5, "levels": [0.45, 0.95] },
-    { "kind": "terrarium", "cat": "bug", "name": "곤충 유리 상자", "fixture": "long-terrarium", "lx0": 10.5, "lz0": 0.45, "lx1": 11.88, "lz1": 6.4, "h": 1.5, "levels": [0.16, 0.86] }
-  ],
-  "fossils": [[3.5, 0.5], [4.5, 0.5], [7.5, 0.5], [8.5, 0.5], [3.5, 2.5], [4.5, 2.5], [7.5, 2.5], [8.5, 2.5]],
-  "fossilY": 0.55
+  "cases": [],
+  "fossils": [],
+  "halls": [
+    {
+      "hall": "fish",
+      "wall": "w",
+      "at": 2.6,
+      "signSide": 1
+    },
+    {
+      "hall": "sea",
+      "wall": "w",
+      "at": 6.4,
+      "signSide": -1
+    },
+    {
+      "hall": "bug",
+      "wall": "e",
+      "at": 2.6,
+      "signSide": 1
+    },
+    {
+      "hall": "art",
+      "wall": "e",
+      "at": 6.4,
+      "signSide": -1
+    },
+    {
+      "hall": "fossil",
+      "wall": "n",
+      "at": 3.5,
+      "signSide": 1
+    },
+    {
+      "hall": "star",
+      "wall": "n",
+      "at": 10.5,
+      "signSide": -1
+    }
+  ]
 }
