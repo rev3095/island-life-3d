@@ -21,13 +21,18 @@
 - 진열표 데이터: `rules.json shop.phases·night·always` (`tool.scuba-kit` 은 items 에 값이 있을 때만), `economy.phase`·`hours`·`stock(dayKey, phase)`, `placedata.phaseGroups`.
 - 문 틀: `door.js through({ dir: 'pass' })` 방↔방 · `placedata` `phaseSpec`·`innerSpot`·`PLACE_PARENT`·`OUTER_KINDS`, `checkPlace` 가 딸린 방·실내 문 검사 · `places.js` 매장 갈래별 가구 묶음, 실내 문 처리기 `house-place-inner`(92), UI-31 이름표(오른쪽 위), `api.phase/inner/parentOf`.
 - 붙박이 Blender 6종 (status review): FU-79 진열 덮개 천 · FU-80 지하 계단 문 · FU-81 정원 코너 문 · FU-82 화분 선반 · FU-83 무인 계산함 · FU-84 등불 진열장.
-- 밤톨 대사 `nightShop` (bamtol.json v4). 테스트 479 통과 (places · night · interior 고침, elem-editor/files.json 에 새 방 파일).
+- 밤톨 대사 `nightShop` (bamtol.json v4). 시계 창·첫날 안내의 「상점 닫힘」 문구를 낮/밤 매장으로. elem-editor/files.json 에 새 방 파일.
+- main 두 번 합침 (9e87b99 · b355184): 밤 특별 상점 실내(RM-18–20) · 박물관 관 여섯(museum-hall.js 고리) · 내 집 증축 층 · M15 주민과 충돌 7+5 — 모두 둘 다 살림 (PLACE_KINDS 는 내 것 + P54 push, `OUTER_KINDS` 는 push 뒤에 셈 · `checkPlace` 는 딸린 방 `sub` + P54 `unattended` · 붙박이 목록 `--index` 다시 · 개수 박은 테스트는 main 값 + 이 브랜치 몫).
 
 ## 점검
 
 - `tools/check-interiors.mjs` 넓힘: ① 문 앞 행동 키를 눌러 **들어가지 않고 창·대화만 뜬 문 = 「팝업만」** 을 세어 0 이어야 통과 ② 이 트랙 몫 문(내 집·상점·박물관·주민 집)은 모든 시각에 실제로 들어가야 통과 (달빛 가게·천막 닫힘은 「닫힘 (밤 트랙 몫)」으로만) ③ 도토리상점 안에서 그 시각 매장의 실내 문 둘 — 열린 문은 실제 Space 로 딸린 방에 들어가 진열품 보기 전부·임시 상자 0·문 매트 행동 키로 1층에 돌아오는지, 닫힌 문은 「닫힘」 글자. 맨 끝 줄 「팝업만 뜬 문 N · 못 들어간 문 N · 상점 실내 문 문제 N」.
 - 봇: `skills.js` 상점 대화 「주문할래요」·탭 「주문」, `bot.exitRoom` 이 딸린 방이면 1층으로 먼저.
 - 개발 서버(4267)에서 실제 키로: 밤 11시 상점 문 → 밤 매장(덮개 천·이름표 UI-31) → 「지하 밤 코너로」 → 코코아 보기 → 사기(「값은 무인 계산함에」) → 지하에서 저장·새로고침 이어 하기 → 「1층으로」 → 섬. 이때 찾은 것 둘 고침: 진열이 묶음 이름 `furniture` 만 가구로 봐서 `indoor`·`outdoor`·`night-furniture` 가 빠짐 · 딸린 방에서 이어 하면 1층을 안 지어 돌아갈 때 오류.
+
+- 결과 (합치기 전): 실내 점검 문제 0 · 자동 플레이 30✅ 0🟡 0⛔ · 콘솔 오류 0. (b355184 합친 뒤): 테스트 525 중 524 통과 · 실패 0 · 실내 점검(포트 4271) 팝업만 0 · 이 트랙 몫 못 들어간 문 0 · 상점 실내 문 6/6 · 박물관 관 18/18 · 밤 새 건물 들어감 · `--home` 내 집 0–3단계 계단 ✅ · 콘솔 오류 0.
+- **main 쪽 고장 하나 고침**: main 의 `tests/playthrough/scenario.js` 가 585c28a(박물관 트랙 합치기)부터 문법 오류 — 142b6d3 합치기에서 `stars`·`daily` 단계 끝 `});` 둘이 빠져 `night-shops`·`villagers-close` 단계가 그 안에 들어감. 그래서 자동 플레이 화면이 안 떠 「보고서를 못 받았어요 (상태 loading)」. 이 브랜치에서 `});` 둘만 넣음 (main 도 같은 두 줄을 넣으면 합칠 때 그대로 맞음).
+- 포트 주의: 4266 은 잠수 트랙 자동 플레이, 4269 는 박물관 트랙 개발 서버가 같이 써서 그쪽 코드를 본 거짓 실패가 났다 — 점검은 빈 포트(4271)로.
 
 ## 남은 것 · 제안
 
