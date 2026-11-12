@@ -1,0 +1,114 @@
+{
+  "id": "IC-AR-01",
+  "slug": "art-sea-morning",
+  "name": "「아침 바다의 돛」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.sea-morning",
+      "code": "IC-AR-01",
+      "variant": "real"
+    },
+    {
+      "item": "art.sea-morning-fake",
+      "code": "IC-AR-01",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "맑은 아침 하늘 아래 잔잔한 바다, 흰 돛을 단 작은 배 한 척과 떠오른 해. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "아침 바다",
+      "작은 돛단배",
+      "노란 해"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "sea",
+      "wave",
+      "sun",
+      "sunGlow",
+      "boat",
+      "sail"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "sea",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#CFE9F5",
+    "sea": "#4E9AD0",
+    "wave": "#FFFFFF",
+    "sun": "#F6C84C",
+    "sunGlow": "#FBE7A6",
+    "boat": "#9A6B45",
+    "sail": "#FBF7F2",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "하늘",
+    "sea": "바다",
+    "wave": "물결",
+    "sun": "해",
+    "sunGlow": "햇무리",
+    "boat": "배",
+    "sail": "돛",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "sun": "#E8604F"
+      }
+    }
+  }
+}

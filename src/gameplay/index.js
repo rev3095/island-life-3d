@@ -14,12 +14,13 @@ const PARTS = [
   ['night', './night/index.js'],         // M12 밤·새벽: 야시장 · 달빛 가게 · 새벽 천막 타로 · 야행성 주민 (assets/night/, 보드 night)
   ['tour', './tour/index.js'],           // P35 무인도 투어 (assets/tour/, 보드 tour D120–D128)
   ['journal', './journal/index.js'],     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)
+  ['daily', './daily/index.js'],         // M13-P2–P5 매일 할 거리: 유성우·소원 · 선물 풍선·새총 · 유리병·레시피 · 방문 행상 (assets/daily/, D142–D147 A)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */
 export const INTENT_LABEL = { action: '행동', pickup: '줍기' };
 /** 맨손이 아닐 때 행동 키 = 든 도구 쓰기 */
-export const TOOL_LABEL = { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기' };
+export const TOOL_LABEL = { rod: '낚시', net: '채집', shovel: '파기', axe: '찍기', can: '물 주기', sling: '쏘기' };
 /**
  * 처리기 이름 → 버튼 글자 (문자열 또는 (대상, ctx) → 문자열). 처리기가 스스로 label 을 주면 그것이 먼저다.
  * '' = 누르면 아무 일도 없다 (화면은 기본 글자)

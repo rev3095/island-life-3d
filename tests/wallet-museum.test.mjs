@@ -66,7 +66,8 @@ test('박물관: progress', () => {
   assert.deepEqual(p.fish, [0, 22]);   // + P35 무인도 물고기 둘
   assert.deepEqual(p.bug, [2, 24]);    // + P35 무인도 곤충 둘
   assert.deepEqual(p.fossil, [0, 8]);
-  assert.deepEqual(p.total, [2, 54]);
+  assert.deepEqual(p.art, [0, 16]);   // P54 미술품 진품 16 (가품은 안 받음)
+  assert.deepEqual(p.total, [2, 70]);
   assert.equal(p.complete, false);
 });
 

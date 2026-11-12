@@ -1,0 +1,93 @@
+{
+  "id": "IC-AR-13",
+  "slug": "art-big-acorn",
+  "name": "「큰 도토리 조각」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.big-acorn",
+      "code": "IC-AR-13",
+      "variant": "real"
+    },
+    {
+      "item": "art.big-acorn-fake",
+      "code": "IC-AR-13",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "매끈하게 깎은 큰 도토리. 비늘 무늬 모자와 짧은 꼭지. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "큰 도토리",
+      "비늘 무늬 모자",
+      "나무 조각"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "조각",
+      "value": "acorn",
+      "options": [
+        "frog",
+        "spiral",
+        "acorn",
+        "bird",
+        "bust",
+        "tower"
+      ]
+    }
+  },
+  "palette": {
+    "nut": "#C98A4E",
+    "cap": "#7A5238",
+    "capDark": "#5A3A26",
+    "base": "#CFC8BC",
+    "baseDark": "#A79F92",
+    "plate": "#D9A84E"
+  },
+  "paletteLabels": {
+    "nut": "도토리 알",
+    "cap": "모자",
+    "capDark": "모자 비늘",
+    "base": "받침 돌",
+    "baseDark": "받침 테",
+    "plate": "이름표"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "cap": "#B8503E"
+      }
+    }
+  }
+}

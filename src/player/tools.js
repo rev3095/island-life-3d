@@ -55,6 +55,17 @@ export function buildTool(ctx, id) {
       tip(0, 0.165, 0.166);
       break;
     }
+    case 'sling': {   // M13 TO-07 새총: Y 자 가지 + 고무줄 (손잡이 아래가 원점)
+      stick(0.2, 0.02, '#B07A4A');
+      for (const s of [1, -1]) {
+        add(new THREE.CylinderGeometry(0.014, 0.017, 0.16, 6), '#B07A4A', s * 0.04, 0.27, 0, 0, 0, -s * 0.5);
+        add(new THREE.CylinderGeometry(0.018, 0.018, 0.02, 6), '#E8604F', s * 0.075, 0.34, 0);
+      }
+      add(new THREE.BoxGeometry(0.15, 0.008, 0.008), '#E8604F', 0, 0.34, 0.02);
+      add(new THREE.SphereGeometry(0.022, 8, 6), '#8A5A3A', 0, 0.34, 0.03);
+      tip(0, 0.36, 0.03);
+      break;
+    }
     default: return null;
   }
   if (GRIP[id]) g.rotation.set(...GRIP[id]);

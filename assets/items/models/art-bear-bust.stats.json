@@ -1,0 +1,52 @@
+{
+  "id": "IC-AR-15",
+  "slug": "art-bear-bust",
+  "name": "「곰 흉상」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.bear-bust",
+    "art.bear-bust-fake"
+  ],
+  "hold": false,
+  "triangles": 1720,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "marble",
+    "marbleDark",
+    "plate"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.48
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.48
+    ]
+  ],
+  "glbBytes": 35040,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-bear-bust_fake_main.png",
+    "art-bear-bust_fake_thumb.png",
+    "art-bear-bust_main.png",
+    "art-bear-bust_real_main.png",
+    "art-bear-bust_real_thumb.png",
+    "art-bear-bust_thumb.png"
+  ]
+}

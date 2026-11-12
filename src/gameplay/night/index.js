@@ -8,6 +8,9 @@
 //  - D108·D110 야행성 주민: 달무리 시간표(assets/villagers/dalmuri.json, 19–5시 깨어 있음)는 town 이 그대로 돌리고, 낮엔 문 옆에 「자는 중」 쪽지 PR-32,
 //    밤에 처음 놀러 가면 마음 +.
 //  - D113 행사 날(불꽃놀이·수확 잔치)·섬 축제 날엔 야시장만 쉰다. D114 밤 콘텐츠는 첫날 안내를 마친 다음 날부터.
+//  - P54 밤 특별 상점 (D165–D169, docs/notes/night-special.md): 운세 부스 BD-15 (20–3시 광장 남서쪽, 여명이 저녁엔 여기서 카드) ·
+//    수상한 여우 상인 BD-14 (가끔 오는 밤, 실내 RM-18 에서 미술품 2–3점 · 진품·가품 섞임 · 감정 대사) · 이상한 천막 BD-13 (가끔, 주인 없이 받침 하나) ·
+//    선물 상자 PR-35 (낮·밤, 섬 풀밭 어딘가 — 열면 미술품·가구·도토리). 서는 날·진열은 rules.js 의 (섬 씨앗 · 날) 난수로 정해진다.
 // 시각은 언제나 ctx.services.time.now() (섬폰 시계 바늘이 옮긴 시각 그대로). 저장 칸 state.night (이 모듈 몫). 약속 docs/CONTRACTS.md 「밤」.
 import * as R from './rules.js';
 import { openDraw, createFortuneChip, openFortune, ensureNightCss } from './ui.js';
@@ -19,7 +22,8 @@ const DESK_DIST = 2.6;     // 실내 말 거는 자리 → 주인 (keepers.js �
 const STALL_CLEAR = 2.2;   // 노점 앞 비워 둘 거리 (주민이 서지 않는다)
 const DOOR_CLEAR = 1.6;
 const FAR = 6;            // 새벽 천막 ↔ 달빛 가게 (칸)
-const DEFAULT_LOT = { 'night-shop': [4, 3], 'dawn-tent': [3, 3] };
+const DEFAULT_LOT = { 'night-shop': [4, 3], 'dawn-tent': [3, 3], 'fortune-booth': [3, 3], 'fox-shop': [3, 3], 'odd-tent': [3, 3] };
+const GIFT_NEAR = 1.3;     // 선물 상자 열기 거리
 
 let N = null;
 
@@ -35,6 +39,9 @@ function createNight(ctx, cfg) {
     s.friend ??= null;    // 타로 「친구」 받은 날
     s.acorns ??= null;    // 타로 「도토리」 받은 날
     s.market ??= null;    // 야시장 알림을 보낸 날
+    s.visit ??= {};       // P54 여우 상인·이상한 천막이 마지막으로 선 날 { foxshop: dayKey, oddtent: dayKey }
+    s.fox ??= {};         // 여우 상인에게 산 것 { day, ids: [] }
+    s.gift ??= {};        // 선물 상자 { day, spot: {tx, tz, x, z}, opened }
     return s;
   };
   const cards = cfg.tarot.cards;
@@ -57,13 +64,13 @@ function createNight(ctx, cfg) {
   }
 
   // ── 건물 자리 ──
-  const placed = { moonshop: null, tent: null, sleepNotes: new Map(), market: null };   // 섬에 놓은 world 물체 id
+  const placed = { moonshop: null, tent: null, fortune: null, foxshop: null, oddtent: null, gift: null, sleepNotes: new Map(), market: null };   // 섬에 놓은 world 물체 id
   const lotOf = async kind => {
     try { const sp = await ctx.assets.loadEnvSpec(kind); if (Array.isArray(sp?.world?.lot)) return sp.world.lot; } catch { /* 모델이 아직 없으면 기본 */ }
     return DEFAULT_LOT[kind] ?? [3, 3];
   };
   /** 칸 검사 — mode 'floor' 건물 바닥 (풀밭 · 단단한 물체 없음 · 다른 건물 문 앞마당 밖) · 'open' 둘레 (걸을 수 있는 땅) · 'clear' 문 앞 (걸을 수 있고 물체 없음) */
-  function cellFn(mode) {
+  function cellFn(mode, grounds = ['grass']) {   // P54: grounds = 바닥으로 쓸 땅 (이상한 천막은 모래밭도)
     const W = world(), I = isl(), doors = R.doorsOf(W.places);
     const hard = (tx, tz) => W.objects.on?.(tx, tz)?.some(o => !R.SOFT_KINDS.has(o.kind)) ?? !!W.objects.at(tx, tz);
     return (tx, tz) => {
@@ -72,7 +79,7 @@ function createNight(ctx, cfg) {
       if (k === 'water' || k === 'sea' || k === 'cliff' || k === 'ramp') return false;
       if (mode === 'open') return true;   // 둘레엔 나무가 있어도 된다
       if (mode === 'clear') return !hard(tx, tz);   // 문 앞: 단단한 물체 없음 (꽃·잡초는 밟고 지나간다)
-      return k === 'grass' && !hard(tx, tz) && !R.nearDoor(doors, c);
+      return grounds.includes(k) && !hard(tx, tz) && !R.nearDoor(doors, c);
     };
   }
   /** 건물 기준점: 달빛 가게 = 광장에서 offset 칸 (동쪽), 천막 = 섬 동쪽 끝 쪽 */
@@ -82,17 +89,27 @@ function createNight(ctx, cfg) {
       const p = W.places.plaza, [ox, oz] = cfg.shop.offset ?? [17, -13];
       return { x: p.x + ox, z: p.z + oz };   // 광장 북쪽 언덕 (보드 D109-A 는 「동쪽 언덕」 — 동쪽 언덕엔 3×3 빈 곳이 없어 박물관 서쪽 언덕)
     }
+    if (kind === 'fortune') {   // P54 운세 부스: 광장 남서쪽
+      const p = W.places.plaza, [ox, oz] = cfg.fortune.offset ?? [-12, 8];
+      return { x: p.x + ox, z: p.z + oz };
+    }
+    const sp = kinds[kind]?.spot;   // P54 여우 상인(서쪽) · 이상한 천막(북서쪽): 섬 크기 비율
+    if (Array.isArray(sp)) return { x: I.w * sp[0], z: I.h * sp[1] };
     return { x: I.w * 0.29, z: I.h * 0.26 };   // 섬 가운데가 (0,0) — 남동쪽 숲 끝 (보드 D111-A)
   }
   async function spotOf(kind, building) {
+    // P54: 앞 순서 건물(달빛 가게·새벽 천막…)의 자리를 먼저 정해 둔다 — 아직 안 선 건물 자리를 새 건물이 가로채지 않게
+    for (const k of NIGHT_PLACES.slice(0, NIGHT_PLACES.indexOf(kind))) if (!st().spots[k]) await spotOf(k, kinds[k].building);
     const s = st().spots[kind];
-    const free0 = cellFn('floor');
-    // 천막은 달빛 가게와 떨어져 숲 끝에 (FAR 칸 안쪽은 건물 바닥으로 안 씀)
-    const other = kind === 'tent' ? st().spots.moonshop : null, I = isl();
-    const free = other ? (tx, tz) => free0(tx, tz) && Math.hypot(I.toWorld(tx, tz).x - other.x, I.toWorld(tx, tz).z - other.z) > FAR : free0;
+    const free0 = cellFn('floor', kinds[kind]?.ground);
+    // 다른 밤 건물(지금 서 있지 않아도 자리를 정해 둔 것)과 떨어지게 (FAR 칸 안쪽은 건물 바닥으로 안 씀) — 천막은 달빛 가게와, P54 건물은 서로·모두와
+    // 앞 순서(NIGHT_PLACES: 달빛 가게 → 천막 → 운세 부스 → 여우 → 이상한 천막)의 정해 둔 자리 + 지금 서 있는 건물만 피한다 (뒤 순서끼리 서로 막아 둘 다 못 서는 일이 없게)
+    const order = NIGHT_PLACES.indexOf(kind);
+    const I = isl(), others = Object.entries(st().spots).filter(([k, v]) => k !== kind && v && (NIGHT_PLACES.indexOf(k) < order || placed[k])).map(([, v]) => v);
+    const free = others.length ? (tx, tz) => free0(tx, tz) && others.every(o => Math.hypot(I.toWorld(tx, tz).x - o.x, I.toWorld(tx, tz).z - o.z) > FAR) : free0;
     if (s && occupiedOk(s, free)) return s;
     const lot = await lotOf(building);
-    const spot = R.buildingSpot(anchorOf(kind), lot, { isFree: free, isOpen: cellFn('open'), isClear: cellFn('clear'), levelAt: (tx, tz) => I.levelAt(tx, tz), toTile: I.toTile, toWorld: I.toWorld, reach: 18 });
+    const spot = R.buildingSpot(anchorOf(kind), lot, { isFree: free, isOpen: cellFn('open'), isClear: cellFn('clear'), levelAt: (tx, tz) => I.levelAt(tx, tz), toTile: I.toTile, toWorld: I.toWorld, reach: kinds[kind]?.reach ?? 18 });
     if (spot) st().spots[kind] = spot;
     return spot;
   }
@@ -102,21 +119,27 @@ function createNight(ctx, cfg) {
     return true;
   }
   const pending = new Set();
-  async function putBuilding(kind, building) {
-    if (placed[kind] || pending.has(kind)) return;
+  const warned = new Set();
+  let placing = Promise.resolve();   // P54: 건물 자리 찾기를 하나씩 (같은 틱에 둘이 같은 자리를 고르지 않게 — 앞 건물 자리가 st().spots 에 들어간 뒤 다음)
+  function putBuilding(kind, building) {
+    if (placed[kind] || pending.has(kind)) return placing;
     pending.add(kind);
-    try {
+    placing = placing.then(() => placeOne(kind, building)).catch(e => console.warn('[night] 건물을 못 놓았어요', kind, e)).finally(() => pending.delete(kind));
+    return placing;
+  }
+  async function placeOne(kind, building) {
+    {
       const W = world();
       if (!W?.objects) return;
       const s = await spotOf(kind, building);
-      if (!s) { console.warn('[night] 건물 자리를 못 찾았어요', kind); return; }
+      if (!s) { if (!warned.has(kind)) { warned.add(kind); console.warn('[night] 건물 자리를 못 찾았어요 (섬에 빈 곳이 없음)', kind); } return; }
       const t = isl().toTile(s.x, s.z);
       const id = W.objects.add(building, t.tx, t.tz, { persist: false, at: { x: s.x, z: s.z } });
       if (!id) return;
       placed[kind] = id;
       const tile = isl().toTile(s.door.x, s.door.z);
       W.places[kind] = { x: s.x, z: s.z, door: { ...s.door }, tx: tile.tx, tz: tile.tz };
-    } finally { pending.delete(kind); }
+    }
   }
   function takeBuilding(kind) {
     if (!placed[kind]) return;
@@ -196,10 +219,13 @@ function createNight(ctx, cfg) {
 
   // ── 가게 주인 (CH-14 별밤 · CH-15 여명) ──
   const keepers = {};   // kind → { actor, person }
-  const kinds = { moonshop: cfg.shop, tent: cfg.tent };
+  const kinds = { moonshop: cfg.shop, tent: cfg.tent, fortune: cfg.fortune, foxshop: cfg.fox, oddtent: cfg.odd };   // P54: 운세 부스 · 여우 상인 · 이상한 천막
+  const NIGHT_PLACES = Object.keys(kinds).filter(k => kinds[k]);
+  const KEEPER_PLACES = NIGHT_PLACES.filter(k => kinds[k].keeper);
   async function keeperOf(kind) {
     const c = kinds[kind];
     if (keepers[kind]) return keepers[kind];
+    if (!c?.keeper) return null;
     const L = cfg.lines[c.keeper];
     const person = { slug: c.keeper, name: L.name, color: L.color, voice: L.voice };
     keepers[kind] = { person, actor: null, loading: createActor(ctx, c.keeper).then(a => { keepers[kind].actor = a; a.setOpacity(0); a.root.visible = false; return a; })
@@ -208,7 +234,7 @@ function createNight(ctx, cfg) {
   }
   async function showKeeper(kind) {
     const K = await keeperOf(kind);
-    const a = await K.loading;
+    const a = await K?.loading;
     const spot = S().house?.places?.info?.(kind)?.keeper;
     if (!a || !spot) return;
     a.root.visible = true;
@@ -234,8 +260,29 @@ function createNight(ctx, cfg) {
     const c = kinds[kind];
     if (!c) return {};
     const have = id => !!S().data?.items?.get?.(id);
+    if (kind === 'foxshop') return { art: foxLeft(), furniture: (c.stock ?? []).filter(have) };   // P54 받침 셋에 미술품, 앞에 여우불 등
+    if (kind === 'oddtent') { const o = oddToday(); return o && have(o.id) && !holding(o.id) ? { [o.group]: [o.id] } : {}; }
     return { furniture: (c.stock ?? []).filter(have) };
   }
+
+  // ── P54 미술품 · 여우 상인 · 이상한 천막 · 선물 상자 (D165–D169) ──
+  const seed = () => ctx.state.island?.seed ?? 0;
+  /** 진품 16점 + 가품 id (가품이 있는 작품만) */
+  function works() {
+    const it = S().data?.items;
+    return (it?.list?.('art') ?? []).map(a => ({ id: a.id, fake: it.get(`${a.id}-fake`) ? `${a.id}-fake` : null }));
+  }
+  const holding = id => (S().data?.inventory?.slots ?? []).some(x => x?.id === id);
+  const forced = {};   // 점검용 (debug.force) — 저장하지 않는다
+  /** 그 가게가 오늘 오나 (여우 상인 · 이상한 천막) — 여우는 열린 첫날 밤 꼭, 천막은 열린 날부터 센다 */
+  const visits = (kind, n = now()) => !!forced[kind] || (!!n && R.visitsToday(n.dayKey, seed(), kinds[kind], { last: st().visit[kind] ?? null, since: kind === 'foxshop' ? null : introDay() }));
+  function foxToday(n = now()) { return n ? R.foxStock(works(), n.dayKey, seed(), cfg.fox) : []; }
+  /** 오늘 아직 안 판 미술품 (산 것 · 지금 가방에 있는 것은 받침에서 뺀다) */
+  function foxLeft(n = now()) {
+    const sold = st().fox.day === n?.dayKey ? st().fox.ids ?? [] : [];
+    return foxToday(n).filter(id => !sold.includes(id) && !holding(id));
+  }
+  function oddToday(n = now()) { return n ? R.oddStock(works(), n.dayKey, seed(), cfg.odd) : null; }
 
   // 달빛 가게 안에서만: 곤충을 팔 때 +20% (data.luck — 타로 보너스에 더한다)
   let shopBonus = null;
@@ -261,19 +308,102 @@ function createNight(ctx, cfg) {
     } else await say(L.bye);
   }
 
-  async function talkTent() {
-    const n = now(), s = st(), K = await keeperOf('tent'), L = cfg.lines.yeomyeong, say = speak(K.person);
-    if (!s.met.yeomyeong) { s.met.yeomyeong = n.dayKey; await say(L.first); ctx.events.emit('night:met', { slug: 'yeomyeong' }); }
+  /** 여명 (새벽 천막 3–5시 · P54 운세 부스 20–3시): 카드 뽑기 UI-20 은 하루 한 장을 둘이 같이 쓴다 */
+  async function talkTent(kind = 'tent') {
+    const n = now(), s = st(), K = await keeperOf(kind), L = cfg.lines.yeomyeong, say = speak(K.person);
+    const c = kinds[kind], booth = kind === 'fortune', goods = booth ? '물건 보기' : '수정 구슬 보기';
+    const openGoods = () => S().ui.shop.open({ stock: stockGroups(kind).furniture, title: c.name, keeper: K.person.name, color: K.person.color, greet: booth ? L.goods ?? '' : ' 별을 담은 구슬이란다스르륵.' });
+    if (!s.met.yeomyeong) { s.met.yeomyeong = n.dayKey; await say(booth ? L.firstBooth ?? L.first : L.first); ctx.events.emit('night:met', { slug: 'yeomyeong' }); }
     if (!R.canDraw(s.tarot, n.dayKey)) {
-      const a = await say([...L.already], ['수정 구슬 보기', '그만']);
-      if (a === 0) await S().ui.shop.open({ stock: stockGroups('tent').furniture, title: cfg.tent.name, keeper: K.person.name, color: K.person.color, greet: ' 별을 담은 구슬이란다스르륵.' });
+      const a = await say([...L.already], [goods, '그만']);
+      if (a === 0) await openGoods();
       return;
     }
-    const a = await say([pick(L.greet)], ['카드 뽑기', '수정 구슬 보기', '그만']);
-    if (a === 1) { await S().ui.shop.open({ stock: stockGroups('tent').furniture, title: cfg.tent.name, keeper: K.person.name, color: K.person.color, greet: ' 별을 담은 구슬이란다스르륵.' }); return; }
+    const a = await say([pick(L.greet)], ['카드 뽑기', goods, '그만']);
+    if (a === 1) { await openGoods(); return; }
     if (a !== 0) { await say(L.bye); return; }
     const id = await draw(n);
     if (id) await say([pick(L.after)]);
+  }
+
+  /** P54 여우 상인 살랑 (CH-17): 오늘의 미술품 고르기 → 감정 대사 → 값 → 사기 (한 밤에 perNight 점). 여우불 등은 상점 창 */
+  async function talkFox() {
+    const n = now(), s = st(), K = await keeperOf('foxshop'), L = cfg.lines.salang, say = speak(K.person), d = S().data, ui = S().ui, c = cfg.fox;
+    if (!s.met.salang) { s.met.salang = n.dayKey; await say(L.first); ctx.events.emit('night:met', { slug: 'salang' }); }
+    const a = await say([pick(L.greet)], L.menu);
+    if (a === 1) { await ui.shop.open({ stock: stockGroups('foxshop').furniture, title: c.name, keeper: K.person.name, color: K.person.color, greet: ' 여우불은 밤길 친구지콩.' }); return; }
+    if (a !== 0) { await say(L.bye); return; }
+    if (s.fox.day !== n.dayKey) s.fox = { day: n.dayKey, ids: [] };
+    if (s.fox.ids.length >= (c.perNight ?? 1)) { await say(L.soldOut); return; }
+    const left = foxLeft(n);
+    if (!left.length) { await say(L.empty); return; }
+    const i = await say([L.pickAsk], [...left.map(id => d.items.get(id)?.name ?? id), '그만']);
+    const id = left[i];
+    if (!id) { await say(L.bye); return; }
+    const it = d.items.get(id), fill = t => t.replaceAll('{name}', it.name).replaceAll('{price}', Number(it.buy).toLocaleString('ko-KR'));
+    const ok = await say([fill(pick(it.fake ? L.fake : L.real)), fill(L.price)], ['살게요', '그만둘래요']);
+    if (ok !== 0) { await say(L.bye); return; }
+    const fits = d.inventory?.canFit ? d.inventory.canFit(id, 1) > 0 : !d.inventory?.isFull?.();
+    if (!fits) { await say(L.full); return; }
+    if (!d.wallet.spend(it.buy)) { await say(L.money); return; }
+    if (!(d.inventory.add(id, 1) > 0)) { d.wallet.add(it.buy); await say(L.full); return; }
+    s.fox.ids.push(id);
+    ctx.events.emit('sfx', { name: 'acorn' });
+    ui.toast?.(`${it.name}을(를) 샀어요`, it.icon);
+    ctx.events.emit('night:art', { id, fake: !!it.fake, from: 'fox' });
+    await say([pick(L.bought)]);
+  }
+
+  // ── P54 선물 상자 PR-35 (D169-A): 낮·밤, 오늘 섬 풀밭 어딘가에 하나 ──
+  const giftToday = (n = now()) => (n && isOpen(n) ? R.giftPlan(works(), n.dayKey, seed(), cfg.gift) : { today: false, contents: null });
+  function giftSpot(n) {
+    const g = st().gift;
+    if (g.day === n.dayKey && g.spot) return g.spot;
+    const W = world(), I = isl(), doors = R.doorsOf(W.places), spots = Object.values(st().spots).filter(Boolean);
+    const ok = (tx, tz) => {
+      if (I.tileAt(tx, tz) !== 'grass' || W.objects.at(tx, tz)) return false;
+      const c = I.toWorld(tx, tz);
+      return I.isWalkable(c.x, c.z) && !R.nearDoor(doors, c) && spots.every(o => Math.hypot(c.x - o.x, c.z - o.z) > 4);
+    };
+    const cell = R.pickCell(R.rngOf(seed(), n.dayKey, 'gift-spot'), I.w, I.h, ok);
+    if (!cell) return null;
+    const c = I.toWorld(cell.tx, cell.tz);
+    st().gift = { day: n.dayKey, spot: { tx: cell.tx, tz: cell.tz, x: c.x, z: c.z }, opened: false };
+    return st().gift.spot;
+  }
+  function syncGift(n) {
+    const want = giftToday(n).today && !(st().gift.day === n.dayKey && st().gift.opened);
+    if (want && !placed.gift) {
+      const sp = giftSpot(n);
+      if (!sp) return;
+      const id = world().objects.add(cfg.gift.prop, sp.tx, sp.tz, { persist: false, at: { x: sp.x, z: sp.z }, rot: 0 });
+      if (id) placed.gift = { id, x: sp.x, z: sp.z, day: n.dayKey };
+    } else if (placed.gift && (!want || placed.gift.day !== n.dayKey)) {
+      world()?.objects?.remove(placed.gift.id);
+      placed.gift = null;
+    }
+  }
+  function giftInFront() {
+    const g = placed.gift, p = S().player?.position, pl = S().player;
+    if (!g || !p || S().house?.where) return null;
+    const dx = g.x - p.x, dz = g.z - p.z, dist = Math.hypot(dx, dz);
+    if (dist > GIFT_NEAR) return null;
+    return dist < 0.5 || (dx * -Math.sin(pl.facing) + dz * -Math.cos(pl.facing)) / dist > 0.3 ? g : null;
+  }
+  function openGift() {
+    const n = now(), d = S().data, L = cfg.lines.gift, got = giftToday(n).contents;
+    if (!got) return;
+    if (got.kind === 'acorns') { d.wallet.add(got.n); toast(L.acorns.replace('{n}', got.n), '🎁'); }
+    else {
+      const it = d.items.get(got.id);
+      if (!it || !(d.collect(got.id, 1)?.added > 0)) { toast(L.full, '🎒'); return; }
+      toast((got.kind === 'art' ? L.art : L.item).replace('{name}', it.name), it.icon);
+      if (got.kind === 'art') ctx.events.emit('night:art', { id: got.id, fake: !!it.fake, from: 'gift' });
+    }
+    ctx.events.emit('sfx', { name: 'pickup' });
+    st().gift.opened = true;
+    ctx.events.emit('night:gift', { dayKey: n.dayKey, contents: got });
+    syncGift(n);
   }
 
   /** UI-20 카드 뽑기 → 카드 id | null. 고르면 다음 게임 날 하루 동안 기운 */
@@ -330,17 +460,18 @@ function createNight(ctx, cfg) {
   // ── 실내 계산대 · 탁자 앞 (달빛 가게 · 천막) ──
   function deskInFront() {
     const where = S().house?.where;
-    if (where !== 'moonshop' && where !== 'tent') return null;
+    if (!KEEPER_PLACES.includes(where)) return null;
     const info = S().house?.places?.info?.(where), p = S().player?.position;
     if (!info?.keeper || !p) return null;
-    return Math.hypot(info.keeper.x - p.x, info.keeper.z - p.z) < DESK_DIST ? where : null;
+    const nearTalk = info.talk && Math.hypot(info.talk.x - p.x, info.talk.z - p.z) < 0.9;   // P54 운세 탁자(2×2)처럼 말 거는 자리가 주인에게서 먼 곳도
+    return nearTalk || Math.hypot(info.keeper.x - p.x, info.keeper.z - p.z) < DESK_DIST ? where : null;
   }
   /** 섬에서 달빛 가게·천막 문 앞 */
   function doorInFront() {
     if (S().house?.where) return null;
     const p = S().player?.position, pl = S().player;
     if (!p) return null;
-    for (const kind of ['moonshop', 'tent']) {
+    for (const kind of NIGHT_PLACES) {
       const d = placed[kind] && world().places[kind]?.door;
       if (!d) continue;
       const dx = d.x - p.x, dz = d.z - p.z, dist = Math.hypot(dx, dz);
@@ -363,6 +494,16 @@ function createNight(ctx, cfg) {
     if (tentNow) { putBuilding('tent', cfg.tent.building); if (last.tentOpen === false) toast('숲 끝에 안개가 끼었어요… 무언가 나타났어요', '🌫️'); }
     else takeBuilding('tent');
     last.tentOpen = tentNow;
+    // P54 운세 부스 (매일 밤) · 여우 상인 · 이상한 천막 (오는 밤만) — 영업 시간에만 선다
+    for (const [kind, msg] of [['fortune', null], ['foxshop', cfg.lines.fox?.toast], ['oddtent', cfg.lines.odd?.toast]]) {
+      const c = kinds[kind];
+      const up = open && R.placeOpen(c, n.hourF) && (kind === 'fortune' || visits(kind, n));
+      if (up) {
+        putBuilding(kind, c.building);
+        if (kind !== 'fortune' && st().visit[kind] !== n.dayKey) { st().visit[kind] = n.dayKey; if (msg) toast(msg, kind === 'foxshop' ? '🦊' : '🎪'); ctx.events.emit('night:visitor', { kind, dayKey: n.dayKey }); }
+      } else takeBuilding(kind);
+    }
+    if (open) syncGift(n); else if (placed.gift) { W.objects.remove(placed.gift.id); placed.gift = null; }
     // 야시장
     const m = market(n);
     if (m.open) putMarket(); else takeMarket();
@@ -414,7 +555,7 @@ function createNight(ctx, cfg) {
   // 장면은 집 안에서 못 트니(story free) 섬 문 앞에서 튼다. 처음 한 번만 (state.night.visited — 장면이 없어도 표시).
   let gate = null;            // { id, res, t, started }
   function firstVisit(kind) {
-    if (kind !== 'moonshop' && kind !== 'tent') return null;
+    if (!NIGHT_PLACES.includes(kind)) return null;
     const s = st(), door = world()?.places?.[kind]?.door;
     s.visited ??= {};
     if (s.visited[kind] || !door) return null;
@@ -457,7 +598,8 @@ function createNight(ctx, cfg) {
     clearSpots() {
       const out = [];
       for (const s of placed.market?.stalls ?? []) out.push({ x: s.front.x, z: s.front.z, r: STALL_CLEAR });
-      for (const k of ['moonshop', 'tent']) { const d = placed[k] && world()?.places?.[k]?.door; if (d) out.push({ x: d.x, z: d.z, r: DOOR_CLEAR }); }
+      for (const k of NIGHT_PLACES) { const d = placed[k] && world()?.places?.[k]?.door; if (d) out.push({ x: d.x, z: d.z, r: DOOR_CLEAR }); }
+      if (placed.gift) out.push({ x: placed.gift.x, z: placed.gift.z, r: GIFT_NEAR });
       return out;
     },
     /** 오늘 기운이 있는 카드 | null */
@@ -472,11 +614,19 @@ function createNight(ctx, cfg) {
     },
     draw: () => draw(),
     debug: {
-      placed: () => ({ moonshop: placed.moonshop, tent: placed.tent, market: placed.market?.stalls.map(s => ({ id: s.id, x: +s.x.toFixed(2), z: +s.z.toFixed(2) })) ?? null, notes: [...placed.sleepNotes.keys()] }),
+      placed: () => ({ moonshop: placed.moonshop, tent: placed.tent, fortune: placed.fortune, foxshop: placed.foxshop, oddtent: placed.oddtent, gift: placed.gift, market: placed.market?.stalls.map(s => ({ id: s.id, x: +s.x.toFixed(2), z: +s.z.toFixed(2) })) ?? null, notes: [...placed.sleepNotes.keys()] }),
       spots: () => ({ ...st().spots }),
       setCard(id, dayKey = now()?.dayKey) { st().tarot = { card: id, drawnOn: null, forDay: dayKey }; chipSync(); },
       sync,
+      /** 점검용: 오늘 밤 여우 상인·이상한 천막을 꼭 세운다 (저장하지 않음) — debug.force({ foxshop: true, oddtent: true }) */
+      force(o = {}) { Object.assign(forced, o); sync(); return { ...forced }; },
+      /** 오늘의 진열·선물 (점검·봇이 볼 곳) */
+      today: () => ({ fox: foxToday(), foxLeft: foxLeft(), odd: oddToday(), gift: giftToday(), giftAt: placed.gift ? { x: placed.gift.x, z: placed.gift.z } : null, visits: { foxshop: visits('foxshop'), oddtent: visits('oddtent') } }),
     },
+    /** P54: 밤 가게 종류 (world.places · house.places 의 이름) */
+    places: () => NIGHT_PLACES.slice(),
+    /** P54 선물 상자 자리 (오늘 섬에 있으면 {x, z}) */
+    giftSpot: () => (placed.gift ? { x: placed.gift.x, z: placed.gift.z } : null),
   };
 
   function register(gp) {
@@ -490,7 +640,13 @@ function createNight(ctx, cfg) {
       name: 'night:desk', intent: 'action', priority: 90,   // 실내 계산대 앞 (도토리상점 town:shop 과 같은 자리)
       label: '말 걸기',
       test: () => deskInFront(),
-      run: kind => (kind === 'moonshop' ? talkShop() : talkTent()),
+      run: kind => (kind === 'moonshop' ? talkShop() : kind === 'foxshop' ? talkFox() : talkTent(kind)),
+    });
+    gp.add({
+      name: 'night:gift', intent: 'action', priority: 55,   // P54 선물 상자 (줍기 50 · 나무 흔들기 60 사이)
+      label: cfg.lines.gift?.label ?? '열기',
+      test: () => giftInFront(),
+      run: () => openGift(),
     });
     gp.add({
       name: 'night:door', intent: 'action', priority: 90,   // 섬: 달빛 가게 · 천막 문
@@ -499,9 +655,9 @@ function createNight(ctx, cfg) {
       test: () => doorInFront(),
       run: kind => {
         if (placeRule(kind) === 'open') return S().house?.places?.enter?.(kind);
-        const L = cfg.lines[kinds[kind].keeper];
+        const L = cfg.lines[kinds[kind].keeper ?? 'odd'];
         ctx.events.emit('sfx', { name: 'door', volume: 0.4 });
-        toast(L.closed[0].replace(/^\(|\)$/g, ''), kind === 'moonshop' ? '🌙' : '🌫️');
+        toast((L?.closed?.[0] ?? '닫혀 있어요').replace(/^\(|\)$/g, ''), { moonshop: '🌙', foxshop: '🦊', oddtent: '🎪', fortune: '🔮' }[kind] ?? '🌫️');
       },
     });
   }
@@ -510,8 +666,8 @@ function createNight(ctx, cfg) {
     ensureNightCss();
     S().data?.luck?.set?.(luckTable);
     chip = createFortuneChip(ctx.uiRoot, { onOpen: () => { const c = service.fortune(); if (c) openFortune(ctx, c, cards.indexOf(c) + 1); } });
-    ctx.events.on('place:enter', ({ place } = {}) => { if (place === 'moonshop' || place === 'tent') showKeeper(place); });
-    ctx.events.on('place:leave', ({ place } = {}) => { if (place === 'moonshop' || place === 'tent') hideKeeper(place); });
+    ctx.events.on('place:enter', ({ place } = {}) => { if (KEEPER_PLACES.includes(place)) showKeeper(place); });
+    ctx.events.on('place:leave', ({ place } = {}) => { if (KEEPER_PLACES.includes(place)) hideKeeper(place); });
     ctx.events.on('house:enter', onHouseEnter);
     ctx.events.on('story:start', () => chip?.hide(true));
     ctx.events.on('story:end', () => chip?.hide(false));

@@ -1,0 +1,91 @@
+{
+  "id": "IC-AR-11",
+  "slug": "art-thinking-frog",
+  "name": "「생각하는 개구리」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.thinking-frog",
+      "code": "IC-AR-11",
+      "variant": "real"
+    },
+    {
+      "item": "art.thinking-frog-fake",
+      "code": "IC-AR-11",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "바위에 앉아 한 손으로 턱을 괴고 골똘히 생각하는 개구리 청동상. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "청동상",
+      "턱 괸 개구리",
+      "바위"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "조각",
+      "value": "frog",
+      "options": [
+        "frog",
+        "spiral",
+        "acorn",
+        "bird",
+        "bust",
+        "tower"
+      ]
+    }
+  },
+  "palette": {
+    "bronze": "#B07A3E",
+    "bronzeDark": "#7A5230",
+    "base": "#CFC8BC",
+    "baseDark": "#A79F92",
+    "plate": "#D9A84E"
+  },
+  "paletteLabels": {
+    "bronze": "청동",
+    "bronzeDark": "짙은 청동·바위",
+    "base": "받침 돌",
+    "baseDark": "받침 테",
+    "plate": "이름표"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "bronze": "#7F8F7A"
+      }
+    }
+  }
+}

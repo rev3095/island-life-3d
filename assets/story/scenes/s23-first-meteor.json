@@ -1,0 +1,191 @@
+{
+  "id": "s23-first-meteor",
+  "version": 1,
+  "status": "review",
+  "chapter": "매일 할 거리",
+  "title": "첫 유성우 밤",
+  "summary": "맑은 밤 8시, 별똥별이 처음 떨어지기 시작한다. 야행성 주민 달무리가 다가와 하늘을 가리키며, 올려다보고 두 손 모아 소원을 빌면 다음 날 바닷가에 별 조각이 떨어진다고 알려 준다. 주인공이 따라서 소원을 빈다.",
+  "trigger": {
+    "on": "meteor-first"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "달무리와 하늘 보기 → 소원",
+      "recommended": true,
+      "desc": "밤하늘을 넓게 → 달무리가 날개로 하늘을 가리킴 → 소원 빌기 안내 → 둘이 나란히 소원.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "별이 가득한 밤 섬, 주인공이 하늘을 본다",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "별똥별이 떨어지는 밤",
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "🌠",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                2.6,
+                1.4
+              ],
+              "face": -90,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "달무리가 다가와 하늘을 가리킨다",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "caption": "오늘 밤은 유성우야부엉!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "to": [
+                1.1,
+                0.4
+              ],
+              "do": "walk",
+              "face": "player",
+              "emote": "🦉",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "올려다보고 두 손 모아 소원 — 다음 날 별 조각",
+          "dur": 4,
+          "cam": {
+            "size": "medium",
+            "target": "dalmuri",
+            "angle": 15,
+            "move": "static"
+          },
+          "caption": "하늘을 올려다보고 소원을 빌면 다음 날 바닷가에 별 조각이 떨어진대",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "⭐",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "둘이 나란히 하늘을 보고 소원",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "caption": "R·V 키(두 손가락)로 올려다보고 Space 로 소원",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": 0,
+              "emote": "🙏",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "🙏",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 안내",
+      "desc": "달무리가 다가와 소원 빌기를 알려 주고 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "달무리와 밤하늘",
+          "dur": 4,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "별똥별에 소원을 빌어 봐부엉",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "at": [
+                1.1,
+                0.4
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🌠",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "dalmuri",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

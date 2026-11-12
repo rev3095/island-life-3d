@@ -1,0 +1,62 @@
+{
+  "id": "PR-33",
+  "slug": "gift-balloon",
+  "name": "선물 풍선",
+  "category": "prop",
+  "kind": "gift-balloon",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "바다 쪽에서 바람 따라 날아오는 큰 풍선 하나에 리본 묶은 선물 상자가 매달려 있다. 새총으로 맞히면 상자가 떨어진다 (색 셋은 게임이 풍선 색만 바꿈).",
+    "keywords": [
+      "큰 풍선",
+      "리본 선물 상자",
+      "바람에 흔들림"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "balloon": "#F26B6B",
+    "shine": "#FFFFFF",
+    "string": "#FBF7F2",
+    "gift": "#FBEFD5",
+    "ribbon": "#E8604F"
+  },
+  "paletteLabels": {
+    "balloon": "풍선",
+    "shine": "반짝임",
+    "string": "줄",
+    "gift": "상자",
+    "ribbon": "리본"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.1
+    },
+    "extent": [
+      0.3,
+      0.3
+    ]
+  }
+}

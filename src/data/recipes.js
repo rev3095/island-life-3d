@@ -4,21 +4,25 @@
 import * as items from './items.js';
 import { RULES } from './tables.js';
 
-/** 레시피 id = 만들어지는 아이템 id */
-export const RECIPES = RULES.recipes.map(({ result, needs, count }) => Object.freeze({ id: result, count: count ?? 1, result, needs }));
+/** 레시피 id = 만들어지는 아이템 id. unlock = 처음엔 모르는 레시피 (M13 D146-A: 레시피 쪽지로 하나씩 열림 — 지금 있던 레시피는 그대로 앎) */
+export const RECIPES = RULES.recipes.map(({ result, needs, count, unlock }) => Object.freeze({ id: result, count: count ?? 1, result, needs, ...(unlock ? { unlock: true } : {}) }));
+/** 쪽지로 여는 레시피 id (표 순서 = 여는 순서) */
+export const LOCKED = RECIPES.filter(r => r.unlock).map(r => r.id);
 
 const BY_ID = new Map(RECIPES.map(r => [r.id, r]));
 
 /** 재료 한 줄을 사람이 읽는 말로: '나무 5', '조개 아무거나 6' */
 export const needText = need => (need.id ? `${items.get(need.id)?.name ?? need.id} ${need.n}` : `${items.CATEGORY_NAMES[need.category]} 아무거나 ${need.n}`);
 
-export function createRecipes(inventory) {
+/** known(id) → 열린 레시피인가 (없으면 모두 앎). 잠긴 레시피는 목록·만들기에서 빠진다 */
+export function createRecipes(inventory, { known = null } = {}) {
+  const open = r => !!r && (!r.unlock || !known || !!known(r.id));
   const have = need => (need.id ? inventory.count(need.id) : inventory.countCategory(need.category));
 
   /** 모자란 재료 목록 [{ ...need, have }] (빈 배열 = 다 있음) */
   function missing(recipeId) {
     const r = BY_ID.get(recipeId);
-    if (!r) return null;
+    if (!open(r)) return null;
     return r.needs.map(need => ({ ...need, have: have(need) })).filter(x => x.have < x.n);
   }
 
@@ -32,7 +36,7 @@ export function createRecipes(inventory) {
   /** 만들기 → 성공하면 재료가 빠지고 결과물이 가방에 들어간다. 실패하면 가방은 그대로 */
   function craft(recipeId) {
     const r = BY_ID.get(recipeId);
-    if (!r || missing(recipeId).length) return false;
+    if (!open(r) || missing(recipeId).length) return false;
     return trial(r, true);
   }
 
@@ -62,8 +66,11 @@ export function createRecipes(inventory) {
   }
 
   return {
-    list: () => RECIPES.slice(),
+    list: () => RECIPES.filter(open),
     get: id => BY_ID.get(id) ?? null,
+    /** 잠긴 레시피 중 아직 모르는 것 (여는 순서대로) */
+    locked: () => RECIPES.filter(r => r.unlock && !open(r)).map(r => r.id),
+    isOpen: id => open(BY_ID.get(id)),
     missing, canCraft, craft,
   };
 }

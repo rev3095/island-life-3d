@@ -1,0 +1,54 @@
+{
+  "id": "FU-66",
+  "slug": "star-mobile",
+  "item": "furn.star-mobile",
+  "name": "별 모빌",
+  "category": "furniture",
+  "kind": "star-mobile",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 648,
+  "parts": 1,
+  "materials": [
+    "base",
+    "glow",
+    "star",
+    "starBlue",
+    "starPink",
+    "string",
+    "wood"
+  ],
+  "objects": [
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.47,
+    0.69,
+    1.52
+  ],
+  "bounds": [
+    [
+      -0.237,
+      -0.507,
+      0.0
+    ],
+    [
+      0.237,
+      0.18,
+      1.522
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 17292,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-mobile_front.png",
+    "star-mobile_main.png",
+    "star-mobile_thumb.png",
+    "star-mobile_top.png"
+  ]
+}

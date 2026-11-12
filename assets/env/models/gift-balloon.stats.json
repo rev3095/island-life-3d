@@ -1,0 +1,36 @@
+{
+  "id": "PR-33",
+  "slug": "gift-balloon",
+  "name": "선물 풍선",
+  "category": "prop",
+  "kind": "gift-balloon",
+  "version": "0.1",
+  "triangles": 1706,
+  "parts": 2,
+  "materials": [
+    "balloon",
+    "gift",
+    "ribbon",
+    "shine",
+    "string"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.6,
+    1.61
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 35264,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "gift-balloon_front.png",
+    "gift-balloon_hero.jpg",
+    "gift-balloon_main.png",
+    "gift-balloon_thumb.png",
+    "gift-balloon_top.png"
+  ]
+}

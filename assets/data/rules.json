@@ -50,7 +50,12 @@
     { "result": "furn.fruit-chair", "needs": [{ "category": "fruit", "n": 10 }], "note": "컨셉: 과일 10" },
     { "result": "furn.flower-shelf", "needs": [{ "id": "mat.wood", "n": 6 }, { "category": "flower", "n": 4 }], "note": "보드: 나무 6 · 꽃 4" },
     { "result": "furn.wood-stove", "needs": [{ "id": "mat.iron", "n": 4 }, { "id": "mat.wood", "n": 4 }], "note": "보드: 철광석 4 · 나무 4" },
-    { "result": "furn.fruit-basket", "needs": [{ "category": "fruit", "n": 5 }], "note": "보드: 과일 5" }
+    { "result": "furn.fruit-basket", "needs": [{ "category": "fruit", "n": 5 }], "note": "보드: 과일 5" },
+    { "result": "tool.sling", "needs": [{ "id": "mat.wood", "n": 3 }, { "id": "mat.branch", "n": 4 }], "unlock": true, "note": "M13 D146-A: 레시피 쪽지로 열림 (첫 쪽지)" },
+    { "result": "furn.star-lamp", "needs": [{ "id": "mat.star-yellow", "n": 2 }, { "id": "mat.iron", "n": 1 }], "unlock": true, "note": "M13 별 조각 가구 FU-63" },
+    { "result": "furn.star-clock", "needs": [{ "id": "mat.star-blue", "n": 2 }, { "id": "mat.wood", "n": 3 }], "unlock": true, "note": "M13 별 조각 가구 FU-64" },
+    { "result": "furn.star-chair", "needs": [{ "id": "mat.star-yellow", "n": 1 }, { "id": "mat.star-pink", "n": 1 }, { "id": "mat.wood", "n": 4 }], "unlock": true, "note": "M13 별 조각 가구 FU-65" },
+    { "result": "furn.star-mobile", "needs": [{ "id": "mat.star-yellow", "n": 1 }, { "id": "mat.star-pink", "n": 1 }, { "id": "mat.star-blue", "n": 1 }, { "id": "mat.branch", "n": 3 }], "unlock": true, "note": "M13 별 조각 가구 FU-66" }
   ],
   "birthdays": {
     "dates": { "coco": "07-14", "bori": "03-21", "mochi": "04-08", "dubu": "11-03", "pong": "09-27", "chorong": "06-18", "danpung": null, "gureum": "05-16", "pado": "08-11", "dalmuri": "10-29" },

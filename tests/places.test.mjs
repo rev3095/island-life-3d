@@ -124,6 +124,7 @@ test('실내: 문 매트 → 계산대 앞 → 주인 자리 앞까지 걸어갈
     const spec = ph ? phaseSpec(specs[k], ph) : specs[k], list = listOf(spec), m = doormatOf(spec), B = boundsOf(spec);
     assert.ok(m.entry > B.z0 && m.entry < B.z1, `${k} 들어와서 서는 곳`);
     assert.ok(reachable(spec, list, { lx: m.lx, lz: m.entry }, spec.talk), `${k} 계산대 앞까지`);
+    if (spec.unattended) continue;   // P54 이상한 천막: 주인 없음 (talk = 진열 받침 앞)
     const counter = list.find(r => r.entry.role === 'counter');
     const cz = counter.rec.gz + 0.5;
     assert.ok(spec.keeper.lz < cz && spec.talk.lz > cz, `${k}: 주인 · 계산대 · 말 거는 자리 순서 (북 → 남)`);
@@ -230,7 +231,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', ...Array.from({ length: 6 }, (_, i) => `FU-${79 + i}`)]);
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-74', 'FU-77', ...Array.from({ length: 6 }, (_, i) => `FU-${79 + i}`)]);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 · 실내 전수 상점 낮/밤 FU-79–84
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);
@@ -258,7 +259,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
       used++;
     }
   }
-  assert.equal(used, 1 + 1 + 2 + 2 + 2 + 1 + 8 + 2 + 3 + 8 + 5 + 4, '상점 1층 계산대·옷 진열대(11차)·실내 문 둘 + 낮 진열 받침 둘 + 밤 덮개 천 둘 · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · 정원 코너 도구 받침·씨앗 진열대 둘·받침·화분 선반 · 지하 밤 코너 등불 진열장·받침·도구 받침·무인 계산함 (실내 전수)');
+  assert.equal(used, 1 + 1 + 2 + 2 + 2 + 1 + 8 + 2 + 3 + 8 + 5 + 4 + 4 + 5 + 4, '상점 1층 계산대·옷 진열대(11차)·실내 문 둘 + 낮 진열 받침 둘 + 밤 덮개 천 둘 · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스·여우 상인·이상한 천막 (5 + 4 + 4) · 실내 전수 정원 코너 도구 받침·씨앗 진열대 둘·받침·화분 선반 · 지하 밤 코너 등불 진열장·받침·도구 받침·무인 계산함');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');

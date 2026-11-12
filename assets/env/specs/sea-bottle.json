@@ -1,0 +1,66 @@
+{
+  "id": "PR-34",
+  "slug": "sea-bottle",
+  "name": "유리병",
+  "category": "prop",
+  "kind": "sea-bottle",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "아침 바닷가 모래에 반쯤 묻혀 비스듬히 누운 유리병. 코르크 마개, 속에 리본 묶은 쪽지가 보인다.",
+    "keywords": [
+      "모래에 반쯤 묻힘",
+      "코르크",
+      "쪽지"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "sand": "#EBD7A8",
+    "glass": "#A8DCD4",
+    "glassLight": "#F2FFFC",
+    "cork": "#B0844E",
+    "paper": "#FBF1D8",
+    "ribbon": "#6FA8DC",
+    "pebble": "#D9CFC0"
+  },
+  "paletteLabels": {
+    "sand": "모래",
+    "glass": "유리",
+    "glassLight": "유리 빛",
+    "cork": "코르크",
+    "paper": "쪽지",
+    "ribbon": "리본",
+    "pebble": "자갈"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.12
+    },
+    "extent": [
+      0.42,
+      0.3
+    ]
+  }
+}

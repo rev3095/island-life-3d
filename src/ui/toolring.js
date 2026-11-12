@@ -1,5 +1,5 @@
 // 도구 고르기 고리: HUD 도구 단추를 누르면 맨손과 가방에 있는 도구를 동그랗게 펼친다 (엄지로 한 번에 고르기).
-// 고르면 창을 닫고 tool1~5 / toolNone 의도를 보낸다 — 드는 규칙(가방에 없는 도구는 못 든다)은 gather·player 가 정한다.
+// 고르면 창을 닫고 tool1~6 / toolNone 의도를 보낸다 — 드는 규칙(가방에 없는 도구는 못 든다)은 gather·player 가 정한다.
 // 키보드는 Q·E·숫자키 그대로이고, 이 창에서는 방향키·Enter, 휴대폰은 A(고르기)·B(닫기).
 import { h, toolSvg, TOOL_NAME } from './dom.js';
 
@@ -8,7 +8,7 @@ export function createToolRing(ctx, panels) {
 
   function open() {
     if (current) return current.p.result;
-    const TOOLS = ctx.constants?.TOOLS ?? ['rod', 'net', 'shovel', 'axe', 'can'];
+    const TOOLS = ctx.constants?.TOOLS ?? ['rod', 'net', 'shovel', 'axe', 'can', 'sling'];
     const inv = ctx.services.data?.inventory;
     const owned = inv?.hasTool ? TOOLS.filter(t => inv.hasTool(t)) : TOOLS;
     const now = ctx.services.player?.tool ?? null;
@@ -40,8 +40,8 @@ export function createToolRing(ctx, panels) {
     p = panels.open('tools', root, {
       initialFocus: () => btns[Math.max(0, list.indexOf(now))],
       onKey(e) {
-        // 1~5·0 은 이 창에서도 바로 고른다
-        const n = /^Digit([0-5])$/.exec(e.code);
+        // 1~6·0 은 이 창에서도 바로 고른다
+        const n = /^Digit([0-6])$/.exec(e.code);
         if (!n) return false;
         const t = n[1] === '0' ? null : TOOLS[n[1] - 1];
         if (list.includes(t)) p.close({ tool: t });

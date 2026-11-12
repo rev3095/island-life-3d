@@ -1,0 +1,48 @@
+{
+  "id": "IC-TL-06",
+  "slug": "tool-sling",
+  "name": "새총",
+  "group": "tool",
+  "kind": "sling",
+  "version": "0.1",
+  "items": [
+    "tool.sling"
+  ],
+  "hold": false,
+  "triangles": 1428,
+  "parts": 1,
+  "materials": [
+    "band",
+    "grip",
+    "gripDark",
+    "leather",
+    "pebble",
+    "wood"
+  ],
+  "objects": [
+    "tool"
+  ],
+  "size": [
+    0.308,
+    0.221,
+    0.638
+  ],
+  "bounds": [
+    [
+      -0.154,
+      -0.11,
+      0.0
+    ],
+    [
+      0.154,
+      0.11,
+      0.638
+    ]
+  ],
+  "glbBytes": 31440,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tool-sling_main.png",
+    "tool-sling_thumb.png"
+  ]
+}

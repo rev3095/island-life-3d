@@ -12,9 +12,12 @@ import { resolveFurniture, FACE } from './interior.js';
 // 실내 전수: 도토리상점 딸린 방 — shop-garden 정원·도구 코너 RM-22 (낮) · shop-night 지하 밤 코너 RM-21 (밤). 섬 문이 아니라 1층 실내 문(inner)으로 드나든다
 export const PLACE_FILES = ['assets/interior/places/shop.json', 'assets/interior/places/museum.json', 'assets/interior/places/moonshop.json', 'assets/interior/places/tent.json', 'assets/interior/places/shop-garden.json', 'assets/interior/places/shop-night.json'];
 export const PLACE_KINDS = ['shop', 'museum', 'moonshop', 'tent', 'shop-garden', 'shop-night'];
+// P54 밤 특별 상점 (D166–D168): 운세 부스 fortune RM-20 · 여우 상인 가게 foxshop RM-18 · 이상한 천막 oddtent RM-19 — 달빛 가게처럼 gameplay/night 가 섬에 놓는다
+PLACE_FILES.push('assets/interior/places/fortune.json', 'assets/interior/places/foxshop.json', 'assets/interior/places/oddtent.json');
+PLACE_KINDS.push('fortune', 'foxshop', 'oddtent');
 /** 딸린 방 → 그 방으로 들어가는 1층 (섬 건물이 없다) */
 export const PLACE_PARENT = { 'shop-garden': 'shop', 'shop-night': 'shop' };
-/** 섬 문으로 들어가는 곳 (딸린 방 빼고) */
+/** 섬 문으로 들어가는 곳 (딸린 방 빼고 — 위 push 뒤에 셈) */
 export const OUTER_KINDS = PLACE_KINDS.filter(k => !PLACE_PARENT[k]);
 /** 그 장소의 맨 바깥 (딸린 방이면 1층) */
 export const rootOf = kind => PLACE_PARENT[kind] ?? kind;
@@ -25,6 +28,7 @@ export const FIXTURE_BASE = 'assets/furniture/fixtures';
 export const FIXTURE_INDEX = 'assets/furniture/fixtures/index.json';
 /** 섬 건물 모델 slug (door.js 가 문 크기를 읽는다) */
 export const PLACE_BUILDING = { shop: 'shop', museum: 'museum', moonshop: 'night-shop', tent: 'dawn-tent', 'shop-garden': 'shop', 'shop-night': 'shop' };
+Object.assign(PLACE_BUILDING, { fortune: 'fortune-booth', foxshop: 'fox-shop', oddtent: 'odd-tent' });   // P54
 export const MUSEUM_CATS = ['fish', 'bug', 'fossil'];
 /** 케이스 안쪽 여백 (m) */
 const CASE_PAD = 0.22;
@@ -179,11 +183,13 @@ export function checkPlace(spec, furnIndex) {
     placed.push(r.rec);
   }
   const sub = !!spec.parent;   // 딸린 방 (정원 코너·지하 밤 코너): 주인·계산대 없이 진열품 앞 「보기」로 산다
-  if (!sub && !list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
+  const staffed = !spec.unattended && !sub;   // P54 이상한 천막처럼 주인 없는 곳 (unattended: true) 은 계산대·주인을 안 본다 — talk 는 진열 앞 서는 곳
+  if (staffed && !list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
   const B = boundsOf(spec), inRoom = p => p && Number.isFinite(p.lx) && Number.isFinite(p.lz) && p.lx > B.x0 && p.lx < B.x1 && p.lz > B.z0 && p.lz < B.z1;
   const boxes = blockersOf(spec, list);
   const k = spec.keeper;
-  if (sub) { /* 주인·말 거는 자리 없음 */ } else if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
+  if (sub) { /* 주인·말 거는 자리 없음 */ } else if (!staffed) { if (k) out.push('주인 없는 곳(unattended)에 keeper 가 있어요'); }
+  else if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
   else if (boxes.slice(0, boxes.length - 1).some(b => inBox(b, k.lx, k.lz))) out.push('keeper 가 가구·케이스 위에 서 있어요');
   const t = spec.talk;
   if (sub) { /* 없음 */ } else if (!inRoom(t)) out.push('talk = { lx, lz } 가 방 안에 있어야 해요');

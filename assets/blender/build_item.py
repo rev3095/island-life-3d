@@ -1565,7 +1565,58 @@ def b_ticket(M):
     m.add(box((0.13, 0.0, 0.028), (0.004, 0.003, 0.05), bevel=0.001, rot=rot_xyz(x=math.pi / 2)), 'boat', outline=False)
 
 
+# ================================================================ M13 매일 할 거리 (13차 보드 wave13 D142–D146 A)
+def b_sling(M):
+    """TO-07 새총 (IC-TL-06): Y 자 나무 가지 손잡이 · 두 갈래 끝에 고무줄 · 가운데 가죽 주머니 · 손잡이에 감은 끈"""
+    m = M.part('tool')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.36), 0.03, 0.028, seg=12), 'wood')
+    m.add(cylinder((0, 0, 0.04), (0, 0, 0.22), 0.034, seg=12), 'grip')
+    for z in (0.08, 0.13, 0.18):
+        m.add(cylinder((0, 0, z - 0.008), (0, 0, z + 0.008), 0.037, seg=12), 'gripDark')
+    tops = []
+    for sx in (1, -1):
+        pts = bezier((0, 0, 0.34), (sx * 0.05, 0, 0.42), (sx * 0.12, 0, 0.5), (sx * 0.13, 0, 0.62), 10)
+        m.add(rail(pts, [0.027 - 0.008 * i / 10 for i in range(11)], seg=10), 'wood')
+        m.add(ellipsoid(pts[-1], (0.021, 0.021, 0.018), seg=10, rings=6), 'wood')
+        tops.append(pts[-1] + V((0, 0, -0.03)))
+        m.add(cylinder(tops[-1] + V((0, 0, -0.012)), tops[-1] + V((0, 0, 0.012)), 0.025, seg=10), 'band')
+    pouch = V((0, -0.16, 0.55))
+    for t in tops:
+        pts = bezier(t, t + (pouch - t) * 0.3 + V((0, 0, 0.01)), pouch + (t - pouch) * 0.3, pouch + V((0.03 if t.x > 0 else -0.03, 0, 0)), 8)
+        m.add(rail(pts, [0.008] * 9, seg=6), 'band', outline=False)
+    m.add(ellipsoid(pouch, (0.05, 0.02, 0.032), seg=14, rings=8), 'leather')
+    m.add(ellipsoid(pouch + V((0, -0.012, 0.0)), (0.022, 0.012, 0.022), seg=10, rings=6), 'pebble', outline=False)
+
+
+def b_star_piece(M):
+    """IC-MA-11 별 조각 (색 셋 — variants): 통통한 별 하나에 작은 부스러기 별 둘, 가운데 반짝이 (glow)"""
+    m = M.part('mat')
+    m.add(star_bm((0, 0, 0.16), 0.15, 0.08, rot=rot_xyz(x=math.pi / 2 - 0.25, z=0.2), inner=0.52), 'star', smooth=False)
+    m.add(ellipsoid((0.0, -0.05, 0.17), (0.035, 0.02, 0.035), seg=10, rings=6), 'starLight', outline=False)
+    for k, (x, y, r) in enumerate(((0.16, -0.04, 0.045), (-0.15, 0.02, 0.035))):
+        m.add(star_bm((x, y, r * 0.5), r, r * 0.6, rot=rot_xyz(z=k * 0.7)), 'star', smooth=False)
+    for x, y, z in ((0.1, -0.1, 0.3), (-0.12, -0.08, 0.26)):
+        m.add(ellipsoid((x, y, z), (0.012, 0.012, 0.012), seg=8, rings=4), 'starLight', outline=False)
+
+
+def b_recipe_note(M):
+    """IC-MA-12 레시피 쪽지: 반쯤 펼친 크림색 두루마리 · 리본 · 별 도장 · 그림 선 몇 줄"""
+    m = M.part('mat')
+    m.add(box((0.02, 0, 0.012), (0.26, 0.2, 0.012), bevel=0.004, rot=rot_xyz(z=0.12)), 'paper')
+    for sx in (1, -1):   # 양 끝 말린 곳
+        m.add(cylinder((sx * 0.15, -0.11, 0.03), (sx * 0.13, 0.12, 0.03), 0.028, seg=14), 'paper')
+        m.add(cylinder((sx * 0.15, -0.11, 0.03), (sx * 0.15, -0.115, 0.03), 0.016, seg=10), 'paperDark')
+    for k in range(3):
+        y = -0.05 + 0.045 * k
+        m.add(box((-0.02, y, 0.02), (0.15 - 0.03 * k, 0.012, 0.003), bevel=0.0, rot=rot_xyz(z=0.12)), 'ink', outline=False)
+    m.add(star_bm((0.07, 0.06, 0.024), 0.035, 0.008), 'seal', smooth=False)
+    m.add(box((0.0, 0, 0.044), (0.03, 0.24, 0.01), bevel=0.003, rot=rot_xyz(z=0.12)), 'ribbon')
+    for sx in (1, -1):
+        m.add(ellipsoid((sx * 0.035, -0.02, 0.052), (0.035, 0.016, 0.012), rot=rot_xyz(z=sx * 0.5), seg=10, rings=6), 'ribbon')
+
+
 BUILDERS = {
+    'sling': b_sling, 'star-piece': b_star_piece, 'recipe-note': b_recipe_note,
     'bungeoppang': b_bungeoppang, 'moon-tteok': b_moon_tteok, 'cocoa': b_cocoa, 'star-candy': b_star_candy,
     'snow-crystal': b_snow_crystal,
     'mushroom': b_mushroom,
@@ -1589,6 +1640,7 @@ BUILDERS = {
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
           'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50), 'night': (-25, 32)}
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
+import night_special_items; BUILDERS.update(night_special_items.builders(globals()))   # P54 밤 특별 상점 미술품 (IC-AR, RENDER['art'] 도 더함)
 
 
 def build(palette, suffix=''):

@@ -1,0 +1,57 @@
+{
+  "id": "IC-MA-12",
+  "slug": "mat-recipe-note",
+  "name": "레시피 쪽지",
+  "group": "mat",
+  "category": "item",
+  "kind": "recipe-note",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.recipe-note",
+      "code": "IC-MA-12"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "바닷가 유리병에서 나온 반쯤 펼친 두루마리 쪽지 — 리본과 별 도장, 그림 선 몇 줄",
+    "keywords": [
+      "두루마리",
+      "리본",
+      "별 도장"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "paper": "#FBF1D8",
+    "paperDark": "#D9C49A",
+    "ink": "#7A6A8A",
+    "seal": "#E8604F",
+    "ribbon": "#6FA8DC"
+  },
+  "paletteLabels": {
+    "paper": "종이",
+    "paperDark": "말린 끝",
+    "ink": "그림 선",
+    "seal": "별 도장",
+    "ribbon": "리본"
+  }
+}

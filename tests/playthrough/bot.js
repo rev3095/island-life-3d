@@ -89,7 +89,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
   bot.release = () => { stick.on = false; stick.x = stick.z = 0; stick.run = false; };
 
   // ---- 키·클릭 ----
-  const KEY_OF = { action: 'Space', pickup: 'KeyF', bag: 'KeyI', phone: 'KeyP', map: 'KeyM', toolNone: 'Digit0', tool1: 'Digit1', tool2: 'Digit2', tool3: 'Digit3', tool4: 'Digit4', tool5: 'Digit5', esc: 'Escape' };
+  const KEY_OF = { action: 'Space', pickup: 'KeyF', bag: 'KeyI', phone: 'KeyP', map: 'KeyM', toolNone: 'Digit0', tool1: 'Digit1', tool2: 'Digit2', tool3: 'Digit3', tool4: 'Digit4', tool5: 'Digit5', tool6: 'Digit6', esc: 'Escape' };
   bot.key = (code, { up = true } = {}) => {
     bot.stats.keys++;
     const target = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : doc.body;
@@ -97,6 +97,11 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     if (up) target.dispatchEvent(new win.KeyboardEvent('keyup', { code, bubbles: true }));
   };
   bot.press = intent => bot.key(KEY_OF[intent] ?? intent);
+  /** 꾹 누른 키 떼기 (bot.key(code, { up: false }) 다음 — 시점 올려다보기 R 등) */
+  bot.keyUp = code => {
+    const target = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : doc.body;
+    target.dispatchEvent(new win.KeyboardEvent('keyup', { code, bubbles: true }));
+  };
   /** 사람이 누르는 것처럼: 창이 막 열렸으면(fresh 160ms) 조금 기다린 뒤 */
   bot.click = async el => {
     if (!el) return false;

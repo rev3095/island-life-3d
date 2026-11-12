@@ -205,7 +205,7 @@ export default {
 
     events.on('input:press', ({ intent }) => {
       if (!P.toolKeys || P.frozen || !ctx.input.enabled || ctx.services.ui?.isBlocking?.()) return;
-      const n = /^tool([1-5])$/.exec(intent);
+      const n = /^tool([1-6])$/.exec(intent);
       if (n) setTool(P.tool === TOOLS[n[1] - 1] ? null : TOOLS[n[1] - 1]);
       else if (intent === 'toolNone') setTool(null);
       else if (intent === 'toolNext' || intent === 'toolPrev') {

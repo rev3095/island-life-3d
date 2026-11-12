@@ -1,0 +1,40 @@
+{
+  "id": "BD-15",
+  "slug": "fortune-booth",
+  "name": "운세 부스",
+  "category": "building",
+  "kind": "fortune-booth",
+  "version": "0.1",
+  "triangles": 3302,
+  "parts": 1,
+  "materials": [
+    "charm",
+    "door",
+    "foundation",
+    "glow",
+    "roof",
+    "roofB",
+    "trim",
+    "wall",
+    "wallB"
+  ],
+  "animations": {},
+  "size": [
+    2.47,
+    2.57,
+    3.37
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 73732,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fortune-booth_front.png",
+    "fortune-booth_hero.jpg",
+    "fortune-booth_main.png",
+    "fortune-booth_thumb.png",
+    "fortune-booth_top.png"
+  ]
+}

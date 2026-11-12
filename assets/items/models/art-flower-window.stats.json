@@ -1,0 +1,60 @@
+{
+  "id": "IC-AR-05",
+  "slug": "art-flower-window",
+  "name": "「창가의 꽃병」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.flower-window",
+    "art.flower-window-fake"
+  ],
+  "hold": false,
+  "triangles": 1800,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "cloud",
+    "frame",
+    "frameTrim",
+    "pane",
+    "petal",
+    "petal2",
+    "petalCenter",
+    "sill",
+    "stand",
+    "stem",
+    "table",
+    "vase"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.47,
+    0.358,
+    0.581
+  ],
+  "bounds": [
+    [
+      -0.235,
+      -0.179,
+      0.0
+    ],
+    [
+      0.235,
+      0.179,
+      0.581
+    ]
+  ],
+  "glbBytes": 43724,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-flower-window_fake_main.png",
+    "art-flower-window_fake_thumb.png",
+    "art-flower-window_main.png",
+    "art-flower-window_real_main.png",
+    "art-flower-window_real_thumb.png",
+    "art-flower-window_thumb.png"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "BD-11",
+  "slug": "peddler-cart",
+  "name": "행상 수레",
+  "category": "prop",
+  "kind": "peddler-cart",
+  "version": "0.1",
+  "triangles": 5720,
+  "parts": 4,
+  "materials": [
+    "canvas",
+    "canvasStripe",
+    "flower",
+    "flowerB",
+    "leaf",
+    "pot",
+    "roll",
+    "rollB",
+    "sack",
+    "sign",
+    "wheel",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    1.7,
+    1.78,
+    2.02
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 117264,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "peddler-cart_front.png",
+    "peddler-cart_hero.jpg",
+    "peddler-cart_main.png",
+    "peddler-cart_thumb.png",
+    "peddler-cart_top.png"
+  ]
+}

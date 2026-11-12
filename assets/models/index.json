@@ -7,8 +7,8 @@
       "species": "human",
       "role": "주인공",
       "category": "character",
-      "version": "0.2.0",
-      "status": "approved",
+      "version": "0.2.1",
+      "status": "review",
       "sit": {
         "hip": 0.0523,
         "forward": -0.0041
@@ -208,6 +208,30 @@
       "sit": {
         "hip": 0.0497,
         "forward": -0.0039
+      }
+    },
+    {
+      "id": "CH-16",
+      "slug": "songi",
+      "name": "송이",
+      "species": "hedgehog",
+      "role": "떠돌이 행상 · 고슴도치",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "CH-17",
+      "slug": "salang",
+      "name": "살랑",
+      "species": "fox",
+      "role": "밤에 오는 수상한 여우 상인 (미술품)",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0534,
+        "forward": -0.0042
       }
     }
   ]

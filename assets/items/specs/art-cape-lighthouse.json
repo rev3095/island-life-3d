@@ -1,0 +1,102 @@
+{
+  "id": "IC-AR-08",
+  "slug": "art-cape-lighthouse",
+  "name": "「등대가 있는 곶」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.cape-lighthouse",
+      "code": "IC-AR-08"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "바다로 튀어나온 초록 곶 끝에 빨간 띠 흰 등대, 노란 불빛이 바다 쪽으로 퍼진다.",
+    "keywords": [
+      "곶",
+      "빨간 띠 등대",
+      "불빛"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "sea",
+      "wave",
+      "cliff",
+      "tower",
+      "stripe",
+      "lamp",
+      "beam",
+      "cloud"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "lighthouse",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#D4ECF4",
+    "sea": "#4E9AD0",
+    "wave": "#FFFFFF",
+    "cliff": "#7FB85E",
+    "tower": "#FBF7F2",
+    "stripe": "#D9583B",
+    "lamp": "#F6C84C",
+    "beam": "#FBEFB8",
+    "cloud": "#FFFFFF",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "하늘",
+    "sea": "바다",
+    "wave": "물결",
+    "cliff": "곶",
+    "tower": "등대",
+    "stripe": "빨간 띠·지붕",
+    "lamp": "등불",
+    "beam": "빛줄기",
+    "cloud": "구름",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  }
+}
