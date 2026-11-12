@@ -1662,6 +1662,7 @@ BUILDERS = {
     'clothes-rack': b_clothes_rack,   # 11차 D102-A 도토리상점 옷 진열대 FU-54
     'tarot-table': b_tarot_table, 'candle-stand': b_candle_stand, 'star-drape': b_star_drape,   # P44 새벽 천막 붙박이 FU-60–62
 }
+import night_special_furniture; BUILDERS.update(night_special_furniture.builders(globals()))   # P54 밤 특별 상점 가구 FU-73·75·76·78 + 붙박이 FU-74·77
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

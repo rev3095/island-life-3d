@@ -104,6 +104,7 @@ test('실내: 문 매트 → 계산대 앞 → 주인 자리 앞까지 걸어갈
     const spec = specs[k], list = listOf(spec), m = doormatOf(spec), B = boundsOf(spec);
     assert.ok(m.entry > B.z0 && m.entry < B.z1, `${k} 들어와서 서는 곳`);
     assert.ok(reachable(spec, list, { lx: m.lx, lz: m.entry }, spec.talk), `${k} 계산대 앞까지`);
+    if (spec.unattended) continue;   // P54 이상한 천막: 주인 없음 (talk = 진열 받침 앞)
     const counter = list.find(r => r.entry.role === 'counter');
     const cz = counter.rec.gz + 0.5;
     assert.ok(spec.keeper.lz < cz && spec.talk.lz > cz, `${k}: 주인 · 계산대 · 말 거는 자리 순서 (북 → 남)`);
@@ -237,7 +238,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
       used++;
     }
   }
-  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 8 + 2 + 3 + 8, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44)');
+  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 8 + 2 + 3 + 8 + 5 + 4 + 4, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스 탁자·받침·촛대·휘장 둘 · 여우 상인 계산대·미술품 받침 셋 · 이상한 천막 받침·촛대 둘·휘장');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');

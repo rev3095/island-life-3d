@@ -1,0 +1,54 @@
+{
+  "id": "FU-73",
+  "slug": "fox-lantern",
+  "item": "furn.fox-lantern",
+  "name": "여우불 등",
+  "category": "furniture",
+  "kind": "fox-lantern",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2514,
+  "parts": 2,
+  "materials": [
+    "earTip",
+    "glow",
+    "mark",
+    "shade",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "lantern",
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.48,
+    0.42,
+    0.96
+  ],
+  "bounds": [
+    [
+      -0.21,
+      -0.21,
+      0.0
+    ],
+    [
+      0.269,
+      0.21,
+      0.963
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 53520,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fox-lantern_front.png",
+    "fox-lantern_main.png",
+    "fox-lantern_thumb.png",
+    "fox-lantern_top.png"
+  ]
+}

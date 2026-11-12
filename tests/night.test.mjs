@@ -271,7 +271,7 @@ test('P54 서는 날 · 진열 · 선물 상자: 같은 날엔 늘 같고, 여�
   assert.ok(gifts > 100 && gifts < 200 && giftArt > 10, `선물 상자 ${gifts}/300 · 미술품 ${giftArt}`);
 });
 
-test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽) · 이상한 천막(북서쪽)이 지금 섬에서 서로·달빛 가게와 안 겹치고 문 앞이 열려 있다', () => {
+test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽) · 이상한 천막(동쪽, 모래밭도)이 지금 섬에서 서로·달빛 가게와 안 겹치고 문 앞이 열려 있다', () => {
   const spec = slug => json(`assets/env/specs/${slug}.json`);
   const layout = json('assets/island/layout.json');
   const fruitId = nativeFruitOf(layout.seed), fruit = fruitId ? (itemsMod.get(fruitId)?.variant ?? fruitId.split('.')[1]) : null;
@@ -283,17 +283,17 @@ test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽
   const land = (tx, tz) => !['water', 'sea', 'cliff', 'ramp'].includes(isl.tileAt(tx, tz));
   const soft = (tx, tz) => !at.has(`${tx},${tz}`) || R.SOFT_KINDS.has(at.get(`${tx},${tz}`));
   const spots = [];
-  const floor = (tx, tz) => { const w = isl.toWorld(tx, tz); return isl.tileAt(tx, tz) === 'grass' && soft(tx, tz) && !R.nearDoor(doors, w) && spots.every(s => Math.hypot(w.x - s.x, w.z - s.z) > 6); };
+  const floorOf = (grounds = ['grass']) => (tx, tz) => { const w = isl.toWorld(tx, tz); return grounds.includes(isl.tileAt(tx, tz)) && soft(tx, tz) && !R.nearDoor(doors, w) && spots.every(s => Math.hypot(w.x - s.x, w.z - s.z) > 6); };
   const opts = { isOpen: land, isClear: (tx, tz) => land(tx, tz) && soft(tx, tz), levelAt: (tx, tz) => isl.levelAt(tx, tz), toTile: isl.toTile, toWorld: isl.toWorld, reach: 18 };
   const plaza = gen.places.plaza;
   const plan = [
     ['moonshop', { x: plaza.x + CFG.shop.offset[0], z: plaza.z + CFG.shop.offset[1] }, 'night-shop'],
     ['fortune', { x: plaza.x + CFG.fortune.offset[0], z: plaza.z + CFG.fortune.offset[1] }, CFG.fortune.building],
     ['foxshop', { x: gen.w * CFG.fox.spot[0], z: gen.h * CFG.fox.spot[1] }, CFG.fox.building],
-    ['oddtent', { x: gen.w * CFG.odd.spot[0], z: gen.h * CFG.odd.spot[1] }, CFG.odd.building],
+    ['oddtent', { x: gen.w * CFG.odd.spot[0], z: gen.h * CFG.odd.spot[1] }, CFG.odd.building, CFG.odd.ground],
   ];
-  for (const [kind, anchor, b] of plan) {
-    const s = R.buildingSpot(anchor, spec(b).world.lot, { ...opts, isFree: floor });
+  for (const [kind, anchor, b, grounds] of plan) {
+    const s = R.buildingSpot(anchor, spec(b).world.lot, { ...opts, isFree: floorOf(grounds) });
     assert.ok(s, `${kind} 자리`);
     assert.ok(doors.every(d => Math.hypot(d.x - s.x, d.z - s.z) > 3), `${kind}: 다른 건물 문 앞을 막지 않음`);
     const d = isl.toTile(s.door.x - 0.01, s.door.z);
@@ -301,7 +301,7 @@ test('P54 건물 자리: 운세 부스(광장 남서쪽) · 여우 상인(서쪽
     spots.push(s);
   }
   assert.ok(spots[2].x < 0, `여우 상인은 섬 서쪽 (${spots[2].x.toFixed(1)})`);
-  assert.ok(spots[3].z < 0, `이상한 천막은 섬 북쪽 (${spots[3].z.toFixed(1)})`);
+  assert.ok(spots[3].x > 0, `이상한 천막은 섬 동쪽 (${spots[3].x.toFixed(1)})`);
 });
 
 test('P54 실내: 운세 부스 RM-20 · 여우 상인 RM-18 · 이상한 천막 RM-19 — 주인·진열 자리', () => {

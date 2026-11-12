@@ -1,0 +1,48 @@
+{
+  "id": "IC-AR-16",
+  "slug": "art-stone-tower",
+  "name": "「돌탑 셋」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.stone-tower"
+  ],
+  "hold": false,
+  "triangles": 1296,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "plate",
+    "stoneA",
+    "stoneB",
+    "stoneC"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.396
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.396
+    ]
+  ],
+  "glbBytes": 27856,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-stone-tower_main.png",
+    "art-stone-tower_thumb.png"
+  ]
+}

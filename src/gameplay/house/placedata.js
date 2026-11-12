@@ -146,11 +146,13 @@ export function checkPlace(spec, furnIndex) {
     if (!fits(placed, r.rec, info, { reserved: doorCellsOf(spec), w, d })) out.push(`${name}: (${r.rec.gx}, ${r.rec.gz}) rot ${r.rec.rot} 에 안 들어가요 (벽·문 매트·다른 가구)`);
     placed.push(r.rec);
   }
-  if (!list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
+  const staffed = !spec.unattended;   // P54 이상한 천막처럼 주인 없는 곳 (unattended: true) 은 계산대·주인을 안 본다 — talk 는 진열 앞 서는 곳
+  if (staffed && !list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
   const B = boundsOf(spec), inRoom = p => p && Number.isFinite(p.lx) && Number.isFinite(p.lz) && p.lx > B.x0 && p.lx < B.x1 && p.lz > B.z0 && p.lz < B.z1;
   const boxes = blockersOf(spec, list);
   const k = spec.keeper;
-  if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
+  if (!staffed) { if (k) out.push('주인 없는 곳(unattended)에 keeper 가 있어요'); }
+  else if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
   else if (boxes.slice(0, boxes.length - 1).some(b => inBox(b, k.lx, k.lz))) out.push('keeper 가 가구·케이스 위에 서 있어요');
   const t = spec.talk;
   if (!inRoom(t)) out.push('talk = { lx, lz } 가 방 안에 있어야 해요');

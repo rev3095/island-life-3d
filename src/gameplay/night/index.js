@@ -70,7 +70,7 @@ function createNight(ctx, cfg) {
     return DEFAULT_LOT[kind] ?? [3, 3];
   };
   /** 칸 검사 — mode 'floor' 건물 바닥 (풀밭 · 단단한 물체 없음 · 다른 건물 문 앞마당 밖) · 'open' 둘레 (걸을 수 있는 땅) · 'clear' 문 앞 (걸을 수 있고 물체 없음) */
-  function cellFn(mode) {
+  function cellFn(mode, grounds = ['grass']) {   // P54: grounds = 바닥으로 쓸 땅 (이상한 천막은 모래밭도)
     const W = world(), I = isl(), doors = R.doorsOf(W.places);
     const hard = (tx, tz) => W.objects.on?.(tx, tz)?.some(o => !R.SOFT_KINDS.has(o.kind)) ?? !!W.objects.at(tx, tz);
     return (tx, tz) => {
@@ -79,7 +79,7 @@ function createNight(ctx, cfg) {
       if (k === 'water' || k === 'sea' || k === 'cliff' || k === 'ramp') return false;
       if (mode === 'open') return true;   // 둘레엔 나무가 있어도 된다
       if (mode === 'clear') return !hard(tx, tz);   // 문 앞: 단단한 물체 없음 (꽃·잡초는 밟고 지나간다)
-      return k === 'grass' && !hard(tx, tz) && !R.nearDoor(doors, c);
+      return grounds.includes(k) && !hard(tx, tz) && !R.nearDoor(doors, c);
     };
   }
   /** 건물 기준점: 달빛 가게 = 광장에서 offset 칸 (동쪽), 천막 = 섬 동쪽 끝 쪽 */
@@ -99,7 +99,7 @@ function createNight(ctx, cfg) {
   }
   async function spotOf(kind, building) {
     const s = st().spots[kind];
-    const free0 = cellFn('floor');
+    const free0 = cellFn('floor', kinds[kind]?.ground);
     // 다른 밤 건물(지금 서 있지 않아도 자리를 정해 둔 것)과 떨어지게 (FAR 칸 안쪽은 건물 바닥으로 안 씀) — 천막은 달빛 가게와, P54 건물은 서로·모두와
     const I = isl(), others = Object.entries(st().spots).filter(([k, v]) => k !== kind && v && (kind !== 'tent' || k === 'moonshop')).map(([, v]) => v);
     const free = others.length ? (tx, tz) => free0(tx, tz) && others.every(o => Math.hypot(I.toWorld(tx, tz).x - o.x, I.toWorld(tx, tz).z - o.z) > FAR) : free0;

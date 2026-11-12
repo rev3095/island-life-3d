@@ -1,6 +1,595 @@
 {
   "models": [
     {
+      "id": "IC-AR-01",
+      "slug": "art-sea-morning",
+      "name": "「아침 바다의 돛」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.sea-morning",
+          "code": "IC-AR-01",
+          "variant": "real",
+          "icon": "assets/items/renders/art-sea-morning_real_thumb.png"
+        },
+        {
+          "item": "art.sea-morning-fake",
+          "code": "IC-AR-01",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-sea-morning_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "sea",
+          "wave",
+          "sun",
+          "sunGlow",
+          "boat",
+          "sail"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-02",
+      "slug": "art-acorn-hill",
+      "name": "「도토리 언덕」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.acorn-hill",
+          "code": "IC-AR-02",
+          "icon": "assets/items/renders/art-acorn-hill_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "hill",
+          "hill2",
+          "trunk",
+          "leaf",
+          "acorn",
+          "cloud"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-03",
+      "slug": "art-star-river",
+      "name": "「별이 흐르는 강」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.star-river",
+          "code": "IC-AR-03",
+          "variant": "real",
+          "icon": "assets/items/renders/art-star-river_real_thumb.png"
+        },
+        {
+          "item": "art.star-river-fake",
+          "code": "IC-AR-03",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-star-river_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "hill",
+          "river",
+          "star",
+          "starGlow"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-04",
+      "slug": "art-owl-lady",
+      "name": "「조용한 부엉이 부인」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.owl-lady",
+          "code": "IC-AR-04",
+          "icon": "assets/items/renders/art-owl-lady_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.47,
+        0.358,
+        0.582
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "dress",
+          "collar",
+          "feather",
+          "face",
+          "eye",
+          "beak",
+          "hat",
+          "ribbon",
+          "flower",
+          "flower2"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-05",
+      "slug": "art-flower-window",
+      "name": "「창가의 꽃병」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.flower-window",
+          "code": "IC-AR-05",
+          "variant": "real",
+          "icon": "assets/items/renders/art-flower-window_real_thumb.png"
+        },
+        {
+          "item": "art.flower-window-fake",
+          "code": "IC-AR-05",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-flower-window_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.47,
+        0.358,
+        0.581
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "sill",
+          "pane",
+          "cloud",
+          "table",
+          "vase",
+          "stem",
+          "petal",
+          "petal2",
+          "petalCenter"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-06",
+      "slug": "art-rain-umbrella",
+      "name": "「빗속의 노란 우산」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.rain-umbrella",
+          "code": "IC-AR-06",
+          "icon": "assets/items/renders/art-rain-umbrella_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "rain",
+          "umbrella",
+          "handle",
+          "ground",
+          "puddle"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-07",
+      "slug": "art-three-pears",
+      "name": "「배 세 알」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.three-pears",
+          "code": "IC-AR-07",
+          "variant": "real",
+          "icon": "assets/items/renders/art-three-pears_real_thumb.png"
+        },
+        {
+          "item": "art.three-pears-fake",
+          "code": "IC-AR-07",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-three-pears_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "table",
+          "cloth",
+          "pear",
+          "pearLight",
+          "stem",
+          "leaf"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-08",
+      "slug": "art-cape-lighthouse",
+      "name": "「등대가 있는 곶」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.cape-lighthouse",
+          "code": "IC-AR-08",
+          "icon": "assets/items/renders/art-cape-lighthouse_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "sea",
+          "wave",
+          "cliff",
+          "tower",
+          "stripe",
+          "lamp",
+          "beam",
+          "cloud"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-09",
+      "slug": "art-dancing-leaves",
+      "name": "「춤추는 단풍」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.dancing-leaves",
+          "code": "IC-AR-09",
+          "variant": "real",
+          "icon": "assets/items/renders/art-dancing-leaves_real_thumb.png"
+        },
+        {
+          "item": "art.dancing-leaves-fake",
+          "code": "IC-AR-09",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-dancing-leaves_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "swirl",
+          "leafA",
+          "leafB",
+          "leafC"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-10",
+      "slug": "art-moon-cat",
+      "name": "「달을 보는 고양이」",
+      "group": "art",
+      "kind": "art-painting",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.moon-cat",
+          "code": "IC-AR-10",
+          "icon": "assets/items/renders/art-moon-cat_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.57,
+        0.315,
+        0.483
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bg",
+          "moon",
+          "moonShade",
+          "roof",
+          "cat",
+          "star"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-11",
+      "slug": "art-thinking-frog",
+      "name": "「생각하는 개구리」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.thinking-frog",
+          "code": "IC-AR-11",
+          "variant": "real",
+          "icon": "assets/items/renders/art-thinking-frog_real_thumb.png"
+        },
+        {
+          "item": "art.thinking-frog-fake",
+          "code": "IC-AR-11",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-thinking-frog_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.32,
+        0.32,
+        0.426
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-12",
+      "slug": "art-wave-spiral",
+      "name": "「물결 나선」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.wave-spiral",
+          "code": "IC-AR-12",
+          "icon": "assets/items/renders/art-wave-spiral_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.32,
+        0.32,
+        0.559
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-13",
+      "slug": "art-big-acorn",
+      "name": "「큰 도토리 조각」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.big-acorn",
+          "code": "IC-AR-13",
+          "variant": "real",
+          "icon": "assets/items/renders/art-big-acorn_real_thumb.png"
+        },
+        {
+          "item": "art.big-acorn-fake",
+          "code": "IC-AR-13",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-big-acorn_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.32,
+        0.32,
+        0.467
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-14",
+      "slug": "art-rising-bird",
+      "name": "「날아오르는 새」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.rising-bird",
+          "code": "IC-AR-14",
+          "icon": "assets/items/renders/art-rising-bird_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.32,
+        0.32,
+        0.586
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-15",
+      "slug": "art-bear-bust",
+      "name": "「곰 흉상」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.bear-bust",
+          "code": "IC-AR-15",
+          "variant": "real",
+          "icon": "assets/items/renders/art-bear-bust_real_thumb.png"
+        },
+        {
+          "item": "art.bear-bust-fake",
+          "code": "IC-AR-15",
+          "variant": "fake",
+          "icon": "assets/items/renders/art-bear-bust_fake_thumb.png"
+        }
+      ],
+      "variants": [
+        "real",
+        "fake"
+      ],
+      "size": [
+        0.32,
+        0.32,
+        0.48
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-AR-16",
+      "slug": "art-stone-tower",
+      "name": "「돌탑 셋」",
+      "group": "art",
+      "kind": "art-sculpture",
+      "hold": false,
+      "items": [
+        {
+          "item": "art.stone-tower",
+          "code": "IC-AR-16",
+          "icon": "assets/items/renders/art-stone-tower_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.32,
+        0.32,
+        0.396
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-BG-01",
       "slug": "bug-cabbage-white",
       "name": "배추흰나비",

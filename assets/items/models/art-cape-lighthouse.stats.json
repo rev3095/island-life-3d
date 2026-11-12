@@ -1,0 +1,54 @@
+{
+  "id": "IC-AR-08",
+  "slug": "art-cape-lighthouse",
+  "name": "「등대가 있는 곶」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.cape-lighthouse"
+  ],
+  "hold": false,
+  "triangles": 1460,
+  "parts": 1,
+  "materials": [
+    "beam",
+    "bg",
+    "cliff",
+    "cloud",
+    "frame",
+    "frameTrim",
+    "lamp",
+    "sea",
+    "stand",
+    "stripe",
+    "tower",
+    "wave"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 36544,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-cape-lighthouse_main.png",
+    "art-cape-lighthouse_thumb.png"
+  ]
+}

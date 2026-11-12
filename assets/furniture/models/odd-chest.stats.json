@@ -1,0 +1,57 @@
+{
+  "id": "FU-75",
+  "slug": "odd-chest",
+  "item": "furn.odd-chest",
+  "name": "수상한 궤짝",
+  "category": "furniture",
+  "kind": "odd-chest",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2208,
+  "parts": 3,
+  "materials": [
+    "glow",
+    "metal",
+    "patch",
+    "patch2",
+    "stitch",
+    "strap",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "chest",
+    "lid",
+    "stars"
+  ],
+  "animations": {},
+  "size": [
+    0.75,
+    0.66,
+    0.68
+  ],
+  "bounds": [
+    [
+      -0.376,
+      -0.396,
+      0.0
+    ],
+    [
+      0.376,
+      0.268,
+      0.685
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 47816,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "odd-chest_front.png",
+    "odd-chest_main.png",
+    "odd-chest_thumb.png",
+    "odd-chest_top.png"
+  ]
+}

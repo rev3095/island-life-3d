@@ -448,6 +448,15 @@
       "status": "approved"
     },
     {
+      "id": "PR-35",
+      "slug": "gift-box",
+      "name": "선물 상자",
+      "category": "prop",
+      "kind": "gift-box",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -536,6 +545,33 @@
       "kind": "tour-boat",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "BD-13",
+      "slug": "odd-tent",
+      "name": "이상한 천막",
+      "category": "building",
+      "kind": "odd-tent",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-14",
+      "slug": "fox-shop",
+      "name": "여우 상인 가게",
+      "category": "building",
+      "kind": "fox-shop",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-15",
+      "slug": "fortune-booth",
+      "name": "운세 부스",
+      "category": "building",
+      "kind": "fortune-booth",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "FB-01",

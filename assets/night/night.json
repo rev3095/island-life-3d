@@ -85,7 +85,8 @@
     "artChance": 0.6,
     "fakeChance": 0.4,
     "stock": ["furn.odd-chest"],
-    "spot": [-0.12,-0.3],
+    "spot": [0.24,0.01],
+    "ground": ["grass","sand"],
     "tag": "odd",
     "about": "밤 9시–새벽 5시, 30% (7일 넘게 안 섰으면 꼭). 주인 없음 — 받침 하나에 미술품(60%, 가품 40%) 또는 수상한 궤짝"
   },

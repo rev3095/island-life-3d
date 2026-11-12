@@ -12,6 +12,8 @@
   "floor": "fl-08",
   "windows": [],
   "door": { "gx0": 2, "gx1": 3 },
+  "unattended": true,
+  "talk": { "lx": 2.5, "lz": 3.6 },
   "furniture": [
     { "fu": "FU-74", "name": "미술품 받침", "box": [1, 1, 0.35], "color": "#7A2E3A", "gx": 2, "gz": 2, "rot": 0 },
     { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 0, "gz": 0, "rot": 0 },
