@@ -237,6 +237,11 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     if (!R || !U || !door) return false;
     P.busy = H.busy = true;
     try {
+      // 저장에서 딸린 방으로 이어 했으면 1층을 아직 안 지었다 → 그 매장 갈래로 먼저 짓는다
+      P.phase ??= R.base.phase ?? phaseNow();
+      setPhase(U, P.phase);
+      await build(U);
+      await refresh(U);
       const m = roomDoor(R), f = innerSpot(U.spec, door);
       const step = { x: U.x0 + f.sx + (f.sx - f.lx) * 0.6, z: U.z0 + f.sz + (f.sz - f.lz) * 0.6 };
       await doors.through({ dir: 'pass', from: { x: m.x, z: m.front + 0.2 }, to: { x: U.x0 + f.sx, z: U.z0 + f.sz, facing: f.back }, step, arrive: s => moveTo(U.kind, s) });
@@ -515,7 +520,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
           m.root.position.set(R.x0 + s.lx - cx, top ? s.hang - b.max.y : s.y - b.min.y, R.z0 + s.lz - cz);
           return tag(m);
         }
-        if (s.group === 'furniture' && kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구)
+        if (kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구 — 묶음 이름이 furniture·indoor·outdoor·night-furniture 어느 것이든)
           const obj = await kit.make(s.id);
           const fp = kit.info(s.id).footprint ?? [1, 1];
           obj.root.scale.setScalar(Math.min(1, (s.fit ?? 2) / Math.max(...fp)));

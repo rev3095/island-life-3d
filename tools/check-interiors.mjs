@@ -2,6 +2,9 @@
 // 행동 키 글자를 보고, 열려 있으면 실제 Space 로 들어가 실내가 뜨는지 · 임시 상자(모델 없는 가구)가 남았는지 · 스크린샷을 남긴다.
 // 준비만 직접 고친다(미리 보기 저장): 첫 섬 축제를 마침(state.festival.endedDay) · 이사 오는 주민 셋 입주(town.movein.skip) — 나머지는 실제 키.
 // 나올 때는 각 실내의 나가기 함수를 부른다 (점검이 보는 것은 들어가기와 안의 모습).
+// 실내 전수 (사용자 요청 6·7번): ① 「목록·팝업으로만 열리는 곳」 = 문 앞 행동 키를 눌렀는데 들어가지 않고 창·대화만 뜬 곳 → 0 이어야 통과.
+//   ② 이 트랙 몫 문(내 집·도토리상점·박물관·주민 집)은 모든 시각에 실제로 걸어 들어가야 통과 (주민이 외출·자는 중이어도). 달빛 가게·새벽 천막의 닫힘은 밤 트랙 몫이라 「닫힘」으로만 적는다.
+//   ③ 도토리상점 안: 그 시각 매장(낮/밤)과 실내 문 — 열린 문은 실제 Space 로 딸린 방(정원·도구 코너 / 지하 밤 코너)에 들어가 진열품 「보기」를 보고 문 매트 행동 키로 1층에 돌아오고, 닫힌 문은 「닫힘」 글자.
 // 사용: node tools/check-interiors.mjs [--target=dev|artifact|both] [--hours=10,23,28] [--only=pado,shop] [--headed] [--port=4264] [--build]
 // 결과: docs/qa/runs/<날짜>-interiors/report.md · report.json · shots/*.jpg (종료 코드: 막힌 것이 있으면 1)
 import { spawn, execSync } from 'node:child_process';
@@ -95,19 +98,28 @@ async function visitDoor({ hour, key, slug, label }) {
   out.peek = pk ? `${pk.name}${lab ? ` · ${lab}` : ''}` : `없음 (창 ${S.ui.isBlocking()} · 입력 ${c.input?.enabled} · 장면 ${!!S.story?.playing} · 얼음 ${!!P.frozen} · 거리 ${Math.hypot(P.position.x - d.x, P.position.z - d.z).toFixed(2)} · 안 ${!!S.house?.inside}/${S.house?.places?.where ?? ''} · ${[...document.querySelectorAll('.pk-scrim, .pk-dlg-box, [role=dialog]')].map(e => e.textContent.trim().slice(0, 24)).join(' / ')})`;
   out.atHome = key === 'villager' ? S.town.atHome(slug) : null;
   out.rule = key === 'villager' ? null : (key === 'moonshop' || key === 'tent') ? S.night?.placeRule?.(key) ?? null : S.town.placeRule?.(key) ?? null;
-  if (!pk || !/^(town:(shop|museum)|house-door-in|house-visit-in|night:door)$/.test(pk.name) || pk.name === 'house-visit-in' && out.atHome !== 'home') { out.note = `문 앞 들어가기 없음`; return out; }
+  const mine = key !== 'moonshop' && key !== 'tent';   // 이 트랙 몫 (늘 들어가야 함)
+  out.mine = mine;
+  if (!pk || !/^(town:(shop|museum)|house-door-in|house-visit-in|night:door)$/.test(pk.name)) { out.note = `문 앞 들어가기 없음`; out.fail = mine; return out; }
   const x0 = P.position.x;
   await press();
+  out.popup = false;
   for (let k = 0; k < 160; k++) {
     step(4); await wait(40);
     if (Math.abs(P.position.x - x0) > 100 && !S.house?.passing && !S.story?.playing) break;
     if (S.story?.playing) await press('Escape');
-    else if (S.ui.isBlocking()) await press();
+    else if (S.ui.isBlocking()) { if (!S.house?.passing && Math.abs(P.position.x - x0) < 100) out.popup = true; await press(); }
+    else if (k > 40 && !S.house?.passing && Math.abs(P.position.x - x0) < 100) break;   // 아무 일도 없음 (닫힘 알림 등)
   }
   out.dialog = S.ui.isBlocking() ? [...document.querySelectorAll('.pk-dlg-box, [role=dialog]')].map(e => e.textContent.trim().slice(0, 40)).join(' / ') : '';
   await settle();
   out.entered = Math.abs(P.position.x - x0) > 100;
-  if (!out.entered) { out.note = `들어가지 못함${out.dialog ? ` (뜬 창: ${out.dialog})` : ''}`; return out; }
+  if (!out.entered) {
+    out.popupOnly = !!out.popup;   // 들어가지 않고 창·대화만 — 실내 전수에선 0 이어야 함
+    out.fail = mine || out.popupOnly;
+    out.note = `${out.popupOnly ? '⛔ 팝업만 · ' : mine ? '⛔ ' : '닫힘 (밤 트랙 몫) · '}들어가지 못함${out.dialog ? ` (뜬 창: ${out.dialog})` : ''}`;
+    return out;
+  }
   out.where = S.house.places?.where ?? (S.house.inside ? 'home' : 'room');
   const near = new Set(), v = new c.THREE.Vector3();
   c.scene.traverse(o => { if (o.userData?.placeholder && o.visible !== false && Math.abs(o.getWorldPosition(v).x - P.position.x) < 20) near.add(String(o.userData.placeholder)); });
@@ -126,13 +138,52 @@ async function visitDoor({ hour, key, slug, label }) {
       await press('Escape'); await settle();
     }
   }
+  // 도토리상점 실내 문 (실내 전수): 그 시각 매장 · 열린 문은 들어가 진열품 보기 → 문 매트 행동 키로 1층 · 닫힌 문은 「닫힘」 글자
+  if (HP?.inner && HP.where === 'shop') {
+    out.phase = HP.phase;
+    out.inner = [];
+    for (const dr of HP.inner('shop')) {
+      const row = { to: dr.to, open: dr.open, label: '', entered: false, looks: 0, lookOk: 0, back: false };
+      P.teleport(dr.x, dr.z, dr.facing); step(6);
+      const k = S.gameplay.interactions.peek('action');
+      const lab = document.querySelector('.pk-action-label, .pk-act-label, [data-action-label]')?.textContent ?? '';
+      row.label = k ? `${k.name}${lab ? ` · ${lab}` : ''}` : '없음';
+      row.peekOk = k?.name === 'house-place-inner';
+      if (dr.open && row.peekOk) {
+        await press();
+        for (let j = 0; j < 80 && (HP.where !== dr.to || S.house.passing); j++) { step(4); await wait(40); }
+        row.entered = HP.where === dr.to;
+        if (row.entered) {
+          await settle();
+          const sp2 = HP.shownSpots(dr.to) ?? [];
+          row.looks = sp2.length;
+          for (const sp of sp2) { P.teleport(sp.x, sp.z + 0.95, 0); step(6); if (S.gameplay.interactions.peek('action')?.name === 'house-place-look') row.lookOk++; }
+          row.placeholders = HP.placeholders(dr.to);
+          const m = S.house.doormat(); P.teleport(m.x, m.z, Math.PI); step(6);
+          row.outKey = S.gameplay.interactions.peek('action')?.name ?? '없음';
+          await press();
+          for (let j = 0; j < 80 && (HP.where !== 'shop' || S.house.passing); j++) { step(4); await wait(40); }
+          row.back = HP.where === 'shop';
+          await settle();
+        }
+      } else if (!dr.open && row.peekOk) {
+        await press(); step(6); await wait(150);
+        row.closedOk = HP.where === 'shop' && !S.ui.isBlocking();
+      }
+      row.ok = row.peekOk && (dr.open ? row.entered && row.back && row.looks > 0 && row.lookOk === row.looks && !(row.placeholders ?? []).length : !!row.closedOk);
+      out.inner.push(row);
+    }
+  }
   step(10);
   return out;
 }
 
 async function leaveAll() {
   const c = window.__island, { settle, step } = window.__ck, H = c.services.house;
-  try { if (H.places?.where) await H.places.leave(); else if (H.inside) await H.leave(); else await H.leaveVisit?.(); } catch (e) { /* 이미 밖 */ }
+  for (let n = 0; n < 3 && H.where; n++) {   // 딸린 방이면 1층 → 섬 (두 번)
+    try { if (H.places?.where) await H.places.leave(); else if (H.inside) await H.leave(); else await H.leaveVisit?.(); } catch (e) { /* 이미 밖 */ }
+    step(40); await settle();
+  }
   step(40); await settle();
   return Math.abs(c.services.player.position.x) < 200;
 }
@@ -186,6 +237,7 @@ async function main() {
         r.leftOk = await ev(leaveAll);
       }
       results.push(r);
+      if (r.inner) for (const x of r.inner) say(`        ↳ [${r.phase}] 실내 문 → ${x.to}: ${x.ok ? '✅' : '✗'} ${x.open ? `들어감 ${x.entered} · 보기 ${x.lookOk}/${x.looks} · 1층으로 ${x.back} (${x.outKey})` : `닫힘 ${x.closedOk}`} [${x.label}]`);
       say(`  ${String(hour).padStart(2)}시 ${String(d.label).padEnd(12)} ${r.entered ? `✅ 들어감 (${r.where})${r.looks?.n ? ` · 보기 ${r.looks.ok}/${r.looks.n}${r.looks.bad.length ? ` ✗ ${r.looks.bad.join(',')}` : ''} · ${r.looks.first ?? ''}` : ''}` : `·· ${r.note ?? r.error}`}${r.placeholders?.length ? ` ⚠ 임시 상자 ${r.placeholders.join(',')}` : ''} [${r.peek ?? '행동 없음'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''}]`);
     }
     results.push({ target, console: logs.slice(0, 20) });
@@ -199,10 +251,15 @@ async function main() {
   const hr = h => (h >= 24 ? `새벽 ${h - 24}시` : h >= 18 ? `밤 ${h - 12}시` : `낮 ${h}시`);
   const md = [`# 실내 점검 ${stamp}`, '', `날짜 흉내 ${DATE} (토) · 도구 \`tools/check-interiors.mjs\``, '', '| 대상 | 시각 | 문 | 결과 | 행동 키 · 주민 · 문 규칙 | 임시 상자 |', '|---|---|---|---|---|---|',
     ...rows.map(r => `| ${r.target} | ${hr(r.hour)} | ${r.label} | ${r.entered ? `✅ 들어감${r.shot ? ` ([사진](${r.shot}))` : ''}` : r.note ?? r.error} | ${r.peek ?? '—'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''} | ${r.placeholders?.join(', ') || ''} |`),
+    '', '## 실내 전수', '', `- 목록·팝업으로만 열리는 문: **${rows.filter(r => r.popupOnly).length}** (0 이어야 통과)`, `- 이 트랙 몫 문(내 집·상점·박물관·주민 집) 못 들어감: **${rows.filter(r => r.mine && !r.entered).length}**`,
+    ...rows.filter(r => r.inner).flatMap(r => r.inner.map(x => `- [${r.target}] ${hr(r.hour)} 도토리상점 ${r.phase} 매장 → ${x.to}: ${x.ok ? '✅' : '✗'} ${x.open ? `들어감 · 보기 ${x.lookOk}/${x.looks} · 1층으로 ${x.back}` : '닫힘 글자'} (${x.label})`)),
     '', ...results.filter(r => r.console).map(r => `- [${r.target}] 콘솔 오류·실패 요청 ${r.console.length}${r.console.length ? `: ${r.console.join(' · ')}` : ''}`)].join('\n');
   await writeFile(join(outDir, 'report.md'), md);
-  const bad = rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
-  say(`\n결과 ${outDir} · 문제 ${bad}`);
+  const popupOnly = rows.filter(r => r.popupOnly).length, notIn = rows.filter(r => r.mine && !r.entered).length;
+  const innerRows = rows.flatMap(r => r.inner ?? []), innerBad = innerRows.filter(x => !x.ok).length;
+  const bad = rows.filter(r => r.error || r.fail || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + innerBad + results.filter(r => r.console?.length).length;
+  say(`\n팝업만 뜬 문 ${popupOnly} · 이 트랙 몫 못 들어간 문 ${notIn} · 상점 실내 문 문제 ${innerBad}/${innerRows.length}`);
+  say(`결과 ${outDir} · 문제 ${bad}`);
   process.exit(bad ? 1 : 0);
 }
 
