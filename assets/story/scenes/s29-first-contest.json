@@ -1,0 +1,190 @@
+{
+  "id": "s29-first-contest",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절이 깊어진다",
+  "title": "첫 대회",
+  "summary": "광장에 처음 보는 무대가 섰다. 사회를 맡은 초롱이 깃발 아래에서 대회를 소개하고, 주민 셋이 낚싯대·잠자리채를 들고 기다린다. 「준비… 시작!」 신호와 함께 첫 대회가 열린다.",
+  "trigger": {
+    "on": "contest-first"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "무대 → 사회 소개 → 출발 신호",
+      "recommended": true,
+      "desc": "깃발 달린 무대를 넓게 → 초롱이 탁자 옆에서 소개 → 주인공이 고개 끄덕 → 초롱 「시작!」.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "깃발 줄과 시상대가 있는 광장 대회 무대",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "caption": "광장에 대회 무대가 섰어요",
+          "actors": [
+            {
+              "who": "chorong",
+              "at": [
+                0.9,
+                -0.2
+              ],
+              "face": 180,
+              "emote": "🎤",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                1.6
+              ],
+              "face": 0,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "초롱이 손을 흔들며 대회 소개",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "caption": "사회는 초롱 — 크기와 마릿수로 겨뤄요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "face": "player",
+              "do": "happy",
+              "emote": "🏆",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "to": [
+                0,
+                0.5
+              ],
+              "do": "walk",
+              "face": "chorong",
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "주인공이 도구를 꽉 쥐고 끄덕",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": -15,
+            "move": "static"
+          },
+          "caption": "제한 시간은 3분!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "face": "chorong",
+              "do": "happy",
+              "emote": "💪",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "face": "player",
+              "emote": "😆",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "초롱 「준비… 시작!」",
+          "dur": 3,
+          "cam": {
+            "size": "full",
+            "target": "chorong",
+            "angle": 10,
+            "move": "pull"
+          },
+          "caption": "준비… 시작!",
+          "actors": [
+            {
+              "who": "chorong",
+              "face": "player",
+              "do": "happy",
+              "emote": "📣",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "chorong",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 출발",
+      "desc": "무대 앞에서 초롱이 「시작!」 하고 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "무대 앞 초롱과 주인공",
+          "dur": 4,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "caption": "첫 대회 시작!",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "at": [
+                0.9,
+                -0.2
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "📣",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0.5
+              ],
+              "face": "chorong",
+              "emote": "💪",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -49,6 +49,7 @@ export default {
       world.places.festival && { x: world.places.festival.x, z: world.places.festival.z, r: 2.8 },
       ...eventSpots(),
       ...(ctx.services.night?.clearSpots?.() ?? []),   // M12 야시장 노점 앞 · 달빛 가게·천막 문 앞
+      ...(ctx.services.contest?.clearSpots?.() ?? []),   // M18-P3 대회 날 무대 접수 탁자 앞
     ].filter(Boolean);
     // 8차 행사 시간엔 그 행사 자리(간판·돗자리·솥·눈덩이)도 — 행동 거리(1.4~1.9) + 말 걸기 거리(1.3). 주인공이 1.4칸 둘레에 서서
     // 간판 앞 Space 가 「소원 빌기」 대신 말 걸기로 가던 것 (M8-P8 행사 점검 EV-02, 가끔)
@@ -68,13 +69,14 @@ export default {
       /** 생일엔 하루 종일 집에 */
       staysIn: V => !!party?.staysIn(V.slug),
       /** 행사·야시장 주인공으로 지금 자리를 지켜야 하나 → 낮에 집에 들르는 시간(homeBreak)을 건너뛴다 (P44 FB-01) */
-      hostBusy: slug => !!(ctx.services.events?.hostSpot?.(slug) ?? ctx.services.night?.hostSpot?.(slug)),
+      hostBusy: slug => !!(ctx.services.events?.hostSpot?.(slug) ?? ctx.services.night?.hostSpot?.(slug) ?? ctx.services.contest?.hostSpot?.(slug)),
       /** 자주 가는 곳 하나 → {x, z} (다른 주민이 가려는 곳과 겹치지 않게) */
       /** 이 자리에 서면 행동 키를 가로막나: 상점·박물관 문 앞 · 광장 모닥불 둘레 (7차 D56-A — 주민이 비켜 선다) */
       blocksAction,
       pickSpot(person, V) {
         // 8차 D79-A: 계절 행사 주인공은 행사 시간 동안 대개 그 행사 자리 둘레에 (gameplay/events hostSpot)
-        const ev = ctx.services.events?.hostSpot?.(person.slug) ?? ctx.services.night?.hostSpot?.(person.slug);   // M12 D108-A: 야시장 날 노점 둘레
+        const ev = ctx.services.events?.hostSpot?.(person.slug) ?? ctx.services.night?.hostSpot?.(person.slug)   // M12 D108-A: 야시장 날 노점 둘레
+          ?? ctx.services.contest?.hostSpot?.(person.slug);   // M18-P3 대회 날 사회 주민(초롱)은 무대 둘레
         if (ev && Math.random() < 0.75) {
           for (let i = 0; i < 16; i++) {   // 무대·모닥불 둘레(blocksAction)에 걸리는 자리가 많아 넉넉히
             const a = Math.random() * Math.PI * 2, r = EVENT_CLEAR + 0.2 + Math.random() * 1.6;   // 행사 자리 바로 앞(EVENT_CLEAR)은 비워 둔다

@@ -1769,6 +1769,7 @@ BUILDERS = {
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
 import night_special_env; BUILDERS.update(night_special_env.builders(globals()))   # P54 밤 특별 상점 BD-13–15 · PR-35
+import contest_env; BUILDERS.update(contest_env.builders(globals()))   # M18-P3 광장 대회 무대 BD-17
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

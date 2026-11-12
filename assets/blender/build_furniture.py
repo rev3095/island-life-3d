@@ -2108,6 +2108,7 @@ BUILDERS = {
     'glass-case': b_glass_case, 'wall-tank': b_wall_tank, 'art-frame': b_art_frame, 'star-projector': b_star_projector,   # 요청 9 박물관 관 붙박이 FU-85–88
 }
 import night_special_furniture; BUILDERS.update(night_special_furniture.builders(globals()))   # P54 밤 특별 상점 가구 FU-73·75·76·78 + 붙박이 FU-74·77
+import contest_furniture; BUILDERS.update(contest_furniture.builders(globals()))   # M18-P3 대회 트로피 FU-89–91
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

@@ -1,0 +1,45 @@
+{
+  "id": "BD-17",
+  "slug": "contest-stage",
+  "name": "대회 무대",
+  "category": "building",
+  "kind": "contest-stage",
+  "version": "0.1",
+  "triangles": 4008,
+  "parts": 3,
+  "materials": [
+    "banner",
+    "bannerMark",
+    "bronze",
+    "flagA",
+    "flagB",
+    "flagC",
+    "gold",
+    "paper",
+    "podium",
+    "pole",
+    "silver",
+    "trim",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    2.9,
+    2.36,
+    2.35
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 82864,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "contest-stage_front.png",
+    "contest-stage_hero.jpg",
+    "contest-stage_main.png",
+    "contest-stage_thumb.png",
+    "contest-stage_top.png"
+  ]
+}

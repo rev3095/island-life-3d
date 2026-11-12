@@ -80,6 +80,11 @@ export const DAILY_FILES = (() => {
     ...(a.characters ?? []).map(k => `assets/models/${k}.glb.json`),
   ]);
 })();
+// M18-P3 대회 무대 BD-17 (assets/contest/contest.json assets.env) — 대회 날에만 놓여서 처음엔 안 받고 daily 묶음에 같이 (묶음 수를 늘리지 않게)
+export const CONTEST_FILES = (() => {
+  const a = JSON.parse(readFileSync(join(ROOT, 'assets/contest/contest.json'), 'utf8')).assets ?? {};
+  return new Set((a.env ?? []).map(k => `assets/env/models/${k}.glb.json`));
+})();
 // 묶을 때 모델 줄이기 (tools/glb-quantize.mjs). --no-quantize 로 끄면 원본 그대로 (비교용)
 const QUANTIZE = !process.argv.includes('--no-quantize');
 export const PACKS = [
@@ -90,8 +95,8 @@ export const PACKS = [
   { name: 'tour', test: p => TOUR_FILES.has(p) },                                   // P35 무인도 투어 배·광석 바위 (배를 놓을 때)
   { name: 'night', test: p => NIGHT_FILES.has(p) },                                 // P40 밤 건물·등불·밤 가게 주인 (밤에 처음 나올 때)
   { name: 'movers', test: p => MOVER_FILES.has(p) },
-  { name: 'daily', test: p => DAILY_FILES.has(p) },                                 // M13 풍선·유리병·행상 수레·행상 (처음 나올 때)                                // P40 이사 오는 주민 모델 (이사 와서 처음 세울 때)
-  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|night|tour|journal|daily|rating)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' || p === 'assets/clothes/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
+  { name: 'daily', test: p => DAILY_FILES.has(p) || CONTEST_FILES.has(p) },                                 // M13 풍선·유리병·행상 수레·행상 (처음 나올 때)                                // P40 이사 오는 주민 모델 (이사 와서 처음 세울 때)
+  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|night|tour|journal|daily|rating|contest)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' || p === 'assets/clothes/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
   { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
   { name: 'items', test: p => p.startsWith('assets/items/') },                     // 들어 보이는 아이템 모델 (처음 잡았을 때)

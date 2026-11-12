@@ -40,6 +40,12 @@ async function dailyKinds(assets) {
   return cfg?.assets?.env ?? [];
 }
 
+/** M18-P3 대회 무대 BD-17 (assets/contest/contest.json assets.env) — 처음에 받지 않고 대회 날 무대를 놓을 때 */
+async function contestKinds(assets) {
+  const cfg = await assets.loadJSON('assets/contest/contest.json').catch(() => null);
+  return cfg?.assets?.env ?? [];
+}
+
 /** P35 무인도 투어 모델 (배·광석 바위, assets/tour/tour.json env) — 처음에 받지 않고 선착장에 배를 놓을 때·투어 섬을 세울 때 */
 async function tourKinds(assets) {
   const cfg = await assets.loadJSON('assets/tour/tour.json').catch(() => null);
@@ -64,6 +70,7 @@ export default {
     for (const k of await nightKinds(assets)) lazy.add(k);
     for (const k of await tourKinds(assets)) lazy.add(k);
     for (const k of await dailyKinds(assets)) lazy.add(k);
+    for (const k of await contestKinds(assets)) lazy.add(k);   // M18-P3 대회 무대
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });

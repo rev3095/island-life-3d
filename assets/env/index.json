@@ -637,6 +637,15 @@
       "status": "approved"
     },
     {
+      "id": "BD-17",
+      "slug": "contest-stage",
+      "name": "대회 무대",
+      "category": "building",
+      "kind": "contest-stage",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FB-01",
       "slug": "festival-booth-lantern",
       "name": "등불 길 부스",

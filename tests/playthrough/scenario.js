@@ -1650,6 +1650,83 @@ export function makeScenario(bot, sk, opts = {}) {
     return miss.length ? awk(`${miss.join(' · ')} — ${done.join(' · ')}`) : pass(done.join(' · '));
   });
 
+  // M18-P3 계절 대회 (D194-A): 날짜를 넘겨 다음 대회 날(낚시 3·7·12월 · 곤충 5·10월)로 → 10시 광장 무대 BD-17 접수 탁자에서 Space → 초롱 대화 「나갈래요!」
+  //   → (처음이면 s29) → 3분 동안 낚시·곤충 잡기 → 결과 발표 → 트로피·도토리 · 섬 일지 「대회 나가기」. 날짜는 시계를 29시로 넘기며 하루씩 (봇은 ?date= 를 쓰지 않는다)
+  add('contest', 'M18-P3 계절 대회: 다음 대회 날까지 날짜 넘기기 → 광장 무대 접수 → 3분 낚시·곤충 → 결과 발표 · 트로피 · 섬 일지', async () => {
+    const C = () => S().contest;
+    if (!C()) return block('대회(contest) 서비스가 없어요');
+    if (!fest().endedDay) return skip('엔딩 전 (대회는 첫 섬 축제 뒤부터)');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    const odd = [], res = {};
+    // ① 다음 대회 날까지 (오늘이 대회 날이면 그대로) — 섬 축제 날과 겹치면 다음 대회
+    const next = C().upcoming()[0];
+    res.target = next?.day ?? null;
+    const t0 = performance.now();
+    let n = 0;
+    while (!C().today() && n < 160) { S().time.setHour(29); await bot.frames(4); n++; }
+    res.daysSkipped = n;
+    if (!C().today()) return block(`${n}일 넘겨도 대회 날이 아님 (목표 ${res.target})`);
+    await bot.setHour(10);
+    await bot.settle(60);
+    const c = C().today(), kind = c.kind;
+    res.contest = `${c.id} ${c.name} ${bot.day()}`;
+    // ② 무대 접수 탁자 앞에서 Space → 초롱 대화 (첫 고르기 = 「나갈래요!」)
+    const tool = kind === 'fish' ? 'tool.rod' : 'tool.net';
+    if (!bot.has(tool)) await sk.shop({ buy: [tool] });
+    if (!(await bot.until(() => !!C().desk(), { timeout: 10, label: '무대' }))) return block('대회 무대가 안 놓임');
+    const desk = C().desk();
+    await bot.tool(null);
+    await bot.walkTo(desk.front, { near: 0.3, label: '대회 접수 탁자' });
+    await bot.face(desk.desk);
+    res.peek = bot.peek();
+    if (res.peek !== 'contest:desk') odd.push(`접수 탁자 앞 행동 키가 ${res.peek}`);
+    const firstBefore = !st().contest?.first;
+    bot.policy = { dialog: () => 0 };
+    bot.press('action');
+    await bot.until(() => C().running, { timeout: 30, label: '대회 시작' });
+    bot.policy = {};
+    await bot.settle(60);   // 처음이면 s29 장면
+    res.s29 = firstBefore ? !!st().story?.seen?.['s29-first-contest'] : 'already';
+    if (firstBefore && !res.s29) odd.push('첫 대회 장면 s29 가 안 나옴');
+    if (!C().running && !C().record(c.id)) return block('대회가 시작되지 않음');
+    await bot.shot('17-contest-start', `${c.name} 접수 · 대회 창 UI-34`);
+    res.ui = !bot.$('.ct-box')?.hidden;
+    if (!res.ui) odd.push('대회 창 UI-34 가 안 보임');
+    // ③ 제한 시간 동안 잡기 (사람처럼 — 낚시는 물가 그림자, 곤충은 둘레에서)
+    let tries = 0, shot = false;
+    while (C().running && tries < 40) {
+      tries++;
+      if (kind === 'fish') await sk.fish({ tries: 1 }); else await sk.bug({ tries: 1 });
+      if (!shot && (C().view()?.me?.count ?? 0) > 0) { shot = true; await bot.shot('17-contest-catch', `대회 중 기록 ${C().view().me.score}점 · ${C().view().me.rank}위`); }
+    }
+    await bot.until(() => !C().running, { timeout: 200, label: '대회 끝' });
+    bot.policy = { dialog: () => 0 };
+    await bot.settle(60);
+    bot.policy = {};
+    // ④ 결과: 기록 · 상 · 섬 일지
+    const rec = C().record(c.id);
+    if (!rec) return block('대회 기록이 없음');
+    res.rank = rec.rank; res.score = rec.score; res.count = rec.count; res.prize = rec.prize;
+    if (rec.prize?.item && !bot.has(rec.prize.item) && !(st().contest?.owed ?? []).includes(rec.prize.item)) odd.push(`상 ${rec.prize.item} 을 못 받음`);
+    res.journal = st().journal?.counts?.contest ?? 0;
+    if (!res.journal) odd.push('섬 일지 「대회 나가기」가 안 셈');
+    res.uiGone = !!bot.$('.ct-box')?.hidden;
+    if (!res.uiGone) odd.push('대회가 끝났는데 대회 창이 남음');
+    // ⑤ 다시 Space → 「벌써 나갔어요」 (접수는 하루 한 번)
+    await bot.tool(null);
+    await bot.walkTo(desk.front, { near: 0.3, label: '대회 접수 탁자' });
+    await bot.face(desk.desk);
+    const again = bot.peek();
+    if (again !== 'contest:desk') odd.push(`대회 뒤 접수 탁자 행동 키 ${again}`);
+    await bot.act('action', { timeout: 20 });
+    if (C().running) odd.push('같은 날 두 번 접수됨');
+    res.realSec = Math.round((performance.now() - t0) / 1000);
+    note('contest', res);
+    const msg = `${res.contest} · ${res.daysSkipped}일 넘김 · ${rec.count}마리 ${rec.score}점 ${rec.rank}위 → ${rec.prize?.item ?? '참가'} + 🌰${rec.prize?.acorns}`;
+    return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;

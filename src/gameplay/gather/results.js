@@ -35,6 +35,8 @@ export function createResults(ctx, kit, mk, fx, { lock }) {
       const data = kit.data;
       if (!data?.collect) return { added: 0, left: n, acorns: 0 };
       const r = data.collect(id, n);
+      // M18-P3 대회: 잡은 것(물고기·곤충·바다 생물)을 알린다 — contest 가 크기를 재고 섬 일지 등도 들을 수 있다
+      if (verb === '잡았다') ctx.events.emit('gather:catch', { id, category: kit.item(id)?.category ?? null, n, added: r.added });
       const name = kit.name(id), icon = kit.icon(id);
       if (r.acorns) {
         kit.sfx('acorn');
