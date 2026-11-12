@@ -7,14 +7,16 @@ import { GROUPS, SHEETS, sheetOf, SOURCE_KO } from './sheets.js';
 import { createMapTab, mapLabel, mapShow } from './map-tab.js';
 import { createRoomTab } from './room-tab.js';
 import { PLACE_FILES, PLACE_KINDS } from '../src/gameplay/house/placedata.js';
+import { HALL_FILES, HALLS } from '../src/gameplay/house/museum-hall-data.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const when = t => (t ? new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
 const won = n => Number(n).toLocaleString('ko-KR');
-const FILES = { items: 'assets/data/items.json', rules: 'assets/data/rules.json', layout: 'assets/island/layout.json', events: 'assets/events/events.json', night: 'assets/night/night.json', tour: 'assets/tour/tour.json' };
+const FILES = { items: 'assets/data/items.json', rules: 'assets/data/rules.json', layout: 'assets/island/layout.json', events: 'assets/events/events.json', night: 'assets/night/night.json', tour: 'assets/tour/tour.json',
+  home: 'assets/interior/home.json', rating: 'assets/rating/rating.json', journal: 'assets/journal/journal.json' };   // M17-P4: 집 증축 · 섬 별점 · 섬 일지
 const BOARD_KO = { elem: '요소', data: '숫자 표', map: '섬 지도' };
-const FILE_KO = { items: '아이템', rules: '규칙', layout: '섬 지도', events: '행사', night: '밤·새벽', tour: '투어', rooms: '방', places: '가게 실내' };
+const FILE_KO = { items: '아이템', rules: '규칙', layout: '섬 지도', events: '행사', night: '밤·새벽', tour: '투어', rooms: '방', places: '가게 실내', halls: '박물관 관', home: '집 증축', rating: '섬 별점', journal: '섬 일지' };
 
 /* ---------- 상태 ---------- */
 let base = null;           // { items, rules, layout, events, night, tour, rooms: { slug: 방 }, places: { slug: 가게 } } — 게임에 들어간 파일
@@ -134,7 +136,7 @@ function hitsOf(s) {
 function changedIn(s) {
   const ks = Object.keys(changes);
   if (s.custom === 'map') return ks.filter(k => k.startsWith('layout/')).length;
-  if (s.custom === 'rooms') return ks.filter(k => k.startsWith('rooms/') || k.startsWith('places/')).length;
+  if (s.custom === 'rooms') return ks.filter(k => k.startsWith('rooms/') || k.startsWith('places/') || k.startsWith('halls/')).length;
   if (s.object) { const pre = objectRows(s).map(([p]) => p); return ks.filter(p => pre.some(q => p === q || q.startsWith(p + '/') || p.startsWith(q + '/'))).length; }
   return ks.filter(p => [s.section, s.extra?.section].filter(Boolean).some(sec => p.startsWith(`${s.file}/${sec}/`) || p === `${s.file}/${sec}`)).length;
 }
@@ -400,10 +402,12 @@ function recipeAct(b) {
 function labelOf(path) {
   const [f, sec, row, ...rest] = path.split('/');
   if (f === 'layout') return [sheetOf('map'), `섬 지도 · ${mapLabel(path.slice(7))}`];
-  if (f === 'rooms' || f === 'places') {
+  if (f === 'rooms' || f === 'places' || f === 'halls') {
     const spec = W[f]?.[sec] ?? base[f]?.[sec];
-    const what = { furniture: '가구 자리', host: '주민 서는 곳', keeper: '주인 서는 곳', name: '이름', wallpaper: '벽지', floor: '바닥' }[row] ?? [row, ...rest].join('/');
-    return [sheetOf('rooms'), `방 배치 · ${spec?.name ?? sec} · ${what}`, `rooms.${sec}`];
+    const PH = { day: '낮 매장', night: '밤 매장' };
+    const what = row === 'phases' ? `${PH[rest[0]] ?? rest[0]} ${rest[1] === 'keeper' ? '주인 서는 곳' : '가구 자리'}`
+      : { furniture: '가구 자리', starter: '처음 가구', fixtures: '계단', inner: '실내 문', halls: '관 입구', host: '주민 서는 곳', keeper: '주인 서는 곳', name: '이름', wallpaper: '벽지', floor: '바닥' }[row] ?? [row, ...rest].join('/');
+    return [sheetOf('rooms'), `방 배치 · ${spec?.name ?? sec} · ${what}`, `rooms.${f === 'halls' ? `hall-${sec}` : sec}`];
   }
   for (const s of SHEETS) if (s.object) for (const [p, label] of objectRows(s)) if (p === path) return [s, `${s.name} · ${label}`];
   const s = SHEETS.find(s => s.file === f && (s.section === sec || s.extra?.section === sec)) ?? (sec === 'recipes' ? sheetOf('recipes') : null);
@@ -416,8 +420,11 @@ function labelOf(path) {
 }
 const showVal = (path, v) => {
   if (path.startsWith('layout/')) return mapShow(path.slice(7), v);
-  if (/^(rooms|places)\/[\w-]+\/furniture$/.test(path)) return Array.isArray(v) ? `가구 ${v.length}개` : fmt(v);
-  if (/^(rooms|places)\/[\w-]+\/(host|keeper)$/.test(path)) return v ? `(${v.lx}, ${v.lz}) ${v.face}` : fmt(v);
+  if (/^(rooms|places|halls)\/[\w-]+\/(furniture|starter|phases\/\w+\/furniture)$/.test(path)) return Array.isArray(v) ? `가구 ${v.length}개` : fmt(v);
+  if (/^(rooms|places)\/[\w-]+\/fixtures$/.test(path)) return Array.isArray(v) ? v.map(f => `${f.slug} (${f.gx}, ${f.gz})${f.from ? ` ${f.from}단계부터` : ''}`).join(' · ') : fmt(v);
+  if (/^places\/[\w-]+\/inner$/.test(path)) return Array.isArray(v) ? v.map(d => `→${d.to} ${d.wall}:${d.slot}${d.phase ? ` ${d.phase}` : ''}`).join(' · ') : fmt(v);
+  if (/^places\/[\w-]+\/halls$/.test(path)) return Array.isArray(v) ? v.map(a => `${a.hall} ${a.wall}:${a.at}`).join(' · ') : fmt(v);
+  if (/^(rooms|places)\/[\w-]+\/(host|keeper|phases\/\w+\/keeper)$/.test(path)) return v ? `(${v.lx}, ${v.lz}) ${v.face}` : fmt(v);
   if (path.startsWith('rules/recipes/')) {
     if (v === undefined) return '(없음)';
     if (v === null) return '(뺌)';
@@ -473,7 +480,7 @@ $('note').addEventListener('input', () => { note = $('note').value; saveSoon(); 
 function checks() {
   const out = checkElements(W).map(c => ({ ...c }));
   if (mapTab && (changedPrefix('layout') || tab === 'map')) for (const [ok, label, why] of mapTab.checks()) out.push({ tab: 'map', ok, label: `섬 지도: ${label}`, why: ok ? '' : why });
-  if (roomTab) for (const [ok, label, why, slug] of roomTab.checks()) if (!ok || changedPrefix(`rooms/${slug}`) || changedPrefix(`places/${slug}`)) out.push({ tab: 'rooms', hash: `rooms.${slug}`, ok, label, why });
+  if (roomTab) for (const [ok, label, why, slug] of roomTab.checks()) if (!ok || changedPrefix(`rooms/${slug}`) || changedPrefix(`places/${slug}`) || changedPrefix(`halls/${slug.replace(/^hall-/, '')}`)) out.push({ tab: 'rooms', hash: `rooms.${slug}`, ok, label, why });
   out.push({ tab: null, ok: invalid.size === 0, label: '잘못 쓴 칸 없음', why: `저장하지 않은 잘못된 칸 ${invalid.size}개 (빨간 테두리)` });
   return out;
 }
@@ -553,10 +560,12 @@ async function start() {
     getJSON('assets/furniture/fixtures/index.json').catch(() => ({ models: [] })),
     Promise.all(PLACE_FILES.map(getJSON)),
   ]);
+  const halls = await Promise.all(HALL_FILES.map(getJSON));
   const rooms = await Promise.all((idx.rooms ?? []).map(r => getJSON(`assets/interior/rooms/${r.slug}.json`)));
   base = Object.fromEntries(keys.map((k, i) => [k, files[i]]));
   base.rooms = Object.fromEntries(rooms.map(r => [r.slug, r]));
   base.places = Object.fromEntries(PLACE_KINDS.map((k, i) => [k, places[i]]));
+  base.halls = Object.fromEntries(HALLS.map((h, i) => [h, halls[i]]));   // 박물관 관 여섯 RM-25–30 (경로 halls/<관>/…)
   interior = idx; furn = { models: [...furnIdx.models, ...fixIdx.models] };
   rebuild();
 

@@ -19,6 +19,7 @@ const json = p => JSON.parse(text(p));
 const W = {
   items: json(ELEM_FILES.items), rules: json(ELEM_FILES.rules), layout: json(ELEM_FILES.layout),
   events: json(ELEM_FILES.events), night: json(ELEM_FILES.night), tour: json(ELEM_FILES.tour),
+  home: json(ELEM_FILES.home), rating: json(ELEM_FILES.rating), journal: json(ELEM_FILES.journal),
 };
 
 test('요소 편집기 표: 탭 묶음·id 가 맞고, 모든 칸 경로가 실제 파일 칸이다', () => {
@@ -44,8 +45,14 @@ test('값 검사: 지금 게임 파일은 모두 통과하고, 틀린 값은 잡
   broken.events.list[0].start = { month: 2, day: 30 };
   broken.rules.shop.outdoorPerDay = 9;
   broken.rules.moving.boxesAfter = 5;
+  broken.items.sea[0].shadow = 9;
+  broken.items.scubaKit.price = broken.items.scubaKit.buy + 1;
+  broken.items.art[0].kind = 'vase';
+  broken.home.stages[2].cost = 1;
+  broken.rating.stars[2] = 10;
+  broken.journal.daily = 99;
   const tabs = checkElements(broken).filter(c => !c.ok).map(c => c.tab);
-  for (const t of ['tour', 'night', 'events', 'shop', 'moving']) assert.ok(tabs.includes(t), `${t} 검사가 틀린 값을 못 잡았다`);
+  for (const t of ['tour', 'night', 'events', 'shop', 'moving', 'sea', 'dive', 'art', 'home', 'rating', 'journal']) assert.ok(tabs.includes(t), `${t} 검사가 틀린 값을 못 잡았다`);
   assert.equal(hourKo(27), '새벽 3시');
   assert.equal(hourKo(24), '자정');
   assert.equal(hourKo(19), '저녁 7시');
@@ -135,6 +142,43 @@ test('게시 파일 목록(elem-editor/files.json)이 편집기가 import 하는
   walk('elem-editor/main.js');
   for (const f of seen) assert.ok(F.modules.includes(f), `${f} 가 게시 목록에 없다 (게시본에서 404)`);
   for (const f of [...F.modules, ...F.assets, F.page]) assert.ok(existsSync(`${ROOT}/${f}`), `${f} 파일이 없다`);
-  for (const d of ['rooms', 'places']) for (const f of readdirSync(`${ROOT}/assets/interior/${d}`)) assert.ok(F.assets.includes(`assets/interior/${d}/${f}`), `${d}/${f}`);
+  for (const d of ['rooms', 'places', 'halls']) for (const f of readdirSync(`${ROOT}/assets/interior/${d}`)) assert.ok(F.assets.includes(`assets/interior/${d}/${f}`), `${d}/${f}`);
   assert.ok(F.modules.length + F.assets.length + 1 < 511, '아티팩트 한 버전 파일 511개 안');
+});
+
+test('M17-P4: 요소 편집기가 바다 생물·스쿠버 키트·미술품·집 증축·섬 별점·섬 일지 표와 관·증축 층 배치를 안다', async () => {
+  const { SEA_SPEEDS, SCUBA_KIT } = await import('../src/data/sea-items.js');
+  const { SEA_SPEED_KO, ART_KIND_KO, itemList } = await import('../tools/elem-checks.mjs');
+  assert.deepEqual(SEA_SPEED_KO, SEA_SPEEDS, '빠르기 이름 = sea-items.js SEA_SPEEDS');
+  for (const id of ['sea', 'art', 'dive', 'home', 'rating', 'journal']) assert.ok(SHEETS.some(s => s.id === id), `표 ${id}`);
+  assert.deepEqual(new Set(W.items.art.map(a => a.kind)), new Set(Object.keys(ART_KIND_KO)));
+  const ids = new Set(itemList(W.items).map(i => i.id));
+  for (const r of W.items.sea) assert.ok(ids.has(`sea.${r.slug}`));
+  assert.ok(ids.has(SCUBA_KIT) && ids.has(`art.${W.items.art[0].slug}`));
+  // 반영 도구: 관·증축·별점·일지 파일
+  assert.deepEqual(elemTarget('halls/sea/furniture'), { key: 'halls/sea', file: 'assets/interior/halls/sea.json', sub: 'furniture' });
+  for (const [k, f] of [['home', 'assets/interior/home.json'], ['rating', 'assets/rating/rating.json'], ['journal', 'assets/journal/journal.json']]) assert.equal(elemTarget(`${k}/version`).file, f);
+  const p = plan('elem', { 'home/stages/2/cost': 55000, 'rating/rewards/5': 6000, 'journal/tasks/0/need': 4, 'items/sea/oyster/speed': 1, 'items/scubaKit/buy': 3200 });
+  assert.deepEqual(p.errors, []);
+  assert.equal(p.files.home.after.stages[2].cost, 55000);
+  assert.equal(p.files.rating.after.rewards['5'], 6000);
+  assert.equal(p.files.journal.after.tasks[0].need, 4);
+  assert.equal(p.files.items.after.sea.find(r => r.slug === 'oyster').speed, 1);
+  // 방 배치: 상점 낮/밤 매장 가구·실내 문·딸린 방, 관 가구, 증축 층 처음 가구·계단 경로가 모두 반영 도구로 간다
+  const shop = json('assets/interior/places/shop.json');
+  const p2 = plan('elem', {
+    'places/shop/phases/night/furniture': shop.phases.night.furniture.slice(0, 1),
+    'places/shop/inner': shop.inner.map(d => ({ ...d, name: `${d.name}!` })),
+    'halls/fish/furniture': json('assets/interior/halls/fish.json').furniture.slice(0, -1),
+    'rooms/rm-16/fixtures': json('assets/interior/rooms/rm-16.json').fixtures.map(f => ({ ...f, from: 2 })),
+    'rooms/rm-15/starter': [{ item: 'furn.floor-lamp', gx: 0, gz: 0, rot: 0 }],
+  });
+  assert.deepEqual(p2.errors, []);
+  assert.equal(p2.files['places/shop'].after.phases.night.furniture.length, 1);
+  assert.ok(p2.files['halls/fish'] && p2.files['rooms/rm-16'] && p2.files['rooms/rm-15']);
+  // 편집기 방 탭이 쓰는 관 전시 목록 = 게임 items.list 순서
+  const { hallLists } = await import('../elem-editor/room-tab.js');
+  const items = (await import('../src/data/items.js'));
+  const L = hallLists(W.items);
+  for (const c of ['fish', 'bug', 'fossil', 'sea', 'art']) assert.deepEqual(L[c].map(i => i.id), items.list(c).map(i => i.id), `관 목록 ${c}`);
 });

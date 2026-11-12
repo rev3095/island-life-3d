@@ -223,6 +223,16 @@ table.obj tr.gh th { text-align: left; font-family: var(--display); font-size: 1
 .r-front { fill: rgba(54,48,42,.6); }
 .r-host { cursor: grab; } .r-host circle { fill: #FFFFFF; stroke: #36302A; stroke-width: .05; }
 .r-host.sel circle { stroke: #C9701F; stroke-width: .09; } .r-face { stroke: #36302A; stroke-width: .07; stroke-linecap: round; }
+.rp.child { border-style: dashed; }
+.phasebar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+.phasebar [aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); font-weight: 600; }
+.r-furn.own rect { stroke: #5A6A9C; stroke-width: .06; stroke-dasharray: .14 .05; }
+.r-fix { cursor: grab; } .r-fix rect { fill: rgba(140,120,96,.28); stroke: #6B5A44; stroke-width: .04; stroke-dasharray: .08 .05; }
+.r-fix.sel rect { stroke: #C9701F; stroke-width: .08; }
+.r-inner { cursor: pointer; } .r-inner rect { fill: #9C6B3E; stroke: #5E3F22; stroke-width: .04; }
+.r-inner.arch rect { fill: #C9A97A; } .r-inner.off { opacity: .35; } .r-inner.sel rect { stroke: #C9701F; stroke-width: .09; }
+.r-spot { fill: none; stroke: #9C6B3E; stroke-width: .04; stroke-dasharray: .05 .04; }
+.r-slot { fill: rgba(79,134,168,.55); }
 .roomside label { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .roomside select, .roomside input[type=text] { min-width: 0; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
 </style>

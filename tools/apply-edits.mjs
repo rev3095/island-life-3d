@@ -21,6 +21,10 @@ export const ELEM_FILES = {
   tour: 'assets/tour/tour.json',
   rooms: slug => `assets/interior/rooms/${slug}.json`,
   places: slug => `assets/interior/places/${slug}.json`,
+  halls: slug => `assets/interior/halls/${slug}.json`,      // M17-P4: 박물관 관 여섯 RM-25–30 (halls/sea/furniture → halls/sea.json)
+  home: 'assets/interior/home.json',                        // M14 집 증축 단계·값
+  rating: 'assets/rating/rating.json',                      // M14 섬 별점
+  journal: 'assets/journal/journal.json',                   // M13 섬 일지
 };
 export const FILES = {
   map: { layout: 'assets/island/layout.json' },
