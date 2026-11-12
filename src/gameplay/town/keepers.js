@@ -283,7 +283,12 @@ export async function createKeepers(ctx, town, lines) {
     else if (furn.length && r() < 0.45) greet.push(...pickLines(LB.today, r, B.recent));
     else if (r() < 0.3) greet.push(...pickLines(LB.chat, r, B.recent));
     // 실내 전수: 진열품은 매장에서 앞에 서서 「보기」로 산다. 밤톨에게는 팔기 · 주문(그 매장에서 오늘 파는 것 목록 — 진열대까지 안 가도 되게)
-    const a = await say(greet, ['팔래요', '주문할래요', '그냥 구경할게요']);
+    // M17-P2 (D185-A): 집 넓히기는 밤톨에게 묻는다 (우편함은 빚 갚기만) — house.grow.offer() 가 null 이면(첫날 전) 줄을 안 넣는다
+    const grow = ctx.services.house?.grow;
+    const canGrow = !!grow?.ask && grow.offer?.() != null;
+    const menu = ['팔래요', '주문할래요', ...(canGrow ? ['집을 넓히고 싶어요'] : []), '그냥 구경할게요'];
+    const a = await say(greet, menu);
+    if (canGrow && a === 2) { await grow.ask({ say }); return; }
     if (a === 0 || a === 1) {
       const floor = phase === 'night' ? '밤 매장' : '낮 매장';
       await ui.shop.open({ stock: d.economy.stock(undefined, phase), tab: a === 0 ? 'sell' : 'buy', buyLabel: '주문', floor, keeper: B.person.name, color: B.person.color, clothes: true });   // 11차 D102-A 옷 진열대 · UI-31 주문 탭
@@ -317,7 +322,17 @@ export async function createKeepers(ctx, town, lines) {
       const before = d.museum.progress();
       const got = [];
       const off = ctx.events.on('museum:changed', ({ id } = {}) => { if (id) got.push(id); });
-      try { await ui.museum.open({ keeper: N.person.name, color: N.person.color }); } finally { off(); }
+      try {
+        // M17-P2 (D181-A): 가품을 내밀면 창이 닫히고 느루가 보고 돌려준다 → 「다른 것도…」 고르면 다시 기증 창
+        for (let round = 0; round < 8; round++) {
+          let fake = null;
+          const offFake = ctx.events.on('museum:fake', ({ id } = {}) => { fake = id ?? fake; });
+          try { await ui.museum.open({ keeper: N.person.name, color: N.person.color }); } finally { offFake(); }
+          if (!fake) break;
+          await fakeTalk(fake, say, vars, round);
+          if (await say(pickLines(LN.fake?.more ?? [['다른 것도… 보여 주시겠어요…?']], r), ['네, 더 볼게요', '괜찮아요']) !== 0) break;
+        }
+      } finally { off(); }
       await donationTalk(got, before, d.museum.progress(), say, vars);
     } else if (a === 1) await story(say, vars);
     else await say(pickLines(LN.bye, r, N.recent));
@@ -354,6 +369,27 @@ export async function createKeepers(ctx, town, lines) {
       await say(pickLines(fresh ? LN.appraise.done : LN.appraise.doneOwned, r, N.recent));
       ctx.events.emit('museum:appraised', { ids });
     }
+  }
+
+  /**
+   * M17-P2 (D181-A) 가품 미술품: 「이건 가품이에요…」 + 진품과 다른 점 한 줄 (art-items.js MUSEUM_TELL → items 칸 museumTell) → 돌려준다.
+   * 가방에서 빼지 않았으니 「돌려준다」는 그대로 두는 것. museum:fake-told { id } (봇·점검이 듣는다)
+   */
+  async function fakeTalk(id, say, vars, round = 0) {
+    const it = ctx.services.data?.items?.get?.(id);
+    vars.item = it?.name ?? '';
+    const tell = it?.museumTell ?? it?.tell ?? '';
+    const F = LN.fake ?? {};
+    const lines = [
+      ...(round ? [] : pickLines(F.look ?? [['어디… 보자…']], r, N.recent)),
+      ...pickLines(F.found ?? [['이건… 가품이에요…']], r, N.recent),
+      ...(tell ? [tell] : []),
+      ...pickLines(F.back ?? [['돌려 드릴게요…']], r, N.recent),
+    ];
+    ctx.events.emit('sfx', { name: 'menu', volume: 0.5 });
+    await say(lines);
+    ctx.services.ui?.toast?.(`${josa(it?.name ?? '미술품', '을')} 돌려받았어요 (가품)`, it?.icon);
+    ctx.events.emit('museum:fake-told', { id, tell });
   }
 
   async function donationTalk(got, before, after, say, vars) {

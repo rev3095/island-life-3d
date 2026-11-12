@@ -1,5 +1,5 @@
 // 가방: 동그란 20칸. 보기(view)·팔기(sell)·기증(donate)·고르기(pick) 모드. open() 은 고른 칸 번호(또는 null)를 돌려준다.
-import { h, fmt, itemInfo, iconEl, josa, DEX_CATEGORIES, BAG_TABS } from './dom.js';
+import { h, fmt, itemInfo, iconEl, josa, MUSEUM_CATEGORIES, BAG_TABS } from './dom.js';
 import { panelShell, gridMove } from './panels.js';
 import { createVariants } from './variants.js';
 
@@ -16,17 +16,19 @@ export function createBag(ctx, panels) {
   let current = null;   // 열려 있는 가방 { p, render }
   // 가구 색·주민 사진 같은 변형 이름 (스펙을 받으면 열린 가방을 다시 그린다)
   const variants = createVariants(ctx, () => current?.render());
+  const isFake = id => !!ctx.services.data?.items?.get?.(id)?.fake;
 
   /** 이 모드에서 고를 수 있는 칸인가 */
   function canPick(mode, slot, info) {
     if (!slot) return false;
     if (mode === 'sell') return info.sell > 0;
-    if (mode === 'donate') return DEX_CATEGORIES.includes(info.category) && !ctx.services.data?.museum?.has?.(slot.id);
+    // M17-P2: 미술품(art)도 기증 · 가품은 내밀 수 있게 고를 수 있다 (느루가 보고 돌려준다 — ui/museum.js donateLoop)
+    if (mode === 'donate') return MUSEUM_CATEGORIES.includes(info.category) && (isFake(slot.id) || !ctx.services.data?.museum?.has?.(slot.id));
     return true;
   }
   function whyNot(mode, info) {
     if (mode === 'sell') return '팔 수 없는 물건이에요';
-    if (mode === 'donate') return DEX_CATEGORIES.includes(info.category) ? '이미 기증했어요' : '박물관에는 물고기·곤충·화석·바다 생물만 받아요';
+    if (mode === 'donate') return MUSEUM_CATEGORIES.includes(info.category) ? '이미 기증했어요' : '박물관에는 물고기·곤충·화석·바다 생물·미술품만 받아요';
     return '';
   }
 

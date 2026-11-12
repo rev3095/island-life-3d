@@ -648,6 +648,39 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
   });
 
+  // M17-P2 (D181-A) 가품 대사: 가방에 가품 미술품이 있으면(살랑·선물 상자에서) 박물관 느루에게 내밀어 본다 — 「이건 가품이에요…」 + 다른 점 한 줄 → 돌려받음
+  add('fake-art', '가품 미술품: 박물관 기증 창에서 가품을 고르면 느루가 다른 점을 짚고 돌려준다', async () => {
+    const fakeSlot = () => S().data.inventory.slots.findIndex(s => s && S().data.items.get(s.id)?.fake);
+    if (fakeSlot() < 0) return skip('가방에 가품 미술품이 없음 (살랑에게 못 샀거나 진품을 삼)');
+    const id = S().data.inventory.slots[fakeSlot()].id;
+    await bot.setHour(11);
+    await bot.settle(10);
+    if (!(await sk.toDoor('museum', '박물관'))) return awk('박물관 문 자리가 없음');
+    const inside = await sk.enterPlace('museum', '박물관');
+    const told = [], said = [];
+    const off = bot.ctx.events.on('museum:fake-told', e => told.push(e));
+    let picked = false;
+    bot.policy = {
+      dialog: texts => { said.push(texts.join('/')); const i = texts.findIndex(t => /기증하러|괜찮아요/.test(t)); return i >= 0 ? i : texts.length - 1; },
+      card: (kind, el, card) => {
+        if (kind !== 'museum') return false;
+        if (!picked) { bot.click(card.querySelector('.pk-donate-go')); return true; }
+        bot.click(card.querySelector('.pk-x'));
+        return true;
+      },
+      bag: mode => { if (mode !== 'donate' || picked) return null; picked = true; return fakeSlot(); },
+    };
+    await bot.act('action', { timeout: 60 });
+    bot.policy = {};
+    off();
+    if (inside) await sk.leavePlace();
+    const kept = S().data.inventory.count(id) > 0, donated = S().data.museum.has(id);
+    note('fakeArt', { id, told, kept, donated, said: said.length });
+    if (!told.length) return awk(`느루가 가품 대사를 안 함 (${id}, 골랐나 ${picked})`);
+    if (!kept || donated) return awk(`가품이 가방에서 빠짐 (남음 ${kept} · 기증됨 ${donated})`);
+    return pass(`${S().data.items.get(id)?.name} — 「${told[0].tell}」`);
+  });
+
   add('festival-loop', '부품 5개 모으기 (주민 마음 열기 → 🎉 → 채집 → 전달), 날마다 반복', async () => {
     const maxDays = opts.maxDays ?? 10;
     const log = [];
@@ -888,7 +921,7 @@ export function makeScenario(bot, sk, opts = {}) {
 
   // M14 집과 섬이 자란다 (결정 D150–D153): 우편함 Space → 밤톨 「지어 주세요!」 → 다음 날 넓어진 1층 · 커진 겉모양 → 빚 갚기 (지갑에 있는 만큼) →
   // 빚을 다 갚았으면 2층도 짓고 계단을 걸어 오르내린다 → 섬폰 「⭐ 섬 평가」 열어 별·주민 한마디. 봇은 시계만 넘기고 우편함·창·걷기는 키로.
-  add('home-grow', '집 증축: 우편함에서 빌려 짓기 → 다음 날 넓어진 방 · 겉모양 → 빚 갚기 → (2층 · 계단 오르내리기) → 섬폰 섬 평가', async () => {
+  add('home-grow', '집 증축: 도토리상점 밤톨에게 「집을 넓히고 싶어요」 → 다음 날 넓어진 방 · 겉모양 → 우편함에서 빚 갚기 → (2층 · 계단 오르내리기) → 섬폰 섬 평가', async () => {
     const H = () => S().house, G = () => H()?.grow;
     if (!G()) return block('집 증축(house.grow)이 없어요');
     if (H().inside) await sk.leaveHome();
@@ -906,8 +939,29 @@ export function makeScenario(bot, sk, opts = {}) {
       await bot.settle(10);
       return said;
     };
+    // M17-P2 (D185-A): 넓히기는 밤톨에게 (우편함은 빚 갚기만 — 빚이 없으면 우편함 Space = 편지 town:mail)
+    const shopAsk = async pick => {
+      await bot.setHour(10);
+      await bot.settle(10);
+      if (!(await sk.toDoor('shop', '상점'))) return '상점 문 자리가 없음';
+      const inside = await sk.enterPlace('shop', '상점');
+      if (!/town:(shop|firstday)/.test(bot.peek() ?? '')) { if (inside) await sk.leavePlace(); return `밤톨 앞 행동 키가 '${bot.peek()}'`; }
+      const said = [];
+      bot.policy = { dialog: texts => { said.push(texts.join('/')); let i = texts.findIndex(t => /집을 넓히고 싶어요/.test(t)); if (i < 0) i = texts.findIndex(pick); return i >= 0 ? i : texts.length - 1; } };
+      await bot.act('action', { timeout: 30 });
+      bot.policy = {};
+      await bot.settle(10);
+      if (inside) await sk.leavePlace();
+      if (!said.some(t => /집을 넓히고 싶어요/.test(t))) return `밤톨 대화에 「집을 넓히고 싶어요」가 없음 (${said.join(' | ')})`;
+      return said;
+    };
     const build = async want => {
-      const r = await mailbox(t => /지어 주세요/.test(t));
+      if (!G().debt && !S().town?.mail?.unread?.()?.length) {   // 빚이 없으면 우편함은 편지 (집 넓히기 아님)
+        const ph = S().world.places.playerHouse, at = S().town?.mail?.spot ?? { x: ph.door.x + 1, z: ph.door.z };
+        await bot.approach(at, { dist: 0.75, label: '우편함' });
+        if (bot.peek() === 'house-grow') odd.push('빚이 없는데 우편함이 집 넓히기를 잡음');
+      }
+      const r = await shopAsk(t => /지어 주세요/.test(t));
       if (typeof r === 'string') { odd.push(r); return false; }
       if (G().pending !== want) { odd.push(`${want}단계 짓기 시작 안 됨 (${r.join(' | ')})`); return false; }
       await bot.nextDay(9);

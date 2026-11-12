@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈)",
+  "version": 3,
+  "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈) · needs = 그 아이템을 가방에 가졌을 때만 뽑힘 (M17-P2 D183-A)",
   "daily": 5,
   "allDoneBonus": 50,
   "afterIntro": true,
@@ -18,9 +18,9 @@
     { "id": "craft", "on": "craft", "need": 1, "pts": 30, "icon": "🔨", "label": "작업대에서 하나 만들기" },
     { "id": "donate", "on": "donate", "need": 1, "pts": 30, "icon": "🏛️", "label": "박물관에 하나 기증하기" },
     { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" },
-    { "id": "balloon", "on": "balloon", "need": 1, "pts": 25, "icon": "🎈", "label": "선물 풍선 하나 맞히기" },
+    { "id": "balloon", "on": "balloon", "need": 1, "pts": 25, "icon": "🎈", "label": "선물 풍선 하나 맞히기", "needs": "tool.sling" },
     { "id": "bottle", "on": "bottle", "need": 1, "pts": 20, "icon": "🍾", "label": "바닷가 유리병 열기" },
-    { "id": "sea1", "on": "sea", "need": 1, "pts": 30, "icon": "🤿", "label": "바다 생물 잡기" }
+    { "id": "sea1", "on": "sea", "need": 1, "pts": 30, "icon": "🤿", "label": "바다 생물 잡기", "needs": "tool.scuba-kit" }
   ],
   "goals": [
     { "id": "angler", "on": "fish", "steps": [10, 50, 200], "pts": [100, 300, 800], "icon": "🎣", "label": "낚시 솜씨" },

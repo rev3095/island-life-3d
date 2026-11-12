@@ -40,7 +40,8 @@ function createRating(ctx, cfg) {
     const w = S().world;
     const objs = (w?.home?.objects ?? w?.objects)?.list?.() ?? [];
     const town = S().town;
-    return R.countIsland(objs, { home: S().house?.grow?.stage ?? 0, residents: town?.residents?.()?.length ?? town?.villagers?.length ?? 0 });
+    const art = (S().house?.furniture ?? []).filter(r => String(r?.item).startsWith('art.')).length;   // M17-P2 D184-A 집에 놓은 미술품 (진품·가품)
+    return R.countIsland(objs, { home: S().house?.grow?.stage ?? 0, residents: town?.residents?.()?.length ?? town?.villagers?.length ?? 0, art });
   }
   const evaluate = () => R.rate(counts(), cfg);
 

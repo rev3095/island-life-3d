@@ -53,7 +53,7 @@ export const LINE_LABELS = {
   today: '오늘 들어온 가구', closed: '문 닫은 때', early: '이른 아침', welcome: '환영 편지', lot: '집터 편지',
   firstVisit: '처음 왔을 때', none: '기증할 게 없을 때', firstDonation: '첫 기증', thanksMany: '여러 개 기증', fossil: '화석', milestone: '기증 수 이정표', milestoneAny: '이정표 (그 밖)',
   complete: '한 분류 다 모음', fish: '물고기', bug: '곤충', allComplete: '모두 모음', appraise: '화석 감정', notice: '감정할 것 알아챔', noticeMany: '여러 개 알아챔', later: '나중에',
-  look: '살펴보기', next: '다음 것', result: '감정 결과', rare: '희귀', owned: '이미 있음', doneOwned: '모두 있음', bagFull: '가방 꽉 참', story: '이야기', empty: '빈 때', open: '시작', close_: '끝',
+  look: '살펴보기', next: '다음 것', result: '감정 결과', rare: '희귀', owned: '이미 있음', doneOwned: '모두 있음', bagFull: '가방 꽉 참', story: '이야기', fake: '가품 미술품', found: '가품 알아챔', more: '더 볼까', empty: '빈 때', open: '시작', close_: '끝',
 };
 /** M15 묶음 안 이름 (같은 칸 이름이 다른 뜻일 때) — 편지 답장 · 같이 하기 · 저녁 노래 */
 export const SUB_LABELS = {

@@ -46,6 +46,16 @@ export function offer(g, cfg = DEFAULT_HOME) {
   return next ? { kind: 'build', next } : { kind: 'done' };
 }
 
+/**
+ * M17-P2 (D185-A) 어디서 무슨 이야기를 하나: where 'mail' 우편함 · 'shop' 도토리상점 밤톨 「집을 넓히고 싶어요」.
+ * 우편함은 빚 갚기만 ('repay' — 빚이 있으면 짓는 중이어도) · 빚이 없으면 'to-shop' (밤톨에게 가라는 한 줄).
+ * 상점은 'build' 다음 단계 · 'pending' 짓는 중 · 'debt' 빚이 남음 (우편함에서 갚으라고) · 'done' 다 지음.
+ */
+export function growTopic(g, cfg = DEFAULT_HOME, where = 'mail') {
+  if (where === 'mail') return g.debt > 0 ? 'repay' : 'to-shop';
+  return offer(g, cfg).kind;
+}
+
 /** 다음 단계 짓기 시작 (빚이 없을 때만) → 시작한 단계 | null */
 export function startBuild(g, cfg = DEFAULT_HOME) {
   const o = offer(g, cfg);

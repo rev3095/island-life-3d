@@ -27,7 +27,7 @@ test('처음 섬은 별 하나 (잡초 30), 잡초만 뽑아도 별 둘 — 별 
 test('세기: 꾸민 것은 data.decor 로, 덤불은 나무 반 개', () => {
   const objs = [{ kind: 'tulip' }, { kind: 'bush' }, { kind: 'bush' }, { kind: 'tree' }, { kind: 'weed' },
     { kind: 'path-stone', data: { decor: 'path' } }, { kind: 'fence-wood', data: { decor: 'fence' } }, { kind: 'fu:bench', data: { decor: 'furn' } }, { kind: 'bridge-built', data: { decor: 'build' } }];
-  assert.deepEqual(R.countIsland(objs, { home: 2, residents: 7 }), { flowers: 1, trees: 2, furn: 1, fences: 1, paths: 1, builds: 1, weeds: 1, home: 2, residents: 7 });
+  assert.deepEqual(R.countIsland(objs, { home: 2, residents: 7 }), { flowers: 1, trees: 2, furn: 1, fences: 1, paths: 1, builds: 1, weeds: 1, home: 2, residents: 7, art: 0 });
 });
 
 test('상: 처음 오른 별마다 한 번, 별 다섯 처음은 한 번만', () => {

@@ -1,5 +1,6 @@
-// 박물관: 물고기·곤충·화석 기증 현황과 기증하기 (가방 기증 모드 → 확인 → data.museum.donate).
-import { h, itemInfo, iconEl, CATEGORY_NAME, DEX_CATEGORIES } from './dom.js';
+// 박물관: 물고기·곤충·화석·바다 생물·미술품 기증 현황과 기증하기 (가방 기증 모드 → 확인 → data.museum.donate).
+// M17-P2 (D181-A): 가품 미술품을 고르면 받지 않고 창을 닫는다 — museum:fake { id } 를 보내고, 느루(town/keepers.js)가 「이건 가품이에요…」와 다른 점 한 줄을 말하고 돌려준다 (가방에 그대로).
+import { h, itemInfo, iconEl, CATEGORY_NAME, MUSEUM_CATEGORIES } from './dom.js';
 import { panelShell, button, confirmBox } from './panels.js';
 import { itemPhrase } from './bag.js';
 import { notice, bar } from './phone.js';
@@ -13,7 +14,7 @@ export function createMuseum(ctx, panels, { bag, toast }) {
     const data = () => ctx.services.data;
     const shell = panelShell({ cls: 'pk-museum', title, tagColor: color, onClose: () => p.close(null), onOutside: () => p.close(null) });
     const view = h('div', { class: 'pk-museum-view' });
-    shell.body.append(h('p', { class: 'pk-keeper' }, h('b', null, keeper), ' 섬의 생물과 화석을 모으고 있어요. 천천히 보고 가요.'), view);
+    shell.body.append(h('p', { class: 'pk-keeper' }, h('b', null, keeper), ' 섬의 생물과 화석, 미술품을 모으고 있어요. 천천히 보고 가요.'), view);
     const go = button('🎒 기증하기', { primary: true, cls: 'pk-donate-go', onclick: donateLoop });
     shell.foot.append(go);
 
@@ -23,7 +24,7 @@ export function createMuseum(ctx, panels, { bag, toast }) {
       go.disabled = !d?.museum;
       if (!d?.museum) { view.append(notice('🏛️', '박물관이 아직 준비 중이에요.', '데이터(data) 모듈이 연결되면 기증할 수 있어요.')); return; }
       const prog = d.museum.progress?.() ?? {};
-      for (const cat of DEX_CATEGORIES) {
+      for (const cat of MUSEUM_CATEGORIES) {
         const all = d.items?.list?.(cat) ?? [];
         const given = all.filter(it => d.museum.has(it.id));
         const [n, total] = prog[cat] ?? [given.length, all.length];
@@ -44,6 +45,11 @@ export function createMuseum(ctx, panels, { bag, toast }) {
         const slot = d.inventory.slots[i];
         if (!slot) continue;
         const it = itemInfo(ctx, slot.id);
+        if (d.items?.get?.(slot.id)?.fake) {   // 가품: 느루가 들여다보고 돌려준다 (창을 닫고 대화로)
+          ctx.events.emit('museum:fake', { id: slot.id });
+          p.close(null);
+          break;
+        }
         const ok = await confirmBox(panels, { title: '기증', icon: it.icon, text: `${itemPhrase(it.name)} 박물관에 기증할까요?`, buttons: [{ label: '기증할게요', value: true, primary: true }, { label: '그만둘래요', value: false }] });
         if (!ok || p.closed) continue;
         const before = d.inventory.count?.(slot.id);
