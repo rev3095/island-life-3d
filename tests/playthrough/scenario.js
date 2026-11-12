@@ -725,8 +725,9 @@ export function makeScenario(bot, sk, opts = {}) {
     };
     const repayAll = async () => {
       if (!G().debt) return true;
-      if (bot.acorns() <= 0) return false;
-      const r = await mailbox(t => /다 갚기|있는 만큼/.test(t));
+      // 뒤 단계(시계로 낮 → 상점에서 사기 등)가 쓸 도토리는 남긴다: 3,000 넘게 있으면 1,000 만 갚는다 (빚이 그보다 적으면 다 갚기)
+      if (bot.acorns() < Math.min(G().debt, 1000) + 3000) return false;
+      const r = await mailbox(t => (G().debt <= 1000 ? /다 갚기/ : /^1,000 갚기/).test(t));
       if (typeof r === 'string') odd.push(r);
       return G().debt === 0;
     };
@@ -745,7 +746,7 @@ export function makeScenario(bot, sk, opts = {}) {
     log.debt0 = G().debt; log.acorns0 = bot.acorns();
     const paid = await repayAll();
     log.debt1 = G().debt;
-    if (G().debt >= log.debt0 && log.acorns0 > 0) odd.push(`빚을 못 갚음 (빚 ${G().debt}, 도토리 ${bot.acorns()})`);
+    if (G().debt >= log.debt0 && log.acorns0 >= 4000) odd.push(`빚을 못 갚음 (빚 ${G().debt}, 도토리 ${bot.acorns()})`);
     if (paid && G().stage < 2) await build(2);
     if (G().stage >= 2) {
       await sk.enterHome();
