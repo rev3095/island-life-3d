@@ -1,0 +1,56 @@
+{
+  "id": "FU-86",
+  "slug": "wall-tank",
+  "item": "fixture.wall-tank",
+  "name": "대형 수조",
+  "category": "fixture",
+  "kind": "wall-tank",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4280,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "bubble",
+    "frame",
+    "gravel",
+    "rock",
+    "seaweed",
+    "tankWater"
+  ],
+  "objects": [
+    "deco",
+    "frame",
+    "water"
+  ],
+  "animations": {},
+  "size": [
+    2.94,
+    0.9,
+    1.67
+  ],
+  "bounds": [
+    [
+      -1.47,
+      -0.452,
+      0.0
+    ],
+    [
+      1.47,
+      0.45,
+      1.673
+    ]
+  ],
+  "footprint": [
+    3,
+    1
+  ],
+  "glbBytes": 83920,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wall-tank_front.png",
+    "wall-tank_main.png",
+    "wall-tank_thumb.png",
+    "wall-tank_top.png"
+  ]
+}
