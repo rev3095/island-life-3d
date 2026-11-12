@@ -177,7 +177,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
 
   function onDoormat(margin = 0.85) {
     const R = rooms[P.where];
-    if (!R) return false;
+    if (!R || halls?.inside) return false;   // 요청 9: 박물관 관 안(z 40+)은 로비 문 매트가 아니다 — 관 문 매트는 museum-hall.js
     const m = doormatOf(R.spec), p = player.position;
     return Math.abs(p.x - (R.x0 + m.lx)) < 0.75 && p.z - R.z0 > R.d - margin;
   }

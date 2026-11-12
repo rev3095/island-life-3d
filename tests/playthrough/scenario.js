@@ -535,7 +535,8 @@ export function makeScenario(bot, sk, opts = {}) {
     bot.key('Escape');
     await bot.until(() => !ST.viewing, { timeout: 3, ui: false });
     await bot.settle(10);
-    // 섬폰 → 도감 → ⭐ 별자리
+    // 섬폰 → 도감 → ⭐ 별자리 (그동안 봇이 섬폰을 닫지 않게)
+    bot.policy = { card: kind => kind === 'phone' };
     bot.press('phone');
     await bot.until(() => bot.top()?.kind === 'phone', { timeout: 4, ui: false });
     const dexBtn = [...doc.querySelectorAll('.pk-stack button')].find(b => /도감/.test(b.textContent));
@@ -546,6 +547,7 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.frames(4);
     const cells = doc.querySelectorAll('.pk-dex-stars .pk-dex-cell:not(.is-unknown)').length;
     if (tab) await bot.shot('stars-dex', '섬폰 도감 별자리 칸');
+    bot.policy = {};
     bot.key('Escape'); await bot.frames(3); bot.key('Escape');
     await bot.settle(10);
     note('stars', { id: c.id, card, n0, n1: ST.count(), dexTab: !!tab, cells, view: sc.view });

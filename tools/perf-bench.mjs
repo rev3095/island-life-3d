@@ -31,6 +31,7 @@ const SCENES = {
   'plaza-night': { date: 'weekday', hour: 21 },
   market: { date: 'saturday', hour: 20.5 },
   tour: { date: 'weekday', hour: 12 },
+  'museum-night': { date: 'weekday', hour: 21 },   // 요청 8·9: 박물관(BD-16) 앞 · 망원경대 · 별자리 별 (--scenes=museum-night)
 };
 
 // ---- 페이지 안에서 도는 쪽 (문자열로 보낸다) ----
@@ -118,6 +119,9 @@ async function driver({ scenes, rounds, shots, probe, variants = [], looks = [] 
         step(4); c.events.emit('time:tick', { now: T.now() }); step(10); await wait(300); await settle();
         for (let i = 0; i < 40 && !(c.services.night?.debug?.placed?.()?.market?.length); i++) { step(4); await wait(150); }
         const pl = W.places.plaza; P.teleport(pl.x, pl.z + 2.5);
+      } else if (name === 'museum-night') {
+        T.setHour(SC_HOUR[name]); c.events.emit('time:tick', { now: T.now() });
+        const d = W.places.museum?.door ?? W.places.plaza; P.teleport(d.x + 2, d.z + 3);
       } else {
         T.setHour(SC_HOUR[name]); c.events.emit('time:tick', { now: T.now() });
         const pl = W.places.plaza; P.teleport(pl.x, pl.z + 2.5);
