@@ -125,6 +125,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
   }
 
   // ---------- 도감 ----------
+  let dexOnlyMonth = false;   // 「이번 달만」 (섬폰을 닫았다 열어도 이 판에서는 기억)
   function dexScreen(view) {
     const data = ctx.services.data;
     let cat = 'fish';
@@ -140,12 +141,22 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     // B-12 「🌙 밤」 탭: 밤에만 나오는 물고기·곤충을 한데 (잡은 수·기증 수는 그 안에서 센다)
     const TABS = [...DEX_CATEGORIES, 'night', ...(ctx.services.stars?.dexPanel ? ['star'] : [])], TAB_NAME = { ...CATEGORY_NAME, night: '🌙 밤', star: '⭐ 별자리' };   // 요청 8: 별자리 칸은 gameplay/stars 가 그린다
     const listOf = c => (c === 'night' ? ['fish', 'bug'].flatMap(k => data.items.list(k) ?? []).filter(isNightOnly) : data.items.list(c) ?? []);
+    // M18-P1 「이번 달」 UI-35: 탭마다 이번 달 새로 나오는 수(초록 숫자) · 칸마다 「새」/「끝」 표시 · 「이번 달만」 거르기 (게임 시각의 달 — time.now)
+    const month = ctx.services.time?.now?.()?.month ?? nowFromDate().month;
+    const I = data.items;
+    const isNew = it => !!I.isNewIn?.(it, month), isLast = it => !!I.isLastIn?.(it, month), inMonth = it => (I.inMonth ? I.inMonth(it, month) : true);
+    const hasMonths = c => c !== 'fossil' && !!I.isNewIn;
+    const newCount = c => (hasMonths(c) ? listOf(c).filter(isNew).length : 0);
+    const tabLabel = c => {
+      const n = newCount(c);
+      return n ? [TAB_NAME[c], h('span', { class: 'pk-tab-new', title: `이번 달 새로 ${n}`, 'aria-label': `이번 달 새로 ${n}` }, String(n))] : TAB_NAME[c];
+    };
     function draw() {
       if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–12)
         tabs.replaceChildren(...TABS.map(c => h('button', {
           type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
           onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },
-        }, TAB_NAME[c])));
+        }, tabLabel(c))));
         ctx.services.stars.dexPanel(panel, { bar });
         return;
       }
@@ -158,18 +169,33 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       tabs.replaceChildren(...TABS.map(c => h('button', {
         type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
         onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },
-      }, TAB_NAME[c])));
+      }, tabLabel(c))));
+      const months = hasMonths(cat);
+      const shown = months && dexOnlyMonth ? all.filter(inMonth) : all;
+      const nNew = months ? all.filter(isNew).length : 0;
+      const monthBar = months && h('div', { class: 'pk-dex-month' },
+        h('span', { class: 'pk-dex-month-text' }, nNew ? [h('span', { class: 'pk-dex-when is-new is-inline' }, '새'), ` ${month}월에 새로 나오는 것 ${nNew}`] : `${month}월에 새로 나오는 것은 없어요`),
+        h('button', {
+          type: 'button', class: 'pk-seg-btn pk-dex-only', 'aria-pressed': String(dexOnlyMonth),
+          onclick: () => { dexOnlyMonth = !dexOnlyMonth; draw(); panel.querySelector('.pk-dex-only')?.focus(); ctx.events.emit('sfx', { name: 'menu' }); },
+        }, '이번 달만'));
       panel.replaceChildren(
         bar(cat === 'fossil' ? '찾은 것' : '잡은 것', nCaught, all.length),
         bar('기증', donated, total),
-        h('ul', { class: 'pk-dex-grid', 'aria-label': `${TAB_NAME[cat]} 목록` }, all.map(it => {
+        monthBar || '',
+        h('ul', { class: 'pk-dex-grid', 'aria-label': `${TAB_NAME[cat]} 목록${months && dexOnlyMonth ? ` (${month}월에 나오는 것만)` : ''}` }, shown.map(it => {
           const got = caught.has(it.id);
           const gave = data.museum?.has?.(it.id);
-          return h('li', { class: `pk-dex-cell${got ? '' : ' is-unknown'}`, title: got ? it.name : '아직 못 만났어요' },
+          const fresh = months && isNew(it), last = months && !fresh && isLast(it);
+          const when = fresh ? ' · 이번 달 새로 나와요' : last ? ' · 이번 달까지 나와요' : '';
+          return h('li', { class: `pk-dex-cell${got ? '' : ' is-unknown'}${fresh ? ' is-new' : ''}`, title: (got ? it.name : '아직 못 만났어요') + when },
             got ? iconEl(it.icon, 'pk-dex-icon') : h('span', { class: 'pk-dex-icon', 'aria-hidden': 'true' }, '?'),
             h('span', { class: 'pk-dex-name' }, got ? it.name : '???'),
+            fresh && h('span', { class: 'pk-dex-when is-new', 'aria-label': '이번 달 새로' }, '새'),
+            last && h('span', { class: 'pk-dex-when is-last', 'aria-label': '이번 달까지' }, '끝'),
             gave && h('span', { class: 'pk-dex-gave', title: '기증함', 'aria-label': '기증함' }, '🏛️'));
         })),
+        shown.length ? '' : h('p', { class: 'pk-dex-empty' }, `${month}월에 나오는 것이 없어요.`),
       );
     }
     draw();

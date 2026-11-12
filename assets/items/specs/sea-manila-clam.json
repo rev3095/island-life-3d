@@ -1,0 +1,55 @@
+{
+  "id": "IC-SE-21",
+  "slug": "sea-manila-clam",
+  "name": "바지락",
+  "group": "sea",
+  "category": "item",
+  "kind": "clam",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.manila-clam",
+      "code": "IC-SE-21"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "작은 둥근 조개, 회갈색 껍데기에 진한 물결 줄과 점 무늬",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 봄"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — shell-clam 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 0.62,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#C8B79C",
+    "shellRib": "#8E7A60",
+    "shellDark": "#5E4E3E"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "껍데기 줄",
+    "shellDark": "껍데기 무늬"
+  }
+}

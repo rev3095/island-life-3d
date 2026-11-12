@@ -1,0 +1,45 @@
+{
+  "id": "IC-SE-21",
+  "slug": "sea-manila-clam",
+  "name": "바지락",
+  "group": "sea",
+  "kind": "clam",
+  "version": "0.1",
+  "items": [
+    "sea.manila-clam"
+  ],
+  "hold": true,
+  "triangles": 2236,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellDark",
+    "shellRib"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.186,
+    0.15,
+    0.054
+  ],
+  "bounds": [
+    [
+      -0.093,
+      -0.075,
+      -0.027
+    ],
+    [
+      0.093,
+      0.075,
+      0.027
+    ]
+  ],
+  "glbBytes": 43536,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-manila-clam_main.png",
+    "sea-manila-clam_thumb.png"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "IC-SE-37",
+  "slug": "sea-red-snow-crab",
+  "name": "홍게",
+  "group": "sea",
+  "kind": "crab",
+  "version": "0.1",
+  "items": [
+    "sea.red-snow-crab"
+  ],
+  "hold": true,
+  "triangles": 4876,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "carapace",
+    "claw",
+    "clawTip",
+    "eye",
+    "eyeHighlight",
+    "leg",
+    "spot"
+  ],
+  "objects": [
+    "crab"
+  ],
+  "size": [
+    0.608,
+    0.467,
+    0.133
+  ],
+  "bounds": [
+    [
+      -0.304,
+      -0.233,
+      -0.066
+    ],
+    [
+      0.304,
+      0.233,
+      0.066
+    ]
+  ],
+  "glbBytes": 99120,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-red-snow-crab_main.png",
+    "sea-red-snow-crab_thumb.png"
+  ]
+}

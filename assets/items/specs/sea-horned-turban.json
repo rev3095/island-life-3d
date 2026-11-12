@@ -1,0 +1,55 @@
+{
+  "id": "IC-SE-27",
+  "slug": "sea-horned-turban",
+  "name": "뿔소라",
+  "group": "sea",
+  "category": "item",
+  "kind": "turban",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.horned-turban",
+      "code": "IC-SE-27"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "녹갈색 소라 껍데기에 뿔 돌기",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 여름"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — shell-turban 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 0.82,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#7E8A62",
+    "shellDark": "#4E5A3C",
+    "shellBase": "#F2E2C0"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellDark": "껍데기 무늬",
+    "shellBase": "껍데기 아래"
+  }
+}

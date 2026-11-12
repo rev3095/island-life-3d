@@ -1,0 +1,53 @@
+{
+  "id": "IC-SE-38",
+  "slug": "sea-scallop",
+  "name": "가리비",
+  "group": "sea",
+  "category": "item",
+  "kind": "scallop",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.scallop",
+      "code": "IC-SE-38"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "부채꼴 주황 조개 껍데기, 곧은 골",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 겨울"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — shell-scallop 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 0.78,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#E89A6A",
+    "shellRib": "#C86E4A"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "껍데기 줄"
+  }
+}

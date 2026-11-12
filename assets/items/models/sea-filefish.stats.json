@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-25",
+  "slug": "sea-filefish",
+  "name": "쥐치",
+  "group": "sea",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "sea.filefish"
+  ],
+  "hold": true,
+  "triangles": 4228,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.06,
+    0.35,
+    0.221
+  ],
+  "bounds": [
+    [
+      -0.03,
+      -0.175,
+      -0.111
+    ],
+    [
+      0.03,
+      0.175,
+      0.111
+    ]
+  ],
+  "glbBytes": 89196,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-filefish_main.png",
+    "sea-filefish_thumb.png"
+  ]
+}

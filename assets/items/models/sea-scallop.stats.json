@@ -1,0 +1,44 @@
+{
+  "id": "IC-SE-38",
+  "slug": "sea-scallop",
+  "name": "가리비",
+  "group": "sea",
+  "kind": "scallop",
+  "version": "0.1",
+  "items": [
+    "sea.scallop"
+  ],
+  "hold": true,
+  "triangles": 1856,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellRib"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.25,
+    0.229,
+    0.064
+  ],
+  "bounds": [
+    [
+      -0.125,
+      -0.114,
+      -0.032
+    ],
+    [
+      0.125,
+      0.114,
+      0.032
+    ]
+  ],
+  "glbBytes": 36008,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-scallop_main.png",
+    "sea-scallop_thumb.png"
+  ]
+}

@@ -199,6 +199,19 @@ img.pk-bag-info-icon, img.pk-recipe-icon, img.pk-stock-icon, img.pk-dex-icon { w
 .is-unknown .pk-dex-icon { font-family: var(--pk-display); color: #C9B994; }
 .pk-dex-name { font-size: calc(12px * var(--pk-fs, 1)); line-height: 1.25; word-break: keep-all; }
 .pk-dex-gave { position: absolute; top: 2px; right: 4px; font-size: calc(12px * var(--pk-fs, 1)); }
+.pk-tabs .pk-tab { position: relative; }   /* M18-P1 UI-35 「이번 달」: 탭 오른쪽 위 초록 숫자 = 이번 달 새로 나오는 수 */
+.pk-tab-new { position: absolute; top: -3px; right: -2px; min-width: 18px; padding: 0 4px; border-radius: 999px; background: #4FA463; color: #fff; font: 700 calc(11px * var(--pk-fs, 1))/18px var(--pk-body, sans-serif); text-align: center; pointer-events: none; }
+.pk-dex-month { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.pk-dex-month-text { flex: 1; font-size: calc(13px * var(--pk-fs, 1)); color: var(--pk-ink-soft); }
+.pk-dex-only { flex: none; padding: 0 14px; min-height: 36px; background: rgba(228, 213, 181, .7); }
+.pk-dex-only[aria-pressed="true"] { background: var(--pk-cream); box-shadow: 0 2px 0 var(--pk-edge); }
+.pk-dex-only[aria-pressed="true"]::before { content: "✓ "; }
+.pk-dex-cell.is-new { box-shadow: inset 0 0 0 2px #8CC79A; }
+.pk-dex-when { position: absolute; top: 2px; left: 4px; padding: 0 4px; border-radius: 6px; font-size: calc(11px * var(--pk-fs, 1)); line-height: 1.5; color: #fff; }
+.pk-dex-when.is-new { background: #4FA463; }
+.pk-dex-when.is-last { background: #C88A3C; }
+.pk-dex-when.is-inline { position: static; display: inline-block; }
+.pk-dex-empty { margin: 14px 0; text-align: center; color: var(--pk-ink-soft); }
 
 .pk-recipes { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; border-radius: 12px; }
 .pk-recipe { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--pk-cream); border-radius: 16px; }

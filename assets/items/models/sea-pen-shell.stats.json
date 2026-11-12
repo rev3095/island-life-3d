@@ -1,0 +1,47 @@
+{
+  "id": "IC-SE-23",
+  "slug": "sea-pen-shell",
+  "name": "키조개",
+  "group": "sea",
+  "kind": "mussel",
+  "version": "0.1",
+  "items": [
+    "sea.pen-shell"
+  ],
+  "hold": true,
+  "triangles": 980,
+  "parts": 1,
+  "materials": [
+    "byssus",
+    "shell",
+    "shellEdge",
+    "shellRib",
+    "shine"
+  ],
+  "objects": [
+    "mussel"
+  ],
+  "size": [
+    0.206,
+    0.32,
+    0.091
+  ],
+  "bounds": [
+    [
+      -0.103,
+      -0.16,
+      -0.046
+    ],
+    [
+      0.103,
+      0.16,
+      0.046
+    ]
+  ],
+  "glbBytes": 32068,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-pen-shell_main.png",
+    "sea-pen-shell_thumb.png"
+  ]
+}

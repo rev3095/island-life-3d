@@ -1,0 +1,47 @@
+{
+  "id": "IC-SE-22",
+  "slug": "sea-webfoot-octopus",
+  "name": "주꾸미",
+  "group": "sea",
+  "kind": "octopus",
+  "version": "0.1",
+  "items": [
+    "sea.webfoot-octopus"
+  ],
+  "hold": true,
+  "triangles": 5240,
+  "parts": 1,
+  "materials": [
+    "back",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "mark"
+  ],
+  "objects": [
+    "octopus"
+  ],
+  "size": [
+    0.281,
+    0.279,
+    0.127
+  ],
+  "bounds": [
+    [
+      -0.14,
+      -0.139,
+      -0.064
+    ],
+    [
+      0.14,
+      0.139,
+      0.064
+    ]
+  ],
+  "glbBytes": 100952,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-webfoot-octopus_main.png",
+    "sea-webfoot-octopus_thumb.png"
+  ]
+}

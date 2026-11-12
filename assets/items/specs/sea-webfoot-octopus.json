@@ -1,0 +1,75 @@
+{
+  "id": "IC-SE-22",
+  "slug": "sea-webfoot-octopus",
+  "name": "주꾸미",
+  "group": "sea",
+  "category": "item",
+  "kind": "octopus",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.webfoot-octopus",
+      "code": "IC-SE-22"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "작은 문어, 모래빛 갈색 몸에 금빛 빨판 점",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 봄"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — fish-octopus 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "길이 (꼬리 포함)",
+      "value": 0.26,
+      "min": 0.15,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#C99A72",
+    "back": "#A87652",
+    "belly": "#EAC8A8",
+    "fin": "#B88660",
+    "mark": "#E8B840",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -40,
+    "pitch": 22
+  }
+}

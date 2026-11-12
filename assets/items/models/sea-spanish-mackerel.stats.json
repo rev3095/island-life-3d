@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-33",
+  "slug": "sea-spanish-mackerel",
+  "name": "삼치",
+  "group": "sea",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "sea.spanish-mackerel"
+  ],
+  "hold": true,
+  "triangles": 4712,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.089,
+    0.53,
+    0.091
+  ],
+  "bounds": [
+    [
+      -0.044,
+      -0.265,
+      -0.045
+    ],
+    [
+      0.044,
+      0.265,
+      0.045
+    ]
+  ],
+  "glbBytes": 101552,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-spanish-mackerel_main.png",
+    "sea-spanish-mackerel_thumb.png"
+  ]
+}

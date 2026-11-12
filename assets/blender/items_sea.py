@@ -1,4 +1,4 @@
-"""M16 잠수 바다 생물 빌더 (IC-SE-01–20) + 스쿠버 키트 (IC-TL-06).
+"""M16 잠수 바다 생물 빌더 (IC-SE-01–20, M18-P1 계절 생물 IC-SE-21–38) + 스쿠버 키트 (IC-TL-06).
 
 build_item.py 가 RENDER 정의 바로 뒤에서 이 파일을 exec 한다 → 같은 전역(V · ellipsoid · cone · rail · slab · oval2d ·
 spline2d · dot_on · eyes · pv · P · TAU …)을 그대로 쓴다. 여기서는 SEA_BUILDERS(kind → 함수)와 RENDER['sea'] 만 내놓고,
@@ -823,10 +823,104 @@ def b_scuba(M):
     m.add(cylinder(sn[4], sn[4] + (sn[4] - sn[3]).normalized() * 0.02, 0.017, 0.017, seg=10), 'hose')
 
 
+# ================================================================ M18-P1 계절 생물 (IC-SE-21–38) — 새 모양 둘
+# 나머지 16종은 있는 빌더(fish · crab · shrimp · octopus · sea-slug · mussel · clam · scallop · turban)를 스펙 params·팔레트로 나눠 쓴다.
+def b_anglerfish(M):
+    """IC-SE-35 아귀: 몸 앞쪽 절반이 넓적한 큰 머리(위에서 눌린 타원), 아래턱이 앞으로 나온 큰 입과 이빨,
+    머리 위 낚싯대 가시 끝에 미끼 혹, 몸 옆 가장자리 술 장식, 뒤로 가늘어지는 꼬리와 둥근 꼬리지느러미. 머리 -Y."""
+    L = pv('length', 0.44)
+    m = M.part('fish')
+    HW, HL, HH = L * 0.36 * pv('width', 1.0), L * 0.5, L * 0.14
+    hc = V((0, -L * 0.18, 0))
+    head = ellipsoid(hc, (HW / 2, HL / 2, HH / 2), seg=26, rings=14)
+    for v in head.verts:
+        t = (v.co.y - hc.y) / (HL / 2)
+        if t > 0:   # 뒤로 갈수록 좁아져 꼬리로 이어짐
+            v.co.x *= 1 - 0.45 * t ** 1.3
+            v.co.z *= 1 - 0.25 * t
+    m.add(head, lambda c, n: 'back' if n.z > 0.25 else ('belly' if n.z < -0.4 else 'body'))
+    # 꼬리 몸통 + 꼬리지느러미
+    tail = rail([hc + V((0, HL * 0.35, 0)), V((0, L * 0.2, 0.004)), V((0, L * 0.36, 0.006))], [HW * 0.22, HW * 0.13, HW * 0.06], seg=14)
+    m.add(tail, lambda c, n: 'back' if n.z > 0.2 else 'body')
+    m.add(slab(tail_pts('round', L * 0.16, HH * 1.3), origin=(0, L * 0.34, 0.006), u=(0, 1, 0), v=(0, 0, 1), thick=0.006), 'fin', smooth=False)
+    # 입: 아래턱(넓은 반달) + 위·아래 이빨
+    mouth_y = hc.y - HL / 2 + L * 0.02
+    m.add(ellipsoid((0, mouth_y + L * 0.01, -HH * 0.16), (HW * 0.42, L * 0.04, HH * 0.2), seg=20, rings=8), lambda c, n: 'body' if n.z > -0.2 else 'belly')
+    m.add(ellipsoid((0, mouth_y + L * 0.004, -HH * 0.02), (HW * 0.4, L * 0.03, HH * 0.1), seg=18, rings=6), 'mouth', outline=False)
+    for k in range(9):
+        x = HW * 0.38 * (k / 4 - 1)
+        y = mouth_y - L * 0.03 * math.cos((k / 4 - 1) * 1.2)
+        m.add(cone(V((x, y, -HH * 0.08)), V((x, y - L * 0.004, HH * 0.04)), L * 0.008, 0.0, seg=5), 'tooth', outline=False)
+    # 눈 (머리 위쪽에 작게)
+    er = L * 0.022
+    for sx in (1, -1):
+        c = V((sx * HW * 0.18, hc.y - HL * 0.18, HH * 0.42))
+        m.add(ellipsoid(c, (er, er, er * 0.9), seg=12, rings=8), 'eye')
+        m.add(ellipsoid(c + V((sx * er * 0.3, -er * 0.4, er * 0.5)), (er * 0.38,) * 3, seg=8, rings=6), 'eyeHighlight')
+    # 낚싯대 가시 + 미끼 혹
+    base = V((0, hc.y - HL * 0.3, HH * 0.45))
+    rod = bezier(base, base + V((0, -L * 0.02, L * 0.12)), base + V((0, -L * 0.1, L * 0.18)), base + V((0, -L * 0.17, L * 0.14)), 6)
+    m.add(rail(rod, [L * 0.008 * (1 - 0.4 * i / 6) for i in range(7)], seg=6), 'fin')
+    m.add(ellipsoid(rod[-1] + V((0, -L * 0.005, -L * 0.012)), (L * 0.026,) * 3, seg=12, rings=8), 'lure')
+    # 가슴지느러미 (넓적한 팔 같은 것) + 옆 술 장식
+    for sx in (1, -1):
+        m.add(slab(oval2d(L * 0.09, L * 0.05, 12, cx=L * 0.07, squeeze=0.4), origin=(sx * HW * 0.4, hc.y + HL * 0.2, -HH * 0.2),
+                   u=(sx, 0.4, -0.2), v=(0, 1, 0), thick=0.006), 'fin', smooth=False)
+        for k in range(7):
+            t = -0.75 + 1.4 * k / 6
+            y = hc.y + HL / 2 * t
+            w = HW / 2 * math.sqrt(max(0.0, 1 - t * t)) * (1 - 0.45 * max(0.0, t) ** 1.3)
+            p = V((sx * w * 0.98, y, -HH * 0.05))
+            m.add(cone(p, p + V((sx * L * 0.035, 0, -L * 0.01)), L * 0.01, 0.0, seg=5), 'fringe', outline=False)
+    rnd = random.Random(int(P.get('seed', 7)))
+    for _ in range(int(P.get('spots', 12))):
+        x, y = rnd.uniform(-0.35, 0.35) * HW, hc.y + rnd.uniform(-0.35, 0.4) * HL
+        dot_on(m, (x, y, HH * 0.48), (0, 0, 1), L * 0.014 * rnd.uniform(0.7, 1.3), 'mark')
+
+
+def b_cuttlefish(M):
+    """IC-SE-29 갑오징어: 넓고 납작한 타원 몸통(+Y 뒤) 둘레를 치마처럼 두른 얇은 지느러미, 짧은 다리 여덟 + 촉완 둘(-Y 앞),
+    등에 줄무늬. 오징어(b_squid)보다 짧고 통통하다."""
+    L = pv('length', 0.3)
+    m = M.part('squid')
+    ML, MW, MH = L * 0.62, L * 0.32, L * 0.13
+    mc = V((0, L / 2 - ML / 2, 0))
+    m.add(ellipsoid(mc, (MW / 2, ML / 2, MH / 2), seg=24, rings=14), lambda c, n: 'back' if n.z > 0.3 else 'body')
+    # 치마 지느러미: 몸통 둘레 바깥 띠
+    ring_o, ring_i = [], []
+    for k in range(25):
+        a = math.pi * (0.04 + 0.92 * k / 24)
+        ring_o.append((math.sin(a) * (MW / 2 + L * 0.035), mc.y - math.cos(a) * (ML / 2 + L * 0.01)))
+        ring_i.append((math.sin(a) * MW / 2 * 0.9, mc.y - math.cos(a) * ML / 2 * 0.9))
+    for sx in (1, -1):
+        poly = [(sx * x, y) for x, y in ring_o] + [(sx * x, y) for x, y in reversed(ring_i)]
+        m.add(slab(poly, origin=(0, 0, -MH * 0.05), u=(1, 0, 0), v=(0, 1, 0), thick=0.004), 'fin', smooth=False)
+    # 등 줄무늬 (가로 물결)
+    for j in range(int(P.get('stripes', 7))):
+        y = mc.y + ML / 2 * (-0.6 + 1.2 * j / 6)
+        w = MW / 2 * math.sqrt(max(0.0, 1 - ((y - mc.y) / (ML / 2)) ** 2)) * 0.8
+        pts = [V((x, y + L * 0.008 * math.sin(i * 1.7), MH / 2 * math.sqrt(max(0.0, 1 - (x / (MW / 2)) ** 2 - ((y - mc.y) / (ML / 2)) ** 2)) + 0.0015)) for i, x in enumerate((-w, -w / 2, 0, w / 2, w))]
+        m.add(rail(pts, [L * 0.006] * 5, seg=5), 'mark', outline=False)
+    hc = V((0, mc.y - ML / 2 - L * 0.05, 0))
+    m.add(ellipsoid(hc, (MW * 0.36, L * 0.07, MH * 0.48), seg=16, rings=10), 'body')
+    eyes(m, MW * 0.3, hc.y, MH * 0.12, L * 0.035)
+    base = hc + V((0, -L * 0.05, 0))
+    for k in range(8):
+        a = TAU * k / 8
+        d = V((math.cos(a), 0, math.sin(a) * 0.6))
+        pts = bezier(base + d * L * 0.03, base + d * L * 0.045 + V((0, -L * 0.06, 0)), base + d * L * 0.05 + V((0, -L * 0.12, 0)), base + d * L * 0.03 + V((0, -L * 0.16, -L * 0.015)), 5)
+        m.add(rail(pts, [L * 0.024 * (1 - 0.7 * i / 5) for i in range(6)], seg=7), 'fin')
+    for sx in (1, -1):
+        a = base + V((sx * L * 0.015, 0, -L * 0.01))
+        pts = bezier(a, a + V((sx * L * 0.03, -L * 0.08, -L * 0.01)), a + V((sx * L * 0.05, -L * 0.17, -L * 0.03)), a + V((sx * L * 0.035, -L * 0.24, -L * 0.02)), 7)
+        m.add(rail(pts, [L * 0.01] * 7 + [L * 0.022], seg=7), 'fin')
+
+
 SEA_BUILDERS = {
     'seaweed': b_seaweed, 'urchin': b_urchin, 'sea-cucumber': b_cucumber, 'sea-squirt': b_squirt,
     'abalone': b_abalone, 'oyster': b_oyster, 'starfish': b_starfish, 'crab': b_crab, 'shrimp': b_shrimp,
     'jellyfish': b_jellyfish, 'anemone': b_anemone, 'sea-slug': b_sea_slug, 'mantis-shrimp': b_mantis_shrimp,
     'horseshoe-crab': b_horseshoe_crab, 'nautilus': b_nautilus, 'pearl-oyster': b_pearl_oyster, 'mussel': b_mussel,
     'scuba': b_scuba,
+    'anglerfish': b_anglerfish, 'cuttlefish': b_cuttlefish,   # M18-P1
 }

@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-36",
+  "slug": "sea-herring",
+  "name": "청어",
+  "group": "sea",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "sea.herring"
+  ],
+  "hold": true,
+  "triangles": 1540,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.06,
+    0.35,
+    0.08
+  ],
+  "bounds": [
+    [
+      -0.03,
+      -0.175,
+      -0.04
+    ],
+    [
+      0.03,
+      0.175,
+      0.04
+    ]
+  ],
+  "glbBytes": 38980,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-herring_main.png",
+    "sea-herring_thumb.png"
+  ]
+}

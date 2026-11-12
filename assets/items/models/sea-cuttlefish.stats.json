@@ -1,0 +1,48 @@
+{
+  "id": "IC-SE-29",
+  "slug": "sea-cuttlefish",
+  "name": "갑오징어",
+  "group": "sea",
+  "kind": "cuttlefish",
+  "version": "0.1",
+  "items": [
+    "sea.cuttlefish"
+  ],
+  "hold": true,
+  "triangles": 2978,
+  "parts": 1,
+  "materials": [
+    "back",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "squid"
+  ],
+  "size": [
+    0.117,
+    0.291,
+    0.042
+  ],
+  "bounds": [
+    [
+      -0.058,
+      -0.146,
+      -0.021
+    ],
+    [
+      0.058,
+      0.146,
+      0.021
+    ]
+  ],
+  "glbBytes": 70076,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-cuttlefish_main.png",
+    "sea-cuttlefish_thumb.png"
+  ]
+}

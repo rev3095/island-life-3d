@@ -1,0 +1,83 @@
+{
+  "id": "IC-SE-29",
+  "slug": "sea-cuttlefish",
+  "name": "갑오징어",
+  "group": "sea",
+  "category": "item",
+  "kind": "cuttlefish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.cuttlefish",
+      "code": "IC-SE-29"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "짧고 넓은 타원 몸통, 둘레 치마 지느러미, 등 물결 줄무늬",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 가을"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — 새 빌더 (items_sea.py)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "length": {
+      "label": "몸 길이",
+      "value": 0.3,
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "stripes": {
+      "label": "등 줄무늬 수",
+      "value": 7,
+      "min": 0,
+      "max": 14,
+      "step": 1,
+      "live": false
+    },
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#C8A888",
+    "back": "#9A7A5E",
+    "belly": "#F2E6D6",
+    "fin": "#E0CAB2",
+    "mark": "#5E4634",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -40,
+    "pitch": 30
+  }
+}

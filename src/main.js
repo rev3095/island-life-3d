@@ -96,7 +96,7 @@ async function boot() {
   }
   if (!ctx.services.world) await coreCheck(ctx);
   events.emit('game:ready', { modules: loaded.map(([n]) => n) });
-  setTimeout(() => assets.prefetchPacks?.({ seasons: ctx.services.events?.soon?.() ?? [] }), 3000);   // 게시본: 나머지 묶음을 쉬엄쉬엄 미리 받기 (계절 행사 묶음은 그 행사 무렵만)
+  setTimeout(() => assets.prefetchPacks?.({ seasons: [...(ctx.services.events?.soon?.() ?? []), ...(ctx.services.data?.items?.seaPacksFor?.(ctx.services.time?.now?.()?.month) ?? [])] }), 3000);   // 게시본: 나머지 묶음을 쉬엄쉬엄 미리 받기 (계절 행사 묶음은 그 행사 무렵만, M18-P1 계절 바다 생물 묶음은 이 달·다음 달 것만)
 
   const resize = () => {
     const w = innerWidth, h = innerHeight;
