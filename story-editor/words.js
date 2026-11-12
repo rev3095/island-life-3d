@@ -52,7 +52,7 @@ const WHEN = {
   // 가게 주인
   firstday: '첫날 안내 (밤톨)', today: '오늘 들어온 가구 안내', after: '첫날 할 일을 마친 뒤', closed: '가게 문 닫은 때 (8–22시 밖)', nightShop: '밤 매장 (22–8시) — 지하 밤 코너·덮개 천 안내 (실내 전수)',
   firstVisit: '박물관에 처음 왔을 때', none: '기증할 게 없을 때', firstDonation: '첫 기증', thanks: '기증 고마워', thanksMany: '여러 개 기증', fossil: '화석 감정',
-  milestone: '기증 수 이정표', milestoneAny: '이정표 (그 밖)', complete: '한 분류를 다 모았을 때', allComplete: '모두 모았을 때', appraise: '화석 감정', bagFull: '가방이 꽉 찼을 때', story: '느루의 옛이야기',
+  milestone: '기증 수 이정표', milestoneAny: '이정표 (그 밖)', complete: '한 분류를 다 모았을 때', allComplete: '모두 모았을 때', appraise: '화석 감정', bagFull: '가방이 꽉 찼을 때', story: '느루의 옛이야기', fake: '가품 미술품을 내밀 때 (M17-P2 — 다른 점 한 줄은 art-items.js MUSEUM_TELL)',
 };
 export const LETTER_WHEN = {
   friend: '친구가 된 뒤 가끔 아침 우편함', close: '단짝이 된 뒤 가끔 아침 우편함', thanks: '부탁을 들어준 다음 날 아침', gift: '편지에 선물이 들어 있을 때 끝에 붙는 한 줄',

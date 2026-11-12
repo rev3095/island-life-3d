@@ -27,8 +27,10 @@ export const fmt = n => Number(n || 0).toLocaleString('ko-KR');
 
 /** data 모듈에 아이템 정보가 없을 때 쓰는 분류별 기본 아이콘 (자리표시) */
 const CATEGORY_ICON = { fish: '🐟', bug: '🦋', fossil: '🦴', fruit: '🍎', mat: '🪵', tool: '🛠️', furn: '🪑', shell: '🐚', flower: '🌷', seed: '🌱' };
-export const CATEGORY_NAME = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', mat: '재료', tool: '도구', furn: '가구', shell: '조개', flower: '꽃', seed: '씨앗', sea: '바다 생물' };
+export const CATEGORY_NAME = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', mat: '재료', tool: '도구', furn: '가구', shell: '조개', flower: '꽃', seed: '씨앗', sea: '바다 생물', art: '미술품' };
 export const DEX_CATEGORIES = ['fish', 'bug', 'fossil', 'sea'];   // M16 잠수: 바다 생물 (도감 탭 · 박물관 기증)
+/** 박물관이 받는 분류 (M17-P2: 미술품 art 도 — 가방 기증 모드·박물관 창. 도감 탭은 DEX_CATEGORIES 그대로) */
+export const MUSEUM_CATEGORIES = [...DEX_CATEGORIES, 'art'];
 /** B-12 「밤」 분류: 밤에만 나오는 물고기·곤충 (나오는 시간 hours 가 한낮 12시를 안 덮고 밤 22시·새벽을 덮음) · 야시장 먹거리(category night) */
 const covers = (hours, h) => (hours ?? []).some(([a, b]) => (a <= b ? h >= a && h < b : h >= a || h < b));
 export const isNightOnly = it => !!it && (it.category === 'night' || (Array.isArray(it.hours) && it.hours.length > 0 && !covers(it.hours, 12) && (covers(it.hours, 22) || covers(it.hours, 2))));

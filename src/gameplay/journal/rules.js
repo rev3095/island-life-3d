@@ -4,24 +4,32 @@
 /** 글자 → 32비트 씨앗 */
 export function hashOf(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 
-/** 그날 할 일 n 개 — 날짜 + 섬 씨앗으로 늘 같게, 같은 on(셀 일) 은 하나만 */
-export function pickTasks(cfg, dayKey, seed = 0) {
+/**
+ * 그날 할 일 n 개 — 날짜 + 섬 씨앗으로 늘 같게, 같은 on(셀 일) 은 하나만.
+ * M17-P2 (D183-A) 조건 칸 needs (아이템 id, 또는 그 배열 = 모두): has(id) 가 false 면 건너뛴다 (섞은 순서는 그대로라 조건 없는 날은 예전과 같다).
+ * has 를 안 주면 조건을 보지 않는다.
+ */
+export function needsMet(task, has) {
+  if (!task?.needs || !has) return true;
+  return [task.needs].flat().every(id => !!has(id));
+}
+export function pickTasks(cfg, dayKey, seed = 0, has = null) {
   let x = hashOf(`${dayKey}|${seed}`) || 1;
   const rnd = () => ((x = Math.imul(x ^ (x >>> 15), 2246822507) ^ Math.imul(x ^ (x >>> 13), 3266489909)) >>> 0) / 4294967296;
   const pool = [...(cfg.tasks ?? [])];
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   const out = [], seen = new Set();
-  for (const t of pool) { if (out.length >= (cfg.daily ?? 5)) break; if (seen.has(t.on)) continue; seen.add(t.on); out.push(t); }
+  for (const t of pool) { if (out.length >= (cfg.daily ?? 5)) break; if (seen.has(t.on) || !needsMet(t, has)) continue; seen.add(t.on); out.push(t); }
   return out;
 }
 
 /** 저장 칸을 채우고, 날이 바뀌었으면 그날 할 일로 새로 */
-export function ensure(state, cfg, dayKey, seed = 0) {
+export function ensure(state, cfg, dayKey, seed = 0, has = null) {
   const j = (state.journal ||= {});
   j.points ??= 0; j.earned ??= 0; j.counts ||= {}; j.goals ||= {}; j.bought ||= {};
   if (j.day !== dayKey) {
     j.day = dayKey;
-    j.tasks = pickTasks(cfg, dayKey, seed).map(t => ({ id: t.id, n: 0, done: false }));
+    j.tasks = pickTasks(cfg, dayKey, seed, has).map(t => ({ id: t.id, n: 0, done: false }));
     j.talked = [];
   }
   return j;

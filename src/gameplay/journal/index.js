@@ -35,7 +35,9 @@ function createJournal(ctx, cfg) {
   const S = () => ctx.services;
   const dayKey = () => S().time?.now?.().dayKey ?? S().data?.day?.key?.() ?? '';
   const live = () => !cfg.afterIntro || !!ctx.state.flags?.firstday?.finished;
-  const J = () => R.ensure(ctx.state, cfg, dayKey(), ctx.state.island?.seed ?? 0);
+  // M17-P2 (D183-A) 할 일 조건 needs: 그 아이템(스쿠버 키트·새총 …)을 가방에 가졌나 — 그날 할 일을 처음 뽑을 때 본다
+  const has = id => (S().data?.inventory?.count?.(id) ?? 0) > 0;
+  const J = () => R.ensure(ctx.state, cfg, dayKey(), ctx.state.island?.seed ?? 0, S().data?.inventory ? has : null);
   let shopOpen = false, acorns = null;
 
   function count(on, amount = 1) {

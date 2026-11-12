@@ -24,9 +24,10 @@ import { createDoors } from './door.js';
 import { createPlaces } from './places.js';
 import { FIXTURE_BASE } from './placedata.js';
 import { HOME_FILE, DEFAULT_HOME, ROOM_FILES, FLOOR_NAME, ensureGrow, floorsFor, growShift, shiftRecs, fixtureBox, stairHeight, stairTrigger, fixtureBlockers, arrivalAt,
-  offer, startBuild, finishBuild, repay, repayChoices, stageOf, maxStage } from './home.js';
+  offer, growTopic, startBuild, finishBuild, repay, repayChoices, stageOf, maxStage } from './home.js';
 import { seatSpec, seatsOf, nearestSeat } from '../decor/seats.js';   // 10차 앉기: 의자 자리 표
 
+const TELESCOPE_ITEM = 'furn.star-telescope';         // 10차 FU-53 별 망원경 — 집 안에선 가구 메뉴 「망원경 보기」(M17-P2)
 const WORKBENCH_INFO = { footprint: [2, 1], place: 'floor' };
 const STARTER = [   // 처음 들어간 날 놓여 있는 가구
   { item: 'furn.round-rug', gx: 2, gz: 3, rot: 0 },
@@ -300,7 +301,8 @@ export default {
     I.add({ name: 'house-decor', intent: 'action', priority: 25, label: '꾸미기', test: () => (H.inside && !H.busy && !H.moving ? decorWall() : null), run: () => decorate() });
     I.add({ name: 'house-place', intent: 'action', priority: 20, test: () => (H.inside && !H.busy ? true : null), run: () => placeFromBag() });
     // M14 집 증축: 내 집 우편함 (안 읽은 편지가 있으면 town:mail 91 이 먼저 읽게 둔다 — 다 읽은 뒤 Space = 집 증축 묻기·갚기)
-    I.add({ name: 'house-grow', intent: 'action', priority: 92, label: '집 넓히기', test: () => (!H.inside && !H.busy && !doors.busy && mailboxInFront() ? true : null), run: () => growTalk() });
+    // M17-P2 (D185-A): 우편함은 집 빚 갚기만 (빚이 있을 때만 잡는다 — 없으면 우편함 = 편지 town:mail). 넓히기는 도토리상점 밤톨 대화 「집을 넓히고 싶어요」
+    I.add({ name: 'house-grow', intent: 'action', priority: 92, label: '집 빚 갚기', test: () => (!H.inside && !H.busy && !doors.busy && G.debt > 0 && mailboxInFront() ? true : null), run: () => growTalk() });
 
     // 주민 집·주민 방 (visit.js): 같은 화면 전환·가구 모델·스펙을 쓴다
     const visits = createVisits(ctx, { H, kit, interior, doors, toast, saveSoon });
@@ -355,8 +357,12 @@ export default {
             return { to: f.to, kind: 'down', x: lv.x0 + ix, z: lv.z0 + b.z0 + 0.5, from: { x: lv.x0 + ox, z: lv.z0 + b.z0 + 0.5 } };
           });
         },
-        /** 우편함 대화 (봇은 우편함 앞 Space 로 — 이건 섬폰·편집기용) */
+        /** 우편함 대화 (빚 갚기 — 봇은 우편함 앞 Space 로 · 이건 섬폰·편집기용) */
         talk: () => growTalk(),
+        /** M17-P2 (D185-A) 도토리상점 밤톨 「집을 넓히고 싶어요」 (town/keepers.js shopFlow 가 자기 say 로 부른다) */
+        ask: ({ say } = {}) => growTalk({ where: 'shop', say }),
+        /** 넓힐 수 있나 (밤톨 대화에 줄을 넣을지): 'build' 다음 단계 · 'debt' · 'pending' · 'done' · null (첫날 전) */
+        offer: () => (afterIntro() ? offer(G, homeCfg).kind : null),
         /** 개발·점검 도구: 다음 날을 기다리지 않고 짓던 것을 다 짓기 */
         finish: () => completeBuild(),
       },
@@ -561,21 +567,29 @@ export default {
     }
     const afterIntro = () => !homeCfg.afterIntro || !!state.flags?.firstday?.finished || !ctx.services.intro;
 
-    /** 우편함 대화: 다음 단계 짓기 · 빚 갚기 · 짓는 중 · 다 지음 */
-    async function growTalk() {
+    /**
+     * 집 증축 대화 (M14 · M17-P2 D185-A). where 'mail' = 우편함 (빚 갚기만 — 빚이 없으면 밤톨에게 가라는 한 줄),
+     * 'shop' = 도토리상점 밤톨 「집을 넓히고 싶어요」 (다음 단계 짓기 · 짓는 중 · 다 지음 · 빚이 남았으면 갚기도). say 를 주면 그 대화창으로 (밤톨 대화 안)
+     */
+    async function growTalk({ where = 'mail', say: sayIn = null } = {}) {
       const ui = ctx.services.ui, wallet = ctx.services.data?.wallet;
-      if (!ui?.dialog || !wallet || H.busy) return;
-      H.busy = true;
-      const say = (lines, choices) => ui.dialog.open({ speaker: '밤톨', color: '#C98F52', lines, choices });
+      if (!ui?.dialog || !wallet || (!sayIn && H.busy)) return;
+      const own = !sayIn;
+      if (own) H.busy = true;
+      const say = sayIn ?? ((lines, choices) => ui.dialog.open({ speaker: '밤톨', color: '#C98F52', lines, choices }));
       try {
         if (!afterIntro()) { await say(['집을 넓히는 이야기는 섬 생활에 익숙해진 뒤에 해요!']); return; }
-        const o = offer(G, homeCfg);
-        if (o.kind === 'pending') { await say([`「${o.next.name}」 공사 중이에요!`, '내일 아침이면 다 지어져 있을 거예요.']); return; }
-        if (o.kind === 'done') { await say(['집이 이제 다 자랐어요!', `그동안 갚은 도토리 ${fmt(G.paid)}개 — 정말 고생 많았어요.`]); return; }
-        if (o.kind === 'debt') {
+        const o = offer(G, homeCfg), topic = growTopic(G, homeCfg, where);
+        if (topic === 'to-shop') { await say(['집을 넓히고 싶으면 도토리상점에 들러 주세요!', '계산대에서 저한테 말해 주면 돼요.']); return; }
+        if (topic === 'pending') { await say([`「${o.next.name}」 공사 중이에요!`, '내일 아침이면 다 지어져 있을 거예요.']); return; }
+        if (topic === 'done') { await say(['집이 이제 다 자랐어요!', `그동안 갚은 도토리 ${fmt(G.paid)}개 — 정말 고생 많았어요.`]); return; }
+        if (topic === 'debt') { await say([`아직 집 빚이 도토리 ${fmt(G.debt)}개 남았어요.`, '빚은 집 앞 우편함에서 갚아요. 다 갚으면 더 넓혀 드릴게요!']); return; }
+        if (topic === 'repay') {
           const have = wallet.get();
           const list = repayChoices(G, have, homeCfg);
-          const pick = await say([`남은 집 빚은 도토리 ${fmt(G.debt)}개예요.`, list.length ? '얼마나 갚을까요?' : '도토리가 모이면 갚으러 와 주세요.'], [...list.map(c => c.label), '다음에 갚을게요']);
+          const letter = where === 'mail' && !!ctx.services.town?.mail?.canWrite?.() && !!ctx.services.town?.mail?.write;   // 우편함은 편지도 (M15)
+          const pick = await say([`남은 집 빚은 도토리 ${fmt(G.debt)}개예요.`, list.length ? '얼마나 갚을까요?' : '도토리가 모이면 갚으러 와 주세요.'], [...list.map(c => c.label), ...(letter ? ['편지 쓸래요'] : []), '다음에 갚을게요']);
+          if (letter && pick === list.length) { await ctx.services.town.mail.write(); return; }
           const c = pick == null ? null : list[pick];
           if (!c) return;
           if (!wallet.spend(c.amount)) { toast('도토리가 모자라요', '🌰'); return; }
@@ -584,7 +598,7 @@ export default {
           events.emit('house:repay', { amount: c.amount, debt: left });
           if (left === 0) {
             const next = stageOf(homeCfg, G.stage + 1);
-            await say(['빚을 다 갚았어요! 대단해요!', next ? `다음엔 「${next.name}」도 할 수 있어요. 우편함에서 또 물어봐 주세요.` : '이제 집이 다 자랐어요.']);
+            await say(['빚을 다 갚았어요! 대단해요!', next ? `다음엔 「${next.name}」도 할 수 있어요. 가게에 오면 또 물어봐 주세요.` : '이제 집이 다 자랐어요.']);
             events.emit('house:paid', { stage: G.stage });
           } else toast(`집 빚 ${fmt(c.amount)} 갚음 — 남은 빚 ${fmt(left)}`, '🏠');
           saveSoon(0.3);
@@ -599,9 +613,9 @@ export default {
         events.emit('sfx', { name: 'menu' });
         player.play?.('happy');
         events.emit('house:build', { stage: st.stage, cost: st.cost, debt: G.debt });
-        await say([`좋아요! 「${st.name}」 공사를 시작할게요.`, '내일 아침이면 다 지어져 있을 거예요. 기대해 주세요!']);
+        await say([`좋아요! 「${st.name}」 공사를 시작할게요.`, '내일 아침이면 다 지어져 있을 거예요. 빚은 우편함에서 갚아요!']);
         saveSoon(0.3);
-      } finally { H.busy = false; }
+      } finally { if (own) H.busy = false; }
     }
 
     /** 짓던 단계를 다 짓는다 (하루 리셋 때 · 집 안이면 나올 때) */
@@ -823,11 +837,12 @@ export default {
     async function placeFromBag() {
       const data = ctx.services.data, ui = ctx.services.ui;
       if (!data || !ui?.bag) return;
-      const isFurn = s => !!s && String(s.id).startsWith('furn.') && !!kit.info(s.id);
+      // M17-P2 (D184-A): 미술품 art.*(진품·가품)도 가구처럼 — 그림은 벽, 조각은 바닥 (furniture.js artInfos)
+      const isFurn = s => !!s && (String(s.id).startsWith('furn.') || String(s.id).startsWith('art.')) && !!kit.info(s.id);
       if (!data.inventory.slots.some(isFurn)) { toast('가방에 놓을 가구가 없어요', '🪑'); return; }
       H.busy = true;
       try {
-        const slot = await ui.bag.open({ mode: 'pick', title: '가구 놓기', hint: '방에 놓을 가구를 골라 주세요', filter: s => isFurn(s) });
+        const slot = await ui.bag.open({ mode: 'pick', title: '가구 놓기', hint: '방에 놓을 가구·미술품을 골라 주세요', filter: s => isFurn(s) });
         if (slot == null) return;
         const picked = data.inventory.slots[slot];
         if (!isFurn(picked)) return;
@@ -899,6 +914,7 @@ export default {
       const variants = Object.keys(spec?.variants ?? {});
       const opts = [];
       if (rec.item === 'furn.wardrobe' && ctx.services.outfit && ui.closet) opts.push(['dress', '갈아입기']);   // 11차 D100-A 옷장 창 UI-19
+      if (rec.item === TELESCOPE_ITEM && ctx.services.stars?.open) opts.push(['scope', '망원경 보기']);   // M17-P2: 박물관 앞 망원경과 같은 망원경 보기 UI-32
       if (!rec.wall && info(rec.item).layer !== 'rug') opts.push(['rotate', '돌리기']);
       opts.push(['move', '옮기기']);
       if (variants.length > 1) opts.push(['color', '색 바꾸기']);
@@ -910,6 +926,7 @@ export default {
       opts.push(['store', '가방에 넣기'], ['cancel', '그만두기']);
       let line = `${josa(name, '을/를')} 어떻게 할까요?`;
       if (opts[0]?.[0] === 'dress') line = '옷장이에요. 무엇을 할까요?';
+      if (opts[0]?.[0] === 'scope') line = '별 망원경이에요. 창밖 밤하늘을 볼까요?';
       if (rec.holds) line = `${josa(nameOf(rec.holds), '이/가')} ${it.holds === 'fish' ? '헤엄치고' : '쉬고'} 있어요. 어떻게 할까요?`;
       else if (it?.plays === 'bgm' && S.radio) line = `라디오에서 ${RADIO[S.radio]} 곡이 나오고 있어요.`;
       H.busy = true;
@@ -917,6 +934,7 @@ export default {
       try { pick = await ui.dialog.open({ speaker: name, color: '#C99B68', lines: [line], choices: opts.map(o => o[1]) }); }
       finally { H.busy = false; }
       const what = pick == null ? 'cancel' : opts[pick][0];
+      if (what === 'scope') { ctx.services.stars.open({ where: '집 안 별 망원경' }); return; }
       if (what === 'dress') {
         H.busy = true;
         try { await ui.closet.open(); } finally { H.busy = false; }

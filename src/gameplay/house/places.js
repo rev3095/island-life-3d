@@ -429,18 +429,22 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   async function itemModel(id) {
     const m = (await loadItemIndex()).get(id);
     if (!m) return null;
-    if (!templates.has(m.slug)) {
+    // M17-P2: 색 변형 아이템(가품 미술품 fakeLook)은 따로 칠한 틀 — 같은 slug 의 진품 틀과 재질을 나눠 쓰지 않는다
+    const look = ctx.services.data?.items?.get?.(id)?.fakeLook ?? null;
+    const key = look ? `${m.slug}:${id}` : m.slug;
+    if (!templates.has(key)) {
       const job = ctx.assets.loadModel(`assets/items/models/${m.slug}`).then(gltf => {
         const { scene: model } = ctx.assets.instantiate(gltf);
-        materials.applyToonStyle(model, { spec: { style: m.style ?? {} } });
+        const toon = materials.applyToonStyle(model, { spec: { style: m.style ?? {} } });
+        if (look) for (const [k, hex] of Object.entries(look)) toon?.setColor?.(k, hex);
         model.name = `item:${m.slug}`;
         const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
         return { model, size };
       });
-      job.catch(() => templates.delete(m.slug));
-      templates.set(m.slug, job);
+      job.catch(() => templates.delete(key));
+      templates.set(key, job);
     }
-    try { const t = await templates.get(m.slug); return { root: t.model.clone(), size: t.size }; } catch { return null; }
+    try { const t = await templates.get(key); return { root: t.model.clone(), size: t.size }; } catch { return null; }
   }
   function clearShown(R) {
     for (const o of R.shown) o.dispose();
@@ -524,7 +528,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
           m.root.position.set(R.x0 + s.lx - cx, top ? s.hang - b.max.y : s.y - b.min.y, R.z0 + s.lz - cz);
           return tag(m);
         }
-        if (kit.info(s.id)) {   // 오늘의 가구 (붙박이가 아닌 진짜 가구 — 묶음 이름이 furniture·indoor·outdoor·night-furniture 어느 것이든)
+        if (kit.info(s.id) && !kit.info(s.id).art) {   // 오늘의 가구 (M17-P2: 미술품은 집 키트가 알아도 진열은 아래 아이템 모델로 — 받침 위 그대로) (붙박이가 아닌 진짜 가구 — 묶음 이름이 furniture·indoor·outdoor·night-furniture 어느 것이든)
           const obj = await kit.make(s.id);
           const fp = kit.info(s.id).footprint ?? [1, 1];
           obj.root.scale.setScalar(Math.min(1, (s.fit ?? 2) / Math.max(...fp)));

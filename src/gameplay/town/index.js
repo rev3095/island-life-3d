@@ -362,7 +362,9 @@ export default {
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
       mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot,
         /** M15: 보낸 편지 목록 · 오늘 더 쓸 수 있나 */
-        sent: () => mail.sent(), canWrite: () => mail.canWrite() },
+        sent: () => mail.sent(), canWrite: () => mail.canWrite(),
+        /** M17-P2: 편지 쓰기 창 (집 빚이 있을 때 우편함 = 빚 갚기 대화가 「편지 쓰기」 줄로 부른다) */
+        write: () => mail.write() },
       /** M15 같이 하기: active() 지금 같이 노는 것 · can(slug) 놀 수 있나 {ok, why} */
       together: { active: () => companion.active, can: slug => { const V = villagers.find(v => v.slug === slug); return V ? companion.can(V) : { ok: false, why: 'none' }; } },
       /** M15 저녁 광장 노래: today() 오늘 계획 · now() 지금 부르는 둘 */

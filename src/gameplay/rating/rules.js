@@ -1,10 +1,10 @@
 // M14 섬 별점 규칙 (DOM·three 없음 → tests/rating.test.mjs). 설정 assets/rating/rating.json (결정 D152-A).
-// counts = { flowers, trees, furn, fences, paths, builds, home, residents, weeds } → 점수·별·칸별 점수·주민 한마디 갈래.
+// counts = { flowers, trees, furn, fences, paths, builds, home, residents, art, weeds } (art = 집 안에 놓은 미술품, M17-P2 D184-A) → 점수·별·칸별 점수·주민 한마디 갈래.
 // 상태 state.rating = { best (지금까지 가장 높은 별), rewarded: [별], five (별 다섯 처음 날 dayKey), last: { day, stars, score } }
 
-/** 물체 목록 (world.objects.list() 모양) → 세는 칸. extra = { home, residents } */
+/** 물체 목록 (world.objects.list() 모양) → 세는 칸. extra = { home, residents, art } */
 export function countIsland(objs, extra = {}) {
-  const c = { flowers: 0, trees: 0, furn: 0, fences: 0, paths: 0, builds: 0, weeds: 0, home: extra.home ?? 0, residents: extra.residents ?? 0 };
+  const c = { flowers: 0, trees: 0, furn: 0, fences: 0, paths: 0, builds: 0, weeds: 0, home: extra.home ?? 0, residents: extra.residents ?? 0, art: extra.art ?? 0 };
   for (const o of objs) {
     const k = o.kind, d = o.data?.decor;
     if (d === 'furn') c.furn++;
