@@ -1,0 +1,53 @@
+{
+  "id": "FU-72",
+  "slug": "album-frame-wall",
+  "item": "furn.album-frame-wall",
+  "name": "추억 벽 액자",
+  "category": "furniture",
+  "kind": "album-frame-wall",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 992,
+  "parts": 2,
+  "materials": [
+    "frame",
+    "mat",
+    "photo",
+    "pin",
+    "string"
+  ],
+  "objects": [
+    "frame",
+    "photo"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.09,
+    1.95
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -0.092,
+      1.2
+    ],
+    [
+      0.42,
+      -0.006,
+      1.954
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 22648,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "album-frame-wall_front.png",
+    "album-frame-wall_main.png",
+    "album-frame-wall_thumb.png",
+    "album-frame-wall_top.png"
+  ]
+}

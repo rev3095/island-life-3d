@@ -13,6 +13,7 @@ export const TRIGGERS = {
   'event-start': { label: '계절 행사를 처음 할 때 (8차 — trigger.event = EV-01…)', event: 'events:start', test: (p, t) => p?.id === t.event && !!p?.first },
   'move-in': { label: '새 주민이 이사 온 날 저녁 (10차 — trigger.slug = 주민, town/moving.js 가 보내는 town:welcome)', event: 'town:welcome', test: (p, t) => !!t.slug && p?.slug === t.slug },
   'night-first': { label: '밤 가게에 처음 들어갈 때 (M12 — trigger.kind = moonshop · tent, night 가 문 앞에서 보내는 night:first)', event: 'night:first', test: (p, t) => !!t.kind && p?.kind === t.kind },
+  'song-first': { label: '저녁 광장 주민 노래를 처음 들을 때 (M15 — town/song.js 가 보내는 town:song 의 first, 자리 x·z = 두 주민 가운데)', event: 'town:song', test: p => !!p?.first },
   'tour-first': { label: '무인도에 처음 도착했을 때 (P35 — tour 가 보내는 tour:arrive 의 first)', event: 'tour:arrive', test: p => !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };

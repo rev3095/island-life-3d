@@ -9,6 +9,8 @@ import {
 } from './rules.js';
 
 export const MENU = ['잡담', '부탁 있어?', '선물 주기', '잘 가'];
+export const TOGETHER_MENU = '같이 놀자';   // M15 (친구 이상일 때 잘 가 앞에)
+export const TOGETHER_TOKEN = 'item:tool.rod';   // M15 이모티콘 대화: 낚싯대 = 같이 낚시
 const TIER_NAME = { known: '아는 사이', friend: '친구', close: '단짝', best: '절친' };
 
 /** 지금 시각·날씨·계절 (time 서비스가 없으면 브라우저 시계) */
@@ -58,7 +60,7 @@ export function giveItem(ctx, id, n = 1, opts = {}) {
   return res.left;
 }
 
-export function createTalk(ctx, { lines, party = null }) {
+export function createTalk(ctx, { lines, party = null, companion = null }) {
   const data = () => ctx.services.data;
   const ui = () => ctx.services.ui;
   const itemName = id => data()?.items?.get?.(id)?.name ?? id;
@@ -161,15 +163,26 @@ export function createTalk(ctx, { lines, party = null }) {
       if (gE.length) await say(greet, null, gE);
       await E.chat({
         gift: giftFlow, request: requestFlow, note,
-        things: () => { const q = currentRequest(v, c.dayKey); return q ? [E.reqToken(q)] : []; },
+        things: () => { const q = currentRequest(v, c.dayKey); return [...(q ? [E.reqToken(q)] : []), ...(togetherOk() ? [TOGETHER_TOKEN] : [])]; },
+        // M15: 🎣(낚싯대) 하나 = 같이 낚시, 🏃 하나 = 같이 산책 (친구 이상 — 덜 친하면 🏃 는 보통 이모티콘으로 판정)
+        special: async one => {
+          if (!companion || (one !== TOGETHER_TOKEN && one !== 'run')) return null;
+          if (one === 'run' && !togetherOk()) return null;
+          return (await togetherFlow(one === TOGETHER_TOKEN ? 'fish' : 'walk')) ? 'end' : true;
+        },
         festival: ctx.services.festival?.ask ? () => ctx.services.festival.ask(V, E) : null,
       });
     } else {
-      const choice = await say(greet.length ? greet : pickLines(L.menu, r, recent), MENU);
-      if (choice === 0) await say(chatLines(L, { ...cc, tier: tierOf(v.friendship) }));
-      else if (choice === 1) await requestFlow();
-      else if (choice === 2) await giftFlow();
-      else await say(pickLines(L.bye, r, recent));
+      const menu = togetherOk() ? [...MENU.slice(0, 3), TOGETHER_MENU, MENU[3]] : MENU;   // M15: 친구 이상이면 「같이 놀자」
+      const pick = menu[await say(greet.length ? greet : pickLines(L.menu, r, recent), menu)];
+      if (pick === MENU[0]) await say(chatLines(L, { ...cc, tier: tierOf(v.friendship) }));
+      else if (pick === MENU[1]) await requestFlow();
+      else if (pick === MENU[2]) await giftFlow();
+      else if (pick === TOGETHER_MENU) {
+        const k = await say(pickLines(L.together?.ask, r, recent), ['같이 낚시', '같이 산책', '다음에']);
+        if (k === 0 || k === 1) await togetherFlow(k === 0 ? 'fish' : 'walk');
+        else await say(pickLines(L.bye, r, recent));
+      } else await say(pickLines(L.bye, r, recent));
     }
 
     // 부탁·선물로 단계가 올랐으면 한마디, 친밀도 최고면 사진 한 번
@@ -184,6 +197,19 @@ export function createTalk(ctx, { lines, party = null }) {
       // 사진 변형 = 주민 slug (집에 놓으면 그 주민 사진이 걸린다)
       const left = giveItem(ctx, 'furn.villager-photo', 1, { variant: V.slug });
       if (left > 0) { v.pending.push({ id: 'furn.villager-photo', variant: V.slug }); await say(pickLines(L.gift.full, r), null, ['sweat', 'gift']); }
+    }
+
+    // ---- M15 같이 하기 ----
+    /** 같이 놀자를 보여 줄 만큼 친한가 (오늘 이미 놀았어도 보여 주고, 물으면 「다음에」라고 한다) */
+    function togetherOk() { return !!companion && companion.can(V).why !== 'tier'; }
+    /** 같이 할래? → 승낙이면 대화가 끝난 뒤 따라온다 (V.togetherWish — index.js 가 시작) → 승낙했나 */
+    async function togetherFlow(kind) {
+      const ok = companion.can(V);
+      if (!ok.ok) { await say(companion.refusal(V, ok.why), null, ok.why === 'tier' ? ['sweat', 'dots'] : ['smile', 'wait']); return false; }
+      V.happy();
+      await say(pickLines(L.together?.[kind === 'fish' ? 'fishYes' : 'walkYes'], r, recent), null, ['grin', kind === 'fish' ? TOGETHER_TOKEN : 'run', 'good']);
+      V.togetherWish = kind;
+      return true;
     }
 
     // ---- 부탁 ----

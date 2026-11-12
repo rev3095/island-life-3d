@@ -1,6 +1,7 @@
 // 주민 한 명의 하루: 집에서 나오기 → 자주 가는 곳을 오가며 쉬기 → 밤(또는 비)엔 문까지 걸어가 들어가기.
 // 길은 path.js 의 칸 A*, 실제 걸음은 world.collide. 플레이어·다른 주민은 비켜 가고, 가까이 오면 쳐다본다.
 // 10차 M10-P1: 섬에 놓은 벤치·피크닉 탁자·통나무 의자(decor.hangouts → seat)에 가면 실제로 앉는다 (mode 'sit': sit_down → sit → stand_up, 자리 맡기 ctx.services.seats).
+// M15: mode 'with' = 바깥 손에 맡김 (같이 낚시·산책 companion.js · 저녁 광장 노래 song.js) — V.ext(dt) 가 걸음·자세를 맡고, V.afterAnim(dt) 가 동작 뒤 자세(AN-14)를 얹는다.
 // 5차: 생일엔 하루 종일 집에 있고(town.staysIn), 플레이어가 그 집 방에 들어오면(house:enter) 방 안에 서 있다 (mode 'room').
 import { createActor } from './actor.js';
 import { shouldBeOut } from './rules.js';
@@ -54,7 +55,7 @@ export async function createVillager(ctx, person, town) {
       if (V.mode !== 'talk') return;
       const back = V.talkFrom;
       // 집 안(문 너머·방)에서 말했으면 그대로 집 안에
-      V.mode = back === 'walk' || back === 'toDoor' || back === 'home' || back === 'room' || (back === 'sit' && V.seat) ? back : 'idle';
+      V.mode = back === 'walk' || back === 'toDoor' || back === 'home' || back === 'room' || (back === 'with' && V.ext) || (back === 'sit' && V.seat) ? back : 'idle';
       if (V.mode === 'idle') V.timer = 1.5 + r() * 2;
       V.think = 0;
     },
@@ -107,6 +108,7 @@ export async function createVillager(ctx, person, town) {
           if (pl && !V.seat) actor.lookAt(pl.x, pl.z);
           break;
         case 'sit': sitStep(dt); break;
+        case 'with': V.ext?.(dt, pd); break;   // M15 같이 하기 · 노래
         case 'chat': {
           const o = V.partner;
           if (!o || o.mode !== 'chat' || o.partner !== V) { V.stopChat(); break; }
@@ -137,6 +139,7 @@ export async function createVillager(ctx, person, town) {
         }
       }
       actor.update(dt, animate);
+      V.afterAnim?.(dt);   // M15 AN-14 낚싯대 들기 (동작 위에 뼈 자세를 얹는다)
       if (V.mode === 'enter' && actor.opacity <= 0.01) toHome();
     },
   };
@@ -257,6 +260,13 @@ export async function createVillager(ctx, person, town) {
     actor.pinned = false;
   }
   V.standUp = then => standUp(then);
+  /** M15: 바깥 손에 맡기기 (ext(dt, 플레이어 거리) 가 매 프레임 걸음을 맡는다) — 앉아 있으면 일어난 뒤 */
+  V.hold = (ext, kind = 'with') => {
+    const go = () => { V.mode = 'with'; V.withKind = kind; V.ext = ext; V.partner = null; V.bubble = null; V.run = false; actor.path = []; };
+    if (V.mode === 'sit' || (V.mode === 'talk' && V.talkFrom === 'sit')) { V.mode = 'sit'; standUp(go); } else go();
+  };
+  /** M15: 바깥 손에서 놓기 → 잠깐 서 있다가 다시 일과대로 */
+  V.release = () => { V.ext = null; V.afterAnim = null; V.withKind = null; V.bubble = null; if (V.mode === 'with') idle(1 + r() * 2); };
   /** 점검용: 그 자리로 걸어가기 (spot.seat 가 있으면 도착해서 앉는다) → 길이 있으면 true */
   V.goTo = spot => (V.mode === 'idle' || V.mode === 'walk' ? walkTo(spot) : false);
 
@@ -271,7 +281,7 @@ export async function createVillager(ctx, person, town) {
   function outNow(now, weather) { return shouldBeOut(person, now, weather, { noBreak: !!town.hostBusy?.(person.slug) }) && !town.staysIn?.(V); }
 
   function think(now, weather) {
-    if (!now || V.mode === 'talk' || V.mode === 'room') return;
+    if (!now || V.mode === 'talk' || V.mode === 'room' || V.mode === 'with') return;
     const want = outNow(now, weather);
     if (want && V.mode === 'home') {
       if ((V.emergeDelay -= THINK) <= 0) emerge();

@@ -15,6 +15,9 @@ import { createMovein, livesHere } from './movein.js';
 import { createMoving, MOVERS } from './moving.js';
 import { createParty } from './party.js';
 import LINES from './lines/index.js';
+import { createCompanion } from './companion.js';   // M15 같이 낚시·산책
+import { createSong } from './song.js';             // M15 저녁 광장 주민 노래 (s26)
+import { createAlbum } from '../../ui/album.js';    // M15 UI-27 추억 앨범 · 액자 FU-71–72
 
 const TALK_DIST = 1.3;
 const EVENT_CLEAR = 3.2;   // 행사 자리에서 주민이 비켜 서는 거리 (솥 1.9 + 말 걸기 1.3)
@@ -196,7 +199,14 @@ export default {
       for (const slug of residents()) mail.post(slug, first ? 'festival' : 'festivalAgain');
     });
     party = createParty(ctx, { mail, residents, toast });
-    const talk = createTalk(ctx, { lines: LINES, party });
+    // M15 「주민과 더 가깝게」: 추억 앨범 (섬폰 📷 · 액자) → 같이 하기 → 노래
+    const album = createAlbum(ctx, { toast });
+    ctx.services.album = album.service;
+    if (ctx.services.ui?.panel && !ctx.services.ui.album) ctx.services.ui.album = { open: () => album.open() };
+    town.nav = nav;
+    const companion = createCompanion(ctx, { town, lines: LINES, toast });
+    const talk = createTalk(ctx, { lines: LINES, party, companion });
+    const song = createSong(ctx, { town, lines: LINES, villagers: () => villagers, companion });
     const chatter = createChatter(villagers, LINES);
 
     /** 이사 온 주민을 섬에 들인다 (모델을 불러 villagers 에 더한다) */
@@ -313,12 +323,16 @@ export default {
       return d < 0.55 || (-Math.sin(pl.facing) * dx - Math.cos(pl.facing) * dz) / d > 0.45 ? mailbox : null;
     }
     const gp = ctx.services.gameplay.interactions;
-    gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, async () => { if (!(await moving.talk(V))) await talk.converse(V); }) });
+    gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, async () => {
+      if (await companion.talk(V)) return;   // M15 같이 노는 중: 계속 / 그만
+      if (await song.talk(V)) return;        // M15 노래하는 중
+      if (!(await moving.talk(V))) await talk.converse(V);
+    }).then(() => { const k = V.togetherWish; V.togetherWish = null; if (k) companion.start(V, k); }) });
     gp.add({ name: 'town:knock', intent: 'action', priority: 90, test: homeDoorInFront, run: V => town.conversation(V, () => talk.knock(V), { face: true }) });
     gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** 지금 섬에 사는 주민 slug 목록 (새 주민은 입주한 뒤부터) */
@@ -346,7 +360,13 @@ export default {
       /** M12 D110-A: 친밀도 더하기 (밤에 처음 놀러 간 야행성 주민 등) → 올라간 새 단계 id | null */
       befriend: (slug, n) => (villagers.some(v => v.slug === slug) ? addFriendship(villagerState(ctx.state, slug), n).up : null),
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
-      mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot },
+      mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot,
+        /** M15: 보낸 편지 목록 · 오늘 더 쓸 수 있나 */
+        sent: () => mail.sent(), canWrite: () => mail.canWrite() },
+      /** M15 같이 하기: active() 지금 같이 노는 것 · can(slug) 놀 수 있나 {ok, why} */
+      together: { active: () => companion.active, can: slug => { const V = villagers.find(v => v.slug === slug); return V ? companion.can(V) : { ok: false, why: 'none' }; } },
+      /** M15 저녁 광장 노래: today() 오늘 계획 · now() 지금 부르는 둘 */
+      song: { today: () => song.plan(), now: () => song.active },
       /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */
       /** 주민 집 색 변형 이름 (10차 새 주민은 lilac·blue·navy) — house/visit.js 문 덧판이 쓴다 */
       houseVariant: slug => moving.variantOf(slug),
@@ -360,8 +380,9 @@ export default {
 
   update(dt) {
     if (!T) return;
-    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving } = T;
+    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving, song } = T;
     movein.update();
+    song.update(dt);
     moving.update(dt);
     const time = ctx.services.time;
     const now = time?.now?.() ?? null;
