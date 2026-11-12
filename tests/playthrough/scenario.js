@@ -694,6 +694,100 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`돌길 3 · 울타리 2 이어짐 · 하나 치움 · 저장 기록 ${saved}`);
   });
 
+  // M14 집과 섬이 자란다 (결정 D150–D153): 우편함 Space → 밤톨 「지어 주세요!」 → 다음 날 넓어진 1층 · 커진 겉모양 → 빚 갚기 (지갑에 있는 만큼) →
+  // 빚을 다 갚았으면 2층도 짓고 계단을 걸어 오르내린다 → 섬폰 「⭐ 섬 평가」 열어 별·주민 한마디. 봇은 시계만 넘기고 우편함·창·걷기는 키로.
+  add('home-grow', '집 증축: 우편함에서 빌려 짓기 → 다음 날 넓어진 방 · 겉모양 → 빚 갚기 → (2층 · 계단 오르내리기) → 섬폰 섬 평가', async () => {
+    const H = () => S().house, G = () => H()?.grow;
+    if (!G()) return block('집 증축(house.grow)이 없어요');
+    if (H().inside) await sk.leaveHome();
+    await bot.settle(20);
+    const odd = [], log = {};
+    const mailbox = async pick => {
+      const ph = S().world.places.playerHouse, at = S().town?.mail?.spot ?? { x: ph.door.x + 1, z: ph.door.z };
+      if (S().town?.mail?.unread?.()?.length) await sk.mail();   // 안 읽은 편지가 있으면 먼저 읽는다 (그동안 우편함 Space = 편지)
+      await bot.approach(at, { dist: 0.75, label: '우편함' });
+      if (bot.peek() !== 'house-grow') return `우편함 앞 행동 키가 '${bot.peek()}'`;
+      const said = [];
+      bot.policy = { dialog: texts => { said.push(texts.join('/')); const i = texts.findIndex(pick); return i >= 0 ? i : texts.length - 1; } };
+      await bot.act('action', { timeout: 30 });
+      bot.policy = {};
+      await bot.settle(10);
+      return said;
+    };
+    const build = async want => {
+      const r = await mailbox(t => /지어 주세요/.test(t));
+      if (typeof r === 'string') { odd.push(r); return false; }
+      if (G().pending !== want) { odd.push(`${want}단계 짓기 시작 안 됨 (${r.join(' | ')})`); return false; }
+      await bot.nextDay(9);
+      await bot.settle(30);
+      if (G().stage !== want) { odd.push(`다음 날 ${want}단계가 안 지어짐 (지금 ${G().stage})`); return false; }
+      return true;
+    };
+    const repayAll = async () => {
+      if (!G().debt) return true;
+      if (bot.acorns() <= 0) return false;
+      const r = await mailbox(t => /다 갚기|있는 만큼/.test(t));
+      if (typeof r === 'string') odd.push(r);
+      return G().debt === 0;
+    };
+    // 1단계: 방 넓히기
+    if (G().stage < 1 && !await build(1)) return awk(odd.join(' · '));
+    const ext = (S().world.home?.objects ?? S().world.objects).list().filter(o => /^house-(player|grown)/.test(o.kind)).map(o => o.kind);
+    log.exterior = ext;
+    if (!ext.includes('house-grown-1') && G().stage === 1) odd.push(`겉모양이 안 바뀜 (${ext.join(',')})`);
+    await sk.enterHome();
+    const f0 = H().room;
+    log.room = `${f0.w}×${f0.d}`;
+    if (f0.w !== 10 || f0.d !== 10) odd.push(`1층이 10×10 이 아님 (${log.room})`);
+    await bot.shot('m14-home-wide', '넓힌 1층 (10×10)');
+    await sk.leaveHome();
+    // 빚 갚기 → 다 갚았으면 2층
+    log.debt0 = G().debt; log.acorns0 = bot.acorns();
+    const paid = await repayAll();
+    log.debt1 = G().debt;
+    if (G().debt >= log.debt0 && log.acorns0 > 0) odd.push(`빚을 못 갚음 (빚 ${G().debt}, 도토리 ${bot.acorns()})`);
+    if (paid && G().stage < 2) await build(2);
+    if (G().stage >= 2) {
+      await sk.enterHome();
+      const goStairs = async to => {
+        const s = H().grow.stairs().find(x => x.to === to);
+        if (!s) { odd.push(`${to}층 가는 계단 없음`); return false; }
+        await bot.walkLocal(s.from, { near: 0.2, label: '계단 앞' });
+        const from = H().grow.level, dx = s.x - s.from.x, dz = s.z - s.from.z, d = Math.hypot(dx, dz) || 1;
+        const end = bot.gameT + 8;
+        while (H().grow.level === from && bot.gameT < end) { if (!S().player.frozen) bot.stick(dx / d, dz / d, false); await bot.stepFrame(); }
+        bot.release();
+        await bot.until(() => !S().player.frozen, { timeout: 4 });
+        await bot.frames(10);
+        if (H().grow.level !== to) { odd.push(`계단으로 ${to}층에 못 감 (지금 ${H().grow.level})`); return false; }
+        return true;
+      };
+      log.up = await goStairs(1);
+      if (log.up) await bot.shot('m14-home-2f', '계단으로 올라온 2층');
+      log.down = log.up && await goStairs(0);
+      await sk.leaveHome();
+    } else log.second = '빚이 남아 2층은 다음에';
+    // 섬폰 → ⭐ 섬 평가
+    bot.press('phone');
+    await bot.until(() => bot.$('.pk-app[data-app="rating"]'), { timeout: 5, ui: false });
+    const app = bot.$('.pk-app[data-app="rating"]');
+    if (!app) odd.push('섬폰에 섬 평가 줄이 없어요');
+    else {
+      await bot.click(app);
+      await bot.until(() => bot.$('.rt-stars'), { timeout: 5, ui: false });
+      log.stars = Number(bot.$('.rt-stars')?.dataset.stars ?? 0);
+      log.talk = bot.$('[data-rating-talk]')?.textContent?.trim().slice(0, 80) ?? '';
+      if (!(log.stars >= 1 && log.stars <= 5)) odd.push('섬 평가 별이 안 보여요');
+      if (!log.talk) odd.push('주민 한마디가 없어요');
+      await bot.shot('m14-rating', '섬폰 섬 평가');
+      bot.press('esc'); await bot.until(() => !bot.$('.rt-stars'), { timeout: 3, ui: false });
+    }
+    bot.press('esc'); await bot.until(() => !bot.blocking(), { timeout: 3, ui: false });
+    log.stage = G().stage; log.debt = G().debt;
+    note('homeGrow', log);
+    return odd.length ? awk(odd.join(' · ')) : pass(`${log.stage}단계 · 1층 ${log.room} · 빚 ${log.debt}${log.up ? ' · 계단 오르내림' : log.second ? ` · ${log.second}` : ''} · 별 ${log.stars}`);
+  });
+
   // 10차 M10-P4 이사 오가기 (보드 wave10 D94-A): 엔딩 뒤 7일마다 새 주민이 빈 집터로, 30일 넘게 산 주민이 가끔 "떠나 볼까…".
   // 봇은 시계만 넘기고(다음 날) 우편함·말 걸기·창 단추로만 한다. 누가 물을 마음인지는 읽기만 (사람은 💭 말풍선을 보고 말을 건다).
   const moving = () => S().town.moving;

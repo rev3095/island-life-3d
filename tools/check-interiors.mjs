@@ -3,6 +3,7 @@
 // 준비만 직접 고친다(미리 보기 저장): 첫 섬 축제를 마침(state.festival.endedDay) · 이사 오는 주민 셋 입주(town.movein.skip) — 나머지는 실제 키.
 // 나올 때는 각 실내의 나가기 함수를 부른다 (점검이 보는 것은 들어가기와 안의 모습).
 // 사용: node tools/check-interiors.mjs [--target=dev|artifact|both] [--hours=10,23,28] [--only=pado,shop] [--headed] [--port=4264] [--build]
+//       --home[=0,1,2,3]  M14 내 집 단계별만: 단계마다 겉모양 · 들어가기 · 계단 걸어 오르내리기 (다른 문은 안 봄)
 // 결과: docs/qa/runs/<날짜>-interiors/report.md · report.json · shots/*.jpg (종료 코드: 막힌 것이 있으면 1)
 import { spawn, execSync } from 'node:child_process';
 import { mkdir, writeFile, readFile, rm, mkdtemp } from 'node:fs/promises';
@@ -26,6 +27,7 @@ const run = (cmd, args) => new Promise((ok, no) => { const p = spawn(cmd, args, 
 const DATE = '2027-05-15';   // 토요일 (야시장 날) · 엔딩 뒤로 둔 미리 보기 날짜
 const HOURS = arg('hours') ? String(arg('hours')).split(',').map(Number) : [10, 23, 28];  // 낮 10시 · 밤 11시 · 새벽 4시 (게임 하루 시각 5~29, --hours=19,21)
 const ONLY = arg('only') ? String(arg('only')).split(',') : null;   // --only=pado,shop (문 key 나 주민 slug)
+const HOME = arg('home') ? (arg('home') === true ? [0, 1, 2, 3] : String(arg('home')).split(',').map(Number)) : null;   // M14 --home=0,1,2,3
 
 // ---- 게임 페이지 안 (문자열로 보내므로 바깥 변수를 쓰지 않는다) ----
 async function boot() {
@@ -137,6 +139,64 @@ async function leaveAll() {
   return Math.abs(c.services.player.position.x) < 200;
 }
 
+// M14 내 집 단계별 (--home[=0,1,2,3]): 단계만 미리 보기 저장에 직접 넣고(state.house.grow — 점검 준비), 나머지는 실제 키 —
+// 문 앞 Space 로 들어가 층마다 계단까지 걸어서(W·A·D 꾹) 오르고 내린다. 겉모양·층마다 사진, 임시 상자·층 수·높이를 적는다.
+async function homeStage({ stage, step: phase }) {
+  const c = window.__island, { settle, step, press, key: kd, wait } = window.__ck;
+  const S = c.services, P = S.player, H = S.house;
+  const out = { stage, phase, ok: true, notes: [] };
+  if (phase === 'outside') {
+    try { if (H.inside) await H.leave(); } catch (e) { /* 밖 */ }
+    S.time.setHour(11); step(10); await settle();
+    const g = (c.state.house.grow ||= {});
+    Object.assign(g, { stage, debt: 0, pending: null });
+    for (let i = 0; i < 40; i++) { step(2); await wait(50); }
+    const ex = (S.world.home?.objects ?? S.world.objects).list().filter(o => /^house-(player|grown)/.test(o.kind)).map(o => o.kind);
+    out.exterior = ex;
+    out.floors = H.grow.floors().map(f => `${f.n}:${f.w}×${f.d}`);
+    const d = S.world.places.playerHouse.door;
+    P.teleport(d.x - 1.2, d.z + 3.2, Math.PI * 0.85);   // 겉모양 사진: 집 앞 비스듬히
+    step(20); await wait(300);
+    return out;
+  }
+  if (phase === 'enter') {
+    const d = S.world.places.playerHouse.door;
+    P.teleport(d.x, d.z + 0.9, 0); step(4);
+    kd('w', 'KeyW', true); step(8); kd('w', 'KeyW', false); step(6);
+    const pk = S.gameplay.interactions.peek('action');
+    out.peek = pk?.name ?? null;
+    await press();
+    for (let k = 0; k < 120 && !(H.inside && !H.passing); k++) { step(4); await wait(40); }
+    await settle();
+    out.inside = H.inside;
+    out.level = H.grow.level;
+    if (!H.inside) { out.ok = false; out.notes.push('들어가지 못함'); }
+    return out;
+  }
+  // phase = 'climb:<to>' — 지금 층에서 그 층으로 가는 계단까지 걸어간다
+  const to = Number(phase.split(':')[1]);
+  const st = H.grow.stairs().find(s => s.to === to);
+  if (!st) { out.ok = false; out.notes.push(`${to}층 가는 계단 없음`); return out; }
+  P.teleport(st.from.x, st.from.z, 0); step(6);
+  const dx = st.x - st.from.x, dz = st.z - st.from.z;
+  const [k, code] = Math.abs(dz) > Math.abs(dx) ? (dz < 0 ? ['w', 'KeyW'] : ['s', 'KeyS']) : (dx < 0 ? ['a', 'KeyA'] : ['d', 'KeyD']);
+  const from = H.grow.level;
+  let peakY = 0;
+  kd(k, code, true);
+  for (let i = 0; i < 90 && H.grow.level === from; i++) { step(2); peakY = Math.max(peakY, P.position.y ?? 0); await wait(30); }
+  kd(k, code, false);
+  for (let i = 0; i < 60 && H.passing !== false; i++) { step(3); await wait(30); }
+  await settle();
+  for (let i = 0; i < 30; i++) { step(2); await wait(30); }
+  out.level = H.grow.level;
+  out.peakY = Math.round(peakY * 100) / 100;
+  if (out.level !== to) { out.ok = false; out.notes.push(`${from}층 → ${to}층 못 감 (지금 ${out.level}, 자리 ${P.position.x.toFixed(1)},${P.position.z.toFixed(1)})`); }
+  const near = new Set(), v = new c.THREE.Vector3();
+  c.scene.traverse(o => { if (o.userData?.placeholder && o.visible !== false && o.getWorldPosition(v) && Math.abs(v.x - P.position.x) < 20 && Math.abs(v.z - P.position.z) < 20) near.add(String(o.userData.placeholder)); });
+  out.placeholders = [...near];
+  return out;
+}
+
 async function main() {
   let server = null;
   if (!(await up(`http://localhost:${port}/api/ping`))) {
@@ -173,6 +233,24 @@ async function main() {
     let b = await ev(boot);
     say(`  준비: ${JSON.stringify(b)}`);
     if (b.reload) { await cdp.send('Page.reload', {}); await sleep(2500); b = await ev(boot); say(`  다시 열기: ${JSON.stringify(b)}`); }
+    if (HOME) {   // M14 내 집 단계별
+      const shoot = async name => { const shot = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); const f = `shots/${target}-home-${name}.jpg`; await writeFile(join(outDir, f), Buffer.from(shot.data, 'base64')); return f; };
+      const ROUTE = { 0: [], 1: [], 2: [1, 0], 3: [1, 2, 1, 0] };
+      for (const stage of HOME) {
+        const rows = [];
+        const o = await ev(homeStage, { stage, step: 'outside' }); o.shot = await shoot(`s${stage}-outside`); rows.push(o);
+        const e = await ev(homeStage, { stage, step: 'enter' }); e.shot = await shoot(`s${stage}-f0`); rows.push(e);
+        for (const to of ROUTE[stage] ?? []) { const r = await ev(homeStage, { stage, step: `climb:${to}` }); r.shot = await shoot(`s${stage}-to${to}-${rows.length}`); rows.push(r); }
+        await ev(leaveAll);
+        for (const r of rows) { r.target = target; r.home = true; results.push(r); }
+        say(`  내 집 ${stage}단계: 겉모양 ${o.exterior?.join(',')} · 층 ${o.floors?.join(' ')} · 들어감 ${e.inside ? '✅' : '✗'}` + rows.slice(2).map(r => ` · →${r.level}층 ${r.ok ? '✅' : '✗'} (높이 ${r.peakY})${r.placeholders?.length ? ` ⚠ 임시 상자 ${r.placeholders.join(',')}` : ''}`).join('') + rows.filter(r => !r.ok).map(r => ` ✗ ${r.notes.join(' ')}`).join(''));
+      }
+      results.push({ target, console: logs.slice(0, 20) });
+      if (logs.length) say(`  콘솔·요청 ${logs.length}: ${logs.slice(0, 3).join(' | ')}`);
+      cdp.close(); browser.kill(); await sleep(400);
+      await rm(profile, { recursive: true, force: true }).catch(() => {});
+      continue;
+    }
     const doors = [{ key: 'playerHouse', label: '내 집' }, { key: 'shop', label: '도토리상점' }, { key: 'museum', label: '박물관' },
       ...(b.residents ?? []).map(s => ({ key: 'villager', slug: s, label: `${s} 집` })), { key: 'moonshop', label: '달빛 가게' }, { key: 'tent', label: '새벽 천막' }];
     for (const hour of HOURS) for (const d of doors.filter(x => !ONLY || ONLY.includes(x.slug ?? x.key))) {
@@ -196,12 +274,15 @@ async function main() {
   server?.kill();
   await writeFile(join(outDir, 'report.json'), JSON.stringify({ ran: stamp, date: DATE, results }, null, 1));
   const rows = results.filter(r => r.hour != null);
+  const homeRows = results.filter(r => r.home);
   const hr = h => (h >= 24 ? `새벽 ${h - 24}시` : h >= 18 ? `밤 ${h - 12}시` : `낮 ${h}시`);
   const md = [`# 실내 점검 ${stamp}`, '', `날짜 흉내 ${DATE} (토) · 도구 \`tools/check-interiors.mjs\``, '', '| 대상 | 시각 | 문 | 결과 | 행동 키 · 주민 · 문 규칙 | 임시 상자 |', '|---|---|---|---|---|---|',
     ...rows.map(r => `| ${r.target} | ${hr(r.hour)} | ${r.label} | ${r.entered ? `✅ 들어감${r.shot ? ` ([사진](${r.shot}))` : ''}` : r.note ?? r.error} | ${r.peek ?? '—'}${r.atHome ? ` · ${r.atHome}` : ''}${r.rule ? ` · ${r.rule}` : ''} | ${r.placeholders?.join(', ') || ''} |`),
+    ...(homeRows.length ? ['', '## 내 집 단계별 (M14 --home)', '', '| 대상 | 단계 | 할 일 | 결과 | 사진 |', '|---|---|---|---|---|',
+      ...homeRows.map(r => `| ${r.target} | ${r.stage} | ${r.phase} | ${r.ok ? '✅' : '✗'} ${r.exterior ? `겉모양 ${r.exterior.join(',')} · 층 ${r.floors.join(' ')}` : r.phase === 'enter' ? `들어감 ${r.inside} (${r.peek})` : `→ ${r.level}층 · 높이 ${r.peakY}`}${r.notes?.length ? ` · ${r.notes.join(' ')}` : ''}${r.placeholders?.length ? ` · 임시 상자 ${r.placeholders.join(',')}` : ''} | [사진](${r.shot}) |`)] : []),
     '', ...results.filter(r => r.console).map(r => `- [${r.target}] 콘솔 오류·실패 요청 ${r.console.length}${r.console.length ? `: ${r.console.join(' · ')}` : ''}`)].join('\n');
   await writeFile(join(outDir, 'report.md'), md);
-  const bad = rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
+  const bad = homeRows.filter(r => !r.ok || r.error || r.placeholders?.length).length + rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
   say(`\n결과 ${outDir} · 문제 ${bad}`);
   process.exit(bad ? 1 : 0);
 }

@@ -187,12 +187,27 @@ export default {
       }
       G.size0 = size0;
       for (const r of S.furniture) if ((r.floor ?? 0) >= H.levels.length) r.floor = 0;   // 없는 층의 가구 (예전 저장) → 1층
+      for (const lv of H.levels) settleRecs(lv);
       for (const lv of H.levels) { buildLevel(lv); addZone(lv); }
       poseBench();
       for (const v of H.views.values()) { if (v.obj) { levelOfRec(v.rec).room.group.add(v.obj.root); pose(v.rec); } }
       if (H.level >= H.levels.length) H.level = 0;
     }
 
+    /** 새 계단·구멍·작업대 자리와 겹친 바닥 가구를 가까운 빈자리로 옮긴다 (2층을 지은 날 1층 계단 자리에 있던 스탠드 등) */
+    function settleRecs(lv) {
+      const others = () => (lv.wb ? [...recsOn(lv.n), lv.wb] : recsOn(lv.n));
+      const opts = r => ({ reserved: lv.reserved, w: lv.w, d: lv.d, ignore: r.id });
+      for (const r of recsOn(lv.n)) {
+        if (r.wall || !info(r.item) || fits(others(), r, info, opts(r))) continue;
+        let best = null, bestD = Infinity;
+        for (let gz = 0; gz < lv.d; gz++) for (let gx = 0; gx < lv.w; gx++) {
+          const d = Math.abs(gx - r.gx) + Math.abs(gz - r.gz);
+          if (d < bestD && fits(others(), { ...r, gx, gz }, info, opts(r))) { best = { gx, gz }; bestD = d; }
+        }
+        if (best) Object.assign(r, best);
+      }
+    }
     function blockers(lv) {
       const out = [];
       if (lv.wb) out.push(boxOf(lv.wb, WORKBENCH_INFO.footprint));
@@ -413,7 +428,7 @@ export default {
     /** 방 문 매트 (door.js 가 걸어 들고 나는 곳, 월드) — 언제나 1층 */
     const roomDoor = () => { const lv = H.levels[0]; return { x: lv.x0 + matX(lv), front: lv.z0 + lv.d, entry: lv.z0 + lv.entry.lz }; };
     /** 지금 집 겉모양 모델 (문짝 크기를 그 모델에서 잰다) */
-    const houseKind = () => stageOf(homeCfg, G.stage)?.exterior ?? 'house-player';
+    function houseKind() { return stageOf(homeCfg, G.stage)?.exterior ?? 'house-player'; }   // 함수 선언 — init 중간(applyExterior)에도 부른다
 
     async function enter() {
       if (H.busy || H.inside || doors.busy) return;
@@ -425,7 +440,12 @@ export default {
     }
 
     async function leave() {
-      if (H.busy || !H.inside || doors.busy || H.level !== 0) return;
+      if (H.busy || !H.inside || doors.busy) return;
+      if (H.level !== 0) {   // 위층에서 부르면 (점검 도구·장면): 1층 문 매트로 옮긴 뒤 나간다
+        const lv = H.levels[0];
+        showLevel(0);
+        player.teleport(lv.x0 + matX(lv), lv.z0 + lv.d - 0.6, Math.PI);
+      }
       H.busy = true;
       try {
         await doors.through({ dir: 'out', place: world.places?.playerHouse, kind: H.exteriorKind ?? 'house-player', room: roomDoor(), arrive: s => goOutside(s) });
