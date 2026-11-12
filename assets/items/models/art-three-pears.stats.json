@@ -1,0 +1,57 @@
+{
+  "id": "IC-AR-07",
+  "slug": "art-three-pears",
+  "name": "「배 세 알」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.three-pears",
+    "art.three-pears-fake"
+  ],
+  "hold": false,
+  "triangles": 2168,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "cloth",
+    "frame",
+    "frameTrim",
+    "leaf",
+    "pear",
+    "pearLight",
+    "stand",
+    "stem",
+    "table"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 48268,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-three-pears_fake_main.png",
+    "art-three-pears_fake_thumb.png",
+    "art-three-pears_main.png",
+    "art-three-pears_real_main.png",
+    "art-three-pears_real_thumb.png",
+    "art-three-pears_thumb.png"
+  ]
+}

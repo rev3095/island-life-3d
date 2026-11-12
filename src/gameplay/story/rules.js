@@ -21,6 +21,7 @@ export const TRIGGERS = {
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
 /** night-first 트리거의 kind (밤 가게 둘) */
 export const NIGHT_KINDS = { moonshop: '달빛 가게 (22–3시)', tent: '새벽 천막 (3–5시)' };
+Object.assign(NIGHT_KINDS, { foxshop: '여우 상인 가게 (오는 밤 20–5시, P54)', oddtent: '이상한 천막 (오는 밤 21–5시, P54)', fortune: '운세 부스 (20–3시, P54)' });
 
 /** 장면 기준 자리 = world.places 의 이름 (건물은 문 앞) */
 export const PLACES = { event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포' };
@@ -244,7 +245,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if (t.on === 'festival-part' && !(Number.isInteger(t.n) && t.n >= 1 && t.n <= 5)) err.push(at('festival-part 의 n 은 1~5'));
     if (t.on === 'event-start' && !/^EV-0[1-4]$/.test(t.event ?? '')) err.push(at('event-start 의 event 는 EV-01~04'));
     if (t.on === 'move-in' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('move-in 의 slug 는 주민 slug'));
-    if (t.on === 'night-first' && !NIGHT_KINDS[t.kind]) err.push(at('night-first 의 kind 는 moonshop · tent'));
+    if (t.on === 'night-first' && !NIGHT_KINDS[t.kind]) err.push(at(`night-first 의 kind 는 ${Object.keys(NIGHT_KINDS).join(' · ')}`));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];

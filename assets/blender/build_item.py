@@ -1640,6 +1640,7 @@ BUILDERS = {
 RENDER = {'fish': (-72, 14), 'bug': (160, 55), 'fossil': (-30, 35), 'tool': (-8, 10), 'mat': (-30, 30), 'seed': (-25, 18),
           'fruit': (-25, 18), 'shell': (-25, 45), 'flower': (-20, 14), 'festival': (-25, 32), 'event': (-25, 50), 'night': (-25, 32)}
 KIND_RENDER = {'butterfly': (165, 68), 'dragonfly': (165, 66), 'bee': (150, 45)}
+import night_special_items; BUILDERS.update(night_special_items.builders(globals()))   # P54 밤 특별 상점 미술품 (IC-AR, RENDER['art'] 도 더함)
 
 
 def build(palette, suffix=''):

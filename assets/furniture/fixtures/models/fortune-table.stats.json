@@ -1,0 +1,65 @@
+{
+  "id": "FU-77",
+  "slug": "fortune-table",
+  "item": "fixture.fortune-table",
+  "name": "운세 탁자",
+  "category": "fixture",
+  "kind": "fortune-table",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 4886,
+  "parts": 3,
+  "materials": [
+    "ball",
+    "brass",
+    "card",
+    "cardMark",
+    "cloth",
+    "flame",
+    "glow",
+    "shine",
+    "star",
+    "trim",
+    "wax"
+  ],
+  "objects": [
+    "flame",
+    "table",
+    "top"
+  ],
+  "animations": {
+    "flicker": {
+      "frames": 24,
+      "seconds": 1.0
+    }
+  },
+  "size": [
+    1.62,
+    1.62,
+    1.05
+  ],
+  "bounds": [
+    [
+      -0.81,
+      -0.81,
+      0.0
+    ],
+    [
+      0.81,
+      0.81,
+      1.05
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 101772,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fortune-table_front.png",
+    "fortune-table_main.png",
+    "fortune-table_thumb.png",
+    "fortune-table_top.png"
+  ]
+}

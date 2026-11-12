@@ -456,6 +456,96 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`별밤 대화 · 카드 ${got.card} → 다음 날 ${got.fortune}${m.today ? ' · 야시장' : ''}`);
   });
 
+  // P54 밤 특별 상점 (D165–D169): 운세 부스(20–3시)에서 여명에게 카드 → 여우 상인 살랑(오는 밤만)에게 미술품 감정·사기 → 이상한 천막(오는 밤만) 들어가 진열 보기
+  // → 낮에 선물 상자가 있으면 열기. 가게가 안 온 밤은 다음 날로 (여우는 6일, 천막은 7일 넘게 안 오면 꼭 온다). 시계만 당긴다.
+  add('night-shops', '밤 상점: 운세 부스 카드 → 여우 상인 살랑 미술품 → 이상한 천막 → 선물 상자', async () => {
+    const N = S().night;
+    if (!N?.places?.().includes('foxshop')) return skip('밤 특별 상점이 없는 판 (P54 전)');
+    if (!N.open) return skip('밤 콘텐츠가 아직 안 열림');
+    const odd = [], got = { days: 0 };
+    const W = () => S().world;
+    const enter = async (kind, label) => {
+      if (!W().places[kind]) return false;
+      if (!(await sk.toDoor(kind, label))) return false;
+      if (bot.peek() !== 'night:door') { odd.push(`${label} 문 앞 행동 키가 ${bot.peek()}`); return false; }
+      bot.press('action');
+      if (await bot.until(() => S().story?.playing, { timeout: 4 })) { await bot.wait(5.5); await bot.shot(`night-${kind}-scene`, `${label} 첫 방문 장면`); }
+      const ok = await bot.until(() => S().house.where === kind && !S().house.passing, { timeout: 60, label: `${label} 들어가기` });
+      if (!ok) { odd.push(`${label} 안으로 못 들어감`); return false; }
+      const info = S().house.places.info(kind);
+      if (info.talk) { await bot.walkLocal(info.talk, { near: 0.2, label: `${label} 말 거는 자리` }); await bot.faceDir(0); }
+      await bot.shot(`night-${kind}`, `${label} 안`);
+      return true;
+    };
+    // 1) 운세 부스: 여명에게 카드 뽑기 (오늘 아직 안 뽑았으면)
+    await bot.setHour(20.5);
+    await bot.settle(30);
+    if (await enter('fortune', '운세 부스')) {
+      let flipped = false, who = null;
+      bot.policy = {
+        dialog: (texts, speaker) => { who ??= speaker; const i = texts.findIndex(t => /카드 뽑기/.test(t)); return i >= 0 ? i : texts.length - 1; },
+        card: (kind, el, card) => {
+          if (!card?.classList.contains('nt-card')) return false;
+          if (!flipped) { const b = card.querySelector('.nt-pick:not([disabled])'); if (b) { bot.click(b); flipped = true; return true; } }
+          const take = [...card.querySelectorAll('.pk-btn')].find(b => b.textContent.trim() === '받기' && !b.hidden);
+          if (take) { bot.click(take); return true; }
+          return true;
+        },
+      };
+      if (bot.peek() === 'night:desk') await bot.act('action', { timeout: 60 });
+      else odd.push(`운세 부스 탁자 앞 행동 키가 ${bot.peek()}`);
+      bot.policy = {};
+      got.booth = { who, card: st().night?.tarot?.card ?? null, flipped };
+      if (!who) odd.push('운세 부스에서 여명과 말을 못 함');
+      await sk.leavePlace();
+    } else odd.push('운세 부스가 안 섬');
+    // 2)–4) 여우 상인 · 이상한 천막 · 선물 상자: 올 때까지 밤마다 (최대 8일)
+    for (let d = 0; d < 9 && !(got.fox && got.odd); d++) {
+      if (d) { await bot.nextDay(8); got.days++; }
+      await bot.settle(20);
+      const g = N.giftSpot?.();
+      if (g && !got.gift) {
+        const w0 = bot.acorns(), bag0 = JSON.stringify(S().data.inventory.slots);
+        await bot.walkTo(g, { near: 0.9, label: '선물 상자' });
+        await bot.face(g);
+        if (bot.peek() === 'night:gift') { await bot.act('action'); got.gift = { acorns: bot.acorns() - w0, bag: JSON.stringify(S().data.inventory.slots) !== bag0, gone: !N.giftSpot() }; }
+        else odd.push(`선물 상자 앞 행동 키가 ${bot.peek()}`);
+      }
+      await bot.setHour(21.5);
+      await bot.settle(30);
+      if (!got.fox && W().places.foxshop && (await enter('foxshop', '여우 상인 가게'))) {
+        const said = [];
+        bot.policy = {
+          dialog: (texts, speaker) => {
+            said.push(speaker);
+            const i = texts.findIndex(t => /미술품 보기|살게요/.test(t));
+            if (i >= 0) return i;
+            return texts.length > 1 && texts[texts.length - 1] === '그만' ? 0 : texts.length - 1;   // 고르기: 첫 작품
+          },
+        };
+        const before = S().data.inventory.slots.filter(Boolean).map(s => s.id);
+        if (bot.peek() === 'night:desk') await bot.act('action', { timeout: 60 });
+        else odd.push(`여우 상인 계산대 앞 행동 키가 ${bot.peek()}`);
+        bot.policy = {};
+        const art = S().data.inventory.slots.filter(Boolean).map(s => s.id).find(id => id.startsWith('art.') && !before.includes(id)) ?? null;
+        got.fox = { day: bot.day(), talked: said.includes('살랑'), stock: N.debug?.today?.().fox ?? null, bought: art, scene: !!S().story?.seen?.('s27-fox-first'), shown: S().house.places.shown('foxshop') };
+        if (!got.fox.talked) odd.push('살랑과 말을 못 함');
+        if (!got.fox.shown) odd.push('여우 상인 받침에 미술품이 없음');
+        await sk.leavePlace();
+      }
+      if (!got.odd && W().places.oddtent && (await enter('oddtent', '이상한 천막'))) {
+        got.odd = { day: bot.day(), shown: S().house.places.shownSpots('oddtent'), scene: !!S().story?.seen?.('s28-odd-tent-first') };
+        if (!got.odd.shown.length) odd.push('이상한 천막 받침이 비어 있음');
+        await sk.leavePlace();
+      }
+    }
+    note('nightShops', got);
+    if (!got.fox) odd.push(`여우 상인이 ${got.days + 1}밤 동안 안 옴`);
+    if (!got.odd) odd.push(`이상한 천막이 ${got.days + 1}밤 동안 안 섬`);
+    const msg = `부스 카드 ${got.booth?.card ?? '-'} · 살랑 ${got.fox ? `${got.fox.stock?.length ?? 0}점${got.fox.bought ? ` · 산 것 ${got.fox.bought}` : ' · 못 삼(도토리)'}` : '-'} · 천막 ${got.odd?.shown?.[0]?.id ?? '-'} · 선물 ${got.gift ? (got.gift.acorns > 0 ? `도토리 ${got.gift.acorns}` : '물건') : '없음'} · ${got.days}일 더`;
+    return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
+  });
+
   add('festival-loop', '부품 5개 모으기 (주민 마음 열기 → 🎉 → 채집 → 전달), 날마다 반복', async () => {
     const maxDays = opts.maxDays ?? 10;
     const log = [];

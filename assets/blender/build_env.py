@@ -1567,6 +1567,7 @@ BUILDERS = {
     'ore-rock': b_ore_rock, 'tour-boat': b_tour_boat,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
+import night_special_env; BUILDERS.update(night_special_env.builders(globals()))   # P54 밤 특별 상점 BD-13–15 · PR-35
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

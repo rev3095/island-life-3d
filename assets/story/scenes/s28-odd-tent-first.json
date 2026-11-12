@@ -1,0 +1,137 @@
+{
+  "id": "s28-odd-tent-first",
+  "version": 1,
+  "status": "review",
+  "chapter": "밤 · 새벽",
+  "title": "이상한 천막",
+  "summary": "밤에 섬 북서쪽에 알록달록 기운 천막이 서 있다. 주인은 보이지 않고 입구 등불만 흔들린다. 주인공이 고개를 갸웃하며 다가가 천 문을 살짝 들춘다. 장면이 끝나면 그대로 들어간다.",
+  "trigger": {
+    "on": "night-first",
+    "kind": "oddtent"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "아무도 없는 천막 → 들춰 보기",
+      "recommended": true,
+      "desc": "기운 천막을 넓게 → 주인공이 다가가며 두리번 → 등불이 흔들리고 → 천 문 앞으로.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "밤 북서쪽 풀밭의 기운 천막",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "{name}",
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                3.6
+              ],
+              "face": 0,
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "두리번거리며 다가간다 — 주인이 없다",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "player",
+            "angle": 20,
+            "move": "push"
+          },
+          "caption": "주인은 보이지 않아요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "to": [
+                0,
+                1.6
+              ],
+              "do": "walk",
+              "face": 0,
+              "emote": "👀",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "천 문 앞 — 살짝 들춰 본다",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": -15,
+            "move": "static"
+          },
+          "caption": "안에 무언가 놓여 있는 것 같아요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "to": [
+                0,
+                0.4
+              ],
+              "do": "walk",
+              "face": 0,
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷",
+      "desc": "천막 앞에서 갸웃하고 바로 들어간다.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "천막 앞 주인공",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "player",
+            "angle": 0,
+            "move": "pull"
+          },
+          "transition": "fade",
+          "music": "night",
+          "caption": "{name}… 누가 세운 걸까요?",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                1.6
+              ],
+              "face": 0,
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

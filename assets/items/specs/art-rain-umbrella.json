@@ -1,0 +1,93 @@
+{
+  "id": "IC-AR-06",
+  "slug": "art-rain-umbrella",
+  "name": "「빗속의 노란 우산」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.rain-umbrella",
+      "code": "IC-AR-06"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "회청색 빗속에 비스듬히 내리는 빗줄기, 그 가운데 노란 우산 하나와 웅덩이.",
+    "keywords": [
+      "비 오는 날",
+      "노란 우산",
+      "웅덩이"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "rain",
+      "umbrella",
+      "handle",
+      "ground",
+      "puddle"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "umbrella",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#9AAAB8",
+    "rain": "#E8EEF2",
+    "umbrella": "#F6C84C",
+    "handle": "#6B4A3A",
+    "ground": "#6E7E88",
+    "puddle": "#C4D4DE",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "비 오는 하늘",
+    "rain": "빗줄기",
+    "umbrella": "우산",
+    "handle": "손잡이",
+    "ground": "땅",
+    "puddle": "웅덩이",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  }
+}
