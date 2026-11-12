@@ -1256,9 +1256,43 @@ export function makeScenario(bot, sk, opts = {}) {
     const r = await sk.dive({ want: 1, timeout: 150 });
     const dex = (st().encyclopedia?.sea ?? []).length;
     note('dive', { ...r, dex0, dex, journal: [j0, st().journal?.counts?.sea ?? 0] });
-    const msg = `${r.entered ? '들어감' : '못 들어감'} · 잠수복 ${r.suit ? '입음' : '안 보임'} · 잡은 것 ${r.caught.map(id => bot.item(id)?.name ?? id).join(', ') || '없음'} (${r.tries}번) · 도감 ${dex0}→${dex} · ${r.left ? '나옴' : '물에 남음'}`;
+    let msg = `${r.entered ? '들어감' : '못 들어감'} · 잠수복 ${r.suit ? '입음' : '안 보임'} · 잡은 것 ${r.caught.map(id => bot.item(id)?.name ?? id).join(', ') || '없음'} (${r.tries}번) · 도감 ${dex0}→${dex} · ${r.left ? '나옴' : '물에 남음'}`;
     if (!r.entered || !r.left) return block(msg);
     if (!r.caught.length || dex <= dex0 || !r.suit) return awk(msg);
+    // 박물관 바다 생물관 (요청 9 관): 잡은 것을 느루에게 기증 → 로비 🐙 아치 → 관에 전시가 하나 늘었는지
+    const H = S().house?.places?.halls;
+    if (!H) return pass(msg);
+    const m0 = H.status('sea')?.donated ?? 0;
+    const don = await sk.museum();
+    const gave = (don?.donated ?? []).filter(id => id.startsWith('sea.'));
+    const hall = { gave, before: m0 };
+    if (gave.length && (await sk.toDoor('museum', '박물관')) && (await sk.enterPlace('museum', '박물관'))) {
+      const a = H.arches().find(x => x.hall === 'sea');
+      if (a) {
+        await bot.walkLocal({ x: a.door.x + Math.sin(a.facing) * 0.35, z: a.door.z + Math.cos(a.facing) * 0.35 }, { near: 0.2, label: '바다 생물관 아치 앞' });
+        await bot.faceDir(a.facing * 180 / Math.PI);
+        if (bot.peek() === 'museum-hall-in') {
+          bot.press('action');
+          if (await bot.until(() => H.where === 'sea' && !H.busy && !S().house.passing, { timeout: 15, label: '바다 생물관 들어가기' })) {
+            const s = H.status('sea');
+            Object.assign(hall, { shown: H.shown('sea'), donated: s.donated, total: s.total, soon: s.soon });
+            await bot.shot('dive-museum-sea', '박물관 바다 생물관 (잠수로 잡아 기증)');
+            const mat = H.doormat();
+            await bot.walkLocal(mat, { near: 0.15, label: '바다 생물관 문 매트' });
+            bot.stick(0, 1, false);
+            await bot.until(() => !H.where && !H.busy && !S().house.passing, { timeout: 8, ui: false, label: '바다 생물관 나가기' });
+            bot.release();
+            await bot.settle(10);
+            if (H.where) { await H.leave?.(); await bot.settle(10); }
+          }
+        } else hall.peek = bot.peek();
+      }
+      await sk.leavePlace();
+    }
+    note('dive-museum', hall);
+    msg += ` · 바다 생물관 ${hall.shown ?? '?'}/${hall.total ?? '?'}`;
+    if (!gave.length) return awk(`${msg} (기증 못 함)`);
+    if (hall.soon || hall.shown !== hall.donated || !(hall.donated > m0)) return awk(`${msg} (관 ${JSON.stringify(hall)})`);
     return pass(msg);
   });
 
