@@ -9,6 +9,7 @@ import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
 import { createDome, SKY_FX } from './dome.js';
 import { createStarSky } from './stars.js';   // 요청 8: 계절 별자리 별 (dome 별 재질을 나눠 씀)
+import { createMeteors } from './meteors.js';   // M13 FX-02 별똥별 (유성우 밤에만 — daily 가 time.meteors.set)
 import { createClouds } from './clouds.js';
 import { createFlare, flareStrength } from './flare.js';
 import { QUALITY } from '../render/quality.js';
@@ -211,6 +212,9 @@ export function createSky(ctx) {
   // 장면 물체
   const dome = createDome({ quality: ctx.quality });   // 하늘 셰이더는 사양(render/quality.js)에 따라 구름 겹 수·빛살·은하수를 줄인다
   const starSky = createStarSky(dome);
+  const meteors = createMeteors({ quality: ctx.quality });
+  dome.group.add(meteors.group);   // 실내에선 돔과 같이 숨는다
+  service.meteors = { set: on => meteors.set(on), get on() { return meteors.on; } };
   const clouds = createClouds(ctx.materials);
   /** 북쪽 3D 솜구름 보이기 = 보드 값(puffs) · 사양(매우 낮음은 숨김 — 그리기 호출·삼각형 아끼기) · 집 밖 */
   const applyPuffs = () => { clouds.group.visible = puffs && !indoor && QUALITY[ctx.quality]?.fx?.puffs !== false; };
@@ -274,6 +278,7 @@ export function createSky(ctx) {
     const viewH = ctx.renderer?.domElement.height || innerHeight;
     const viewScale = viewH / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
     dome.update(look, camera, elapsed, ctx.renderer?.getPixelRatio() ?? 1, { cover: wx.cover, grey: Math.min(1, wx.overcast * 0.6 + wx.rain * 0.4), night: nf });
+    meteors.update(dt, camera, { night: nf, cover: wx.cover });
     clouds.update(dt, ctx.focus, wx.cover, Math.min(1, wx.overcast * 0.55 + wx.rain * 0.45), look.horizon);
     // 하늘 → 땅·물 셰이더 (core/materials.js look): 구름 그림자는 해가 보일 때만, 흐를수록 짙게 · 물에 비칠 하늘 색 (선형)
     const L = ctx.materials?.look;
@@ -336,6 +341,7 @@ export function createSky(ctx) {
       events.on('world:ready', () => { syncSeason(now().season); scanIn = 0; });
       events.on('game:ready', () => { syncSeason(now().season); scanIn = 0; emitAll(true); });
       const tier = q => { dome.setQuality(q); applyPuffs(); syncShaderFx(); };
+      events.on('quality:changed', ({ quality }) => meteors.setQuality(quality));   // M13 별똥별 사양
       events.on('quality:changed', ({ quality }) => tier(quality));
       tier(ctx.quality);              // 처음 사양 (주소·저장된 사양). 바꾸면 quality:changed 로
       // 해 렌즈 빛 (three.js 예제 Lensflare) — 못 불러와도 하늘은 그대로

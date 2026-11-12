@@ -76,6 +76,8 @@ async function boot() {
     return { ok: true, reload: true, spare: spare.map(l => l.id) };
   }
   const mv = [];
+  // P54: 가끔만 오는 여우 상인 · 이상한 천막은 점검하는 밤에 꼭 세운다 (점검 준비 — 저장하지 않는 debug.force)
+  c.services.night?.debug?.force?.({ foxshop: true, oddtent: true });
   return { ok: true, residents: c.services.town.residents(), moved: mv };
 }
 
@@ -94,7 +96,7 @@ async function visitDoor({ hour, key, slug, label }) {
   const lab = pk ? (typeof pk.label === 'function' ? '' : pk.label ?? '') : '';
   out.peek = pk ? `${pk.name}${lab ? ` · ${lab}` : ''}` : `없음 (창 ${S.ui.isBlocking()} · 입력 ${c.input?.enabled} · 장면 ${!!S.story?.playing} · 얼음 ${!!P.frozen} · 거리 ${Math.hypot(P.position.x - d.x, P.position.z - d.z).toFixed(2)} · 안 ${!!S.house?.inside}/${S.house?.places?.where ?? ''} · ${[...document.querySelectorAll('.pk-scrim, .pk-dlg-box, [role=dialog]')].map(e => e.textContent.trim().slice(0, 24)).join(' / ')})`;
   out.atHome = key === 'villager' ? S.town.atHome(slug) : null;
-  out.rule = key === 'villager' ? null : (key === 'moonshop' || key === 'tent') ? S.night?.placeRule?.(key) ?? null : S.town.placeRule?.(key) ?? null;
+  out.rule = key === 'villager' ? null : (S.night?.places?.() ?? ['moonshop', 'tent']).includes(key) ? S.night?.placeRule?.(key) ?? null : S.town.placeRule?.(key) ?? null;
   if (!pk || !/^(town:(shop|museum)|house-door-in|house-visit-in|night:door)$/.test(pk.name) || pk.name === 'house-visit-in' && out.atHome !== 'home') { out.note = `문 앞 들어가기 없음`; return out; }
   const x0 = P.position.x;
   await press();
@@ -210,7 +212,8 @@ async function main() {
     say(`  준비: ${JSON.stringify(b)}`);
     if (b.reload) { await cdp.send('Page.reload', {}); await sleep(2500); b = await ev(boot); say(`  다시 열기: ${JSON.stringify(b)}`); }
     const doors = [{ key: 'playerHouse', label: '내 집' }, { key: 'shop', label: '도토리상점' }, { key: 'museum', label: '박물관' },
-      ...(b.residents ?? []).map(s => ({ key: 'villager', slug: s, label: `${s} 집` })), { key: 'moonshop', label: '달빛 가게' }, { key: 'tent', label: '새벽 천막' }];
+      ...(b.residents ?? []).map(s => ({ key: 'villager', slug: s, label: `${s} 집` })), { key: 'moonshop', label: '달빛 가게' }, { key: 'tent', label: '새벽 천막' },
+      { key: 'fortune', label: '운세 부스' }, { key: 'foxshop', label: '여우 상인 가게' }, { key: 'oddtent', label: '이상한 천막' }];   // P54 밤 특별 상점
     for (const hour of HOURS) for (const d of doors.filter(x => !ONLY || ONLY.includes(x.slug ?? x.key))) {
       const r = await ev(visitDoor, { hour, ...d });
       r.target = target;

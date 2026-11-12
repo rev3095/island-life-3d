@@ -1,0 +1,57 @@
+{
+  "id": "FU-78",
+  "slug": "tarot-frame",
+  "item": "furn.tarot-frame",
+  "name": "타로 액자",
+  "category": "furniture",
+  "kind": "tarot-frame",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 2192,
+  "parts": 1,
+  "materials": [
+    "card",
+    "cardEdge",
+    "cardMark",
+    "frame",
+    "frameDark",
+    "moon",
+    "star",
+    "string",
+    "sun",
+    "velvet"
+  ],
+  "objects": [
+    "frame"
+  ],
+  "animations": {},
+  "size": [
+    0.86,
+    0.08,
+    1.94
+  ],
+  "bounds": [
+    [
+      -0.43,
+      -0.087,
+      1.21
+    ],
+    [
+      0.43,
+      -0.006,
+      1.944
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 49212,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "tarot-frame_front.png",
+    "tarot-frame_main.png",
+    "tarot-frame_thumb.png",
+    "tarot-frame_top.png"
+  ]
+}

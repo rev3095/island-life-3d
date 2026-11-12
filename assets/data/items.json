@@ -156,7 +156,8 @@
     { "slug": "net", "name": "잠자리채", "emoji": "🥅", "price": 100, "buy": 400, "durability": 30, "use": "곤충 잡기", "from": "시작 지급" },
     { "slug": "shovel", "name": "삽", "emoji": "⛏️", "price": 200, "buy": 800, "durability": 40, "use": "화석 파기 · 나무 심기", "from": "상점 800 / 제작: 나무 5" },
     { "slug": "axe", "name": "도끼", "emoji": "🪓", "price": 200, "buy": 800, "durability": 60, "use": "나무 베기 · 바위 치기", "from": "상점 800 / 제작: 나뭇가지 5 + 돌 1" },
-    { "slug": "can", "name": "물뿌리개", "emoji": "🚿", "price": 200, "buy": 800, "durability": 40, "use": "꽃에 물 주기 → 새 꽃 번식", "from": "상점 800 / 제작: 나무 5" }
+    { "slug": "can", "name": "물뿌리개", "emoji": "🚿", "price": 200, "buy": 800, "durability": 40, "use": "꽃에 물 주기 → 새 꽃 번식", "from": "상점 800 / 제작: 나무 5" },
+    { "slug": "sling", "name": "새총", "emoji": "🎯", "price": 300, "buy": 1200, "durability": 30, "use": "하늘 풍선 맞히기", "from": "상점 1,200 / 제작: 나무 3 + 나뭇가지 4 (유리병 레시피 쪽지)" }
   ],
   "furniture": [
     { "slug": "log-chair", "name": "통나무 의자", "emoji": "🪑", "price": 240, "buy": 0, "size": "1×1", "source": "craft", "from": "제작" },
@@ -199,5 +200,23 @@
     { "slug": "pansy", "name": "팬지 씨앗", "emoji": "🌱", "price": 60, "buy": 240, "flower": "pansy" },
     { "slug": "sapling", "name": "어린 나무", "emoji": "🌳", "price": 160, "buy": 640, "tree": "tree" },
     { "slug": "cedar-sapling", "name": "삼나무 묘목", "emoji": "🌲", "price": 160, "buy": 640, "tree": "cedar" }
+  ],
+  "art": [
+    { "slug": "sea-morning", "code": "IC-AR-01", "name": "아침 바다의 돛", "kind": "painting", "emoji": "🖼️", "price": 1200, "buy": 4800, "desc": "해가 막 떠오른 바다에 작은 돛배 하나. 노란 해가 물결마다 반짝여요.", "fake": { "key": "sun", "tell": "해가 붉어요 (진품은 노란 해)" } },
+    { "slug": "acorn-hill", "code": "IC-AR-02", "name": "도토리 언덕", "kind": "painting", "emoji": "🖼️", "price": 1100, "buy": 4400, "desc": "둥근 초록 언덕 위에 커다란 도토리나무 한 그루. 보고 있으면 바람 소리가 들려요." },
+    { "slug": "star-river", "code": "IC-AR-03", "name": "별이 흐르는 강", "kind": "painting", "emoji": "🖼️", "price": 1400, "buy": 5600, "desc": "밤하늘의 별이 구불구불한 파란 강물에 비쳐 같이 흘러가요.", "fake": { "key": "river", "tell": "강물이 초록빛이에요 (진품은 파란 강)" } },
+    { "slug": "owl-lady", "code": "IC-AR-04", "name": "조용한 부엉이 부인", "kind": "painting", "emoji": "🖼️", "price": 1300, "buy": 5200, "desc": "모자를 쓴 부엉이 부인이 살짝 웃고 있어요. 어디서 봐도 눈이 마주쳐요." },
+    { "slug": "flower-window", "code": "IC-AR-05", "name": "창가의 꽃병", "kind": "painting", "emoji": "🖼️", "price": 1150, "buy": 4600, "desc": "햇살 드는 창가에 파란 꽃병, 꽃이 한가득 꽂혀 있어요.", "fake": { "key": "vase", "tell": "꽃병이 보라색이에요 (진품은 파란 꽃병)" } },
+    { "slug": "rain-umbrella", "code": "IC-AR-06", "name": "빗속의 노란 우산", "kind": "painting", "emoji": "🖼️", "price": 1050, "buy": 4200, "desc": "비가 쏟아지는 회색 거리에 노란 우산 하나만 환해요." },
+    { "slug": "three-pears", "code": "IC-AR-07", "name": "배 세 알", "kind": "painting", "emoji": "🖼️", "price": 1000, "buy": 4000, "desc": "하얀 천 위에 연두빛 배 세 알. 오래 보면 배가 고파져요.", "fake": { "key": "pear", "tell": "배 한 알이 주황색이에요 (진품은 모두 연두빛)" } },
+    { "slug": "cape-lighthouse", "code": "IC-AR-08", "name": "등대가 있는 곶", "kind": "painting", "emoji": "🖼️", "price": 1200, "buy": 4800, "desc": "바위 곶 끝에 빨간 줄무늬 등대가 서서 먼바다를 비춰요." },
+    { "slug": "dancing-leaves", "code": "IC-AR-09", "name": "춤추는 단풍", "kind": "painting", "emoji": "🖼️", "price": 1250, "buy": 5000, "desc": "크림빛 바탕 위로 단풍잎이 빙글빙글 춤을 추는 그림이에요.", "fake": { "key": "bg", "tell": "바탕이 잿빛 파랑이에요 (진품은 크림빛)" } },
+    { "slug": "moon-cat", "code": "IC-AR-10", "name": "달을 보는 고양이", "kind": "painting", "emoji": "🖼️", "price": 1350, "buy": 5400, "desc": "지붕 위에 앉은 고양이가 커다란 달을 올려다봐요." },
+    { "slug": "thinking-frog", "code": "IC-AR-11", "name": "생각하는 개구리", "kind": "sculpture", "emoji": "🗿", "price": 1600, "buy": 6400, "desc": "턱을 괴고 깊은 생각에 잠긴 청동 개구리 조각이에요.", "fake": { "key": "bronze", "tell": "청동이 아니라 푸르스름한 돌빛이에요" } },
+    { "slug": "wave-spiral", "code": "IC-AR-12", "name": "물결 나선", "kind": "sculpture", "emoji": "🗿", "price": 1450, "buy": 5800, "desc": "파도가 말려 올라가는 모양을 매끈하게 깎은 조각이에요." },
+    { "slug": "big-acorn", "code": "IC-AR-13", "name": "큰 도토리 조각", "kind": "sculpture", "emoji": "🗿", "price": 1500, "buy": 6000, "desc": "사람 머리만 한 도토리 조각. 갈색 깍정이 무늬가 꼼꼼해요.", "fake": { "key": "cap", "tell": "깍정이가 붉은색이에요 (진품은 갈색)" } },
+    { "slug": "rising-bird", "code": "IC-AR-14", "name": "날아오르는 새", "kind": "sculpture", "emoji": "🗿", "price": 1550, "buy": 6200, "desc": "날개를 활짝 펴고 하늘로 솟아오르는 새의 조각이에요." },
+    { "slug": "bear-bust", "code": "IC-AR-15", "name": "곰 흉상", "kind": "sculpture", "emoji": "🗿", "price": 1650, "buy": 6600, "desc": "하얀 대리석으로 깎은 점잖은 곰의 흉상이에요.", "fake": { "key": "marble", "tell": "대리석이 분홍빛이 돌아요 (진품은 새하얀 대리석)" } },
+    { "slug": "stone-tower", "code": "IC-AR-16", "name": "돌탑 셋", "kind": "sculpture", "emoji": "🗿", "price": 1250, "buy": 5000, "desc": "매끈한 돌 셋을 아슬아슬하게 쌓아 올린 조각이에요." }
   ]
 }

@@ -245,6 +245,48 @@
       "status": "approved"
     },
     {
+      "id": "FU-74",
+      "slug": "art-plinth",
+      "item": "fixture.art-plinth",
+      "name": "미술품 받침",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.81,
+        0.81,
+        0.35
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-77",
+      "slug": "fortune-table",
+      "item": "fixture.fortune-table",
+      "name": "운세 탁자",
+      "place": "floor",
+      "footprint": [
+        2,
+        2
+      ],
+      "size": [
+        1.62,
+        1.62,
+        1.05
+      ],
+      "variants": [],
+      "animations": [
+        "flicker"
+      ],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-85",
       "slug": "glass-case",
       "item": "fixture.glass-case",

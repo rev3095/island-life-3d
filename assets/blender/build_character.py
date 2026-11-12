@@ -7,7 +7,7 @@
 prompt(컨셉·키워드·레퍼런스)는 사람이 읽는 설명이라 스크립트가 직접 쓰지 않는다.
 좌표계: Blender Z-up, 캐릭터 정면 = -Y. 키 1.0 = 게임 타일 1칸.
 """
-import bpy, bmesh, json, math, os, sys
+import bpy, bmesh, json, math, os, random, sys
 from mathutils import Vector, Matrix
 
 args = sys.argv[sys.argv.index('--') + 1:]
@@ -47,6 +47,7 @@ FEATURES = {
     'owl': {'muzzle': 'hook', 'tail': 'feather', 'ears': 'tufts', 'eyes': 'big', 'head': (1.12, 0.95, 0.88), 'eyeSpread': 0.92},   # 귀깃 + 큰 눈
     # 12차 밤·새벽 (밤·새벽 검수 보드 D106–D114) 밤 가게 주인 · 새벽 점쟁이
     'bat': {'ears': 'bat', 'muzzle': 'small', 'fangs': True, 'eyes': 'iris', 'batWings': True, 'head': (1.08, 0.95, 0.9)},   # 큰 귀 + 금빛 눈 + 접은 박쥐 날개 (꼬리 없음)
+    'hedgehog': {'ears': 'round', 'muzzle': 'small', 'tail': 'stub', 'spines': True, 'head': (1.04, 0.96, 0.92)},   # M13 행상 송이 (CH-16): 곰 둥근 귀 + 머리 뒤·등에 가시 (13차 보드 D145-A)
     'moth': {'mouth': 'smile', 'eyes': 'iris', 'antennae': True, 'mothWings': True, 'ruff': True, 'head': (1.04, 0.95, 0.92)},   # 깃털 더듬이 + 등 날개 넷 + 목털
 }
 SPECIES = spec.get('species', 'cat')
@@ -588,6 +589,36 @@ if F.get('wool'):
         p = V((BODY_R[0] * rr * math.sin(a), -BODY_R[1] * rr * math.cos(a), z))
         B.add(ellipsoid(p, (0.042, 0.042, 0.036), seg=14, rings=8), wool, 'spine')
 
+# 가시 (고슴도치, M13 행상 CH-16): 머리 뒤·위와 등을 덮는 갈색 털 덮개 + 그 위에 뒤로 누운 촘촘한 가시. 얼굴 쪽(앞 반)은 비워 둔다
+if F.get('spines'):
+    smat = col('spines', 'marking')
+    rnd = random.Random(16)
+
+    def mantle(C, R, keep, bone, grow=1.06):
+        bm = ellipsoid(C, (R[0] * grow, R[1] * grow, R[2] * grow), seg=28, rings=16)
+        bmesh.ops.delete(bm, geom=[f for f in bm.faces if not keep(f.calc_center_median())], context='FACES')
+        B.add(bm, smat, bone)
+
+    hc, hr = HEAD_C, HEAD_R
+    mantle(hc, hr, lambda c: c.y > hc.y - hr[1] * 0.1 or c.z > hc.z + hr[2] * 0.72, 'head', 1.045)
+    mantle(BODY_C, BODY_R, lambda c: c.y > BODY_C.y + BODY_R[1] * 0.05 and c.z > BODY_C.z - BODY_R[2] * 0.6, 'spine', 1.08)
+    for pitch in (-0.1, 0.22, 0.52, 0.8, 1.05, 1.28):
+        n_ring = max(5, int(14 * math.cos(pitch * 0.85)))
+        for k in range(n_ring):
+            yaw = math.pi + (k - (n_ring - 1) / 2) * (3.1 / n_ring) + (0.12 if (int(pitch * 10) % 2) else 0)
+            front = abs(math.atan2(math.sin(yaw), math.cos(yaw)))
+            if front < 1.45 and pitch < 1.1:
+                continue
+            p, n = head_point(yaw + rnd.uniform(-0.05, 0.05), pitch + rnd.uniform(-0.04, 0.04), inset=-0.01 * hs)
+            d = (n * 0.55 + V((0, 0.75, 0.2))).normalized()
+            B.add(cone(p, p + d * 0.085 * hs, 0.032 * hs, 0.003, squash=0.6, seg=6), smat, 'head')
+    for pitch in (-0.5, -0.15, 0.2, 0.55, 0.85):
+        for k in range(7):
+            yaw = math.pi + (k - 3) * 0.36 + (0.18 if (int(pitch * 10) % 2) else 0)
+            p, n = ell_point(BODY_C, (BODY_R[0] * 1.08, BODY_R[1] * 1.08, BODY_R[2] * 1.08), yaw, pitch, inset=0.006)
+            d = (n * 0.5 + V((0, 0.8, 0.25))).normalized()
+            B.add(cone(p, p + d * 0.07, 0.028, 0.003, squash=0.6, seg=6), smat, 'spine')
+
 # 등껍질 (거북)
 if F.get('shell'):
     SC = V((0, BODY_R[1] * 0.62, BODY_C.z + 0.015))
@@ -983,9 +1014,24 @@ def spin(t):
     }
 
 
+def wish(t):
+    """AN-13 두 손 모아 소원 (한 번, 2.2초, M13 유성우 D144-A): 하늘을 올려다보고 두 손을 가슴 앞에 모아 눈을 감듯 고개를 살짝 숙였다가 다시 본다."""
+    k = smooth(min(1.0, t / 0.25)) * (1.0 - smooth((t - 0.85) / 0.15))
+    up = smooth(min(1.0, t / 0.2)) * (1.0 - smooth((t - 0.35) / 0.2)) + smooth((t - 0.75) / 0.15) * (1.0 - smooth((t - 0.9) / 0.1))
+    bow = sin(math.pi * min(1.0, max(0.0, (t - 0.35) / 0.4)))
+    return {
+        'hips': ((0, 0, 0), (0, 0.004 * sin(TAU * t), 0)),
+        'spine': ((-0.12 * up + 0.08 * bow, 0, 0), None),
+        'head': ((-0.45 * up + 0.22 * bow, 0, 0), None),
+        'arm.L': ((1.25 * k, 0, -0.55 * k), None), 'arm.R': ((1.25 * k, 0, 0.55 * k), None),
+        'ear.L': ((0.1 * bow, 0, 0), None), 'ear.R': ((0.1 * bow, 0, 0), None),
+        'tail.1': ((0.15 * k, 0, 0), None),
+    }
+
+
 ANIMS = {'idle': (48, idle), 'walk': (24, walk), 'run': (16, run), 'happy': (36, happy),
          'sparkler': (36, sparkler), 'push': (28, push), 'place': (30, place),
-         'sit_down': (14, sit_down), 'sit': (48, sit), 'stand_up': (12, stand_up), 'spin': (26, spin)}
+         'sit_down': (14, sit_down), 'sit': (48, sit), 'stand_up': (12, stand_up), 'spin': (26, spin), 'wish': (52, wish)}
 ANIMS = {k: v for k, v in ANIMS.items() if k in spec.get('animations', ANIMS)}
 
 

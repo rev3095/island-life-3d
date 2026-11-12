@@ -1,0 +1,77 @@
+{
+  "id": "FU-78",
+  "slug": "tarot-frame",
+  "item": "furn.tarot-frame",
+  "name": "타로 액자",
+  "category": "furniture",
+  "kind": "tarot-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "금빛 테 액자 안 남색 벨벳 위에 타로 카드 셋 — 해 · 달 · 별 그림. 벽에 건다.",
+    "keywords": [
+      "금빛 액자",
+      "타로 카드 셋",
+      "해·달·별"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "해골 같은 무서운 카드"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "sun",
+      "moon",
+      "star",
+      "cardMark",
+      "card",
+      "string"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#E0B85A",
+    "frameDark": "#B8893A",
+    "velvet": "#2E3768",
+    "cardEdge": "#7C5BA8",
+    "card": "#FFF3DC",
+    "sun": "#F2A93B",
+    "moon": "#8A9AD8",
+    "star": "#E8C26A",
+    "cardMark": "#7C5BA8",
+    "string": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "금빛 테",
+    "frameDark": "모서리 장식",
+    "velvet": "남색 벨벳",
+    "cardEdge": "카드 테",
+    "card": "카드 바탕",
+    "sun": "해",
+    "moon": "달",
+    "star": "별",
+    "cardMark": "이름 칸",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

@@ -1,0 +1,51 @@
+{
+  "id": "FU-65",
+  "slug": "star-chair",
+  "item": "furn.star-chair",
+  "name": "별 의자",
+  "category": "furniture",
+  "kind": "star-chair",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 892,
+  "parts": 1,
+  "materials": [
+    "cushion",
+    "star",
+    "starLight",
+    "wood"
+  ],
+  "objects": [
+    "chair"
+  ],
+  "animations": {},
+  "size": [
+    0.57,
+    0.54,
+    1.07
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.25,
+      -0.002
+    ],
+    [
+      0.285,
+      0.288,
+      1.072
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 19484,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-chair_front.png",
+    "star-chair_main.png",
+    "star-chair_thumb.png",
+    "star-chair_top.png"
+  ]
+}

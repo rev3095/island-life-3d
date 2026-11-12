@@ -1,0 +1,57 @@
+{
+  "id": "FU-76",
+  "slug": "fortune-lamp",
+  "item": "furn.fortune-lamp",
+  "name": "점괘 등",
+  "category": "furniture",
+  "kind": "fortune-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "둥근 놋쇠 받침 위로 손바닥 모양 받침이 둥근 등을 받쳐 든다. 놋쇠 덮개 사이로 빛 구슬이 보이고, 덮개의 별자리 구멍에서도 빛이 샌다.",
+    "keywords": [
+      "손바닥 받침",
+      "둥근 놋쇠 등",
+      "별자리 구멍"
+    ],
+    "references": [],
+    "avoid": [
+      "진짜 사람 손",
+      "무서운 점집"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "brass": "#D9A84E",
+    "brassDark": "#A87A34",
+    "hand": "#EADCC4",
+    "glow": "#FFE7A8"
+  },
+  "paletteLabels": {
+    "brass": "놋쇠",
+    "brassDark": "짙은 놋쇠 테",
+    "hand": "손바닥 받침",
+    "glow": "등 빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

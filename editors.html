@@ -209,6 +209,23 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
 .tbl td:first-child { white-space: nowrap; }
 .archive { font-size: 14px; }
 .archive a { color: var(--leaf); }
+
+/* 검수 보드 보관함 (n차 순서) */
+.ar-tbl { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.ar-tbl table { min-width: 820px; }
+.ar-tbl td { font-size: 13px; }
+.ar-tbl .cha { font-family: var(--display); font-size: 17px; color: var(--acorn); white-space: nowrap; }
+.ar-tbl .cha .seq { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.ar-tbl .bd { min-width: 180px; }
+.ar-tbl .bd b { font-weight: 400; font-size: 14px; }
+.ar-tbl .bd a { color: var(--leaf); white-space: nowrap; }
+.ar-tbl .bd .sub { display: block; font-size: 12px; color: var(--muted); }
+.ar-tbl .num { font-family: var(--mono); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ar-tbl .pk { min-width: 160px; }
+.ar-tbl .sm { min-width: 220px; max-width: 46ch; }
+.ar-tbl tr.cha-start td { border-top: 2px solid var(--line); }
+.ar-tbl details { margin-top: 4px; }
+.ar-tbl .src { font-size: 11px; padding: 0 7px; }
 @media (prefers-reduced-motion: no-preference) { .ed { transition: border-color .15s; } .ed:target { border-color: var(--leaf); } }
 </style>
 
@@ -265,7 +282,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   </header>
 
   <nav class="toc" aria-label="목차">
-    <a href="#manage">전체 관리</a><a href="#editors">편집기</a><a href="#boards">검수 보드</a><a href="#play">게임</a><a href="#how">반영 순서 · 명령</a>
+    <a href="#manage">전체 관리</a><a href="#editors">편집기</a><a href="#boards">검수 보드</a><a href="#archive-boards">보드 보관함</a><a href="#play">게임</a><a href="#how">반영 순서 · 명령</a>
   </nav>
 
   <section id="manage">
@@ -311,6 +328,18 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <p class="muted">새 리소스나 큰 결정은 보드에서 골라요. 고른 내용은 보드에 바로 저장되고, "검수 보드 반영"으로 게임에 들어가요. 반영한 결정도 보드에서 언제든 다시 고를 수 있어요.</p></div>
     <div class="cards" data-group="board"></div>
     <p class="archive muted" id="archive"></p>
+  </section>
+
+  <section id="archive-boards">
+    <div class="sec-head"><p class="id">ARCHIVE · n차 검수 보드</p><h2>검수 보드 보관함</h2>
+      <p class="muted">지금까지의 검수 보드를 만든 차례(결정 번호 순서)대로 n차로 모았어요. 마일스톤을 정한 보드는 「n차」, 그 사이에 따로 연 주제 보드는 바로 앞 차수에 붙여 「n차 · 주제」예요. 반영 기록은 보드마다의 저장소(<code>applied</code>·<code>history</code>)를 Claude 가 이 홈 저장소 <code>archive</code> 에 옮겨 적은 것이고, 보드 링크에서 언제든 다시 고를 수 있어요 (지우지 않고 앞으로만 쌓아요).</p></div>
+    <p class="small muted" id="arInfo">보관함을 그리는 중…</p>
+    <div class="tblwrap ar-tbl">
+      <table class="tbl" id="arTable">
+        <thead><tr><th>차수</th><th>보드</th><th>만든 날</th><th>결정</th><th>반영</th><th>고른 것</th><th>반영 요약</th><th>반영 커밋</th></tr></thead>
+        <tbody><tr><td colspan="8" class="empty">보관함을 그리는 중이에요. 보드 링크는 위 바로 가기에 있어요.</td></tr></tbody>
+      </table>
+    </div>
   </section>
 
   <section id="play">
@@ -420,6 +449,34 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "style", "group": "editor", "name": "스타일 편집기", "url": "https://claude.ai/artifact/EWuGKbMpo9uTjLEUzhT2Pd", "file": "style-editor.html", "et": "ET-10", "track": "M6-P6",
     "edits": "셰이더 명암·그늘·외곽선·화면 효과 슬라이더. 값을 저장소에 남기고 프리셋으로.",
     "command": "스타일 반영", "openLabel": "바뀐 것", "reads": ["drafts/style", "applied/style"] }
+]
+</script>
+
+<!-- 검수 보드 보관함 차례 (n차 순서). 규칙은 docs/notes/board-archive.md:
+     줄 = 결정 번호(D) 순서 = 만든 순서 (seq 1부터). 마일스톤 N 을 정한 본 보드는 「N차」(wave<N>, M12 는 night), 그 사이 주제 보드는 바로 앞 본 보드의 차수에 붙여 「N차 · 주제」.
+     id = <두 자리 차수>-<보드 id> = 홈 저장소 archive/<id> 문서 이름. 반영 기록(applied·history 모음)은 그 문서에 (tools/hub-archive.mjs).
+     저장 없는 보드는 fallback 에 문서(devlog·README)로 채운 기록. 새 보드는 끝에 한 줄 + archive/<id> 문서 (tests/hub.test.mjs 가 editors-list 보드와 맞는지 본다). -->
+<script type="application/json" id="archive-index">
+[
+  { "id": "01-concept", "seq": 1, "cha": 1, "label": "1차", "kind": "concept", "board": "concept", "decisions": "D1–D7", "made": "2026-10-28",
+    "fallback": { "version": 0, "appliedAt": "2026-10-28", "commit": "905f905", "picksFrom": "recommended",
+      "picks": { "D1": "B", "D2": "B", "D3": "A", "D4": "A", "D5": "A", "D6": "B", "D7": "A" },
+      "summary": "저장 기능 전의 1차 계획 보드 — 선택은 채팅으로 받아 보드 기록이 없어요. 여기 고른 것은 보드의 추천안(*): 소프트 툰+외곽선 · 직접 그린 아이콘(5차 D8-B 에서 3D 렌더 아이콘으로 바뀜) · 실제 시계+빠른 시간 · 주민 6명 · 머리색·옷색만 · 섬 보통 64×56 · 포근섬 이야기·도토리",
+      "from": "devlog 세션 1 (2026-10-28) · concept/concept-board.html 결정 표 · concept/README.md 보드 표" } },
+  { "id": "05-wave5", "seq": 2, "cha": 5, "label": "5차", "kind": "main", "board": "wave5", "decisions": "D8–D13", "made": "2026-10-29" },
+  { "id": "05-z5", "seq": 3, "cha": 5, "label": "5차 · 축제", "kind": "theme", "board": "z5", "decisions": "D14–D25", "made": "2026-10-29" },
+  { "id": "06-wave6", "seq": 4, "cha": 6, "label": "6차", "kind": "main", "board": "wave6", "decisions": "D26–D35", "made": "2026-10-29" },
+  { "id": "07-wave7", "seq": 5, "cha": 7, "label": "7차", "kind": "main", "board": "wave7", "decisions": "D36–D57", "made": "2026-10-30", "also": "QA 결과 D49–D57 은 v2 에서" },
+  { "id": "07-sky", "seq": 6, "cha": 7, "label": "7차 · 하늘", "kind": "theme", "board": "sky", "decisions": "D58–D66", "made": "2026-11-04", "also": "하늘 층 SK-01–08" },
+  { "id": "07-interiors", "seq": 7, "cha": 7, "label": "7차 · 실내", "kind": "theme", "board": "interiors", "decisions": "D67–D73", "made": "2026-11-04" },
+  { "id": "08-wave8", "seq": 8, "cha": 8, "label": "8차", "kind": "main", "board": "wave8", "decisions": "D74–D85", "made": "2026-11-05" },
+  { "id": "09-wave9", "seq": 9, "cha": 9, "label": "9차", "kind": "main", "board": "wave9", "decisions": "D86–D92", "made": "2026-11-07" },
+  { "id": "10-wave10", "seq": 10, "cha": 10, "label": "10차", "kind": "main", "board": "wave10", "decisions": "D93–D99", "made": "2026-11-10" },
+  { "id": "11-wave11", "seq": 11, "cha": 11, "label": "11차", "kind": "main", "board": "wave11", "decisions": "D100–D105", "made": "2026-11-10" },
+  { "id": "12-night", "seq": 12, "cha": 12, "label": "12차 · 밤·새벽", "kind": "main", "board": "night", "decisions": "D106–D114", "made": "2026-11-10", "also": "M12 를 정한 본 보드 (12차 wave 보드 대신)" },
+  { "id": "12-tour", "seq": 13, "cha": 12, "label": "12차 · 투어", "kind": "theme", "board": "tour", "decisions": "D120–D128", "made": "2026-11-10", "also": "11차 D100-B 「새 곳」의 작은 섬을 따로 정함" },
+  { "id": "12-shader", "seq": 14, "cha": 12, "label": "12차 · 셰이더", "kind": "theme", "board": "shader", "decisions": "D130–D139", "made": "2026-11-11" },
+  { "id": "13-wave13", "seq": 15, "cha": 13, "label": "13차", "kind": "main", "board": "wave13", "decisions": "D140–D147", "made": "2026-11-12" }
 ]
 </script>
 
@@ -549,8 +606,70 @@ window.HubLogic = (function () {
       checks: { total: checks.length, slow: checks.filter(function (c) { return c.plaza && c.plaza.ok === false; }).length, recent: recent },
     };
   }
+  /* ---------- 검수 보드 보관함 (archive-index → 홈 저장소 archive/<id>) ----------
+     보드마다의 저장소 applied/<보드 id> · history/<보드 id>-v<n> 을 Claude 가 읽어 tools/hub-archive.mjs 가 이 함수로 문서를 만든다.
+     화면은 차례(archive-index)를 먼저 그리고, 저장소 문서가 있으면 그 기록으로 채운다. */
+  function dnum(k) { var m = /^D(\d+)$/.exec(k); return m ? +m[1] : null; }
+  /** { D8: 'B', D9: 'A', …, 'D130-spec': 'all' } → 'D8-B · 나머지 A (6개)' · '모두 A (9개)' (사양 고르기 같은 'D130-…' 칸은 수만) */
+  function pickSummary(picks) {
+    picks = picks && typeof picks === 'object' ? picks : {};
+    var keys = Object.keys(picks).filter(function (k) { return dnum(k) !== null; }).sort(function (a, b) { return dnum(a) - dnum(b); });
+    if (!keys.length) return '';
+    var tally = {};
+    keys.forEach(function (k) { var v = String(picks[k]); tally[v] = (tally[v] || 0) + 1; });
+    var most = Object.keys(tally).sort(function (a, b) { return tally[b] - tally[a] || a.localeCompare(b); })[0];
+    var odd = keys.filter(function (k) { return String(picks[k]) !== most; }).map(function (k) { return k + '-' + picks[k]; });
+    var specs = Object.keys(picks).filter(function (k) { return /^D\d+-/.test(k); }).length;
+    return (odd.length ? odd.join(' · ') + ' · 나머지 ' + most : '모두 ' + most) + ' (' + keys.length + '개' + (specs ? ' · 사양 고르기 ' + specs : '') + ')';
+  }
+  function histLine(h) {
+    return { version: typeof h.version === 'number' ? h.version : null, appliedAt: stamp(h.appliedAt) || null, summary: String(h.summary || ''),
+      commit: h.commit || null, picks: h.picks && typeof h.picks === 'object' ? h.picks : {}, notes: h.notes && typeof h.notes === 'object' ? h.notes : {} };
+  }
+  /** 차례 한 줄 + 홈 목록 항목 + 보드 저장소 { applied, history } → 홈 저장소 archive/<id> 문서 */
+  function archiveDoc(entry, base, rec, now) {
+    base = base || {}; rec = rec || {};
+    var hist = (Array.isArray(rec.history) ? rec.history : []).filter(Boolean).map(histLine)
+      .sort(function (a, b) { return (b.version || 0) - (a.version || 0); });
+    var ap = rec.applied ? histLine(rec.applied) : hist[0] || null;
+    if (ap && !ap.commit) hist.forEach(function (h) { if (h.version === ap.version && h.commit) ap.commit = h.commit; });   // applied 에 commit 이 빠진 옛 보드 (wave5)
+    var fb = !ap && entry.fallback ? entry.fallback : null;
+    var cur = ap || (fb ? histLine(fb) : null);
+    var commits = [];
+    hist.slice().reverse().concat(cur ? [cur] : []).forEach(function (h) { if (h.commit && commits.indexOf(h.commit) < 0) commits.push(h.commit); });
+    var picks = cur ? cur.picks : {}, notes = cur ? cur.notes : {};
+    return {
+      id: entry.id, seq: entry.seq, cha: entry.cha, label: entry.label, kind: entry.kind, board: entry.board,
+      name: base.name || entry.board, url: base.url || null, file: base.file || null,
+      made: entry.made || null, decisions: entry.decisions || '', also: entry.also || null,
+      source: ap ? 'store' : fb ? 'docs' : 'none', from: fb ? fb.from || null : null, picksFrom: fb ? fb.picksFrom || null : 'board',
+      applied: cur ? { version: cur.version, appliedAt: cur.appliedAt, summary: cur.summary, commit: cur.commit } : null,
+      picks: picks, picksSummary: pickSummary(picks), notes: notes, notesCount: Object.keys(notes).length,
+      versions: hist.length, history: hist, commits: commits,
+      builtAt: now || Date.now(), by: 'claude',
+    };
+  }
+  /** 화면 줄: 차례 순서 + 저장소 문서 (차례에 없는 문서 = 홈을 다시 게시하기 전에 더한 새 보드 → seq 순으로 끝에) */
+  function archiveRows(index, list, docs) {
+    index = Array.isArray(index) ? index : []; docs = docs || {};
+    var byBoard = {};
+    (list || []).forEach(function (e) { byBoard[e.id] = e; });
+    var seen = {};
+    var out = index.slice().sort(function (a, b) { return a.seq - b.seq; }).map(function (en) {
+      seen[en.id] = true;
+      var d = docs[en.id];
+      var row = d && typeof d === 'object' ? d : archiveDoc(en, byBoard[en.board], null, 0);
+      return Object.assign({}, row, { stored: !!(d && typeof d === 'object'), url: (byBoard[en.board] && byBoard[en.board].url) || row.url || null });
+    });
+    Object.keys(docs).filter(function (id) { return !seen[id] && docs[id] && typeof docs[id] === 'object'; })
+      .map(function (id) { return Object.assign({}, docs[id], { id: id, stored: true }); })
+      .sort(function (a, b) { return (a.seq || 0) - (b.seq || 0); })
+      .forEach(function (r) { out.push(r); });
+    return out;
+  }
   return { KINDS: KINDS, STATES: STATES, MAX: MAX, key: key, rows: rows, filter: filter, counts: counts, request: request, chatText: chatText,
-    REPORT_KINDS: REPORT_KINDS, REPORT_STATES: REPORT_STATES, game: game, gpuName: gpuName };
+    REPORT_KINDS: REPORT_KINDS, REPORT_STATES: REPORT_STATES, game: game, gpuName: gpuName,
+    pickSummary: pickSummary, archiveDoc: archiveDoc, archiveRows: archiveRows };
 })();
 </script>
 <script src="concept/board-kit.js"></script>
@@ -575,9 +694,11 @@ const safe = (where, fn) => { try { return fn(); } catch (e) { fail(where, e); }
 
 let LIST = [];
 try { LIST = JSON.parse($('editors-list').textContent); } catch (e) { fail('편집기 목록 읽기', e); }
+let AINDEX = [];   // 검수 보드 보관함 차례 (n차 순서)
+try { AINDEX = JSON.parse($('archive-index').textContent); } catch (e) { fail('보관함 차례 읽기', e); }
 
 // store: loading | ok | local | none · storeWhy = 못 읽은 까닭 (화면에 그대로)
-let status = {}, meta = {}, catalog = {}, marks = {}, manage = [];
+let status = {}, meta = {}, catalog = {}, marks = {}, manage = [], archive = {};
 let store = 'loading', storeWhy = '', owner = null, writable = null, me = null, db = null, firstSnap = false;
 const ui = { group: 'all', state: 'all', q: '' };
 const picked = new Map();          // key → 줄 (분류를 바꿔도 남는다)
@@ -782,8 +903,41 @@ function renderReqs() {
     </article>`;
   }).join('');
 }
+/* ---------- 검수 보드 보관함 ---------- */
+const short = c => (typeof c === 'string' && /^[0-9a-f]{7,40}$/.test(c) ? c.slice(0, 7) : c);
+function renderArchive() {
+  const rows = H.archiveRows(AINDEX, LIST, archive);
+  const body = $('arTable').tBodies[0];
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="8" class="empty">보관함 차례가 비어 있어요.</td></tr>'; $('arInfo').textContent = ''; return; }
+  let last = null;
+  body.innerHTML = rows.map(r => {
+    const ap = r.applied;
+    const hist = Array.isArray(r.history) ? r.history : [];
+    const link = okUrl(r.url) ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">보드 열기 ↗</a>` : '';
+    const src = r.source === 'docs' ? '<span class="tag src" title="보드 저장소가 없어 문서 기록으로 채움">문서 기록</span>'
+      : !r.stored ? '<span class="tag src">저장소 기록 전</span>' : '';
+    const notes = r.notes && Object.keys(r.notes).length ? `<span class="sub">의견: ${Object.entries(r.notes).map(([k, v]) => `${esc(k)} — ${esc(v)}`).join(' · ')}</span>` : '';
+    const more = hist.length > 1 ? AL.list(hist, { title: n => `반영 기록 ${n}개` }) : '';
+    const commits = (Array.isArray(r.commits) ? r.commits : []).map(c => `<code>${esc(short(c))}</code>`).join(' → ');
+    const startCha = r.cha !== last; last = r.cha;
+    return `<tr id="ar-${esc(r.id)}"${startCha ? ' class="cha-start"' : ''}>
+      <td class="cha">${esc(r.label)}<span class="seq">#${esc(r.seq)} · ${esc(r.id)}</span></td>
+      <td class="bd"><b>${esc(r.name)}</b> <span class="id">${esc(r.board)}</span> ${src}<span class="sub">${r.also ? esc(r.also) + ' · ' : ''}${link}</span></td>
+      <td class="num">${esc(r.made ?? '—')}</td>
+      <td class="num">${esc(r.decisions)}</td>
+      <td class="num">${ap ? `<b>v${esc(ap.version)}</b>${ap.appliedAt ? `<br>${esc(when(ap.appliedAt))}` : ''}` : '<span class="muted">—</span>'}</td>
+      <td class="pk">${esc(r.picksSummary || '—')}${r.picksFrom === 'recommended' ? '<span class="sub">(보드 추천안 — 저장된 선택 없음)</span>' : ''}${notes}</td>
+      <td class="sm">${ap ? esc(ap.summary) : '<span class="muted">반영 기록 없음</span>'}${more}</td>
+      <td class="num">${commits || '—'}</td></tr>`;
+  }).join('');
+  const stored = rows.filter(r => r.stored).length;
+  const top = rows.reduce((n, r) => Math.max(n, +r.cha || 0), 0);
+  $('arInfo').textContent = `보드 ${rows.length}개 · 1차–${top}차 · `
+    + (stored ? `저장소 기록 ${stored}개${stored < rows.length ? ` (나머지 ${rows.length - stored}개는 차례만)` : ''}` : store === 'loading' || (store === 'ok' && !firstSnap) ? '기록을 불러오는 중…' : subErr['보관함'] ? `기록을 읽지 못했어요 (${subErr['보관함']}) — 차례와 보드 링크만 보여요` : '저장소 기록 없음 — 차례와 보드 링크만 보여요');
+}
 function render() {
   safe('카드 그리기', renderCards);
+  safe('보관함 그리기', renderArchive);
   safe('전체 관리 그리기', renderManage);
   safe('요청 목록 그리기', renderReqs);
   safe('머리 띠 그리기', renderTop);
@@ -874,7 +1028,7 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- 홈 저장소: 웹 링크(아티팩트 db) 또는 로컬 dev-server ---------- */
-// status/<편집기 id> · meta/check · meta/catalog · catalog/<분류> · marks/<분류> 는 Claude 가 ArtifactData 로 써 넣는다 (쓰기 admin).
+// status/<편집기 id> · meta/check · meta/catalog · catalog/<분류> · marks/<분류> · archive/<n차 id> 는 Claude 가 ArtifactData 로 써 넣는다 (쓰기 admin).
 // 이 페이지가 쓰는 곳은 manage/* (전체 관리 요청) 하나.
 const byId = docs => Object.fromEntries(docs.map(d => [d.id, d.data()]));
 const settle = (p, ms, fallback = null) => Promise.race([Promise.resolve().then(() => p()).catch(() => fallback), new Promise(r => setTimeout(() => r(fallback), ms))]);
@@ -892,15 +1046,16 @@ function watchDb() {
   db.collection('meta').onSnapshot(qs => { meta = byId(qs.docs); render(); }, onErr('기록'));
   db.collection('catalog').onSnapshot(qs => { catalog = byId(qs.docs); delete subErr['목록']; render(); }, onErr('목록'));
   db.collection('marks').onSnapshot(qs => { marks = byId(qs.docs); render(); }, onErr('표시'));
+  db.collection('archive').onSnapshot(qs => { archive = byId(qs.docs); delete subErr['보관함']; render(); }, onErr('보관함'));
   db.collection('manage').onSnapshot(qs => { manage = qs.docs.map(d => ({ ...d.data(), id: d.id })); render(); }, onErr('요청'));
   setTimeout(() => { if (!firstSnap && store === 'ok') { storeWhy = '저장소가 15초 동안 답하지 않아요'; render(); } }, 15000);
 }
 // dev-server 의 /api/db/hub-<이름> (assets/review/hub-*.json, 행마다 docId) 를 읽어 흉내 낸다
 async function pullLocal() {
   const rows = c => fetch(`api/db/${c}`).then(r => (r.ok ? r.json() : [])).catch(() => []);
-  const [st, mt, ct, mk, mg, gr, gc] = await Promise.all(['hub-status', 'hub-meta', 'hub-catalog', 'hub-marks', 'hub-manage', 'game-reports', 'checks'].map(rows));
+  const [st, mt, ct, mk, mg, gr, gc, ar] = await Promise.all(['hub-status', 'hub-meta', 'hub-catalog', 'hub-marks', 'hub-manage', 'game-reports', 'checks', 'hub-archive'].map(rows));
   const docs = list => Object.fromEntries(list.filter(r => r.docId).map(r => [r.docId, r]));
-  status = docs(st); meta = docs(mt); catalog = docs(ct); marks = docs(mk); manage = mg;
+  status = docs(st); meta = docs(mt); catalog = docs(ct); marks = docs(mk); manage = mg; archive = docs(ar);
   // 게임 저장소 흉내 (같은 dev-server 라 바로 읽힌다): 게임이 남긴 문제 알리기·기기 점검 → status/game 요약
   const withId = list => list.map(r => ({ ...r, id: r.docId ?? r.id }));
   status.game = { ...status.game, ...H.game(withId(gr), withId(gc)) };

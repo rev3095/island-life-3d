@@ -1,0 +1,57 @@
+{
+  "id": "IC-AR-01",
+  "slug": "art-sea-morning",
+  "name": "「아침 바다의 돛」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.sea-morning",
+    "art.sea-morning-fake"
+  ],
+  "hold": false,
+  "triangles": 1820,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "boat",
+    "frame",
+    "frameTrim",
+    "sail",
+    "sea",
+    "stand",
+    "sun",
+    "sunGlow",
+    "wave"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 41740,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-sea-morning_fake_main.png",
+    "art-sea-morning_fake_thumb.png",
+    "art-sea-morning_main.png",
+    "art-sea-morning_real_main.png",
+    "art-sea-morning_real_thumb.png",
+    "art-sea-morning_thumb.png"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "CH-17",
+  "slug": "salang",
+  "name": "살랑",
+  "species": "fox",
+  "version": "0.1",
+  "triangles": 11372,
+  "vertices": 5750,
+  "bones": 14,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "earTip",
+    "tail",
+    "tailTip",
+    "glasses",
+    "bowtie"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 1.02,
+  "glbBytes": 431980,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0534,
+    "forward": -0.0042
+  },
+  "renders": [
+    "salang_back.png",
+    "salang_front.png",
+    "salang_happy.png",
+    "salang_hero.png",
+    "salang_run.png",
+    "salang_side.png",
+    "salang_sit.png",
+    "salang_three_quarter.png",
+    "salang_thumb.png",
+    "salang_walk.png"
+  ]
+}

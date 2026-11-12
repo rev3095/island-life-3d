@@ -1,0 +1,53 @@
+{
+  "id": "FU-65",
+  "slug": "star-chair",
+  "item": "furn.star-chair",
+  "name": "별 의자",
+  "category": "furniture",
+  "kind": "star-chair",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "나무 다리 넷에 둥근 방석, 등받이가 커다란 노란 별 모양. 앉을 수 있다.",
+    "keywords": [
+      "별 등받이",
+      "둥근 방석"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D146-A · 별 조각 레시피로만 (유리병·풍선·일지로 레시피가 열림)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "cushion": "#8CC8FF",
+    "star": "#FFD45C",
+    "starLight": "#FFF6C8"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "cushion": "방석",
+    "star": "별 등받이",
+    "starLight": "별 가운데"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

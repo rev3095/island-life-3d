@@ -1,0 +1,47 @@
+{
+  "id": "IC-AR-12",
+  "slug": "art-wave-spiral",
+  "name": "「물결 나선」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.wave-spiral"
+  ],
+  "hold": false,
+  "triangles": 1204,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "foam",
+    "plate",
+    "wave"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.559
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.559
+    ]
+  ],
+  "glbBytes": 25564,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-wave-spiral_main.png",
+    "art-wave-spiral_thumb.png"
+  ]
+}

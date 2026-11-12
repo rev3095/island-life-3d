@@ -1,0 +1,82 @@
+{
+  "id": "IC-MA-11",
+  "slug": "mat-star-piece",
+  "name": "별 조각",
+  "group": "mat",
+  "category": "item",
+  "kind": "star-piece",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "mat.star-yellow",
+      "code": "IC-MA-11",
+      "variant": "yellow"
+    },
+    {
+      "item": "mat.star-pink",
+      "code": "IC-MA-11",
+      "variant": "pink"
+    },
+    {
+      "item": "mat.star-blue",
+      "code": "IC-MA-11",
+      "variant": "blue"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "소원을 빈 다음 날 바닷가에 떨어진 통통한 별 조각과 작은 부스러기 별 (색 셋)",
+    "keywords": [
+      "통통한 별",
+      "반짝이",
+      "색 셋"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "star": "#FFD45C",
+    "starLight": "#FFF6C8"
+  },
+  "paletteLabels": {
+    "star": "별",
+    "starLight": "반짝이"
+  },
+  "variants": {
+    "yellow": {
+      "label": "노랑 (기본)",
+      "palette": {}
+    },
+    "pink": {
+      "label": "분홍",
+      "palette": {
+        "star": "#FF9EC4",
+        "starLight": "#FFE4F0"
+      }
+    },
+    "blue": {
+      "label": "하늘",
+      "palette": {
+        "star": "#8CC8FF",
+        "starLight": "#E2F2FF"
+      }
+    }
+  }
+}

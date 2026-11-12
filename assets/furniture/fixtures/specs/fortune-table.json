@@ -1,0 +1,74 @@
+{
+  "id": "FU-77",
+  "slug": "fortune-table",
+  "item": "fixture.fortune-table",
+  "name": "운세 탁자",
+  "category": "fixture",
+  "kind": "fortune-table",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "바닥까지 늘어진 남색 별무늬 탁자보를 덮은 둥근 탁자. 위에 수정 구슬, 엎어 둔 카드 셋, 작은 초.",
+    "keywords": [
+      "둥근 탁자",
+      "별무늬 남색 탁자보",
+      "수정 구슬",
+      "엎어 둔 카드"
+    ],
+    "references": [],
+    "avoid": [
+      "무서운 해골",
+      "어두운 공포 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "cloth": "#2E3768",
+    "trim": "#E0B85A",
+    "star": "#E8C26A",
+    "glow": "#FFE38A",
+    "brass": "#D9A84E",
+    "ball": "#B8B0E8",
+    "shine": "#FFFFFF",
+    "card": "#5A4C8A",
+    "cardMark": "#E8C26A",
+    "wax": "#FFF4E0",
+    "flame": "#FFB347"
+  },
+  "paletteLabels": {
+    "cloth": "남색 탁자보",
+    "trim": "금빛 자락",
+    "star": "탁자보 별",
+    "glow": "빛나는 별·구슬 빛",
+    "brass": "놋쇠 받침",
+    "ball": "수정 구슬",
+    "shine": "구슬 반짝임",
+    "card": "카드 뒷면",
+    "cardMark": "카드 무늬",
+    "wax": "초",
+    "flame": "불꽃"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": [
+    "flicker"
+  ]
+}

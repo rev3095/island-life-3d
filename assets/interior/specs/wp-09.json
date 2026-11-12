@@ -1,0 +1,116 @@
+{
+  "id": "WP-09",
+  "slug": "wp-09",
+  "kind": "wallpaper",
+  "name": "들꽃 수레",
+  "version": 1,
+  "status": "review",
+  "price": 0,
+  "peddler": true,
+  "pattern": {
+    "tile": [
+      32,
+      32
+    ],
+    "size": [
+      0.64,
+      0.64
+    ],
+    "base": "base",
+    "shapes": [
+      {
+        "circle": [
+          8,
+          8,
+          2.2
+        ],
+        "fill": "flowerA"
+      },
+      {
+        "circle": [
+          5.5,
+          7,
+          1.4
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          10.5,
+          7,
+          1.4
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          8,
+          5.4,
+          1.4
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          8,
+          10.6,
+          1.4
+        ],
+        "fill": "petal"
+      },
+      {
+        "circle": [
+          24,
+          22,
+          1.8
+        ],
+        "fill": "flowerB"
+      },
+      {
+        "ellipse": [
+          20,
+          25,
+          2.6,
+          1.1
+        ],
+        "fill": "leaf"
+      },
+      {
+        "ellipse": [
+          13,
+          18,
+          2.2,
+          0.9
+        ],
+        "fill": "leaf"
+      },
+      {
+        "circle": [
+          27,
+          6,
+          1
+        ],
+        "fill": "dot"
+      },
+      {
+        "circle": [
+          4,
+          26,
+          1
+        ],
+        "fill": "dot"
+      }
+    ]
+  },
+  "palette": {
+    "base": "#FBF1D8",
+    "flowerA": "#F6C84C",
+    "flowerB": "#F28CB8",
+    "petal": "#FFFFFF",
+    "leaf": "#8CC08A",
+    "dot": "#E8B98A",
+    "wainscot": "#C9A86A",
+    "molding": "#8A6244",
+    "baseboard": "#6E4E36"
+  }
+}

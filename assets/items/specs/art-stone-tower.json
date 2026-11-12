@@ -1,0 +1,75 @@
+{
+  "id": "IC-AR-16",
+  "slug": "art-stone-tower",
+  "name": "「돌탑 셋」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.stone-tower",
+      "code": "IC-AR-16"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "크기와 색이 조금씩 다른 매끈한 돌 셋을 차곡차곡 쌓은 돌탑.",
+    "keywords": [
+      "돌탑",
+      "매끈한 돌 셋",
+      "균형"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "조각",
+      "value": "tower",
+      "options": [
+        "frog",
+        "spiral",
+        "acorn",
+        "bird",
+        "bust",
+        "tower"
+      ]
+    }
+  },
+  "palette": {
+    "stoneA": "#8E8A84",
+    "stoneB": "#B4A890",
+    "stoneC": "#D8D0C2",
+    "base": "#CFC8BC",
+    "baseDark": "#A79F92",
+    "plate": "#D9A84E"
+  },
+  "paletteLabels": {
+    "stoneA": "아래 돌",
+    "stoneB": "가운데 돌",
+    "stoneC": "위 돌",
+    "base": "받침 돌",
+    "baseDark": "받침 테",
+    "plate": "이름표"
+  }
+}

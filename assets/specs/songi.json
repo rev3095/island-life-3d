@@ -1,0 +1,69 @@
+{
+  "id": "CH-16",
+  "slug": "songi",
+  "name": "송이",
+  "species": "hedgehog",
+  "role": "떠돌이 행상 · 고슴도치",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "수레를 끌고 섬과 섬 사이를 떠도는 고슴도치 행상. 수·일 낮에 광장에 와서 희귀 꽃씨·묘목·다른 곳에서 안 파는 벽지를 판다. 밤송이 같은 갈색 가시, 크림빛 얼굴, 초록 앞치마에 밀짚 빛 스카프. 말끝마다 '~송' 을 붙이는 수다쟁이.",
+    "keywords": [
+      "2.5등신",
+      "밤송이 가시",
+      "크림빛 얼굴",
+      "초록 앞치마",
+      "작은 둥근 귀"
+    ],
+    "references": [
+      "검수 보드 wave13 CH-16 (행상, 지금 섬에 없는 종족)",
+      "고슴도치 봉제 인형"
+    ],
+    "avoid": [
+      "뾰족하고 아파 보이는 가시",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "13차 보드 wave13 D145-A — 종족은 지금 섬에 없는 고슴도치 (새 부품 spines: 머리 뒤·등 가시)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.92,
+    "headScale": 1.02,
+    "bodyWidth": 1.06,
+    "limbLength": 0.95,
+    "earSize": 0.8,
+    "earPointiness": 1,
+    "tailLength": 0.6,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#E9D3B2",
+    "muzzle": "#FBF0DE",
+    "innerEar": "#F2C6B4",
+    "nose": "#3A2A22",
+    "tail": "#8A6244",
+    "spines": "#8A6244",
+    "shirt": "#6FB08A",
+    "pants": "#7A5A3E",
+    "eye": "#2A2230",
+    "blush": "#F2A6B0",
+    "outline": "#4A3B32"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}

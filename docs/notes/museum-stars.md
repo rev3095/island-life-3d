@@ -37,14 +37,26 @@
 
 ## 확인
 
-- `node --test tests/` — 488개 (480 + 새 8) 통과.
+- `node --test tests/` — 합치기 전 488개 (480 + 새 8) 통과.
 - `node tools/check-interiors.mjs --only=museum --port=4269` — 낮 10시·밤 23시·새벽 4시 모두: 박물관 ✅ + 관 여섯 ✅ 들어감 · 로비로 ✅ · 살펴보기 글자 ✅ · 콘솔 오류 0 · 문제 0. (요청은 `--port=4267` 이었지만 4267 은 실내 전수 세션 `interiors-all` 의 dev-server 가 쓰고 있어서, 같은 포트로 돌리면 그쪽 코드를 점검하게 된다 → 이 작업 트리 서버 4269)
 - 개발 서버(4269, `?debug&date=2027-01-10`)에서 실제 키로: 이름 정하기 → 밤 22시 → 망원경대 앞 Space(「망원경 보기」) → 방향키 ←·↓ 로 눈사람자리 맞춤 → 찰칵 카드 → Enter·Esc → 박물관 → 로비 아치 여섯 Space 들어가기·문 매트 Space 나오기 → 별자리관에서 저장 → 새로고침 → 별자리관 안에서 이어 하기. 콘솔 오류 0.
-- 자동 플레이·사양 넷 GPU: 아래 「돌린 결과」.
+- 자동 플레이 `node tools/playtest.mjs --port=4269 --only=boot,naming,arrival,clock,fd-tool,fd-gather,fd-catch,fd-sell,fd-donate,fd-home,buy-tools,evening-bugs,museum-halls,stars` — **14단계 모두 통과** · 봇이 찾은 문제 0 · 콘솔 오류 0. 「박물관 관」 = 관 6/6 들어감 (물고기 1/22 · 곤충 2/24 · 화석 3/8 · 바다 생물 곧 열려요 · 미술 곧 열려요(합치기 전) · 별자리 액자 12), 「별자리」 = 방향키로 단풍잎자리 맞춰 찰칵 → 섬폰 도감 「⭐ 별자리」 1/12. 처음 돌릴 때 봇이 큰 버그 하나를 찾았다: 관 문 매트에서 아래로 밀면 `places.js` 로비 문 매트 판정(같은 x, z − 로비 z0 > 깊이)도 참이 되어 섬으로 나가 버림 → `places.js onDoormat` 이 관 안에선 false (고침 12827b6). 사진: 공유 노트 폴더 `museum-stars-shots/`.
+- GPU (`node tools/perf-bench.mjs --scenes=plaza-day,plaza-night,museum-night`, 이 컴퓨터 Intel UHD, 1280×800, 세 번 가운데 값 ms — main 2299be4 기준 → 이 브랜치). 새 장면 `museum-night` = 밤 21시 박물관 앞(망원경대·별자리 별이 화면에 듦):
+
+  | 사양 | 광장 낮 | 광장 밤 | 박물관 앞 밤 |
+  |---|---|---|---|
+  | 높음 | 46.9 → 44.0 | 51.6 → 46.3 | 39.6 → 37.0 (흔들림 큼) |
+  | 적정 | 6.62 → 6.61 | 6.37 → 6.36 | 9.28 → 7.41 (기준 쪽 흔들림 7.9–9.9) |
+  | **낮음** | **2.91 → 2.91** | **2.94 → 2.98** | **3.13 → 3.21** (그리기 57 → 58, 삼각형 280k → 289k: 증축 모델 +7k · 망원경대) |
+  | 매우 낮음 | 1.80 → 1.74 | 1.75 → 1.72 | 1.70 → 1.73 |
+
+  낮음은 광장에서 그대로, 박물관 바로 앞에서만 +0.08ms. 새 셰이더는 없다 (별자리 별은 dome 별 재질을 나눠 씀).
+- **main 9e87b99 합침** (m13-daily 별똥별 `meteors.js` · p54-night-special 분류 `art` · board-archive): 충돌 일곱 — `sky/index.js` 고리 둘 다(별자리 별 + 별똥별) · `build_furniture.py` 빌더 둘 다 · `scenario.js` 단계 둘 다(stars + night-shops) · 고정 개수 = main 값 + 이 브랜치(배경 83 → 84, 붙박이 목록 + FU-85–88, 붙박이 쓰임 main 식에서 박물관 받침·케이스 10 뺌) · 생성 `assets/env/index.json`·`fixtures/index.json` 은 `--index` 로 다시. 합친 뒤 테스트 504 (통과 503 · 건너뜀 1 · 실패 0), check-interiors --only=museum 문제 0. **미술관은 진짜 `art` 로 채워진다**: `items.list('art')` 16 = 그림 10 → 액자, 조각 6 → 받침 (다 기증하면 16/16 전시), 가품 `art.<slug>-fake` 은 `museum.canDonate` false 라 기증 거절 (밤 특별 상점 트랙 고리 그대로).
 
 ## 남은 것 · 제안
 
-- **sea·art 연결**: 잠수 트랙(`sea`)·밤 특별 상점 트랙(`art`, `items.list('art')` = 진품 16, `artKind`, 가품은 list 에서 빠짐 — 그 트랙이 알려 옴)이 `data/museum.js` KINDS 를 넓히면 관은 저절로 찬다. 느루 기증 창(`ui/museum.js`)이 새 분류를 보여 주는지는 그 트랙들 몫. 가품 거절 대사도 그쪽.
+- **sea 연결**: 잠수 트랙이 분류 `sea` 를 넣고 `data/museum.js` KINDS(이제 `items.COLLECTIBLE`)에 들어가면 바다 생물관은 저절로 찬다 — 합친 뒤 check-interiors 한 번. (art 는 합쳐서 확인함.)
+- 미술품 조각 모델은 자기 받침이 있어 FU-38 받침 위에 한 단 더 올라간 모양 — 보기 싫으면 `art.json` 조각 spots 의 y 를 0.05(바닥)로.
 - 박물관 모델 BD-16·망원경대 PR-40·FU-85–88 은 status `review` (리소스 편집기에서 확정). PR-40 번호는 이 트랙이 잡음 — 다른 트랙 PR 번호와 겹치면 조정 세션이 바꿔도 된다.
 - 실내(집 안)에 놓은 FU-53 별 망원경은 아직 예전 「살피기」 — 창가에서 망원경 보기를 열게 하려면 house 쪽 한 줄.
 - 망원경 보기 동안에도 3D 장면은 뒤에서 그려진다(2D 화면이 덮음). 더 아끼려면 render 쪽에 「덮였으면 건너뛰기」 고리 — render 트랙 몫.

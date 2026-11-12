@@ -104,6 +104,7 @@ test('실내: 문 매트 → 계산대 앞 → 주인 자리 앞까지 걸어갈
     const spec = specs[k], list = listOf(spec), m = doormatOf(spec), B = boundsOf(spec);
     assert.ok(m.entry > B.z0 && m.entry < B.z1, `${k} 들어와서 서는 곳`);
     assert.ok(reachable(spec, list, { lx: m.lx, lz: m.entry }, spec.talk), `${k} 계산대 앞까지`);
+    if (spec.unattended) continue;   // P54 이상한 천막: 주인 없음 (talk = 진열 받침 앞)
     const counter = list.find(r => r.entry.role === 'counter');
     const cz = counter.rec.gz + 0.5;
     assert.ok(spec.keeper.lz < cz && spec.talk.lz > cz, `${k}: 주인 · 계산대 · 말 거는 자리 순서 (북 → 남)`);
@@ -210,7 +211,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + 요청 9 박물관 관 붙박이 FU-85–88
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-74', 'FU-77', 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 붙박이 FU-85–88
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);
@@ -237,7 +238,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
       used++;
     }
   }
-  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 3 + 8, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 로비 안내대 (요청 9: 화석 받침·케이스는 관 RM-25–30 으로) · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44)');
+  assert.equal(used, 1 + 3 + 1 + 1 + 1 + 1 + 3 + 8 + 5 + 4 + 4, '상점 계산대·진열 받침 셋(10차 야외 가구 받침)·도구 받침·씨앗 진열대·옷 진열대(11차) · 박물관 로비 안내대 (요청 9: 화석 받침·케이스는 관 RM-25–30 으로) · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스 탁자·받침·촛대·휘장 둘 · 여우 상인 계산대·미술품 받침 셋 · 이상한 천막 받침·촛대 둘·휘장');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
   assert.ok(Math.abs(top('fossil-pedestal').size[2] - json('assets/interior/halls/fossil.json').racks[0].spots[0][2]) < 0.02, '화석 받침 윗면 = 화석관 받침 자리 높이 (요청 9)');

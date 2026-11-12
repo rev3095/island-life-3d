@@ -1,0 +1,29 @@
+{
+  "id": "RM-19",
+  "slug": "oddtent",
+  "kind": "place",
+  "place": "oddtent",
+  "name": "이상한 천막",
+  "version": 1,
+  "status": "review",
+  "note": "P54 밤 특별 상점 D166-A: 밤에 가끔만 서는 이상한 천막 안. 주인은 없고 가운데 미술품 받침(FU-74) 하나에 그날 무언가 하나(미술품이면 진품·가품 모름, 아니면 수상한 궤짝 FU-75) — 받침 앞 「보기」로 산다. 구석 세 갈래 촛대 FU-61 · 별 휘장 FU-62 다시 씀. 벽지 WP-07 빗방울 · 바닥 FL-08 모래 바닥.",
+  "size": [6, 6],
+  "wallpaper": "wp-07",
+  "floor": "fl-08",
+  "windows": [],
+  "door": { "gx0": 2, "gx1": 3 },
+  "unattended": true,
+  "talk": { "lx": 2.5, "lz": 3.6 },
+  "furniture": [
+    { "fu": "FU-74", "name": "미술품 받침", "box": [1, 1, 0.35], "color": "#7A2E3A", "gx": 2, "gz": 2, "rot": 0 },
+    { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 0, "gz": 0, "rot": 0 },
+    { "fu": "FU-61", "name": "세 갈래 촛대", "box": [1, 1, 1.2], "color": "#D9A84E", "gx": 5, "gz": 0, "rot": 0 },
+    { "fu": "FU-62", "name": "별 휘장", "box": [1, 1, 1.3], "color": "#4B3F7A", "wall": "n", "slot": 2 },
+    { "item": "furn.odd-chest", "gx": 5, "gz": 3, "rot": 0 },
+    { "item": "furn.plant-pot", "gx": 0, "gz": 3, "rot": 0, "deco": true }
+  ],
+  "stock": [
+    { "group": "art", "lx": 2.5, "lz": 2.5, "y": 0.35, "fit": 0.8, "count": 1 },
+    { "group": "furniture", "lx": 2.5, "lz": 2.5, "y": 0.35, "fit": 0.8, "count": 1 }
+  ]
+}

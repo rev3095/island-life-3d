@@ -20,6 +20,7 @@
     "src/sky/clouds.js", "src/sky/flare.js",
     "src/sky/debug.js",
     "src/sky/dome.js",
+    "src/sky/meteors.js",
     "src/sky/index.js",
     "src/sky/indoor.js",
     "src/sky/look.js",

@@ -155,3 +155,75 @@ export const nearDoor = (doors, { x, z }, r = 3.2) => doors.some(d => Math.hypot
 
 /** 등불 줄 자리: 노점 사이 (n-1 개) */
 export const lanternSpots = stalls => stalls.slice(1).map((s, i) => ({ x: (s.x + stalls[i].x) / 2, z: (s.z + stalls[i].z) / 2 - 0.6, rot: 0 }));
+
+// ── P54 밤 특별 상점 (D165–D169, docs/notes/night-special.md) ──
+// 서는 날·진열은 모두 (섬 씨앗 · 날 · 이름) 으로 정해져서, 같은 날엔 다시 열어도 같다 (Math.random 을 쓰지 않는다).
+
+/** (씨앗 · 날 · 이름) → 0~1 난수 함수 */
+export function rngOf(seed, dayKey, tag) {
+  let s = hash(`${seed}|${dayKey}|${tag}`) || 1;
+  return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+}
+
+/**
+ * 오늘 밤 그 가게가 오나 (여우 상인 D167-A · 이상한 천막 D166-A): 확률 chance, 또는 마지막으로 온 날(last, 없으면 since)부터 guarantee 일이 지났으면 꼭.
+ * last 가 없고 since 도 없으면 (처음) firstNight 이면 온다.
+ */
+export function visitsToday(dayKey, seed, c, { last = null, since = null } = {}) {
+  if (!c) return false;
+  if (last === dayKey) return true;
+  const base = last ?? since;
+  if (!base) return !!c.firstNight;
+  if (c.guarantee && daysBetween(base, dayKey) >= c.guarantee) return true;
+  return rngOf(seed, dayKey, c.tag ?? c.building ?? 'visit')() < (c.chance ?? 0);
+}
+
+/**
+ * 오늘의 미술품 고르기 → 아이템 id 배열. works = [{ id, fake (가품 id | null) }], n = 몇 점, fakeChance = 가품이 있는 작품이 가품일 확률.
+ * 서로 다른 작품만 (진품·가품이 같은 작품으로 둘 나오지 않음).
+ */
+export function pickArt(works, rng, n = 1, fakeChance = 0) {
+  const pool = works.slice(), out = [];
+  while (out.length < n && pool.length) {
+    const w = pool.splice(Math.floor(rng() * pool.length), 1)[0];
+    out.push(w.fake && rng() < fakeChance ? w.fake : w.id);
+  }
+  return out;
+}
+
+/** 여우 상인 오늘의 미술품 2–3점 (D167-A) */
+export function foxStock(works, dayKey, seed, c) {
+  const r = rngOf(seed, dayKey, 'fox-stock'), [lo, hi] = c.artCount ?? [2, 3];
+  return pickArt(works, r, lo + Math.floor(r() * (hi - lo + 1)), c.fakeChance ?? 0.5);
+}
+
+/** 이상한 천막 진열 하나 (D166-A): 확률 artChance 로 미술품 하나 { group: 'art', id }, 아니면 수상한 물건 { group: 'furniture', id } */
+export function oddStock(works, dayKey, seed, c) {
+  const r = rngOf(seed, dayKey, 'odd-stock');
+  if (works.length && r() < (c.artChance ?? 0.5)) return { group: 'art', id: pickArt(works, r, 1, c.fakeChance ?? 0.4)[0] };
+  const list = c.stock ?? [];
+  return list.length ? { group: 'furniture', id: list[Math.floor(r() * list.length)] } : null;
+}
+
+/**
+ * 선물 상자 PR-35 (D169-A): 오늘 섬에 떨어져 있나 → { today, contents: { kind: 'art'|'item'|'acorns', id?, n? } }.
+ * 낮·밤 모두. 확률 chance, 안에는 artChance 로 미술품(가품 섞임), 아니면 가구 하나 또는 도토리.
+ */
+export function giftPlan(works, dayKey, seed, c) {
+  const r = rngOf(seed, dayKey, 'gift');
+  if (!(r() < (c.chance ?? 0))) return { today: false, contents: null };
+  if (works.length && r() < (c.artChance ?? 0)) return { today: true, contents: { kind: 'art', id: pickArt(works, r, 1, c.fakeChance ?? 0.5)[0] } };
+  const items = c.items ?? [];
+  if (items.length && r() < (c.itemChance ?? 0.5)) return { today: true, contents: { kind: 'item', id: items[Math.floor(r() * items.length)] } };
+  const [lo, hi] = c.acorns ?? [100, 300];
+  return { today: true, contents: { kind: 'acorns', n: Math.round((lo + r() * (hi - lo)) / 10) * 10 } };
+}
+
+/** 칸 고르기: 섬 크기 w×h 에서 rng 로 ok(tx, tz) 인 칸 하나 (tries 번) → { tx, tz } | null */
+export function pickCell(rng, w, h, ok, tries = 400) {
+  for (let i = 0; i < tries; i++) {
+    const tx = Math.floor(rng() * w), tz = Math.floor(rng() * h);
+    if (ok(tx, tz)) return { tx, tz };
+  }
+  return null;
+}
