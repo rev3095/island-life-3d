@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "board": "z5",
   "applied": 1,
   "note": "Z5 축제 설정 — 검수 보드 z5 (https://claude.ai/artifact/Cqjh9RiTwUn1CcPhCNtoWS) 반영 v1 (임시, 바뀔 수 있음). 결정이 바뀌면 되도록 이 파일과 스펙만 고친다. 칸마다 어떤 결정(D)인지, 다른 안으로 바꿀 때 무엇을 더 해야 하는지는 docs/notes/z5-festival.md '바꿀 자리' 표.",
@@ -64,13 +64,13 @@
     "method": "heart+gather",
     "open": {
       "tier": "friend",
-      "wins": 2,
+      "wins": 10,
       "ways": [
         "emote",
         "gift",
         "favor"
       ],
-      "note": "7차 보드 wave7 D50-A: 마음이 통한 일 = 이모티콘 대화 성공 · 좋아하는 선물(하루 한 번) · 부탁 들어주기. ways 를 [\"emote\"] 로 두면 예전 규칙"
+      "note": "7차 보드 wave7 D50-A: 마음이 통한 일 = 이모티콘 대화 성공 · 좋아하는 선물(하루 한 번) · 부탁 들어주기. ways 를 [\"emote\"] 로 두면 예전 규칙. M17-P3 (D41-A · D186-A 축제까지 5~7일): wins 2 → 10 — 이모티콘 대화는 하루 3번까지만 세서 빠른 사람도 4일째에야 열린다 (tools/festival-pace.mjs)"
     },
     "list": [
       {

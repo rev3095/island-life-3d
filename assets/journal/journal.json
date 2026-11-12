@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈)",
   "daily": 5,
   "allDoneBonus": 50,
@@ -39,9 +39,9 @@
     { "id": "sapling", "kind": "item", "item": "seed.cedar-sapling", "n": 1, "cost": 120, "label": "삼나무 묘목" },
     { "id": "ticket", "kind": "item", "item": "mat.tour-ticket", "n": 1, "cost": 300, "label": "섬 여행 표" },
     { "id": "recipe-note", "kind": "item", "item": "mat.recipe-note", "n": 1, "cost": 250, "label": "레시피 쪽지" },
-    { "id": "crystal", "kind": "item", "item": "mat.crystal", "n": 1, "cost": 600, "label": "수정" },
+    { "id": "crystal", "kind": "item", "item": "mat.crystal", "n": 1, "cost": 1000, "label": "수정" },
     { "id": "star-rug", "kind": "item", "item": "furn.star-rug", "n": 1, "cost": 500, "label": "별자리 깔개" },
     { "id": "telescope", "kind": "item", "item": "furn.star-telescope", "n": 1, "cost": 900, "label": "별 망원경" },
-    { "id": "gold", "kind": "item", "item": "mat.gold-ore", "n": 1, "cost": 1500, "label": "금광석" }
+    { "id": "gold", "kind": "item", "item": "mat.gold-ore", "n": 1, "cost": 2000, "label": "금광석" }
   ]
 }
