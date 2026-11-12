@@ -1,0 +1,35 @@
+{
+  "id": "PR-35",
+  "slug": "gift-box",
+  "name": "선물 상자",
+  "category": "prop",
+  "kind": "gift-box",
+  "version": "0.1",
+  "triangles": 1548,
+  "parts": 1,
+  "materials": [
+    "box",
+    "dot",
+    "glow",
+    "ribbon"
+  ],
+  "animations": {},
+  "size": [
+    0.47,
+    0.47,
+    0.69
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 32168,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "gift-box_front.png",
+    "gift-box_hero.jpg",
+    "gift-box_main.png",
+    "gift-box_thumb.png",
+    "gift-box_top.png"
+  ]
+}

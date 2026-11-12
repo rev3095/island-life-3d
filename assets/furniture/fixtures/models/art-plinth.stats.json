@@ -1,0 +1,52 @@
+{
+  "id": "FU-74",
+  "slug": "art-plinth",
+  "item": "fixture.art-plinth",
+  "name": "미술품 받침",
+  "category": "fixture",
+  "kind": "art-plinth",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1452,
+  "parts": 1,
+  "materials": [
+    "brass",
+    "plate",
+    "stone",
+    "stoneDark",
+    "velvet"
+  ],
+  "objects": [
+    "plinth"
+  ],
+  "animations": {},
+  "size": [
+    0.81,
+    0.81,
+    0.35
+  ],
+  "bounds": [
+    [
+      -0.405,
+      -0.405,
+      0.0
+    ],
+    [
+      0.405,
+      0.405,
+      0.351
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 30348,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-plinth_front.png",
+    "art-plinth_main.png",
+    "art-plinth_thumb.png",
+    "art-plinth_top.png"
+  ]
+}

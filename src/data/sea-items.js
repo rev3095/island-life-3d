@@ -20,6 +20,6 @@ export function seaItems(T, { itemIcon, weightOf }) {
   }));
   const k = T.scubaKit;
   // 손에 드는 도구가 아니라(tool 칸 없음) 가방에 있으면 바다에 들어갈 수 있는 것. 내구도 없음. 입으면 잠수복 CL-13 (바다에서만)
-  if (k) out.push({ id: SCUBA_KIT, category: 'tool', code: 'TL-06', name: k.name, icon: itemIcon('tool-scuba-kit'), emoji: k.emoji, price: k.price, buy: k.buy, use: k.use, from: k.from, wear: 'scuba' });
+  if (k) out.push({ id: SCUBA_KIT, category: 'tool', code: 'TL-07', name: k.name, icon: itemIcon('tool-scuba-kit'), emoji: k.emoji, price: k.price, buy: k.buy, use: k.use, from: k.from, wear: 'scuba' });
   return out;
 }

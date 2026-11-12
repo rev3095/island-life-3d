@@ -11,16 +11,21 @@ import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
 // 12차 밤·새벽 분류(야시장 먹거리 IC-NT)·달빛 가게·새벽 천막 가구 FU-55–59 는 night-items.js 에서
 import { NIGHT_CATEGORY as NC, NIGHT_FURN, nightItems } from './night-items.js';
+// M13 매일 할 거리: 별 조각 IC-MA-11 · 레시피 쪽지 IC-MA-12 · 별 조각 가구 FU-63–66 은 daily-items.js 에서
+import { DAILY_FURN, dailyItems } from './daily-items.js';
+// P54 밤 특별 상점 미술품 분류(IC-AR, 표 items.json art · 가품 = 색 변형)는 art-items.js 에서
+import { ART_CATEGORY as AC, artItems } from './art-items.js';
 // M16 잠수: 바다 생물 분류(IC-SE-01–20)와 스쿠버 키트는 sea-items.js 에서 (표 값은 items.json sea · scubaKit)
 import { SEA_CATEGORY as SC, seaItems } from './sea-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
 CATEGORIES.push(FC.key, EC.key, NC.key); CATEGORY_NAMES[FC.key] = FC.name; CATEGORY_NAMES[EC.key] = EC.name; CATEGORY_NAMES[NC.key] = NC.name;
-CATEGORIES.push(SC.key); CATEGORY_NAMES[SC.key] = SC.name;
+CATEGORIES.push(AC.key); CATEGORY_NAMES[AC.key] = AC.name;   // P54 미술품
+CATEGORIES.push(SC.key); CATEGORY_NAMES[SC.key] = SC.name;   // M16 바다 생물
 
 /** 한 칸에 쌓이는 최대 개수 (아이템에 stack 이 있으면 그 값) */
-export const STACK = { [SC.key]: 1, ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack, [NC.key]: NC.stack };
+export const STACK = { [SC.key]: 1, ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack, [NC.key]: NC.stack, [AC.key]: AC.stack };
 /** 계절 표기 → 달 목록 */
 export const SEASON_MONTHS = T.seasons;
 /** 시간 표기 → [시작, 끝) 시각 구간. 낮 = 새벽~저녁(5~19시), 밤 = 저녁~새벽(17~5시). 저녁엔 둘 다 나온다 */
@@ -98,7 +103,7 @@ export const ITEMS = [
   // 친밀도 선물 가구(source 'friend')는 items.json 의 owner = 주는 주민 slug (B-24)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id, owner }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source, ...(owner ? { owner } : {}),
@@ -113,7 +118,9 @@ export const ITEMS = [
 ITEMS.push(...festivalItems(itemIcon));   // IC-FE-01–04 축제 부스에서 만드는 것 (5차 Z5)
 ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8차 M8)
 ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
-ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 + 스쿠버 키트 (TL-06)
+ITEMS.push(...dailyItems(itemIcon));      // IC-MA-11 별 조각 셋 · IC-MA-12 레시피 쪽지 (M13)
+ITEMS.push(...artItems(T.art, itemIcon)); // IC-AR-01–16 미술품 진품 16 + 가품 (P54 밤 특별 상점)
+ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 + 스쿠버 키트 (TL-07)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -129,8 +136,8 @@ for (const it of ITEMS) {
 }
 
 const BY_ID = new Map(ITEMS.map(it => [it.id, it]));
-// 감정 전 화석은 카테고리 목록(도감·박물관 칸·화석 뽑기)에서 뺀다
-const BY_CAT = new Map(CATEGORIES.map(c => [c, ITEMS.filter(it => it.category === c && !it.unknown)]));
+// 감정 전 화석 · 미술품 가품은 카테고리 목록(도감·박물관 칸·화석 뽑기)에서 뺀다
+const BY_CAT = new Map(CATEGORIES.map(c => [c, ITEMS.filter(it => it.category === c && !it.unknown && !it.fake)]));
 
 /** id → 아이템 또는 null */
 export const get = id => BY_ID.get(id) ?? null;
@@ -139,5 +146,5 @@ export const list = category => (category == null ? ITEMS.slice() : (BY_CAT.get(
 export const has = id => BY_ID.has(id);
 /** 한 칸에 몇 개까지 쌓이나 (모르는 id 는 1) */
 export const stackOf = id => BY_ID.get(id)?.stack ?? 1;
-/** 박물관·도감에 들어가는 카테고리 (M16 잠수: 바다 생물 sea — 박물관 관 배치는 박물관 트랙) */
-export const COLLECTIBLE = ['fish', 'bug', 'fossil', SC.key];
+/** 박물관·도감에 들어가는 카테고리 (P54 미술품 art — 가품 fake 는 박물관이 받지 않는다 museum.js · M16 바다 생물 sea — 박물관 관 배치는 박물관 트랙) */
+export const COLLECTIBLE = ['fish', 'bug', 'fossil', 'art', SC.key];

@@ -2,8 +2,8 @@
 // state.museum = { fish:[id], bug:[id], fossil:[id], sea:[id] }, state.encyclopedia = { fish:[id], bug:[id], sea:[id] } (한 번이라도 잡은 것)
 import * as items from './items.js';
 
-const KINDS = items.COLLECTIBLE;
-const CAUGHT = new Set(['fish', 'bug', 'sea']);   // 도감에 '잡아 봤다' 를 적는 분류 (화석은 기증으로만)
+const KINDS = items.COLLECTIBLE;   // 물고기·곤충·화석 + P54 미술품 art + M16 바다 생물 sea
+const CAUGHT = new Set(['fish', 'bug', 'sea']);   // 도감에 '잡아 봤다' 를 적는 분류 (화석·미술품은 기증으로만)
 
 export function createMuseum(state, { onChange = () => {} } = {}) {
   const shelf = cat => {
@@ -16,10 +16,10 @@ export function createMuseum(state, { onChange = () => {} } = {}) {
     if (!Array.isArray(state.encyclopedia[cat])) state.encyclopedia[cat] = [];
     return state.encyclopedia[cat];
   };
-  // 감정 전 화석(unknown)은 받지 않는다 — 느루가 감정한 뒤에 기증한다
+  // 감정 전 화석(unknown)은 받지 않는다 — 느루가 감정한 뒤에 기증한다. P54 미술품 가품(fake)도 받지 않는다
   const catOf = id => {
     const it = items.get(id);
-    return it && !it.unknown && KINDS.includes(it.category) ? it.category : null;
+    return it && !it.unknown && !it.fake && KINDS.includes(it.category) ? it.category : null;
   };
 
   const has = id => {

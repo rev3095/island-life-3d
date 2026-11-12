@@ -1,0 +1,53 @@
+{
+  "id": "IC-AR-13",
+  "slug": "art-big-acorn",
+  "name": "「큰 도토리 조각」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.big-acorn",
+    "art.big-acorn-fake"
+  ],
+  "hold": false,
+  "triangles": 1608,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "cap",
+    "capDark",
+    "nut",
+    "plate"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.467
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.467
+    ]
+  ],
+  "glbBytes": 34768,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-big-acorn_fake_main.png",
+    "art-big-acorn_fake_thumb.png",
+    "art-big-acorn_main.png",
+    "art-big-acorn_real_main.png",
+    "art-big-acorn_real_thumb.png",
+    "art-big-acorn_thumb.png"
+  ]
+}

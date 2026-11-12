@@ -5,6 +5,9 @@
 
 export const CAT_KO = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
 
+/** items.json 밖(src/data/daily-items.js)에 있는 아이템 — 레시피가 쓴다 (M13 별 조각 · 레시피 쪽지 · 별 조각 가구 FU-63–66). tests/daily.test.mjs 가 daily-items.js 와 맞는지 본다 */
+export const CODE_ITEMS = ['mat.star-yellow', 'mat.star-pink', 'mat.star-blue', 'mat.recipe-note', 'furn.star-lamp', 'furn.star-clock', 'furn.star-chair', 'furn.star-mobile'];
+
 /** 아이템 표 → [{ cat, id, name, emoji }] (레시피 재료 고르기·없는 아이템 검사) */
 export function itemList(T) {
   const out = [];
@@ -41,7 +44,7 @@ export function checkElements(W) {
   const out = [];
   const add = (tab, ok, label, why = '') => out.push({ tab, ok: !!ok, label, why: ok ? '' : why });
   const T = W.items, R = W.rules;
-  const ids = new Set(itemList(T ?? {}).map(i => i.id));
+  const ids = new Set([...itemList(T ?? {}).map(i => i.id), ...CODE_ITEMS]);
 
   /* ---- 상점 ---- */
   if (R?.shop) {

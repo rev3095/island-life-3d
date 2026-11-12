@@ -5,7 +5,7 @@
 ## 결정 (추천안)
 | ID | 정한 것 | 바꿀 자리 |
 |---|---|---|
-| D160 | 스쿠버 키트 `tool.scuba-kit` (TL-06 · 모델 IC-TL-06): 사는 값 3000 · 파는 값 750. 손에 드는 도구가 아니라(`tool` 칸 없음, `wear: 'scuba'`, 내구도 없음) **가방에 있으면** 해변 물가에서 들어간다. 도토리상점이 **늘** 판다 | 값 `items.json scubaKit` · 늘 파는 목록 `rules.json shop.always` → `economy.shopStock().always` (하루 도구 다섯은 `t.tool` 있는 것만) |
+| D160 | 스쿠버 키트 `tool.scuba-kit` (TL-07 · 모델 IC-TL-07 — M13 새총이 IC-TL-06): 사는 값 3000 · 파는 값 750. 손에 드는 도구가 아니라(`tool` 칸 없음, `wear: 'scuba'`, 내구도 없음) **가방에 있으면** 해변 물가에서 들어간다. 도토리상점이 **늘** 판다 | 값 `items.json scubaKit` · 늘 파는 목록 `rules.json shop.always` → `economy.shopStock().always` (하루 도구 다섯은 `t.tool` 있는 것만) |
 | D161 | 헤엄 AN-15 · 잠기기 AN-16 은 **코드 자세** (`src/player/swim.js` `pose()` — 서기 클립 위에 뼈 덧돌림 + 몸 앞으로 기울이기). 주인공 .glb.json 을 다시 구우면 다른 트랙(M13 AN-13 등)과 바이너리 충돌이라서 | 나중에 `build_character.py` 클립 `swim`·`dive` 로 옮기려면 swim.js `pose()` 만 바꾸면 된다 |
 | D162 | 바다 = `world.addZone` 구역 (헤엄치는 동안만): 해안 물가 선 + `DEEP` 0.6 바깥 ~ 섬 칸 밖 `MARGIN` 7칸, 빠르기 걷기 × 0.62 (잠기면 × 0.55). 선착장 다리 둘레는 비움. 구역 `isWalkable` = false (주민 길찾기가 바다로 안 감). 투어 섬·실내에선 안 됨. 더 먼 바다는 「물살이 세서 못 가요」 | `dive.js` 위쪽 상수 |
 | D163 | 물속 화면: 모든 사양 안개 색·거리 (sky 가 매 장면 다시 칠해서 나오면 저절로 돌아옴) · **높음·적정만** 화면 셰이더 한 장(물빛 그물·가장자리 어둡게). 낮음·매우 낮음은 셰이더 없음. 물방울 FX-03 = InstancedMesh 하나 (사양별 72·56·32·20개). 잠긴 주인공은 바다 판이 불투명이라 물낯 그림자 + 물방울 줄로 보임 | `dive-fx.js` |
@@ -20,8 +20,8 @@
 ## 파일
 - 새: `src/gameplay/gather/dive.js` · `dive-fx.js` · `src/player/swim.js` · `src/data/sea-items.js` · `assets/blender/items_sea.py` · `assets/items/specs/sea-*.json` 20 · `tool-scuba-kit.json` · `assets/clothes/specs/wetsuit.json` · `tests/dive.test.mjs`.
 - 고침(줄 몇 개): `items.js` · `economy.js` · `spawns.js` · `museum.js` · `gather/index.js` · `journal/index.js` · `ui/dom.js` · `ui/bag.js` · `player/wear.js` (`SLOT_BONES.suit`·`SLOT_LABEL.suit`, SLOTS 는 그대로) · `outfit-rules.js` (SLOTS 밖 칸 옷은 옷장에 안 들어감) · `build_item.py` (items_sea.py exec 두 줄) · `build_clothes.py` (kind wetsuit) · `tools/build-clothes.mjs` (`EXTRA_SLOTS`) · `tools/res-contracts.mjs` · 데이터 `items.json`·`rules.json`·`journal.json` · 편집기 게시 목록 `assets/story/editor-files.json`·`assets/villagers/editor-files.json` (items.js 가 sea-items.js 를 읽음).
-- 모델 22개 모두 **검수 대기 (status review)**: 바다 생물 20 (삼각형 1.0–5.7k) · 스쿠버 키트 3.4k · 잠수복 2.5k. 아쉬운 것: 미역이 넓은 잎 풀처럼 보임 · 대게와 키다리게가 작은 아이콘에서 비슷 · 바닷가재가 작게 · 잠수복 공기통이 옆에서 살짝 떠 보임, 물안경이 큰 안경처럼.
-- 개수 박은 테스트(이 브랜치): 아이콘 116→137 · 스펙 103→124 · hold 55→75 · 옷 13→14 · 도구 5→6(손 도구 5) · 박물관 total 54→74.
+- 모델 22개 모두 **검수 대기 (status review)**: 바다 생물 20 (삼각형 1.0–5.7k) · 스쿠버 키트 3.4k (IC-TL-07) · 잠수복 2.5k. 아쉬운 것: 미역이 넓은 잎 풀처럼 보임 · 대게와 키다리게가 작은 아이콘에서 비슷 · 바닷가재가 작게 · 잠수복 공기통이 옆에서 살짝 떠 보임, 물안경이 큰 안경처럼.
+- 개수 박은 테스트 (main 9e87b99 합친 뒤): 아이콘 145→166 · 스펙 122→143 · hold +20 · 옷 13→14 · 도구 6→7(손 도구 6) · 박물관 total 70→90 · 게시 묶음 19→20 (items-3).
 
 ## 확인
 - 테스트: (끝에 적음)

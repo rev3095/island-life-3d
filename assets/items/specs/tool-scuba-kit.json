@@ -1,5 +1,5 @@
 {
-  "id": "IC-TL-06",
+  "id": "IC-TL-07",
   "slug": "tool-scuba-kit",
   "name": "스쿠버 키트",
   "group": "tool",
@@ -10,7 +10,7 @@
   "items": [
     {
       "item": "tool.scuba-kit",
-      "code": "IC-TL-06"
+      "code": "IC-TL-07"
     }
   ],
   "hold": false,

@@ -1,0 +1,33 @@
+{
+  "id": "RM-18",
+  "slug": "foxshop",
+  "kind": "place",
+  "place": "foxshop",
+  "name": "여우 상인 가게",
+  "version": 1,
+  "status": "review",
+  "note": "P54 밤 특별 상점 D167-A: 밤에 가끔 오는 수상한 여우 상인 살랑(CH-17)의 가게 안. 안쪽 가운데 계산대(FU-36) 뒤에 살랑, 양옆·앞 왼쪽 미술품 받침(FU-74) 셋에 오늘의 미술품 2–3점(진품·가품 섞임 — night.json fox), 앞 오른쪽에 여우불 등(FU-73). 살랑에게 말하면 감정 대사와 함께 산다 (받침 앞 「보기」로도 산다). 벽지 WP-05 통나무 벽 · 바닥 FL-05 짙은 판자.",
+  "size": [8, 6],
+  "wallpaper": "wp-05",
+  "floor": "fl-05",
+  "windows": ["n:1", "n:6"],
+  "door": { "gx0": 3, "gx1": 4 },
+  "keeper": { "slug": "salang", "lx": 4, "lz": 0.5, "face": "s" },
+  "talk": { "lx": 4, "lz": 2.45 },
+  "furniture": [
+    { "fu": "FU-36", "name": "계산대", "box": [2, 1, 0.6], "color": "#6B4A3A", "gx": 3, "gz": 1, "rot": 0, "role": "counter", "scale": [1, 0.72, 1] },
+    { "fu": "FU-74", "name": "미술품 받침", "box": [1, 1, 0.35], "color": "#7A2E3A", "gx": 1, "gz": 2, "rot": 0 },
+    { "fu": "FU-74", "name": "미술품 받침", "box": [1, 1, 0.35], "color": "#7A2E3A", "gx": 6, "gz": 2, "rot": 0 },
+    { "fu": "FU-74", "name": "미술품 받침", "box": [1, 1, 0.35], "color": "#7A2E3A", "gx": 1, "gz": 4, "rot": 0 },
+    { "item": "furn.paint-easel", "gx": 0, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.floor-lamp", "gx": 7, "gz": 0, "rot": 0, "deco": true },
+    { "item": "furn.picture-frame", "wall": "n", "slot": 2 },
+    { "item": "furn.sea-chart-frame", "wall": "n", "slot": 5 }
+  ],
+  "stock": [
+    { "group": "art", "lx": 1.5, "lz": 2.5, "y": 0.35, "fit": 0.8, "count": 1 },
+    { "group": "art", "from": 1, "lx": 6.5, "lz": 2.5, "y": 0.35, "fit": 0.8, "count": 1 },
+    { "group": "art", "from": 2, "lx": 1.5, "lz": 4.5, "y": 0.35, "fit": 0.8, "count": 1 },
+    { "group": "furniture", "lx": 6.5, "lz": 4.5, "y": 0, "fit": 1, "count": 1 }
+  ]
+}

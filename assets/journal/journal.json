@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈)",
   "daily": 5,
   "allDoneBonus": 50,
@@ -18,6 +18,8 @@
     { "id": "craft", "on": "craft", "need": 1, "pts": 30, "icon": "🔨", "label": "작업대에서 하나 만들기" },
     { "id": "donate", "on": "donate", "need": 1, "pts": 30, "icon": "🏛️", "label": "박물관에 하나 기증하기" },
     { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" },
+    { "id": "balloon", "on": "balloon", "need": 1, "pts": 25, "icon": "🎈", "label": "선물 풍선 하나 맞히기" },
+    { "id": "bottle", "on": "bottle", "need": 1, "pts": 20, "icon": "🍾", "label": "바닷가 유리병 열기" },
     { "id": "sea1", "on": "sea", "need": 1, "pts": 30, "icon": "🤿", "label": "바다 생물 잡기" }
   ],
   "goals": [
@@ -27,13 +29,16 @@
     { "id": "garden", "on": "water", "steps": [20, 100, 300], "pts": [100, 300, 800], "icon": "💧", "label": "꽃 가꾸기" },
     { "id": "maker", "on": "craft", "steps": [5, 20, 60], "pts": [100, 300, 800], "icon": "🔨", "label": "만들기 장인" },
     { "id": "curator", "on": "donate", "steps": [5, 30, 80], "pts": [100, 300, 800], "icon": "🏛️", "label": "박물관 친구" },
-    { "id": "diary", "on": "allDone", "steps": [3, 10, 30], "pts": [150, 400, 1000], "icon": "📔", "label": "일지 다 채운 날" }
+    { "id": "diary", "on": "allDone", "steps": [3, 10, 30], "pts": [150, 400, 1000], "icon": "📔", "label": "일지 다 채운 날" },
+    { "id": "wisher", "on": "wish", "steps": [1, 10, 40], "pts": [100, 300, 800], "icon": "🌠", "label": "별똥별 소원" },
+    { "id": "sharpshot", "on": "balloon", "steps": [5, 30, 100], "pts": [100, 300, 800], "icon": "🎈", "label": "풍선 명사수" }
   ],
   "shop": [
     { "id": "acorns", "kind": "acorns", "n": 300, "cost": 100, "icon": "🌰", "label": "도토리 300" },
     { "id": "seeds", "kind": "item", "item": "seed.cosmos", "n": 3, "cost": 60, "label": "코스모스 씨앗 3" },
     { "id": "sapling", "kind": "item", "item": "seed.cedar-sapling", "n": 1, "cost": 120, "label": "삼나무 묘목" },
     { "id": "ticket", "kind": "item", "item": "mat.tour-ticket", "n": 1, "cost": 300, "label": "섬 여행 표" },
+    { "id": "recipe-note", "kind": "item", "item": "mat.recipe-note", "n": 1, "cost": 250, "label": "레시피 쪽지" },
     { "id": "crystal", "kind": "item", "item": "mat.crystal", "n": 1, "cost": 600, "label": "수정" },
     { "id": "star-rug", "kind": "item", "item": "furn.star-rug", "n": 1, "cost": 500, "label": "별자리 깔개" },
     { "id": "telescope", "kind": "item", "item": "furn.star-telescope", "n": 1, "cost": 900, "label": "별 망원경" },

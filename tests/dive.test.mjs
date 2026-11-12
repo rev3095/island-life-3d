@@ -8,12 +8,12 @@ import { pose, bodyPlace, SWIM_PITCH, DIVE_PITCH } from '../src/player/swim.js';
 import { inSea, fleeStep, canCatch, CATCH_R, MARGIN, FLEE_V, WANDER_V } from '../src/gameplay/gather/dive.js';
 import { rngFor } from '../src/data/rng.js';
 
-test('상점: 스쿠버 키트는 날마다 늘 판다 (rules.json shop.always) · 하루 도구 다섯은 그대로', () => {
+test('상점: 스쿠버 키트는 날마다 늘 판다 (rules.json shop.always) · 하루 도구는 손 도구 그대로', () => {
   for (const day of ['2026-11-12', '2027-01-03', '2027-07-15']) {
     const s = shopStock(day, 7);
     assert.ok(s.always.includes('tool.scuba-kit'), day);
     assert.ok(s.all.includes('tool.scuba-kit'), day);
-    assert.equal(s.tools.length, 5);
+    assert.equal(s.tools.length, items.list('tool').filter(t => t.tool).length);
     assert.ok(!s.tools.includes('tool.scuba-kit'));
   }
 });

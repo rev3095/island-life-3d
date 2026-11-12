@@ -1,0 +1,52 @@
+{
+  "id": "FU-63",
+  "slug": "star-lamp",
+  "item": "furn.star-lamp",
+  "name": "별 조각 램프",
+  "category": "furniture",
+  "kind": "star-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 480,
+  "parts": 1,
+  "materials": [
+    "base",
+    "glow",
+    "metal",
+    "starBlue",
+    "starPink"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.48,
+    0.4,
+    1.15
+  ],
+  "bounds": [
+    [
+      -0.239,
+      -0.2,
+      0.0
+    ],
+    [
+      0.244,
+      0.2,
+      1.15
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 12348,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-lamp_front.png",
+    "star-lamp_main.png",
+    "star-lamp_thumb.png",
+    "star-lamp_top.png"
+  ]
+}

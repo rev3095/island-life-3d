@@ -1,0 +1,75 @@
+{
+  "id": "IC-AR-14",
+  "slug": "art-rising-bird",
+  "name": "「날아오르는 새」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.rising-bird",
+      "code": "IC-AR-14"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "받침에서 휘어 오르는 가는 기둥 끝에 날개를 활짝 위로 편 은빛 새.",
+    "keywords": [
+      "날아오르는 새",
+      "은빛 금속",
+      "휘어 오르는 기둥"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "조각",
+      "value": "bird",
+      "options": [
+        "frog",
+        "spiral",
+        "acorn",
+        "bird",
+        "bust",
+        "tower"
+      ]
+    }
+  },
+  "palette": {
+    "bird": "#B8C4CC",
+    "beak": "#D9A84E",
+    "rod": "#6E7E88",
+    "base": "#CFC8BC",
+    "baseDark": "#A79F92",
+    "plate": "#D9A84E"
+  },
+  "paletteLabels": {
+    "bird": "새",
+    "beak": "부리",
+    "rod": "기둥",
+    "base": "받침 돌",
+    "baseDark": "받침 테",
+    "plate": "이름표"
+  }
+}

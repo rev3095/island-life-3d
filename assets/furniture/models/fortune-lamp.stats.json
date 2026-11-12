@@ -1,0 +1,51 @@
+{
+  "id": "FU-76",
+  "slug": "fortune-lamp",
+  "item": "furn.fortune-lamp",
+  "name": "점괘 등",
+  "category": "furniture",
+  "kind": "fortune-lamp",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2900,
+  "parts": 1,
+  "materials": [
+    "brass",
+    "brassDark",
+    "glow",
+    "hand"
+  ],
+  "objects": [
+    "lamp"
+  ],
+  "animations": {},
+  "size": [
+    0.44,
+    0.44,
+    0.9
+  ],
+  "bounds": [
+    [
+      -0.22,
+      -0.22,
+      0.0
+    ],
+    [
+      0.22,
+      0.22,
+      0.9
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 57672,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fortune-lamp_front.png",
+    "fortune-lamp_main.png",
+    "fortune-lamp_thumb.png",
+    "fortune-lamp_top.png"
+  ]
+}

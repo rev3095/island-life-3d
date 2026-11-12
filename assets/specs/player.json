@@ -4,8 +4,8 @@
   "name": "플레이어",
   "species": "human",
   "role": "주인공",
-  "version": "0.2.0",
-  "status": "approved",
+  "version": "0.2.1",
+  "status": "review",
   "prompt": {
     "concept": "섬에 막 이사 온 주인공. 담백하게 웃는 얼굴로, 누구나 자기라고 느낄 수 있는 평범하고 귀여운 모습.",
     "keywords": [
@@ -73,6 +73,7 @@
     "sit_down",
     "sit",
     "stand_up",
-    "spin"
+    "spin",
+    "wish"
   ]
 }

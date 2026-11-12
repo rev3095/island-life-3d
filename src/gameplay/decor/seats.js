@@ -17,6 +17,8 @@ export const SEATS = {
   sofa: { y: 0.52, step: 0.62, seats: [{ x: -0.4, z: 0.08, face: [0, 1] }, { x: 0.4, z: 0.08, face: [0, 1] }] },
   'fruit-chair': { y: 0.5, step: 0.6, seats: [{ x: 0, z: 0.16, face: [0, 1] }] },
   'lotus-chair': { y: 0.47, step: 0.62, seats: [{ x: 0, z: 0, face: [0, 1] }] },
+  // M13 FU-65 별 의자 (b_star_chair 방석 sh 0.44 + 0.05 위 둥근 방석)
+  'star-chair': { y: 0.47, step: 0.6, seats: [{ x: 0, z: 0, face: [0, 1] }] },
 };
 
 /** 가구 slug ('furn.' · 'fu:' 머리는 떼고) → 앉는 자리 표 | null */

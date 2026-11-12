@@ -1,0 +1,62 @@
+{
+  "id": "FU-66",
+  "slug": "star-mobile",
+  "item": "furn.star-mobile",
+  "name": "별 모빌",
+  "category": "furniture",
+  "kind": "star-mobile",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "둥근 받침에서 휘어 오른 나무 기둥 끝에 막대 둘, 줄에 매달린 별 조각 다섯이 살랑인다. 가운데 별이 밤에 빛난다.",
+    "keywords": [
+      "매달린 별",
+      "살랑"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D146-A · 별 조각 레시피로만 (유리병·풍선·일지로 레시피가 열림)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "base": "#FBF7F2",
+    "wood": "#B07A4A",
+    "string": "#FBF7F2",
+    "star": "#FFD45C",
+    "starPink": "#FF9EC4",
+    "starBlue": "#8CC8FF",
+    "glow": "#FFE38A"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "wood": "나무",
+    "string": "줄",
+    "star": "노랑 별",
+    "starPink": "분홍 별",
+    "starBlue": "하늘 별",
+    "glow": "가운데 별빛"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

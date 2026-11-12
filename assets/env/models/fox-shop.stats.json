@@ -1,0 +1,47 @@
+{
+  "id": "BD-14",
+  "slug": "fox-shop",
+  "name": "여우 상인 가게",
+  "category": "building",
+  "kind": "fox-shop",
+  "version": "0.1",
+  "triangles": 4804,
+  "parts": 1,
+  "materials": [
+    "cap",
+    "door",
+    "doorMark",
+    "earInner",
+    "earTip",
+    "foundation",
+    "frame",
+    "glow",
+    "lantern",
+    "pictureA",
+    "pictureB",
+    "roof",
+    "trim",
+    "wall",
+    "wallDark",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.66,
+    2.36,
+    2.88
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 104156,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fox-shop_front.png",
+    "fox-shop_hero.jpg",
+    "fox-shop_main.png",
+    "fox-shop_thumb.png",
+    "fox-shop_top.png"
+  ]
+}
