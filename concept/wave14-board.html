@@ -1,0 +1,440 @@
+<title>포근섬 14차 검수 보드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 11차 보드와 같은 섬 안내 책자 — 마일스톤 → 지금 섬 점검 → 결정(카드마다 스케치) → 고른 방향의 새 리소스 → 계획. 카드마다 의견 칸 */
+:root {
+  --bg: #EDF3EA;        /* 풀잎이 비치는 종이 */
+  --panel: #FBFDF8;
+  --stage: #F3F7EC;     /* 그림 받침 */
+  --ink: #26332D;
+  --muted: #5F7268;
+  --line: #D3DDD0;
+  --leaf: #3F8F5C;      /* 강조: 잎 */
+  --sea: #2F86A6;       /* 보조: 바다 */
+  --acorn: #A8642E;     /* ID 라벨: 도토리 */
+  --chip: #E3EEDD;
+  --new: #C9583B;       /* 새로 만드는 것 표시 */
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+    --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18211D; --panel: #212C27; --stage: #2F3D36; --ink: #E6EEE8; --muted: #9DB2A6;
+  --line: #34443D; --leaf: #7DCB95; --sea: #6EC2E0; --acorn: #E2A26A; --chip: #2C3B34; --new: #F08F72;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(32px, 6vw, 52px); color: var(--leaf); }
+h2 { font-size: 27px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+a { color: var(--sea); }
+code { font-family: var(--mono); font-size: .86em; overflow-wrap: anywhere; }
+.id { font-family: var(--mono); font-size: 12px; color: var(--acorn); letter-spacing: .04em; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+.tag.new { background: var(--new); color: var(--panel); }
+
+header.top { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px dashed var(--line); }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--chip); font-variant-numeric: tabular-nums; }
+.pill.wait { background: var(--acorn); color: var(--panel); }
+.pill.ok { background: var(--leaf); color: var(--panel); }
+.lede { max-width: 70ch; font-size: 16px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; margin-top: 4px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; padding: 4px 10px; border-radius: 8px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); outline: none; }
+
+section { padding-top: 44px; display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 4px; max-width: 72ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stage { background: var(--stage); border-radius: 10px; display: grid; place-items: center; padding: 8px; }
+.stage svg { width: 100%; height: auto; display: block; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.note:focus-visible, button:focus-visible, input:focus-visible + label { outline: 2px solid var(--sea); outline-offset: 2px; }
+.note.filled { border-color: var(--acorn); }
+
+/* 결정: 스케치 + 선택지 */
+.dec { display: grid; gap: 10px; }
+.decbody { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 780px) { .decbody { grid-template-columns: 300px minmax(0, 1fr); align-items: start; } }
+.decside { display: grid; gap: 8px; min-width: 0; }
+.opts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt label { display: grid; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.opt input:checked + label { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.opt .rec { font-size: 12px; color: var(--leaf); }
+.nowline { font-size: 13px; color: var(--muted); }
+.nowline b { color: var(--ink); font-weight: 400; }
+
+.tblwrap { overflow-x: auto; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-weight: 400; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tbl td.id { white-space: nowrap; }
+td.st { font-size: 16px; text-align: center; }
+
+
+
+/* 요청 글 */
+.out { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+textarea#reqText { width: 100%; box-sizing: border-box; min-height: 180px; font: 13px/1.6 var(--mono); padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: var(--panel); cursor: pointer; }
+button.ghost { background: transparent; color: var(--leaf); }
+#copyMsg { font-size: 13px; color: var(--leaf); min-height: 1.2em; }
+.board { gap: 6px; }
+.board .btns button[disabled] { opacity: .45; cursor: default; }
+.hist { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.hist li span { margin-right: 8px; }
+.changed { outline: 2px solid var(--acorn); outline-offset: 2px; }
+.changedTag { background: var(--acorn); color: var(--panel); }
+details summary { cursor: pointer; font-size: 14px; }
+.miles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.mile { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.mile .small { grid-column: 1 / -1; }
+.mile.here { border-color: var(--leaf); box-shadow: inset 0 0 0 1px var(--leaf); }
+.mile.done { opacity: .78; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } }
+/* 행사 달력 · 행사 카드 */
+.cal { display: grid; gap: 4px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.cal .m { display: grid; gap: 3px; align-content: start; padding: 6px 4px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); text-align: center; font-size: 12px; min-width: 0; }
+.cal .m b { font-family: var(--display); font-weight: 400; font-size: 14px; }
+.cal .ev { font-size: 11px; padding: 1px 2px; border-radius: 6px; background: var(--acorn); color: var(--panel); overflow-wrap: anywhere; }
+.cal .fest { background: var(--sea); }
+@media (max-width: 640px) { .cal { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.res { display: flex; flex-wrap: wrap; gap: 4px; }
+.res .tag { font-family: var(--mono); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="id">ISLAND-LIFE-3D · 14차 · 검수 보드 v1 · 2026-11-12 · main 63d8bac · 게임 v40</p>
+    <h1>포근섬 14차 검수 보드</h1>
+    <p class="lede">13차에서 정한 M13 「매일 할 거리」와 이어서 만든 <b>M14 집 증축 · M15 주민과 더 가깝게 · M16 잠수·미술품·별자리·박물관 관 · 실내 전부 직접 입장</b>이 게임 v40 에 모두 들어갔어요. 이 보드는 <b>트랙이 보드 없이 정한 것(D150–D179)을 확정</b>하고, 트랙이 남긴 <b>빈칸 여섯</b>과 <b>다음 마일스톤 M17 의 방향</b>을 정해요. 검수를 기다리는 리소스 116개도 묶음별로 모았어요. 고른 내용은 바로 저장되고, 채팅에 <b>"검수 보드 반영"</b>이라고 하면 진행해요.</p>
+    <p class="links"><a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 링크 (v40)</a><a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈 (보관함)</a><a href="https://claude.ai/artifact/1weSx9yyf2U4mLnwvopBNV">리소스 편집기</a><a href="https://claude.ai/artifact/Lo1QpQ9svMsenNYUGUM72B">13차 보드</a><a href="https://claude.ai/artifact/1bVjhLYMBJ8wySqR894WXW">개발 보고서</a></p>
+    <div class="status" id="pills"></div>
+    <div id="boardPanel" class="out board" aria-live="polite"></div>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <a href="#miles">로드맵</a><a href="#now">v40 점검</a><a href="#tracks">트랙 결정 확정</a><a href="#decide">결정 D180–D187</a><a href="#res">검수 대기 리소스</a><a href="#plan">진행 계획</a><a href="#you">사용자 몫</a><a href="#send">요청 글</a>
+  </nav>
+
+  <section id="miles">
+    <div class="sec-head"><p class="id">ROADMAP</p><h2>마일스톤과 앞으로의 로드맵</h2>
+      <p class="muted">「동물의 숲처럼 풍성하게」 네 묶음 M13–M16 이 끝났어요. M17 은 D180 에서 골라요 — 추천은 새 놀이를 더하기 전에 지금 있는 것을 다듬는 묶음이에요.</p></div>
+    <div class="miles" id="milesList"></div>
+  </section>
+
+  <section id="now">
+    <div class="sec-head"><p class="id">AUDIT · 2026-11-12 · main 63d8bac · 게임 v40 · 테스트 531/531</p><h2>v40 점검 — 이번에 들어간 것과 남은 빈칸</h2>
+      <p class="muted">트랙 노트와 점검 결과에서 모았어요. ✅ 됨 · △ 됐지만 빈칸 있음 · ❌ 아직. 오른쪽 칸은 이 보드의 어느 결정과 닿는지.</p></div>
+    <div class="tblwrap"><table class="tbl" id="auditTable"><thead><tr><th>무엇</th><th>지금</th><th>상태</th><th>어디서</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="tracks">
+    <div class="sec-head"><p class="id">TRACK DECISIONS · D150 – D179</p><h2>트랙이 보드 없이 정한 것 — 확정할까요?</h2>
+      <p class="muted">병렬 트랙은 요청(1–9번)을 바로 만들면서 세부를 스스로 정했어요. 모두 게임 v40 에 들어가 있어요. 바꾸고 싶은 줄에만 의견을 적어 주세요 — 비우면 그대로 확정이에요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="trackTable"><thead><tr><th>번호</th><th>트랙</th><th>정한 것</th><th>의견</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><p class="id">DECISIONS · D180 – D187</p><h2>새로 정할 것 여덟 가지</h2>
+      <p class="muted">추천안이 미리 골라져 있어요. 다르게 하고 싶은 것만 바꿔 주세요. D181–D186 은 트랙이 남긴 빈칸, D187 은 검수 방식이에요.</p></div>
+    <div id="decisions" class="grid" style="grid-template-columns:1fr"></div>
+  </section>
+
+  <section id="res">
+    <div class="sec-head"><p class="id">REVIEW · 116</p><h2>검수를 기다리는 리소스 — 묶음별</h2>
+      <p class="muted">모두 Blender 스크립트·데이터로 만들었고 리소스·스토리·요소 편집기에서 하나씩 볼 수 있어요. 트랙이 스스로 아쉽다고 적은 것은 <span class="tag new">고칠 후보</span>로 표시했어요. 카드 의견 칸에 묶음 전체에 대한 말을, 하나만 고치려면 ID 와 함께 적어 주세요.</p></div>
+    <div class="grid" id="resCards"></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><p class="id">PLAN · M17</p><h2>승인 뒤 진행 계획 (D180-A 기준)</h2>
+      <p class="muted">지금처럼 트랙마다 세션과 브랜치를 나눠 만들고, 합치기 전에 점검(테스트 · 자동 플레이 · 실내 · 시계 · 행사)을 돌려요. 트랙마다 다른 포트를 써요.</p></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>트랙</th><th>만드는 것</th><th>맡는 파일</th><th>먼저 필요한 것</th></tr></thead><tbody id="planRows"></tbody></table></div>
+  </section>
+
+  <section id="you">
+    <div class="sec-head"><p class="id">YOUR TURN</p><h2>사용자가 할 것</h2>
+      <p class="muted">Claude 가 대신할 수 없는 것이에요. 이 보드와 따로, 편할 때 해 주세요.</p></div>
+    <div class="tblwrap"><table class="tbl" id="youTable"><thead><tr><th>ID</th><th>할 것</th><th>어떻게</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="send">
+    <div class="sec-head"><p class="id">REQUEST</p><h2>요청 글 만들기</h2>
+      <p class="muted">보통은 채팅에 "검수 보드 반영"만 보내면 돼요 (선택은 이미 저장돼 있어요). 아래 글은 저장소를 쓸 수 없는 창에서 쓰거나, 채팅에 그대로 남기고 싶을 때 써요.</p></div>
+    <div class="out">
+      <div class="btns"><button id="build" type="button">요청 글 만들기</button><button id="copy" type="button" class="ghost">복사</button><button id="clear" type="button" class="ghost">의견 모두 지우기</button><span id="copyMsg" role="status"></span></div>
+      <textarea id="reqText" aria-label="요청 글" placeholder="요청 글 만들기를 누르면 여기에 나와요."></textarea>
+    </div>
+  </section>
+</div>
+
+<script>
+const INK = '#4A3B32';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const noteBox = (id, label) => `<input class="note" id="note-${id}" data-id="${id}" data-label="${esc(label)}" placeholder="${id} 의견 (비우면 그대로 승인)" aria-label="${esc(label)} 의견">`;
+// 스케치 색 (밝은 받침 위에 그려서 어두운 화면에서도 같은 색)
+const P = { frame: '#FBF7F2', bar: '#3F8F5C', pane: '#E3EEDD', line: '#C9D3C5', acc: '#A8642E', sea: '#9CC3EA', soft: '#F3E7D3', red: '#C9583B', grass: '#8CCB6E', sand: '#EBD9A8', white: '#FBFDF8',
+  pink: '#F4B6C8', night: '#2E3A5C', gold: '#F2C14E', snow: '#EEF3F6', leafA: '#E8913A', wood: '#8A5A3B', fur: '#F2EEE8' };
+const T = (x, y, s, { size = 11, anchor = 'start', fill = INK, weight } = {}) =>
+  `<text x="${x}" y="${y}" font-size="${size}" text-anchor="${anchor}" fill="${fill}"${weight ? ` font-weight="${weight}"` : ''}>${esc(s)}</text>`;
+const R = (x, y, w, h, f = P.pane, r = 6, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}"${extra}/>`;
+const C = (x, y, r, f, extra = '') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"${extra}/>`;
+const lines = (x, y, n, w, gap = 12) => Array.from({ length: n }, (_, i) => `<rect x="${x}" y="${y + i * gap}" width="${w - (i % 3) * 14}" height="5" rx="2.5" fill="${P.line}"/>`).join('');
+const btn = (x, y, w, label, solid = true) => R(x, y, w, 22, solid ? P.bar : P.white, 11, solid ? '' : ` stroke="${P.bar}" stroke-width="2"`) + T(x + w / 2, y + 15, label, { size: 10, anchor: 'middle', fill: solid ? P.white : P.bar });
+const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 4}" stroke="${P.acc}" stroke-width="2.5"/><path d="M${x2 - 7} ${y - 5} L${x2} ${y} L${x2 - 7} ${y + 5}z" fill="${P.acc}"/>`;
+const island = (cx, cy, s = 1, g = P.grass) => `<path transform="translate(${cx} ${cy}) scale(${s})" d="M-40 0 C-40 -22 -14 -30 6 -28 C30 -26 42 -12 40 4 C38 20 16 28 -4 26 C-26 24 -40 16 -40 0z" fill="${g}" stroke="${P.sand}" stroke-width="5"/>`;
+const sketchFrame = (body, label, h = 130) => `<svg viewBox="0 0 320 ${h}" role="img" aria-label="${esc(label)}"><rect width="320" height="${h}" rx="10" fill="${P.frame}" stroke="${P.line}"/>${body}</svg>`;
+// 작은 그림 조각
+const villager = (x, y, col = P.acc, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">${C(0, -14, 8, col)}<rect x="-6" y="-7" width="12" height="13" rx="5" fill="${col}"/></g>`;
+const cherry = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-3" y="-4" width="6" height="22" rx="2" fill="${P.wood}"/>${C(-10, -12, 11, P.pink)}${C(9, -14, 12, P.pink)}${C(0, -24, 11, '#F7C9D6')}</g>`;
+const burst = (x, y, r, col) => Array.from({ length: 10 }, (_, i) => { const a = i * Math.PI / 5; return `<path d="M${(x + Math.cos(a) * r * .35).toFixed(1)} ${(y + Math.sin(a) * r * .35).toFixed(1)} L${(x + Math.cos(a) * r).toFixed(1)} ${(y + Math.sin(a) * r).toFixed(1)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`; }).join('') + C(x, y, 2.5, col);
+const pot = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 -8 h44 l-5 24 h-34z" fill="#5A4636"/><rect x="-25" y="-12" width="50" height="6" rx="3" fill="#6E5644"/><path d="M-10 -16 q4 -8 0 -14 M2 -16 q4 -8 0 -14 M14 -16 q4 -8 0 -14" fill="none" stroke="${P.line}" stroke-width="2"/></g>`;
+const snowman = (x, y, s = 1, face = 'smile') => `<g transform="translate(${x} ${y}) scale(${s})">${C(0, 6, 14, P.white, ` stroke="${P.line}"`)}${C(0, -16, 10, P.white, ` stroke="${P.line}"`)}${C(-3, -18, 1.4, INK)}${C(3, -18, 1.4, INK)}<path d="M0 -15 l7 2 -7 1z" fill="${P.leafA}"/>${face === 'smile' ? `<path d="M-4 -11 q4 3 8 0" fill="none" stroke="${INK}" stroke-width="1.2"/>` : ''}</g>`;
+const flake = (x, y, r = 4, col = P.white) => `<path d="M${x - r} ${y} H${x + r} M${x} ${y - r} V${y + r} M${x - r * .7} ${y - r * .7} L${x + r * .7} ${y + r * .7} M${x - r * .7} ${y + r * .7} L${x + r * .7} ${y - r * .7}" stroke="${col}" stroke-width="1.4"/>`;
+const petal = (x, y, rot = 30) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="2.4" fill="${P.pink}" transform="rotate(${rot} ${x} ${y})"/>`;
+const leafBit = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="3" fill="${P.leafA}" transform="rotate(-25 ${x} ${y})"/>`;
+const path = (x, y, w, col) => `<rect x="${x}" y="${y}" width="${w}" height="14" rx="3" fill="${col}"/>` + Array.from({ length: Math.floor(w / 14) }, (_, i) => `<rect x="${x + 2 + i * 14}" y="${y + 2}" width="10" height="10" rx="2" fill="${P.white}" opacity=".35"/>`).join('');
+const fence = (x, y, n, col = P.wood) => Array.from({ length: n }, (_, i) => `<rect x="${x + i * 12}" y="${y}" width="4" height="18" rx="1" fill="${col}"/>`).join('') + `<rect x="${x}" y="${y + 5}" width="${(n - 1) * 12 + 4}" height="3" fill="${col}"/>`;
+const chair = (x, y, col = P.wood) => R(x, y, 18, 6, col, 2) + R(x, y - 14, 4, 14, col, 1) + R(x + 2, y + 6, 3, 8, col, 1) + R(x + 13, y + 6, 3, 8, col, 1);
+
+const house = (x, y, roof = P.red) => `<path d="M${x - 14} ${y - 18} L${x} ${y - 32} L${x + 14} ${y - 18}z" fill="${roof}"/>` + R(x - 11, y - 18, 22, 18, P.white, 2, ` stroke="${P.line}"`) + R(x - 3, y - 10, 6, 10, P.wood, 1);
+
+const balloon = (x, y, col = P.red, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="-14" rx="9" ry="11" fill="${col}"/><path d="M0 -3 q-3 8 0 16" stroke="${P.line}" fill="none"/><rect x="-6" y="12" width="12" height="9" rx="2" fill="${P.gold}"/></g>`;
+const bottle = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-6" y="-8" width="12" height="18" rx="5" fill="#9FD4C8" opacity=".9"/><rect x="-3" y="-14" width="6" height="7" rx="2" fill="#9FD4C8"/><rect x="-4" y="-2" width="8" height="8" rx="1" fill="${P.soft}"/></g>`;
+const star = (x, y, r = 6, col = P.gold) => { let d = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; d += `${i ? 'L' : 'M'}${(x + Math.cos(a) * rr).toFixed(1)} ${(y + Math.sin(a) * rr).toFixed(1)} `; } return `<path d="${d}z" fill="${col}"/>`; };
+const streak = (x, y, len, col = P.gold) => `<path d="M${x} ${y} l${len} ${len * .45}" stroke="${col}" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>` + star(x + len, y + len * .45, 4, col);
+const book = (x, y) => R(x, y, 46, 58, P.white, 5, ` stroke="${P.line}"`) + lines(x + 6, y + 10, 4, 34, 11) + `<path d="M${x + 8} ${y + 52} l4 4 7 -8" stroke="${P.bar}" stroke-width="2.5" fill="none"/>`;
+const coin = (x, y, n) => C(x, y, 9, P.gold) + T(x, y + 4, n, { size: 9, anchor: 'middle' });
+const sling = (x, y) => `<path d="M${x} ${y} v-14 M${x} ${y - 14} l-8 -10 M${x} ${y - 14} l8 -10" stroke="${P.wood}" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M${x - 8} ${y - 24} q8 8 16 0" stroke="${P.red}" stroke-width="2" fill="none"/>`;
+const cart = (x, y) => R(x - 26, y - 22, 52, 22, P.soft, 4, ` stroke="${P.line}"`) + `<path d="M${x - 30} ${y - 22} h60 l-6 -12 h-48z" fill="${P.red}"/>` + C(x - 16, y + 4, 6, P.wood) + C(x + 16, y + 4, 6, P.wood);
+const fish = (x, y, s = 1, col = P.sea) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="12" ry="6" fill="${col}"/><path d="M10 0 l9 -6 v12z" fill="${col}"/>${C(-6, -1, 1.4, INK)}</g>`;
+const frameArt = (x, y, w = 40, h = 30, col = P.gold) => R(x, y, w, h, P.wood, 3) + R(x + 4, y + 4, w - 8, h - 8, col, 2);
+const tent = (x, y, col = '#7A6A9A') => `<path d="M${x - 26} ${y} L${x} ${y - 36} L${x + 26} ${y}z" fill="${col}"/><path d="M${x - 6} ${y} L${x} ${y - 16} L${x + 6} ${y}z" fill="${P.night}"/>`;
+const moon = (x, y, r = 10) => C(x, y, r, P.gold) + C(x + r * .45, y - r * .3, r * .85, P.night);
+
+/* ---------- 로드맵 ---------- */
+const MILES = [
+  ['M0–M12', '기본 게임 · 편집기 · 행사 · 꾸미기 · 이사 · 옷 · 밤', 'done', '섬·채집·주민·상점·박물관·집·축제·엔딩 · 계절 행사 넷 · 섬 꾸미기 · 이사 · 옷 · 밤·새벽'],
+  ['M13', '매일 할 거리', 'done', '섬 일지 · 유성우 소원 · 선물 풍선·새총 · 유리병 레시피 · 행상 송이 (13차 보드 D140–D147)'],
+  ['M14', '집과 섬이 자란다', 'done', '집 증축 1층 넓히기·2층·다락 · 섬 별점 · 다리·경사로 (D150–D154)'],
+  ['M15', '주민과 더 가깝게', 'done', '편지 쓰기 · 같이 낚시·산책 · 저녁 노래 · 섬폰 앨범·추억 액자 (D155–D159)'],
+  ['M16', '모으기 넓히기 + 실내', 'done', '잠수·바다 생물 20 · 밤 특별 상점·미술품 16 · 망원경 별자리 · 박물관 관 여섯 · 실내 전부 직접 입장 (D160–D179)'],
+  ['M17', '다듬기 · 검수 확정 · 밸런스 (추천)', 'here', '검수 116개 확정 · 고칠 모델 · 빈칸 여섯 · 축제까지 5~7일(D41-A) · 편집기 따라잡기 · 저사양 GPU'],
+  ['M18', '계절이 깊어진다', 'later', '계절 바다 생물·미술품 교환 · 계절 별자리 · 주민 사연 장면 (D180-B 로 앞당길 수 있음)'],
+];
+const MS = { done: ['✅', '끝'], here: ['📝', '이 보드 (추천)'], later: ['·', '다음 보드'] };
+$('milesList').innerHTML = MILES.map(([id, name, st, what]) => `
+  <div class="mile ${st}"><span class="id">${id}</span><b>${name}</b><span class="tag">${MS[st][0]} ${MS[st][1]}</span><span class="small muted">${what}</span></div>`).join('');
+
+/* ---------- v40 점검 ---------- */
+const AUDIT = [
+  ['실내 전부 직접 입장', '목록·창만 뜨던 실내 0 · 상점 낮/밤 매장(1층 + 정원 코너 / 지하 밤 코너) · 주민 집 외출·자는 중에도 빈 방', '✅', '실내 점검 문제 0'],
+  ['달빛 가게 · 새벽 천막 낮 시각', '여는 시각에만 건물이 있음 — 그 밖엔 「닫힘」', '△', 'D182'],
+  ['밤 특별 상점 · 미술품', '운세 부스 · 여우 상인 살랑 · 이상한 천막 · 선물 상자 · 진품/가품 16점', '△', 'D181 · D184'],
+  ['망원경 별자리 · 박물관 관 여섯', '박물관 옆 망원경대(조준·줌·찍기) · 별자리 도감 12 · 물고기·곤충·화석·바다·미술·별자리 관', '△', '집 안 망원경은 예전 「살피기」 → M17-P2'],
+  ['잠수', '스쿠버 키트(상점 늘 팜) · 바다 생물 20 · 잠수복 · 물속 화면 (높음·적정만)', '△', 'D183'],
+  ['집 증축 · 섬 별점', '우편함에서 빚으로 짓고 갚기 · 계단 걸어 오르내리기 · 별 다섯 장면', '△', 'D185'],
+  ['주민과 더 가깝게', '편지 하루 3통 · 같이 낚시·산책 · 저녁 노래 · 앨범 사진', '✅', '—'],
+  ['축제까지 걸리는 날', '지금 3~5일 (D41-B 임시, 의견 「추후 D41-A」)', '△', 'D186'],
+  ['검수 대기 리소스', '116개 (모델 87 · 방 17 · 장면 12) — 모두 status review', '❌', 'D187 · 아래 「검수 대기」'],
+  ['편집기 셋', '게임 v40 보다 뒤 — 새 방·바다 생물·장면 s23–s28 이 아직 안 보임', '❌', 'M17-P4'],
+  ['점검', '테스트 531/531 · 게시본 열기 콘솔 오류 0 · 트랙별 자동 플레이 36✅ / 잠수·상점 12/12', '△', '합친 main 의 전체 자동 플레이 → M17-P5'],
+];
+$('auditTable').tBodies[0].innerHTML = AUDIT.map(([a, b, c, d]) => `<tr><td>${a}</td><td class="small">${b}</td><td class="st">${c}</td><td class="small">${d}</td></tr>`).join('');
+
+/* ---------- 트랙 결정 확정 (D150–D179) ---------- */
+const TRACKS = [
+  ['D150–D154', 'M14 집과 섬이 자란다', '증축 넷(1층 10×10 → 2층 → 다락)·빚 갚아야 다음 · 계단은 걸어서 · 섬 별점 값과 상 · 다리 TI-13·경사로 TI-14 자리 규칙 · 겉모양 BD-12 셋'],
+  ['D155–D159', 'M15 주민과 더 가깝게', '숫자 `BOND` 코드 상수 · 같이 하기는 친구(30) 이상 · AN-14 코드 자세 · 사진 160×100 JPEG 저장 · 액자 300·500 도토리'],
+  ['D160–D164', 'M16 잠수', '키트 상점 늘 팜 · 헤엄·잠기기 코드 자세 · 바다 = 헤엄치는 동안만 구역(섬 밖 7칸) · 물속 셰이더 높음·적정만 · 바다 생물 20(그림자·빠르기)'],
+  ['D165–D169', '밤 특별 상점', '미술품 16(진품/가품) · 이상한 천막(주인 없음, 오는 밤만) · 여우 상인 살랑(오는 밤만, 감정 대사) · 운세 부스 20–3시 · 선물 상자 낮·밤'],
+  ['D175–D179', '박물관 · 별자리', '관 드나들기(로비 벽 아치) · 박물관 겉모양 BD-16 · 별자리는 맑은 밤 · 망원경 찍기 = 도감 · 미술관 그림 액자·조각 받침'],
+  ['실내 전수', '실내 · 상점 낮/밤', '도토리상점 늘 열고 낮/밤 매장 다름 · 딸린 방 RM-21·22 · 주민 집 빈 방 구경 · 창은 NPC·진열품 「보기」에서만'],
+];
+$('trackTable').tBodies[0].innerHTML = TRACKS.map(([id, tr, what]) => `<tr><td class="id">${id}</td><td>${tr}</td><td class="small">${what.replace(/`([^`]+)`/g, '<code>$1</code>')}</td><td>${noteBox(id, tr)}</td></tr>`).join('');
+
+/* ---------- 결정 스케치 ---------- */
+function sketch(id) {
+  let b = '';
+  if (id === 'D180') {
+    b += R(8, 10, 74, 100, P.pane, 10) + `<path d="M28 70 l10 10 22 -26" stroke="${P.bar}" stroke-width="6" fill="none" stroke-linecap="round"/>` + T(45, 124, 'A 다듬기·확정', { size: 9, anchor: 'middle' });
+    b += R(86, 10, 74, 100, P.soft, 10) + cherry(108, 70, .8) + leafBit(134, 50) + flake(140, 76, 6, P.sea) + T(123, 124, 'B 계절이 깊어짐', { size: 9, anchor: 'middle' });
+    b += R(164, 10, 74, 100, P.soft, 10) + villager(190, 84, P.acc, 1.2) + R(200, 28, 30, 20, P.white, 4) + T(215, 42, '🎬', { size: 11, anchor: 'middle' }) + T(201, 124, 'C 섬 이야기 2부', { size: 9, anchor: 'middle' });
+    b += R(242, 10, 70, 100, P.soft, 10) + island(265, 62, .4) + island(292, 80, .3, P.leafA) + arrow(270, 70, 288) + T(277, 124, 'D 친구 섬 방문', { size: 9, anchor: 'middle' });
+  } else if (id === 'D181') {
+    b += R(8, 12, 146, 96, P.pane, 10) + frameArt(30, 36, 44, 34, P.red) + villager(110, 92, '#8E7B5A', 1.2) + R(84, 24, 62, 22, P.white, 4) + T(115, 39, '이건 가품…', { size: 9, anchor: 'middle' }) + T(81, 124, 'A 느루가 까닭을 말함', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + frameArt(190, 36, 44, 34, P.red) + T(270, 58, '기증 ✕', { size: 11, anchor: 'middle', fill: P.red }) + T(239, 124, 'B 창에 표시만 (지금)', { size: 9, anchor: 'middle' });
+  } else if (id === 'D182') {
+    b += R(8, 12, 96, 96, P.night, 10) + tent(56, 86) + moon(80, 32) + T(56, 124, 'A 밤에만 나타남', { size: 9, anchor: 'middle' });
+    b += R(112, 12, 96, 96, P.soft, 10) + tent(160, 86, '#9A8AB0') + R(140, 30, 40, 16, P.white, 3) + T(160, 42, '밤에 열어요', { size: 8, anchor: 'middle' }) + T(160, 124, 'B 낮엔 닫힌 건물', { size: 9, anchor: 'middle' });
+    b += R(216, 12, 96, 96, P.soft, 10) + tent(264, 86, '#9A8AB0') + villager(290, 92, P.sea, .9) + T(264, 124, 'C 낮에도 빈 실내', { size: 9, anchor: 'middle' });
+  } else if (id === 'D183') {
+    b += R(8, 12, 146, 96, P.pane, 10) + book(22, 24) + fish(110, 56, 1.4, P.sea) + T(110, 90, '키트 산 뒤', { size: 9, anchor: 'middle' }) + T(81, 124, 'A 키트를 산 뒤에만 뽑힘', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + book(182, 24) + T(266, 60, '🤿 필요', { size: 11, anchor: 'middle' }) + T(239, 124, 'B 그대로 + 「키트 필요」', { size: 9, anchor: 'middle' });
+  } else if (id === 'D184') {
+    b += R(8, 12, 146, 96, P.pane, 10) + house(50, 92) + frameArt(80, 30, 40, 30) + frameArt(118, 50, 26, 20, P.sea) + T(81, 124, 'A 집에 걸고 놓기', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + R(196, 40, 86, 52, P.white, 4, ` stroke="${P.line}"`) + frameArt(220, 50, 38, 28) + T(239, 124, 'B 박물관에만', { size: 9, anchor: 'middle' });
+  } else if (id === 'D185') {
+    b += R(8, 12, 146, 96, P.pane, 10) + villager(46, 92, P.acc, 1.2) + R(60, 30, 80, 22, P.white, 4) + T(100, 45, '집 넓힐래요', { size: 9, anchor: 'middle' }) + house(120, 98) + T(81, 124, 'A 밤톨에게도 묻기', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + R(222, 50, 30, 36, P.red, 4) + R(216, 44, 42, 8, P.wood, 2) + T(239, 124, 'B 우편함만 (지금)', { size: 9, anchor: 'middle' });
+  } else if (id === 'D186') {
+    b += R(8, 12, 146, 96, P.pane, 10) + [0, 1, 2, 3, 4, 5, 6].map(i => R(18 + i * 18, 50, 14, 14, i < 6 ? P.grass : P.gold, 3)).join('') + T(81, 90, '5~7일', { size: 12, anchor: 'middle', fill: P.bar }) + T(81, 124, 'A 축제까지 5~7일 (D41-A)', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + [0, 1, 2, 3].map(i => R(196 + i * 22, 50, 16, 14, i < 3 ? P.grass : P.gold, 3)).join('') + T(239, 90, '3~5일', { size: 12, anchor: 'middle' }) + T(239, 124, 'B 지금 그대로', { size: 9, anchor: 'middle' });
+  } else if (id === 'D187') {
+    b += R(8, 12, 146, 96, P.pane, 10) + [0, 1, 2].map(i => R(22, 26 + i * 24, 118, 18, P.white, 4, ` stroke="${P.line}"`) + T(30, 39 + i * 24, ['바다 생물 20 ✓', '미술품 16 ✓', '가구 26 ✓'][i], { size: 9 })).join('') + T(81, 124, 'A 묶음별 「모두 확정」', { size: 9, anchor: 'middle' });
+    b += R(166, 12, 146, 96, P.soft, 10) + lines(186, 30, 6, 100, 11) + T(239, 124, 'B 하나씩 (116번)', { size: 9, anchor: 'middle' });
+  }
+  return sketchFrame(b, id);
+}
+
+/* ---------- 결정 ---------- */
+const DECISIONS = [
+  { id: 'D180', q: 'M17 에서 먼저 할 묶음은?', now: '네 묶음(M13–M16)이 다 들어감 — 검수 대기 116개 · 빈칸 여섯 · 밸런스 임시값 · 편집기가 게임보다 뒤', opts: [
+    ['A', '다듬기 · 검수 확정 · 밸런스', '새 놀이는 잠시 멈추고 검수 116개 확정 · 아쉬운 모델 다시 만들기 · 이 보드의 빈칸 여섯 · 축제까지 5~7일 · 편집기 셋 따라잡기 · 합친 main 전체 자동 플레이 · 저사양 GPU 재기. 「완성도」를 올려요.', true],
+    ['B', '계절이 깊어진다', '계절마다 다른 바다 생물·별자리 · 미술품 교환(주민·여우) · 계절 가구 레시피. 모으기가 1년 내내 바뀌어요. 새 모델이 많아요.'],
+    ['C', '섬 이야기 2부', '주민마다 사연 장면 둘~셋 · 주민끼리 사이(친구·다툼·화해) · 엔딩 뒤 두 번째 큰 이야기. 대사·장면이 많이 늘어요.'],
+    ['D', '친구 섬 방문', '게임 링크 저장소로 다른 사람 섬을 구경하고 편지·선물 주고받기. 저장소 규칙·보안 점검이 커요.'] ] },
+  { id: 'D181', q: '가품 미술품을 박물관에 내밀면?', now: '기증 창에 가품이 안 뜰 뿐, 까닭을 말해 주지 않음', opts: [
+    ['A', '느루가 까닭을 말하고 돌려줌', '「이건 가품이에요… 진품은 ○○가 달라요」 — 어디가 다른지 힌트 한 줄 (작품마다 `tell`). 가품은 집에 둘 수 있어요(D184).', true],
+    ['B', '창에 「가품이라 못 받아요」 표시만', '대사 없이 기증 창에서 흐리게.'] ] },
+  { id: 'D182', q: '달빛 가게 · 새벽 천막의 문 닫힌 시각은?', now: '여는 시각(22–3시 · 3–5시)에만 건물이 서 있음 — 다른 시각엔 그 자리에 아무것도 없음', opts: [
+    ['A', '지금처럼 밤에만 나타남', '「밤에만 오는 가게」 맛을 살려요. 낮에 「들어갈 수 없는 문」이 생기지 않아요 (실내 전부 직접 입장 규칙과도 맞음).', true],
+    ['B', '낮엔 닫힌 건물이 서 있음', '건물은 늘 있고 문에 「밤에 열어요」 팻말. 문 앞 행동 키는 팻말만.'],
+    ['C', '낮에도 주인 없는 실내 구경', '건물이 늘 있고 낮엔 주인 없이 들어가 진열만 봐요 (사지는 못함).'] ] },
+  { id: 'D183', q: '섬 일지 「바다 생물 잡기」는?', now: '스쿠버 키트가 없어도 뽑힘', opts: [
+    ['A', '키트를 산 뒤에만 뽑힘', '일지 할 일에 조건 칸(`needs`)을 두고 키트·새총처럼 도구가 필요한 일은 도구가 있을 때만 뽑아요.', true],
+    ['B', '그대로 + 「키트 필요」 표시', '뽑히기는 하되 일지에 🤿 필요 표시.'] ] },
+  { id: 'D184', q: '미술품을 집에 놓을 수 있나요?', now: '박물관 기증만 (가품은 둘 데가 없음)', opts: [
+    ['A', '집에 걸고 놓기', '그림은 벽 칸, 조각은 바닥 칸 (가구처럼). 진품·가품 모두 — 가품은 모르는 사람 눈엔 똑같아요. 섬 별점에 조금 더해져요.', true],
+    ['B', '박물관에만', '가품은 팔기만 (10 도토리).'] ] },
+  { id: 'D185', q: '집 증축은 어디서 묻나요?', now: '우편함(92) 행동 키에서만', opts: [
+    ['A', '우편함 + 밤톨에게도', '도토리상점 밤톨과 말할 때 「집을 넓히고 싶어요」 줄 추가 (동물의 숲처럼 상점 주인이 증축 담당). 우편함은 빚 갚기만.', true],
+    ['B', '우편함만', '지금 그대로.'] ] },
+  { id: 'D186', q: '축제까지 걸리는 날은? (보류했던 D41)', now: 'D41-B 임시값 3~5일 — 의견 「추후 D41-A(5~7일) 방향」', opts: [
+    ['A', '5~7일 (D41-A)', '축제 부품 모으기 단계를 늘리고 하루 할 일과 섬 일지를 섞어요. 새 놀이(일지·풍선·행상·잠수)가 생겨 하루가 꽉 차졌어요.', true],
+    ['B', '지금 3~5일', '빠르게 엔딩까지.'] ] },
+  { id: 'D187', q: '검수 대기 116개는 어떻게 확정하나요?', now: '리소스·스토리·요소 편집기에서 하나씩 「확정」', opts: [
+    ['A', '묶음별 「모두 확정」 + 고칠 것만 의견', '이 보드 「검수 대기」 카드마다 묶음 확정. 의견을 적은 ID 와 고칠 후보만 다시 만들고, 나머지는 반영 때 status → ok.', true],
+    ['B', '편집기에서 하나씩', '모델마다 편집기에서 보고 확정 (지금 방식).'] ] },
+];
+const decCard = d => `
+  <div class="card dec" id="dec-${d.id}"><div class="head"><span class="id">${d.id}</span><h3>${d.q}</h3></div>
+    <div class="decbody"><div class="stage">${sketch(d.id)}</div>
+      <div class="decside"><p class="nowline">지금: <b>${d.now}</b></p>
+        <div class="opts">${d.opts.map(([k, t, desc, rec]) => `
+          <div class="opt"><input type="radio" name="${d.id}" id="${d.id}${k}" value="${k}" ${rec ? 'checked' : ''}>
+            <label for="${d.id}${k}"><span><b>${d.id}-${k}</b> ${t}</span><span class="small muted">${desc.replace(/`([^`]+)`/g, '<code>$1</code>')}</span>${rec ? '<span class="rec">추천</span>' : ''}</label></div>`).join('')}</div></div></div>
+    ${noteBox(d.id, d.q)}</div>`;
+$('decisions').innerHTML = DECISIONS.map(decCard).join('');
+
+/* ---------- 검수 대기 리소스 ---------- */
+const icon = (body, h = 110) => `<svg viewBox="0 0 200 ${h}" role="img"><rect width="200" height="${h}" rx="10" fill="${P.frame}" stroke="${P.line}"/>${body}</svg>`;
+// [ID 묶음, 이름, 분류, 개수, 고칠 후보?, 설명, 그림]
+const RES = [
+  ['IC-SE-01–20', '바다 생물', '아이템 · M16', 20, true, '미역 · 성게 · 해삼 … 앵무조개 · 진주조개 · 홍합. 트랙 메모: <b>미역이 넓은 잎 풀처럼</b> · <b>대게와 키다리게가 작은 아이콘에서 비슷</b> · 바닷가재가 작게.', () => fish(60, 50, 2) + fish(130, 70, 1.4, P.red) + star(160, 34, 9, P.leafA)],
+  ['IC-TL-07 · CL-13', '스쿠버 키트 · 잠수복', '도구 · 옷 · M16', 2, true, '트랙 메모: 잠수복 <b>공기통이 옆에서 살짝 떠 보임</b> · <b>물안경이 큰 안경처럼</b>.', () => villager(100, 92, P.sea, 2.2) + R(118, 44, 10, 26, P.line, 4)],
+  ['IC-AR-01–16', '미술품 16점', '아이템 · 밤 상점', 16, false, '그림 12 · 조각 4 (진품·가품 쌍, 가품은 아이콘 색만 다름). 실내 진열의 가품 3D 는 진품 색 — D181 과 함께 손볼지.', () => frameArt(30, 30, 56, 44) + frameArt(100, 40, 40, 30, P.sea) + frameArt(150, 30, 36, 48, P.pink)],
+  ['FU-63–88', '새 가구 26', '가구 · M13–M16', 26, false, '별 조각 가구 넷 · 계단·난간 넷 · 추억 액자 둘 · 밤 상점 소품 여섯 · 상점 코너 여섯 · 박물관 진열장·수조·투영기·그림 액자 넷.', () => chair(40, 70) + star(100, 50, 12) + frameArt(130, 40, 40, 30)],
+  ['BD-11–16 · PR-33–40 · TI-13–14', '건물 · 소품 · 놓는 것 14', '배경 · M13–M16', 14, false, '행상 수레 · 증축 집 셋 · 이상한 천막 · 여우 상인 가게 · 운세 부스 · 박물관 · 풍선 · 유리병 · 선물 상자 · 망원경대 · 나무다리 · 경사로.', () => house(60, 90) + house(100, 90, '#5B8FC9') + tent(150, 92)],
+  ['RM-08 · 09 · 15–22 · 25–30 · WP-09', '방 · 실내 배치 17', '실내 · 요소 편집기', 17, false, '상점 v6(낮/밤) · 정원 코너 · 지하 밤 코너 · 증축 방 셋 · 밤 상점 셋 · 박물관 로비 + 관 여섯 · 행상 벽지.', () => R(30, 26, 140, 70, P.white, 6, ` stroke="${P.line}"`) + R(40, 36, 50, 50, P.pane, 4) + R(100, 36, 60, 22, P.soft, 4) + R(100, 64, 60, 22, P.soft, 4)],
+  ['CH-16 · CH-17 · CH-11–13 · CH-01', '캐릭터 6', '캐릭터', 6, false, '행상 송이(고슴도치) · 여우 상인 살랑 · 이사 오는 구름·파도·달무리 · 주인공(소원·헤엄 자세 더함).', () => villager(60, 90, '#7A6A9A', 2) + villager(110, 90, P.leafA, 2) + villager(160, 90, P.sea, 2)],
+  ['s17–s28 · IC-MA-11–12 · IC-TL-06', '장면 12 · 재료 · 새총', '스토리 · 아이템', 15, false, '장면 s17–s28 (이사 셋 · 달빛 가게 · 천막 · 투어 · 유성우 · 행상 · 별 다섯 · 저녁 노래 · 여우 · 이상한 천막) — 스토리 편집기 「스토리 반영」. 별 조각 · 레시피 쪽지 · 새총.', () => R(30, 24, 140, 66, P.white, 6, ` stroke="${P.line}"`) + T(100, 62, '🎬 ×12', { size: 18, anchor: 'middle' })],
+];
+const total = RES.reduce((a, r) => a + r[3], 0);
+$('resCards').innerHTML = RES.map(([id, name, kind, n, fix, desc, art]) => `
+  <div class="card" id="res-${id.split(' ')[0]}"><div class="head"><span class="id">${id}</span><h3>${name}</h3>${fix ? '<span class="tag new">고칠 후보</span>' : '<span class="tag">' + n + '개</span>'}</div>
+    <div class="stage">${icon(art())}</div>
+    <p class="small"><span class="tag">${kind}</span> <span class="tag">${n}개</span></p>
+    <p class="small muted">${desc}</p>${noteBox(id.split(' ')[0], name)}</div>`).join('');
+
+/* ---------- 계획 ---------- */
+const PLAN = [
+  ['M17-P0', '14차 검수 보드 (<b>이 보드</b>) → 사용자 선택 → "검수 보드 반영"', '<code>concept/wave14-board.html</code>', '—'],
+  ['M17-P1', '검수 확정 — 묶음 확정(D187-A) · 고칠 후보 다시 만들기(미역 · 대게/키다리게 · 바닷가재 · 잠수복) · 의견 적은 ID', '<code>assets/blender/</code> · <code>assets/*/specs</code> status · 리소스 편집기 묶음', '반영'],
+  ['M17-P2', '빈칸 — 가품 대사 D181 · 일지 조건 D183 · 미술품 집에 D184 · 밤톨 증축 묻기 D185 · 집 안 망원경 보기 · (D182-B/C 면 밤 건물)', '<code>town/keepers.js</code> · <code>journal/</code> · <code>house/</code> · <code>night/</code>', '반영'],
+  ['M17-P3', '밸런스 — 축제까지 5~7일(D186-A) · 하루 할 일 양 · 도토리 흐름(증축 빚 · 미술품 값 · 키트 값)', '<code>assets/festival/config.json</code> · <code>assets/data/rules.json</code> → "숫자 반영"', '반영'],
+  ['M17-P4', '편집기 따라잡기 — 요소 편집기 방 탭 <code>phases</code>·<code>inner</code>·<code>parent</code> · 바다 생물·키트 칸 · 리소스·스토리·요소 편집기 다시 게시', '<code>elem-editor/</code> · <code>tools/elem-checks.mjs</code> · <code>tools/build-editor-index.mjs</code>', 'P1'],
+  ['M17-P5', 'QA — 합친 main 전체 자동 플레이 · 봇 빈칸(여우 상인 사기 · 다리·경사로 · 길 막힘 셋) · 실내·시계·행사 점검 · 저사양 GPU(유성우 밤 · 물속) · 게임·편집기 게시', '<code>tests/playthrough/</code> · <code>tools/</code>', 'P1–P4'],
+];
+$('planRows').innerHTML = PLAN.map(([id, what, files, need]) => `<tr><td class="id">${id}</td><td>${what}</td><td class="small">${files}</td><td class="small">${need}</td></tr>`).join('');
+
+/* ---------- 사용자 몫 ---------- */
+const YOU = [
+  ['푸시', 'GitHub 올리기 승인', 'main 이 origin 보다 50여 커밋 앞서 있어요. 채팅에 "푸시" 라고 하면 올려요.'],
+  ['s17–s28', '장면 12 검수', '스토리 편집기에서 장면을 보고 고치거나 "스토리 반영" (편집기는 M17-P4 에서 v40 에 맞춰 다시 게시)'],
+  ['RC-05–08 · 12', '출시 손 점검', 'claude.ai 에서 게임 링크 직접 열기 · iPhone · Android · 다른 GPU 컴퓨터 · 다른 계정으로 공유 링크 (<code>docs/notes/release.md</code>)'],
+  ['보고서', 'PR 보고서 확인', '<a href="https://claude.ai/artifact/1bVjhLYMBJ8wySqR894WXW">개발 보고서</a> 를 열어 보고 공유할지 (지금 나만 보기)'],
+];
+$('youTable').tBodies[0].innerHTML = YOU.map(([a, b, c]) => `<tr><td class="id">${a}</td><td>${b}</td><td class="small">${c}</td></tr>`).join('');
+
+/* ---------- 머리 숫자 ---------- */
+$('pills').innerHTML = ['<span class="pill wait">사용자 선택 대기</span>', `결정 ${DECISIONS.length} (D180–D187)`, `트랙 결정 확정 ${TRACKS.length}줄 (D150–D179)`, `검수 대기 ${total}`, `트랙 ${PLAN.length} (M17-P0–P5)`]
+  .map((t, i) => i ? `<span class="pill">${t}</span>` : t).join('');
+
+/* ---------- 요청 글 ---------- */
+const notes = [...document.querySelectorAll('.note')];
+window.BOARD = { id: 'wave14', decisions: DECISIONS };   // 선택·의견 저장·반영 비교·되돌리기는 board-kit.js
+$('build').addEventListener('click', () => {
+  const lines = ['[포근섬 14차 검수 보드 v1 의견]', '', '■ 결정'];
+  for (const d of DECISIONS) {
+    const r = document.querySelector(`input[name="${d.id}"]:checked`);
+    const opt = d.opts.find(o => o[0] === r?.value);
+    lines.push(`${d.id}-${r?.value ?? '?'} ${opt ? opt[1] : ''}${opt && !opt[3] ? ' (추천안에서 바꿈)' : ''}`);
+  }
+  const filled = notes.filter(n => n.value.trim());
+  lines.push('', '■ 의견');
+  if (filled.length) for (const n of filled) lines.push(`${n.dataset.id} ${n.dataset.label}: ${n.value.trim()}`);
+  else lines.push('(의견 없음 — 트랙 결정 D150–D179 와 검수 대기 묶음은 그대로 확정)');
+  const ch = window.boardKit?.changed() ?? [];
+  const ap = window.boardKit?.applied();
+  if (ap) lines.push('', ch.length ? `■ 마지막 반영 v${ap.version} 뒤 바뀐 것: ${ch.join(', ')}` : `■ 마지막 반영 v${ap.version} 뒤 바뀐 것 없음`);
+  lines.push('', '의견을 적지 않은 ID 는 그대로 승인.');
+  $('reqText').value = lines.join('\n');
+  $('copyMsg').textContent = '';
+});
+$('copy').addEventListener('click', () => {
+  const t = $('reqText');
+  if (!t.value) $('build').click();
+  navigator.clipboard.writeText(t.value).then(() => { $('copyMsg').textContent = '복사했어요. 채팅에 붙여 넣어 주세요.'; })
+    .catch(() => { t.focus(); t.select(); $('copyMsg').textContent = '자동 복사가 막혀 있어요. 글을 선택해 두었으니 Ctrl+C 로 복사해 주세요.'; });
+});
+$('clear').addEventListener('click', () => {
+  for (const n of notes) { n.value = ''; n.classList.remove('filled'); }
+  window.boardKit?.saveNow();
+  $('copyMsg').textContent = '의견을 모두 지웠어요.';
+});
+</script>
+<script src="board-kit.js"></script>

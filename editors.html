@@ -259,6 +259,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
       <a href="https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx" target="_blank" rel="noopener">투어 보드 ↗</a>
       <a href="https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp" target="_blank" rel="noopener">셰이더 보드 ↗</a>
       <a href="https://claude.ai/artifact/Lo1QpQ9svMsenNYUGUM72B" target="_blank" rel="noopener">13차 보드 ↗</a>
+      <a href="https://claude.ai/artifact/6bEcyFkU9dW3thR3BwRNYb" target="_blank" rel="noopener">14차 보드 ↗</a>
       <a href="https://claude.ai/artifact/SKNtCRjBfZEJ1iES9hcWKY" target="_blank" rel="noopener">11차 보드 ↗</a>
       <a href="https://claude.ai/artifact/AZHj6d7gTqXyjXhZcCkW1H" target="_blank" rel="noopener">10차 보드 ↗</a>
       <a href="https://claude.ai/artifact/LqYJsMK1gF7FaP5ZBvFnfc" target="_blank" rel="noopener">9차 보드 ↗</a>
@@ -399,6 +400,9 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "shader", "group": "board", "name": "셰이더 검수 보드 v0.1", "url": "https://claude.ai/artifact/6ijKYZnTxNerwg3jwTa6Vp", "file": "concept/shader-board.html",
     "edits": "셰이더. 결정 D130–D139 (눈 쌓임 · 잎 뒤 비침 · 젖은 땅 윤기 · 낮은 안개 · 적정 색 보정 · 외곽선 · 물 빛 그물 · 반짝임 · LUT · 하프톤), 반영 v1 = 2026-11-12 (저사양 우선 — 필요한 날만 셰이더 글자째).",
     "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/shader", "applied/shader"] },
+  { "id": "wave14", "group": "board", "name": "14차 검수 보드 v1", "url": "https://claude.ai/artifact/6bEcyFkU9dW3thR3BwRNYb", "file": "concept/wave14-board.html",
+    "edits": "M17 방향과 M13–M16 마무리. 트랙이 정한 D150–D179 확정 · 결정 D180–D187 (M17 큰 방향 · 가품 대사 · 밤 건물 닫힌 시각 · 일지 잠수 조건 · 미술품 집에 · 증축 묻기 · 축제까지 5~7일(D41) · 검수 방식) · 검수 대기 116 묶음별 · 로드맵 M17–M18.",
+    "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave14", "applied/wave14"] },
   { "id": "wave13", "group": "board", "name": "13차 검수 보드 v1", "url": "https://claude.ai/artifact/Lo1QpQ9svMsenNYUGUM72B", "file": "concept/wave13-board.html",
     "edits": "M13 방향 — 동물의 숲처럼 풍성하게. 결정 D140–D147 (M13 큰 방향 · 섬 일지 · 풍선 선물 · 유리병 · 유성우 소원 · 방문 행상 · 레시피 모으기 · 저사양), D140-A 기준 새 리소스 UI-24 · TO-07 · PR-33–34 · IC-MA-11–13 · FX-02 · AN-13 · CH-16 · BD-11 · FU-63–66 · s23–s24, 로드맵 M14–M16.",
     "command": "검수 보드 반영", "openLabel": "바뀐 선택", "reads": ["boards/wave13", "applied/wave13"] },
@@ -476,7 +480,8 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; }
   { "id": "12-night", "seq": 12, "cha": 12, "label": "12차 · 밤·새벽", "kind": "main", "board": "night", "decisions": "D106–D114", "made": "2026-11-10", "also": "M12 를 정한 본 보드 (12차 wave 보드 대신)" },
   { "id": "12-tour", "seq": 13, "cha": 12, "label": "12차 · 투어", "kind": "theme", "board": "tour", "decisions": "D120–D128", "made": "2026-11-10", "also": "11차 D100-B 「새 곳」의 작은 섬을 따로 정함" },
   { "id": "12-shader", "seq": 14, "cha": 12, "label": "12차 · 셰이더", "kind": "theme", "board": "shader", "decisions": "D130–D139", "made": "2026-11-11" },
-  { "id": "13-wave13", "seq": 15, "cha": 13, "label": "13차", "kind": "main", "board": "wave13", "decisions": "D140–D147", "made": "2026-11-12" }
+  { "id": "13-wave13", "seq": 15, "cha": 13, "label": "13차", "kind": "main", "board": "wave13", "decisions": "D140–D147", "made": "2026-11-12" },
+  { "id": "14-wave14", "seq": 16, "cha": 14, "label": "14차", "kind": "main", "board": "wave14", "decisions": "D180–D187", "made": "2026-11-12", "also": "트랙 결정 D150–D179 확정 칸 포함" }
 ]
 </script>
 
