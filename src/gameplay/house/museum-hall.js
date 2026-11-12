@@ -7,7 +7,7 @@
 //  - 아치 옆 안내판(행동 키 91) = 그 관 설명 창 (기증은 로비 안내대의 느루와 말할 때만 — keepers.js 그대로).
 //  - 전시: 기증한 것만 제자리에 (아이템 표 순서). 수조·온실 상자는 줄(line), 받침·진열장은 spots, 미술 그림은 액자(frames) 캔버스에 아이콘 그림.
 //    분류에 아이템이 없으면(sea·art 아직) 「곧 열려요」 — 관은 비어 있고 안내판·들어갈 때 알림.
-//  - 별자리관: 액자 열둘에 gameplay/stars 가 찍은 별자리 그림(2D 캔버스 → 텍스처), 가운데 투영기 위에 별 점 구름(Points 하나, 매우 낮음이면 숨김).
+//  - 별자리관: 액자 열여덟에 gameplay/stars 가 찍은 별자리 그림(2D 캔버스 → 텍스처), 가운데 투영기 위에 별 점 구름(Points 하나, 매우 낮음이면 숨김).
 //  - 사양 낮음·매우 낮음: deco 소품·수조 물 장식 숨김(places 와 같은 규칙), 매우 낮음은 전시물이 가만히.
 import { boxOf, moveCircle, inBox } from './grid.js';
 import { buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } from './room.js';

@@ -141,7 +141,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     const TABS = [...DEX_CATEGORIES, 'night', ...(ctx.services.stars?.dexPanel ? ['star'] : [])], TAB_NAME = { ...CATEGORY_NAME, night: '🌙 밤', star: '⭐ 별자리' };   // 요청 8: 별자리 칸은 gameplay/stars 가 그린다
     const listOf = c => (c === 'night' ? ['fish', 'bug'].flatMap(k => data.items.list(k) ?? []).filter(isNightOnly) : data.items.list(c) ?? []);
     function draw() {
-      if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–12)
+      if (cat === 'star') {   // 요청 8 별자리 도감 (IC-ST-01–18, M18-P2 +6)
         tabs.replaceChildren(...TABS.map(c => h('button', {
           type: 'button', role: 'tab', class: 'pk-tab', 'aria-selected': String(c === cat), tabindex: c === cat ? '0' : '-1',
           onclick: () => { cat = c; draw(); tabs.querySelector('[aria-selected="true"]')?.focus(); },

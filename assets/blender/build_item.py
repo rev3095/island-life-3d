@@ -675,6 +675,30 @@ def b_ant(M):
     six_legs(m, s, s * 0.05, -s * 0.03, ys=(-0.08, -0.02, 0.04), reach=0.34, drop=0.2, mat='body', r=0.016)
 
 
+def b_frog(M):
+    # M18-P2 청개구리 IC-BG-25 (장마 하루 · 비 오는 날 생물): 동그란 몸 · 툭 튀어나온 눈 · 접은 뒷다리. 앞 = -Y
+    s = pv('size', 0.22)
+    m = M.part('bug')
+    m.add(ellipsoid((0, s * 0.04, s * 0.11), (s * 0.2, s * 0.26, s * 0.13), seg=20, rings=12), 'body')
+    m.add(ellipsoid((0, s * 0.02, s * 0.06), (s * 0.17, s * 0.22, s * 0.07), seg=16, rings=8), 'belly')
+    for sx in (1, -1):
+        e = V((sx * s * 0.1, -s * 0.16, s * 0.22))
+        m.add(ellipsoid(e, (s * 0.07,) * 3, seg=12, rings=8), 'body')
+        m.add(ellipsoid(e + V((sx * s * 0.012, -s * 0.045, s * 0.02)), (s * 0.04,) * 3, seg=10, rings=6), 'eye')
+        m.add(ellipsoid(e + V((sx * s * 0.02, -s * 0.07, s * 0.04)), (s * 0.013,) * 3, seg=6, rings=4), 'eyeHighlight')
+        # 뒷다리: 몸 옆으로 접힌 넓적다리 + 발
+        hip = V((sx * s * 0.17, s * 0.16, s * 0.07))
+        knee = V((sx * s * 0.26, s * 0.02, s * 0.06))
+        foot = V((sx * s * 0.2, s * 0.26, s * 0.015))
+        m.add(rail([hip, knee, foot], [s * 0.06, s * 0.045, s * 0.03], seg=8), 'body')
+        m.add(ellipsoid(foot + V((sx * s * 0.03, s * 0.03, 0)), (s * 0.06, s * 0.05, s * 0.015), seg=8, rings=4), 'belly')
+        # 앞다리
+        sh = V((sx * s * 0.12, -s * 0.12, s * 0.07))
+        hand = V((sx * s * 0.16, -s * 0.24, s * 0.012))
+        m.add(rail([sh, hand], [s * 0.032, s * 0.024], seg=6), 'body')
+        m.add(ellipsoid(hand, (s * 0.04, s * 0.035, s * 0.012), seg=8, rings=4), 'belly')
+
+
 def b_snail(M):
     s = pv('size', 0.24)
     m = M.part('bug')
@@ -1625,7 +1649,7 @@ BUILDERS = {
     'pie': b_pie, 'juice': b_juice, 'wreath': b_wreath, 'medal': b_medal,
     'fish': b_fish, 'flatfish': b_flatfish, 'squid': b_squid, 'octopus': b_octopus, 'seahorse': b_seahorse,
     'butterfly': b_butterfly, 'dragonfly': b_dragonfly, 'bee': b_bee, 'firefly': b_firefly, 'beetle': b_beetle, 'cicada': b_cicada,
-    'hopper': b_hopper, 'ant': b_ant, 'snail': b_snail, 'pillbug': b_pillbug, 'skater': b_skater, 'caterpillar': b_caterpillar, 'earwig': b_earwig,
+    'hopper': b_hopper, 'ant': b_ant, 'snail': b_snail, 'frog': b_frog, 'pillbug': b_pillbug, 'skater': b_skater, 'caterpillar': b_caterpillar, 'earwig': b_earwig,
     'ammonite': b_ammonite, 'trilobite': b_trilobite, 'amber': b_amber, 'fern-fossil': b_fern_fossil, 'shark-tooth': b_shark_tooth,
     'dino-track': b_dino_track, 'tusk': b_tusk, 'dino-skull': b_dino_skull, 'unknown-fossil': b_unknown_fossil,
     'rod': b_rod, 'net': b_net, 'shovel': b_shovel, 'axe': b_axe, 'can': b_can,

@@ -21,6 +21,7 @@
     "src/sky/debug.js",
     "src/sky/dome.js",
     "src/sky/meteors.js",
+    "src/sky/special.js", "src/sky/footprints.js",
     "src/sky/index.js",
     "src/sky/indoor.js",
     "src/sky/look.js",

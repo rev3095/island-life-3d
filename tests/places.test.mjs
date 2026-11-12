@@ -67,7 +67,7 @@ test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
 test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은 자리, 겹치지 않음 (요청 9: 로비 RM-09 → 관 RM-25–27)', () => {
   const lists = Object.fromEntries(MUSEUM_CATS.map(c => [c, items.list(c).map(it => ({ id: it.id }))]));
   assert.equal(lists.fish.length, 22);   // + P35 무인도 물고기 둘
-  assert.equal(lists.bug.length, 24);    // + P35 무인도 곤충 둘
+  assert.equal(lists.bug.length, 25);    // + P35 무인도 곤충 둘 + M18-P2 청개구리
   assert.equal(lists.fossil.length, 8);
   assert.equal(exhibitPlan(specs.museum, Object.fromEntries(MUSEUM_CATS.map(c => [c, lists[c].map(x => x.id)])), () => false).length, 0, '로비에는 전시 자리가 없다 (관으로 옮김)');
   const halls = HALL_FILES.map(f => json(f)).filter(h => MUSEUM_CATS.includes(h.hall));
@@ -82,7 +82,7 @@ test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은
     assert.equal(keys.size, plan.length, `${h.hall} 두 전시가 한 자리에 겹치지 않는다`);
     for (const e of plan) assert.ok(e.lx > 0 && e.lx < h.size[0] && e.lz > 0 && e.lz < h.size[1] - 1 && e.y >= 0 && e.y < 2, `${e.id} 가 관 안`);
   }
-  assert.equal(total, 54);
+  assert.equal(total, 55);   // M18-P2 청개구리 +1
   // 케이스 자리 계산: 한 자리면 가운데
   const one = caseSlots({ lx0: 0, lz0: 0, lx1: 2, lz1: 2, levels: [0.5] }, 1)[0];
   assert.deepEqual([one.lx, one.lz, one.y], [1, 1, 0.5]);

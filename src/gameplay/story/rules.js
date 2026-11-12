@@ -18,11 +18,15 @@ export const TRIGGERS = {
   'tour-first': { label: '무인도에 처음 도착했을 때 (P35 — tour 가 보내는 tour:arrive 의 first)', event: 'tour:arrive', test: p => !!p?.first },
   'meteor-first': { label: '처음 유성우가 떨어질 때 (M13 — daily 가 보내는 daily:meteor 의 first)', event: 'daily:meteor', test: p => !!p?.first },
   'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
+  'meteor-big': { label: '큰 유성우 밤 별똥별이 처음 떨어질 때 (M18-P2 — daily 가 보내는 daily:meteor 의 bigFirst)', event: 'daily:meteor', test: p => !!p?.bigFirst },
+  'special-day': { label: '그날만 날씨를 처음 맞을 때 (M18-P2 — trigger.kind = monsoon · first-snow, daily 가 보내는 daily:special 의 first)', event: 'daily:special', test: (p, t) => !!t.kind && p?.kind === t.kind && !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
 /** night-first 트리거의 kind (밤 가게 둘) */
 export const NIGHT_KINDS = { moonshop: '달빛 가게 (22–3시)', tent: '새벽 천막 (3–5시)' };
+/** special-day 트리거의 kind (M18-P2 그날만 날씨 — 날짜 규칙 src/sky/special.js) */
+export const SPECIAL_KINDS = { monsoon: '장마 하루 (6월 셋째 수요일)', 'first-snow': '첫눈 하루 (12월 첫째 토요일, 눈이 오기 시작할 때)' };
 Object.assign(NIGHT_KINDS, { foxshop: '여우 상인 가게 (오는 밤 20–5시, P54)', oddtent: '이상한 천막 (오는 밤 21–5시, P54)', fortune: '운세 부스 (20–3시, P54)' });
 
 /** 장면 기준 자리 = world.places 의 이름 (건물은 문 앞) */
@@ -248,6 +252,7 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if (t.on === 'event-start' && !/^EV-0[1-4]$/.test(t.event ?? '')) err.push(at('event-start 의 event 는 EV-01~04'));
     if (t.on === 'move-in' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('move-in 의 slug 는 주민 slug'));
     if (t.on === 'night-first' && !NIGHT_KINDS[t.kind]) err.push(at(`night-first 의 kind 는 ${Object.keys(NIGHT_KINDS).join(' · ')}`));
+    if (t.on === 'special-day' && !SPECIAL_KINDS[t.kind]) err.push(at(`special-day 의 kind 는 ${Object.keys(SPECIAL_KINDS).join(' · ')}`));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];

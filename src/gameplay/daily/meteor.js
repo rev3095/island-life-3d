@@ -4,6 +4,7 @@
 // 그날 아침 달무리(야행성 주민)가 쪽지로 알린다 · 처음 별똥별이 떨어지면 daily:meteor { first } → 장면 s23 (story 트리거 meteor-first).
 import * as R from './rules.js';
 import { STAR_IDS } from '../../data/daily-items.js';
+import { isSpecial } from '../../sky/special.js';   // M18-P2 큰 유성우 밤 (8월·12월 둘째 토요일 — 규칙은 sky/special.js)
 
 export function createMeteor(K) {
   const { ctx, cfg: CFG, S, st, now, seed, toast, emit, count } = K;
@@ -17,10 +18,14 @@ export function createMeteor(K) {
     if (memo.day !== n.dayKey) {
       let fc = null;
       try { fc = S().time?.forecast?.(n.dayKey) ?? null; } catch { fc = null; }
-      memo = { day: n.dayKey, on: R.meteorTonight(n.dayKey, seed(), cfg, fc) };
+      const big = isSpecial(n.dayKey, 'big-meteor');   // 큰 유성우 밤은 하늘이 17시부터 늘 맑다 (special.js applySpecial)
+      memo = { day: n.dayKey, big, on: big || R.meteorTonight(n.dayKey, seed(), cfg, fc) };
     }
     return memo.on;
   }
+  /** 오늘 밤이 큰 유성우인가 (M18-P2 D192-A) */
+  const bigTonight = (n = now()) => (tonight(n), !!memo.big);
+  const bigCfg = () => ({ ...cfg, ...(CFG.bigMeteor ?? {}) });
 
   const lookTilt = () => S().player?.camera?.look?.tilt ?? 0;
   const wishesTonight = n => (st().wish?.day === n.dayKey ? st().wish.n : 0);
@@ -29,7 +34,7 @@ export function createMeteor(K) {
   function dropStars(n) {
     const s = st(), w = s.wish;
     if (!w || w.dropped || w.day === n.dayKey || !K.onIsland()) return;
-    const k = R.starsForWishes(w.n, cfg);
+    const k = R.starsForWishes(w.n, w.big ? bigCfg() : cfg);   // 큰 유성우 밤의 소원은 별 조각 두 배
     w.dropped = true;
     if (!k) return;
     const cells = R.pickSandCells(K.sandCells(), k, n.dayKey, seed(), 'stars', 3);
@@ -45,20 +50,24 @@ export function createMeteor(K) {
     const s = st();
     if (open) dropStars(n);
     // 그날 아침 예고 (5–20시 사이 처음 볼 때)
+    const big = t && bigTonight(n), B = CFG.bigMeteor ?? {};
     if (t && s.notice !== n.dayKey && R.inHours(n.hourF, [5, cfg.hours[0]])) {
       s.notice = n.dayKey;
       const owl = (S().town?.residents?.() ?? []).includes('dalmuri');
-      toast(owl ? cfg.notice : cfg.noticeNoOwl, owl ? '🦉' : '🌠');
+      toast(big ? (owl ? B.notice : B.noticeNoOwl) ?? cfg.notice : owl ? cfg.notice : cfg.noticeNoOwl, owl ? '🦉' : '🌠');
       emit('daily:meteor-notice', { dayKey: n.dayKey, owl });
     }
     const on = R.meteorNow(t, n.hourF, cfg, !K.onIsland());
-    S().time?.meteors?.set?.(on);
+    S().time?.meteors?.set?.(on, { big });
     if (on && !active) {
-      const first = !s.seen.meteorFirst;
-      if (s.seen.meteor !== n.dayKey) { s.seen.meteor = n.dayKey; toast(cfg.start, '🌠'); }
+      // 큰 유성우 밤이 처음이면 장면 s31 (meteor-big) — 그날이 첫 유성우여도 s31 이 소원 빌기까지 알려 주므로 s23 은 건너뛴다
+      const bigFirst = big && !s.seen.bigMeteor;
+      const first = !s.seen.meteorFirst && !bigFirst;
+      if (s.seen.meteor !== n.dayKey) { s.seen.meteor = n.dayKey; toast(big ? B.start ?? cfg.start : cfg.start, '🌠'); }
       s.seen.meteorFirst ??= n.dayKey;
+      if (big) s.seen.bigMeteor ??= n.dayKey;
       const p = S().player?.position;
-      emit('daily:meteor', { on: true, first, dayKey: n.dayKey, x: p?.x ?? 0, z: p?.z ?? 0 });
+      emit('daily:meteor', { on: true, first, big, bigFirst, dayKey: n.dayKey, x: p?.x ?? 0, z: p?.z ?? 0 });
     } else if (!on && active) emit('daily:meteor', { on: false, dayKey: n.dayKey });
     active = on;
   }
@@ -72,7 +81,7 @@ export function createMeteor(K) {
   function wish(n = now()) {
     const s = st();
     if (wishesTonight(n) >= (cfg.wishesPerNight ?? 3)) { toast(cfg.full, '🌠'); return false; }
-    if (s.wish?.day !== n.dayKey) s.wish = { day: n.dayKey, n: 0, dropped: false };
+    if (s.wish?.day !== n.dayKey) s.wish = { day: n.dayKey, n: 0, dropped: false, big: bigTonight(n) };
     s.wish.n++;
     const pl = S().player;
     pl?.play?.(pl.hasClip?.('wish') ? 'wish' : 'happy');
@@ -101,6 +110,7 @@ export function createMeteor(K) {
     sync, update, register,
     service: {
       tonight: () => tonight(),
+      big: () => bigTonight(),
       get active() { return active; },
       canWish: () => !!canWish(),
       wishes: () => { const n = now(); return n ? wishesTonight(n) : 0; },

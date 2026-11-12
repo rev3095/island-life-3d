@@ -4,7 +4,7 @@ import * as items from '../src/data/items.js';
 
 test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화석 8 · 도구 5 · 가구 20(+5차 13)', () => {
   assert.equal(items.list('fish').length, 22);   // + P35 무인도 투어 무지개놀래기 · 꽃쏨뱅이
-  assert.equal(items.list('bug').length, 24);    // + P35 보석풍뎅이 · 달빛나방
+  assert.equal(items.list('bug').length, 25);    // + P35 보석풍뎅이 · 달빛나방 + M18-P2 청개구리 IC-BG-25
   assert.equal(items.list('fossil').length, 8);
   assert.equal(items.list('tool').length, 7);   // + M13 새총 TO-07 + M16 스쿠버 키트 (손에 드는 도구는 6 — tool 칸 있는 것)
   assert.equal(items.list('tool').filter(t => t.tool).length, 6);

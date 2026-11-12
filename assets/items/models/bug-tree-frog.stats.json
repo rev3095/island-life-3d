@@ -1,0 +1,46 @@
+{
+  "id": "IC-BG-25",
+  "slug": "bug-tree-frog",
+  "name": "청개구리",
+  "group": "bug",
+  "kind": "frog",
+  "version": "0.1",
+  "items": [
+    "bug.tree-frog"
+  ],
+  "hold": true,
+  "triangles": 1592,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight"
+  ],
+  "objects": [
+    "bug"
+  ],
+  "size": [
+    0.132,
+    0.135,
+    0.068
+  ],
+  "bounds": [
+    [
+      -0.066,
+      -0.068,
+      -0.034
+    ],
+    [
+      0.066,
+      0.068,
+      0.034
+    ]
+  ],
+  "glbBytes": 32864,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bug-tree-frog_main.png",
+    "bug-tree-frog_thumb.png"
+  ]
+}

@@ -26,7 +26,7 @@ const HOLD = new Set(['fish', 'bug', 'fossil', 'sea']);       // 잡아서 들�
 const FIXED_MATERIALS = new Set(['eyeHighlight']);
 
 test('아이템 아이콘: 가구를 뺀 166개가 모두 렌더 썸네일이고 글자용 emoji 가 남아 있다', () => {
-  assert.equal(NOT_FURN.length, 166);   // 116 + M13 5 (IC-TL-06 · IC-MA-11 셋 · IC-MA-12) + P54 미술품 24 (진품 16 · 가품 8) + M16 잠수 21 (바다 생물 IC-SE-01–20 · 스쿠버 키트 IC-TL-07)
+  assert.equal(NOT_FURN.length, 167);   // + M18-P2 청개구리 IC-BG-25 · 116 + M13 5 (IC-TL-06 · IC-MA-11 셋 · IC-MA-12) + P54 미술품 24 (진품 16 · 가품 8) + M16 잠수 21 (바다 생물 IC-SE-01–20 · 스쿠버 키트 IC-TL-07)
   for (const it of NOT_FURN) {
     assert.match(it.icon, /^assets\/items\/renders\/[\w-]+_thumb\.png$/, `${it.id}: icon 이 썸네일 경로가 아님`);
     assert.ok(has(it.icon), `${it.id}: 썸네일 없음 ${it.icon} (node tools/build-item.mjs)`);
@@ -35,7 +35,7 @@ test('아이템 아이콘: 가구를 뺀 166개가 모두 렌더 썸네일이고
 });
 
 test('아이템 모델 목록: 스펙 143개가 빠짐없이 빌드되어 있고 id·version·status 가 스펙과 같다', () => {
-  assert.equal(Object.keys(SPECS).length, 143, '스펙 개수 (고유 모델 143 = 아이콘 166 − 같은 모델의 색 변형 23)');
+  assert.equal(Object.keys(SPECS).length, 144, '스펙 개수 (고유 모델 144 = 아이콘 167 − 같은 모델의 색 변형 23, M18-P2 청개구리 +1)');
   assert.equal(LIST.length, Object.keys(SPECS).length, '목록에 없는 스펙이 있다 (node tools/build-item.mjs <slug>)');
   const ids = new Set();
   for (const m of LIST) {
@@ -75,7 +75,7 @@ test('아이템 모델 목록: 아이템마다 모델이 하나, 아이콘 경�
     if (vars.length) assert.equal(m.items.length, vars.length, `${m.slug}: 변형마다 아이템 하나`);
   }
   for (const it of NOT_FURN) assert.ok(seen.has(it.id), `${it.id}: 아이템 모델 없음`);
-  assert.equal(seen.size, 166);
+  assert.equal(seen.size, 167);   // M18-P2 청개구리 +1
 });
 
 test('아이템 모델: 재질 이름은 모두 스펙 팔레트 키 (리소스 교체 약속)', () => {
@@ -103,7 +103,7 @@ test('아이템 모델: 물고기·곤충·화석·바다 생물은 들어 보�
       assert.ok(Math.abs(lo[2]) < 0.01, `${m.slug}: 바닥이 원점 높이가 아니다`);
     }
   }
-  assert.equal(LIST.filter(m => m.hold).length, 75, '물고기 22 · 곤충 24 · 화석 9 (P35 무인도 물고기 둘 · 곤충 둘) · 바다 생물 20 (M16)');
+  assert.equal(LIST.filter(m => m.hold).length, 76, '물고기 22 · 곤충 25 (M18-P2 청개구리) · 화석 9 (P35 무인도 물고기 둘 · 곤충 둘) · 바다 생물 20 (M16)');
 });
 
 test('아이템 스펙: 편집기가 읽을 params 모양 (label·value, 숫자는 min ≤ value ≤ max, 고르기는 options 안)', () => {

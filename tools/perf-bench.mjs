@@ -25,13 +25,18 @@ const say = t => process.stdout.write(`${t}\n`);
 const up = async url => { try { return (await fetch(url)).ok; } catch { return false; } };
 
 // 장소: 날짜(요일이 중요 — 야시장은 토요일) · 시각
-const DATES = { weekday: '2026-11-12', saturday: '2026-11-14' };
+const DATES = { weekday: '2026-11-12', saturday: '2026-11-14', monsoon: '2027-06-16', firstsnow: '2027-12-04', bigmeteor: '2027-08-14' };
 const SCENES = {
   'plaza-day': { date: 'weekday', hour: 12 },
   'plaza-night': { date: 'weekday', hour: 21 },
   market: { date: 'saturday', hour: 20.5 },
   tour: { date: 'weekday', hour: 12 },
   'museum-night': { date: 'weekday', hour: 21 },   // 요청 8·9: 박물관(BD-16) 앞 · 망원경대 · 별자리 별 (--scenes=museum-night)
+  // M18-P2 그날만 날씨 (--scenes=monsoon-day,snow-day,meteor-night): 광장. weather = 그날이 특별한 날이 아닌 코드(main 등)에선 그 날씨로 바로 바꿔
+  // 「보통 비·눈 날」과 견준다 (time.special 이 있으면 그날 예보 그대로 — 굵은 비 FX-03 · 쌓이는 눈 FX-04 · 큰 유성우)
+  'monsoon-day': { date: 'monsoon', hour: 12, weather: 'rain' },
+  'snow-day': { date: 'firstsnow', hour: 15, weather: 'snow' },
+  'meteor-night': { date: 'bigmeteor', hour: 22 },
 };
 
 // ---- 페이지 안에서 도는 쪽 (문자열로 보낸다) ----
@@ -124,6 +129,13 @@ async function driver({ scenes, rounds, shots, probe, variants = [], looks = [] 
         const d = W.places.museum?.door ?? W.places.plaza; P.teleport(d.x + 2, d.z + 3);
       } else {
         T.setHour(SC_HOUR[name]); c.events.emit('time:tick', { now: T.now() });
+        const wx = (typeof SC_WX !== 'undefined' ? SC_WX : {})[name];
+        if (wx && !T.special?.()) T.setWeather(wx, { instant: true });   // M18-P2: 특별한 날이 없는 코드에선 보통 비·눈으로
+        if (name === 'meteor-night') {   // 별똥별은 첫날 안내 뒤에 열린다 → 열어 두고, 그 밤이 유성우가 아닌 코드(main)면 보통 유성우로 켠다
+          const f = ((c.state.flags ||= {}).firstday ||= {}); f.done = { ...(f.done ?? {}), intro: '2027-04-01' };
+          c.services.daily?.debug?.sync?.(); step(4);
+          if (!T.meteors?.on) T.meteors?.set?.(true);
+        }
         const pl = W.places.plaza; P.teleport(pl.x, pl.z + 2.5);
       }
       step(40); await wait(400); step(20);
@@ -282,7 +294,8 @@ async function main() {
           const t0 = Date.now();
           await cdp.send('Page.navigate', { url });
           const hours = Object.fromEntries(list.map(s => [s, SCENES[s].hour]));
-          const expr = `(async () => { const SC_HOUR = ${JSON.stringify(hours)}; ${driver.toString().replace(/^async function driver/, 'const driver = async function')}; return JSON.stringify(await driver(${JSON.stringify({ scenes: list, rounds, shots: !!shots, probe: !!arg('probe'), variants: arg('variants') ? JSON.parse(await readFile(arg('variants'), 'utf8')) : [], looks: arg('looks') ? JSON.parse(await readFile(arg('looks'), 'utf8')) : [] })})); })()`;
+          const wxs = Object.fromEntries(list.filter(s => SCENES[s].weather).map(s => [s, SCENES[s].weather]));
+          const expr = `(async () => { const SC_HOUR = ${JSON.stringify(hours)}; const SC_WX = ${JSON.stringify(wxs)}; ${driver.toString().replace(/^async function driver/, 'const driver = async function')}; return JSON.stringify(await driver(${JSON.stringify({ scenes: list, rounds, shots: !!shots, probe: !!arg('probe'), variants: arg('variants') ? JSON.parse(await readFile(arg('variants'), 'utf8')) : [], looks: arg('looks') ? JSON.parse(await readFile(arg('looks'), 'utf8')) : [] })})); })()`;
           const run = cdp.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true, timeout: 600000 });
           if (shots) {
             await mkdir(shots, { recursive: true });

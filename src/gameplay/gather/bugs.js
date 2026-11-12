@@ -68,7 +68,8 @@ export function createBugs(ctx, kit, { bugModels, drops }) {
     else if (place === 'water') anchor = tileAnchor((tx, tz) => isl().tileAt(tx, tz) === 'water' || (isl().tileAt(tx, tz) !== 'sea' && nearWater(tx, tz)));
     if (obj) anchor = { x: obj.x, z: obj.z, y: obj.y, obj };
     if (!anchor) return;
-    const id = kit.data?.spawns?.bug?.({ place, hour: Math.floor(now.hour), month: now.month, weather: now.weather, rng: Math.random });
+    const rainBoost = kit.services?.daily?.special?.rainBoost?.() ?? 1;   // M18-P2 장마 하루: 비 오는 날 생물 많이
+    const id = kit.data?.spawns?.bug?.({ place, hour: Math.floor(now.hour), month: now.month, weather: now.weather, rainBoost, rng: Math.random });
     if (!id) return;
     add(id, place, anchor);
   }

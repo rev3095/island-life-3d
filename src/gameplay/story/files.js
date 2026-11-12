@@ -29,4 +29,7 @@ export const SCENE_FILES = [
   'assets/story/scenes/s27-fox-first.json',   // P54 수상한 여우 상인 첫 만남 (trigger night-first kind foxshop)
   'assets/story/scenes/s28-odd-tent-first.json',   // P54 이상한 천막 첫 방문 (trigger night-first kind oddtent)
   'assets/story/scenes/s25-five-stars.json',   // M14 섬 평가 별 다섯 처음 (trigger rating-five)
+  'assets/story/scenes/s30-monsoon-day.json',   // M18-P2 장마 하루 (trigger special-day kind monsoon)
+  'assets/story/scenes/s31-big-meteor.json',   // M18-P2 큰 유성우 밤 (trigger meteor-big)
+  'assets/story/scenes/s32-first-snow.json',   // M18-P2 첫눈 아침 (trigger special-day kind first-snow)
 ];

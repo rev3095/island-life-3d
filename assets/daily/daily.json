@@ -19,6 +19,46 @@
     "full": "오늘 밤 소원은 다 빌었어요. 내일 아침 바닷가를 봐요",
     "stars": "어젯밤 소원이 닿았나 봐요 — 바닷가에 별 조각이 반짝여요 ✨"
   },
+  "bigMeteor": {
+    "note": "M18-P2 D192-A 큰 유성우 밤 — 8월·12월 둘째 토요일 (규칙 src/sky/special.js). 17시부터 늘 맑음, 별똥별 두 배(sky/meteors.js BIG_METEOR), 소원 하나에 별 조각 둘 (최대 여섯). 처음이면 장면 s31 (트리거 meteor-big). 보통 유성우(주 1–2번)는 그대로",
+    "starsPerWish": 2,
+    "maxStars": 6,
+    "notice": "🦉 달무리 쪽지: 오늘 밤은 일 년에 두 번 있는 「큰 유성우」 밤이부엉! 별똥별이 비처럼 쏟아질 거부엉. 저녁 8시부터!",
+    "noticeNoOwl": "오늘 밤은 일 년에 두 번 있는 「큰 유성우」 밤이래요 — 저녁 8시부터 별똥별이 쏟아져요 🌠",
+    "start": "🌠 큰 유성우가 시작됐어요! 오늘 밤 소원은 별 조각이 두 배예요 — 하늘을 올려다보고(R·V) Space"
+  },
+  "special": {
+    "note": "M18-P2 D193-A 그날만 날씨 — 날짜 규칙은 src/sky/special.js (장마 6월 셋째 수 · 태풍 9월 둘째 일 · 태풍 다음 날 그다음 월 · 첫눈 12월 첫째 토). 모듈 src/gameplay/daily/special.js",
+    "monsoon": {
+      "notice": "☔ 오늘은 장마 하루 — 하루 종일 굵은 비가 와요. 비 오는 날에만 나오는 생물이 많이 나와요!",
+      "rainBoost": 3
+    },
+    "typhoon": {
+      "notice": "🌀 태풍이 지나가는 날이에요. 바람이 세니 조심해요 — 내일 아침 바닷가엔 떠밀려 온 것이 많을 거예요"
+    },
+    "afterTyphoon": {
+      "notice": "🌊 태풍이 지나갔어요! 바닷가에 떠밀려 온 것들이 가득해요",
+      "count": 14,
+      "drops": [
+        { "item": "mat.branch", "n": 2, "w": 4 },
+        { "item": "mat.wood", "n": 1, "w": 3 },
+        { "item": "shell.clam", "n": 1, "w": 2 },
+        { "item": "shell.cowrie", "n": 1, "w": 2 },
+        { "item": "shell.scallop", "n": 1, "w": 2 },
+        { "item": "shell.whelk", "n": 1, "w": 1 },
+        { "item": "shell.turban", "n": 1, "w": 1 },
+        { "item": "shell.coral", "n": 1, "w": 1 },
+        { "item": "mat.acorn-bag", "n": 1, "w": 1 },
+        { "item": "mat.recipe-note", "n": 1, "w": 1, "note": true }
+      ]
+    },
+    "firstSnow": {
+      "notice": "❄️ 하늘이 잿빛이에요 — 오늘은 첫눈이 올 것 같아요 (아침 8시쯤)",
+      "start": "❄️ 첫눈이 내려요! 눈이 조금씩 쌓여요 — 걸으면 발자국이 남아요",
+      "recipe": "furn.snowman-lamp",
+      "recipeText": "첫눈 기념 레시피 — 「{name}」 만드는 법을 알게 됐어요! (재료: {needs})"
+    }
+  },
   "balloons": {
     "note": "D142-A 하루 몇 번 바다 쪽에서 선물 풍선. 새총(TO-07, 숫자키 6)을 들고 아래에서 Space. 흔들림은 높음·적정만 정점 셰이더 (D147-A)",
     "perDay": 3,

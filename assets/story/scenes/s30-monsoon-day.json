@@ -1,0 +1,176 @@
+{
+  "id": "s30-monsoon-day",
+  "version": 1,
+  "status": "review",
+  "chapter": "계절이 깊어진다",
+  "title": "장마 하루",
+  "summary": "6월 장마 하루, 아침부터 굵은 비가 쏟아진다. 노란 우산을 쓴 초롱이가 빗속에서 신나게 다가와, 오늘 같은 날엔 청개구리랑 달팽이가 잔뜩 나온다고 알려 준다. 둘이 우산 아래에서 빗소리를 듣는다.",
+  "trigger": {
+    "on": "special-day",
+    "kind": "monsoon"
+  },
+  "place": "playerHouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "초롱이와 빗속 산책",
+      "recommended": true,
+      "desc": "굵은 비 내리는 섬을 넓게 → 우산 쓴 초롱이가 다가옴 → 비 오는 날 생물 안내 → 나란히 빗소리.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "굵은 비가 쏟아지는 섬, 주인공이 하늘을 본다",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "morning",
+          "caption": "장마 하루 — 하루 종일 굵은 비",
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "☔",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "우산 쓴 초롱이가 빗속을 달려온다",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "push"
+          },
+          "caption": "오늘은 장마래! 비 냄새 좋다~",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "at": [
+                3,
+                1.6
+              ],
+              "to": [
+                1.1,
+                0.4
+              ],
+              "do": "run",
+              "face": "player",
+              "emote": "😄",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "chorong",
+              "emote": "😮",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "비 오는 날 생물 안내",
+          "dur": 4,
+          "cam": {
+            "size": "medium",
+            "target": "chorong",
+            "angle": 15,
+            "move": "static"
+          },
+          "caption": "이런 날엔 청개구리랑 달팽이가 잔뜩 나와! 풀밭이랑 바위 위를 봐",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "do": "happy",
+              "face": "player",
+              "emote": "🐸",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "chorong",
+              "emote": "💡",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "둘이 나란히 빗소리를 듣는다",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "group",
+            "angle": -10,
+            "move": "pull"
+          },
+          "caption": "우산 아래에서 듣는 빗소리",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "face": 0,
+              "emote": "🎵",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "😊",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 안내",
+      "desc": "비 내리는 섬 한 컷 + 안내 글.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "굵은 비가 쏟아지는 섬",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "transition": "fade",
+          "music": "morning",
+          "caption": "장마 하루 — 오늘은 청개구리·달팽이가 많이 나와요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 0,
+              "emote": "☔",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
