@@ -156,7 +156,8 @@
     { "slug": "net", "name": "잠자리채", "emoji": "🥅", "price": 100, "buy": 400, "durability": 30, "use": "곤충 잡기", "from": "시작 지급" },
     { "slug": "shovel", "name": "삽", "emoji": "⛏️", "price": 200, "buy": 800, "durability": 40, "use": "화석 파기 · 나무 심기", "from": "상점 800 / 제작: 나무 5" },
     { "slug": "axe", "name": "도끼", "emoji": "🪓", "price": 200, "buy": 800, "durability": 60, "use": "나무 베기 · 바위 치기", "from": "상점 800 / 제작: 나뭇가지 5 + 돌 1" },
-    { "slug": "can", "name": "물뿌리개", "emoji": "🚿", "price": 200, "buy": 800, "durability": 40, "use": "꽃에 물 주기 → 새 꽃 번식", "from": "상점 800 / 제작: 나무 5" }
+    { "slug": "can", "name": "물뿌리개", "emoji": "🚿", "price": 200, "buy": 800, "durability": 40, "use": "꽃에 물 주기 → 새 꽃 번식", "from": "상점 800 / 제작: 나무 5" },
+    { "slug": "sling", "name": "새총", "emoji": "🎯", "price": 300, "buy": 1200, "durability": 30, "use": "하늘 풍선 맞히기", "from": "상점 1,200 / 제작: 나무 3 + 나뭇가지 4 (유리병 레시피 쪽지)" }
   ],
   "furniture": [
     { "slug": "log-chair", "name": "통나무 의자", "emoji": "🪑", "price": 240, "buy": 0, "size": "1×1", "source": "craft", "from": "제작" },

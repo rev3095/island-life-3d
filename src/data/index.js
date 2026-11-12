@@ -32,7 +32,8 @@ export function createDataService(ctx, opts = {}) {
   const inventory = createInventory(state, { onChange: slots => emit('inventory:changed', { slots }) });
   const wallet = createWallet(state, { onChange: acorns => emit('wallet:changed', { acorns }) });
   const museum = createMuseum(state, { onChange: id => emit('museum:changed', { id }) });
-  const recipes = createRecipes(inventory);
+  // M13 D146-A: 쪽지로 여는 레시피는 state.recipes.known 에 적힌 것만 (daily 모듈이 연다)
+  const recipes = createRecipes(inventory, { known: id => !!state.recipes?.known?.includes?.(id) });
   const day = createDay({ state, getNow, onNewDay: summary => emit('data:newday', summary), allowBack: !!ctx.preview });
   const harvest = createHarvest({ state, day });
   const economy = createEconomy({ inventory, wallet, getSeed: () => state.island.seed, getDayKey: () => day.key() });

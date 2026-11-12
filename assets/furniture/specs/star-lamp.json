@@ -1,0 +1,58 @@
+{
+  "id": "FU-63",
+  "slug": "star-lamp",
+  "item": "furn.star-lamp",
+  "name": "별 조각 램프",
+  "category": "furniture",
+  "kind": "star-lamp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "하얀 받침과 가는 기둥 위에 별 셋을 모은 등갓. 가운데 노란 별이 밤에 빛난다.",
+    "keywords": [
+      "별 셋",
+      "밤에 빛남"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D146-A · 별 조각 레시피로만 (유리병·풍선·일지로 레시피가 열림)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "base": "#FBF7F2",
+    "metal": "#C9A84C",
+    "glow": "#FFE38A",
+    "starPink": "#FF9EC4",
+    "starBlue": "#8CC8FF"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "metal": "기둥",
+    "glow": "가운데 별빛",
+    "starPink": "분홍 별",
+    "starBlue": "하늘 별"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

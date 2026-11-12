@@ -1,0 +1,54 @@
+{
+  "id": "CH-16",
+  "slug": "songi",
+  "name": "송이",
+  "species": "hedgehog",
+  "version": "0.1",
+  "triangles": 13400,
+  "vertices": 6987,
+  "bones": 13,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "spines"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 0.92,
+  "glbBytes": 452544,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "songi_back.png",
+    "songi_front.png",
+    "songi_happy.png",
+    "songi_hero.png",
+    "songi_run.png",
+    "songi_side.png",
+    "songi_three_quarter.png",
+    "songi_thumb.png",
+    "songi_walk.png"
+  ]
+}

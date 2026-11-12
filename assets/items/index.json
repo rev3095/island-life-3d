@@ -2308,6 +2308,75 @@
       "status": "approved"
     },
     {
+      "id": "IC-MA-11",
+      "slug": "mat-star-piece",
+      "name": "별 조각",
+      "group": "mat",
+      "kind": "star-piece",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.star-yellow",
+          "code": "IC-MA-11",
+          "variant": "yellow",
+          "icon": "assets/items/renders/mat-star-piece_yellow_thumb.png"
+        },
+        {
+          "item": "mat.star-pink",
+          "code": "IC-MA-11",
+          "variant": "pink",
+          "icon": "assets/items/renders/mat-star-piece_pink_thumb.png"
+        },
+        {
+          "item": "mat.star-blue",
+          "code": "IC-MA-11",
+          "variant": "blue",
+          "icon": "assets/items/renders/mat-star-piece_blue_thumb.png"
+        }
+      ],
+      "variants": [
+        "yellow",
+        "pink",
+        "blue"
+      ],
+      "size": [
+        0.385,
+        0.19,
+        0.313
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-MA-12",
+      "slug": "mat-recipe-note",
+      "name": "레시피 쪽지",
+      "group": "mat",
+      "kind": "recipe-note",
+      "hold": false,
+      "items": [
+        {
+          "item": "mat.recipe-note",
+          "code": "IC-MA-12",
+          "icon": "assets/items/renders/mat-recipe-note_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.355,
+        0.243,
+        0.062
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-NT-01",
       "slug": "night-bungeoppang",
       "name": "붕어빵",
@@ -2798,6 +2867,32 @@
       },
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "IC-TL-06",
+      "slug": "tool-sling",
+      "name": "새총",
+      "group": "tool",
+      "kind": "sling",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.sling",
+          "code": "IC-TL-06",
+          "icon": "assets/items/renders/tool-sling_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.308,
+        0.221,
+        0.638
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "IC-TR-01",

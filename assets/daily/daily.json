@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "note": "M13 매일 할 거리 P2–P5 (13차 검수 보드 wave13 D142–D147 모두 A). 규칙 src/gameplay/daily/rules.js, 모듈 src/gameplay/daily/index.js. 시각은 게임 하루 시각 5~29 (28 = 다음 날 새벽 4시).",
+  "opensAfterDay": 1,
+  "meteor": {
+    "note": "D144-A 맑은 밤 주 1–2번 20–4시. 올려다보기(R/V·두 손가락·오른쪽 끌기) 하고 Space → 소원. 다음 날 아침 바닷가에 별 조각",
+    "hours": [20, 28],
+    "twoChance": 0.4,
+    "weather": ["clear", "rainbow"],
+    "lookTilt": 0.45,
+    "wishesPerNight": 3,
+    "starsPerWish": 1,
+    "maxStars": 3,
+    "notice": "🦉 달무리 쪽지: 오늘 밤엔 별똥별이 쏟아질 것 같아부엉. 저녁 8시가 지나면 하늘을 올려다봐부엉!",
+    "noticeNoOwl": "오늘 밤은 하늘이 맑아 별똥별이 떨어질 것 같아요 (저녁 8시부터)",
+    "start": "별똥별이 떨어지기 시작했어요! 하늘을 올려다보고(R·V 키 · 두 손가락) Space 로 소원을 빌어요",
+    "lookHint": "별똥별이 지나가요 — Space 로 소원 빌기",
+    "wished": ["별똥별에 소원을 빌었어요 ✨", "소원이 하늘로 날아갔어요 ✨", "두 손 모아 소원을 빌었어요 ✨"],
+    "full": "오늘 밤 소원은 다 빌었어요. 내일 아침 바닷가를 봐요",
+    "stars": "어젯밤 소원이 닿았나 봐요 — 바닷가에 별 조각이 반짝여요 ✨"
+  },
+  "balloons": {
+    "note": "D142-A 하루 몇 번 바다 쪽에서 선물 풍선. 새총(TO-07, 숫자키 6)을 들고 아래에서 Space. 흔들림은 높음·적정만 정점 셰이더 (D147-A)",
+    "perDay": 3,
+    "hours": [9, 18],
+    "window": 1.5,
+    "speed": 1.15,
+    "height": 4.6,
+    "reach": 3.4,
+    "colors": ["#F26B6B", "#6FA8DC", "#F6C84C"],
+    "first": "🎈 바다 쪽에서 선물 풍선이 날아와요! 새총(6)으로 맞혀 봐요",
+    "again": "🎈 선물 풍선이 날아와요",
+    "noSling": "새총이 있으면 풍선을 맞힐 수 있어요 (도토리상점 · 행상 · 레시피)",
+    "miss": "아깝다! 조금 더 가까이에서",
+    "gifts": [
+      { "item": "mat.wood", "n": 3, "w": 3 },
+      { "item": "mat.stone", "n": 3, "w": 3 },
+      { "item": "mat.iron", "n": 2, "w": 2 },
+      { "item": "mat.clay", "n": 2, "w": 2 },
+      { "item": "mat.acorn-bag", "n": 2, "w": 2 },
+      { "item": "mat.recipe-note", "n": 1, "w": 2, "note": true },
+      { "item": "furn.plant-pot", "n": 1, "w": 1 },
+      { "item": "seed.cosmos", "n": 3, "w": 1 }
+    ]
+  },
+  "bottle": {
+    "note": "D143-A 날마다 아침 바닷가에 유리병 하나 — 열면 레시피 쪽지 (D146-A 새 레시피 하나). 레시피를 다 알면 작은 선물",
+    "kind": "sea-bottle",
+    "found": "유리병 속에 쪽지가 들어 있어요!",
+    "after": [
+      { "item": "mat.acorn-bag", "n": 1, "w": 2 },
+      { "item": "shell.cowrie", "n": 2, "w": 2 },
+      { "item": "mat.recipe-note", "n": 1, "w": 1 }
+    ],
+    "afterText": "유리병 속에 작은 선물이 들어 있어요"
+  },
+  "recipes": {
+    "note": "D146-A 새 레시피만 하나씩 열림 (assets/data/rules.json recipes 의 unlock: true, 표 순서대로). 지금 있던 레시피는 그대로",
+    "read": "레시피 쪽지를 펼쳤어요 — 「{name}」 만드는 법이 적혀 있어요! 작업대에서 만들 수 있어요.",
+    "all": "아는 레시피가 다 모였어요. 쪽지는 기념으로 둘게요"
+  },
+  "peddler": {
+    "note": "D145-A 행상 하나 · 주 2회 — 수·일 낮(9–17시) 광장 한쪽 수레 BD-11 + 행상 송이 CH-16 (고슴도치). 희귀 꽃 모종 · 묘목 · 다른 곳에서 안 파는 벽지 하나",
+    "weekdays": [3, 0],
+    "hours": [9, 17],
+    "keeper": "songi",
+    "name": "송이",
+    "color": "#6FB08A",
+    "voice": "pong",
+    "cart": "peddler-cart",
+    "offset": [-7, 5],
+    "flowers": 2,
+    "saplings": 1,
+    "markup": 4,
+    "saplingPool": ["seed.sapling", "seed.cedar-sapling"],
+    "wallpaper": { "slug": "wp-09", "price": 2600 },
+    "arrive": "🛒 떠돌이 행상 송이가 광장에 수레를 세웠어요 (오후 5시까지)",
+    "lines": {
+      "first": ["안녕하세송! 나는 섬과 섬 사이를 떠도는 행상, 송이송.", "수요일이랑 일요일 낮에 이 광장에 들를게송. 다른 데서 못 보는 걸 가져왔송!"],
+      "greet": ["어서 와송! 오늘은 뭘 가져왔게송?", "바닷바람 따라 왔송. 구경하고 가송!", "오늘 물건은 오늘만이송~"],
+      "pick": "무엇을 줄까송?",
+      "bought": ["좋은 걸 골랐송!", "잘 키워 줘송!"],
+      "short": "도토리가 조금 모자라송…",
+      "full": "가방이 꽉 찼송. 조금 비우고 와송",
+      "owned": "그 벽지는 이미 가지고 있송!",
+      "bye": ["또 보자송! 다음엔 다른 걸 가져올게송", "바람 좋은 날 또 올게송~"],
+      "closed": "수레가 비어 있어요 (행상은 수·일 낮 9–17시)"
+    }
+  },
+  "assets": {
+    "env": ["gift-balloon", "sea-bottle", "peddler-cart"],
+    "characters": ["songi"]
+  }
+}

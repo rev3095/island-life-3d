@@ -1639,7 +1639,81 @@ def b_star_drape(M):
     s.add(ellipsoid((-0.225, -0.075, 1.27), (0.06, 0.008, 0.06), seg=16, rings=8), 'drape')
 
 
+# ================================================================ M13 별 조각 가구 FU-63–66 (13차 보드 wave13 D146-A, 별 조각 레시피로만)
+def b_star_lamp(M):
+    """FU-63 별 조각 램프: 하얀 둥근 받침 · 가는 기둥 · 별 셋을 모은 등갓 (가운데 큰 별이 glow — 밤에 켜짐)"""
+    m = M.part('lamp')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.06), 0.2, 0.19, seg=24), 'base')
+    m.add(cylinder((0, 0, 0.06), (0, 0, 0.78), 0.025, seg=10), 'metal')
+    m.add(annulus((0, 0, 0.06), 0.13, 0.17, thick=0.01, seg=24), 'metal')
+    m.add(star_shape((0, 0, 0.95), 0.2, 0.07, puff=0.3), 'glow')
+    for k, (x, z, r, col) in enumerate(((-0.17, 0.82, 0.08, 'starPink'), (0.18, 0.84, 0.075, 'starBlue'))):
+        m.add(star_shape((x, 0.02, z), r, 0.035, rot=rot_xyz(y=0.4 - 0.8 * k), puff=0.25), col)
+        m.add(cylinder((0, 0, 0.78), (x * 0.8, 0.015, z - 0.02), 0.008, seg=6), 'metal')
+
+
+def b_star_clock(M):
+    """FU-64 별빛 벽시계 (벽): 남색 둥근 판 · 금빛 테 · 12시 자리에 큰 별, 시각 자리에 작은 별 · 바늘 둘 (게임이 시각에 맞춰 돌림)"""
+    m = M.part('clock')
+    cz, R = 1.55, 0.28
+    m.add(cylinder((0, 0, cz), (0, -0.07, cz), R, seg=40), 'rim')
+    m.add(cylinder((0, -0.07, cz), (0, -0.08, cz), R * 0.86, seg=40), 'face')
+    for k in range(12):
+        a = TAU * k / 12
+        if k == 0:
+            continue
+        r = 0.018 if k % 3 == 0 else 0.011
+        m.add(star_shape((math.sin(a) * 0.19, -0.086, cz + math.cos(a) * 0.19), r, 0.008, puff=0.2), 'tick')
+    m.add(star_shape((0, -0.06, cz + R + 0.04), 0.09, 0.04, puff=0.25), 'glow')
+    for sx in (1, -1):
+        m.add(star_shape((sx * 0.12, -0.05, cz + R - 0.01), 0.04, 0.025, rot=rot_xyz(y=sx * 0.5), puff=0.2), 'tick')
+    m.add(ellipsoid((0, -0.1, cz), (0.02, 0.01, 0.02), seg=10, rings=6), 'hand')
+    hh = M.part('hourHand', pivot=(0, -0.092, cz))
+    hh.add(box((0, -0.092, cz + 0.05), (0.03, 0.008, 0.12), bevel=0.004), 'hand')
+    mh = M.part('minuteHand', pivot=(0, -0.098, cz))
+    mh.add(box((0, -0.098, cz + 0.075), (0.018, 0.008, 0.18), bevel=0.003), 'hand')
+
+
+def b_star_chair(M):
+    """FU-65 별 의자: 다리 넷 위 둥근 방석 · 등받이가 커다란 별 모양 (별 끝 셋이 위로)"""
+    m = M.part('chair')
+    sh = 0.44
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(cylinder((sx * 0.17, sy * 0.15, 0), (sx * 0.15, sy * 0.13, sh - 0.04), 0.03, 0.025, seg=10), 'wood')
+    m.add(cylinder((0, 0, sh - 0.06), (0, 0, sh - 0.02), 0.25, seg=28), 'wood')
+    m.add(ellipsoid((0, 0, sh), (0.24, 0.23, 0.05), seg=28, rings=10), 'cushion')
+    m.add(star_shape((0, 0.2, sh + 0.33), 0.3, 0.07, rot=rot_xyz(x=-0.12), puff=0.18), 'star')
+    m.add(star_shape((0, 0.16, sh + 0.33), 0.1, 0.03, rot=rot_xyz(x=-0.12), puff=0.25), 'starLight')
+    for sx in (1, -1):
+        m.add(cylinder((sx * 0.12, 0.17, sh - 0.02), (sx * 0.1, 0.2, sh + 0.12), 0.022, seg=8), 'wood')
+
+
+def b_star_mobile(M):
+    """FU-66 별 모빌: 둥근 받침 · 휜 기둥 · 끝에서 늘어진 나무 막대 둘에 별 조각 다섯이 줄에 매달림 (가운데 별 glow)"""
+    m = M.part('stand')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.05), 0.18, 0.17, seg=24), 'base')
+    arm = bezier(V((0, 0.05, 0.05)), V((0, 0.05, 1.1)), V((0, 0.0, 1.5)), V((0, -0.32, 1.5)), 14)
+    m.add(tube(arm, [0.022] * len(arm), seg=8), 'wood')
+    top = V((0, -0.32, 1.47))
+    m.add(cylinder(top, top - V((0, 0, 0.12)), 0.004, seg=6), 'string', outline=False)
+    for rot, L in ((0.0, 0.36), (math.pi / 2, 0.26)):
+        c = top - V((0, 0, 0.12 + (0.0 if rot == 0 else 0.22)))
+        d = V((math.cos(rot), math.sin(rot), 0))
+        m.add(cylinder(c - d * L / 2, c + d * L / 2, 0.009, seg=6), 'wood')
+        for k, sgn in enumerate((1, -1)):
+            p = c + d * sgn * L / 2
+            drop = 0.14 + 0.06 * k + (0.1 if rot else 0)
+            m.add(cylinder(p, p - V((0, 0, drop)), 0.003, seg=4), 'string', outline=False)
+            col = ('starPink', 'starBlue', 'star', 'starPink')[k + (2 if rot else 0)]
+            m.add(star_shape(p - V((0, 0, drop + 0.05)), 0.06, 0.025, rot=rot_xyz(z=rot), puff=0.25), col)
+    c = top - V((0, 0, 0.12))
+    m.add(cylinder(c, c - V((0, 0, 0.42)), 0.003, seg=4), 'string', outline=False)
+    m.add(star_shape(c - V((0, 0, 0.5)), 0.09, 0.035, puff=0.3), 'glow')
+
+
 BUILDERS = {
+    'star-lamp': b_star_lamp, 'star-clock': b_star_clock, 'star-chair': b_star_chair, 'star-mobile': b_star_mobile,
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
     'outdoor-bench': b_outdoor_bench, 'garden-lamp': b_garden_lamp, 'flower-pots': b_flower_pots, 'picnic-table': b_picnic_table,

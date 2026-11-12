@@ -124,6 +124,15 @@
       "status": "approved"
     },
     {
+      "id": "BD-11",
+      "slug": "peddler-cart",
+      "name": "행상 수레",
+      "category": "prop",
+      "kind": "peddler-cart",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FP-01",
       "slug": "festival-part-lantern",
       "name": "반딧불 등불",
@@ -446,6 +455,24 @@
       "kind": "sleep-note",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "PR-33",
+      "slug": "gift-balloon",
+      "name": "선물 풍선",
+      "category": "prop",
+      "kind": "gift-balloon",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-34",
+      "slug": "sea-bottle",
+      "name": "유리병",
+      "category": "prop",
+      "kind": "sea-bottle",
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "BD-01",
