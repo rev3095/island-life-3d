@@ -1639,6 +1639,213 @@ def b_star_drape(M):
     s.add(ellipsoid((-0.225, -0.075, 1.27), (0.06, 0.008, 0.06), seg=16, rings=8), 'drape')
 
 
+# ================================================================ M14 내 집 계단 (assets/furniture/fixtures — 가구 목록·아이템 표 밖, 증축한 방에 붙박이)
+def _rail_line(m, a, b, h=0.78, posts=3, mat='wood'):
+    """a→b 를 따라 기둥 + 손잡이 (바닥 높이 a.z·b.z 에서 h 위)"""
+    a, b = V(a), V(b)
+    for k in range(posts):
+        t = k / max(1, posts - 1)
+        p = a.lerp(b, t)
+        m.add(box((p.x, p.y, p.z + h / 2), (0.07, 0.07, h), bevel=0.015), mat)
+    m.add(cylinder(a + V((0, 0, h + 0.02)), b + V((0, 0, h + 0.02)), 0.035, seg=10), 'woodLight')
+
+
+def b_home_stairs(M):
+    """FU-67 나무 계단 (2×3, 1층 → 2층): 남쪽(-Y)에서 올라 북쪽 벽 쪽 1.7 높이에서 끝난다. 서쪽에 난간. 원점 = 발자국 가운데 바닥"""
+    m = M.part('stairs')
+    n, top, L, W = 6, 1.7, 2.92, 1.8
+    run = L / n
+    for i in range(n):
+        y0 = -L / 2 + i * run
+        z = (i + 1) * top / n
+        m.add(box((0.05, y0 + run / 2, z / 2), (W - 0.1, run, z), bevel=0.02), 'woodDark')            # 계단 몸 (속이 찬 단)
+        m.add(box((0.05, y0 + run / 2 - 0.02, z + 0.02), (W - 0.04, run + 0.06, 0.05), bevel=0.012), 'wood' if i % 2 else 'woodLight')   # 디딤판
+    m.add(box((-W / 2 - 0.02, 0, top / 2 + 0.05), (0.08, L, 0.1), bevel=0.02, rot=rot_xyz(x=math.atan2(top, L))), 'woodDark')   # 옆판
+    for k in range(4):
+        t = k / 3
+        y = -L / 2 + 0.2 + t * (L - 0.4)
+        z = (y + L / 2) / L * top
+        m.add(box((-W / 2, y, z + 0.42), (0.07, 0.07, 0.84), bevel=0.015), 'wood')
+    m.add(cylinder((-W / 2, -L / 2 + 0.2, 0.9), (-W / 2, L / 2 - 0.2, top + 0.75), 0.035, seg=10), 'woodLight')
+
+
+def b_attic_stairs(M):
+    """FU-68 다락 계단 (1×2, 2층 → 다락): 가파른 나무 계단, 양옆 손잡이. 남쪽에서 올라 북쪽 1.6 높이. 원점 = 발자국 가운데 바닥"""
+    m = M.part('stairs')
+    n, top, L, W = 5, 1.6, 2.0, 0.84
+    run = L / n
+    for i in range(n):
+        y0 = -L / 2 + i * run
+        z = (i + 1) * top / n
+        m.add(box((0, y0 + run / 2, z), (W - 0.12, run * 0.8, 0.05), bevel=0.012), 'woodLight')
+    ang = math.atan2(top, L)
+    for sx in (-1, 1):
+        m.add(box((sx * W / 2, 0, top / 2 + 0.04), (0.07, math.hypot(L, top) * 0.98, 0.16), bevel=0.02, rot=rot_xyz(x=ang)), 'woodDark')
+        m.add(cylinder((sx * W / 2, -L / 2 + 0.1, 0.75), (sx * W / 2, L / 2 - 0.05, top + 0.7), 0.03, seg=8), 'wood')
+        for y in (-L / 2 + 0.12, L / 2 - 0.12):
+            z = (y + L / 2) / L * top
+            m.add(box((sx * W / 2, y, z + 0.38), (0.06, 0.06, 0.76), bevel=0.012), 'wood')
+
+
+def _hole(m, w, d, steps, top=1.7):
+    """바닥에 뚫린 아래층 계단 구멍: 어두운 바닥 + 내려가는 디딤판 몇 개 (북쪽이 높다)"""
+    m.add(box((0, 0, 0.004), (w, d, 0.008), bevel=0.0), 'hole', outline=False)
+    for k in range(steps):
+        y = d / 2 - 0.25 - k * (d / (steps + 1))
+        m.add(box((0, y, 0.012 - 0.002 * k), (w - 0.18, 0.16, 0.006), bevel=0.0), 'holeStep', outline=False)
+    for sx in (-1, 1):   # 구멍 테두리 턱
+        m.add(box((sx * (w / 2 + 0.02), 0, 0.02), (0.06, d + 0.06, 0.04), bevel=0.01), 'woodDark')
+    for sy in (-1, 1):
+        m.add(box((0, sy * (d / 2 + 0.02), 0.02), (w + 0.1, 0.06, 0.04), bevel=0.01), 'woodDark')
+
+
+def b_stair_rail(M):
+    """FU-69 계단 난간 (2×3, 2층의 내려가는 곳): 아래층 계단 구멍 + 남쪽·서쪽 난간. 서쪽 북쪽 끝(1칸)은 열려 있어 그쪽으로 걸어 내려간다"""
+    m = M.part('rail')
+    w, d = 1.8, 2.86
+    _hole(m, w, d, 4)
+    _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (w / 2, -d / 2, 0), posts=3)
+    _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (-w / 2 - 0.02, d / 2 - 1.15, 0), posts=3)
+
+
+def b_attic_hatch(M):
+    """FU-70 다락 문 난간 (1×2, 다락의 내려가는 곳): 2층 계단 구멍 + 남쪽·동쪽 난간. 동쪽 북쪽 끝은 열려 있다"""
+    m = M.part('rail')
+    w, d = 0.84, 1.88
+    _hole(m, w, d, 3)
+    _rail_line(m, (-w / 2, -d / 2, 0), (w / 2 + 0.02, -d / 2, 0), posts=2)
+    _rail_line(m, (w / 2 + 0.02, -d / 2, 0), (w / 2 + 0.02, d / 2 - 0.95, 0), posts=2)
+
+
+def b_album_frame(M):
+    """FU-71 추억 액자 (M15, 탁상): 작은 협탁 위 가로 사진틀. 'photo' 칸에 게임이 앨범 사진을 입힌다 (ui/album.js dress) — 사진 칸 위에는 아무것도 얹지 않는다."""
+    m = M.part('table')
+    side_table(m, top_z=0.5, w=0.52, d=0.42)
+    p = M.part('frame')
+    T = rot_xyz(x=-0.2)   # 위가 살짝 뒤로 기운다
+    base = V((0, 0.02, 0.525))
+    at = lambda x, y, z: base + T @ V((x, y, z))
+    p.add(box(at(0, 0, 0.17), (0.48, 0.04, 0.34), bevel=0.02, rot=T), 'frame')
+    p.add(box(at(0, -0.016, 0.17), (0.42, 0.01, 0.28), bevel=0.004, rot=T), 'mat')
+    for sx, sz in ((1, 1), (-1, 1), (1, -1), (-1, -1)):   # 모서리 사진 꽂이
+        p.add(box(at(sx * 0.17, -0.024, 0.17 + sz * 0.105), (0.05, 0.004, 0.05), bevel=0.0, rot=T @ rot_xyz(y=sx * sz * 0.785)), 'corner')
+    p.add(box((0, 0.14, 0.66), (0.05, 0.02, 0.26), bevel=0.006, rot=rot_xyz(x=0.42)), 'frame')   # 뒤 받침
+    ph = M.part('photo')
+    ph.add(box(at(0, -0.023, 0.17), (0.37, 0.004, 0.231), bevel=0.0, rot=T), 'photo')
+
+
+def b_album_frame_wall(M):
+    """FU-72 추억 벽 액자 (M15, 벽걸이): 나무 테 + 흰 바탕 + 'photo' 칸 (게임이 앨범 사진을 입힌다) + 테 위 작은 하트 핀."""
+    m = M.part('frame')
+    cz, W, H, Tk = 1.5, 0.84, 0.6, 0.06
+    for cx, z, sx, sz in ((0, cz + H / 2 - Tk / 2, W, Tk), (0, cz - H / 2 + Tk / 2, W, Tk), (-W / 2 + Tk / 2, cz, Tk, H), (W / 2 - Tk / 2, cz, Tk, H)):
+        m.add(box((cx, -0.04, z), (sx, 0.06, sz), bevel=0.014), 'frame')
+    m.add(box((0, -0.025, cz), (W - Tk * 1.2, 0.02, H - Tk * 1.2), bevel=0.003), 'mat')
+    m.add(ellipsoid((W / 2 - 0.07, -0.08, cz + H / 2 - 0.03), (0.03, 0.012, 0.026), seg=12, rings=6), 'pin')
+    m.add(ellipsoid((W / 2 - 0.09, -0.08, cz + H / 2 - 0.015), (0.022, 0.012, 0.02), seg=10, rings=6), 'pin')
+    m.add(ellipsoid((W / 2 - 0.05, -0.08, cz + H / 2 - 0.015), (0.022, 0.012, 0.02), seg=10, rings=6), 'pin')
+    nail = V((0, -0.02, cz + H / 2 + 0.14))
+    for sx in (1, -1):
+        m.add(cylinder((sx * 0.3, -0.03, cz + H / 2 - 0.02), nail, 0.005, seg=6), 'string')
+    m.add(ellipsoid(nail, (0.014, 0.014, 0.014), seg=8, rings=6), 'string')
+    ph = M.part('photo')
+    ph.add(box((0, -0.037, cz), (0.6, 0.004, 0.375), bevel=0.0), 'photo')
+
+
+
+# ================================================================ 요청 9 박물관 관 붙박이 (FU-85–88, assets/furniture/fixtures)
+def b_glass_case(M):
+    """FU-85 유리 진열장 (1×1): 나무 받침장 위 유리 상자 (뚜껑 없이 위 테만 — 위에서 보는 카메라에 안이 보이게) · 놋쇠 이름판.
+    화석·바다 생물·작은 전시물은 게임이 윗면(0.74)에 놓는다."""
+    W, H0, H1 = 0.84, 0.72, 0.5
+    m = M.part('case')
+    m.add(box((0, 0, H0 / 2), (W, W, H0), bevel=0.03), 'wood')
+    m.add(box((0, 0, H0 + 0.015), (W + 0.04, W + 0.04, 0.03), bevel=0.01), 'woodDark')
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(box((sx * (W / 2 - 0.02), sy * (W / 2 - 0.02), H0 + H1 / 2), (0.03, 0.03, H1), bevel=0.006), 'brass')
+    for sy in (1, -1):
+        m.add(box((0, sy * (W / 2 - 0.02), H0 + H1), (W, 0.03, 0.03), bevel=0.006), 'brass')
+        m.add(box((sy * (W / 2 - 0.02), 0, H0 + H1), (0.03, W, 0.03), bevel=0.006), 'brass')
+    g = M.part('glass')
+    for sy in (1, -1):
+        g.add(box((0, sy * (W / 2 - 0.02), H0 + H1 / 2), (W - 0.05, 0.012, H1 - 0.03), bevel=0.002), 'caseGlass', outline=False)
+        g.add(box((sy * (W / 2 - 0.02), 0, H0 + H1 / 2), (0.012, W - 0.05, H1 - 0.03), bevel=0.002), 'caseGlass', outline=False)
+    m.add(box((0, -W / 2 - 0.012, H0 - 0.14), (0.3, 0.02, 0.08), bevel=0.006), 'brass')
+    m.add(box((0, 0, H0 + 0.035), (W - 0.12, W - 0.12, 0.02), bevel=0.004), 'cloth')
+
+
+def b_wall_tank(M):
+    """FU-86 대형 수조 (3×1, 벽에 붙여 놓는 바닥 붙박이): 나무 받침장 · 큰 물 상자(뚜껑 없이 테두리) · 자갈 · 물풀 · 돌 · 거품.
+    물고기·바다 생물은 게임이 넣는다 (층 0.8 · 1.25)."""
+    W, D, B, H = 2.9, 0.86, 0.5, 1.15
+    m = M.part('frame')
+    m.add(box((0, 0, B / 2), (W, D, B), bevel=0.03), 'frame')
+    m.add(box((0, 0, B + 0.02), (W + 0.04, D + 0.04, 0.04), bevel=0.01), 'brass')
+    t = 0.045
+    for sx in (1, -1, 0.333, -0.333):
+        for sy in (1, -1):
+            m.add(box((sx * (W / 2 - t / 2), sy * (D / 2 - t / 2), B + H / 2), (t, t, H), bevel=0.008), 'frame')
+    for sy in (1, -1):
+        m.add(box((0, sy * (D / 2 - t / 2), B + H), (W, t, t), bevel=0.008), 'frame')
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - t / 2), 0, B + H), (t, D, t), bevel=0.008), 'frame')
+    m.add(box((0, -D / 2 - 0.012, B - 0.15), (0.42, 0.02, 0.1), bevel=0.006), 'brass')
+    w = M.part('water')
+    w.add(box((0, 0, B + 0.06), (W - 0.06, D - 0.06, 0.06), bevel=0.01), 'gravel')
+    w.add(box((0, 0, B + 0.09 + (H - 0.2) / 2), (W - 0.08, D - 0.08, H - 0.2), bevel=0.01), 'tankWater', outline=False)
+    d = M.part('deco')
+    rnd = random.Random(86)
+    for k in range(10):
+        x = -W / 2 + 0.2 + k * (W - 0.4) / 9
+        y = D / 2 - 0.14 + rnd.uniform(-0.04, 0.03)
+        hgt, ph = rnd.uniform(0.35, 0.75), rnd.uniform(0, TAU)
+        pts = [V((x + 0.04 * math.sin(ph + i * 1.3), y, B + 0.09 + i * hgt / 6)) for i in range(7)]
+        d.add(rail(pts, [0.024 * (1 - i / 7) + 0.006 for i in range(7)], seg=8, flat=0.5), 'seaweed')
+    for k in range(5):
+        d.add(ellipsoid((-W / 2 + 0.35 + k * (W - 0.7) / 4, rnd.uniform(0.0, 0.2), B + 0.11), (rnd.uniform(0.09, 0.14), rnd.uniform(0.07, 0.11), 0.07), seg=14, rings=8), 'rock')
+    for k in range(6):
+        d.add(ellipsoid((W / 2 - 0.3, -0.05, B + 0.35 + k * 0.13), (0.018 + 0.004 * k,) * 3, seg=8, rings=5), 'bubble')
+
+
+def b_art_frame(M):
+    """FU-87 미술관 그림 액자 (벽, 1칸): 금빛 테 · 빈 캔버스(게임이 그림을 얹는다) · 위 작은 그림 등(밤에 켜짐) · 놋쇠 이름판.
+    원점 = 벽면 바닥, 앞 -Y. 그림 가운데 높이 1.5."""
+    W, H, cz = 0.86, 0.68, 1.5
+    m = M.part('frame')
+    m.add(box((0, -0.03, cz), (W + 0.12, 0.05, H + 0.12), bevel=0.02), 'gold')
+    m.add(box((0, -0.058, cz), (W, 0.012, H), bevel=0.003), 'canvas', outline=False)
+    for sx in (1, -1):
+        for sz in (1, -1):
+            m.add(ellipsoid((sx * (W / 2 + 0.04), -0.06, cz + sz * (H / 2 + 0.04)), (0.035, 0.02, 0.035), seg=10, rings=6), 'gold')
+    m.add(box((0, -0.03, cz - H / 2 - 0.2), (0.24, 0.02, 0.07), bevel=0.006), 'brass')
+    arm0, arm1 = V((0, -0.02, cz + H / 2 + 0.12)), V((0, -0.2, cz + H / 2 + 0.2))
+    m.add(cylinder(arm0, arm1, 0.012, seg=8), 'brass')
+    m.add(cone(arm1 + V((0, 0, 0.03)), arm1 + V((0, -0.05, -0.05)), 0.06, 0.035, seg=14), 'brass')
+    m.add(ellipsoid(arm1 + V((0, -0.035, -0.035)), (0.03, 0.03, 0.02), seg=10, rings=6), 'glow', outline=False)
+
+
+def b_star_projector(M):
+    """FU-88 천체 투영기 (2×2, 별자리관 가운데): 둥근 받침 · 기둥 · 양쪽 별 공(작은 구멍 점이 밤처럼 빛남) · 놋쇠 고리."""
+    m = M.part('base')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.12), 0.78, 0.74, seg=32), 'metal')
+    m.add(cylinder((0, 0, 0.12), (0, 0, 0.16), 0.6, seg=32), 'brass')
+    m.add(cylinder((0, 0, 0.16), (0, 0, 0.82), 0.12, 0.09, seg=16), 'metal')
+    m.add(box((0, 0, 0.88), (0.22, 0.22, 0.14), bevel=0.03), 'metal')
+    p = M.part('globes')
+    rnd = random.Random(88)
+    for sy in (1, -1):
+        c = V((0, sy * 0.36, 1.02 + sy * 0.06))
+        p.add(cylinder(V((0, 0, 0.92)), c, 0.07, seg=12), 'metal')
+        p.add(ellipsoid(c, (0.24, 0.24, 0.24), seg=24, rings=14), 'projector')
+        p.add(annulus(c, 0.24, 0.27, axis=(0, 1, 0), thick=0.03, seg=28), 'brass')
+        for k in range(16):
+            th, ph = rnd.uniform(0, TAU), rnd.uniform(-1.2, 1.3)
+            n = V((math.cos(th) * math.cos(ph), math.sin(th) * math.cos(ph), math.sin(ph)))
+            p.add(ellipsoid(c + n * 0.242, (0.018,) * 3, seg=6, rings=4), 'glow', outline=False)
+    m.add(box((0, -0.62, 0.2), (0.34, 0.03, 0.1), bevel=0.006), 'brass')
+
+
 # ================================================================ M13 별 조각 가구 FU-63–66 (13차 보드 wave13 D146-A, 별 조각 레시피로만)
 def b_star_lamp(M):
     """FU-63 별 조각 램프: 하얀 둥근 받침 · 가는 기둥 · 별 셋을 모은 등갓 (가운데 큰 별이 glow — 밤에 켜짐)"""
@@ -1713,6 +1920,8 @@ def b_star_mobile(M):
 
 
 BUILDERS = {
+    'home-stairs': b_home_stairs, 'attic-stairs': b_attic_stairs, 'stair-rail': b_stair_rail, 'attic-hatch': b_attic_hatch,   # M14 내 집 계단 FU-67–70
+    'album-frame': b_album_frame, 'album-frame-wall': b_album_frame_wall,   # M15 추억 액자 FU-71–72
     'star-lamp': b_star_lamp, 'star-clock': b_star_clock, 'star-chair': b_star_chair, 'star-mobile': b_star_mobile,
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
@@ -1735,6 +1944,7 @@ BUILDERS = {
     'tool-stand': b_tool_stand, 'seed-shelf': b_seed_shelf, 'long-tank': b_long_tank, 'long-terrarium': b_long_terrarium,
     'clothes-rack': b_clothes_rack,   # 11차 D102-A 도토리상점 옷 진열대 FU-54
     'tarot-table': b_tarot_table, 'candle-stand': b_candle_stand, 'star-drape': b_star_drape,   # P44 새벽 천막 붙박이 FU-60–62
+    'glass-case': b_glass_case, 'wall-tank': b_wall_tank, 'art-frame': b_art_frame, 'star-projector': b_star_projector,   # 요청 9 박물관 관 붙박이 FU-85–88
 }
 import night_special_furniture; BUILDERS.update(night_special_furniture.builders(globals()))   # P54 밤 특별 상점 가구 FU-73·75·76·78 + 붙박이 FU-74·77
 

@@ -484,6 +484,15 @@
       "status": "review"
     },
     {
+      "id": "PR-40",
+      "slug": "telescope-stand",
+      "name": "망원경대",
+      "category": "prop",
+      "kind": "telescope-stand",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -507,15 +516,6 @@
       "name": "도토리상점",
       "category": "building",
       "kind": "shop",
-      "version": "0.1",
-      "status": "approved"
-    },
-    {
-      "id": "BD-04",
-      "slug": "museum",
-      "name": "박물관",
-      "category": "building",
-      "kind": "museum",
       "version": "0.1",
       "status": "approved"
     },
@@ -574,6 +574,33 @@
       "status": "approved"
     },
     {
+      "id": "BD-12-1",
+      "slug": "house-grown-1",
+      "name": "넓힌 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-12-2",
+      "slug": "house-grown-2",
+      "name": "2층 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-12-3",
+      "slug": "house-grown-3",
+      "name": "다락 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-13",
       "slug": "odd-tent",
       "name": "이상한 천막",
@@ -598,6 +625,15 @@
       "category": "building",
       "kind": "fortune-booth",
       "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-16",
+      "slug": "museum",
+      "name": "박물관",
+      "category": "building",
+      "kind": "museum",
+      "version": "0.2",
       "status": "review"
     },
     {
@@ -752,6 +788,24 @@
       "kind": "path-flower",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "TI-13",
+      "slug": "bridge-built",
+      "name": "놓는 나무다리",
+      "category": "tile",
+      "kind": "built-bridge",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-14",
+      "slug": "ramp-built",
+      "name": "놓는 경사로",
+      "category": "tile",
+      "kind": "built-ramp",
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

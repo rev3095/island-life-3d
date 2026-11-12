@@ -1,0 +1,39 @@
+{
+  "id": "BD-12-3",
+  "slug": "house-grown-3",
+  "name": "다락 내 집",
+  "category": "building",
+  "kind": "house-grown",
+  "version": "0.1",
+  "triangles": 3732,
+  "parts": 1,
+  "materials": [
+    "door",
+    "flower",
+    "foundation",
+    "leaf",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    3.04,
+    2.87,
+    4.22
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 75484,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "house-grown-3_front.png",
+    "house-grown-3_hero.jpg",
+    "house-grown-3_main.png",
+    "house-grown-3_thumb.png",
+    "house-grown-3_top.png"
+  ]
+}

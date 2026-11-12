@@ -1,0 +1,50 @@
+{
+  "id": "RM-17",
+  "slug": "rm-17",
+  "kind": "room",
+  "owner": "player",
+  "ownerName": "나",
+  "name": "다락방",
+  "version": 1,
+  "status": "review",
+  "floorIndex": 2,
+  "note": "M14 집 증축 3단계 「다락 올리기」. 벽이 낮은 지붕 밑 방 (8×6). 서쪽 다락 문 난간 FU-70 으로 2층에 내려간다 (북동쪽이 열림).",
+  "wallpaper": "wp-01",
+  "floor": "fl-01",
+  "size": [
+    8,
+    6
+  ],
+  "origin": {
+    "x": 500,
+    "z": 80
+  },
+  "windows": [
+    "n:3",
+    "n:5"
+  ],
+  "door": null,
+  "wallH": 1.8,
+  "fixtures": [
+    {
+      "slug": "attic-hatch",
+      "fu": "FU-70",
+      "gx": 0,
+      "gz": 0,
+      "w": 1,
+      "d": 2,
+      "kind": "down",
+      "to": 1,
+      "open": "e"
+    }
+  ],
+  "starter": [
+    {
+      "item": "furn.plant-pot",
+      "gx": 7,
+      "gz": 5,
+      "rot": 0
+    }
+  ],
+  "furniture": []
+}

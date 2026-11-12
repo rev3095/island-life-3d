@@ -478,6 +478,118 @@ def b_museum(M):
     face_y = -0.15 - (D + 0.6) / 2 - 0.1
     spiral = [V((math.cos(t) * 0.022 * t, face_y, top + 0.55 + math.sin(t) * 0.022 * t)) for t in (i * 0.35 for i in range(1, 34))]
     m.add(tube(spiral, [0.018] * len(spiral), seg=8), 'trim', outline=False)   # 박공에 암모나이트 문양
+    if P.get('annex', 0) >= 0.5:
+        museum_annex(M, W, D, base)
+
+
+def museum_annex(M, W, D, base):
+    """BD-16 박물관 증축 (요청 9): 앞 신전(문·기둥·박공·계단)은 BD-04 그대로 두고, 같은 6×6 터 안에서 뒤로 커진다.
+    뒤채(관 여섯이 든 홀) · 가운데 천체 투영실 둥근 지붕(별 무늬가 밤에 켜짐) · 서쪽 수조관 물빛 유리 지붕 · 동쪽 곤충관 온실 지붕 ·
+    양옆 둥근 창 · 앞벽 깃발 둘 (물고기 · 별). 섬 터(lot 6×6)는 그대로라 섬 생성이 바뀌지 않는다."""
+    a = M.part('annex')
+    y0, y1 = 1.05, 2.9                    # 뒤채 앞·뒤 (Blender +Y = 게임 북쪽)
+    cy, dep, hw = (y0 + y1) / 2, y1 - y0, 2.85
+    a.add(box((0, cy + 0.02, 0.22), (hw * 2 + 0.1, dep + 0.1, 0.45), bevel=0.03), 'stone')      # 뒤채 기단
+    H = 2.75
+    a.add(box((0, cy, base + H / 2), (hw * 2, dep, H), bevel=0.06), 'wall')
+    a.add(box((0, cy, base + H + 0.06), (hw * 2 + 0.14, dep + 0.14, 0.12), bevel=0.03), 'column')   # 처마
+    for sx in (1, -1):                    # 양옆 둥근 창 (밤에 켜짐)
+        for y in (y0 + 0.45, y0 + 1.25):
+            c = V((sx * (hw + 0.005), y, base + 1.55))
+            a.add(cylinder(c - V((sx * 0.04, 0, 0)), c + V((sx * 0.03, 0, 0)), 0.24, seg=20), 'column')
+            a.add(cylinder(c, c + V((sx * 0.04, 0, 0)), 0.18, seg=20), 'window', outline=False)
+    for sx in (1, -1):                    # 앞 신전 옆으로 보이는 뒤채 앞면 띠 창
+        x = sx * (W / 2 + (hw - W / 2) / 2)
+        a.add(box((x, y0 - 0.01, base + 1.4), (0.22, 0.04, 0.9), bevel=0.02), 'window', outline=False)
+        a.add(box((x, y0 - 0.03, base + 1.4), (0.3, 0.03, 1.0), bevel=0.01), 'column')
+    top = base + H + 0.12
+    # 가운데 천체 투영실: 둥근 북(드럼) + 반구 지붕 + 별 점 · 꼭대기 별
+    d = M.part('dome')
+    dc = V((0, cy - 0.12, top))
+    d.add(cylinder(dc, dc + V((0, 0, 0.32)), 1.08, seg=32), 'column')
+    for k in range(12):                   # 드럼 둘레 작은 창
+        t = TAU * (k + 0.5) / 12
+        p = dc + V((math.cos(t) * 1.075, math.sin(t) * 1.075, 0.17))
+        d.add(box(p, (0.1, 0.1, 0.16), bevel=0.01, rot=rot_xyz(z=t)), 'window', outline=False)
+    d.add(ellipsoid(dc + V((0, 0, 0.32)), (0.99, 0.99, 0.95), seg=32, rings=16), 'dome')
+    rnd = random.Random(16)
+    for k in range(26):                   # 지붕 별 무늬 (glow → 밤에 켜짐)
+        th, ph = rnd.uniform(0, TAU), rnd.uniform(0.18, 1.3)
+        n = V((math.cos(th) * math.cos(ph), math.sin(th) * math.cos(ph), math.sin(ph)))
+        if n.y > 0.6:                     # 뒤쪽은 안 보이니 아낀다
+            continue
+        p = dc + V((0, 0, 0.32)) + V((n.x * 0.99, n.y * 0.99, n.z * 0.95)) * 1.005
+        r = rnd.uniform(0.028, 0.05)
+        d.add(ellipsoid(p, (r, r, r), seg=8, rings=5), 'glow', outline=False)
+    tip = dc + V((0, 0, 1.3))
+    d.add(cylinder(tip - V((0, 0, 0.06)), tip + V((0, 0, 0.16)), 0.035, seg=8), 'trim')
+    d.add(ellipsoid(tip + V((0, 0, 0.22)), (0.09, 0.03, 0.09), seg=10, rings=6), 'glow', outline=False)
+    # 서쪽: 수조관 물빛 유리 반원 지붕 + 살
+    w = M.part('aqua')
+    wc = V((-hw + 0.78, cy, top))
+    w.add(cylinder(wc - V((0, dep / 2 - 0.2, 0)), wc + V((0, dep / 2 - 0.2, 0)), 0.55, seg=20), 'aqua')
+    w.add(box(wc + V((0, 0, -0.02)), (1.16, dep - 0.3, 0.06), bevel=0.01), 'column')
+    for k in range(3):
+        y = wc.y - dep / 2 + 0.35 + k * (dep - 0.7) / 2
+        w.add(cylinder(V((wc.x, y - 0.02, wc.z)), V((wc.x, y + 0.02, wc.z)), 0.58, seg=20), 'column')
+    # 동쪽: 곤충관 온실 박공 지붕 (유리판 + 흰 살)
+    g = M.part('greenhouse')
+    gc = V((hw - 0.78, cy, top))
+    g.add(prism(gc, dep - 0.3, 1.12, 0.62, ridge='y'), 'greenGlass')
+    ang = math.atan2(0.62, 0.56)
+    for k in range(4):
+        y = gc.y - (dep - 0.3) / 2 + k * (dep - 0.3) / 3
+        for sx in (1, -1):
+            g.add(box(V((gc.x + sx * 0.28, y, gc.z + 0.31)), (0.84, 0.035, 0.035), bevel=0.006, rot=rot_xyz(y=sx * ang)), 'column')
+    g.add(box(gc + V((0, 0, 0.62)), (0.05, dep - 0.25, 0.05), bevel=0.01), 'column')
+    # 앞벽 깃발 둘 (물고기 · 별) — 바깥 기둥과 안쪽 기둥 사이
+    f = M.part('banners')
+    fy = -D / 2 + 0.16
+    for sx, mark in ((-1, 'fish'), (1, 'star')):
+        x = sx * W * 0.24
+        f.add(box((x, fy, base + 1.85), (0.5, 0.05, 0.05), bevel=0.01), 'trim')
+        f.add(box((x, fy - 0.01, base + 1.32), (0.42, 0.025, 1.0), bevel=0.01), 'banner')
+        c = V((x, fy - 0.035, base + 1.38))
+        if mark == 'fish':
+            f.add(ellipsoid(c, (0.13, 0.012, 0.07), seg=12, rings=6), 'trim', outline=False)
+            f.add(cone(c + V((0.1, 0, 0)), c + V((0.2, 0, 0)), 0.07, 0.0, squash=0.15, seg=3), 'trim', outline=False)
+        else:
+            for k in range(5):
+                t = math.pi / 2 + TAU * k / 5
+                f.add(cone(c, c + V((math.cos(t) * 0.14, 0, math.sin(t) * 0.14)), 0.05, 0.0, squash=0.25, seg=4), 'glow', outline=False)
+
+
+def b_telescope_stand(M):
+    """PR-40 박물관 앞 공용 망원경대 (요청 8): 돌 받침대 + 둥근 디딤 받침 + 남색 망원경이 북쪽(+Y) 하늘을 겨눔 · 놋쇠 테 · 별 패(밤에 켜짐).
+    플레이어는 남쪽(-Y)에서 다가와 행동 키 — 게임 카메라에 통이 하늘로 뻗은 옆모습이 보이게 비스듬히."""
+    m = M.part('stand')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.08), 0.42, 0.4, seg=24), 'stone')
+    m.add(box((0, 0.04, 0.36), (0.36, 0.36, 0.56), bevel=0.04), 'stone')
+    m.add(box((0, 0.04, 0.66), (0.46, 0.46, 0.06), bevel=0.02), 'stoneDark')
+    m.add(cylinder((0, 0.04, 0.69), (0, 0.04, 0.78), 0.12, 0.1, seg=16), 'metal')
+    m.add(box((0, -0.15, 0.3), (0.2, 0.02, 0.2), bevel=0.01), 'brass')       # 앞 별 패
+    c = V((0, -0.165, 0.3))
+    for k in range(5):
+        t = math.pi / 2 + TAU * k / 5
+        m.add(cone(c, c + V((math.cos(t) * 0.075, 0, math.sin(t) * 0.075)), 0.03, 0.0, squash=0.3, seg=4), 'glow', outline=False)
+    fork = V((0, 0.04, 0.86))
+    for sx in (1, -1):
+        m.add(box(fork + V((sx * 0.13, 0, 0.02)), (0.04, 0.08, 0.2), bevel=0.01), 'metal')
+    m.add(box(fork + V((0, 0, -0.07)), (0.3, 0.1, 0.04), bevel=0.01), 'metal')
+    d = V((0.18, 0.62, 0.76)).normalized()
+    back, front = fork - d * 0.22, fork + d * 0.56
+    m.add(cylinder(back, front, 0.085, 0.1, seg=24), 'tube')
+    for t, r in ((0.12, 0.093), (0.62, 0.1)):
+        p = back + (front - back) * t
+        m.add(cylinder(p - d * 0.03, p + d * 0.03, r, seg=24), 'brass')
+    m.add(cylinder(front - d * 0.03, front + d * 0.06, 0.12, 0.12, seg=24), 'brass')
+    m.add(cylinder(front + d * 0.055, front + d * 0.065, 0.095, seg=24), 'lens', outline=False)
+    m.add(cylinder(back, back - d * 0.1, 0.03, 0.026, seg=12), 'metal')
+    m.add(cylinder(back - d * 0.1, back - d * 0.13, 0.04, seg=12), 'brass')
+    side = d.cross(V((0, 0, 1))).normalized()
+    fp = fork + side * 0.12 + d * 0.05 + V((0, 0, 0.08))
+    m.add(cylinder(fp - d * 0.13, fp + d * 0.11, 0.025, seg=12), 'tube')
+    m.add(cylinder(fork + side * 0.03, fp, 0.012, seg=6), 'metal')
 
 
 def gable_roof(m, base, length, span, height, overhang=0.15, thick=0.09, mat='roof'):
@@ -1456,6 +1568,93 @@ def b_tour_boat(M):
     hull.add(tube([V((-W * 0.45, -L * 0.3, zc + 0.26)), V((-W * 0.75, -L * 0.25, zc + 0.12)), V((-W * 1.05, -L * 0.2, zc + 0.36))], [0.018] * 3, seg=6), 'rope')
 
 
+# ================================================================ M14 집과 섬이 자란다 (BD-12 커진 내 집 · TI-13 놓는 다리 · TI-14 놓는 경사로)
+def b_house_grown(M):
+    """BD-12 커진 내 집 (집 증축 단계 params.stage 1 방 넓히기 · 2 2층 · 3 다락). 문은 언제나 집터 가운데(x 0) 앞 —
+    BD-01 과 같은 집터 3×3, 같은 문 자리라 door.js 문짝이 그대로 맞는다. 원점 = 집터 가운데 바닥"""
+    st = int(P.get('stage', 1))
+    W, D = 2.1, 2.2
+    Hh = 1.5 if st == 1 else 2.55
+    roofH = 1.0 if st < 3 else 1.45
+    bx = -0.3                                   # 본채는 서쪽으로 조금, 동쪽에 덧붙인 방(날개)
+    m = M.part('house')
+    m.add(box((bx, 0, 0.1), (W + 0.14, D + 0.14, 0.2), bevel=0.04), 'foundation')
+    m.add(box((bx, 0, 0.2 + Hh / 2), (W, D, Hh), bevel=0.06), 'wall')
+    top = 0.2 + Hh
+    m.add(prism((bx, 0, top - 0.02), D, W, roofH * 0.96, ridge='y'), 'wall')
+    m.add(prism((bx, 0, top + 0.02), D, W, roofH, overhang=0.18, ridge='y'), 'roof')
+    # 문 (x 0 = 집터 가운데) + 문 앞 디딤돌
+    m.add(box((0, -D / 2 - 0.02, 0.2 + 0.52), (0.56, 0.08, 1.0), bevel=0.04), 'door')
+    m.add(ellipsoid((0.17, -D / 2 - 0.07, 0.68), (0.035, 0.03, 0.035), seg=10, rings=6), 'trim')
+    m.add(box((0, -D / 2 - 0.28, 0.06), (0.86, 0.42, 0.12), bevel=0.03), 'foundation')
+    window(m, bx - W * 0.3, -D / 2 - 0.02, 0.2 + 0.9)
+    if st >= 2:   # 2층: 위 줄 창 둘 + 층 사이 띠
+        m.add(box((bx, -D / 2 - 0.01, 0.2 + 1.5), (W + 0.04, 0.06, 0.08), bevel=0.02), 'trim')
+        for sx in (-1, 1):
+            window(m, bx + sx * W * 0.27, -D / 2 - 0.02, 0.2 + 2.05, w=0.44, h=0.4)
+        # 서쪽 벽 꽃 상자
+        m.add(box((bx - W * 0.27, -D / 2 - 0.12, 0.2 + 1.8), (0.5, 0.16, 0.1), bevel=0.02), 'trim')
+        for k in range(4):
+            m.add(ellipsoid((bx - W * 0.27 - 0.18 + k * 0.12, -D / 2 - 0.13, 0.2 + 1.89), (0.05, 0.05, 0.05), seg=10, rings=6), 'flower', outline=False)
+    if st >= 3:   # 다락: 지붕 위 내민 창(도머) + 박공 둥근 창
+        dz = top + roofH * 0.38
+        m.add(box((bx + 0.35, -D * 0.2, dz), (0.56, 0.62, 0.5), bevel=0.04), 'wall')
+        m.add(prism((bx + 0.35, -D * 0.2, dz + 0.24), 0.66, 0.66, 0.3, overhang=0.06, ridge='y'), 'roof')
+        window(m, bx + 0.35, -D * 0.2 - 0.32, dz, w=0.34, h=0.3)
+        m.add(cylinder((bx - W / 2 - 0.02, 0, top + 0.42), (bx - W / 2 - 0.07, 0, top + 0.42), 0.17, seg=20), 'trim')   # 서쪽 박공 둥근 창
+        m.add(cylinder((bx - W / 2 - 0.05, 0, top + 0.42), (bx - W / 2 - 0.08, 0, top + 0.42), 0.12, seg=20), 'window', outline=False)
+    # 굴뚝
+    m.add(box((bx + W * 0.25, D * 0.2, top + roofH * 0.6), (0.24, 0.24, 0.7 + (0.25 if st >= 3 else 0)), bevel=0.03), 'foundation')
+    # 동쪽 날개 (넓힌 방): 낮은 벽 + 한쪽 지붕
+    ww, wd, wh = 0.7, 1.7, 1.25
+    wx = bx + W / 2 + ww / 2 - 0.02
+    m.add(box((wx, 0.1, 0.1), (ww + 0.12, wd + 0.12, 0.2), bevel=0.04), 'foundation')
+    m.add(box((wx, 0.1, 0.2 + wh / 2), (ww, wd, wh), bevel=0.05), 'wall')
+    m.add(box((wx + 0.02, 0.1, 0.2 + wh + 0.13), (ww + 0.16, wd + 0.3, 0.1), bevel=0.03, rot=rot_xyz(y=-0.32)), 'roof')
+    window(m, wx, 0.1 - wd / 2 - 0.02, 0.2 + wh * 0.55, w=0.44, h=0.42)
+    if st >= 2:   # 2층부터 날개 앞 작은 화분
+        m.add(cylinder((wx + 0.2, -wd / 2 - 0.15, 0.0), (wx + 0.2, -wd / 2 - 0.15, 0.24), 0.11, 0.13, seg=14), 'foundation')
+        m.add(ellipsoid((wx + 0.2, -wd / 2 - 0.15, 0.32), (0.15, 0.15, 0.14), seg=14, rings=8), 'leaf')
+
+
+def b_built_bridge(M):
+    """TI-13 놓는 나무다리: 강 2칸 + 양쪽 둑 반 칸 (길이 3, 폭 1.1). 널빤지 + 밧줄 난간 + 말뚝 넷. 원점 = 다리 가운데 땅 높이"""
+    L, W = 3.0 * P.get('length', 1), 1.1 * P.get('width', 1)
+    m = M.part('bridge')
+    n = 14
+    arch = lambda x: 0.16 * math.cos(math.pi * x / L)
+    for i in range(n):
+        x = -L / 2 + (i + 0.5) * L / n
+        m.add(box((x, 0, 0.16 + arch(x)), (L / n * 0.86, W, 0.06), bevel=0.012), 'wood' if i % 2 else 'woodLight')
+    for sy in (1, -1):
+        beam = [V((x, sy * (W / 2 - 0.1), 0.1 + arch(x))) for x in (L * (i / 10 - 0.5) for i in range(11))]
+        m.add(tube(beam, [0.05] * len(beam), seg=8), 'woodDark')
+        posts = [-L / 2 + 0.12, L / 2 - 0.12]
+        for x in posts:
+            m.add(cylinder((x, sy * (W / 2 - 0.03), -0.25), (x, sy * (W / 2 - 0.03), 0.68 + arch(x)), 0.055, seg=10), 'woodDark')
+        rope = [V((x, sy * (W / 2 - 0.03), 0.58 + arch(x) - 0.08 * math.sin(math.pi * (x - posts[0]) / (posts[1] - posts[0])))) for x in (posts[0] + (posts[1] - posts[0]) * i / 12 for i in range(13))]
+        m.add(tube(rope, [0.02] * len(rope), seg=6), 'rope')
+
+
+def b_built_ramp(M):
+    """TI-14 놓는 경사로: 절벽 앞 아래칸 둘(1×2)에 놓는 흙 비탈 + 나무 디딤판. 앞(-Y, 남쪽) 높이 0 → 뒤(+Y, 절벽 쪽) 높이 1.
+    원점 = 두 칸 가운데 땅 높이"""
+    h = 1.0 * P.get('height', 1)
+    m = M.part('ramp')
+    m.add(wedge(0.96, 2.0, h), lambda c, n: 'path' if n.z > 0.3 else 'dirt')
+    slope = math.atan2(h, 2.0)
+    for i in range(6):
+        y = -0.85 + i * 0.34
+        z = (y + 1.0) / 2.0 * h
+        m.add(box((0, y, z + 0.02), (0.86, 0.08, 0.05), bevel=0.012, rot=rot_xyz(x=slope)), 'wood')
+    for sx in (1, -1):   # 옆 말뚝·풀
+        m.add(cylinder((sx * 0.5, 0.9, 0), (sx * 0.5, 0.9, h + 0.12), 0.05, seg=8), 'wood')
+        m.add(cylinder((sx * 0.5, -0.1, 0), (sx * 0.5, -0.1, h * 0.45 + 0.12), 0.045, seg=8), 'wood')
+        for k in range(3):
+            y = -0.8 + k * 0.6
+            m.add(cone((sx * 0.5, y, -0.01), (sx * 0.52, y, 0.14), 0.05, 0.004, squash=0.5, seg=6), 'grass', outline=False)
+
+
 # ================================================================ M13 매일 할 거리 (13차 보드 wave13 D142–D145 A)
 def b_gift_balloon(M):
     """PR-33 선물 풍선: 큰 풍선 하나 · 줄 · 줄 끝에 매단 리본 선물 상자 (원점 = 상자 바닥 가운데). 색 셋은 게임이 balloon 재질 색만 바꾼다.
@@ -1547,6 +1746,7 @@ def b_peddler_cart(M):
 
 
 BUILDERS = {
+    'house-grown': b_house_grown, 'built-bridge': b_built_bridge, 'built-ramp': b_built_ramp,   # M14
     'gift-balloon': b_gift_balloon, 'sea-bottle': b_sea_bottle, 'peddler-cart': b_peddler_cart,
     'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
@@ -1560,6 +1760,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'telescope-stand': b_telescope_stand,   # 요청 8 박물관 앞 공용 망원경대 PR-40
     'snowball': b_snowball, 'snowman': b_snowman,
     'harvest-pot': b_harvest_pot, 'scarecrow': b_scarecrow,
     'fireworks-raft': b_fireworks_raft,

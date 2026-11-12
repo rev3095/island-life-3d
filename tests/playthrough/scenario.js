@@ -282,6 +282,43 @@ export function makeScenario(bot, sk, opts = {}) {
     return pass(`화석 ${fossils} · 곤충 ${bugs} · 기증 ${m?.donated?.length ?? 0}`);
   });
 
+  // 요청 9 박물관 재단장: 로비 아치로 관 여섯에 걸어 들어가 기증한 것이 제자리에 있는지 (sea·art 는 분류가 없으면 「곧 열려요」)
+  add('museum-halls', '박물관 관: 로비 아치 → 물고기관·곤충관·화석관·바다 생물관·미술관·별자리관 → 문 매트로 로비', async () => {
+    if (!S().house?.places?.halls) return skip('박물관 관 모듈이 없어요');
+    if (!(await sk.toDoor('museum', '박물관'))) return block('박물관 문에 못 감');
+    if (!(await sk.enterPlace('museum', '박물관'))) return block('박물관 로비로 못 들어감');
+    const H = S().house.places.halls, odd = [], got = {};
+    await bot.shot('museum-lobby', '박물관 로비 (아치 여섯)');
+    for (const hall of ['fish', 'bug', 'fossil', 'sea', 'art', 'star']) {
+      const a = H.arches().find(x => x.hall === hall);
+      if (!a) { odd.push(`${hall} 아치 없음`); continue; }
+      await bot.walkLocal({ x: a.door.x + Math.sin(a.facing) * 0.35, z: a.door.z + Math.cos(a.facing) * 0.35 }, { near: 0.2, label: `${hall} 아치 앞` });
+      await bot.faceDir(a.facing * 180 / Math.PI);
+      if (bot.peek() !== 'museum-hall-in') { odd.push(`${hall} 아치 앞 행동 키가 ${bot.peek()}`); continue; }
+      bot.press('action');
+      const inside = await bot.until(() => H.where === hall && !H.busy && !S().house.passing, { timeout: 15, label: `${hall} 들어가기` });
+      if (!inside) { odd.push(`${hall} 에 못 들어감`); continue; }
+      const st = H.status(hall), shown = H.shown(hall);
+      got[hall] = { shown, donated: st.donated, total: st.total, soon: st.soon };
+      if (hall !== 'star' && shown !== st.donated) odd.push(`${hall} 전시 ${shown} ≠ 기증 ${st.donated}`);
+      if (hall === 'star' && shown !== 12) odd.push(`별자리관 액자 ${shown}/12`);
+      await bot.shot(`museum-hall-${hall}`, `박물관 ${hall} 관`);
+      // 나가기: 문 매트로 가서 아래로 민다 (사람처럼)
+      const m = H.doormat();
+      await bot.walkLocal(m, { near: 0.15, label: `${hall} 문 매트` });
+      bot.stick(0, 1, false);
+      await bot.until(() => !H.where && !H.busy && !S().house.passing, { timeout: 8, ui: false, label: `${hall} 나가기` });
+      bot.release();
+      await bot.settle(10);
+      if (H.where) { odd.push(`${hall} 에서 로비로 못 나옴`); await H.leave?.(); await bot.settle(10); }
+    }
+    const left = await sk.leavePlace();
+    note('museumHalls', got);
+    if (!left) odd.push('로비에서 섬으로 못 나옴');
+    const n = Object.keys(got).length;
+    return odd.length ? (n ? awk(odd.join(' · ')) : block(odd.join(' · '))) : pass(`관 ${n}/6 들어감 · ${Object.entries(got).map(([k, v]) => `${k} ${v.soon ? '곧 열려요' : `${v.shown}/${v.total}`}`).join(' · ')}`);
+  });
+
   add('decor', '집 꾸미기: 라디오 놓기 · 벽지 사서 붙이기', async () => {
     const wp0 = st().house.wallpaper, fl0 = st().house.floor;
     // QA-10 (11차 보드 D105-A): 첫날 삽·도끼를 사면 50 도토리쯤 남아 오늘의 벽지(1,200~)를 못 사고 「wp-01 → wp-01」 로 끝났다.
@@ -456,6 +493,69 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(odd.join(' · ')) : pass(`별밤 대화 · 카드 ${got.card} → 다음 날 ${got.fortune}${m.today ? ' · 야시장' : ''}`);
   });
 
+  // 요청 8 별자리: 밤에 박물관 앞 망원경대 → 행동 키 → 망원경 보기(UI-32)에서 방향키·줌 키로 이 계절 별자리 하나를 가운데에 → 찰칵(UI-33) → 도감 「⭐ 별자리」
+  add('stars', '별자리: 밤 9시 박물관 앞 망원경 → 방향키로 별자리 맞추기 → 찰칵 → 섬폰 도감 별자리 칸', async () => {
+    const ST = S().stars;
+    if (!ST) return skip('별자리 모듈이 없어요');
+    await bot.setHour(21);
+    await bot.settle(20);
+    if (S().time.weather === 'rain' || S().time.weather === 'snow' || S().time.weather === 'cloudy') {
+      for (let k = 0; k < 4 && ['rain', 'snow', 'cloudy'].includes(S().time.weather); k++) { await bot.nextDay(21); await bot.settle(30); }
+    }
+    for (let k = 0; k < 20 && !ST.stand(); k++) await bot.wait(0.5);
+    const stand = ST.stand();
+    if (!stand) return block('망원경대가 안 섬');
+    await bot.walkTo({ x: stand.x, z: stand.z + 0.95 }, { near: 0.25, label: '망원경대 앞' });
+    await bot.faceDir(0);
+    if (bot.peek() !== 'stars:scope') return block(`망원경대 앞 행동 키가 ${bot.peek()}`);
+    const n0 = ST.count();
+    bot.press('action');
+    if (!(await bot.until(() => ST.viewing, { timeout: 5, ui: false, label: '망원경 보기' }))) return block('망원경 보기가 안 열림');
+    await bot.shot('stars-scope', '망원경 보기 (UI-32)');
+    const sc = ST.scope, list = ST.list().filter(c => c.season === S().time.now().season && !c.found);
+    if (!list.length) { bot.key('Escape'); return pass('이 계절 별자리는 이미 다 찍음'); }
+    const c = list[0];
+    // 사람처럼 방향키를 누르고 있다가 뗀다 (화면이 가운데를 맞추면 찰칵)
+    const win = bot.win ?? window, doc = win.document;
+    const hold = async (code, until, max = 12) => {
+      const t = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : doc.body;
+      t.dispatchEvent(new win.KeyboardEvent('keydown', { code, key: code, bubbles: true, cancelable: true }));
+      const end = bot.gameT + max;
+      while (bot.gameT < end && !until() && !sc.card) await bot.stepFrame();
+      t.dispatchEvent(new win.KeyboardEvent('keyup', { code, bubbles: true }));
+    };
+    const dAz = () => ((c.az - sc.view.az + 540) % 360) - 180;
+    if (dAz() < 0) await hold('ArrowLeft', () => dAz() >= 0); else await hold('ArrowRight', () => dAz() <= 0);
+    if (sc.view.alt < c.alt) await hold('ArrowUp', () => sc.view.alt >= c.alt); else await hold('ArrowDown', () => sc.view.alt <= c.alt);
+    await bot.until(() => sc.card, { timeout: 4, ui: false, label: '찰칵' });
+    const card = sc.card;
+    if (card) await bot.shot('stars-capture', '찍은 결과 (UI-33)');
+    bot.key('Enter');
+    await bot.frames(4);
+    bot.key('Escape');
+    await bot.until(() => !ST.viewing, { timeout: 3, ui: false });
+    await bot.settle(10);
+    // 섬폰 → 도감 → ⭐ 별자리 (그동안 봇이 섬폰을 닫지 않게)
+    bot.policy = { card: kind => kind === 'phone' };
+    bot.press('phone');
+    await bot.until(() => bot.top()?.kind === 'phone', { timeout: 4, ui: false });
+    const dexBtn = [...doc.querySelectorAll('.pk-stack button')].find(b => /도감/.test(b.textContent));
+    if (dexBtn) await bot.click(dexBtn);
+    await bot.frames(4);
+    const tab = [...doc.querySelectorAll('.pk-stack [role=tab]')].find(b => /별자리/.test(b.textContent));
+    if (tab) await bot.click(tab);
+    await bot.frames(4);
+    const cells = doc.querySelectorAll('.pk-dex-stars .pk-dex-cell:not(.is-unknown)').length;
+    if (tab) await bot.shot('stars-dex', '섬폰 도감 별자리 칸');
+    bot.policy = {};
+    bot.key('Escape'); await bot.frames(3); bot.key('Escape');
+    await bot.settle(10);
+    note('stars', { id: c.id, card, n0, n1: ST.count(), dexTab: !!tab, cells, view: sc.view });
+    if (!card || ST.count() !== n0 + 1) return block(`${c.name} 을 못 찍음 (시야 ${JSON.stringify(sc.view)})`);
+    const odd = [];
+    if (!tab) odd.push('도감에 별자리 탭이 없음');
+    else if (cells !== ST.count()) odd.push(`도감 별자리 칸 ${cells} ≠ 찍은 수 ${ST.count()}`);
+    return odd.length ? awk(odd.join(' · ')) : pass(`${c.name} 찰칵 · 도감 ${ST.count()}/12`);
   // P54 밤 특별 상점 (D165–D169): 운세 부스(20–3시)에서 여명에게 카드 → 여우 상인 살랑(오는 밤만)에게 미술품 감정·사기 → 이상한 천막(오는 밤만) 들어가 진열 보기
   // → 낮에 선물 상자가 있으면 열기. 가게가 안 온 밤은 다음 날로 (여우는 6일, 천막은 7일 넘게 안 오면 꼭 온다). 시계만 당긴다.
   add('night-shops', '밤 상점: 운세 부스 카드 → 여우 상인 살랑 미술품 → 이상한 천막 → 선물 상자', async () => {
@@ -782,6 +882,101 @@ export function makeScenario(bot, sk, opts = {}) {
     if (dec().active) odd.push('Esc 로 안 꺼짐');
     if (saved !== dec().list().length) odd.push(`저장 기록 ${saved} ≠ 놓인 것 ${dec().list().length}`);
     return odd.length ? awk(odd.join(' · ')) : pass(`돌길 3 · 울타리 2 이어짐 · 하나 치움 · 저장 기록 ${saved}`);
+  });
+
+  // M14 집과 섬이 자란다 (결정 D150–D153): 우편함 Space → 밤톨 「지어 주세요!」 → 다음 날 넓어진 1층 · 커진 겉모양 → 빚 갚기 (지갑에 있는 만큼) →
+  // 빚을 다 갚았으면 2층도 짓고 계단을 걸어 오르내린다 → 섬폰 「⭐ 섬 평가」 열어 별·주민 한마디. 봇은 시계만 넘기고 우편함·창·걷기는 키로.
+  add('home-grow', '집 증축: 우편함에서 빌려 짓기 → 다음 날 넓어진 방 · 겉모양 → 빚 갚기 → (2층 · 계단 오르내리기) → 섬폰 섬 평가', async () => {
+    const H = () => S().house, G = () => H()?.grow;
+    if (!G()) return block('집 증축(house.grow)이 없어요');
+    if (H().inside) await sk.leaveHome();
+    await bot.settle(20);
+    const odd = [], log = {};
+    const mailbox = async pick => {
+      const ph = S().world.places.playerHouse, at = S().town?.mail?.spot ?? { x: ph.door.x + 1, z: ph.door.z };
+      if (S().town?.mail?.unread?.()?.length) await sk.mail();   // 안 읽은 편지가 있으면 먼저 읽는다 (그동안 우편함 Space = 편지)
+      await bot.approach(at, { dist: 0.75, label: '우편함' });
+      if (bot.peek() !== 'house-grow') return `우편함 앞 행동 키가 '${bot.peek()}'`;
+      const said = [];
+      bot.policy = { dialog: texts => { said.push(texts.join('/')); const i = texts.findIndex(pick); return i >= 0 ? i : texts.length - 1; } };
+      await bot.act('action', { timeout: 30 });
+      bot.policy = {};
+      await bot.settle(10);
+      return said;
+    };
+    const build = async want => {
+      const r = await mailbox(t => /지어 주세요/.test(t));
+      if (typeof r === 'string') { odd.push(r); return false; }
+      if (G().pending !== want) { odd.push(`${want}단계 짓기 시작 안 됨 (${r.join(' | ')})`); return false; }
+      await bot.nextDay(9);
+      await bot.settle(30);
+      if (G().stage !== want) { odd.push(`다음 날 ${want}단계가 안 지어짐 (지금 ${G().stage})`); return false; }
+      return true;
+    };
+    const repayAll = async () => {
+      if (!G().debt) return true;
+      // 뒤 단계(시계로 낮 → 상점에서 사기 등)가 쓸 도토리는 남긴다: 3,000 넘게 있으면 1,000 만 갚는다 (빚이 그보다 적으면 다 갚기)
+      if (bot.acorns() < Math.min(G().debt, 1000) + 3000) return false;
+      const r = await mailbox(t => (G().debt <= 1000 ? /다 갚기/ : /^1,000 갚기/).test(t));
+      if (typeof r === 'string') odd.push(r);
+      return G().debt === 0;
+    };
+    // 1단계: 방 넓히기
+    if (G().stage < 1 && !await build(1)) return awk(odd.join(' · '));
+    const ext = (S().world.home?.objects ?? S().world.objects).list().filter(o => /^house-(player|grown)/.test(o.kind)).map(o => o.kind);
+    log.exterior = ext;
+    if (!ext.includes('house-grown-1') && G().stage === 1) odd.push(`겉모양이 안 바뀜 (${ext.join(',')})`);
+    await sk.enterHome();
+    const f0 = H().room;
+    log.room = `${f0.w}×${f0.d}`;
+    if (f0.w !== 10 || f0.d !== 10) odd.push(`1층이 10×10 이 아님 (${log.room})`);
+    await bot.shot('m14-home-wide', '넓힌 1층 (10×10)');
+    await sk.leaveHome();
+    // 빚 갚기 → 다 갚았으면 2층
+    log.debt0 = G().debt; log.acorns0 = bot.acorns();
+    const paid = await repayAll();
+    log.debt1 = G().debt;
+    if (G().debt >= log.debt0 && log.acorns0 >= 4000) odd.push(`빚을 못 갚음 (빚 ${G().debt}, 도토리 ${bot.acorns()})`);
+    if (paid && G().stage < 2) await build(2);
+    if (G().stage >= 2) {
+      await sk.enterHome();
+      const goStairs = async to => {
+        const s = H().grow.stairs().find(x => x.to === to);
+        if (!s) { odd.push(`${to}층 가는 계단 없음`); return false; }
+        await bot.walkLocal(s.from, { near: 0.2, label: '계단 앞' });
+        const from = H().grow.level, dx = s.x - s.from.x, dz = s.z - s.from.z, d = Math.hypot(dx, dz) || 1;
+        const end = bot.gameT + 8;
+        while (H().grow.level === from && bot.gameT < end) { if (!S().player.frozen) bot.stick(dx / d, dz / d, false); await bot.stepFrame(); }
+        bot.release();
+        await bot.until(() => !S().player.frozen, { timeout: 4 });
+        await bot.frames(10);
+        if (H().grow.level !== to) { odd.push(`계단으로 ${to}층에 못 감 (지금 ${H().grow.level})`); return false; }
+        return true;
+      };
+      log.up = await goStairs(1);
+      if (log.up) await bot.shot('m14-home-2f', '계단으로 올라온 2층');
+      log.down = log.up && await goStairs(0);
+      await sk.leaveHome();
+    } else log.second = '빚이 남아 2층은 다음에';
+    // 섬폰 → ⭐ 섬 평가
+    bot.press('phone');
+    await bot.until(() => bot.$('.pk-app[data-app="rating"]'), { timeout: 5, ui: false });
+    const app = bot.$('.pk-app[data-app="rating"]');
+    if (!app) odd.push('섬폰에 섬 평가 줄이 없어요');
+    else {
+      await bot.click(app);
+      await bot.until(() => bot.$('.rt-stars'), { timeout: 5, ui: false });
+      log.stars = Number(bot.$('.rt-stars')?.dataset.stars ?? 0);
+      log.talk = bot.$('[data-rating-talk]')?.textContent?.trim().slice(0, 80) ?? '';
+      if (!(log.stars >= 1 && log.stars <= 5)) odd.push('섬 평가 별이 안 보여요');
+      if (!log.talk) odd.push('주민 한마디가 없어요');
+      await bot.shot('m14-rating', '섬폰 섬 평가');
+      bot.press('esc'); await bot.until(() => !bot.$('.rt-stars'), { timeout: 3, ui: false });
+    }
+    bot.press('esc'); await bot.until(() => !bot.blocking(), { timeout: 3, ui: false });
+    log.stage = G().stage; log.debt = G().debt;
+    note('homeGrow', log);
+    return odd.length ? awk(odd.join(' · ')) : pass(`${log.stage}단계 · 1층 ${log.room} · 빚 ${log.debt}${log.up ? ' · 계단 오르내림' : log.second ? ` · ${log.second}` : ''} · 별 ${log.stars}`);
   });
 
   // 10차 M10-P4 이사 오가기 (보드 wave10 D94-A): 엔딩 뒤 7일마다 새 주민이 빈 집터로, 30일 넘게 산 주민이 가끔 "떠나 볼까…".
@@ -1272,6 +1467,89 @@ export function makeScenario(bot, sk, opts = {}) {
     } else odd.push('행상 수레가 안 나옴');
     note('daily', res);
     return odd.length ? awk(odd.join(' · ')) : pass(`레시피 +${res.recipes} · 풍선 ${res.balloon?.shots ?? 0}발 · 소원 ${res.wishes} → 별 조각 ${res.starsGot} · 행상 🌰${res.peddlerSpent}`);
+  // M15 「주민과 더 가깝게」: 우편함 편지 쓰기(UI-26, 선물 동봉) → 친구 이상 주민에게 🎣(낚싯대) = 같이 낚시 → 다음 날 답장 → 섬폰 📷 앨범(UI-27) → 추억 액자(FU-71)
+  add('villagers-close', 'M15 주민과 더 가깝게: 편지 쓰기 → 같이 낚시 → 다음 날 답장 → 섬폰 앨범 → 추억 액자', async () => {
+    const T = S().town, W = () => S().world;
+    if (!T?.together || !S().album) return block('M15 서비스(town.together · album)가 없어요');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    await bot.setHour(10);
+    await bot.tool(null);
+    const done = [], miss = [];
+    // ① 편지: 가장 친한 주민에게 과일·꽃·조개 하나 넣어서
+    const met = residents().filter(s => T.state(s).met).sort((a, b) => T.state(b).friendship - T.state(a).friendship);
+    const to = met[0];
+    const f0 = to ? T.state(to).friendship : 0;
+    const m = to ? await sk.mail({ write: { to, gift: it => !!it && ['fruit', 'flower', 'shell'].includes(it.category) && !keep.has(it.id) } }) : null;
+    if (m?.sent?.to === to) done.push(`편지 → ${to}${m.sent.gift ? ` (${m.sent.gift})` : ''}`); else miss.push(`편지 못 보냄 (창 ${m?.opened ? '열림' : '안 열림'})`);
+    // ② 같이 낚시: 오늘 같이 놀 수 있는 친구 (밖에 있고 말 걸 수 있는)
+    const pal = residents().filter(s => T.together.can(s).ok).find(s => S().town.villagers.find(V => V.slug === s)?.talkable);
+    let fished = null;
+    if (!pal) miss.push('같이 놀 친구가 없음 (친구 30 이상 · 밖)');
+    else if (await sk.reach(pal)) {
+      let asked = false;
+      bot.policy = { emote: () => (asked ? null : (asked = true, ['item:tool.rod'])), emoteChoice: () => 0, dialog: () => 0 };
+      bot.press('action');
+      await bot.frames(3);
+      await bot.settle(60, 0.5);
+      bot.policy = {};
+      if (!(await bot.until(() => T.together.active()?.slug === pal, { timeout: 5 }))) miss.push(`${pal} 같이 낚시가 안 시작됨`);
+      else {
+        // 가까운 물가로 가서 선다 → 주민이 옆 물가 칸에서 낚싯대를 든다 (AN-14)
+        const isl = W().island, nav = T.debug.nav, p = bot.pos(), t0 = isl.toTile(p.x, p.z);
+        let best = null, bd = 1e9;
+        for (let dz = -18; dz <= 18; dz++) for (let dx = -18; dx <= 18; dx++) {
+          const tx = t0.tx + dx, tz = t0.tz + dz;
+          if (!nav.walkable(tx, tz) || isl.tileAt(tx, tz) === 'sand') continue;
+          const wn = [[0, -1], [1, 0], [-1, 0]].find(([a, b]) => isl.tileAt(tx + a, tz + b) === 'water');
+          if (wn && Math.hypot(dx, dz) < bd) { bd = Math.hypot(dx, dz); best = { tx, tz, wn }; }
+        }
+        if (best) {
+          const c = isl.toWorld(best.tx, best.tz);
+          await bot.walkTo(c, { near: 0.3, label: '강가' });
+          await bot.face({ x: c.x + best.wn[0], z: c.z + best.wn[1] });
+        }
+        let shot = false;
+        await bot.until(() => {
+          if (!shot && T.together.active()?.phase === 'fish') { shot = true; bot.shot('16-m15-fish', `${pal}와 같이 낚시 (AN-14)`); }
+          return !T.together.active();
+        }, { timeout: 175, label: '같이 낚시 끝' });
+        await bot.settle(40);
+        const t = T.state(pal).together;
+        fished = { pal, phase: shot ? 'fish' : 'follow', day: t?.day, f: T.state(pal).friendship };
+        if (t?.day === bot.day()) done.push(`같이 낚시 ${pal}${shot ? ' (물가에서)' : ''}`); else miss.push(`${pal} 같이 낚시가 끝나지 않음`);
+      }
+    } else miss.push(`${pal} 에게 못 감`);
+    // ③ 다음 날 아침: 답장
+    await bot.nextDay(9); await bot.settle(60);
+    const replies = (T.mail.unread?.() ?? []).filter(l => /^reply/.test(l.kind));
+    const r = await sk.mail();
+    if (to && replies.some(l => l.from === to)) done.push(`답장 ${replies.map(l => `${l.from}:${l.kind}`).join(',')} · 친밀도 ${f0}→${T.state(to).friendship}`); else if (to) miss.push('답장이 안 옴');
+    // ④ 섬폰 📷 앨범 → 사진 → 추억 액자 (도토리 300)
+    const photos = S().album.list().length;
+    if (bot.acorns() < 300) await sellSurplus();
+    bot.policy = { card: (kind, el, card) => !!card?.classList.contains('pk-album') };   // 앨범 창은 봇이 직접 누른다 (기본 정책은 모르는 창을 닫는다)
+    bot.press('phone');
+    let framed = false;
+    if (await bot.until(() => bot.$('.pk-app[data-app="album"]'), { timeout: 5, ui: false })) {
+      await bot.wait(0.3, { ui: false });
+      await bot.click(bot.$('.pk-app[data-app="album"]'));
+      if (await bot.until(() => bot.$('.pk-album [data-album-photo]'), { timeout: 5, ui: false })) {
+        await bot.click(bot.$('.pk-album [data-album-photo]'));
+        await bot.frames(3);
+        await bot.shot('16-m15-album', '추억 앨범');
+        const b = bot.$('.pk-album [data-album-frame="desk"]');
+        if (b && !b.disabled) { await bot.click(b); framed = bot.has('furn.album-frame') > 0; }
+      }
+      await bot.click(bot.$('.pk-album .pk-x'));
+    }
+    bot.policy = {};
+    await bot.frames(3);
+    for (let k = 0; k < 4 && bot.top(); k++) { bot.press('esc'); await bot.frames(4); }
+    if (photos) done.push(`앨범 ${photos}장${framed ? ' · 추억 액자' : ''}`); else miss.push('앨범에 사진이 없음');
+    if (photos && !framed) miss.push('액자 못 만듦');
+    note('m15', { to, letter: m?.sent ?? null, fished, replies: replies.map(l => l.kind), photos, framed, song: T.song.today() });
+    return miss.length ? awk(`${miss.join(' · ')} — ${done.join(' · ')}`) : pass(done.join(' · '));
   });
 
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {

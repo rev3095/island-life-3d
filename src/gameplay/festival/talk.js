@@ -74,7 +74,7 @@ export function createEmoteTalk(ctx, emo, cfg = {}) {
       gesture: name => gesture(V, name),
       /**
        * 자유 대화: 플레이어가 이모티콘을 골라 보낸다. 🎁 하나 = 선물 주기, ❓ 하나 = 부탁 있어?, 🎉 하나 = 축제 이야기(있으면), 잘 가 = 끝.
-       * h = { gift(), request(), festival?() → true 면 처리함, note(up), things() → 물건 탭에 더할 낱말 }
+       * h = { gift(), request(), festival?() → true 면 처리함, note(up), things() → 물건 탭에 더할 낱말, special?(낱말) → 'end' 끝 · true 처리함 · null 보통 판정 (M15) }
        */
       async chat(h = {}) {
         if (!talkable) { await ui.say(['smile', 'wave']); return; }
@@ -92,6 +92,9 @@ export function createEmoteTalk(ctx, emo, cfg = {}) {
           if (one === 'gift' && h.gift) { await h.gift(); continue; }
           if (one === 'ask' && h.request) { await h.request(); continue; }
           if (one === 'party' && h.festival && (await h.festival())) continue;
+          const sp = one && h.special ? await h.special(one) : null;   // M15 같이 하기 (town/talk.js) — 'end' 면 대화를 끝낸다
+          if (sp === 'end') break;
+          if (sp) continue;
           const res = judge(rules, V.slug, keys.filter(k => !String(k).startsWith('item:')), { dayKey: c.dayKey, weather: c.weather, want: wantDone ? null : want, ...st });
           st.greeted = res.greeted; st.waited = res.waited;
           const pts = countPoints(rules, v, c.dayKey, res.points);

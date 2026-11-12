@@ -1,0 +1,63 @@
+{
+  "id": "FU-70",
+  "slug": "attic-hatch",
+  "item": "fixture.attic-hatch",
+  "name": "다락 문 난간",
+  "category": "fixture",
+  "kind": "attic-hatch",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "다락 바닥의 2층 계단 구멍과 남쪽·동쪽 난간 (북동쪽이 열린 내려가는 곳).",
+    "keywords": [
+      "다락 구멍",
+      "난간"
+    ],
+    "references": [
+      "그림책 속 다락방"
+    ],
+    "avoid": [
+      "쇠 계단"
+    ],
+    "notes": "M14 집 증축 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures) — 결정 D151. 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "hole",
+      "holeStep"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C79A66",
+    "woodLight": "#D9B27F",
+    "woodDark": "#8A6542",
+    "hole": "#3A2C24",
+    "holeStep": "#6E5038"
+  },
+  "paletteLabels": {
+    "wood": "기둥·디딤판",
+    "woodLight": "밝은 디딤판·손잡이",
+    "woodDark": "계단 몸·옆판",
+    "hole": "아래층 어둠",
+    "holeStep": "아래 디딤판"
+  },
+  "footprint": [
+    1,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

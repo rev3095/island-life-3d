@@ -1,0 +1,66 @@
+{
+  "id": "FU-72",
+  "slug": "album-frame-wall",
+  "item": "furn.album-frame-wall",
+  "name": "추억 벽 액자",
+  "category": "furniture",
+  "kind": "album-frame-wall",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "벽에 거는 나무 테 사진 액자. 흰 바탕에 추억 사진 한 장, 테 위에 작은 하트 핀 — 섬폰 앨범에서 고른 사진이 들어간다.",
+    "keywords": [
+      "벽걸이",
+      "나무 테",
+      "하트 핀"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 사람 사진"
+    ],
+    "notes": "M15 「주민과 더 가깝게」 추억 앨범 (13차 보드 로드맵 M15) — 'photo' 칸에 게임이 앨범 사진을 입힌다 (ui/album.js dress)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "mat",
+      "photo",
+      "string"
+    ],
+    "flat": [
+      "photo"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#B98957",
+    "mat": "#FFFDF6",
+    "photo": "#CFE3EA",
+    "pin": "#F07A8A",
+    "string": "#6B4B30"
+  },
+  "paletteLabels": {
+    "frame": "액자 테",
+    "mat": "사진 바탕",
+    "photo": "사진 (게임에서 앨범 사진)",
+    "pin": "하트 핀",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

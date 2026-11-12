@@ -11,7 +11,7 @@ import { Box3, Matrix4, Vector3 } from 'three';
 // 가리는 물체 종류 → 모양. 키 작은 것(꽃·바위·덤불·울타리)과 밟고 서는 것(다리·선착장)은 빼고, 가는 가로등도 뺀다
 const OCCLUDERS = {
   tree: 'bands', 'fruit-tree': 'bands', cedar: 'bands', palm: 'bands',
-  'house-player': 'box', 'house-villager': 'box', shop: 'box', museum: 'box', signboard: 'box',
+  'house-player': 'box', 'house-grown-1': 'box', 'house-grown-2': 'box', 'house-grown-3': 'box', 'house-villager': 'box', shop: 'box', museum: 'box', signboard: 'box',
   // 5차 Z5 축제 광장의 키 큰 것 (무대 3.7 · 아치 3.0 · 부스·덮개 2.6칸). 빠져 있어서 그 뒤(북쪽)에 서면 플레이어가 안 보였다 (QA-07)
   'festival-stage': 'box', 'festival-arch': 'box', 'festival-cover': 'box',
   'festival-booth-lantern': 'box', 'festival-booth-music': 'box', 'festival-booth-flower': 'box', 'festival-booth-food': 'box', 'festival-booth-fish': 'box',

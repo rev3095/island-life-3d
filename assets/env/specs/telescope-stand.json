@@ -1,0 +1,77 @@
+{
+  "id": "PR-40",
+  "slug": "telescope-stand",
+  "name": "망원경대",
+  "category": "prop",
+  "kind": "telescope-stand",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "박물관 앞마당 옆 공용 망원경대 (요청 8). 돌 받침대 위 남색 망원경이 북쪽 하늘을 겨눈다. 밤에 다가가 행동 키 → 망원경 보기(UI-32)로 별자리를 찍는다.",
+    "keywords": [
+      "돌 받침대",
+      "남색 망원경",
+      "놋쇠 테",
+      "별 패"
+    ],
+    "references": [
+      "천문대 공원 망원경",
+      "바닷가 전망대 쌍안경"
+    ],
+    "avoid": [
+      "동전 넣는 관광 망원경",
+      "금속 번쩍임"
+    ],
+    "notes": "번호 PR-40 은 이 트랙이 잡음 (다른 트랙 PR 번호와 겹치면 조정 세션이 바꿔도 됨)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012,
+    "flat": [
+      "glow"
+    ],
+    "noOutline": [
+      "glow",
+      "lens"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#CFC6B4",
+    "stoneDark": "#A79C88",
+    "metal": "#4E5A57",
+    "tube": "#2F3F6E",
+    "brass": "#D8A84B",
+    "lens": "#BFE3F2",
+    "glow": "#FFE7A0"
+  },
+  "paletteLabels": {
+    "stone": "받침돌",
+    "stoneDark": "받침 윗판",
+    "metal": "쇠붙이",
+    "tube": "통",
+    "brass": "놋쇠",
+    "lens": "렌즈",
+    "glow": "별 패(밤)"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.36
+    }
+  }
+}

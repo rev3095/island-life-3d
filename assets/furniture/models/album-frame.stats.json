@@ -1,0 +1,55 @@
+{
+  "id": "FU-71",
+  "slug": "album-frame",
+  "item": "furn.album-frame",
+  "name": "추억 액자",
+  "category": "furniture",
+  "kind": "album-frame",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1032,
+  "parts": 3,
+  "materials": [
+    "corner",
+    "frame",
+    "mat",
+    "photo",
+    "wood",
+    "woodDark"
+  ],
+  "objects": [
+    "frame",
+    "photo",
+    "table"
+  ],
+  "animations": {},
+  "size": [
+    0.52,
+    0.42,
+    0.86
+  ],
+  "bounds": [
+    [
+      -0.26,
+      -0.21,
+      0.0
+    ],
+    [
+      0.26,
+      0.21,
+      0.859
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 23508,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "album-frame_front.png",
+    "album-frame_main.png",
+    "album-frame_thumb.png",
+    "album-frame_top.png"
+  ]
+}

@@ -48,6 +48,7 @@ const WHEN = {
   gift: '선물을 줬을 때 (반응마다)', event: '계절 행사 기간에 말 걸 때', bye: '대화를 끝낼 때', tierUp: '친한 정도가 오른 날 한 번', photo: '절친이 되어 사진을 줄 때',
   home: '집 문 너머 (낮 · 비 · 잘 때)', chatting: '주민끼리 수다 중일 때 말 걸면', banter: '주민 둘이 수다 떨 때 머리 위 말풍선', leave: '이사 가겠다고 할 때 (이사 오가기)',
   letters: '우편함 편지 (편지 탭)', birthday: '그 주민 생일 (하루 종일 집에서 파티)',
+  together: '친구 이상 주민에게 「같이 놀자」 (🎣 낚싯대 · 🏃) — 같이 낚시·산책하는 동안과 끝날 때 (M15)', song: '저녁 18–20시 광장에서 주민 둘이 번갈아 노래할 때 — 가사는 머리 위 🎵 말풍선 (M15)',
   // 가게 주인
   firstday: '첫날 안내 (밤톨)', today: '오늘 들어온 가구 안내', after: '첫날 할 일을 마친 뒤', closed: '가게 문 닫은 때 (8–22시 밖)',
   firstVisit: '박물관에 처음 왔을 때', none: '기증할 게 없을 때', firstDonation: '첫 기증', thanks: '기증 고마워', thanksMany: '여러 개 기증', fossil: '화석 감정',
@@ -58,9 +59,11 @@ export const LETTER_WHEN = {
   birthday: '그 주민 생일 아침 — 파티 초대', playerBirthday: '내 생일 아침 (만난 주민 몇 명이)', moving: '이사 오기 전날 (집터 표지판 뒤)', movein: '이사 온 날',
   away: '섬을 떠난 뒤 며칠마다', welcome: '첫날 할 일을 마친 다음 (밤톨 환영)', lot: '빈 집터에 표지판이 선 날 (밤톨)',
   festival: '첫 섬 축제(엔딩)가 끝난 다음 아침 — 섬 주민 모두', festivalAgain: '해마다 섬 축제가 끝난 다음 아침 (두 번째부터)',
+  reply: '내가 우편함에서 보낸 편지의 답장 — 다음 날 아침 (선물이 없거나 보통·좋아함, M15)', replyLove: '내 편지에 넣은 선물을 아주 좋아했을 때 답장 — {item} = 내가 넣은 선물 (M15)',
+  replyDislike: '내 편지에 넣은 선물이 취향이 아닐 때 답장 (M15)', together: '같이 낚시·산책한 다음 날 아침 (가끔, M15)',
 };
-const LETTER_ORDER = ['friend', 'close', 'thanks', 'gift', 'birthday', 'playerBirthday', 'festival', 'festivalAgain', 'moving', 'movein', 'away', 'welcome', 'lot'];
-const LETTER_NAME = { friend: '친구', close: '단짝', thanks: '고마워', gift: '선물 동봉', birthday: '주민 생일', playerBirthday: '내 생일', moving: '이사 전날', movein: '이사 온 날', away: '떠난 뒤', welcome: '환영 (밤톨)', lot: '집터 (밤톨)', guide: '밤톨 안내 글', festival: '첫 축제 축하', festivalAgain: '해마다 축제 축하' };
+const LETTER_ORDER = ['friend', 'close', 'thanks', 'gift', 'reply', 'replyLove', 'replyDislike', 'together', 'birthday', 'playerBirthday', 'festival', 'festivalAgain', 'moving', 'movein', 'away', 'welcome', 'lot'];
+const LETTER_NAME = { friend: '친구', close: '단짝', thanks: '고마워', gift: '선물 동봉', birthday: '주민 생일', playerBirthday: '내 생일', moving: '이사 전날', movein: '이사 온 날', away: '떠난 뒤', welcome: '환영 (밤톨)', lot: '집터 (밤톨)', guide: '밤톨 안내 글', festival: '첫 축제 축하', festivalAgain: '해마다 축제 축하', reply: '내 편지 답장', replyLove: '답장 · 아주 좋은 선물', replyDislike: '답장 · 취향 아닌 선물', together: '같이 논 다음 날' };
 const GUIDE_POOLS = ['intro', 'firstday', 'today', 'after', 'closed'];   // 밤톨 안내 글 (편지 탭)
 
 /** 그 밖의 글: 파일 · 언제 · 글 칸 이름 */

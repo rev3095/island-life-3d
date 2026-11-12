@@ -1,0 +1,35 @@
+{
+  "id": "TI-14",
+  "slug": "ramp-built",
+  "name": "놓는 경사로",
+  "category": "tile",
+  "kind": "built-ramp",
+  "version": "0.1",
+  "triangles": 888,
+  "parts": 1,
+  "materials": [
+    "dirt",
+    "grass",
+    "path",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    1.1,
+    2.0,
+    1.12
+  ],
+  "footprint": [
+    1,
+    2
+  ],
+  "glbBytes": 20124,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "ramp-built_front.png",
+    "ramp-built_hero.jpg",
+    "ramp-built_main.png",
+    "ramp-built_thumb.png",
+    "ramp-built_top.png"
+  ]
+}

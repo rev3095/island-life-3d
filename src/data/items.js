@@ -11,6 +11,7 @@ import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
 // 12차 밤·새벽 분류(야시장 먹거리 IC-NT)·달빛 가게·새벽 천막 가구 FU-55–59 는 night-items.js 에서
 import { NIGHT_CATEGORY as NC, NIGHT_FURN, nightItems } from './night-items.js';
+import { ALBUM_FURN } from './album-items.js';   // M15 추억 액자 FU-71–72 (섬폰 앨범에서 만든다)
 // M13 매일 할 거리: 별 조각 IC-MA-11 · 레시피 쪽지 IC-MA-12 · 별 조각 가구 FU-63–66 은 daily-items.js 에서
 import { DAILY_FURN, dailyItems } from './daily-items.js';
 // P54 밤 특별 상점 미술품 분류(IC-AR, 표 items.json art · 가품 = 색 변형)는 art-items.js 에서
@@ -103,7 +104,7 @@ export const ITEMS = [
   // 친밀도 선물 가구(source 'friend')는 items.json 의 owner = 주는 주민 slug (B-24)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN, ...ALBUM_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id, owner }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source, ...(owner ? { owner } : {}),
