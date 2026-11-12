@@ -556,6 +556,8 @@ export function makeScenario(bot, sk, opts = {}) {
     if (!tab) odd.push('도감에 별자리 탭이 없음');
     else if (cells !== ST.count()) odd.push(`도감 별자리 칸 ${cells} ≠ 찍은 수 ${ST.count()}`);
     return odd.length ? awk(odd.join(' · ')) : pass(`${c.name} 찰칵 · 도감 ${ST.count()}/12`);
+  });
+
   // P54 밤 특별 상점 (D165–D169): 운세 부스(20–3시)에서 여명에게 카드 → 여우 상인 살랑(오는 밤만)에게 미술품 감정·사기 → 이상한 천막(오는 밤만) 들어가 진열 보기
   // → 낮에 선물 상자가 있으면 열기. 가게가 안 온 밤은 다음 날로 (여우는 6일, 천막은 7일 넘게 안 오면 꼭 온다). 시계만 당긴다.
   add('night-shops', '밤 상점: 운세 부스 카드 → 여우 상인 살랑 미술품 → 이상한 천막 → 선물 상자', async () => {
@@ -1441,6 +1443,8 @@ export function makeScenario(bot, sk, opts = {}) {
     } else odd.push('행상 수레가 안 나옴');
     note('daily', res);
     return odd.length ? awk(odd.join(' · ')) : pass(`레시피 +${res.recipes} · 풍선 ${res.balloon?.shots ?? 0}발 · 소원 ${res.wishes} → 별 조각 ${res.starsGot} · 행상 🌰${res.peddlerSpent}`);
+  });
+
   // M15 「주민과 더 가깝게」: 우편함 편지 쓰기(UI-26, 선물 동봉) → 친구 이상 주민에게 🎣(낚싯대) = 같이 낚시 → 다음 날 답장 → 섬폰 📷 앨범(UI-27) → 추억 액자(FU-71)
   add('villagers-close', 'M15 주민과 더 가깝게: 편지 쓰기 → 같이 낚시 → 다음 날 답장 → 섬폰 앨범 → 추억 액자', async () => {
     const T = S().town, W = () => S().world;
