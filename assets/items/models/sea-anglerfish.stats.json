@@ -1,0 +1,53 @@
+{
+  "id": "IC-SE-35",
+  "slug": "sea-anglerfish",
+  "name": "아귀",
+  "group": "sea",
+  "kind": "anglerfish",
+  "version": "0.1",
+  "items": [
+    "sea.anglerfish"
+  ],
+  "hold": true,
+  "triangles": 3472,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "fringe",
+    "lure",
+    "mark",
+    "mouth",
+    "tooth"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.256,
+    0.454,
+    0.131
+  ],
+  "bounds": [
+    [
+      -0.128,
+      -0.227,
+      -0.065
+    ],
+    [
+      0.128,
+      0.227,
+      0.065
+    ]
+  ],
+  "glbBytes": 79244,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-anglerfish_main.png",
+    "sea-anglerfish_thumb.png"
+  ]
+}

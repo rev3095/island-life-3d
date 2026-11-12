@@ -3727,6 +3727,480 @@
       "status": "approved"
     },
     {
+      "id": "IC-SE-21",
+      "slug": "sea-manila-clam",
+      "name": "바지락",
+      "group": "sea",
+      "kind": "clam",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.manila-clam",
+          "code": "IC-SE-21",
+          "icon": "assets/items/renders/sea-manila-clam_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.186,
+        0.15,
+        0.054
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-22",
+      "slug": "sea-webfoot-octopus",
+      "name": "주꾸미",
+      "group": "sea",
+      "kind": "octopus",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.webfoot-octopus",
+          "code": "IC-SE-22",
+          "icon": "assets/items/renders/sea-webfoot-octopus_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.281,
+        0.279,
+        0.127
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-23",
+      "slug": "sea-pen-shell",
+      "name": "키조개",
+      "group": "sea",
+      "kind": "mussel",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.pen-shell",
+          "code": "IC-SE-23",
+          "icon": "assets/items/renders/sea-pen-shell_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.206,
+        0.32,
+        0.091
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "shine"
+        ],
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-24",
+      "slug": "sea-hair-crab",
+      "name": "털게",
+      "group": "sea",
+      "kind": "crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.hair-crab",
+          "code": "IC-SE-24",
+          "icon": "assets/items/renders/sea-hair-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.477,
+        0.433,
+        0.129
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-25",
+      "slug": "sea-filefish",
+      "name": "쥐치",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.filefish",
+          "code": "IC-SE-25",
+          "icon": "assets/items/renders/sea-filefish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.06,
+        0.35,
+        0.221
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-26",
+      "slug": "sea-sea-hare",
+      "name": "군소",
+      "group": "sea",
+      "kind": "sea-slug",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-hare",
+          "code": "IC-SE-26",
+          "icon": "assets/items/renders/sea-sea-hare_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.149,
+        0.372,
+        0.109
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-27",
+      "slug": "sea-horned-turban",
+      "name": "뿔소라",
+      "group": "sea",
+      "kind": "turban",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.horned-turban",
+          "code": "IC-SE-27",
+          "icon": "assets/items/renders/sea-horned-turban_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.313,
+        0.302,
+        0.254
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-28",
+      "slug": "sea-conger",
+      "name": "갯장어",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.conger",
+          "code": "IC-SE-28",
+          "icon": "assets/items/renders/sea-conger_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.086,
+        0.61,
+        0.07
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-29",
+      "slug": "sea-cuttlefish",
+      "name": "갑오징어",
+      "group": "sea",
+      "kind": "cuttlefish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.cuttlefish",
+          "code": "IC-SE-29",
+          "icon": "assets/items/renders/sea-cuttlefish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.117,
+        0.291,
+        0.042
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-30",
+      "slug": "sea-gizzard-shad",
+      "name": "전어",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.gizzard-shad",
+          "code": "IC-SE-30",
+          "icon": "assets/items/renders/sea-gizzard-shad_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.053,
+        0.31,
+        0.106
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-31",
+      "slug": "sea-long-arm-octopus",
+      "name": "낙지",
+      "group": "sea",
+      "kind": "octopus",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.long-arm-octopus",
+          "code": "IC-SE-31",
+          "icon": "assets/items/renders/sea-long-arm-octopus_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.367,
+        0.364,
+        0.167
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-32",
+      "slug": "sea-fleshy-prawn",
+      "name": "대하",
+      "group": "sea",
+      "kind": "shrimp",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.fleshy-prawn",
+          "code": "IC-SE-32",
+          "icon": "assets/items/renders/sea-fleshy-prawn_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.166,
+        0.343,
+        0.192
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-33",
+      "slug": "sea-spanish-mackerel",
+      "name": "삼치",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.spanish-mackerel",
+          "code": "IC-SE-33",
+          "icon": "assets/items/renders/sea-spanish-mackerel_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.089,
+        0.53,
+        0.091
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-34",
+      "slug": "sea-cod",
+      "name": "대구",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.cod",
+          "code": "IC-SE-34",
+          "icon": "assets/items/renders/sea-cod_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.101,
+        0.503,
+        0.148
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-35",
+      "slug": "sea-anglerfish",
+      "name": "아귀",
+      "group": "sea",
+      "kind": "anglerfish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.anglerfish",
+          "code": "IC-SE-35",
+          "icon": "assets/items/renders/sea-anglerfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.256,
+        0.454,
+        0.131
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-36",
+      "slug": "sea-herring",
+      "name": "청어",
+      "group": "sea",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.herring",
+          "code": "IC-SE-36",
+          "icon": "assets/items/renders/sea-herring_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.06,
+        0.35,
+        0.08
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-37",
+      "slug": "sea-red-snow-crab",
+      "name": "홍게",
+      "group": "sea",
+      "kind": "crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.red-snow-crab",
+          "code": "IC-SE-37",
+          "icon": "assets/items/renders/sea-red-snow-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.608,
+        0.467,
+        0.133
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-38",
+      "slug": "sea-scallop",
+      "name": "가리비",
+      "group": "sea",
+      "kind": "scallop",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.scallop",
+          "code": "IC-SE-38",
+          "icon": "assets/items/renders/sea-scallop_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.25,
+        0.229,
+        0.064
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-SH-01",
       "slug": "shell-clam",
       "name": "바지락",

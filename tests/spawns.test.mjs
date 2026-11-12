@@ -31,7 +31,7 @@ test('물고기: 서식지로 거른다', () => {
   const sea = ids(spawns.fishPool({ habitat: 'sea', hour: 12, month: 1 }));
   assert.ok(!sea.includes('fish.tuna'), '참치는 선착장에서만');
   const pier = ids(spawns.fishPool({ habitat: 'pier', hour: 12, month: 1 }));
-  assert.ok(pier.includes('fish.tuna') && pier.includes('fish.mackerel'), '선착장은 바다 물고기도');
+  assert.ok(pier.includes('fish.tuna') && pier.includes('fish.horse-mackerel'), '선착장은 바다 물고기도 (고등어는 M18-P1 부터 8~12월)');
   assert.deepEqual(spawns.fishPool({ habitat: 'lava' }), []);
   assert.equal(spawns.fish({ habitat: 'lava' }), null);
 });

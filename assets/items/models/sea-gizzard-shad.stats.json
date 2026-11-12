@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-30",
+  "slug": "sea-gizzard-shad",
+  "name": "전어",
+  "group": "sea",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "sea.gizzard-shad"
+  ],
+  "hold": true,
+  "triangles": 1604,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.053,
+    0.31,
+    0.106
+  ],
+  "bounds": [
+    [
+      -0.027,
+      -0.155,
+      -0.053
+    ],
+    [
+      0.027,
+      0.155,
+      0.053
+    ]
+  ],
+  "glbBytes": 40140,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-gizzard-shad_main.png",
+    "sea-gizzard-shad_thumb.png"
+  ]
+}

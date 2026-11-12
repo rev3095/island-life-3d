@@ -1,0 +1,79 @@
+{
+  "id": "IC-SE-26",
+  "slug": "sea-sea-hare",
+  "name": "군소",
+  "group": "sea",
+  "category": "item",
+  "kind": "sea-slug",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sea-hare",
+      "code": "IC-SE-26"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "통통한 갈색 바다 달팽이, 토끼 귀 더듬이, 밝은 점",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 여름"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — sea-sea-slug 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이",
+      "value": 0.34,
+      "min": 0.14,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    },
+    "spots": {
+      "label": "등 점 수",
+      "value": 18,
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "live": false
+    }
+  },
+  "palette": {
+    "slug": "#6E5A48",
+    "rim": "#9C8468",
+    "foot": "#84705C",
+    "rhino": "#8C7458",
+    "gill": "#A88C70",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "slug": "몸",
+    "rim": "테·점",
+    "foot": "발",
+    "rhino": "더듬이",
+    "gill": "아가미",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

@@ -16,6 +16,7 @@ import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { imageType } from '../src/core/packs.js';
+import { seaPackOf } from '../src/data/sea-items.js';
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const MB = 1024 * 1024;
@@ -41,6 +42,14 @@ export const SEASON_FILES = (() => {
   return new Map([...uses].filter(([, s]) => s.length === 1).map(([p, [slug]]) => [p, slug]));
 })();
 const seasonPacks = [...new Set(SEASON_FILES.values())].map(slug => ({ name: `season-${slug}`, season: slug, test: p => SEASON_FILES.get(p) === slug }));
+// M18-P1 계절 바다 생물 묶음 (D197-A): 한 계절에만 나오는 바다 생물(items.json sea 의 season 이 봄·여름·가을·겨울 하나)의 모델 → sea-<계절>.
+// 처음에 받지 않고, 미리 받기도 그 계절(이 달·다음 달)일 때만 (main.js → items.seaPacksFor). 잡거나 박물관·상점에서 처음 읽으면 그때 받는다.
+// 아이콘(작은 그림)은 도감·가방이 철과 상관없이 보여서 icons 묶음 그대로.
+export const SEA_SEASON_FILES = (() => {
+  const T = JSON.parse(readFileSync(join(ROOT, 'assets/data/items.json'), 'utf8'));
+  return new Map((T.sea ?? []).filter(r => seaPackOf(r.season)).map(r => [`assets/items/models/sea-${r.slug}.glb.json`, seaPackOf(r.season)]));
+})();
+const seaSeasonPacks = [...new Set(SEA_SEASON_FILES.values())].map(name => ({ name, season: name, test: p => SEA_SEASON_FILES.get(p) === name }));
 // 9차 섬 꾸미기 묶음: 길·울타리 배경 모델 (assets/decor/decor.json) — 처음에 받지 않고 섬 꾸미기를 켜거나 저장에 놓은 것이 있을 때.
 // 야외 가구는 집 가구와 같은 모델이라 furniture 묶음 그대로
 export const DECOR_FILES = (() => {
@@ -86,6 +95,7 @@ export const PACKS = [
   { name: 'clothes', test: p => p.startsWith('assets/clothes/') && p !== 'assets/clothes/index.json' },   // 11차 옷 모델·썸네일 (처음에 받지 않고 상점·옷장·입은 옷이 있을 때 — 목록만 섬 묶음)
   { name: 'icons', test: p => !!imageType(p) },                                     // 그림: 아이템 아이콘·가구 썸네일 (가방·상점·박물관을 처음 열 때)
   ...seasonPacks,                                                                   // 계절 행사 모델 (그 행사 때)
+  ...seaSeasonPacks,                                                                // M18-P1 계절 바다 생물 모델 (그 계절 무렵)
   { name: 'decor', test: p => DECOR_FILES.has(p) },                                 // 9차 섬 꾸미기 길·울타리 (놓을 때)
   { name: 'tour', test: p => TOUR_FILES.has(p) },                                   // P35 무인도 투어 배·광석 바위 (배를 놓을 때)
   { name: 'night', test: p => NIGHT_FILES.has(p) },                                 // P40 밤 건물·등불·밤 가게 주인 (밤에 처음 나올 때)

@@ -45,7 +45,7 @@ test('build-web: 게시 파일은 모듈·css + 에셋 묶음 몇 개 (에셋을
     assert.equal(f.path, f.src);
   }
   assert.equal(plan.publish.filter(f => f.path.startsWith('packs/')).length, plan.packs.length);
-  assert.ok(plan.packs.length <= 20,   // + M13 daily 묶음 + M16 바다 생물 모델로 items 묶음 하나 더 (items-3)
+  assert.ok(plan.packs.length <= 25,   // + M13 daily 묶음 + M16 바다 생물 모델로 items 묶음 하나 더 (items-3) + M18-P1 계절 바다 생물 묶음 넷 (sea-spring|summer|autumn|winter) · icons 하나 더
     `묶음 ${plan.packs.length}개`);
   assert.ok(plan.publish.length + 1 <= LIMITS.perPublish, `한 번에 다 올라가는 수 (지금 ${plan.publish.length + 1}개)`);
 });
@@ -307,4 +307,14 @@ test('packs.js: 개발 서버처럼 (묶음 목록 없음) — 경로 그대로,
   assert.equal(P.urlNow('assets/items/renders/fish-carp_thumb.png'), 'assets/items/renders/fish-carp_thumb.png');
   assert.equal(await P.url('assets/furniture/renders/bed_thumb.png'), 'assets/furniture/renders/bed_thumb.png');
   assert.deepEqual(P.packStatus(), []);
+});
+
+test('build-web: M18-P1 계절 바다 생물 모델은 그 계절 묶음에만 (boot 아님, 미리 받기는 그 계절만)', () => {
+  const seaPacks = plan.packs.filter(p => /^packs\/sea-(spring|summer|autumn|winter)-\d+\.json$/.test(p.path));
+  assert.equal(new Set(seaPacks.map(p => p.season)).size, 4);
+  for (const p of seaPacks) {
+    assert.ok(!p.boot, `${p.path} 는 처음에 받지 않는다`);
+    assert.ok(p.files.every(f => f.path.startsWith('assets/items/models/sea-')), p.path);
+  }
+  for (const p of plan.packs.filter(p => p.boot)) assert.ok(!p.files.some(f => f.path.startsWith('assets/items/models/')), `${p.path} 에 아이템 모델이 없다`);
 });

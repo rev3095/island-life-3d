@@ -1,0 +1,161 @@
+{
+  "id": "IC-SE-37",
+  "slug": "sea-red-snow-crab",
+  "name": "홍게",
+  "group": "sea",
+  "category": "item",
+  "kind": "crab",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.red-snow-crab",
+      "code": "IC-SE-37"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "대게 닮은 긴 다리 게, 온몸 붉은빛",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 겨울"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — sea-snow-crab 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "등딱지 너비",
+      "value": 0.24,
+      "min": 0.08,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    },
+    "bodyLength": {
+      "label": "등딱지 길이 비",
+      "value": 0.8,
+      "min": 0.4,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "bodyHeight": {
+      "label": "등딱지 높이 비",
+      "value": 0.18,
+      "min": 0.15,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "spike": {
+      "label": "옆 가시",
+      "value": 0.2,
+      "min": 0,
+      "max": 1.5,
+      "step": 0.05,
+      "live": false
+    },
+    "pear": {
+      "label": "앞이 좁은 정도",
+      "value": 0.1,
+      "min": 0,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "legLength": {
+      "label": "다리 길이",
+      "value": 0.21,
+      "min": 0.08,
+      "max": 0.45,
+      "step": 0.01,
+      "live": false
+    },
+    "legThick": {
+      "label": "다리 굵기",
+      "value": 0.016,
+      "min": 0.004,
+      "max": 0.025,
+      "step": 0.001,
+      "live": false
+    },
+    "kneeLift": {
+      "label": "무릎 높이",
+      "value": 0.24,
+      "min": 0.1,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    },
+    "claw": {
+      "label": "집게 크기",
+      "value": 0.7,
+      "min": 0.2,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "clawArm": {
+      "label": "집게 팔 길이",
+      "value": 0.1,
+      "min": 0.05,
+      "max": 0.3,
+      "step": 0.01,
+      "live": false
+    },
+    "paddle": {
+      "label": "노 같은 뒷다리 (1 = 있음)",
+      "value": 0,
+      "min": 0,
+      "max": 1,
+      "step": 1,
+      "live": false
+    },
+    "bumps": {
+      "label": "등 돌기 수",
+      "value": 10,
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "live": false
+    }
+  },
+  "palette": {
+    "carapace": "#D0483A",
+    "spot": "#A83228",
+    "belly": "#F6DCC8",
+    "leg": "#DC5A48",
+    "claw": "#D0483A",
+    "clawTip": "#F6DCC8",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "carapace": "등딱지",
+    "spot": "등 돌기",
+    "belly": "배",
+    "leg": "다리",
+    "claw": "집게",
+    "clawTip": "집게 끝",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

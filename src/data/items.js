@@ -121,7 +121,7 @@ ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8
 ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
 ITEMS.push(...dailyItems(itemIcon));      // IC-MA-11 별 조각 셋 · IC-MA-12 레시피 쪽지 (M13)
 ITEMS.push(...artItems(T.art, itemIcon)); // IC-AR-01–16 미술품 진품 16 + 가품 (P54 밤 특별 상점)
-ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 + 스쿠버 키트 (TL-07)
+ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 (+ M18-P1 계절 생물 IC-SE-21–38) + 스쿠버 키트 (TL-07)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -149,3 +149,14 @@ export const has = id => BY_ID.has(id);
 export const stackOf = id => BY_ID.get(id)?.stack ?? 1;
 /** 박물관·도감에 들어가는 카테고리 (P54 미술품 art — 가품 fake 는 박물관이 받지 않는다 museum.js · M16 바다 생물 sea — 박물관 관 배치는 박물관 트랙) */
 export const COLLECTIBLE = ['fish', 'bug', 'fossil', 'art', SC.key];
+
+// ---------- M18-P1 「이번 달」 (도감 UI-35) ----------
+/** 그 달에 나오나 (months 가 없는 화석 등은 늘) */
+export const inMonth = (it, month) => !it?.months || it.months.includes(month);
+const prevMonth = m => (m === 1 ? 12 : m - 1), nextMonth = m => (m === 12 ? 1 : m + 1);
+/** 이번 달에 새로 나오나 — 지난달엔 없고 이번 달엔 있음 (연중·화석은 아님) */
+export const isNewIn = (it, month) => !!it?.months && it.months.length < 12 && it.months.includes(month) && !it.months.includes(prevMonth(month));
+/** 이번 달이 마지막인가 — 이번 달엔 있고 다음 달엔 없음 */
+export const isLastIn = (it, month) => !!it?.months && it.months.length < 12 && it.months.includes(month) && !it.months.includes(nextMonth(month));
+/** 이 달·다음 달에 나올 계절 바다 생물의 모델 묶음 이름 (게시본 미리 받기 — main.js prefetchPacks) */
+export const seaPacksFor = month => [...new Set(list(SC.key).filter(it => it.pack && (it.months.includes(month) || it.months.includes(nextMonth(month)))).map(it => it.pack))];

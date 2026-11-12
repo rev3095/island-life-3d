@@ -1,0 +1,99 @@
+{
+  "id": "IC-SE-35",
+  "slug": "sea-anglerfish",
+  "name": "아귀",
+  "group": "sea",
+  "category": "item",
+  "kind": "anglerfish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.anglerfish",
+      "code": "IC-SE-35"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "넓적한 큰 머리, 큰 입과 이빨, 머리 위 낚싯대 미끼",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 겨울"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — 새 빌더 (items_sea.py)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "length": {
+      "label": "몸 길이",
+      "value": 0.44,
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "width": {
+      "label": "머리 너비",
+      "value": 1,
+      "min": 0,
+      "max": 2,
+      "step": 0.01,
+      "live": false
+    },
+    "spots": {
+      "label": "점 수",
+      "value": 12,
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "live": false
+    },
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#7A6650",
+    "back": "#5E4C3A",
+    "belly": "#D8C8B0",
+    "fin": "#6E5A46",
+    "mouth": "#5A2E2A",
+    "tooth": "#F4F0E4",
+    "lure": "#F2C64A",
+    "fringe": "#8C765E",
+    "mark": "#4A3A2C",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "back": "등",
+    "belly": "배",
+    "fin": "지느러미",
+    "mouth": "입 안",
+    "tooth": "이빨",
+    "lure": "미끼 혹",
+    "fringe": "술 장식",
+    "mark": "무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -35,
+    "pitch": 32
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "IC-SE-24",
+  "slug": "sea-hair-crab",
+  "name": "털게",
+  "group": "sea",
+  "kind": "crab",
+  "version": "0.1",
+  "items": [
+    "sea.hair-crab"
+  ],
+  "hold": true,
+  "triangles": 5980,
+  "parts": 1,
+  "materials": [
+    "belly",
+    "carapace",
+    "claw",
+    "clawTip",
+    "eye",
+    "eyeHighlight",
+    "leg",
+    "spot"
+  ],
+  "objects": [
+    "crab"
+  ],
+  "size": [
+    0.477,
+    0.433,
+    0.129
+  ],
+  "bounds": [
+    [
+      -0.239,
+      -0.217,
+      -0.064
+    ],
+    [
+      0.239,
+      0.217,
+      0.064
+    ]
+  ],
+  "glbBytes": 120104,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-hair-crab_main.png",
+    "sea-hair-crab_thumb.png"
+  ]
+}

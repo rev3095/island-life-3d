@@ -67,5 +67,5 @@ test('잡기 · 달아나기: 잠겨야 잡고, 클수록 닿는 거리가 넓�
 
 test('박물관·도감: 바다 생물을 기증·기록할 수 있다 (분류 sea)', () => {
   assert.ok(items.COLLECTIBLE.includes('sea'));
-  assert.equal(items.list('sea').length, 20);
+  assert.equal(items.list('sea').length, 38);   // + M18-P1 계절 생물 18
 });

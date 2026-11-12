@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-28",
+  "slug": "sea-conger",
+  "name": "갯장어",
+  "group": "sea",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "sea.conger"
+  ],
+  "hold": true,
+  "triangles": 1592,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.086,
+    0.61,
+    0.07
+  ],
+  "bounds": [
+    [
+      -0.043,
+      -0.305,
+      -0.035
+    ],
+    [
+      0.043,
+      0.305,
+      0.035
+    ]
+  ],
+  "glbBytes": 41164,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-conger_main.png",
+    "sea-conger_thumb.png"
+  ]
+}

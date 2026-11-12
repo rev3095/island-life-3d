@@ -1,0 +1,45 @@
+{
+  "id": "IC-SE-27",
+  "slug": "sea-horned-turban",
+  "name": "뿔소라",
+  "group": "sea",
+  "kind": "turban",
+  "version": "0.1",
+  "items": [
+    "sea.horned-turban"
+  ],
+  "hold": true,
+  "triangles": 1258,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellBase",
+    "shellDark"
+  ],
+  "objects": [
+    "shell"
+  ],
+  "size": [
+    0.313,
+    0.302,
+    0.254
+  ],
+  "bounds": [
+    [
+      -0.157,
+      -0.151,
+      -0.127
+    ],
+    [
+      0.157,
+      0.151,
+      0.127
+    ]
+  ],
+  "glbBytes": 26096,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-horned-turban_main.png",
+    "sea-horned-turban_thumb.png"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "IC-SE-23",
+  "slug": "sea-pen-shell",
+  "name": "키조개",
+  "group": "sea",
+  "category": "item",
+  "kind": "mussel",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.pen-shell",
+      "code": "IC-SE-23"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "길쭉한 세모꼴 큰 조개, 올리브 갈색 껍데기",
+    "keywords": [
+      "바다",
+      "잠수",
+      "계절 봄"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M18-P1 계절 생물 (D191-A · D197-A) — sea-mussel 모양을 params·팔레트로"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "shine"
+    ],
+    "flat": [
+      "shine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "껍데기 길이",
+      "value": 0.32,
+      "min": 0.12,
+      "max": 0.32,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#4A4632",
+    "shellRib": "#6A6448",
+    "shellEdge": "#8A8058",
+    "shine": "#D8D4B8",
+    "byssus": "#8A7454"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellRib": "결 줄",
+    "shellEdge": "이음매 테",
+    "shine": "반짝임",
+    "byssus": "수염"
+  }
+}

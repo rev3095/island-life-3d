@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-26",
+  "slug": "sea-sea-hare",
+  "name": "군소",
+  "group": "sea",
+  "kind": "sea-slug",
+  "version": "0.1",
+  "items": [
+    "sea.sea-hare"
+  ],
+  "hold": true,
+  "triangles": 4188,
+  "parts": 1,
+  "materials": [
+    "eye",
+    "eyeHighlight",
+    "foot",
+    "gill",
+    "rhino",
+    "rim",
+    "slug"
+  ],
+  "objects": [
+    "slug"
+  ],
+  "size": [
+    0.149,
+    0.372,
+    0.109
+  ],
+  "bounds": [
+    [
+      -0.074,
+      -0.186,
+      -0.055
+    ],
+    [
+      0.074,
+      0.186,
+      0.055
+    ]
+  ],
+  "glbBytes": 85488,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-hare_main.png",
+    "sea-sea-hare_thumb.png"
+  ]
+}
