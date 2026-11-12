@@ -1164,6 +1164,46 @@
       "status": "review"
     },
     {
+      "id": "FU-71",
+      "slug": "album-frame",
+      "item": "furn.album-frame",
+      "name": "추억 액자",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.52,
+        0.42,
+        0.86
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-72",
+      "slug": "album-frame-wall",
+      "item": "furn.album-frame-wall",
+      "name": "추억 벽 액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.84,
+        0.09,
+        1.95
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-73",
       "slug": "fox-lantern",
       "item": "furn.fox-lantern",

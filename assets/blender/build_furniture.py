@@ -1717,6 +1717,41 @@ def b_attic_hatch(M):
     _rail_line(m, (w / 2 + 0.02, -d / 2, 0), (w / 2 + 0.02, d / 2 - 0.95, 0), posts=2)
 
 
+def b_album_frame(M):
+    """FU-71 추억 액자 (M15, 탁상): 작은 협탁 위 가로 사진틀. 'photo' 칸에 게임이 앨범 사진을 입힌다 (ui/album.js dress) — 사진 칸 위에는 아무것도 얹지 않는다."""
+    m = M.part('table')
+    side_table(m, top_z=0.5, w=0.52, d=0.42)
+    p = M.part('frame')
+    T = rot_xyz(x=-0.2)   # 위가 살짝 뒤로 기운다
+    base = V((0, 0.02, 0.525))
+    at = lambda x, y, z: base + T @ V((x, y, z))
+    p.add(box(at(0, 0, 0.17), (0.48, 0.04, 0.34), bevel=0.02, rot=T), 'frame')
+    p.add(box(at(0, -0.016, 0.17), (0.42, 0.01, 0.28), bevel=0.004, rot=T), 'mat')
+    for sx, sz in ((1, 1), (-1, 1), (1, -1), (-1, -1)):   # 모서리 사진 꽂이
+        p.add(box(at(sx * 0.17, -0.024, 0.17 + sz * 0.105), (0.05, 0.004, 0.05), bevel=0.0, rot=T @ rot_xyz(y=sx * sz * 0.785)), 'corner')
+    p.add(box((0, 0.14, 0.66), (0.05, 0.02, 0.26), bevel=0.006, rot=rot_xyz(x=0.42)), 'frame')   # 뒤 받침
+    ph = M.part('photo')
+    ph.add(box(at(0, -0.023, 0.17), (0.37, 0.004, 0.231), bevel=0.0, rot=T), 'photo')
+
+
+def b_album_frame_wall(M):
+    """FU-72 추억 벽 액자 (M15, 벽걸이): 나무 테 + 흰 바탕 + 'photo' 칸 (게임이 앨범 사진을 입힌다) + 테 위 작은 하트 핀."""
+    m = M.part('frame')
+    cz, W, H, Tk = 1.5, 0.84, 0.6, 0.06
+    for cx, z, sx, sz in ((0, cz + H / 2 - Tk / 2, W, Tk), (0, cz - H / 2 + Tk / 2, W, Tk), (-W / 2 + Tk / 2, cz, Tk, H), (W / 2 - Tk / 2, cz, Tk, H)):
+        m.add(box((cx, -0.04, z), (sx, 0.06, sz), bevel=0.014), 'frame')
+    m.add(box((0, -0.025, cz), (W - Tk * 1.2, 0.02, H - Tk * 1.2), bevel=0.003), 'mat')
+    m.add(ellipsoid((W / 2 - 0.07, -0.08, cz + H / 2 - 0.03), (0.03, 0.012, 0.026), seg=12, rings=6), 'pin')
+    m.add(ellipsoid((W / 2 - 0.09, -0.08, cz + H / 2 - 0.015), (0.022, 0.012, 0.02), seg=10, rings=6), 'pin')
+    m.add(ellipsoid((W / 2 - 0.05, -0.08, cz + H / 2 - 0.015), (0.022, 0.012, 0.02), seg=10, rings=6), 'pin')
+    nail = V((0, -0.02, cz + H / 2 + 0.14))
+    for sx in (1, -1):
+        m.add(cylinder((sx * 0.3, -0.03, cz + H / 2 - 0.02), nail, 0.005, seg=6), 'string')
+    m.add(ellipsoid(nail, (0.014, 0.014, 0.014), seg=8, rings=6), 'string')
+    ph = M.part('photo')
+    ph.add(box((0, -0.037, cz), (0.6, 0.004, 0.375), bevel=0.0), 'photo')
+
+
 
 # ================================================================ 요청 9 박물관 관 붙박이 (FU-85–88, assets/furniture/fixtures)
 def b_glass_case(M):
@@ -1886,6 +1921,7 @@ def b_star_mobile(M):
 
 BUILDERS = {
     'home-stairs': b_home_stairs, 'attic-stairs': b_attic_stairs, 'stair-rail': b_stair_rail, 'attic-hatch': b_attic_hatch,   # M14 내 집 계단 FU-67–70
+    'album-frame': b_album_frame, 'album-frame-wall': b_album_frame_wall,   # M15 추억 액자 FU-71–72
     'star-lamp': b_star_lamp, 'star-clock': b_star_clock, 'star-chair': b_star_chair, 'star-mobile': b_star_mobile,
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,

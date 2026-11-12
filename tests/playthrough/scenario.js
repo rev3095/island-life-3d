@@ -1441,6 +1441,89 @@ export function makeScenario(bot, sk, opts = {}) {
     } else odd.push('행상 수레가 안 나옴');
     note('daily', res);
     return odd.length ? awk(odd.join(' · ')) : pass(`레시피 +${res.recipes} · 풍선 ${res.balloon?.shots ?? 0}발 · 소원 ${res.wishes} → 별 조각 ${res.starsGot} · 행상 🌰${res.peddlerSpent}`);
+  // M15 「주민과 더 가깝게」: 우편함 편지 쓰기(UI-26, 선물 동봉) → 친구 이상 주민에게 🎣(낚싯대) = 같이 낚시 → 다음 날 답장 → 섬폰 📷 앨범(UI-27) → 추억 액자(FU-71)
+  add('villagers-close', 'M15 주민과 더 가깝게: 편지 쓰기 → 같이 낚시 → 다음 날 답장 → 섬폰 앨범 → 추억 액자', async () => {
+    const T = S().town, W = () => S().world;
+    if (!T?.together || !S().album) return block('M15 서비스(town.together · album)가 없어요');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    await bot.setHour(10);
+    await bot.tool(null);
+    const done = [], miss = [];
+    // ① 편지: 가장 친한 주민에게 과일·꽃·조개 하나 넣어서
+    const met = residents().filter(s => T.state(s).met).sort((a, b) => T.state(b).friendship - T.state(a).friendship);
+    const to = met[0];
+    const f0 = to ? T.state(to).friendship : 0;
+    const m = to ? await sk.mail({ write: { to, gift: it => !!it && ['fruit', 'flower', 'shell'].includes(it.category) && !keep.has(it.id) } }) : null;
+    if (m?.sent?.to === to) done.push(`편지 → ${to}${m.sent.gift ? ` (${m.sent.gift})` : ''}`); else miss.push(`편지 못 보냄 (창 ${m?.opened ? '열림' : '안 열림'})`);
+    // ② 같이 낚시: 오늘 같이 놀 수 있는 친구 (밖에 있고 말 걸 수 있는)
+    const pal = residents().filter(s => T.together.can(s).ok).find(s => S().town.villagers.find(V => V.slug === s)?.talkable);
+    let fished = null;
+    if (!pal) miss.push('같이 놀 친구가 없음 (친구 30 이상 · 밖)');
+    else if (await sk.reach(pal)) {
+      let asked = false;
+      bot.policy = { emote: () => (asked ? null : (asked = true, ['item:tool.rod'])), emoteChoice: () => 0, dialog: () => 0 };
+      bot.press('action');
+      await bot.frames(3);
+      await bot.settle(60, 0.5);
+      bot.policy = {};
+      if (!(await bot.until(() => T.together.active()?.slug === pal, { timeout: 5 }))) miss.push(`${pal} 같이 낚시가 안 시작됨`);
+      else {
+        // 가까운 물가로 가서 선다 → 주민이 옆 물가 칸에서 낚싯대를 든다 (AN-14)
+        const isl = W().island, nav = T.debug.nav, p = bot.pos(), t0 = isl.toTile(p.x, p.z);
+        let best = null, bd = 1e9;
+        for (let dz = -18; dz <= 18; dz++) for (let dx = -18; dx <= 18; dx++) {
+          const tx = t0.tx + dx, tz = t0.tz + dz;
+          if (!nav.walkable(tx, tz) || isl.tileAt(tx, tz) === 'sand') continue;
+          const wn = [[0, -1], [1, 0], [-1, 0]].find(([a, b]) => isl.tileAt(tx + a, tz + b) === 'water');
+          if (wn && Math.hypot(dx, dz) < bd) { bd = Math.hypot(dx, dz); best = { tx, tz, wn }; }
+        }
+        if (best) {
+          const c = isl.toWorld(best.tx, best.tz);
+          await bot.walkTo(c, { near: 0.3, label: '강가' });
+          await bot.face({ x: c.x + best.wn[0], z: c.z + best.wn[1] });
+        }
+        let shot = false;
+        await bot.until(() => {
+          if (!shot && T.together.active()?.phase === 'fish') { shot = true; bot.shot('16-m15-fish', `${pal}와 같이 낚시 (AN-14)`); }
+          return !T.together.active();
+        }, { timeout: 175, label: '같이 낚시 끝' });
+        await bot.settle(40);
+        const t = T.state(pal).together;
+        fished = { pal, phase: shot ? 'fish' : 'follow', day: t?.day, f: T.state(pal).friendship };
+        if (t?.day === bot.day()) done.push(`같이 낚시 ${pal}${shot ? ' (물가에서)' : ''}`); else miss.push(`${pal} 같이 낚시가 끝나지 않음`);
+      }
+    } else miss.push(`${pal} 에게 못 감`);
+    // ③ 다음 날 아침: 답장
+    await bot.nextDay(9); await bot.settle(60);
+    const replies = (T.mail.unread?.() ?? []).filter(l => /^reply/.test(l.kind));
+    const r = await sk.mail();
+    if (to && replies.some(l => l.from === to)) done.push(`답장 ${replies.map(l => `${l.from}:${l.kind}`).join(',')} · 친밀도 ${f0}→${T.state(to).friendship}`); else if (to) miss.push('답장이 안 옴');
+    // ④ 섬폰 📷 앨범 → 사진 → 추억 액자 (도토리 300)
+    const photos = S().album.list().length;
+    if (bot.acorns() < 300) await sellSurplus();
+    bot.policy = { card: (kind, el, card) => !!card?.classList.contains('pk-album') };   // 앨범 창은 봇이 직접 누른다 (기본 정책은 모르는 창을 닫는다)
+    bot.press('phone');
+    let framed = false;
+    if (await bot.until(() => bot.$('.pk-app[data-app="album"]'), { timeout: 5, ui: false })) {
+      await bot.wait(0.3, { ui: false });
+      await bot.click(bot.$('.pk-app[data-app="album"]'));
+      if (await bot.until(() => bot.$('.pk-album [data-album-photo]'), { timeout: 5, ui: false })) {
+        await bot.click(bot.$('.pk-album [data-album-photo]'));
+        await bot.frames(3);
+        await bot.shot('16-m15-album', '추억 앨범');
+        const b = bot.$('.pk-album [data-album-frame="desk"]');
+        if (b && !b.disabled) { await bot.click(b); framed = bot.has('furn.album-frame') > 0; }
+      }
+      await bot.click(bot.$('.pk-album .pk-x'));
+    }
+    bot.policy = {};
+    await bot.frames(3);
+    for (let k = 0; k < 4 && bot.top(); k++) { bot.press('esc'); await bot.frames(4); }
+    if (photos) done.push(`앨범 ${photos}장${framed ? ' · 추억 액자' : ''}`); else miss.push('앨범에 사진이 없음');
+    if (photos && !framed) miss.push('액자 못 만듦');
+    note('m15', { to, letter: m?.sent ?? null, fished, replies: replies.map(l => l.kind), photos, framed, song: T.song.today() });
+    return miss.length ? awk(`${miss.join(' · ')} — ${done.join(' · ')}`) : pass(done.join(' · '));
   });
 
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {

@@ -42,7 +42,7 @@ export const RULE_FLAGS = [
 export const LINE_LABELS = {
   intro: '처음 만남', greet: '인사', weather: '날씨', season: '계절', tier: '친한 정도', time: '시간대 한마디', chat: '잡담', menu: '메뉴 물을 때',
   goingHome: '집에 갈 때', request: '부탁', gift: '선물', bye: '잘 가', tierUp: '더 친해졌을 때', photo: '사진 줄 때', home: '문 너머', chatting: '수다 중 말 걸 때',
-  banter: '주민끼리 수다', letters: '편지', birthday: '생일', event: '계절 행사 기간', 'EV-01': '봄 꽃놀이', 'EV-02': '여름 불꽃놀이', 'EV-03': '가을 수확 잔치', 'EV-04': '겨울 눈사람 날',
+  banter: '주민끼리 수다', letters: '편지', together: '같이 하기 (M15)', song: '저녁 광장 노래 (M15)', birthday: '생일', event: '계절 행사 기간', 'EV-01': '봄 꽃놀이', 'EV-02': '여름 불꽃놀이', 'EV-03': '가을 수확 잔치', 'EV-04': '겨울 눈사람 날',
   dawn: '새벽', morning: '아침', afternoon: '낮', evening: '저녁', night: '밤', clear: '맑음', cloudy: '흐림', rain: '비', snow: '눈', rainbow: '무지개',
   spring: '봄', summer: '여름', autumn: '가을', winter: '겨울', new: '처음', known: '아는 사이', friend: '친구', close: '단짝', best: '절친',
   ask: '부탁하기', accept: '들어줄게', decline: '다음에', remind: '다시 물을 때', notYet: '아직', thanks: '고마워', reward: '보상', done: '오늘은 끝',
@@ -55,7 +55,14 @@ export const LINE_LABELS = {
   complete: '한 분류 다 모음', fish: '물고기', bug: '곤충', allComplete: '모두 모음', appraise: '화석 감정', notice: '감정할 것 알아챔', noticeMany: '여러 개 알아챔', later: '나중에',
   look: '살펴보기', next: '다음 것', result: '감정 결과', rare: '희귀', owned: '이미 있음', doneOwned: '모두 있음', bagFull: '가방 꽉 참', story: '이야기', empty: '빈 때', open: '시작', close_: '끝',
 };
-export const lineLabel = (key, parent) => (parent === 'letters' && key === 'gift' ? LINE_LABELS.gift_ : parent === 'story' && key === 'close' ? LINE_LABELS.close_ : LINE_LABELS[key] ?? key);
+/** M15 묶음 안 이름 (같은 칸 이름이 다른 뜻일 때) — 편지 답장 · 같이 하기 · 저녁 노래 */
+export const SUB_LABELS = {
+  letters: { gift: '선물 동봉', reply: '내 편지 답장', replyLove: '답장 (아주 좋은 선물)', replyDislike: '답장 (취향 아닌 선물)', together: '같이 논 다음 날' },
+  together: { ask: '무엇을 할까', fishYes: '낚시 좋아', walkYes: '산책 좋아', busy: '오늘은 어려워', notYet: '아직 덜 친함', caught: '주민이 낚았을 때', cheer: '내가 낚았을 때',
+    walking: '산책 중 말 걸 때', stop: '그만할 때', end: '헤어질 때', gift: '작은 선물', sleepy: '집에 갈 시간' },
+  song: { sing: '노래 가사 (16자)', talk: '노래 중 말 걸 때' },
+};
+export const lineLabel = (key, parent) => SUB_LABELS[parent]?.[key] ?? (parent === 'story' && key === 'close' ? LINE_LABELS.close_ : LINE_LABELS[key] ?? key);
 
 /** 대사 자리 {이름} 또는 {이름:조사} (town/rules.js fill) — 이 밖의 이름은 오타로 본다 */
 export const PLACEHOLDERS = { player: '플레이어 이름', island: '섬 이름', want: '부탁한 것', item: '물건 이름', reward: '보상', other: '수다 상대', furn: '오늘 들어온 가구', n: '개수', cat: '분류 이름' };
@@ -129,13 +136,13 @@ export function checkVillager(d, env = {}) {
   const pools = linePools(d.lines);
   if (!pools.length) no('lines', '대사가 없어요');
   // 대사 길이 (tests/town.test.mjs 「대사 데이터」 와 같은 규칙): 주민 한 줄 60자 · 수다 말풍선 16자 · 가게 주인 64자 · 편지는 여러 줄 · 주민은 100줄 이상
-  const maxLen = path => (d.role === 'keeper' ? 64 : path === 'banter' ? 16 : 60);
+  const maxLen = path => (d.role === 'keeper' ? 64 : path === 'banter' || path === 'song/sing' ? 16 : 60);   // M15 노래 가사도 말풍선이라 16자
   let count = 0;
   for (const { path, list } of pools) {
     if (!list.length) no(`lines/${path}`, '켜 둔 대사가 하나는 있어야 해요');
     list.forEach((e, i) => {
       if (!isLine(e)) { no(`lines/${path}/${i}`, '글 한 줄 또는 이어지는 여러 줄'); return; }
-      if (d.role === 'villager' && /^letters\/(friend|close|thanks)$/.test(path) && !Array.isArray(e)) no(`lines/${path}/${i}`, '편지는 여러 줄 (칸 안에서 줄 바꾸기)');
+      if (d.role === 'villager' && /^letters\/(friend|close|thanks|reply|replyLove|replyDislike|together)$/.test(path) && !Array.isArray(e)) no(`lines/${path}/${i}`, '편지는 여러 줄 (칸 안에서 줄 바꾸기)');
       for (const s of [e].flat()) {
         count++;
         if (!s.trim()) no(`lines/${path}/${i}`, '빈 줄');
