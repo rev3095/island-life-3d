@@ -478,6 +478,118 @@ def b_museum(M):
     face_y = -0.15 - (D + 0.6) / 2 - 0.1
     spiral = [V((math.cos(t) * 0.022 * t, face_y, top + 0.55 + math.sin(t) * 0.022 * t)) for t in (i * 0.35 for i in range(1, 34))]
     m.add(tube(spiral, [0.018] * len(spiral), seg=8), 'trim', outline=False)   # 박공에 암모나이트 문양
+    if P.get('annex', 0) >= 0.5:
+        museum_annex(M, W, D, base)
+
+
+def museum_annex(M, W, D, base):
+    """BD-16 박물관 증축 (요청 9): 앞 신전(문·기둥·박공·계단)은 BD-04 그대로 두고, 같은 6×6 터 안에서 뒤로 커진다.
+    뒤채(관 여섯이 든 홀) · 가운데 천체 투영실 둥근 지붕(별 무늬가 밤에 켜짐) · 서쪽 수조관 물빛 유리 지붕 · 동쪽 곤충관 온실 지붕 ·
+    양옆 둥근 창 · 앞벽 깃발 둘 (물고기 · 별). 섬 터(lot 6×6)는 그대로라 섬 생성이 바뀌지 않는다."""
+    a = M.part('annex')
+    y0, y1 = 1.05, 2.9                    # 뒤채 앞·뒤 (Blender +Y = 게임 북쪽)
+    cy, dep, hw = (y0 + y1) / 2, y1 - y0, 2.85
+    a.add(box((0, cy + 0.02, 0.22), (hw * 2 + 0.1, dep + 0.1, 0.45), bevel=0.03), 'stone')      # 뒤채 기단
+    H = 2.75
+    a.add(box((0, cy, base + H / 2), (hw * 2, dep, H), bevel=0.06), 'wall')
+    a.add(box((0, cy, base + H + 0.06), (hw * 2 + 0.14, dep + 0.14, 0.12), bevel=0.03), 'column')   # 처마
+    for sx in (1, -1):                    # 양옆 둥근 창 (밤에 켜짐)
+        for y in (y0 + 0.45, y0 + 1.25):
+            c = V((sx * (hw + 0.005), y, base + 1.55))
+            a.add(cylinder(c - V((sx * 0.04, 0, 0)), c + V((sx * 0.03, 0, 0)), 0.24, seg=20), 'column')
+            a.add(cylinder(c, c + V((sx * 0.04, 0, 0)), 0.18, seg=20), 'window', outline=False)
+    for sx in (1, -1):                    # 앞 신전 옆으로 보이는 뒤채 앞면 띠 창
+        x = sx * (W / 2 + (hw - W / 2) / 2)
+        a.add(box((x, y0 - 0.01, base + 1.4), (0.22, 0.04, 0.9), bevel=0.02), 'window', outline=False)
+        a.add(box((x, y0 - 0.03, base + 1.4), (0.3, 0.03, 1.0), bevel=0.01), 'column')
+    top = base + H + 0.12
+    # 가운데 천체 투영실: 둥근 북(드럼) + 반구 지붕 + 별 점 · 꼭대기 별
+    d = M.part('dome')
+    dc = V((0, cy - 0.12, top))
+    d.add(cylinder(dc, dc + V((0, 0, 0.32)), 1.08, seg=32), 'column')
+    for k in range(12):                   # 드럼 둘레 작은 창
+        t = TAU * (k + 0.5) / 12
+        p = dc + V((math.cos(t) * 1.075, math.sin(t) * 1.075, 0.17))
+        d.add(box(p, (0.1, 0.1, 0.16), bevel=0.01, rot=rot_xyz(z=t)), 'window', outline=False)
+    d.add(ellipsoid(dc + V((0, 0, 0.32)), (0.99, 0.99, 0.95), seg=32, rings=16), 'dome')
+    rnd = random.Random(16)
+    for k in range(26):                   # 지붕 별 무늬 (glow → 밤에 켜짐)
+        th, ph = rnd.uniform(0, TAU), rnd.uniform(0.18, 1.3)
+        n = V((math.cos(th) * math.cos(ph), math.sin(th) * math.cos(ph), math.sin(ph)))
+        if n.y > 0.6:                     # 뒤쪽은 안 보이니 아낀다
+            continue
+        p = dc + V((0, 0, 0.32)) + V((n.x * 0.99, n.y * 0.99, n.z * 0.95)) * 1.005
+        r = rnd.uniform(0.028, 0.05)
+        d.add(ellipsoid(p, (r, r, r), seg=8, rings=5), 'glow', outline=False)
+    tip = dc + V((0, 0, 1.3))
+    d.add(cylinder(tip - V((0, 0, 0.06)), tip + V((0, 0, 0.16)), 0.035, seg=8), 'trim')
+    d.add(ellipsoid(tip + V((0, 0, 0.22)), (0.09, 0.03, 0.09), seg=10, rings=6), 'glow', outline=False)
+    # 서쪽: 수조관 물빛 유리 반원 지붕 + 살
+    w = M.part('aqua')
+    wc = V((-hw + 0.78, cy, top))
+    w.add(cylinder(wc - V((0, dep / 2 - 0.2, 0)), wc + V((0, dep / 2 - 0.2, 0)), 0.55, seg=20), 'aqua')
+    w.add(box(wc + V((0, 0, -0.02)), (1.16, dep - 0.3, 0.06), bevel=0.01), 'column')
+    for k in range(3):
+        y = wc.y - dep / 2 + 0.35 + k * (dep - 0.7) / 2
+        w.add(cylinder(V((wc.x, y - 0.02, wc.z)), V((wc.x, y + 0.02, wc.z)), 0.58, seg=20), 'column')
+    # 동쪽: 곤충관 온실 박공 지붕 (유리판 + 흰 살)
+    g = M.part('greenhouse')
+    gc = V((hw - 0.78, cy, top))
+    g.add(prism(gc, dep - 0.3, 1.12, 0.62, ridge='y'), 'greenGlass')
+    ang = math.atan2(0.62, 0.56)
+    for k in range(4):
+        y = gc.y - (dep - 0.3) / 2 + k * (dep - 0.3) / 3
+        for sx in (1, -1):
+            g.add(box(V((gc.x + sx * 0.28, y, gc.z + 0.31)), (0.84, 0.035, 0.035), bevel=0.006, rot=rot_xyz(y=sx * ang)), 'column')
+    g.add(box(gc + V((0, 0, 0.62)), (0.05, dep - 0.25, 0.05), bevel=0.01), 'column')
+    # 앞벽 깃발 둘 (물고기 · 별) — 바깥 기둥과 안쪽 기둥 사이
+    f = M.part('banners')
+    fy = -D / 2 + 0.16
+    for sx, mark in ((-1, 'fish'), (1, 'star')):
+        x = sx * W * 0.24
+        f.add(box((x, fy, base + 1.85), (0.5, 0.05, 0.05), bevel=0.01), 'trim')
+        f.add(box((x, fy - 0.01, base + 1.32), (0.42, 0.025, 1.0), bevel=0.01), 'banner')
+        c = V((x, fy - 0.035, base + 1.38))
+        if mark == 'fish':
+            f.add(ellipsoid(c, (0.13, 0.012, 0.07), seg=12, rings=6), 'trim', outline=False)
+            f.add(cone(c + V((0.1, 0, 0)), c + V((0.2, 0, 0)), 0.07, 0.0, squash=0.15, seg=3), 'trim', outline=False)
+        else:
+            for k in range(5):
+                t = math.pi / 2 + TAU * k / 5
+                f.add(cone(c, c + V((math.cos(t) * 0.14, 0, math.sin(t) * 0.14)), 0.05, 0.0, squash=0.25, seg=4), 'glow', outline=False)
+
+
+def b_telescope_stand(M):
+    """PR-40 박물관 앞 공용 망원경대 (요청 8): 돌 받침대 + 둥근 디딤 받침 + 남색 망원경이 북쪽(+Y) 하늘을 겨눔 · 놋쇠 테 · 별 패(밤에 켜짐).
+    플레이어는 남쪽(-Y)에서 다가와 행동 키 — 게임 카메라에 통이 하늘로 뻗은 옆모습이 보이게 비스듬히."""
+    m = M.part('stand')
+    m.add(cylinder((0, 0, 0), (0, 0, 0.08), 0.42, 0.4, seg=24), 'stone')
+    m.add(box((0, 0.04, 0.36), (0.36, 0.36, 0.56), bevel=0.04), 'stone')
+    m.add(box((0, 0.04, 0.66), (0.46, 0.46, 0.06), bevel=0.02), 'stoneDark')
+    m.add(cylinder((0, 0.04, 0.69), (0, 0.04, 0.78), 0.12, 0.1, seg=16), 'metal')
+    m.add(box((0, -0.15, 0.3), (0.2, 0.02, 0.2), bevel=0.01), 'brass')       # 앞 별 패
+    c = V((0, -0.165, 0.3))
+    for k in range(5):
+        t = math.pi / 2 + TAU * k / 5
+        m.add(cone(c, c + V((math.cos(t) * 0.075, 0, math.sin(t) * 0.075)), 0.03, 0.0, squash=0.3, seg=4), 'glow', outline=False)
+    fork = V((0, 0.04, 0.86))
+    for sx in (1, -1):
+        m.add(box(fork + V((sx * 0.13, 0, 0.02)), (0.04, 0.08, 0.2), bevel=0.01), 'metal')
+    m.add(box(fork + V((0, 0, -0.07)), (0.3, 0.1, 0.04), bevel=0.01), 'metal')
+    d = V((0.18, 0.62, 0.76)).normalized()
+    back, front = fork - d * 0.22, fork + d * 0.56
+    m.add(cylinder(back, front, 0.085, 0.1, seg=24), 'tube')
+    for t, r in ((0.12, 0.093), (0.62, 0.1)):
+        p = back + (front - back) * t
+        m.add(cylinder(p - d * 0.03, p + d * 0.03, r, seg=24), 'brass')
+    m.add(cylinder(front - d * 0.03, front + d * 0.06, 0.12, 0.12, seg=24), 'brass')
+    m.add(cylinder(front + d * 0.055, front + d * 0.065, 0.095, seg=24), 'lens', outline=False)
+    m.add(cylinder(back, back - d * 0.1, 0.03, 0.026, seg=12), 'metal')
+    m.add(cylinder(back - d * 0.1, back - d * 0.13, 0.04, seg=12), 'brass')
+    side = d.cross(V((0, 0, 1))).normalized()
+    fp = fork + side * 0.12 + d * 0.05 + V((0, 0, 0.08))
+    m.add(cylinder(fp - d * 0.13, fp + d * 0.11, 0.025, seg=12), 'tube')
+    m.add(cylinder(fork + side * 0.03, fp, 0.012, seg=6), 'metal')
 
 
 def gable_roof(m, base, length, span, height, overhang=0.15, thick=0.09, mat='roof'):
@@ -1543,8 +1655,99 @@ def b_built_ramp(M):
             m.add(cone((sx * 0.5, y, -0.01), (sx * 0.52, y, 0.14), 0.05, 0.004, squash=0.5, seg=6), 'grass', outline=False)
 
 
+# ================================================================ M13 매일 할 거리 (13차 보드 wave13 D142–D145 A)
+def b_gift_balloon(M):
+    """PR-33 선물 풍선: 큰 풍선 하나 · 줄 · 줄 끝에 매단 리본 선물 상자 (원점 = 상자 바닥 가운데). 색 셋은 게임이 balloon 재질 색만 바꾼다.
+    부품을 'balloon'·'gift' 둘로 나눠 두어 맞혔을 때 게임이 상자만 떨어뜨린다."""
+    b = M.part('balloon')
+    c = V((0, 0, 1.25))
+    b.add(ellipsoid(c, (0.3, 0.3, 0.36), seg=28, rings=16), 'balloon')
+    b.add(cone(c - V((0, 0, 0.35)), c - V((0, 0, 0.42)), 0.02, 0.045, seg=10), 'balloon')
+    b.add(ellipsoid(c + V((-0.11, -0.22, 0.13)), (0.05, 0.02, 0.09), rot=rot_xyz(y=0.4, z=0.5), seg=12, rings=6), 'shine', outline=False)
+    knot = V((0, 0, 0.27))
+    s = bezier(c - V((0, 0, 0.42)), c - V((0, 0, 0.6)), knot + V((0.06, 0, 0.3)), knot, 14)
+    b.add(tube(s, [0.007] * len(s), seg=5), 'string', outline=False)
+    g = M.part('gift')
+    gc = V((0, 0, 0.12))
+    g.add(box(gc, (0.24, 0.24, 0.24), bevel=0.02), 'gift')
+    g.add(box(gc, (0.25, 0.05, 0.245), bevel=0.01), 'ribbon')
+    g.add(box(gc, (0.05, 0.25, 0.245), bevel=0.01), 'ribbon')
+    for sx in (1, -1):
+        g.add(ellipsoid(knot + V((sx * 0.045, 0, -0.005)), (0.05, 0.022, 0.035), rot=rot_xyz(y=-sx * 0.5), seg=12, rings=6), 'ribbon')
+
+
+def b_sea_bottle(M):
+    """PR-34 유리병: 바닷가 모래에 반쯤 묻혀 비스듬히 누운 병 · 코르크 마개 · 속에 말아 넣은 쪽지와 리본 · 둘레 모래 둔덕"""
+    m = M.part('bottle')
+    m.add(jitter(ellipsoid((0, 0, 0.0), (0.42, 0.3, 0.07), seg=18, rings=8), 0.01, 3, keep_bottom=0.0), 'sand')
+    R = rot_xyz(y=math.pi / 2 - 0.18, z=0.35)
+    base = V((-0.17, 0.05, 0.06))
+    ax = R @ V((0, 0, 1))
+    m.add(cylinder(base, base + ax * 0.26, 0.085, 0.085, seg=20), 'glass')
+    m.add(ellipsoid(base + ax * 0.26, (0.085, 0.085, 0.05), rot=R, seg=20, rings=8), 'glass')
+    m.add(cylinder(base + ax * 0.28, base + ax * 0.38, 0.035, 0.03, seg=14), 'glass')
+    m.add(cylinder(base + ax * 0.38, base + ax * 0.43, 0.032, 0.036, seg=12), 'cork')
+    m.add(cylinder(base + ax * 0.05, base + ax * 0.22, 0.045, seg=12), 'paper')
+    m.add(cylinder(base + ax * 0.13, base + ax * 0.145, 0.05, seg=12), 'ribbon')
+    m.add(ellipsoid(base + ax * 0.12 + V((0, -0.06, 0.04)), (0.02, 0.012, 0.05), rot=R, seg=8, rings=4), 'glassLight', outline=False)
+    for x, y in ((0.25, -0.12), (0.28, 0.1)):   # 둘레 작은 조개 · 자갈
+        m.add(ellipsoid((x, y, 0.05), (0.04, 0.035, 0.02), seg=10, rings=5), 'pebble')
+
+
+def b_peddler_cart(M):
+    """BD-11 행상 수레: 바퀴 둘 달린 나무 수레 · 줄무늬 차양 · 꽃 화분·묘목·말아 둔 벽지 · 작은 간판. 앞(-Y)이 손님 쪽 (원점 = 바닥 가운데)"""
+    m = M.part('cart')
+    W, D, H = 1.6, 0.8, 0.62
+    m.add(box((0, 0, H), (W, D, 0.08), bevel=0.02), 'wood')
+    for sy in (1, -1):
+        m.add(box((0, sy * (D / 2 - 0.03), H + 0.14), (W, 0.05, 0.22), bevel=0.015), 'woodDark')
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - 0.03), 0, H + 0.14), (0.05, D, 0.22), bevel=0.015), 'woodDark')
+        c = V((sx * 0.52, 0, 0.32))   # 바퀴
+        m.add(cylinder(c + V((0, -D / 2 - 0.06, 0)), c + V((0, -D / 2 - 0.0, 0)), 0.32, seg=24), 'wheel')
+        m.add(cylinder(c + V((0, D / 2 + 0.0, 0)), c + V((0, D / 2 + 0.06, 0)), 0.32, seg=24), 'wheel')
+        for yy in (-D / 2 - 0.07, D / 2 + 0.07):
+            m.add(cylinder(c + V((0, yy - 0.01, 0)), c + V((0, yy + 0.01, 0)), 0.07, seg=12), 'woodDark')
+        for k in range(2):   # 바퀴살
+            a = math.pi / 4 + k * math.pi / 2
+            for yy in (-D / 2 - 0.03, D / 2 + 0.03):
+                m.add(box(c + V((0, yy, 0)), (0.5, 0.025, 0.04), bevel=0.005, rot=rot_xyz(y=a)), 'woodDark')
+    for sx in (1, -1):   # 손잡이 (뒤쪽 +Y 로 뻗음)
+        m.add(cylinder((sx * 0.4, D / 2, H), (sx * 0.4, D / 2 + 0.75, H - 0.25), 0.03, seg=8), 'woodDark')
+    for sx in (1, -1):   # 차양 기둥
+        for sy in (1, -1):
+            m.add(cylinder((sx * (W / 2 - 0.06), sy * (D / 2 - 0.06), H), (sx * (W / 2 - 0.06), sy * (D / 2 - 0.06), 1.85), 0.025, seg=8), 'woodDark')
+    aw = M.part('awning')
+    for k in range(8):   # 줄무늬 차양: 앞으로 비스듬히
+        x0 = -W / 2 - 0.05 + (W + 0.1) * k / 8
+        aw.add(box((x0 + (W + 0.1) / 16, -0.05, 1.9), ((W + 0.1) / 8, D + 0.3, 0.04), bevel=0.004, rot=rot_xyz(x=-0.18)), 'canvas' if k % 2 == 0 else 'canvasStripe')
+    for k in range(8):   # 앞 물결 가장자리
+        x0 = -W / 2 - 0.05 + (W + 0.1) * (k + 0.5) / 8
+        aw.add(ellipsoid((x0, -D / 2 - 0.2, 1.84), ((W + 0.1) / 16, 0.025, 0.07), seg=10, rings=6), 'canvasStripe' if k % 2 == 0 else 'canvas')
+    g = M.part('goods')
+    for i, (x, col) in enumerate(((-0.55, 'flower'), (-0.3, 'flowerB'), (0.55, 'flower'))):   # 꽃 화분
+        p = V((x, -0.18, H + 0.04))
+        g.add(cylinder(p, p + V((0, 0, 0.16)), 0.08, 0.1, seg=14), 'pot')
+        g.add(ellipsoid(p + V((0, 0, 0.2)), (0.09, 0.09, 0.06), seg=12, rings=6), 'leaf')
+        for k in range(3):
+            a = TAU * k / 3 + i
+            g.add(ellipsoid(p + V((math.cos(a) * 0.05, math.sin(a) * 0.05, 0.25)), (0.035, 0.035, 0.03), seg=10, rings=6), col)
+    sp = V((0.15, 0.15, H + 0.04))   # 묘목 (뿌리 감싼 자루)
+    g.add(ellipsoid(sp + V((0, 0, 0.08)), (0.1, 0.1, 0.09), seg=14, rings=8), 'sack')
+    g.add(cylinder(sp + V((0, 0, 0.15)), sp + V((0, 0, 0.5)), 0.018, seg=8), 'woodDark')
+    for z, r in ((0.5, 0.13), (0.62, 0.1)):
+        g.add(cone(sp + V((0, 0, z - 0.06)), sp + V((0, 0, z + 0.14)), r, 0.0, seg=10), 'leaf')
+    for k, col in enumerate(('roll', 'rollB')):   # 말아 둔 벽지 두루마리
+        g.add(cylinder((-0.2 + 0.1 * k, 0.12, H + 0.1), (0.05 + 0.1 * k, 0.12, H + 0.1), 0.05, seg=14), col)
+    sg = M.part('sign')
+    sg.add(box((0, -D / 2 - 0.02, H + 0.38), (0.55, 0.03, 0.2), bevel=0.01), 'sign')
+    sg.add(star_shape((-0.18, -D / 2 - 0.045, H + 0.38), 0.05, 0.015, puff=0.2), 'flower')
+    sg.add(box((0.06, -D / 2 - 0.04, H + 0.38), (0.28, 0.006, 0.03), bevel=0.0), 'woodDark', outline=False)
+
+
 BUILDERS = {
     'house-grown': b_house_grown, 'built-bridge': b_built_bridge, 'built-ramp': b_built_ramp,   # M14
+    'gift-balloon': b_gift_balloon, 'sea-bottle': b_sea_bottle, 'peddler-cart': b_peddler_cart,
     'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,
     'fence-wood': b_deco_fence, 'fence-picket': b_deco_fence,
@@ -1557,6 +1760,7 @@ BUILDERS = {
     'lamp': b_lamp, 'bench': b_bench, 'mailbox': b_mailbox, 'signboard': b_signboard, 'bridge': b_bridge, 'fence': b_fence,
     'fossil-spot': b_fossil_spot, 'workbench': b_workbench, 'campfire': b_campfire,
     'house': b_house, 'shop': b_shop, 'museum': b_museum, 'dock': b_dock,
+    'telescope-stand': b_telescope_stand,   # 요청 8 박물관 앞 공용 망원경대 PR-40
     'snowball': b_snowball, 'snowman': b_snowman,
     'harvest-pot': b_harvest_pot, 'scarecrow': b_scarecrow,
     'fireworks-raft': b_fireworks_raft,
@@ -1564,6 +1768,7 @@ BUILDERS = {
     'ore-rock': b_ore_rock, 'tour-boat': b_tour_boat,
     'moving-boxes': b_moving_boxes, 'party-balloons': b_party_balloons, 'lot-sign': b_lot_sign,
 }
+import night_special_env; BUILDERS.update(night_special_env.builders(globals()))   # P54 밤 특별 상점 BD-13–15 · PR-35
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

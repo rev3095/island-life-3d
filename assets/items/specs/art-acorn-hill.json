@@ -1,0 +1,96 @@
+{
+  "id": "IC-AR-02",
+  "slug": "art-acorn-hill",
+  "name": "「도토리 언덕」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.acorn-hill",
+      "code": "IC-AR-02"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "굽이치는 초록 언덕 위에 도토리가 주렁주렁 열린 큰 나무 한 그루와 흰 구름.",
+    "keywords": [
+      "초록 언덕",
+      "도토리나무",
+      "구름"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "hill",
+      "hill2",
+      "trunk",
+      "leaf",
+      "acorn",
+      "cloud"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "hill",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#D4ECF4",
+    "hill": "#8CCB6E",
+    "hill2": "#5FAE5A",
+    "trunk": "#8C6440",
+    "leaf": "#4E9A4A",
+    "acorn": "#B97A3E",
+    "cloud": "#FFFFFF",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "하늘",
+    "hill": "앞 언덕",
+    "hill2": "뒷 언덕",
+    "trunk": "나무 줄기",
+    "leaf": "나뭇잎",
+    "acorn": "도토리",
+    "cloud": "구름",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  }
+}

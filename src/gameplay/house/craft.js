@@ -28,7 +28,8 @@ const textIcon = it => it?.emoji ?? (/\.(svg|png|webp|jpe?g)$/i.test(it?.icon ??
 function choiceLabel(data, r) {
   const it = data.items.get(r.result ?? r.id);
   const short = needsOf(data, r).filter(x => x.have < x.n).map(x => `${x.name} ${x.n - x.have}`);
-  return short.length ? `${textIcon(it)} ${it?.name ?? r.id} · ${short.join(', ')} 모자람` : `${textIcon(it)} ${it?.name ?? r.id}  ✔`;
+  const note = r.unlock ? '📜' : '';   // M13 D146-A: 레시피 쪽지로 연 레시피
+  return short.length ? `${note}${textIcon(it)} ${it?.name ?? r.id} · ${short.join(', ')} 모자람` : `${note}${textIcon(it)} ${it?.name ?? r.id}  ✔`;
 }
 
 /** 작업대를 연다. 무언가 만들었으면 true */
@@ -38,6 +39,7 @@ export async function openWorkbench(ctx) {
   const list = data.recipes.list();
   if (!list.length) { ui.toast?.('아직 아는 레시피가 없어요', '🔨'); return false; }
   const pages = Math.ceil(list.length / PER_PAGE);
+  const locked = data.recipes.locked?.().length ?? 0;   // M13 D146-A: 아직 모르는 새 레시피 수
   let page = 0, first = true;
   for (;;) {
     const slice = list.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
@@ -46,7 +48,7 @@ export async function openWorkbench(ctx) {
     const quit = labels.push('그만두기') - 1;
     const pick = await ui.dialog.open({
       speaker: '작업대', color: '#C99B68',
-      lines: [first ? `무엇을 만들까요? (${page + 1}/${pages})` : `다른 레시피예요. (${page + 1}/${pages})`],
+      lines: [first ? `무엇을 만들까요? (${page + 1}/${pages})${locked ? ` — 레시피 쪽지를 모으면 새 레시피가 ${locked}개 더 열려요` : ''}` : `다른 레시피예요. (${page + 1}/${pages})`],
       choices: labels,
     });
     first = false;

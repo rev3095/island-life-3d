@@ -1,0 +1,59 @@
+{
+  "id": "IC-TL-06",
+  "slug": "tool-sling",
+  "name": "새총",
+  "group": "tool",
+  "category": "item",
+  "kind": "sling",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "tool.sling",
+      "code": "IC-TL-06"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "Y 자 나무 가지 새총, 손잡이에 감은 끈, 두 갈래 끝 고무줄과 가죽 주머니 (보드 TO-07)",
+    "keywords": [
+      "Y 자 나무",
+      "고무줄",
+      "가죽 주머니"
+    ],
+    "references": [],
+    "avoid": [],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "wood": "#B07A4A",
+    "grip": "#5E8A6E",
+    "gripDark": "#3F6A52",
+    "band": "#E8604F",
+    "leather": "#8A5A3A",
+    "pebble": "#B9B4A8"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "grip": "손잡이 끈",
+    "gripDark": "끈 줄",
+    "band": "고무줄",
+    "leather": "주머니",
+    "pebble": "돌"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "IC-AR-03",
+  "slug": "art-star-river",
+  "name": "「별이 흐르는 강」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.star-river",
+    "art.star-river-fake"
+  ],
+  "hold": false,
+  "triangles": 1804,
+  "parts": 1,
+  "materials": [
+    "bg",
+    "frame",
+    "frameTrim",
+    "hill",
+    "river",
+    "stand",
+    "star",
+    "starGlow"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 40268,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-star-river_fake_main.png",
+    "art-star-river_fake_thumb.png",
+    "art-star-river_main.png",
+    "art-star-river_real_main.png",
+    "art-star-river_real_thumb.png",
+    "art-star-river_thumb.png"
+  ]
+}

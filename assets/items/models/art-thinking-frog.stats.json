@@ -1,0 +1,52 @@
+{
+  "id": "IC-AR-11",
+  "slug": "art-thinking-frog",
+  "name": "「생각하는 개구리」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.thinking-frog",
+    "art.thinking-frog-fake"
+  ],
+  "hold": false,
+  "triangles": 2176,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "bronze",
+    "bronzeDark",
+    "plate"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.426
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.426
+    ]
+  ],
+  "glbBytes": 43552,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-thinking-frog_fake_main.png",
+    "art-thinking-frog_fake_thumb.png",
+    "art-thinking-frog_main.png",
+    "art-thinking-frog_real_main.png",
+    "art-thinking-frog_real_thumb.png",
+    "art-thinking-frog_thumb.png"
+  ]
+}

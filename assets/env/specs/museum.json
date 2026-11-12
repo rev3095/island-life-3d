@@ -1,18 +1,22 @@
 {
-  "id": "BD-04",
+  "id": "BD-16",
   "slug": "museum",
   "name": "박물관",
   "category": "building",
   "kind": "museum",
-  "version": "0.1",
-  "status": "approved",
+  "version": "0.2",
+  "status": "review",
   "prompt": {
-    "concept": "느루가 관장인 박물관. 기둥 넷과 박공에 암모나이트 문양이 있는 작은 신전 모양.",
+    "concept": "느루가 관장인 박물관 — 요청 9 증축(BD-16, 예전 BD-04 신전 모양 그대로): 같은 자리에서 뒤로 커져 관 여섯(물고기·곤충·화석·바다 생물·미술·별자리)이 들어간다. 가운데 천체 투영실 둥근 지붕(별 무늬가 밤에 켜짐), 서쪽 수조관 물빛 유리 지붕, 동쪽 곤충관 온실 지붕, 앞벽 깃발 둘.",
     "keywords": [
       "계단식 기단",
       "기둥 4개",
       "삼각 박공",
-      "암모나이트 문양"
+      "암모나이트 문양",
+      "뒤채 증축",
+      "천체 투영실 둥근 지붕",
+      "온실 지붕",
+      "물빛 유리 지붕"
     ],
     "references": [
       "작은 그리스 신전",
@@ -21,12 +25,19 @@
     "avoid": [
       "유리 외벽 현대 건축"
     ],
-    "notes": ""
+    "notes": "BD-04 를 증축. 섬 터(lot 6×6)·문·계단은 그대로 (섬 생성·문 전환이 바뀌지 않게), 충돌 상자만 뒤로 0.65 늘림."
   },
   "style": {
     "shading": "toon",
     "outline": true,
-    "outlineWidth": 0.024
+    "outlineWidth": 0.024,
+    "flat": [
+      "glow"
+    ],
+    "noOutline": [
+      "glow",
+      "window"
+    ]
   },
   "params": {
     "scale": {
@@ -50,6 +61,13 @@
       "min": 0.8,
       "max": 1.3,
       "step": 0.01
+    },
+    "annex": {
+      "label": "증축 (뒤채·둥근 지붕)",
+      "value": 1,
+      "min": 0,
+      "max": 1,
+      "step": 1
     }
   },
   "palette": {
@@ -58,7 +76,13 @@
     "column": "#F7F1E4",
     "roof": "#7A9A5A",
     "door": "#5F7F45",
-    "trim": "#B5523B"
+    "trim": "#B5523B",
+    "dome": "#3F5A9A",
+    "aqua": "#8FD3E8",
+    "greenGlass": "#CFE9C4",
+    "banner": "#3E6E8E",
+    "glow": "#FFE7A0",
+    "window": "#F6E2A8"
   },
   "paletteLabels": {
     "stone": "기단",
@@ -66,7 +90,13 @@
     "column": "기둥·처마",
     "roof": "지붕",
     "door": "문",
-    "trim": "문양"
+    "trim": "문양",
+    "dome": "둥근 지붕",
+    "aqua": "수조관 유리 지붕",
+    "greenGlass": "온실 유리",
+    "banner": "깃발",
+    "glow": "별 무늬(밤)",
+    "window": "창(밤)"
   },
   "animations": [],
   "world": {
@@ -78,7 +108,7 @@
       "boxes": [
         [
           -2.95,
-          -2.25,
+          -2.9,
           2.95,
           1.62
         ]

@@ -11,6 +11,8 @@ import { patternTexture } from './pattern.js';
 export const ROOM = { x: 500, z: 0 };               // 플레이어 방 가운데 (월드)
 export const VISIT_ROOM = { x: 540, z: 0 };         // 주민 방 가운데 (방 하나를 주민마다 다시 꾸며 쓴다)
 export const PLACE_ROOMS = { shop: { x: 580, z: 0 }, museum: { x: 620, z: 0 }, moonshop: { x: 660, z: 0 }, tent: { x: 700, z: 0 } };   // M12: 달빛 가게 · 새벽 천막   // 상점·박물관 실내 가운데 (places.js)
+// P54 밤 특별 상점: 운세 부스 · 여우 상인 가게 · 이상한 천막 (z 60 줄 — 다른 실내가 x 줄 끝에 더해져도 안 겹치게)
+Object.assign(PLACE_ROOMS, { fortune: { x: 620, z: 60 }, foxshop: { x: 660, z: 60 }, oddtent: { x: 700, z: 60 } });
 export const WALL_H = 2.6;
 export const WAINSCOT_H = 0.85;
 export const WINDOWS = ['n:1', 'n:6'];               // 북쪽 벽 창문 자리 (칸 번호)

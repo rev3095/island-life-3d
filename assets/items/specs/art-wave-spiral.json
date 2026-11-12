@@ -1,0 +1,73 @@
+{
+  "id": "IC-AR-12",
+  "slug": "art-wave-spiral",
+  "name": "「물결 나선」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.wave-spiral",
+      "code": "IC-AR-12"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "바닥에서 감아 올라 끝이 파도처럼 말리는 푸른 돌 나선, 꼭대기에 물보라 알갱이.",
+    "keywords": [
+      "나선",
+      "말리는 파도",
+      "물보라"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "조각",
+      "value": "spiral",
+      "options": [
+        "frog",
+        "spiral",
+        "acorn",
+        "bird",
+        "bust",
+        "tower"
+      ]
+    }
+  },
+  "palette": {
+    "wave": "#7FA7C4",
+    "foam": "#F4F8FA",
+    "base": "#CFC8BC",
+    "baseDark": "#A79F92",
+    "plate": "#D9A84E"
+  },
+  "paletteLabels": {
+    "wave": "푸른 돌",
+    "foam": "물보라",
+    "base": "받침 돌",
+    "baseDark": "받침 테",
+    "plate": "이름표"
+  }
+}

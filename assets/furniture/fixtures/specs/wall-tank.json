@@ -1,0 +1,74 @@
+{
+  "id": "FU-86",
+  "slug": "wall-tank",
+  "item": "fixture.wall-tank",
+  "name": "대형 수조",
+  "category": "fixture",
+  "kind": "wall-tank",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "물고기관·바다 생물관 벽을 따라 놓는 3칸 큰 수조. 나무 받침장 위 물 상자(뚜껑 없이 테두리), 자갈·물풀·돌·거품. 물고기는 게임이 두 층(0.8·1.25)에 넣는다.",
+    "keywords": [
+      "큰 수조",
+      "나무 받침장",
+      "물풀"
+    ],
+    "references": [
+      "작은 시골 박물관",
+      "동네 미술관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "요청 9 박물관 재단장·증축 — 관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "bubble",
+      "gravel",
+      "tankWater"
+    ],
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#7A5A3E",
+    "brass": "#D8A84B",
+    "gravel": "#E2D2AE",
+    "tankWater": "#9ED6E8",
+    "seaweed": "#5FAE5A",
+    "rock": "#9AA3A0",
+    "bubble": "#F2FBFF"
+  },
+  "paletteLabels": {
+    "frame": "틀",
+    "brass": "놋쇠",
+    "gravel": "자갈",
+    "tankWater": "물",
+    "seaweed": "물풀",
+    "rock": "돌",
+    "bubble": "거품"
+  },
+  "footprint": [
+    3,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

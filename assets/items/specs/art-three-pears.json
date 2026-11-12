@@ -1,0 +1,114 @@
+{
+  "id": "IC-AR-07",
+  "slug": "art-three-pears",
+  "name": "「배 세 알」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.three-pears",
+      "code": "IC-AR-07",
+      "variant": "real"
+    },
+    {
+      "item": "art.three-pears-fake",
+      "code": "IC-AR-07",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "따뜻한 벽 앞 탁자 위 흰 천에 놓인 연두빛 배 세 알과 잎 하나. 조용한 정물화. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "정물화",
+      "배 세 알",
+      "흰 천"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "table",
+      "cloth",
+      "pear",
+      "pearLight",
+      "stem",
+      "leaf"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "pears",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#C99A6A",
+    "table": "#7A5238",
+    "cloth": "#F4EEE2",
+    "pear": "#C4D45A",
+    "pearLight": "#E4EC9A",
+    "stem": "#6B4A3A",
+    "leaf": "#5E9F4F",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "벽",
+    "table": "탁자",
+    "cloth": "흰 천",
+    "pear": "배",
+    "pearLight": "배 빛",
+    "stem": "꼭지",
+    "leaf": "잎",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "pear": "#E8913C"
+      }
+    }
+  }
+}

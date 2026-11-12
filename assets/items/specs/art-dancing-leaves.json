@@ -1,0 +1,108 @@
+{
+  "id": "IC-AR-09",
+  "slug": "art-dancing-leaves",
+  "name": "「춤추는 단풍」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.dancing-leaves",
+      "code": "IC-AR-09",
+      "variant": "real"
+    },
+    {
+      "item": "art.dancing-leaves-fake",
+      "code": "IC-AR-09",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "크림 바탕 위에서 빨강·주황·노랑 단풍잎이 소용돌이 선을 따라 춤추듯 도는 추상화. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "추상화",
+      "단풍잎",
+      "소용돌이"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "swirl",
+      "leafA",
+      "leafB",
+      "leafC"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "leaves",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#F7EBD3",
+    "swirl": "#B98957",
+    "leafA": "#D9583B",
+    "leafB": "#E8913C",
+    "leafC": "#F0C04A",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "바탕",
+    "swirl": "소용돌이 선",
+    "leafA": "빨간 잎",
+    "leafB": "주황 잎",
+    "leafC": "노란 잎",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "bg": "#A9B8CC"
+      }
+    }
+  }
+}

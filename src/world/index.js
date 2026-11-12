@@ -34,6 +34,12 @@ async function nightKinds(assets) {
   return cfg?.assets?.env ?? [];
 }
 
+/** M13 매일 할 거리 (assets/daily/daily.json assets.env — 선물 풍선 · 유리병 · 행상 수레) — 놓일 때 받는다 */
+async function dailyKinds(assets) {
+  const cfg = await assets.loadJSON('assets/daily/daily.json').catch(() => null);
+  return cfg?.assets?.env ?? [];
+}
+
 /** P35 무인도 투어 모델 (배·광석 바위, assets/tour/tour.json env) — 처음에 받지 않고 선착장에 배를 놓을 때·투어 섬을 세울 때 */
 async function tourKinds(assets) {
   const cfg = await assets.loadJSON('assets/tour/tour.json').catch(() => null);
@@ -57,6 +63,7 @@ export default {
     for (const k of await decorKinds(assets, data)) lazy.add(k);
     for (const k of await nightKinds(assets)) lazy.add(k);
     for (const k of await tourKinds(assets)) lazy.add(k);
+    for (const k of await dailyKinds(assets)) lazy.add(k);
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });

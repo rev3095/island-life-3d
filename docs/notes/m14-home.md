@@ -32,8 +32,13 @@
 - TI-13 `bridge-built` (`b_built_bridge`) · TI-14 `ramp-built` (`b_built_ramp`).
 - 붙박이 FU-67 `home-stairs` · FU-68 `attic-stairs` · FU-69 `stair-rail` · FU-70 `attic-hatch` (build_furniture.py, assets/furniture/fixtures).
 
-## 확인
-- `node --test tests/` 전부 통과 (아래 보고의 수). 새 테스트 `home.test.mjs` · `built.test.mjs` · `rating.test.mjs`. 개수 맞춘 테스트: assets 배경 76→81 · 붙박이 목록 +FU-67–70 · 주민 방 테스트는 `owner !== 'player'` 만 · 방 목록은 전부.
+## 확인 (2026-11-12)
+- main 585c28a (m13-daily · p54-night-special · board-archive · museum-stars 포함) 를 브랜치에 합침 — 충돌은 줄 단위로 둘 다 살림, 개수 테스트는 main 값 + M14 (배경 84+5 = 89 · 붙박이 18+4 = 22), env·붙박이 index.json 은 `--index` 로 다시 만듦.
+- `node --test tests/` **517 통과 · 0 실패** (합친 뒤).
+- `node tools/check-interiors.mjs --home --port=4262`: 0–3단계 겉모양 · 들어가기 · 계단 1→2→다락→2→1층 모두 ✅, 콘솔 오류 0 (합친 뒤 다시 돌림).
+- `node tools/playtest.mjs --port=4262` (합치기 전): 31✅ 0🟡 0⛔ · 콘솔 오류 0 · `home-grow` 통과 (1단계 짓기 · 10×10 · 섬 평가 ★). 봇은 도토리가 모자라 2층은 다음으로 넘김 — 계단은 check-interiors 가 본다. 처음엔 봇이 빚에 도토리를 다 써서 뒤 `clock-phone` 이 🟡 → 1,000 씩만 갚게 고침.
+- 실제 게임(머리 없는 Chrome)에서 다리·경사로를 Space 로 놓고 걸어서 건너고·오름 확인 (도토리 3,000·2,000 빠짐, 콘솔 오류 0).
+- 원래 줄: 새 테스트 `home.test.mjs` · `built.test.mjs` · `rating.test.mjs`. 개수 맞춘 테스트: assets 배경 76→81 · 붙박이 목록 +FU-67–70 · 주민 방 테스트는 `owner !== 'player'` 만 · 방 목록은 전부.
 - `node tools/check-interiors.mjs --home --port=4262` (새 `--home[=0,1,2,3]`): 단계마다 겉모양 · 문으로 들어가기 · 계단 걸어 오르내리기 · 사진 (결과 docs/qa/runs/<날짜>-interiors).
 - 자동 플레이 단계 `home-grow` (scenario.js, island-decor 다음).
 

@@ -1,0 +1,81 @@
+{
+  "id": "BD-11",
+  "slug": "peddler-cart",
+  "name": "행상 수레",
+  "category": "prop",
+  "kind": "peddler-cart",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "수·일 낮 광장 한쪽에 서는 떠돌이 행상의 나무 수레 — 줄무늬 차양, 바퀴 둘, 꽃 화분·묘목·말아 둔 벽지, 작은 간판.",
+    "keywords": [
+      "나무 수레",
+      "줄무늬 차양",
+      "꽃 화분 · 묘목"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "13차 보드 wave13 D140–D147 A (M13 매일 할 거리)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C99B68",
+    "woodDark": "#8A5E3B",
+    "wheel": "#A8744A",
+    "canvas": "#FBF1D8",
+    "canvasStripe": "#6FB08A",
+    "pot": "#D9845A",
+    "leaf": "#5FAE5A",
+    "flower": "#F6C84C",
+    "flowerB": "#F28CB8",
+    "sack": "#C9A86A",
+    "roll": "#A8C8F0",
+    "rollB": "#F2C6A0",
+    "sign": "#FBF7F2"
+  },
+  "paletteLabels": {
+    "wood": "수레 판",
+    "woodDark": "수레 테",
+    "wheel": "바퀴",
+    "canvas": "차양",
+    "canvasStripe": "차양 줄",
+    "pot": "화분",
+    "leaf": "잎",
+    "flower": "꽃",
+    "flowerB": "꽃 둘째",
+    "sack": "묘목 자루",
+    "roll": "벽지 두루마리",
+    "rollB": "벽지 둘째",
+    "sign": "간판"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.75,
+        1.0
+      ]
+    },
+    "extent": [
+      1.0,
+      0.9
+    ]
+  }
+}

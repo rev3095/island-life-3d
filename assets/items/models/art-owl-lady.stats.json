@@ -1,0 +1,56 @@
+{
+  "id": "IC-AR-04",
+  "slug": "art-owl-lady",
+  "name": "「조용한 부엉이 부인」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.owl-lady"
+  ],
+  "hold": false,
+  "triangles": 2436,
+  "parts": 1,
+  "materials": [
+    "beak",
+    "bg",
+    "collar",
+    "dress",
+    "eye",
+    "face",
+    "feather",
+    "flower",
+    "flower2",
+    "frame",
+    "frameTrim",
+    "hat",
+    "ribbon",
+    "stand"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.47,
+    0.358,
+    0.582
+  ],
+  "bounds": [
+    [
+      -0.235,
+      -0.179,
+      0.0
+    ],
+    [
+      0.235,
+      0.179,
+      0.582
+    ]
+  ],
+  "glbBytes": 55580,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-owl-lady_main.png",
+    "art-owl-lady_thumb.png"
+  ]
+}

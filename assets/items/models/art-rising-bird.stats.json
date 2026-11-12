@@ -1,0 +1,48 @@
+{
+  "id": "IC-AR-14",
+  "slug": "art-rising-bird",
+  "name": "「날아오르는 새」",
+  "group": "art",
+  "kind": "art-sculpture",
+  "version": "0.1",
+  "items": [
+    "art.rising-bird"
+  ],
+  "hold": false,
+  "triangles": 930,
+  "parts": 1,
+  "materials": [
+    "base",
+    "baseDark",
+    "beak",
+    "bird",
+    "plate",
+    "rod"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.32,
+    0.32,
+    0.586
+  ],
+  "bounds": [
+    [
+      -0.16,
+      -0.16,
+      0.0
+    ],
+    [
+      0.16,
+      0.16,
+      0.586
+    ]
+  ],
+  "glbBytes": 21488,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-rising-bird_main.png",
+    "art-rising-bird_thumb.png"
+  ]
+}

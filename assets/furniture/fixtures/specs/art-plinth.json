@@ -1,0 +1,60 @@
+{
+  "id": "FU-74",
+  "slug": "art-plinth",
+  "item": "fixture.art-plinth",
+  "name": "미술품 받침",
+  "category": "fixture",
+  "kind": "art-plinth",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤 특별 상점에서 미술품을 올려 보여 주는 낮은 네모 돌 받침. 짙은 빨강 벨벳 윗면, 금빛 모서리, 앞에 작은 이름표. 미술품은 윗면(높이 0.35)에 올린다.",
+    "keywords": [
+      "낮은 돌 받침",
+      "빨간 벨벳",
+      "금빛 모서리",
+      "이름표"
+    ],
+    "references": [],
+    "avoid": [
+      "높은 박물관 기둥",
+      "글자"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "stone": "#D8D0C2",
+    "stoneDark": "#A79F92",
+    "velvet": "#8E2F3A",
+    "brass": "#D9A84E",
+    "plate": "#F4E6C8"
+  },
+  "paletteLabels": {
+    "stone": "받침 돌",
+    "stoneDark": "받침 테",
+    "velvet": "벨벳",
+    "brass": "금빛 모서리",
+    "plate": "이름표"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

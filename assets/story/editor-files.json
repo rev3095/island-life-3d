@@ -19,6 +19,8 @@
     "src/data/event-items.js",
     "src/data/decor-items.js",
     "src/data/night-items.js",
+    "src/data/daily-items.js",
+    "src/data/art-items.js",
     "src/core/assets.js",
     "src/core/packs.js",
     "tools/edits.mjs",
@@ -46,6 +48,10 @@
     "assets/story/scenes/s21-tent-first.json",
     "assets/story/scenes/s22-first-tour.json",
     "assets/story/scenes/s25-five-stars.json",
+    "assets/story/scenes/s23-first-meteor.json",
+    "assets/story/scenes/s24-peddler-first.json",
+    "assets/story/scenes/s27-fox-first.json",
+    "assets/story/scenes/s28-odd-tent-first.json",
     "assets/models/index.json",
     "assets/data/items.json",
     "assets/data/rules.json",
@@ -80,6 +86,8 @@
     "assets/renders/pado_thumb.png",
     "assets/renders/dalmuri_thumb.png",
     "assets/renders/byeolbam_thumb.png",
-    "assets/renders/yeomyeong_thumb.png"
+    "assets/renders/yeomyeong_thumb.png",
+    "assets/renders/songi_thumb.png",
+    "assets/renders/salang_thumb.png"
   ]
 }

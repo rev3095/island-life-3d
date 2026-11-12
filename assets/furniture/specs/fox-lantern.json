@@ -1,0 +1,61 @@
+{
+  "id": "FU-73",
+  "slug": "fox-lantern",
+  "item": "furn.fox-lantern",
+  "name": "여우불 등",
+  "category": "furniture",
+  "kind": "fox-lantern",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "짧은 나무 받침대 위에 놓인 여우 얼굴 모양 종이 등. 뾰족한 귀와 붉은 볼 무늬, 가늘게 웃는 눈 틈과 가운데 띠로 푸르스름한 여우불이 비친다.",
+    "keywords": [
+      "여우 얼굴 종이 등",
+      "푸른 여우불",
+      "나무 받침대"
+    ],
+    "references": [],
+    "avoid": [
+      "무서운 도깨비불",
+      "날카로운 눈매"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#9A6B45",
+    "woodDark": "#6B4A33",
+    "shade": "#FBF3E4",
+    "earTip": "#4A3B32",
+    "mark": "#D9583B",
+    "glow": "#CFE8FF"
+  },
+  "paletteLabels": {
+    "wood": "받침대",
+    "woodDark": "살·가로대",
+    "shade": "종이 등",
+    "earTip": "귀 끝·코",
+    "mark": "볼 무늬",
+    "glow": "여우불"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

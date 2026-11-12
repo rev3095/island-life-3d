@@ -78,6 +78,8 @@ async function boot() {
     return { ok: true, reload: true, spare: spare.map(l => l.id) };
   }
   const mv = [];
+  // P54: 가끔만 오는 여우 상인 · 이상한 천막은 점검하는 밤에 꼭 세운다 (점검 준비 — 저장하지 않는 debug.force)
+  c.services.night?.debug?.force?.({ foxshop: true, oddtent: true });
   return { ok: true, residents: c.services.town.residents(), moved: mv };
 }
 
@@ -96,7 +98,7 @@ async function visitDoor({ hour, key, slug, label }) {
   const lab = pk ? (typeof pk.label === 'function' ? '' : pk.label ?? '') : '';
   out.peek = pk ? `${pk.name}${lab ? ` · ${lab}` : ''}` : `없음 (창 ${S.ui.isBlocking()} · 입력 ${c.input?.enabled} · 장면 ${!!S.story?.playing} · 얼음 ${!!P.frozen} · 거리 ${Math.hypot(P.position.x - d.x, P.position.z - d.z).toFixed(2)} · 안 ${!!S.house?.inside}/${S.house?.places?.where ?? ''} · ${[...document.querySelectorAll('.pk-scrim, .pk-dlg-box, [role=dialog]')].map(e => e.textContent.trim().slice(0, 24)).join(' / ')})`;
   out.atHome = key === 'villager' ? S.town.atHome(slug) : null;
-  out.rule = key === 'villager' ? null : (key === 'moonshop' || key === 'tent') ? S.night?.placeRule?.(key) ?? null : S.town.placeRule?.(key) ?? null;
+  out.rule = key === 'villager' ? null : (S.night?.places?.() ?? ['moonshop', 'tent']).includes(key) ? S.night?.placeRule?.(key) ?? null : S.town.placeRule?.(key) ?? null;
   if (!pk || !/^(town:(shop|museum)|house-door-in|house-visit-in|night:door)$/.test(pk.name) || pk.name === 'house-visit-in' && out.atHome !== 'home') { out.note = `문 앞 들어가기 없음`; return out; }
   const x0 = P.position.x;
   await press();
@@ -130,6 +132,42 @@ async function visitDoor({ hour, key, slug, label }) {
   }
   step(10);
   return out;
+}
+
+/** 요청 9 박물관 관: 로비 아치 앞에 서서 실제 Space → 관 안 (전시 수 · 살펴보기 글자) → 문 매트에서 Space 로 로비 */
+async function visitHall({ hall }) {
+  const c = window.__island, { settle, step, press, wait } = window.__ck;
+  const S = c.services, P = S.player, H = S.house.places?.halls;
+  const out = { hall, entered: false, back: false, shown: 0, peek: null, note: '' };
+  if (!H) { out.note = '관 모듈 없음'; return out; }
+  const a = H.arches().find(x => x.hall === hall);
+  if (!a) { out.note = '아치 없음'; return out; }
+  P.teleport(a.door.x + Math.sin(a.facing) * 0.35, a.door.z + Math.cos(a.facing) * 0.35, a.facing);
+  step(6);
+  const pk = S.gameplay.interactions.peek('action');
+  out.peek = pk?.name ?? '없음';
+  if (pk?.name !== 'museum-hall-in') { out.note = `아치 앞 행동 키가 ${out.peek}`; return out; }
+  await press();
+  for (let k = 0; k < 120 && !(H.where === hall && !H.busy && !S.house.passing); k++) { step(4); await wait(40); }
+  await settle();
+  out.entered = H.where === hall;
+  if (!out.entered) { out.note = '들어가지 못함'; return out; }
+  out.status = H.status(hall);
+  out.shown = H.shown(hall);
+  const sp = H.shownSpots(hall)[0];
+  if (sp) { P.teleport(sp.x + (sp.x - P.position.x > 0 ? 0 : 0), sp.z + 0.95, 0); step(6); out.look = S.gameplay.interactions.peek('action')?.name ?? '없음'; }
+  return out;
+}
+async function leaveHall() {
+  const c = window.__island, { settle, step, press, wait } = window.__ck;
+  const S = c.services, H = S.house.places?.halls;
+  const m = H?.doormat();
+  if (!m) return false;
+  S.player.teleport(m.x, m.z, Math.PI); step(6);
+  await press();
+  for (let k = 0; k < 120 && (H.where || H.busy || S.house.passing); k++) { step(4); await wait(40); }
+  await settle();
+  return !H.where && S.house.places.where === 'museum';
 }
 
 async function leaveAll() {
@@ -252,7 +290,8 @@ async function main() {
       continue;
     }
     const doors = [{ key: 'playerHouse', label: '내 집' }, { key: 'shop', label: '도토리상점' }, { key: 'museum', label: '박물관' },
-      ...(b.residents ?? []).map(s => ({ key: 'villager', slug: s, label: `${s} 집` })), { key: 'moonshop', label: '달빛 가게' }, { key: 'tent', label: '새벽 천막' }];
+      ...(b.residents ?? []).map(s => ({ key: 'villager', slug: s, label: `${s} 집` })), { key: 'moonshop', label: '달빛 가게' }, { key: 'tent', label: '새벽 천막' },
+      { key: 'fortune', label: '운세 부스' }, { key: 'foxshop', label: '여우 상인 가게' }, { key: 'oddtent', label: '이상한 천막' }];   // P54 밤 특별 상점
     for (const hour of HOURS) for (const d of doors.filter(x => !ONLY || ONLY.includes(x.slug ?? x.key))) {
       const r = await ev(visitDoor, { hour, ...d });
       r.target = target;
@@ -261,6 +300,17 @@ async function main() {
         const shot = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 70 });
         r.shot = `shots/${target}-${hour}-${d.slug ?? d.key}.jpg`;
         await writeFile(join(outDir, r.shot), Buffer.from(shot.data, 'base64'));
+        if (d.key === 'museum') for (const hall of ['fish', 'bug', 'fossil', 'sea', 'art', 'star']) {   // 요청 9: 관마다 들어가 보기
+          const h = await ev(visitHall, { hall });
+          if (h.entered) {
+            const hs = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 70 });
+            h.shot = `shots/${target}-${hour}-museum-${hall}.jpg`;
+            await writeFile(join(outDir, h.shot), Buffer.from(hs.data, 'base64'));
+            h.back = await ev(leaveHall);
+          }
+          results.push({ target, hour, key: 'museum-hall', label: `박물관 · ${hall}`, entered: h.entered, where: hall, shot: h.shot, note: h.note, peek: h.peek, hallOk: h.entered && h.back, leftOk: h.back });
+          say(`  ${String(hour).padStart(2)}시   └ ${hall.padEnd(7)} ${h.entered ? `✅ 들어감 · 전시 ${h.shown}${h.status ? ` (${h.status.soon ? '곧 열려요' : `${h.status.donated}/${h.status.total}`})` : ''} · 살펴보기 ${h.look ?? '—'} · 로비로 ${h.back ? '✅' : '✗'}` : `✗ ${h.note}`}`);
+        }
         r.leftOk = await ev(leaveAll);
       }
       results.push(r);
@@ -282,7 +332,7 @@ async function main() {
       ...homeRows.map(r => `| ${r.target} | ${r.stage} | ${r.phase} | ${r.ok ? '✅' : '✗'} ${r.exterior ? `겉모양 ${r.exterior.join(',')} · 층 ${r.floors.join(' ')}` : r.phase === 'enter' ? `들어감 ${r.inside} (${r.peek})` : `→ ${r.level}층 · 높이 ${r.peakY}`}${r.notes?.length ? ` · ${r.notes.join(' ')}` : ''}${r.placeholders?.length ? ` · 임시 상자 ${r.placeholders.join(',')}` : ''} | [사진](${r.shot}) |`)] : []),
     '', ...results.filter(r => r.console).map(r => `- [${r.target}] 콘솔 오류·실패 요청 ${r.console.length}${r.console.length ? `: ${r.console.join(' · ')}` : ''}`)].join('\n');
   await writeFile(join(outDir, 'report.md'), md);
-  const bad = homeRows.filter(r => !r.ok || r.error || r.placeholders?.length).length + rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false)).length + results.filter(r => r.console?.length).length;
+  const bad = homeRows.filter(r => !r.ok || r.error || r.placeholders?.length).length + rows.filter(r => r.error || r.placeholders?.length || r.looks?.bad?.length || (r.entered && r.leftOk === false) || (r.key === 'museum-hall' && !r.hallOk)).length + results.filter(r => r.console?.length).length;
   say(`\n결과 ${outDir} · 문제 ${bad}`);
   process.exit(bad ? 1 : 0);
 }

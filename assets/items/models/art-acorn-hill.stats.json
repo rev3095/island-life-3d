@@ -1,0 +1,52 @@
+{
+  "id": "IC-AR-02",
+  "slug": "art-acorn-hill",
+  "name": "「도토리 언덕」",
+  "group": "art",
+  "kind": "art-painting",
+  "version": "0.1",
+  "items": [
+    "art.acorn-hill"
+  ],
+  "hold": false,
+  "triangles": 2752,
+  "parts": 1,
+  "materials": [
+    "acorn",
+    "bg",
+    "cloud",
+    "frame",
+    "frameTrim",
+    "hill",
+    "hill2",
+    "leaf",
+    "stand",
+    "trunk"
+  ],
+  "objects": [
+    "art"
+  ],
+  "size": [
+    0.57,
+    0.315,
+    0.483
+  ],
+  "bounds": [
+    [
+      -0.285,
+      -0.158,
+      0.0
+    ],
+    [
+      0.285,
+      0.158,
+      0.483
+    ]
+  ],
+  "glbBytes": 58720,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "art-acorn-hill_main.png",
+    "art-acorn-hill_thumb.png"
+  ]
+}

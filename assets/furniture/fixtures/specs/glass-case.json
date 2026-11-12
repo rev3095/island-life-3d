@@ -1,0 +1,68 @@
+{
+  "id": "FU-85",
+  "slug": "glass-case",
+  "item": "fixture.glass-case",
+  "name": "유리 진열장",
+  "category": "fixture",
+  "kind": "glass-case",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "관마다 쓰는 1칸 유리 진열장. 나무 받침장 위 유리 상자(뚜껑 없이 위 테만), 안에 천 깔개, 앞 놋쇠 이름판. 화석·바다 생물·작은 전시물이 윗면(0.74)에 놓인다.",
+    "keywords": [
+      "유리 진열장",
+      "나무 받침장",
+      "놋쇠 테"
+    ],
+    "references": [
+      "작은 시골 박물관",
+      "동네 미술관"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "요청 9 박물관 재단장·증축 — 관 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "caseGlass"
+    ],
+    "flat": [
+      "glow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#9C7452",
+    "woodDark": "#7A5A3E",
+    "brass": "#D8A84B",
+    "caseGlass": "#DDEFF4",
+    "cloth": "#7E4E5E"
+  },
+  "paletteLabels": {
+    "wood": "받침장",
+    "woodDark": "윗판",
+    "brass": "놋쇠",
+    "caseGlass": "유리",
+    "cloth": "천 깔개"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

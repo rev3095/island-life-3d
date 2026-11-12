@@ -1,0 +1,108 @@
+{
+  "id": "IC-AR-03",
+  "slug": "art-star-river",
+  "name": "「별이 흐르는 강」",
+  "group": "art",
+  "category": "item",
+  "kind": "art-painting",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "art.star-river",
+      "code": "IC-AR-03",
+      "variant": "real"
+    },
+    {
+      "item": "art.star-river-fake",
+      "code": "IC-AR-03",
+      "variant": "fake"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "남색 밤하늘에 별이 반짝이고, 언덕 사이로 파란 강이 굽이쳐 흐른다. 가품은 한 가지 색만 살짝 다르다.",
+    "keywords": [
+      "밤하늘",
+      "반짝이는 별",
+      "굽이치는 강"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 명화 따라 그리기",
+      "다른 게임 미술품과 똑같은 구성",
+      "무서운 분위기"
+    ],
+    "notes": "P54 밤 특별 상점 (사용자 요청 3·4·5번, 결정 D165–D169) · 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bg",
+      "hill",
+      "river",
+      "star",
+      "starGlow"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": false
+    },
+    "motif": {
+      "label": "그림",
+      "value": "starriver",
+      "options": [
+        "sea",
+        "hill",
+        "starriver",
+        "lady",
+        "vase",
+        "umbrella",
+        "pears",
+        "lighthouse",
+        "leaves",
+        "mooncat"
+      ]
+    }
+  },
+  "palette": {
+    "bg": "#2E3768",
+    "hill": "#1E2448",
+    "river": "#4E8FD8",
+    "star": "#FFE38A",
+    "starGlow": "#4A5590",
+    "frame": "#B98957",
+    "frameTrim": "#E0B85A",
+    "stand": "#8C6440"
+  },
+  "paletteLabels": {
+    "bg": "밤하늘",
+    "hill": "언덕 그림자",
+    "river": "강",
+    "star": "별",
+    "starGlow": "별빛 번짐",
+    "frame": "액자 테",
+    "frameTrim": "안쪽 금빛 줄",
+    "stand": "받침·뒤 다리"
+  },
+  "variants": {
+    "real": {
+      "label": "진품",
+      "palette": {}
+    },
+    "fake": {
+      "label": "가품",
+      "palette": {
+        "river": "#5FA88A"
+      }
+    }
+  }
+}
