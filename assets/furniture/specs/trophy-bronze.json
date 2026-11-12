@@ -1,0 +1,75 @@
+{
+  "id": "FU-91",
+  "slug": "trophy-bronze",
+  "item": "furn.trophy-bronze",
+  "name": "동 트로피",
+  "category": "furniture",
+  "kind": "contest-trophy",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "계절 낚시·곤충 대회 3등 상. 나무 받침 두 단 위 손잡이 둘 달린 동빛 잔, 잔 위에 별, 받침 앞에 리본.",
+    "keywords": [
+      "손잡이 둘 달린 잔",
+      "잔 위 별",
+      "받침 앞 리본"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "15차 보드 wave15 D194-A · M18-P3 대회 (src/gameplay/contest/)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "잔 높이",
+      "value": 0.9,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    },
+    "star": {
+      "label": "별 크기",
+      "value": 0.85,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "base": "#8C6440",
+    "plate": "#F4DFC8",
+    "ribbon": "#4FA56B",
+    "metal": "#D08A52",
+    "metalDark": "#A2643A",
+    "gem": "#F2C14E"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "plate": "이름판",
+    "ribbon": "리본",
+    "metal": "동빛 잔",
+    "metalDark": "잔 테·기둥",
+    "gem": "보석"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

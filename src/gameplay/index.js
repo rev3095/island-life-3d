@@ -16,7 +16,8 @@ const PARTS = [
   ['tour', './tour/index.js'],           // P35 무인도 투어 (assets/tour/, 보드 tour D120–D128)
   ['journal', './journal/index.js'],     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)
   ['daily', './daily/index.js'],         // M13-P2–P5 매일 할 거리: 유성우·소원 · 선물 풍선·새총 · 유리병·레시피 · 방문 행상 (assets/daily/, D142–D147 A)
-  ['rating', './rating/index.js'],       // M14 섬 별점 평가: 섬폰 ⭐ · 별 상 · s25 (assets/rating/, 결정 D152-A)
+  ['rating', './rating/index.js'],
+  ['contest', './contest/index.js'],     // M18-P3 계절 낚시·곤충 대회: 광장 무대 BD-17 · 대회 창 UI-34 · 트로피 FU-89–91 · s29 (assets/contest/, D194-A)       // M14 섬 별점 평가: 섬폰 ⭐ · 별 상 · s25 (assets/rating/, 결정 D152-A)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

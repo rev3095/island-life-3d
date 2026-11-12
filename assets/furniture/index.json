@@ -1282,6 +1282,66 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-89",
+      "slug": "trophy-gold",
+      "item": "furn.trophy-gold",
+      "name": "금 트로피",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.43,
+        0.43,
+        1.01
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-90",
+      "slug": "trophy-silver",
+      "item": "furn.trophy-silver",
+      "name": "은 트로피",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.43,
+        0.43,
+        0.91
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-91",
+      "slug": "trophy-bronze",
+      "item": "furn.trophy-bronze",
+      "name": "동 트로피",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.43,
+        0.43,
+        0.83
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

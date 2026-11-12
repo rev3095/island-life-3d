@@ -135,6 +135,7 @@ function createJournal(ctx, cfg) {
     ev.on('gather:planted', () => count('plant'));
     ev.on('house:craft', () => count('craft'));
     ev.on('dive:catch', () => count('sea'));   // M16 잠수: 바다 생물 잡기 (gather/dive.js)
+    ev.on('contest:enter', () => count('contest'));   // M18-P3 계절 대회 나가기 (gameplay/contest)
     ev.on('museum:changed', ({ id } = {}) => { if (id) count('donate'); });
     ev.on('dialog:line', ({ speaker } = {}) => {
       if (!live() || !isVillager(speaker)) return;

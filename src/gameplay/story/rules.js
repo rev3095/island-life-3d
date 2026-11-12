@@ -17,6 +17,7 @@ export const TRIGGERS = {
   'song-first': { label: '저녁 광장 주민 노래를 처음 들을 때 (M15 — town/song.js 가 보내는 town:song 의 first, 자리 x·z = 두 주민 가운데)', event: 'town:song', test: p => !!p?.first },
   'tour-first': { label: '무인도에 처음 도착했을 때 (P35 — tour 가 보내는 tour:arrive 의 first)', event: 'tour:arrive', test: p => !!p?.first },
   'meteor-first': { label: '처음 유성우가 떨어질 때 (M13 — daily 가 보내는 daily:meteor 의 first)', event: 'daily:meteor', test: p => !!p?.first },
+  'contest-first': { label: '계절 대회에 처음 나갈 때 (M18-P3 — contest 가 접수하며 보내는 contest:enter 의 first, 자리 x·z = 접수 탁자 앞)', event: 'contest:enter', test: p => !!p?.first },
   'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
   'meteor-big': { label: '큰 유성우 밤 별똥별이 처음 떨어질 때 (M18-P2 — daily 가 보내는 daily:meteor 의 bigFirst)', event: 'daily:meteor', test: p => !!p?.bigFirst },
   'special-day': { label: '그날만 날씨를 처음 맞을 때 (M18-P2 — trigger.kind = monsoon · first-snow, daily 가 보내는 daily:special 의 first)', event: 'daily:special', test: (p, t) => !!t.kind && p?.kind === t.kind && !!p?.first },

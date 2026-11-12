@@ -12,6 +12,7 @@
     "src/data/decor-items.js",
     "src/data/night-items.js",
     "src/data/daily-items.js",
+    "src/data/contest-items.js",
     "src/data/art-items.js",
     "src/data/album-items.js",
     "src/data/sea-items.js",

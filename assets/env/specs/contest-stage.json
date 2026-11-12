@@ -1,0 +1,116 @@
+{
+  "id": "BD-17",
+  "slug": "contest-stage",
+  "name": "대회 무대",
+  "category": "building",
+  "kind": "contest-stage",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "계절 낚시·곤충 대회 날에만 광장 한쪽에 서는 나무 무대. 시상대 세 단, 뒤 현수막, 삼각 깃발 줄, 앞 왼쪽 접수 탁자.",
+    "keywords": [
+      "나무 마루",
+      "시상대 세 단",
+      "삼각 깃발",
+      "접수 탁자"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "15차 보드 wave15 D194-A · M18-P3 — 대회 날만 놓고 저장 안 함 (persist:false)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.012
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "무대 너비",
+      "value": 2.9,
+      "min": 2.4,
+      "max": 3.2,
+      "step": 0.05
+    },
+    "depth": {
+      "label": "무대 깊이",
+      "value": 1.7,
+      "min": 1.4,
+      "max": 2,
+      "step": 0.05
+    }
+  },
+  "palette": {
+    "wood": "#D8AC74",
+    "woodDark": "#8A5E3B",
+    "trim": "#F2C14E",
+    "podium": "#FBF7F2",
+    "gold": "#F2C14E",
+    "silver": "#C9D2DB",
+    "bronze": "#D08A52",
+    "pole": "#7A5236",
+    "banner": "#3F7FC9",
+    "bannerMark": "#FBF1D8",
+    "flagA": "#E8514A",
+    "flagB": "#F6C84C",
+    "flagC": "#6FB08A",
+    "paper": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "wood": "마루 널빤지",
+    "woodDark": "마루 받침·다리",
+    "trim": "앞 띠·현수막 테",
+    "podium": "시상대",
+    "gold": "금 패",
+    "silver": "은 패",
+    "bronze": "동 패",
+    "pole": "기둥·줄",
+    "banner": "현수막·탁자 천",
+    "bannerMark": "현수막 무늬",
+    "flagA": "깃발 빨강",
+    "flagB": "깃발 노랑",
+    "flagC": "깃발 초록",
+    "paper": "접수 종이"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "boxes": [
+        [
+          -1.47,
+          -0.9,
+          1.47,
+          0.9
+        ],
+        [
+          -0.42,
+          0.9,
+          0.42,
+          1.16
+        ],
+        [
+          -1.42,
+          1.1,
+          -0.78,
+          1.5
+        ]
+      ]
+    },
+    "extent": [
+      1.5,
+      1.2,
+      0,
+      0.3
+    ]
+  }
+}

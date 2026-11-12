@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "board": "wave15",
+  "decision": {
+    "D194": "A"
+  },
+  "note": "M18-P3 계절 낚시·곤충 대회 (15차 보드 wave15 D194-A). 날짜·시간·제한 시간·점수·주민 참가자·상·대사는 이 파일 하나 — 규칙은 src/gameplay/contest/rules.js (순수), 놀이는 contest/index.js. 대회 날은 계절 행사(assets/events/events.json) 7일과 겹치지 않아야 한다 (tests/contest.test.mjs 가 본다).",
+  "open": {
+    "after": "ending"
+  },
+  "hours": [9, 18],
+  "seconds": 180,
+  "list": [
+    {
+      "id": "CT-01",
+      "kind": "fish",
+      "name": "봄 낚시 대회",
+      "emoji": "🎣",
+      "date": {
+        "month": 3,
+        "day": 20
+      }
+    },
+    {
+      "id": "CT-02",
+      "kind": "bug",
+      "name": "봄 곤충 대회",
+      "emoji": "🦋",
+      "date": {
+        "month": 5,
+        "day": 20
+      }
+    },
+    {
+      "id": "CT-03",
+      "kind": "fish",
+      "name": "여름 낚시 대회",
+      "emoji": "🎣",
+      "date": {
+        "month": 7,
+        "day": 20
+      }
+    },
+    {
+      "id": "CT-04",
+      "kind": "bug",
+      "name": "가을 곤충 대회",
+      "emoji": "🐞",
+      "date": {
+        "month": 10,
+        "day": 5
+      }
+    },
+    {
+      "id": "CT-05",
+      "kind": "fish",
+      "name": "겨울 낚시 대회",
+      "emoji": "🎣",
+      "date": {
+        "month": 12,
+        "day": 10
+      }
+    }
+  ],
+  "kinds": {
+    "fish": {
+      "label": "낚시",
+      "tool": "rod",
+      "toolItem": "tool.rod",
+      "what": "물고기",
+      "unit": "마리",
+      "verb": "낚은",
+      "whatObj": "물고기를",
+      "toolSubj": "낚싯대가"
+    },
+    "bug": {
+      "label": "곤충",
+      "tool": "net",
+      "toolItem": "tool.net",
+      "what": "곤충",
+      "unit": "마리",
+      "verb": "잡은",
+      "whatObj": "곤충을",
+      "toolSubj": "잠자리채가"
+    }
+  },
+  "score": {
+    "perCatch": 10,
+    "note": "점수 = 가장 큰 것(cm) + 마릿수 × perCatch. 같으면 먼저 그 점수에 닿은 쪽"
+  },
+  "size": {
+    "spread": 0.25,
+    "fish": {
+      "byShadow": {
+        "1": 6,
+        "2": 14,
+        "3": 28,
+        "4": 45,
+        "5": 70,
+        "6": 110
+      }
+    },
+    "bug": {
+      "byPrice": [
+        [0, 3],
+        [200, 4],
+        [500, 6],
+        [1000, 8],
+        [3000, 11],
+        [6000, 14]
+      ]
+    }
+  },
+  "host": "chorong",
+  "rivals": {
+    "count": 3,
+    "catches": {
+      "fish": [2, 5],
+      "bug": [1, 4]
+    },
+    "best": {
+      "fish": [20, 65],
+      "bug": [4, 9]
+    },
+    "note": "주민 참가자 셋 (사회 주민 빼고, 섬에 사는 주민 중 날짜로 뽑음). 대회 종류마다 마릿수·가장 큰 것 범위 안에서 날짜로 정하고, 제한 시간 동안 나눠서 잡는다. 보통 실력(낚시 4마리·곤충 3마리)이면 1등이 30% 안팎 — tests/contest.test.mjs"
+  },
+  "prizes": [
+    {
+      "rank": 1,
+      "item": "furn.trophy-gold",
+      "acorns": 3000
+    },
+    {
+      "rank": 2,
+      "item": "furn.trophy-silver",
+      "acorns": 2000
+    },
+    {
+      "rank": 3,
+      "item": "furn.trophy-bronze",
+      "acorns": 1000
+    },
+    {
+      "rank": 4,
+      "item": null,
+      "acorns": 300
+    }
+  ],
+  "stage": {
+    "env": "contest-stage",
+    "offset": [0, 0],
+    "note": "무대 자리 = 광장(plaza)+offset 에서 가장 가까운, 3×4 칸이 비고 평평한 곳 (문 3.2칸 · 축제 광장 반지름+3 · 행상 수레 5칸 밖)"
+  },
+  "assets": {
+    "env": ["contest-stage"]
+  },
+  "scene": "s29",
+  "lines": {
+    "announce": "{emoji} 오늘은 {name} 날! 광장 대회 무대에서 9시부터 18시까지 접수해요",
+    "before": "대회는 아침 9시부터예요, 개굴! 조금 있다 와 줘요",
+    "invite": [
+      "오늘은 {name} 날이에요, 개굴!",
+      "{time}분 동안 {whatObj} 잡아서 가장 큰 것 크기랑 마릿수로 겨뤄요. 주민 셋도 나와요!"
+    ],
+    "ask": "나가 볼래요?",
+    "yes": "나갈래요!",
+    "no": "다음에요",
+    "noTool": "{toolSubj} 있어야 나갈 수 있어요, 개굴. 도토리상점에서 살 수 있어요!",
+    "start": "준비… 시작! {time}분 동안 힘내요, 개굴!",
+    "already": "오늘 대회는 벌써 나갔어요! 다음 대회도 기다릴게요, 개굴",
+    "closed": "오늘 대회는 끝났어요. 다음 대회 때 봐요, 개굴!",
+    "running": "대회 중이에요! 어서 {whatObj} 잡아요!",
+    "timeUp": "그만! 시간 끝났어요, 개굴!",
+    "results": "결과 발표!",
+    "rank1": "1등이에요! 금 트로피를 받아요, 개굴!",
+    "rank2": "2등! 은 트로피예요, 개굴!",
+    "rank3": "3등! 동 트로피예요, 개굴!",
+    "rank4": "아쉽지만 이번엔 상을 못 받았어요. 참가 선물 도토리를 받아요!",
+    "none": "하나도 못 잡았어요… 그래도 나와 줘서 고마워요, 개굴!"
+  }
+}

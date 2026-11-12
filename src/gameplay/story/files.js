@@ -28,6 +28,7 @@ export const SCENE_FILES = [
   'assets/story/scenes/s26-evening-song.json',   // M15 저녁 광장 첫 노래 (trigger song-first)
   'assets/story/scenes/s27-fox-first.json',   // P54 수상한 여우 상인 첫 만남 (trigger night-first kind foxshop)
   'assets/story/scenes/s28-odd-tent-first.json',   // P54 이상한 천막 첫 방문 (trigger night-first kind oddtent)
+  'assets/story/scenes/s29-first-contest.json',   // M18-P3 첫 계절 대회 (trigger contest-first)
   'assets/story/scenes/s25-five-stars.json',   // M14 섬 평가 별 다섯 처음 (trigger rating-five)
   'assets/story/scenes/s30-monsoon-day.json',   // M18-P2 장마 하루 (trigger special-day kind monsoon)
   'assets/story/scenes/s31-big-meteor.json',   // M18-P2 큰 유성우 밤 (trigger meteor-big)

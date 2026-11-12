@@ -1,0 +1,53 @@
+{
+  "id": "FU-89",
+  "slug": "trophy-gold",
+  "item": "furn.trophy-gold",
+  "name": "금 트로피",
+  "category": "furniture",
+  "kind": "contest-trophy",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1960,
+  "parts": 1,
+  "materials": [
+    "base",
+    "gem",
+    "metal",
+    "metalDark",
+    "plate",
+    "ribbon"
+  ],
+  "objects": [
+    "trophy"
+  ],
+  "animations": {},
+  "size": [
+    0.43,
+    0.43,
+    1.01
+  ],
+  "bounds": [
+    [
+      -0.214,
+      -0.23,
+      0.0
+    ],
+    [
+      0.214,
+      0.2,
+      1.014
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 41080,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "trophy-gold_front.png",
+    "trophy-gold_main.png",
+    "trophy-gold_thumb.png",
+    "trophy-gold_top.png"
+  ]
+}
