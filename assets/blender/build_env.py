@@ -1568,6 +1568,93 @@ def b_tour_boat(M):
     hull.add(tube([V((-W * 0.45, -L * 0.3, zc + 0.26)), V((-W * 0.75, -L * 0.25, zc + 0.12)), V((-W * 1.05, -L * 0.2, zc + 0.36))], [0.018] * 3, seg=6), 'rope')
 
 
+# ================================================================ M14 집과 섬이 자란다 (BD-12 커진 내 집 · TI-13 놓는 다리 · TI-14 놓는 경사로)
+def b_house_grown(M):
+    """BD-12 커진 내 집 (집 증축 단계 params.stage 1 방 넓히기 · 2 2층 · 3 다락). 문은 언제나 집터 가운데(x 0) 앞 —
+    BD-01 과 같은 집터 3×3, 같은 문 자리라 door.js 문짝이 그대로 맞는다. 원점 = 집터 가운데 바닥"""
+    st = int(P.get('stage', 1))
+    W, D = 2.1, 2.2
+    Hh = 1.5 if st == 1 else 2.55
+    roofH = 1.0 if st < 3 else 1.45
+    bx = -0.3                                   # 본채는 서쪽으로 조금, 동쪽에 덧붙인 방(날개)
+    m = M.part('house')
+    m.add(box((bx, 0, 0.1), (W + 0.14, D + 0.14, 0.2), bevel=0.04), 'foundation')
+    m.add(box((bx, 0, 0.2 + Hh / 2), (W, D, Hh), bevel=0.06), 'wall')
+    top = 0.2 + Hh
+    m.add(prism((bx, 0, top - 0.02), D, W, roofH * 0.96, ridge='y'), 'wall')
+    m.add(prism((bx, 0, top + 0.02), D, W, roofH, overhang=0.18, ridge='y'), 'roof')
+    # 문 (x 0 = 집터 가운데) + 문 앞 디딤돌
+    m.add(box((0, -D / 2 - 0.02, 0.2 + 0.52), (0.56, 0.08, 1.0), bevel=0.04), 'door')
+    m.add(ellipsoid((0.17, -D / 2 - 0.07, 0.68), (0.035, 0.03, 0.035), seg=10, rings=6), 'trim')
+    m.add(box((0, -D / 2 - 0.28, 0.06), (0.86, 0.42, 0.12), bevel=0.03), 'foundation')
+    window(m, bx - W * 0.3, -D / 2 - 0.02, 0.2 + 0.9)
+    if st >= 2:   # 2층: 위 줄 창 둘 + 층 사이 띠
+        m.add(box((bx, -D / 2 - 0.01, 0.2 + 1.5), (W + 0.04, 0.06, 0.08), bevel=0.02), 'trim')
+        for sx in (-1, 1):
+            window(m, bx + sx * W * 0.27, -D / 2 - 0.02, 0.2 + 2.05, w=0.44, h=0.4)
+        # 서쪽 벽 꽃 상자
+        m.add(box((bx - W * 0.27, -D / 2 - 0.12, 0.2 + 1.8), (0.5, 0.16, 0.1), bevel=0.02), 'trim')
+        for k in range(4):
+            m.add(ellipsoid((bx - W * 0.27 - 0.18 + k * 0.12, -D / 2 - 0.13, 0.2 + 1.89), (0.05, 0.05, 0.05), seg=10, rings=6), 'flower', outline=False)
+    if st >= 3:   # 다락: 지붕 위 내민 창(도머) + 박공 둥근 창
+        dz = top + roofH * 0.38
+        m.add(box((bx + 0.35, -D * 0.2, dz), (0.56, 0.62, 0.5), bevel=0.04), 'wall')
+        m.add(prism((bx + 0.35, -D * 0.2, dz + 0.24), 0.66, 0.66, 0.3, overhang=0.06, ridge='y'), 'roof')
+        window(m, bx + 0.35, -D * 0.2 - 0.32, dz, w=0.34, h=0.3)
+        m.add(cylinder((bx - W / 2 - 0.02, 0, top + 0.42), (bx - W / 2 - 0.07, 0, top + 0.42), 0.17, seg=20), 'trim')   # 서쪽 박공 둥근 창
+        m.add(cylinder((bx - W / 2 - 0.05, 0, top + 0.42), (bx - W / 2 - 0.08, 0, top + 0.42), 0.12, seg=20), 'window', outline=False)
+    # 굴뚝
+    m.add(box((bx + W * 0.25, D * 0.2, top + roofH * 0.6), (0.24, 0.24, 0.7 + (0.25 if st >= 3 else 0)), bevel=0.03), 'foundation')
+    # 동쪽 날개 (넓힌 방): 낮은 벽 + 한쪽 지붕
+    ww, wd, wh = 0.7, 1.7, 1.25
+    wx = bx + W / 2 + ww / 2 - 0.02
+    m.add(box((wx, 0.1, 0.1), (ww + 0.12, wd + 0.12, 0.2), bevel=0.04), 'foundation')
+    m.add(box((wx, 0.1, 0.2 + wh / 2), (ww, wd, wh), bevel=0.05), 'wall')
+    m.add(box((wx + 0.02, 0.1, 0.2 + wh + 0.13), (ww + 0.16, wd + 0.3, 0.1), bevel=0.03, rot=rot_xyz(y=-0.32)), 'roof')
+    window(m, wx, 0.1 - wd / 2 - 0.02, 0.2 + wh * 0.55, w=0.44, h=0.42)
+    if st >= 2:   # 2층부터 날개 앞 작은 화분
+        m.add(cylinder((wx + 0.2, -wd / 2 - 0.15, 0.0), (wx + 0.2, -wd / 2 - 0.15, 0.24), 0.11, 0.13, seg=14), 'foundation')
+        m.add(ellipsoid((wx + 0.2, -wd / 2 - 0.15, 0.32), (0.15, 0.15, 0.14), seg=14, rings=8), 'leaf')
+
+
+def b_built_bridge(M):
+    """TI-13 놓는 나무다리: 강 2칸 + 양쪽 둑 반 칸 (길이 3, 폭 1.1). 널빤지 + 밧줄 난간 + 말뚝 넷. 원점 = 다리 가운데 땅 높이"""
+    L, W = 3.0 * P.get('length', 1), 1.1 * P.get('width', 1)
+    m = M.part('bridge')
+    n = 14
+    arch = lambda x: 0.16 * math.cos(math.pi * x / L)
+    for i in range(n):
+        x = -L / 2 + (i + 0.5) * L / n
+        m.add(box((x, 0, 0.16 + arch(x)), (L / n * 0.86, W, 0.06), bevel=0.012), 'wood' if i % 2 else 'woodLight')
+    for sy in (1, -1):
+        beam = [V((x, sy * (W / 2 - 0.1), 0.1 + arch(x))) for x in (L * (i / 10 - 0.5) for i in range(11))]
+        m.add(tube(beam, [0.05] * len(beam), seg=8), 'woodDark')
+        posts = [-L / 2 + 0.12, L / 2 - 0.12]
+        for x in posts:
+            m.add(cylinder((x, sy * (W / 2 - 0.03), -0.25), (x, sy * (W / 2 - 0.03), 0.68 + arch(x)), 0.055, seg=10), 'woodDark')
+        rope = [V((x, sy * (W / 2 - 0.03), 0.58 + arch(x) - 0.08 * math.sin(math.pi * (x - posts[0]) / (posts[1] - posts[0])))) for x in (posts[0] + (posts[1] - posts[0]) * i / 12 for i in range(13))]
+        m.add(tube(rope, [0.02] * len(rope), seg=6), 'rope')
+
+
+def b_built_ramp(M):
+    """TI-14 놓는 경사로: 절벽 앞 아래칸 둘(1×2)에 놓는 흙 비탈 + 나무 디딤판. 앞(-Y, 남쪽) 높이 0 → 뒤(+Y, 절벽 쪽) 높이 1.
+    원점 = 두 칸 가운데 땅 높이"""
+    h = 1.0 * P.get('height', 1)
+    m = M.part('ramp')
+    m.add(wedge(0.96, 2.0, h), lambda c, n: 'path' if n.z > 0.3 else 'dirt')
+    slope = math.atan2(h, 2.0)
+    for i in range(6):
+        y = -0.85 + i * 0.34
+        z = (y + 1.0) / 2.0 * h
+        m.add(box((0, y, z + 0.02), (0.86, 0.08, 0.05), bevel=0.012, rot=rot_xyz(x=slope)), 'wood')
+    for sx in (1, -1):   # 옆 말뚝·풀
+        m.add(cylinder((sx * 0.5, 0.9, 0), (sx * 0.5, 0.9, h + 0.12), 0.05, seg=8), 'wood')
+        m.add(cylinder((sx * 0.5, -0.1, 0), (sx * 0.5, -0.1, h * 0.45 + 0.12), 0.045, seg=8), 'wood')
+        for k in range(3):
+            y = -0.8 + k * 0.6
+            m.add(cone((sx * 0.5, y, -0.01), (sx * 0.52, y, 0.14), 0.05, 0.004, squash=0.5, seg=6), 'grass', outline=False)
+
+
 # ================================================================ M13 매일 할 거리 (13차 보드 wave13 D142–D145 A)
 def b_gift_balloon(M):
     """PR-33 선물 풍선: 큰 풍선 하나 · 줄 · 줄 끝에 매단 리본 선물 상자 (원점 = 상자 바닥 가운데). 색 셋은 게임이 balloon 재질 색만 바꾼다.
@@ -1659,6 +1746,7 @@ def b_peddler_cart(M):
 
 
 BUILDERS = {
+    'house-grown': b_house_grown, 'built-bridge': b_built_bridge, 'built-ramp': b_built_ramp,   # M14
     'gift-balloon': b_gift_balloon, 'sea-bottle': b_sea_bottle, 'peddler-cart': b_peddler_cart,
     'night-shop': b_night_shop, 'dawn-tent': b_dawn_tent, 'night-lanterns': b_night_lanterns, 'sleep-note': b_sleep_note,
     'path-stone': b_deco_path, 'path-brick': b_deco_path, 'path-plank': b_deco_path, 'path-flower': b_deco_path,

@@ -1,0 +1,37 @@
+{
+  "id": "BD-12-1",
+  "slug": "house-grown-1",
+  "name": "넓힌 내 집",
+  "category": "building",
+  "kind": "house-grown",
+  "version": "0.1",
+  "triangles": 1628,
+  "parts": 1,
+  "materials": [
+    "door",
+    "foundation",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    3.04,
+    2.87,
+    2.72
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 35048,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "house-grown-1_front.png",
+    "house-grown-1_hero.jpg",
+    "house-grown-1_main.png",
+    "house-grown-1_thumb.png",
+    "house-grown-1_top.png"
+  ]
+}

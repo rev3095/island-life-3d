@@ -1,0 +1,52 @@
+{
+  "id": "RM-15",
+  "slug": "rm-15",
+  "kind": "room",
+  "owner": "player",
+  "ownerName": "나",
+  "name": "넓힌 1층",
+  "version": 1,
+  "status": "review",
+  "floorIndex": 0,
+  "note": "M14 집 증축 1단계 「방 넓히기」부터의 1층 (10×10). 2단계부터 동쪽 벽에 2층 계단 FU-67. 처음 집(8×8) 가구는 가운데를 지키며 한 칸씩 옮겨진다 (home.js growShift).",
+  "wallpaper": null,
+  "floor": null,
+  "size": [
+    10,
+    10
+  ],
+  "origin": {
+    "x": 500,
+    "z": 0
+  },
+  "windows": [
+    "n:1",
+    "n:5"
+  ],
+  "door": {
+    "gx0": 4,
+    "gx1": 5
+  },
+  "workbench": {
+    "gx": 0,
+    "gz": 3,
+    "rot": 1
+  },
+  "fixtures": [
+    {
+      "slug": "home-stairs",
+      "fu": "FU-67",
+      "gx": 8,
+      "gz": 0,
+      "w": 2,
+      "d": 3,
+      "kind": "up",
+      "to": 1,
+      "rail": "w",
+      "top": 1.7,
+      "from": 2
+    }
+  ],
+  "starter": [],
+  "furniture": []
+}

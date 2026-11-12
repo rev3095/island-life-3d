@@ -211,7 +211,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-74', 'FU-77', 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 붙박이 FU-85–88
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-67', 'FU-68', 'FU-69', 'FU-70', 'FU-74', 'FU-77', 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 붙박이 FU-85–88   // + M14 내 집 계단 FU-67–70
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);

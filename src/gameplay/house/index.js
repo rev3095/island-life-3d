@@ -6,11 +6,15 @@
 //  - 5차 Z2: 벽지·바닥(assets/interior 스펙, interior.js·pattern.js). 벽을 보고 행동 키(25) → 꾸미기 메뉴(벽지·바닥 바꾸기·가구 놓기).
 //    상점 코너(ui/shop.js)는 house.interior 로 오늘의 벽지·바닥을 보고 산다. 주민 집 문 → 주민 방(visit.js).
 //  - 실내 보드 interiors: 도토리상점·박물관 실내(places.js). 드나들기는 모두 door.js 의 through() 하나로.
-// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio, nextId, wallpaper, floor, owned, visit, place } — rec 모양은 grid.js 맨 위 (+ variant 색, holds 넣어 둔 물고기·곤충 id).
-//   place = 상점·박물관 안에서 저장했으면 'shop'|'museum' (이어하기, places.js).
+//  - M14 집 증축 (home.js · assets/interior/home.json, 결정 D150–D151): 내 집 우편함(92)에서 도토리 빚으로 다음 단계를 짓고 갚는다.
+//    단계 1 방 넓히기(1층 10×10, RM-15) · 2 2층(z 40, RM-16) · 3 다락(z 80, RM-17). 층마다 방·구역(zone)이 따로이고,
+//    계단(FU-67·68, 붙박이 assets/furniture/fixtures)을 걸어 올라 꼭대기에 닿으면 / 위층 구멍(FU-69·70)의 열린 쪽으로 들어서면 짧게 어두워졌다가 다른 층.
+//    집 겉모양은 단계마다 BD-12 (env house-grown-1–3) 로 바꿔 놓는다 (처음 집 BD-01 은 치운다).
+// 상태 칸 state.house = { furniture: [rec], inside, seeded, radio, nextId, wallpaper, floor, owned, visit, place, level, grow } — rec 모양은 grid.js 맨 위 (+ variant 색, holds 넣어 둔 물고기·곤충 id, floor 층 번호).
+//   place = 상점·박물관 안에서 저장했으면 'shop'|'museum' (이어하기, places.js). level = 집 안 층 (0 1층). grow = 집 증축 (home.js).
 // 화면 전환은 ui.fade, 카메라 범위는 player.camera.setBounds — 없으면 직접 한다.
 import { ROOM_W, ROOM_D, boxOf, fits, spotInFront, rotateInPlace, wallInFront, wallFree, moveCircle, inBox } from './grid.js';
-import { ROOM, buildRoom, wallMount, x0, z0, WINDOWS, DOOR, ENTRY, BOUNDS, cameraBox, CAMERA_CURVE } from './room.js';
+import { ROOM, buildRoom, wallMount, cornerOf, WINDOWS, DOOR, cameraBox, CAMERA_CURVE } from './room.js';
 import { createFurnitureKit } from './furniture.js';
 import { openWorkbench, josa } from './craft.js';
 import { loadInterior, normalizeHouse, todayPick, listOf, entryOf, KIND_NAME } from './interior.js';
@@ -18,39 +22,70 @@ import { swatchURL } from './pattern.js';
 import { createVisits } from './visit.js';
 import { createDoors } from './door.js';
 import { createPlaces } from './places.js';
+import { FIXTURE_BASE } from './placedata.js';
+import { HOME_FILE, DEFAULT_HOME, ROOM_FILES, FLOOR_NAME, ensureGrow, floorsFor, growShift, shiftRecs, fixtureBox, stairHeight, stairTrigger, fixtureBlockers, arrivalAt,
+  offer, startBuild, finishBuild, repay, repayChoices, stageOf, maxStage } from './home.js';
 import { seatSpec, seatsOf, nearestSeat } from '../decor/seats.js';   // 10차 앉기: 의자 자리 표
 
-const WORKBENCH = { id: 'workbench', item: 'workbench', gx: 0, gz: 2, rot: 1 };   // 서쪽 벽에 붙여 동쪽을 본다
 const WORKBENCH_INFO = { footprint: [2, 1], place: 'floor' };
 const STARTER = [   // 처음 들어간 날 놓여 있는 가구
   { item: 'furn.round-rug', gx: 2, gz: 3, rot: 0 },
   { item: 'furn.floor-lamp', gx: 7, gz: 0, rot: 0 },
   { item: 'furn.plant-pot', gx: 0, gz: 0, rot: 0 },
 ];
-const RESERVED = new Set([`${DOOR.gx0},${ROOM_D - 1}`, `${DOOR.gx1},${ROOM_D - 1}`]);   // 문 매트 칸은 비워 둔다
-const WINDOW_SET = new Set(WINDOWS);
+/** 처음 집 (단계 0, 방 파일 없음) */
+const BASE_FLOOR = { n: 0, slug: null, name: '1층', size: [ROOM_W, ROOM_D], origin: ROOM, windows: WINDOWS, door: DOOR, workbench: { gx: 0, gz: 2, rot: 1 }, fixtures: [], starter: STARTER };
 const PUSH_TIME = 0.2;                                // 문 쪽으로 이만큼 밀면 드나든다
 const REACH = 0.62;                                   // 플레이어 앞 몇 칸까지 가구를 건드리나
-const CAMERA_BOX = cameraBox(ROOM);
 const DECOR_REACH = 0.95;                             // 벽에서 이만큼 안이면 꾸미기 메뉴
 const PAGE = 5;                                       // 벽지·바닥 고르기 한 쪽에 보이는 수
+const STAIR_FADE = { out: 0.24, in: 0.32, color: '#2E2420', cool: 0.7 };   // 계단 드나들기 (원 없이 짧게)
 // 라디오 채널 = 시간대 배경음 (실내 기본곡 'indoor' 는 '작은 라디오' 분위기라 켜지 않았을 때 쓴다)
 const RADIO = { dawn: '새벽 · 조용한 피아노', morning: '오전 · 밝은 마림바', afternoon: '오후 · 느긋한 우쿨렐레', evening: '저녁 · 따뜻한 패드', night: '밤 · 오르골' };
 const RADIO_ORDER = Object.keys(RADIO);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = n => Number(n).toLocaleString('ko-KR');
 
 let H = null;   // 이 모듈의 상태
+
+/** 층 정의 → 층 (칸 크기·모서리·문 매트·막는 칸·카메라) — 방(room)·구역은 init 이 붙인다 */
+function levelOf(def) {
+  const [w, d] = def.size, o = def.origin;
+  const { x0, z0 } = cornerOf(o, w, d);
+  const door = def.door ?? null;
+  const reserved = new Set(door ? [`${door.gx0},${d - 1}`, `${door.gx1},${d - 1}`] : []);
+  const fixtures = (def.fixtures ?? []).map(f => ({ ...f }));
+  for (const f of fixtures) {
+    const b = fixtureBox(f);
+    for (let z = b.z0; z < b.z1; z++) for (let x = b.x0; x < b.x1; x++) reserved.add(`${x},${z}`);
+    if (f.kind === 'up') for (let x = b.x0; x < b.x1; x++) reserved.add(`${x},${b.z1}`);            // 계단 아래 오르는 칸
+    else reserved.add(`${(f.open ?? 'w') === 'w' ? b.x0 - 1 : b.x1},${b.z0}`);                      // 구멍 열린 쪽 칸
+  }
+  return {
+    n: def.n, def, w, d, origin: o, x0, z0, door, reserved, fixtures,
+    wb: def.workbench ? { id: 'workbench', item: 'workbench', ...def.workbench } : null,
+    windows: def.windows ?? [], windowSet: new Set(def.windows ?? []),
+    bounds: { x0: 0.09, z0: 0.09, x1: w - 0.09, z1: door ? d : d - 0.12 },
+    cam: cameraBox(o, w, d),
+    entry: { lx: w / 2, lz: d - 0.7 },
+    room: null, fixObjs: [],
+  };
+}
 
 export default {
   name: 'house',
 
   async init(ctx) {
-    const { THREE, scene, state, events } = ctx;
+    const { scene, state, events } = ctx;
     const world = ctx.services.world, player = ctx.services.player;
     if (!world || !player) { console.warn('[house] world·player 가 없어 집을 만들지 않습니다'); return; }
     const kit = createFurnitureKit(ctx);
     await kit.load();
+    const fixKit = createFurnitureKit(ctx, { base: FIXTURE_BASE });   // M14 계단 붙박이 FU-67–70
+    await fixKit.load().catch(e => console.warn('[house] 붙박이 목록을 못 읽었어요 (계단은 상자로)', e));
     const interior = await loadInterior(ctx.assets.loadJSON);
+    const homeCfg = await ctx.assets.loadJSON(HOME_FILE).catch(e => (console.warn('[house] home.json 없음 — 기본 증축 단계', e), DEFAULT_HOME));
+    const homeRooms = Object.fromEntries((await Promise.all(ROOM_FILES.map(f => ctx.assets.loadJSON(f).catch(() => null)))).filter(Boolean).map(r => [r.slug, r]));
 
     const S = (state.house ||= { furniture: [] });
     if (!Array.isArray(S.furniture)) S.furniture = [];
@@ -59,60 +94,151 @@ export default {
     if (S.radio === true) S.radio = 'morning';                         // 예전 저장 (켜짐/꺼짐만 있던 때)
     for (const r of S.furniture) if (r.holds && !ctx.services.data?.items.get(r.holds)) delete r.holds;
     normalizeHouse(S, interior.index);
-
-    const room = buildRoom(ctx, { wallpaper: interior.specs.get(S.wallpaper), floor: interior.specs.get(S.floor), frame: interior.frame });
-    room.group.visible = false;
-    scene.add(room.group);
+    let G = ensureGrow(S, homeCfg);
 
     H = {
-      ctx, kit, room, S, interior, inside: false, busy: false, moving: null,
+      ctx, kit, S, interior, inside: false, busy: false, moving: null,
       views: new Map(),          // rec.id → { obj, rec } (만들어지는 중이면 obj = null)
-      pushT: 0, pushOutT: 0, saveT: 0, fadeEl: null, bench: null,
+      pushT: 0, pushOutT: 0, saveT: 0, fadeEl: null, bench: null, stairCool: 0,
+      levels: [], level: 0,
     };
+    const L = () => H.levels[H.level] ?? H.levels[0];
+    const levelOfRec = rec => H.levels[rec.floor ?? 0] ?? H.levels[0];
+    const recsOn = n => S.furniture.filter(r => (r.floor ?? 0) === n);
+    Object.defineProperty(H, 'room', { get: () => H.levels[0]?.room });
 
     const info = item => (item === 'workbench' ? WORKBENCH_INFO : kit.info(item));
     H.info = info;
 
-    // ── 구역: 방 안에서는 이 바닥·벽·가구 충돌을 쓴다 ──
-    const local = (x, z) => ({ lx: x - x0, lz: z - z0 });
-    const blockers = () => {
-      const out = [boxOf(WORKBENCH, WORKBENCH_INFO.footprint)];
+    // ── 층 짓기: 단계에 맞는 층 목록, 층마다 방·구역 ──
+    const decorOf = lv => (lv.n === 0 ? { wallpaper: S.wallpaper, floor: S.floor } : (G.decor[lv.n] ||= { wallpaper: lv.def.wallpaper ?? 'wp-01', floor: lv.def.floor ?? 'fl-01' }));
+    function buildLevel(lv) {
+      const dec = decorOf(lv);
+      lv.room = buildRoom(ctx, { origin: lv.origin, size: [lv.w, lv.d], windows: lv.windows, door: lv.door, wallH: lv.def.wallH ?? undefined,
+        wallpaper: interior.specs.get(dec.wallpaper), floor: interior.specs.get(dec.floor), frame: interior.frame, name: lv.n ? `house-room-${lv.n}` : 'house-room' });
+      lv.room.group.visible = H.inside && H.level === lv.n;
+      scene.add(lv.room.group);
+      for (const f of lv.fixtures) placeFixture(lv, f);
+    }
+    async function placeFixture(lv, f) {
+      const b = fixtureBox(f), at = { x: lv.x0 + (b.x0 + b.x1) / 2, z: lv.z0 + (b.z0 + b.z1) / 2 };
+      const item = `fixture.${f.slug}`;
+      const room = lv.room;
+      try {
+        if (!fixKit.info(item)) throw new Error(`붙박이 ${f.slug} 가 목록에 없어요`);
+        const obj = await fixKit.make(item);
+        if (lv.room !== room) { obj.dispose(); return; }   // 그 사이 방을 다시 지었다
+        obj.root.position.set(at.x, 0, at.z);
+        room.group.add(obj.root);
+        lv.fixObjs.push(obj);
+      } catch (e) {
+        console.warn('[house] 계단 모델을 못 만들었어요 — 임시 상자', f.slug, e);
+        const { THREE, materials } = ctx;
+        const m = new THREE.Mesh(new THREE.BoxGeometry(f.w, f.kind === 'up' ? (f.top ?? 1.7) : 0.05, f.d), materials.toonMaterial('#B98957', { name: 'stairBox' }));
+        m.position.set(at.x, f.kind === 'up' ? (f.top ?? 1.7) / 2 : 0.02, at.z);
+        room.group.add(m);
+      }
+    }
+    function addZone(lv) {
+      const local = (x, z) => ({ lx: x - lv.x0, lz: z - lv.z0 });
+      lv.zoneOff = world.addZone({
+        contains: (x, z) => Math.abs(x - lv.origin.x) < lv.w && Math.abs(z - lv.origin.z) < lv.d,
+        collide(fx, fz, nx, nz, r) {
+          const p = moveCircle(blockers(lv), lv.bounds, fx - lv.x0, fz - lv.z0, nx - lv.x0, nz - lv.z0, r ?? 0.26);
+          return { x: p.x + lv.x0, z: p.z + lv.z0 };
+        },
+        heightAt: (x, z) => {
+          const { lx, lz } = local(x, z);
+          for (const f of lv.fixtures) { const y = stairHeight(f, lx, lz); if (y != null) return y; }
+          return onRug(lv, lx, lz) ? 0.03 : 0;
+        },
+        groundAt: () => lv.room?.floor?.step ?? 'wood',
+        isWalkable(x, z) {
+          const { lx, lz } = local(x, z);
+          const B = lv.bounds;
+          if (lx < B.x0 || lz < B.z0 || lx > B.x1 || lz > B.z1) return false;
+          return !blockers(lv).some(b => inBox(b, lx, lz));
+        },
+      });
+    }
+    function disposeLevel(lv) {
+      for (const o of lv.fixObjs) o.dispose();
+      lv.fixObjs = [];
+      // 가구·작업대 모델은 다시 지은 방에 옮겨 붙인다 — 방 dispose 가 그 메시까지 지우지 않게 먼저 떼어 둔다
+      H.bench?.removeFromParent();
+      for (const v of H.views.values()) if (v.obj && levelOfRec(v.rec) === lv) v.obj.root.removeFromParent();
+      lv.room?.dispose();
+      lv.room = null;
+      lv.zoneOff?.();
+      lv.zoneOff = null;
+    }
+    /** 단계에 맞춰 층을 (다시) 짓는다. 1층이 커지면 가구를 같은 월드 자리로 옮긴다 */
+    function buildLevels() {
+      const defs = floorsFor(G.stage, homeRooms, BASE_FLOOR);
+      const before = H.levels[0] ? [H.levels[0].w, H.levels[0].d] : null;
+      for (const lv of H.levels) disposeLevel(lv);
+      H.levels = defs.map(levelOf);
+      // 예전 저장: 1층 크기가 단계와 다르면 (넓힌 날) 가구를 옮긴다 — 크기는 S.grow.size0 에 적어 둔다
+      const size0 = [H.levels[0].w, H.levels[0].d];
+      const was = Array.isArray(G.size0) ? G.size0 : (before ?? [ROOM_W, ROOM_D]);
+      if (was[0] !== size0[0] || was[1] !== size0[1]) {
+        shiftRecs(S.furniture, growShift(was, size0), 0);
+        for (const r of S.furniture) if ((r.floor ?? 0) === 0 && !r.wall && !fits(S.furniture, r, info, { reserved: H.levels[0].reserved, w: size0[0], d: size0[1] })) r.gz = clamp(r.gz, 0, size0[1] - 2);
+      }
+      G.size0 = size0;
+      for (const r of S.furniture) if ((r.floor ?? 0) >= H.levels.length) r.floor = 0;   // 없는 층의 가구 (예전 저장) → 1층
+      for (const lv of H.levels) settleRecs(lv);
+      for (const lv of H.levels) { buildLevel(lv); addZone(lv); }
+      poseBench();
+      for (const v of H.views.values()) { if (v.obj) { levelOfRec(v.rec).room.group.add(v.obj.root); pose(v.rec); } }
+      if (H.level >= H.levels.length) H.level = 0;
+    }
+
+    /** 새 계단·구멍·작업대 자리와 겹친 바닥 가구를 가까운 빈자리로 옮긴다 (2층을 지은 날 1층 계단 자리에 있던 스탠드 등) */
+    function settleRecs(lv) {
+      const others = () => (lv.wb ? [...recsOn(lv.n), lv.wb] : recsOn(lv.n));
+      const opts = r => ({ reserved: lv.reserved, w: lv.w, d: lv.d, ignore: r.id });
+      for (const r of recsOn(lv.n)) {
+        if (r.wall || !info(r.item) || fits(others(), r, info, opts(r))) continue;
+        let best = null, bestD = Infinity;
+        for (let gz = 0; gz < lv.d; gz++) for (let gx = 0; gx < lv.w; gx++) {
+          const d = Math.abs(gx - r.gx) + Math.abs(gz - r.gz);
+          if (d < bestD && fits(others(), { ...r, gx, gz }, info, opts(r))) { best = { gx, gz }; bestD = d; }
+        }
+        if (best) Object.assign(r, best);
+      }
+    }
+    function blockers(lv) {
+      const out = [];
+      if (lv.wb) out.push(boxOf(lv.wb, WORKBENCH_INFO.footprint));
+      for (const f of lv.fixtures) out.push(...fixtureBlockers(f));
       for (const r of S.furniture) {
-        if (r.wall || r === H.moving?.rec) continue;
+        if (r.wall || r === H.moving?.rec || (r.floor ?? 0) !== lv.n) continue;
         const fi = info(r.item);
         if (!fi || fi.layer === 'rug') continue;
         const b = boxOf(r, fi.footprint);
         out.push({ x0: b.x0 + 0.04, z0: b.z0 + 0.04, x1: b.x1 - 0.04, z1: b.z1 - 0.04 });
       }
       return out;
-    };
-    const onRug = (lx, lz) => S.furniture.some(r => !r.wall && info(r.item)?.layer === 'rug' && r !== H.moving?.rec && inBox(boxOf(r, info(r.item).footprint), lx, lz, -0.1));
-    world.addZone({
-      contains: (x, z) => Math.abs(x - ROOM.x) < ROOM_W && Math.abs(z - ROOM.z) < ROOM_D,
-      collide(fx, fz, nx, nz, r) {
-        const p = moveCircle(blockers(), BOUNDS, fx - x0, fz - z0, nx - x0, nz - z0, r ?? 0.26);
-        return { x: p.x + x0, z: p.z + z0 };
-      },
-      heightAt: (x, z) => { const { lx, lz } = local(x, z); return onRug(lx, lz) ? 0.03 : 0; },
-      groundAt: () => room.floor?.step ?? 'wood',
-      isWalkable(x, z) {
-        const { lx, lz } = local(x, z);
-        if (lx < BOUNDS.x0 || lz < BOUNDS.z0 || lx > BOUNDS.x1 || lz > BOUNDS.z1) return false;
-        return !blockers().some(b => inBox(b, lx, lz));
-      },
-    });
+    }
+    const onRug = (lv, lx, lz) => S.furniture.some(r => (r.floor ?? 0) === lv.n && !r.wall && info(r.item)?.layer === 'rug' && r !== H.moving?.rec && inBox(boxOf(r, info(r.item).footprint), lx, lz, -0.1));
 
-    // 작업대: 배경 모델(assets/env 'workbench')을 그대로 쓴다
+    // 작업대: 배경 모델(assets/env 'workbench')을 그대로 쓴다 (1층 서쪽 벽)
     try {
       const [gltf, spec] = await Promise.all([ctx.assets.loadEnv('workbench'), ctx.assets.loadEnvSpec('workbench')]);
       const { scene: wb } = ctx.assets.instantiate(gltf);
       ctx.materials.applyToonStyle(wb, { spec });
-      const b = boxOf(WORKBENCH, WORKBENCH_INFO.footprint);
-      wb.position.set(x0 + b.cx, 0, z0 + b.cz);
-      wb.rotation.y = WORKBENCH.rot * Math.PI / 2;
-      room.group.add(wb);
       H.bench = wb;
     } catch (e) { console.warn('[house] 작업대 모델을 못 읽었어요', e); }
+    function poseBench() {
+      const lv = H.levels[0], wb = H.bench;
+      if (!wb || !lv?.wb) return;
+      const b = boxOf(lv.wb, WORKBENCH_INFO.footprint);
+      wb.position.set(lv.x0 + b.cx, 0, lv.z0 + b.cz);
+      wb.rotation.y = lv.wb.rot * Math.PI / 2;
+      lv.room.group.add(wb);
+    }
+    buildLevels();
 
     // 어두워졌다 밝아지는 막: ui.fade 가 있으면 그것 (색·원형은 door.js 가 고른다), 없으면 #ui 맨 앞(ui 창보다 아래)에 직접
     let ownFade = null;
@@ -147,7 +273,12 @@ export default {
       for (const r of S.furniture) if (!H.views.has(r.id) && kit.info(r.item)) spawn(r);
       H.list = S.furniture;
       S.inside = H.inside;   // 서 있는 곳은 player 가 정한다 — 지금 있는 곳을 그대로 적는다
+      S.level = H.level;
+      // 증축 단계도 저장을 따라간다
+      const g = ensureGrow(S, homeCfg);
+      if (g !== G || g.stage !== H.stageBuilt) { G = g; H.stageBuilt = G.stage; buildLevels(); applyExterior(); }
     };
+    H.stageBuilt = G.stage;
 
     // ── 행동 키 ──
     const I = ctx.services.gameplay.interactions;
@@ -168,6 +299,8 @@ export default {
       run: t => menu(t.rec) });
     I.add({ name: 'house-decor', intent: 'action', priority: 25, label: '꾸미기', test: () => (H.inside && !H.busy && !H.moving ? decorWall() : null), run: () => decorate() });
     I.add({ name: 'house-place', intent: 'action', priority: 20, test: () => (H.inside && !H.busy ? true : null), run: () => placeFromBag() });
+    // M14 집 증축: 내 집 우편함 (안 읽은 편지가 있으면 town:mail 91 이 먼저 읽게 둔다 — 다 읽은 뒤 Space = 집 증축 묻기·갚기)
+    I.add({ name: 'house-grow', intent: 'action', priority: 92, label: '집 넓히기', test: () => (!H.inside && !H.busy && !doors.busy && mailboxInFront() ? true : null), run: () => growTalk() });
 
     // 주민 집·주민 방 (visit.js): 같은 화면 전환·가구 모델·스펙을 쓴다
     const visits = createVisits(ctx, { H, kit, interior, doors, toast, saveSoon });
@@ -176,12 +309,13 @@ export default {
     const places = await createPlaces(ctx, { H, kit, interior, doors, toast, saveSoon });
     H.places = places;
 
-    // 저장에서 이어하기: 집 안에서 끝냈으면 다시 집 안에
+    // 저장에서 이어하기: 집 안에서 끝냈으면 다시 집 안에 (그 층)
     if (S.inside) {
       const p = state.player;
-      const lx = p.x - x0, lz = p.z - z0;
-      const ok = Number.isFinite(lx) && lx > BOUNDS.x0 && lx < BOUNDS.x1 && lz > BOUNDS.z0 && lz < BOUNDS.z1 && !blockers().some(b => inBox(b, lx, lz));
-      goInside(ok ? { lx, lz, facing: p.facing ?? 0 } : { ...ENTRY, facing: 0 });
+      const lv = H.levels[S.level ?? 0] ?? H.levels[0];
+      const lx = p.x - lv.x0, lz = p.z - lv.z0, B = lv.bounds;
+      const ok = Number.isFinite(lx) && lx > B.x0 && lx < B.x1 && lz > B.z0 && lz < B.z1 && !blockers(lv).some(b => inBox(b, lx, lz));
+      goInside(ok ? { lx, lz, facing: p.facing ?? 0, level: lv.n } : { ...H.levels[0].entry, facing: 0, level: 0 });
     } else if (S.visit) await visits.resume(S.visit);
     else if (S.place) await places.resume(S.place);
 
@@ -194,16 +328,38 @@ export default {
       remove: id => { const r = S.furniture.find(o => o.id === id); if (r) removeRec(r); return !!r; },
       workbench: () => workbench(),
       models: () => kit.list.map(m => ({ ...m })),
-      room: { x: ROOM.x, z: ROOM.z, w: ROOM_W, d: ROOM_D, x0, z0 },
+      /** 지금 층의 방 (밖이면 1층) { x, z, w, d, x0, z0, floor } */
+      get room() { const lv = H.inside ? L() : H.levels[0]; return { x: lv.origin.x, z: lv.origin.z, w: lv.w, d: lv.d, x0: lv.x0, z0: lv.z0, floor: lv.n }; },
       /** 지금 있는 방: 'player' (내 집) | 주민 slug (그 주민 방) | 'shop' | 'museum' | null (밖) */
       get where() { return H.inside ? 'player' : visits.where ?? places.where; },
-      /** 지금 방의 문 매트 (나가는 곳, 월드) { x, z } | null — QA 봇·편집기용 */
+      /** 지금 방의 문 매트 (나가는 곳, 월드) { x, z } | null — QA 봇·편집기용. 내 집 위층이면 null */
       doormat() {
-        if (H.inside) return { x: x0 + ROOM_W / 2, z: z0 + ROOM_D - 0.45 };
+        if (H.inside) { const lv = L(); return lv.door ? { x: lv.x0 + (lv.door.gx0 + lv.door.gx1 + 1) / 2, z: lv.z0 + lv.d - 0.45 } : null; }
         return visits.doormat() ?? places.doormat();
       },
       /** 문 드나드는 중인가 (door.js) */
       get passing() { return doors.busy; },
+      /** M14 집 증축: 단계·빚·층 (home.js) — 봇·점검 도구·섬폰이 읽는다 */
+      grow: {
+        get stage() { return G.stage; }, get debt() { return G.debt; }, get pending() { return G.pending; },
+        get max() { return maxStage(homeCfg); }, get config() { return homeCfg; },
+        get level() { return H.inside ? H.level : null; },
+        floors: () => H.levels.map(lv => ({ n: lv.n, name: lv.def.name ?? FLOOR_NAME[lv.n], slug: lv.def.slug, w: lv.w, d: lv.d, x0: lv.x0, z0: lv.z0, fixtures: lv.fixtures.map(f => ({ ...f })) })),
+        /** 계단 꼭대기·구멍 열린 쪽 (월드) — 봇이 걸어갈 곳: [{ to, kind, x, z, from: {x, z} }] */
+        stairs() {
+          const lv = L();
+          return lv.fixtures.map(f => {
+            const b = fixtureBox(f), cx = (b.x0 + b.x1) / 2;
+            if (f.kind === 'up') return { to: f.to, kind: 'up', x: lv.x0 + cx, z: lv.z0 + b.z0 + 0.4, from: { x: lv.x0 + cx, z: lv.z0 + b.z1 + 0.5 } };
+            const ox = (f.open ?? 'w') === 'w' ? b.x0 - 0.5 : b.x1 + 0.5, ix = (f.open ?? 'w') === 'w' ? b.x0 + 0.7 : b.x1 - 0.7;
+            return { to: f.to, kind: 'down', x: lv.x0 + ix, z: lv.z0 + b.z0 + 0.5, from: { x: lv.x0 + ox, z: lv.z0 + b.z0 + 0.5 } };
+          });
+        },
+        /** 우편함 대화 (봇은 우편함 앞 Space 로 — 이건 섬폰·편집기용) */
+        talk: () => growTalk(),
+        /** 개발·점검 도구: 다음 날을 기다리지 않고 짓던 것을 다 짓기 */
+        finish: () => completeBuild(),
+      },
       /** 상점·박물관 실내 (places.js): enter(kind) · leave() · info(kind) → { keeper, talk, doormat, room } */
       places: places.api,
       /** 주민 방 (visit.js): 들어가기·나오기, 방 자리, 주민이 설 곳 */
@@ -234,13 +390,14 @@ export default {
           saveSoon(0.5);
           return true;
         },
-        /** 플레이어 방에 바로 붙이기 (가진 것만) → true | false */
+        /** 플레이어 방에 바로 붙이기 (가진 것만, 집 안이면 지금 층) → true | false */
         apply: (kind, slug) => applyDecor(kind, slug),
         swatch: slug => swatch(slug),
         spec: slug => interior.specs.get(slug) ?? null,
       },
     };
-    console.info(`[house] 집 준비됨 · 가구 모델 ${kit.list.length}종 · 놓인 가구 ${S.furniture.length}개${H.inside ? ' · 집 안에서 이어하기' : ''}`);
+    applyExterior();
+    console.info(`[house] 집 준비됨 · 가구 모델 ${kit.list.length}종 · 놓인 가구 ${S.furniture.length}개 · 증축 ${G.stage}단계${G.debt ? ` (빚 ${fmt(G.debt)})` : ''}${H.inside ? ` · 집 안(${FLOOR_NAME[H.level]})에서 이어하기` : ''}`);
 
     // ────────────────────────────── 드나들기 ──────────────────────────────
 
@@ -253,47 +410,81 @@ export default {
       if (Math.hypot(p.x - d.x, p.z - (d.z - 0.25)) > 1.0) return false;
       return !needFacing || Math.cos(player.facing) > 0.5;
     }
+    /** 1층 문 매트 가운데 (방 기준 lx) */
+    const matX = lv => (lv.door.gx0 + lv.door.gx1 + 1) / 2;
     function onDoormat() {
+      const lv = L();
+      if (!lv.door) return false;
       const p = player.position;
-      return Math.abs(p.x - (x0 + ROOM_W / 2)) < 0.75 && p.z - z0 > ROOM_D - 0.85;
+      return Math.abs(p.x - (lv.x0 + matX(lv))) < 0.75 && p.z - lv.z0 > lv.d - 0.85;
     }
+    H.onDoormatPush = () => {
+      const lv = L();
+      if (!lv.door) return false;
+      const p = player.position;
+      return Math.abs(p.x - (lv.x0 + matX(lv))) < 0.75 && p.z - lv.z0 > lv.d - 0.5;
+    };
 
-    /** 방 문 매트 (door.js 가 걸어 들고 나는 곳, 월드) */
-    const roomDoor = () => ({ x: x0 + ROOM_W / 2, front: z0 + ROOM_D, entry: z0 + ENTRY.lz });
+    /** 방 문 매트 (door.js 가 걸어 들고 나는 곳, 월드) — 언제나 1층 */
+    const roomDoor = () => { const lv = H.levels[0]; return { x: lv.x0 + matX(lv), front: lv.z0 + lv.d, entry: lv.z0 + lv.entry.lz }; };
+    /** 지금 집 겉모양 모델 (문짝 크기를 그 모델에서 잰다) */
+    function houseKind() { return stageOf(homeCfg, G.stage)?.exterior ?? 'house-player'; }   // 함수 선언 — init 중간(applyExterior)에도 부른다
 
     async function enter() {
       if (H.busy || H.inside || doors.busy) return;
       H.busy = true;
       try {
-        await doors.through({ dir: 'in', place: world.places?.playerHouse, kind: 'house-player', room: roomDoor(),
-          arrive: s => goInside({ lx: s.x - x0, lz: s.z - z0, facing: s.facing }) });
+        await doors.through({ dir: 'in', place: world.places?.playerHouse, kind: H.exteriorKind ?? 'house-player', room: roomDoor(),
+          arrive: s => goInside({ lx: s.x - H.levels[0].x0, lz: s.z - H.levels[0].z0, facing: s.facing, level: 0 }) });
       } finally { H.busy = false; }
     }
 
     async function leave() {
       if (H.busy || !H.inside || doors.busy) return;
+      if (H.level !== 0) {   // 위층에서 부르면 (점검 도구·장면): 1층 문 매트로 옮긴 뒤 나간다
+        const lv = H.levels[0];
+        showLevel(0);
+        player.teleport(lv.x0 + matX(lv), lv.z0 + lv.d - 0.6, Math.PI);
+      }
       H.busy = true;
       try {
-        await doors.through({ dir: 'out', place: world.places?.playerHouse, kind: 'house-player', room: roomDoor(), arrive: s => goOutside(s) });
+        await doors.through({ dir: 'out', place: world.places?.playerHouse, kind: H.exteriorKind ?? 'house-player', room: roomDoor(), arrive: s => goOutside(s) });
       } finally { H.busy = false; }
     }
 
-    function goInside({ lx, lz, facing }) {
+    function showLevel(n) {
+      H.level = n;
+      S.level = n;
+      for (const lv of H.levels) lv.room.group.visible = H.inside && lv.n === n;
+      player.camera?.setBounds?.(L().cam);
+    }
+
+    function goInside({ lx, lz, facing, level = 0 }) {
       H.inside = true;
       S.inside = true;
-      room.group.visible = true;
       if (!H.preloaded) { H.preloaded = true; kit.preload(kit.list.map(m => m.item)); }   // 가구 모델은 처음 들어갈 때 미리 받아 둔다
       if (!S.seeded) {
         S.seeded = true;
-        for (const s of STARTER) if (fits(S.furniture, { id: '__s', ...s }, info, { reserved: RESERVED })) placeRec(s.item, s, { silent: true });
+        for (const s of STARTER) if (fits(recsOn(0), { id: '__s', ...s }, info, { reserved: H.levels[0].reserved, w: H.levels[0].w, d: H.levels[0].d })) placeRec(s.item, s, { silent: true, floor: 0 });
       }
-      player.camera?.setBounds?.(CAMERA_BOX);
+      seedLevels();
+      showLevel(level);
       player.camera?.setCurveScale?.(CAMERA_CURVE);
-      player.teleport(x0 + lx, z0 + lz, facing);
+      const lv = L();
+      player.teleport(lv.x0 + lx, lv.z0 + lz, facing);
       ctx.services.time?.setIndoor?.(true);
       ctx.services.audio?.bgm?.(radioSong());
-      events.emit('house:enter', { owner: 'player' });
+      events.emit('house:enter', { owner: 'player', floor: level });
       saveSoon(0.5);
+    }
+    /** 새로 생긴 층에 처음 놓이는 가구 (방 파일 starter) — 층마다 한 번 */
+    function seedLevels() {
+      const done = (G.seeded ||= []);
+      for (const lv of H.levels) {
+        if (!lv.n || done.includes(lv.n)) continue;
+        done.push(lv.n);
+        for (const s of lv.def.starter ?? []) if (info(s.item) && fits(recsOn(lv.n), { id: '__s', ...s }, info, { reserved: lv.reserved, w: lv.w, d: lv.d })) placeRec(s.item, s, { silent: true, floor: lv.n });
+      }
     }
 
     /** spot = 섬에 설 곳 { x, z, facing } (door.js — 문간). 없으면 문 앞 */
@@ -301,16 +492,158 @@ export default {
       if (H.moving) cancelMoving();
       H.inside = false;
       S.inside = false;
+      showLevel(0);
       const d = doorPoint() ?? world.places?.spawn ?? { x: 0, z: 0 };
       player.camera?.setBounds?.(null);
       player.camera?.setCurveScale?.(1);
       const s = spot ?? { x: d.x, z: d.z + 0.15, facing: Math.PI };
       player.teleport(s.x, s.z, s.facing ?? Math.PI);
-      room.group.visible = false;
+      for (const lv of H.levels) lv.room.group.visible = false;
       ctx.services.time?.setIndoor?.(false);
       ctx.services.audio?.bgm?.('auto');
       events.emit('house:leave', { owner: 'player' });
+      if (G.pendingDone) Promise.resolve().then(() => completeBuild());   // 집 안에 있는 동안 날이 바뀌었으면 나올 때 짓는다
       saveSoon(0.5);
+    }
+
+    // ────────────────────────────── 계단 (M14) ──────────────────────────────
+
+    /** 계단 꼭대기·구멍에 닿았으면 다른 층으로 (update 가 부른다) */
+    H.checkStairs = () => {
+      if (H.stairCool > 0 || H.moving) return;
+      const lv = L(), p = player.position;
+      const f = stairTrigger(lv.fixtures, p.x - lv.x0, p.z - lv.z0);
+      if (f) climb(f);
+    };
+    async function climb(f) {
+      const from = L(), to = H.levels[f.to];
+      const pair = to?.fixtures.find(x => x.to === from.n);
+      if (!to || !pair || H.busy) return;
+      const dir = f.kind === 'up' ? 'up' : 'down';
+      H.busy = true;
+      player.freeze?.(true);
+      try {
+        events.emit('sfx', { name: 'step-wood', volume: 1 });
+        await fadeTo(true, STAIR_FADE.out, STAIR_FADE.color);
+        const a = arrivalAt(pair, dir);
+        showLevel(to.n);
+        player.teleport(to.x0 + a.lx, to.z0 + a.lz, a.facing);
+        const calm = !!ctx.services.ui?.access?.calm;
+        const walk = !calm && player.walkTo ? player.walkTo(to.x0 + a.walk.lx, to.z0 + a.walk.lz, { speed: 2.2 }) : null;
+        await Promise.all([fadeTo(false, STAIR_FADE.in, STAIR_FADE.color), walk]);
+        if (calm) player.teleport(to.x0 + a.walk.lx, to.z0 + a.walk.lz, a.facing);
+        events.emit('house:floor', { floor: to.n, from: from.n, dir });
+        saveSoon(0.5);
+      } catch (e) {
+        console.error('[house] 계단', e);
+        fadeTo(false, 0.2);
+      } finally {
+        player.freeze?.(false);
+        H.busy = false;
+        H.stairCool = STAIR_FADE.cool;
+      }
+    }
+
+    // ────────────────────────────── 집 증축 (M14) ──────────────────────────────
+
+    function mailSpot() {
+      const s = ctx.services.town?.mail?.spot;
+      if (s) return s;
+      const d = world.home?.places?.playerHouse?.door ?? doorPoint();
+      return d ? { x: d.x + 1, z: d.z } : null;
+    }
+    function mailboxInFront() {
+      const q = mailSpot();
+      if (!q || (ctx.services.town?.mail?.unread?.().length ?? 0) > 0) return null;
+      const p = player.position, dx = q.x - p.x, dz = q.z - p.z, d = Math.hypot(dx, dz);
+      if (d > 1.15) return null;
+      return d < 0.55 || (-Math.sin(player.facing) * dx - Math.cos(player.facing) * dz) / d > 0.45;
+    }
+    const afterIntro = () => !homeCfg.afterIntro || !!state.flags?.firstday?.finished || !ctx.services.intro;
+
+    /** 우편함 대화: 다음 단계 짓기 · 빚 갚기 · 짓는 중 · 다 지음 */
+    async function growTalk() {
+      const ui = ctx.services.ui, wallet = ctx.services.data?.wallet;
+      if (!ui?.dialog || !wallet || H.busy) return;
+      H.busy = true;
+      const say = (lines, choices) => ui.dialog.open({ speaker: '밤톨', color: '#C98F52', lines, choices });
+      try {
+        if (!afterIntro()) { await say(['집을 넓히는 이야기는 섬 생활에 익숙해진 뒤에 해요!']); return; }
+        const o = offer(G, homeCfg);
+        if (o.kind === 'pending') { await say([`「${o.next.name}」 공사 중이에요!`, '내일 아침이면 다 지어져 있을 거예요.']); return; }
+        if (o.kind === 'done') { await say(['집이 이제 다 자랐어요!', `그동안 갚은 도토리 ${fmt(G.paid)}개 — 정말 고생 많았어요.`]); return; }
+        if (o.kind === 'debt') {
+          const have = wallet.get();
+          const list = repayChoices(G, have, homeCfg);
+          const pick = await say([`남은 집 빚은 도토리 ${fmt(G.debt)}개예요.`, list.length ? '얼마나 갚을까요?' : '도토리가 모이면 갚으러 와 주세요.'], [...list.map(c => c.label), '다음에 갚을게요']);
+          const c = pick == null ? null : list[pick];
+          if (!c) return;
+          if (!wallet.spend(c.amount)) { toast('도토리가 모자라요', '🌰'); return; }
+          const left = repay(G, c.amount);
+          events.emit('sfx', { name: 'acorn' });
+          events.emit('house:repay', { amount: c.amount, debt: left });
+          if (left === 0) {
+            const next = stageOf(homeCfg, G.stage + 1);
+            await say(['빚을 다 갚았어요! 대단해요!', next ? `다음엔 「${next.name}」도 할 수 있어요. 우편함에서 또 물어봐 주세요.` : '이제 집이 다 자랐어요.']);
+            events.emit('house:paid', { stage: G.stage });
+          } else toast(`집 빚 ${fmt(c.amount)} 갚음 — 남은 빚 ${fmt(left)}`, '🏠');
+          saveSoon(0.3);
+          return;
+        }
+        // 다음 단계 짓기
+        const n = o.next;
+        const pick = await say([G.stage === 0 ? '집이 조금 좁지 않아요?' : '집을 더 키워 볼까요?', `「${n.name}」 — ${n.note ?? ''}`, `도토리 ${fmt(n.cost)}개를 빌려 지을 수 있어요. 갚는 건 천천히, 언제든요.`], ['지어 주세요!', '다음에요']);
+        if (pick !== 0) return;
+        const st = startBuild(G, homeCfg);
+        if (!st) return;
+        events.emit('sfx', { name: 'menu' });
+        player.play?.('happy');
+        events.emit('house:build', { stage: st.stage, cost: st.cost, debt: G.debt });
+        await say([`좋아요! 「${st.name}」 공사를 시작할게요.`, '내일 아침이면 다 지어져 있을 거예요. 기대해 주세요!']);
+        saveSoon(0.3);
+      } finally { H.busy = false; }
+    }
+
+    /** 짓던 단계를 다 짓는다 (하루 리셋 때 · 집 안이면 나올 때) */
+    function completeBuild() {
+      if (G.pending == null) { G.pendingDone = false; return false; }
+      if (H.inside) { G.pendingDone = true; return false; }
+      G.pendingDone = false;
+      const st = finishBuild(G);
+      H.stageBuilt = st;
+      buildLevels();
+      applyExterior();
+      const s = stageOf(homeCfg, st);
+      toast(`집 공사가 끝났어요 — ${s?.name ?? ''}`, '🏠');
+      events.emit('house:grown', { stage: st, floors: H.levels.length });
+      saveSoon(0.3);
+      return true;
+    }
+    events.on('data:newday', () => completeBuild());
+
+    /** 집 겉모양: 단계 1 부터 BD-12 (house-grown-N) — 처음 집 BD-01 은 치우고 그 자리에 저장하지 않는 물체로 놓는다 */
+    async function applyExterior() {
+      const objs = world.home?.objects ?? world.objects;
+      const ph = world.home?.places?.playerHouse ?? world.places?.playerHouse;
+      const isl = world.home?.island ?? world.island;
+      const kind = houseKind();
+      const mine = objs.list().filter(o => o.data?.grownHouse);
+      const orig = objs.list('house-player')[0];
+      if (kind === 'house-player') {
+        H.exteriorKind = 'house-player';
+        for (const o of mine) objs.remove(o.id);
+        if (!orig && mine.length && ph) { const t = isl.toTile(ph.x, ph.z); objs.add('house-player', t.tx, t.tz, { persist: false, at: { x: ph.x, z: ph.z, y: mine[0].y }, rot: mine[0].rot }); }   // 저장을 예전 것으로 바꿨을 때
+        return;
+      }
+      if (mine.some(o => o.kind === kind)) { H.exteriorKind = kind; if (orig) objs.remove(orig.id); return; }
+      const ok = await objs.ensure(kind).catch(() => false);
+      if (!ok || !ph) { console.warn('[house] 커진 집 모델을 못 받았어요 — 처음 집 그대로', kind); H.exteriorKind = orig ? 'house-player' : kind; return; }
+      for (const o of objs.list().filter(x => x.data?.grownHouse)) objs.remove(o.id);
+      const { tx, tz } = orig?.tile ?? isl.toTile(ph.x, ph.z);   // 건물 가운데 칸 (place.tx·tz 는 문 앞 칸)
+      const y = orig?.y ?? isl.levelAt(tx, tz);
+      objs.add(kind, tx, tz, { persist: false, rot: orig?.rot ?? 0, at: { x: orig?.x ?? ph.x, z: orig?.z ?? ph.z, y }, grownHouse: true });
+      if (orig) objs.remove(orig.id);
+      H.exteriorKind = kind;
     }
 
     // ────────────────────────────── 벽지·바닥 ──────────────────────────────
@@ -331,29 +664,36 @@ export default {
       return out;
     }
 
-    /** 바뀐 벽지·바닥을 방에 붙인다 (저장 불러오기·reset 뒤에도 update 가 부른다) */
+    /** 바뀐 벽지·바닥을 방에 붙인다 (저장 불러오기·reset 뒤에도 update 가 부른다) — 층마다 */
     function showDecor() {
       normalizeHouse(S, interior.index);
-      if (room.wallpaper?.slug !== S.wallpaper) room.setWallpaper(interior.specs.get(S.wallpaper));
-      if (room.floor?.slug !== S.floor) room.setFloor(interior.specs.get(S.floor));
+      for (const lv of H.levels) {
+        const dec = decorOf(lv), room = lv.room;
+        if (!room) continue;
+        if (room.wallpaper?.slug !== dec.wallpaper) room.setWallpaper(interior.specs.get(dec.wallpaper));
+        if (room.floor?.slug !== dec.floor) room.setFloor(interior.specs.get(dec.floor));
+      }
     }
     H.showDecor = showDecor;
+    H.decorChanged = () => H.levels.some(lv => { const dec = decorOf(lv); return lv.room && (lv.room.wallpaper?.slug !== dec.wallpaper || lv.room.floor?.slug !== dec.floor); });
 
     function applyDecor(kind, slug) {
       const m = entryOf(interior.index, slug);
       if (!m || m.kind !== kind || !S.owned.includes(slug) || !interior.specs.get(slug)) return false;
-      S[kind] = slug;
+      const lv = H.inside ? L() : H.levels[0];
+      if (lv.n === 0) S[kind] = slug;
+      else decorOf(lv)[kind] = slug;
       showDecor();
-      events.emit('house:decor', { kind, slug });
+      events.emit('house:decor', { kind, slug, floor: lv.n });
       saveSoon();
       return true;
     }
 
     /** 바라보는 벽이 가까이 있고 그 자리에 벽 가구가 없으면 → 벽 자리 */
     function decorWall() {
-      const { lx, lz } = playerLocal();
-      const w = wallInFront(lx, lz, player.facing, { reach: DECOR_REACH });
-      if (!w || S.furniture.some(r => r.wall === w.wall && r.slot === w.slot)) return null;
+      const { lx, lz } = playerLocal(), lv = L();
+      const w = wallInFront(lx, lz, player.facing, { reach: DECOR_REACH, w: lv.w, d: lv.d });
+      if (!w || recsOn(lv.n).some(r => r.wall === w.wall && r.slot === w.slot)) return null;
       return w;
     }
 
@@ -362,26 +702,27 @@ export default {
       if (!ui?.dialog) { placeFromBag(); return; }
       H.busy = true;
       let pick = null;
-      try { pick = await ui.dialog.open({ speaker: '꾸미기', color: '#C99B68', lines: ['방을 어떻게 꾸밀까요?'], choices: ['벽지 바꾸기', '바닥 바꾸기', '가구 놓기', '그만두기'] }); }
+      try { pick = await ui.dialog.open({ speaker: '꾸미기', color: '#C99B68', lines: [H.levels.length > 1 ? `${FLOOR_NAME[H.level]}을 어떻게 꾸밀까요?` : '방을 어떻게 꾸밀까요?'], choices: ['벽지 바꾸기', '바닥 바꾸기', '가구 놓기', '그만두기'] }); }
       finally { H.busy = false; }
       if (pick === 0) await chooseDecor('wallpaper');
       else if (pick === 1) await chooseDecor('floor');
       else if (pick === 2) await placeFromBag();
     }
 
-    /** 가진 벽지·바닥 고르기: 한 쪽에 PAGE 개씩, 고르면 바로 붙는다 */
+    /** 가진 벽지·바닥 고르기: 한 쪽에 PAGE 개씩, 고르면 바로 붙는다 (지금 층) */
     async function chooseDecor(kind) {
       const ui = ctx.services.ui, what = KIND_NAME[kind];
+      const cur = () => decorOf(L())[kind];
       const mine = listOf(interior.index, kind).filter(m => S.owned.includes(m.slug));
       if (mine.length < 2) { toast(`도토리상점에서 ${josa(what, '을/를')} 사 오면 바꿀 수 있어요`, '🏪'); return; }
       let page = 0;
       for (;;) {
         const pages = Math.ceil(mine.length / PAGE);
         const shown = mine.slice(page * PAGE, page * PAGE + PAGE);
-        const choices = shown.map(m => (S[kind] === m.slug ? `${m.name} (지금)` : m.name));
+        const choices = shown.map(m => (cur() === m.slug ? `${m.name} (지금)` : m.name));
         if (pages > 1) choices.push('다른 것 보기 ▶');
         choices.push('그만두기');
-        const now = entryOf(interior.index, S[kind])?.name ?? '';
+        const now = entryOf(interior.index, cur())?.name ?? '';
         H.busy = true;
         let i = null;
         try { i = await ui.dialog.open({ speaker: '꾸미기', color: '#C99B68', lines: [`지금 ${josa(what, '은/는')} ${josa(now, '이에요/예요')}. 어떤 걸로 바꿀까요?`], choices }); }
@@ -389,7 +730,7 @@ export default {
         if (i == null || i >= choices.length - 1) return;
         if (pages > 1 && i === shown.length) { page = (page + 1) % pages; continue; }
         const m = shown[i];
-        if (m && m.slug !== S[kind] && applyDecor(kind, m.slug)) {
+        if (m && m.slug !== cur() && applyDecor(kind, m.slug)) {
           events.emit('sfx', { name: 'menu' });
           player.play?.('happy');
           toast(`${what}: ${m.name}`, kind === 'wallpaper' ? '🖼️' : '🟫');
@@ -407,30 +748,34 @@ export default {
       return `f${n}`;
     }
 
-    function playerLocal() { const p = player.position; return { lx: p.x - x0, lz: p.z - z0 }; }
+    function playerLocal() { const p = player.position, lv = L(); return { lx: p.x - lv.x0, lz: p.z - lv.z0 }; }
 
-    /** 가구 하나를 플레이어 앞에 놓을 자리 (벽 가구는 바라보는 벽) → spot | null */
+    /** 가구 하나를 플레이어 앞에 놓을 자리 (벽 가구는 바라보는 벽) → spot | null — 지금 층 */
     function findSpot(item, ignore = null) {
       const fi = info(item);
       if (!fi) return null;
+      const lv = L();
       const { lx, lz } = playerLocal();
+      const here = recsOn(lv.n);
       if (fi.place === 'wall' || fi.place === 'window') {
-        const w = wallInFront(lx, lz, player.facing);
+        const w = wallInFront(lx, lz, player.facing, { w: lv.w, d: lv.d });
         if (!w) return null;
         const tries = fi.place === 'window'
-          ? WINDOWS.map(k => k.split(':')).filter(([wl]) => wl === w.wall).map(([, s]) => Number(s)).sort((a, b) => Math.abs(a - w.slot) - Math.abs(b - w.slot)).filter(s => Math.abs(s - w.slot) <= 2)
-          : [w.slot, w.slot - 1, w.slot + 1].filter(s => s >= 0 && s < (w.wall === 'n' ? ROOM_W : ROOM_D));
-        const slot = tries.find(s => wallFree(S.furniture, w.wall, s, fi.place, WINDOW_SET, ignore));
+          ? lv.windows.map(k => k.split(':')).filter(([wl]) => wl === w.wall).map(([, s]) => Number(s)).sort((a, b) => Math.abs(a - w.slot) - Math.abs(b - w.slot)).filter(s => Math.abs(s - w.slot) <= 2)
+          : [w.slot, w.slot - 1, w.slot + 1].filter(s => s >= 0 && s < (w.wall === 'n' ? lv.w : lv.d));
+        const slot = tries.find(s => wallFree(here, w.wall, s, fi.place, lv.windowSet, ignore));
         return slot == null ? null : { wall: w.wall, slot };
       }
-      const others = [...S.furniture, WORKBENCH];
-      return spotInFront(others, item, lx, lz, player.facing, info, { reserved: RESERVED, ignore });
+      const others = lv.wb ? [...here, lv.wb] : here;
+      return spotInFront(others, item, lx, lz, player.facing, info, { reserved: lv.reserved, ignore, w: lv.w, d: lv.d });
     }
 
-    function placeRec(item, spot, { silent = false, variant = null } = {}) {
+    function placeRec(item, spot, { silent = false, variant = null, floor = null } = {}) {
       if (!spot || !info(item)) return null;
       const rec = spot.wall ? { id: newId(), item, wall: spot.wall, slot: spot.slot } : { id: newId(), item, gx: spot.gx, gz: spot.gz, rot: spot.rot ?? 0 };
       if (variant) rec.variant = variant;
+      const fl = floor ?? (H.inside ? H.level : 0);
+      if (fl) rec.floor = fl;
       S.furniture.push(rec);
       spawn(rec);
       if (!silent) { events.emit('sfx', { name: 'step-wood', volume: 1 }); saveSoon(); }
@@ -454,7 +799,7 @@ export default {
         if (H.views.get(rec.id) !== v) { obj.dispose(); return; }   // 만드는 사이에 치웠다
         v.obj = obj;
         if (rec.holds) obj.setHolds(rec.holds);
-        room.group.add(obj.root);
+        levelOfRec(rec).room.group.add(obj.root);
         pose(rec);
       } catch (e) { console.error('[house] 가구를 못 만들었어요', rec.item, e); }
     }
@@ -463,13 +808,14 @@ export default {
     function pose(rec, lift = 0) {
       const obj = H.views.get(rec.id)?.obj;
       if (!obj) return;
+      const lv = levelOfRec(rec);
       if (rec.wall) {
-        const m = wallMount(rec.wall, rec.slot);
+        const m = wallMount(rec.wall, rec.slot, { x0: lv.x0, z0: lv.z0, w: lv.w });
         obj.root.position.set(m.x, lift, m.z);
         obj.root.rotation.y = m.rotY;
       } else {
         const b = boxOf(rec, info(rec.item).footprint);
-        obj.root.position.set(x0 + b.cx, lift, z0 + b.cz);
+        obj.root.position.set(lv.x0 + b.cx, lift, lv.z0 + b.cz);
         obj.root.rotation.y = rec.rot * Math.PI / 2;
       }
     }
@@ -501,9 +847,9 @@ export default {
 
     // ────────────────────────────── 가구 건드리기 ──────────────────────────────
 
-    /** 플레이어 앞의 가구 · 작업대 → { kind: 'furniture', rec } | { kind: 'workbench' } | null */
+    /** 플레이어 앞의 가구 · 작업대 → { kind: 'furniture', rec } | { kind: 'workbench' } | null (지금 층) */
     function targetInFront() {
-      const { lx, lz } = playerLocal();
+      const { lx, lz } = playerLocal(), lv = L();
       const f = player.facing;
       const px = lx - Math.sin(f) * REACH, pz = lz - Math.cos(f) * REACH;
       let best = null, bestD = Infinity;
@@ -512,17 +858,18 @@ export default {
         const d = Math.hypot(b.cx - lx, b.cz - lz);
         if (d < bestD) { best = t; bestD = d; }
       };
-      consider({ kind: 'workbench' }, boxOf(WORKBENCH, WORKBENCH_INFO.footprint));
-      for (const rec of S.furniture) {
+      if (lv.wb) consider({ kind: 'workbench' }, boxOf(lv.wb, WORKBENCH_INFO.footprint));
+      const here = recsOn(lv.n);
+      for (const rec of here) {
         if (rec.wall || info(rec.item)?.layer === 'rug') continue;
         consider({ kind: 'furniture', rec }, boxOf(rec, info(rec.item).footprint));
       }
       if (best) return best;
-      const w = wallInFront(lx, lz, f, { reach: 1.25 });
-      const onWall = w && S.furniture.find(r => r.wall === w.wall && r.slot === w.slot);
+      const w = wallInFront(lx, lz, f, { reach: 1.25, w: lv.w, d: lv.d });
+      const onWall = w && here.find(r => r.wall === w.wall && r.slot === w.slot);
       if (onWall) return { kind: 'furniture', rec: onWall };
       // 러그는 밖에서 바라볼 때만 (러그 위에 서 있으면 행동 키 = 가구 놓기)
-      const rug = S.furniture.find(r => {
+      const rug = here.find(r => {
         if (r.wall || info(r.item)?.layer !== 'rug') return false;
         const b = boxOf(r, info(r.item).footprint);
         return inBox(b, px, pz) && !inBox(b, lx, lz);
@@ -537,8 +884,9 @@ export default {
       const t = targetInFront();
       const spec = t?.kind === 'furniture' ? seatSpec(t.rec.item) : null;
       if (!spec) return null;
+      const lv = levelOfRec(t.rec);
       const b = boxOf(t.rec, info(t.rec.item).footprint);
-      const cx = x0 + b.cx, cz = z0 + b.cz;
+      const cx = lv.x0 + b.cx, cz = lv.z0 + b.cz;
       const list = seatsOf(spec, { x: cx, z: cz, y: world.island.heightAt(cx, cz), rot: (t.rec.rot ?? 0) * Math.PI / 2 }, `house:${t.rec.id}`);
       return nearestSeat(list, pl.position.x, pl.position.z, { reach: 1.6, facing: pl.facing, taken: k => !!ctx.services.seats.holder(k) });
     }
@@ -575,7 +923,8 @@ export default {
         return;
       }
       if (what === 'rotate') {
-        const next = rotateInPlace([...S.furniture, WORKBENCH], rec, info, { reserved: RESERVED, blockCells: new Set([playerCell()]) });
+        const lv = levelOfRec(rec), here = recsOn(lv.n);
+        const next = rotateInPlace(lv.wb ? [...here, lv.wb] : here, rec, info, { reserved: lv.reserved, blockCells: new Set([playerCell()]), w: lv.w, d: lv.d });
         if (!next) { toast('돌릴 자리가 없어요', it?.icon); return; }
         Object.assign(rec, next);
         pose(rec);
@@ -709,15 +1058,18 @@ export default {
       else events.emit('toast', { text, icon });
     }
     function saveSoon(sec = 1.5) { H.saveT = H.saveT > 0 ? Math.min(H.saveT, sec) : sec; }
+    H.level0 = () => H.levels[0];
+    H.cur = L;
   },
 
   update(dt, ctx) {
     if (!H) return;
-    if (H.S.furniture !== H.list) H.resync();
-    if (H.room.wallpaper?.slug !== H.S.wallpaper || H.room.floor?.slug !== H.S.floor || !Array.isArray(H.S.owned)) H.showDecor();
+    if (H.S.furniture !== H.list || H.S.grow?.stage !== H.stageBuilt || (H.S.grow && H.S.grow.stage == null)) H.resync();
+    if (H.decorChanged() || !Array.isArray(H.S.owned)) H.showDecor();
     H.doors.update(dt);
     H.visits.update(dt);
     H.places.update(dt);
+    if (H.stairCool > 0) H.stairCool -= dt;
     const player = ctx.services.player, input = ctx.input;
     const blocked = ctx.services.ui?.isBlocking?.() || input.enabled === false;
 
@@ -730,10 +1082,9 @@ export default {
         H.pushT = atDoor && input.move.z < -0.5 ? H.pushT + dt : 0;
         if (H.pushT > PUSH_TIME) { H.pushT = 0; ctx.services.house.enter(); }
       } else {
-        const p = player.position;
-        const atMat = Math.abs(p.x - (x0 + ROOM_W / 2)) < 0.75 && p.z - z0 > ROOM_D - 0.5;
-        H.pushOutT = atMat && input.move.z > 0.5 ? H.pushOutT + dt : 0;
+        H.pushOutT = H.onDoormatPush() && input.move.z > 0.5 ? H.pushOutT + dt : 0;
         if (H.pushOutT > PUSH_TIME) { H.pushOutT = 0; ctx.services.house.leave(); }
+        H.checkStairs();   // M14 계단 꼭대기·구멍
       }
     }
 
@@ -741,11 +1092,11 @@ export default {
       if (H.moving) H.updateMoving(dt);
       const now = ctx.services.time?.now?.();
       for (const v of H.views.values()) v.obj?.tick(dt, now);
-      H.room.setNight(ctx.services.time?.nightFactor ?? 0);
+      H.cur().room.setNight(ctx.services.time?.nightFactor ?? 0);
       // 카메라: player.camera.setBounds 가 없는 예전 player 면 여기서 방 가운데 둘레로 당긴다
       if (!player.camera?.setBounds) {
-        const f = ctx.focus, cam = ctx.camera;
-        const cx = clamp(f.x, CAMERA_BOX.x0, CAMERA_BOX.x1), cz = clamp(f.z, CAMERA_BOX.z0, CAMERA_BOX.z1);
+        const f = ctx.focus, cam = ctx.camera, box = H.cur().cam;
+        const cx = clamp(f.x, box.x0, box.x1), cz = clamp(f.z, box.z0, box.z1);
         cam.position.x += cx - f.x;
         cam.position.z += cz - f.z;
         f.x = cx; f.z = cz;

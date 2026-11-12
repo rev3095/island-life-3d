@@ -1,0 +1,52 @@
+{
+  "id": "FU-69",
+  "slug": "stair-rail",
+  "item": "fixture.stair-rail",
+  "name": "계단 난간",
+  "category": "fixture",
+  "kind": "stair-rail",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1212,
+  "parts": 1,
+  "materials": [
+    "hole",
+    "holeStep",
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "rail"
+  ],
+  "animations": {},
+  "size": [
+    1.9,
+    2.96,
+    0.84
+  ],
+  "bounds": [
+    [
+      -0.955,
+      -1.48,
+      0.0
+    ],
+    [
+      0.95,
+      1.48,
+      0.835
+    ]
+  ],
+  "footprint": [
+    2,
+    3
+  ],
+  "glbBytes": 26768,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "stair-rail_front.png",
+    "stair-rail_main.png",
+    "stair-rail_thumb.png",
+    "stair-rail_top.png"
+  ]
+}

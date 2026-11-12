@@ -8,6 +8,8 @@
 //   들고 있는 동안에도 저장 기록(state.island.added)은 옛 자리 그대로 남겨 둬서(keeper), 끄기·새로 고침에도 잃지 않는다.
 // 10차 D96-A 칸 누르기: 꾸미는 동안 땅을 짧게 누르면(마우스 클릭·손가락 톡) 그 칸이 대상 (PICK_REACH 6칸 안) — 움직이면 다시 앞 칸.
 //   마우스 걷기는 꾹 누르기·끌기로만 (player/mouse.js setClickHandler).
+// M14 다리 TI-13 · 경사로 TI-14 (결정 D153-A): decor.json builds — 도토리를 내고 강물 2칸·남쪽 절벽 앞에 놓는다. 칸 표 바꾸기는 world.build (world/built.js),
+//   저장 state.island.built = [{ type: 'bridge'|'ramp', tx, tz, axis? }] (모델은 저장하지 않는 물체로 시작할 때 다시 놓는다). 고치기에서 치우기만 (돈은 돌려주지 않음).
 import { canPlace, dirOfFacing, footprintTiles, linkTags, WHY_TEXT, pickCell, targetCell } from './rules.js';
 import { createDecorBar } from './bar.js';
 import { createSeats } from './sit.js';   // 10차 앉기 (AN-11)
@@ -26,8 +28,8 @@ export default {
     const { THREE, events, state } = ctx;
     const cfg = await ctx.assets.loadJSON('assets/decor/decor.json').catch(e => (console.warn('[decor] decor.json 없음', e), null));
     if (!cfg) return;
-    const PATHS = cfg.paths ?? [], FENCES = cfg.fences ?? [];
-    const GROUP = Object.fromEntries([...PATHS.map(p => [p.kind, 'path']), ...FENCES.map(f => [f.kind, 'fence'])]);
+    const PATHS = cfg.paths ?? [], FENCES = cfg.fences ?? [], BUILDS = cfg.builds ?? [];
+    const GROUP = Object.fromEntries([...PATHS.map(p => [p.kind, 'path']), ...FENCES.map(f => [f.kind, 'fence']), ...BUILDS.map(b => [b.kind, 'build'])]);
     const isl = world.island, objs = world.objects;
     const toast = (t, icon) => S().ui?.toast?.(t, icon);
 
@@ -47,6 +49,7 @@ export default {
       const out = [
         ...PATHS.map(p => ({ group: 'path', kind: p.kind, name: p.name, icon: p.icon, code: p.id })),
         ...FENCES.map(f => ({ group: 'fence', kind: f.kind, name: f.name, icon: f.icon, code: f.id })),
+        ...(world.build ? BUILDS.map(b => ({ group: 'build', kind: b.kind, type: b.type, name: b.name, icon: b.icon, code: b.id, cost: b.cost ?? 0 })) : []),
       ];
       const inv = S().data?.inventory, seen = new Set();
       const outdoor = new Set(outdoorItems().map(it => it.id));
@@ -158,6 +161,8 @@ export default {
 
     // ---------- 고치기 대상: 앞 칸의 꾸민 것 (위 층 먼저) ----------
     function targetAt(tx, tz) {
+      const b = builtAt(tx, tz);
+      if (b) return b;
       const here = objs.on(tx, tz).filter(o => o.data?.decor);
       return here.find(o => layerOf(o.kind) === 'top') ?? here[0] ?? null;
     }
@@ -178,6 +183,7 @@ export default {
         if (ghost?.root) ghost.root.visible = false;
         const o = targetAt(anchor.tx, anchor.tz);
         if (!o) { setFrame(anchor, [1, 1], isl.levelAt(anchor.tx, anchor.tz), false); frameMat.color.setHex(0xd8d0be); fillMat.color.setHex(0xd8d0be); D.view = { target: null }; return; }
+        if (o.data.decor === 'build') { const v = buildView(o.data.built); setFrame(v.min, v.size, o.y, false); frameMat.color.setHex(0xf2c14e); fillMat.color.setHex(0xf2c14e); D.view = { target: o }; return; }
         const ext = o.kind.startsWith(FURN_KIND) ? (S().data?.items?.get?.(o.data.item)?.size ?? [1, 1]) : [1, 1];
         const q = Math.round(((o.rot ?? 0) / (Math.PI / 2))) % 2;
         const size = q ? [ext[1], ext[0]] : ext;
@@ -189,6 +195,7 @@ export default {
       }
       const PK = D.moving?.pick ?? D.pick;
       if (!PK) { frame.visible = false; D.view = null; return; }
+      if (PK.group === 'build') return refreshBuild(PK, anchor, dir);
       const fp = footprintOf(PK);
       const { tiles, min, size } = footprintTiles(anchor, dir, fp, D.q);
       const res = canPlace(tiles, layerOf(PK.kind), env());
@@ -212,6 +219,7 @@ export default {
       if (!D.active || D.mode !== 'place' || !D.pick || !v) return false;
       if (!v.ok) { toast(WHY_TEXT[v.why] ?? '여기엔 놓을 수 없어요', '🚫'); events.emit('sfx', { name: 'menu', volume: 0.5 }); return false; }
       const p = D.pick;
+      if (p.group === 'build') return placeBuild(p, v);
       if (p.group === 'furn') {
         const inv = S().data?.inventory;
         const slot = inv?.slots.findIndex(s => s?.id === p.item && (s.variant ?? null) === (p.variant ?? null));
@@ -240,6 +248,7 @@ export default {
     function remove() {
       const o = D.view?.target;
       if (!D.active || D.mode !== 'edit' || !o || D.moving) return false;
+      if (o.data.decor === 'build') return removeBuild(o);
       if (seated(o)) { toast('누가 앉아 있어요', '🪑'); return false; }
       if (o.data.decor === 'furn') {
         const got = S().data?.collect?.(o.data.item, 1, o.variant && !o.variant.includes('+') ? { variant: o.variant } : {});
@@ -262,8 +271,10 @@ export default {
         if (D.moving.pick.group !== 'furn') { toast('길·울타리는 이웃에 맞춰 저절로 이어져요', '🔗'); return false; }
         D.q = (D.q + step + 4) % 4; events.emit('sfx', { name: 'menu', volume: 0.5 }); return true;
       }
+      if (D.mode === 'place' && D.pick?.group === 'build') { toast(D.pick.type === 'bridge' ? '다리는 강을 가로질러 저절로 놓여요' : '경사로는 절벽 쪽으로 저절로 놓여요', '🌉'); return false; }
       if (D.mode === 'place') { D.q = (D.q + step + 4) % 4; events.emit('sfx', { name: 'menu', volume: 0.5 }); return true; }
       const o = D.view?.target;
+      if (o?.data?.decor === 'build') { toast('다리·경사로는 돌릴 수 없어요 — 치우고 다시 놓아요', '🌉'); return false; }
       if (!o || o.data.decor !== 'furn') { if (o) toast('길·울타리는 이웃에 맞춰 저절로 이어져요', '🔗'); return false; }
       if (seated(o)) { toast('누가 앉아 있어요', '🪑'); return false; }
       const fp = S().data?.items?.get?.(o.data.item)?.size ?? [1, 1];
@@ -283,6 +294,101 @@ export default {
       return true;
     }
 
+    // ---------- M14 다리·경사로 (world.build) ----------
+    const B = world.build;
+    const builtList = () => (state.island.built ||= []);
+    const buildCfg = kind => BUILDS.find(b => b.kind === kind);
+    /** 놓은 기록 → { min, size } (고치기 테두리) */
+    function buildView(rec) {
+      if (rec.type === 'ramp') return { min: { tx: rec.tx, tz: rec.tz }, size: [1, 2] };
+      return rec.axis === 'x' ? { min: { tx: rec.tx - 1, tz: rec.tz }, size: [4, 1] } : { min: { tx: rec.tx, tz: rec.tz - 1 }, size: [1, 4] };
+    }
+    /** 칸의 놓은 다리·경사로 물체 (고치기 대상) */
+    function builtAt(tx, tz) {
+      const r = B?.at(tx, tz);
+      if (!r) return null;
+      return objs.list().find(o => o.data?.decor === 'build' && o.data.built?.tx === r.tx && o.data.built?.tz === r.tz && o.data.built?.type === r.type) ?? null;
+    }
+    const playerTile = () => isl.toTile(player.position.x, player.position.z);
+    /** 다리·경사로 자리 (앞 칸 또는 한 칸 더 앞) → spot */
+    function buildSpot(PK, anchor, dir) {
+      const blocked = (tx, tz) => objs.on(tx, tz).some(o => layerOf(o.kind) !== 'ground');
+      const d = dir[0] || dir[1] ? dir : dirOfFacing(player.facing);
+      const tries = [anchor, { tx: anchor.tx + d[0], tz: anchor.tz + d[1] }];
+      let first = null;
+      for (const a of tries) {
+        const s = PK.type === 'bridge' ? B.bridgeSpot(a.tx, a.tz, d, { blocked }) : B.rampSpot(a.tx, a.tz, { blocked });
+        if (s.ok && PK.type === 'ramp' && s.cells.some(c => objs.on(c.tx, c.tz).length)) { first ??= { ...s, ok: false, why: 'taken' }; continue; }
+        if (s.ok) return s;
+        first ??= s;
+      }
+      return first;
+    }
+    function refreshBuild(PK, anchor, dir) {
+      const s = buildSpot(PK, anchor, dir);
+      const lim = builtList().length >= (cfg.buildLimit ?? 12);
+      const ok = !!s?.ok && !lim;
+      let min = anchor, size = [1, 1];
+      if (s?.ok) {
+        if (PK.type === 'ramp') { min = s.cells[0]; size = [1, 2]; }
+        else { const [a] = s.cells; min = s.axis === 'x' ? { tx: a.tx - 1, tz: a.tz } : { tx: a.tx, tz: a.tz - 1 }; size = s.axis === 'x' ? [4, 1] : [1, 4]; }
+      }
+      const y = s?.ok ? s.y : isl.levelAt(anchor.tx, anchor.tz);
+      setFrame(min, size, y, ok);
+      D.view = { tiles: s?.cells ?? [anchor], min, size, ok, why: lim ? 'limit' : s?.why, anchor, build: s };
+      if (ghost?.key === `${PK.kind}|` && ghost.root) {
+        ghost.root.visible = !!s?.ok;
+        if (s?.ok) { ghost.root.position.set(s.x, s.y, s.z); ghost.root.rotation.y = s.rot ?? 0; }
+      } else ghostFor(PK);
+    }
+    /** 놓은 기록 하나를 칸 표·모델로 (시작할 때·놓을 때) → 물체 id | null */
+    function applyBuilt(rec) {
+      const kind = BUILDS.find(b => b.type === rec.type)?.kind;
+      if (!kind || !B) return null;
+      const s = rec.type === 'bridge' ? B.bridgeSpot(rec.tx, rec.tz, rec.axis === 'x' ? [1, 0] : [0, 1]) : B.rampSpot(rec.tx, rec.tz);
+      if (!s.ok || s.cells[0].tx !== rec.tx || s.cells[0].tz !== rec.tz || (rec.type === 'bridge' && s.axis !== rec.axis)) { console.warn('[decor] 놓은 다리·경사로 자리가 맞지 않아 뺍니다', rec, s.why); return null; }
+      if (rec.type === 'bridge') B.addBridge(s); else B.addRamp(s);
+      return objs.add(kind, rec.tx, rec.tz, { persist: false, rot: s.rot ?? 0, at: { x: s.x, z: s.z, y: s.y }, decor: 'build', built: { type: rec.type, tx: rec.tx, tz: rec.tz, axis: rec.axis ?? null } });
+    }
+    function placeBuild(p, v) {
+      const s = v.build;
+      if (!s?.ok) return false;
+      const wallet = S().data?.wallet, cost = buildCfg(p.kind)?.cost ?? 0;
+      if (cost && !wallet?.spend?.(cost)) { toast(`도토리가 모자라요 (🌰 ${cost.toLocaleString('ko-KR')})`, '🌰'); return false; }
+      const rec = p.type === 'bridge' ? { type: 'bridge', tx: s.cells[0].tx, tz: s.cells[0].tz, axis: s.axis } : { type: 'ramp', tx: s.cells[0].tx, tz: s.cells[0].tz };
+      const id = applyBuilt(rec);
+      if (!id) { if (cost) wallet.add(cost); return false; }
+      builtList().push(rec);
+      player.play?.('place');
+      events.emit('sfx', { name: 'step-wood', volume: 1 });
+      events.emit('decor:place', { kind: p.kind, group: 'build', item: null, tx: rec.tx, tz: rec.tz });
+      events.emit('decor:build', { type: rec.type, tx: rec.tx, tz: rec.tz, cost });
+      toast(p.type === 'bridge' ? '다리를 놓았어요! 이제 강을 건널 수 있어요' : '경사로를 놓았어요! 언덕에 오를 수 있어요', p.icon);
+      saveSoon();
+      bar.render();
+      return true;
+    }
+    /** 다리·경사로가 차지하는 칸 (서 있으면 못 치운다) */
+    const builtCells = b => (b.type === 'ramp' ? [{ tx: b.tx, tz: b.tz }, { tx: b.tx, tz: b.tz + 1 }] : [0, 1].map(k => (b.axis === 'x' ? { tx: b.tx + k, tz: b.tz } : { tx: b.tx, tz: b.tz + k })));
+    function removeBuild(o) {
+      const b = o.data.built, r = B?.at(b.tx, b.tz);
+      if (!r) return false;
+      const pt = playerTile(), cells = builtCells(b);
+      if (cells.some(c => c.tx === pt.tx && c.tz === pt.tz)) { toast(WHY_TEXT.player, '🚫'); return false; }
+      B.remove(r);
+      objs.remove(o.id);
+      const list = builtList(), i = list.findIndex(x => x.type === b.type && x.tx === b.tx && x.tz === b.tz);
+      if (i >= 0) list.splice(i, 1);
+      events.emit('sfx', { name: 'step-wood', volume: 0.6 });
+      events.emit('decor:remove', { kind: o.kind, group: 'build', item: null, tx: b.tx, tz: b.tz });
+      toast(b.type === 'bridge' ? '다리를 치웠어요' : '경사로를 치웠어요', '🧹');
+      saveSoon();
+      bar.render();
+      return true;
+    }
+    // 시작할 때: 놓은 다리·경사로를 칸 표·모델로 (모델은 lazy — 놓일 때 받는다)
+    if (B) for (const rec of [...builtList()]) if (!applyBuilt(rec)) builtList().splice(builtList().indexOf(rec), 1);
+
     // ---------- 10차 D95-A 옮기기 ----------
     const quarterOf = rot => ((Math.round((rot ?? 0) / (Math.PI / 2)) % 4) + 4) % 4;
     const addedOf = id => state.island.added.find(a => a.id === id) ?? null;
@@ -291,6 +397,7 @@ export default {
     function pickUp() {
       const o = D.view?.target;
       if (!D.active || D.mode !== 'edit' || !o || D.moving) return false;
+      if (o.data?.decor === 'build') { toast('다리·경사로는 옮길 수 없어요 — 치우고 다시 놓아요', '🌉'); return false; }
       if (seated(o)) { toast('누가 앉아 있어요', '🪑'); return false; }
       const saved = addedOf(o.id);
       if (!saved) return false;
@@ -452,6 +559,8 @@ export default {
       get moving() { return D.moving ? { ...D.moving.pick, from: D.moving.from } : null; }, get cell() { return D.cell; },
       /** 놓은 꾸밈 목록 */
       list: decorObjs,
+      /** M14 놓은 다리·경사로 기록 (state.island.built) */
+      built: () => builtList().map(r => ({ ...r })),
       /** 칸에 놓은 길이 있나 (주민 길찾기가 싸게 친다) */
       isRoad: (tx, tz) => objs.on(tx, tz).some(o => GROUP[o.kind] === 'path'),
       /**

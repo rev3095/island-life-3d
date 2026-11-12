@@ -245,6 +245,86 @@
       "status": "approved"
     },
     {
+      "id": "FU-67",
+      "slug": "home-stairs",
+      "item": "fixture.home-stairs",
+      "name": "나무 계단",
+      "place": "floor",
+      "footprint": [
+        2,
+        3
+      ],
+      "size": [
+        1.89,
+        2.98,
+        2.48
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-68",
+      "slug": "attic-stairs",
+      "item": "fixture.attic-stairs",
+      "name": "다락 계단",
+      "place": "floor",
+      "footprint": [
+        1,
+        2
+      ],
+      "size": [
+        0.91,
+        2.04,
+        2.32
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-69",
+      "slug": "stair-rail",
+      "item": "fixture.stair-rail",
+      "name": "계단 난간",
+      "place": "floor",
+      "footprint": [
+        2,
+        3
+      ],
+      "size": [
+        1.9,
+        2.96,
+        0.84
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-70",
+      "slug": "attic-hatch",
+      "item": "fixture.attic-hatch",
+      "name": "다락 문 난간",
+      "place": "floor",
+      "footprint": [
+        1,
+        2
+      ],
+      "size": [
+        0.94,
+        1.98,
+        0.84
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-74",
       "slug": "art-plinth",
       "item": "fixture.art-plinth",
