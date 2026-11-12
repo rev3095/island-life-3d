@@ -1083,9 +1083,11 @@ export function makeScenario(bot, sk, opts = {}) {
     // ④ 섬폰 📷 앨범 → 사진 → 추억 액자 (도토리 300)
     const photos = S().album.list().length;
     if (bot.acorns() < 300) await sellSurplus();
+    bot.policy = { card: (kind, el, card) => !!card?.classList.contains('pk-album') };   // 앨범 창은 봇이 직접 누른다 (기본 정책은 모르는 창을 닫는다)
     bot.press('phone');
     let framed = false;
     if (await bot.until(() => bot.$('.pk-app[data-app="album"]'), { timeout: 5, ui: false })) {
+      await bot.wait(0.3, { ui: false });
       await bot.click(bot.$('.pk-app[data-app="album"]'));
       if (await bot.until(() => bot.$('.pk-album [data-album-photo]'), { timeout: 5, ui: false })) {
         await bot.click(bot.$('.pk-album [data-album-photo]'));
@@ -1096,6 +1098,7 @@ export function makeScenario(bot, sk, opts = {}) {
       }
       await bot.click(bot.$('.pk-album .pk-x'));
     }
+    bot.policy = {};
     await bot.frames(3);
     for (let k = 0; k < 4 && bot.top(); k++) { bot.press('esc'); await bot.frames(4); }
     if (photos) done.push(`앨범 ${photos}장${framed ? ' · 추억 액자' : ''}`); else miss.push('앨범에 사진이 없음');
