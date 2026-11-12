@@ -17,7 +17,8 @@
     { "id": "sell", "on": "sell", "need": 1, "pts": 15, "icon": "🌰", "label": "도토리상점에서 물건 팔기" },
     { "id": "craft", "on": "craft", "need": 1, "pts": 30, "icon": "🔨", "label": "작업대에서 하나 만들기" },
     { "id": "donate", "on": "donate", "need": 1, "pts": 30, "icon": "🏛️", "label": "박물관에 하나 기증하기" },
-    { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" }
+    { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" },
+    { "id": "sea1", "on": "sea", "need": 1, "pts": 30, "icon": "🤿", "label": "바다 생물 잡기" }
   ],
   "goals": [
     { "id": "angler", "on": "fish", "steps": [10, 50, 200], "pts": [100, 300, 800], "icon": "🎣", "label": "낚시 솜씨" },

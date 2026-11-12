@@ -1,8 +1,9 @@
-// 박물관 기증과 도감. 기증은 물고기·곤충·화석만, 같은 것은 한 번만.
-// state.museum = { fish:[id], bug:[id], fossil:[id] }, state.encyclopedia = { fish:[id], bug:[id] } (한 번이라도 잡은 것)
+// 박물관 기증과 도감. 기증은 물고기·곤충·화석·바다 생물(M16)만 (items.COLLECTIBLE), 같은 것은 한 번만.
+// state.museum = { fish:[id], bug:[id], fossil:[id], sea:[id] }, state.encyclopedia = { fish:[id], bug:[id], sea:[id] } (한 번이라도 잡은 것)
 import * as items from './items.js';
 
-const KINDS = ['fish', 'bug', 'fossil'];
+const KINDS = items.COLLECTIBLE;
+const CAUGHT = new Set(['fish', 'bug', 'sea']);   // 도감에 '잡아 봤다' 를 적는 분류 (화석은 기증으로만)
 
 export function createMuseum(state, { onChange = () => {} } = {}) {
   const shelf = cat => {
@@ -36,10 +37,10 @@ export function createMuseum(state, { onChange = () => {} } = {}) {
     return true;
   }
 
-  /** 도감에 '잡아 봤다' 기록 (물고기·곤충). 새로 적었으면 true */
+  /** 도감에 '잡아 봤다' 기록 (물고기·곤충·바다 생물). 새로 적었으면 true */
   function record(id) {
     const c = items.get(id)?.category;
-    if (c !== 'fish' && c !== 'bug') return false;
+    if (!CAUGHT.has(c)) return false;
     const b = book(c);
     if (b.includes(id)) return false;
     b.push(id);
@@ -47,7 +48,7 @@ export function createMuseum(state, { onChange = () => {} } = {}) {
   }
   const caught = id => {
     const c = items.get(id)?.category;
-    return (c === 'fish' || c === 'bug') && book(c).includes(id);
+    return CAUGHT.has(c) && book(c).includes(id);
   };
 
   /** { fish:[기증 수, 전체], bug:[..], fossil:[..], total:[..], complete } */

@@ -45,6 +45,25 @@ export function fish({ rng = Math.random, ...opts } = {}) {
   return pickWeighted(fishPool(opts), e => e.weight, rng)?.item.id ?? null;
 }
 
+/**
+ * M16 잠수: 지금 바다 밑에서 나올 수 있는 바다 생물과 가중치 (시각·달만 본다 — 날씨는 안 탐, 큰 것은 타로 「바다」 보너스)
+ */
+export function seaPool({ hour = 12, month = 1 } = {}) {
+  const out = [];
+  for (const it of items.list('sea')) {
+    if (!inHours(it.hours, hour) || !it.months.includes(month)) continue;
+    let w = it.weight;
+    if (it.shadow >= G.wetBigFish.shadow) w *= 1 + luck('bigFish');
+    out.push({ item: it, weight: w });
+  }
+  return out;
+}
+
+/** 바다 생물 하나 정하기 → itemId | null */
+export function sea({ rng = Math.random, ...opts } = {}) {
+  return pickWeighted(seaPool(opts), e => e.weight, rng)?.item.id ?? null;
+}
+
 /** 물속 그림자 크기 1(아주 작음) ~ 6(대형) */
 export const shadowOf = id => items.get(id)?.shadow ?? 0;
 

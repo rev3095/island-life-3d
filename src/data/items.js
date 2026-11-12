@@ -11,13 +11,16 @@ import { EVENT_CATEGORY as EC, EVENT_FURN, eventItems } from './event-items.js';
 import { DECOR_FURN, FAVOR_FURN, OUTDOOR } from './decor-items.js';   // 10차 좋아하는 가구 FU-51–53 은 FAVOR_FURN
 // 12차 밤·새벽 분류(야시장 먹거리 IC-NT)·달빛 가게·새벽 천막 가구 FU-55–59 는 night-items.js 에서
 import { NIGHT_CATEGORY as NC, NIGHT_FURN, nightItems } from './night-items.js';
+// M16 잠수: 바다 생물 분류(IC-SE-01–20)와 스쿠버 키트는 sea-items.js 에서 (표 값은 items.json sea · scubaKit)
+import { SEA_CATEGORY as SC, seaItems } from './sea-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
 CATEGORIES.push(FC.key, EC.key, NC.key); CATEGORY_NAMES[FC.key] = FC.name; CATEGORY_NAMES[EC.key] = EC.name; CATEGORY_NAMES[NC.key] = NC.name;
+CATEGORIES.push(SC.key); CATEGORY_NAMES[SC.key] = SC.name;
 
 /** 한 칸에 쌓이는 최대 개수 (아이템에 stack 이 있으면 그 값) */
-export const STACK = { ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack, [NC.key]: NC.stack };
+export const STACK = { [SC.key]: 1, ...T.stack, [FC.key]: FC.stack, [EC.key]: EC.stack, [NC.key]: NC.stack };
 /** 계절 표기 → 달 목록 */
 export const SEASON_MONTHS = T.seasons;
 /** 시간 표기 → [시작, 끝) 시각 구간. 낮 = 새벽~저녁(5~19시), 밤 = 저녁~새벽(17~5시). 저녁엔 둘 다 나온다 */
@@ -110,6 +113,7 @@ export const ITEMS = [
 ITEMS.push(...festivalItems(itemIcon));   // IC-FE-01–04 축제 부스에서 만드는 것 (5차 Z5)
 ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8차 M8)
 ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
+ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 + 스쿠버 키트 (TL-06)
 
 const deepFreeze = v => {
   if (v && typeof v === 'object' && !Object.isFrozen(v)) {
@@ -135,5 +139,5 @@ export const list = category => (category == null ? ITEMS.slice() : (BY_CAT.get(
 export const has = id => BY_ID.has(id);
 /** 한 칸에 몇 개까지 쌓이나 (모르는 id 는 1) */
 export const stackOf = id => BY_ID.get(id)?.stack ?? 1;
-/** 박물관·도감에 들어가는 카테고리 */
-export const COLLECTIBLE = ['fish', 'bug', 'fossil'];
+/** 박물관·도감에 들어가는 카테고리 (M16 잠수: 바다 생물 sea — 박물관 관 배치는 박물관 트랙) */
+export const COLLECTIBLE = ['fish', 'bug', 'fossil', SC.key];
