@@ -1,0 +1,87 @@
+{
+  "id": "IC-SE-11",
+  "slug": "sea-moon-jellyfish",
+  "name": "보름달물해파리",
+  "group": "sea",
+  "category": "item",
+  "kind": "jellyfish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.moon-jellyfish",
+      "code": "IC-SE-11"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "반투명 느낌의 옅은 하늘색 갓(외곽선 없이 밝게) 위 분홍 고리 넷 + 짧은 촉수",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "bell",
+      "bellRim",
+      "gonad",
+      "tentacle",
+      "oralArm"
+    ],
+    "flat": [
+      "bell",
+      "bellRim",
+      "tentacle",
+      "oralArm"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "radius": {
+      "label": "갓 반지름",
+      "value": 0.14,
+      "min": 0.08,
+      "max": 0.22,
+      "step": 0.005,
+      "live": false
+    },
+    "dome": {
+      "label": "갓 높이 비",
+      "value": 0.48,
+      "min": 0.25,
+      "max": 0.8,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "bell": "#CBEBF7",
+    "bellRim": "#A9DCF0",
+    "gonad": "#F2A6C8",
+    "tentacle": "#DDF2FA",
+    "oralArm": "#E8F5FB"
+  },
+  "paletteLabels": {
+    "bell": "갓",
+    "bellRim": "갓 가장자리",
+    "gonad": "고리 무늬",
+    "tentacle": "촉수",
+    "oralArm": "입팔"
+  }
+}

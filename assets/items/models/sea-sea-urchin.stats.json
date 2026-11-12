@@ -1,0 +1,46 @@
+{
+  "id": "IC-SE-02",
+  "slug": "sea-sea-urchin",
+  "name": "성게",
+  "group": "sea",
+  "kind": "urchin",
+  "version": "0.1",
+  "items": [
+    "sea.sea-urchin"
+  ],
+  "hold": true,
+  "triangles": 1404,
+  "parts": 1,
+  "materials": [
+    "mouth",
+    "spine",
+    "spineTip",
+    "urchin"
+  ],
+  "objects": [
+    "urchin"
+  ],
+  "size": [
+    0.325,
+    0.33,
+    0.238
+  ],
+  "bounds": [
+    [
+      -0.163,
+      -0.165,
+      -0.119
+    ],
+    [
+      0.163,
+      0.165,
+      0.119
+    ]
+  ],
+  "glbBytes": 72312,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-urchin_main.png",
+    "sea-sea-urchin_thumb.png"
+  ]
+}

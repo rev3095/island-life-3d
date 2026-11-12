@@ -19,7 +19,8 @@
     { "id": "donate", "on": "donate", "need": 1, "pts": 30, "icon": "🏛️", "label": "박물관에 하나 기증하기" },
     { "id": "weed", "on": "weed", "need": 5, "pts": 15, "icon": "🌿", "label": "잡초 5개 뽑기" },
     { "id": "balloon", "on": "balloon", "need": 1, "pts": 25, "icon": "🎈", "label": "선물 풍선 하나 맞히기" },
-    { "id": "bottle", "on": "bottle", "need": 1, "pts": 20, "icon": "🍾", "label": "바닷가 유리병 열기" }
+    { "id": "bottle", "on": "bottle", "need": 1, "pts": 20, "icon": "🍾", "label": "바닷가 유리병 열기" },
+    { "id": "sea1", "on": "sea", "need": 1, "pts": 30, "icon": "🤿", "label": "바다 생물 잡기" }
   ],
   "goals": [
     { "id": "angler", "on": "fish", "steps": [10, 50, 200], "pts": [100, 300, 800], "icon": "🎣", "label": "낚시 솜씨" },

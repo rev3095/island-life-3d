@@ -11,7 +11,8 @@
     "mat": 30,
     "tool": 1,
     "furn": 1,
-    "seed": 10
+    "seed": 10,
+    "sea": 1
   },
   "seasons": {
     "연중": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -24,7 +25,8 @@
     "여름~가을": [6, 7, 8, 9, 10, 11],
     "겨울~봄": [12, 1, 2, 3, 4, 5],
     "봄·가을": [3, 4, 5, 9, 10, 11],
-    "초여름": [6]
+    "초여름": [6],
+    "가을~겨울": [9, 10, 11, 12, 1, 2]
   },
   "times": { "종일": [[0, 24]], "낮": [[5, 19]], "밤": [[17, 24], [0, 5]], "비 올 때": [[0, 24]] },
   "fishPlaces": {
@@ -218,5 +220,35 @@
     { "slug": "rising-bird", "code": "IC-AR-14", "name": "날아오르는 새", "kind": "sculpture", "emoji": "🗿", "price": 1550, "buy": 6200, "desc": "날개를 활짝 펴고 하늘로 솟아오르는 새의 조각이에요." },
     { "slug": "bear-bust", "code": "IC-AR-15", "name": "곰 흉상", "kind": "sculpture", "emoji": "🗿", "price": 1650, "buy": 6600, "desc": "하얀 대리석으로 깎은 점잖은 곰의 흉상이에요.", "fake": { "key": "marble", "tell": "대리석이 분홍빛이 돌아요 (진품은 새하얀 대리석)" } },
     { "slug": "stone-tower", "code": "IC-AR-16", "name": "돌탑 셋", "kind": "sculpture", "emoji": "🗿", "price": 1250, "buy": 5000, "desc": "매끈한 돌 셋을 아슬아슬하게 쌓아 올린 조각이에요." }
+  ],
+  "scubaKit": {
+    "name": "스쿠버 키트",
+    "emoji": "🤿",
+    "price": 750,
+    "buy": 3000,
+    "use": "가방에 넣고 해변 물가에서 행동 키 → 헤엄 · 잠수",
+    "from": "도토리상점 (늘 팔아요)"
+  },
+  "sea": [
+    { "slug": "seaweed", "name": "미역", "time": "종일", "season": "겨울~봄", "shadow": 2, "speed": 0, "price": 600, "rare": false, "emoji": "🌿", "desc": "바위에 붙어 물결 따라 하늘거리는 넓은 잎. 겨울 바다에서 가장 부드럽다." },
+    { "slug": "sea-urchin", "name": "성게", "time": "종일", "season": "봄~여름", "shadow": 2, "speed": 1, "price": 1700, "rare": false, "emoji": "✴️", "desc": "가시투성이 밤송이 같은 바다 생물. 가시를 천천히 움직여 바닥을 기어 다닌다." },
+    { "slug": "sea-cucumber", "name": "해삼", "time": "종일", "season": "겨울~봄", "shadow": 2, "speed": 1, "price": 500, "rare": false, "emoji": "🥒", "desc": "오돌토돌한 돌기가 난 통통한 몸. 모래 바닥을 아주 느리게 굴러가듯 다닌다." },
+    { "slug": "sea-squirt", "name": "멍게", "time": "종일", "season": "봄~여름", "shadow": 2, "speed": 0, "price": 600, "rare": false, "emoji": "🔴", "desc": "울퉁불퉁한 주황빛 덩어리. 위에 난 구멍 두 개로 바닷물을 들이마셨다 뿜었다 한다." },
+    { "slug": "abalone", "name": "전복", "time": "밤", "season": "여름~가을", "shadow": 3, "speed": 1, "price": 2000, "rare": false, "emoji": "🐚", "desc": "귀처럼 납작한 껍데기 가장자리에 숨구멍이 줄지어 있다. 안쪽은 무지갯빛으로 반짝인다." },
+    { "slug": "oyster", "name": "굴", "time": "종일", "season": "가을~겨울", "shadow": 2, "speed": 0, "price": 1100, "rare": false, "emoji": "🦪", "desc": "바위에 단단히 들러붙어 사는 울퉁불퉁한 조개. 찬 바람이 불면 살이 오른다." },
+    { "slug": "starfish", "name": "불가사리", "time": "종일", "season": "연중", "shadow": 2, "speed": 0, "price": 500, "rare": false, "emoji": "⭐", "desc": "팔 다섯 개를 쭉 뻗은 바다의 별. 팔 하나를 잃어도 다시 자라난다." },
+    { "slug": "blue-crab", "name": "꽃게", "time": "종일", "season": "봄·가을", "shadow": 3, "speed": 2, "price": 1200, "rare": false, "emoji": "🦀", "desc": "노처럼 납작한 뒷다리로 물속을 헤엄치는 게. 푸른 등딱지에 집게 끝이 붉다." },
+    { "slug": "sweet-shrimp", "name": "단새우", "time": "종일", "season": "가을~겨울", "shadow": 1, "speed": 2, "price": 1400, "rare": false, "emoji": "🦐", "desc": "깊고 찬 바다에 사는 분홍빛 작은 새우. 이름처럼 살이 달큰하다." },
+    { "slug": "lobster", "name": "바닷가재", "time": "종일", "season": "봄~여름", "shadow": 5, "speed": 3, "price": 4500, "rare": false, "emoji": "🦞", "desc": "커다란 집게 두 개를 든 바다의 장수. 위험하면 꼬리를 접어 뒤로 휙 달아난다." },
+    { "slug": "moon-jellyfish", "name": "보름달물해파리", "time": "종일", "season": "여름", "shadow": 2, "speed": 1, "price": 600, "rare": false, "emoji": "🪼", "desc": "갓 위에 동그란 고리 무늬 넷이 비치는 해파리. 물결에 몸을 맡기고 둥실둥실 떠다닌다." },
+    { "slug": "sea-anemone", "name": "말미잘", "time": "종일", "season": "연중", "shadow": 3, "speed": 0, "price": 500, "rare": false, "emoji": "🌸", "desc": "바위에 피어난 꽃 같지만 촉수로 먹이를 잡는 동물. 건드리면 쏙 오므라든다." },
+    { "slug": "sea-slug", "name": "갯민숭달팽이", "time": "낮", "season": "봄~여름", "shadow": 1, "speed": 0, "price": 700, "rare": false, "emoji": "🐌", "desc": "껍데기 없는 바다 달팽이. 보랏빛 몸에 노란 테를 두르고 등에 아가미 꽃을 달았다." },
+    { "slug": "mantis-shrimp", "name": "갯가재", "time": "밤", "season": "봄~가을", "shadow": 3, "speed": 2, "price": 2500, "rare": false, "emoji": "🦐", "desc": "접어 둔 앞발을 번개처럼 뻗어 먹이를 잡는다. 알록달록한 몸빛이 화려하다." },
+    { "slug": "snow-crab", "name": "대게", "time": "종일", "season": "겨울", "shadow": 5, "speed": 2, "price": 6000, "rare": false, "emoji": "🦀", "desc": "대나무 마디처럼 곧고 긴 다리를 가진 게. 눈 내리는 철 깊은 바다에서 올라온다." },
+    { "slug": "spider-crab", "name": "키다리게", "time": "종일", "season": "겨울~봄", "shadow": 6, "speed": 3, "price": 10000, "rare": true, "emoji": "🦀", "desc": "다리를 펼치면 어른 키만 하다는 바다의 거인. 거미처럼 가느다란 다리로 성큼성큼 걷는다." },
+    { "slug": "horseshoe-crab", "name": "투구게", "time": "밤", "season": "여름", "shadow": 4, "speed": 1, "price": 2500, "rare": false, "emoji": "🛡️", "desc": "공룡보다 먼저 바다에 살았다는 오래된 생물. 둥근 투구 같은 등판과 꼬리 가시가 있다." },
+    { "slug": "nautilus", "name": "앵무조개", "time": "밤", "season": "봄~가을", "shadow": 3, "speed": 2, "price": 1800, "rare": false, "emoji": "🐚", "desc": "줄무늬 소용돌이 껍데기 속 방에 공기를 채워 떠오르고 가라앉는다. 촉수가 수십 개다." },
+    { "slug": "pearl-oyster", "name": "진주조개", "time": "종일", "season": "연중", "shadow": 2, "speed": 1, "price": 2800, "rare": true, "emoji": "🦪", "desc": "짙은 껍데기 안쪽이 무지갯빛으로 빛나는 조개. 아주 가끔 안에 둥근 진주를 품고 있다." },
+    { "slug": "mussel", "name": "홍합", "time": "종일", "season": "연중", "shadow": 1, "speed": 0, "price": 400, "rare": false, "emoji": "🦪", "desc": "검푸른 물방울꼴 껍데기를 한 조개. 실 같은 수염으로 바위에 다닥다닥 붙어 산다." }
   ]
 }

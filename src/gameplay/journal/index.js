@@ -132,6 +132,7 @@ function createJournal(ctx, cfg) {
     ev.on('gather:watered', ({ ids } = {}) => count('water', Math.max(1, ids?.length ?? 1)));
     ev.on('gather:planted', () => count('plant'));
     ev.on('house:craft', () => count('craft'));
+    ev.on('dive:catch', () => count('sea'));   // M16 잠수: 바다 생물 잡기 (gather/dive.js)
     ev.on('museum:changed', ({ id } = {}) => { if (id) count('donate'); });
     ev.on('dialog:line', ({ speaker } = {}) => {
       if (!live() || !isVillager(speaker)) return;

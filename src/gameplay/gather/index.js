@@ -14,6 +14,7 @@ import { createFishing } from './fishing.js';
 import { createBugs } from './bugs.js';
 import { createWork } from './work.js';
 import { createGarden } from './garden.js';
+import { createDive } from './dive.js';   // M16 잠수: 스쿠버 키트 · 헤엄 · 바다 생물
 
 let G = null;
 
@@ -63,6 +64,7 @@ export default {
     const trees = createTrees(ctx, kit, { drops, fx, mk, bugModels, bugs, results, act, lock });
     fishing = createFishing(ctx, kit, { mk, fx, results, toolbelt, act });
     const work = createWork(ctx, kit, { mk, fx, drops, results, toolbelt, act, garden, bugs });
+    const dive = createDive(ctx, kit, { results });
 
     // ---------- 잠자리채 ----------
     const bugMesh = id => { const m = bugModels.build(id); m.root.scale.setScalar(1.6); return m.root; };
@@ -99,6 +101,7 @@ export default {
       test: () => (isBusy() ? 'busy' : null),
       run: () => { if (fishing.active) fishing.press(); },
     });
+    for (const h of dive.handlers) interactions.add(h);   // 물에 있는 동안 150 · 물가에서 들어가기 48
     interactions.add({ name: 'gather-shake', intent: 'action', priority: 60, test: () => trees.find(), run: o => trees.shake(o) });
     interactions.add({ name: 'gather-pickup', intent: 'pickup', priority: 50, test: () => pickup.find(), run: t => pickup.run(t) });
     interactions.add({ name: 'gather-plant', intent: 'pickup', priority: 45, test: () => garden.holeInFront(), run: t => garden.plant(t) });
@@ -114,11 +117,11 @@ export default {
     // 11차 시계: 시각을 옮기면 지금 나온 곤충·물고기 그림자를 거두고 새 시간대 것으로 다시 채운다 (잡는 중인 것은 둔다)
     events.on('time:shift', () => { bugs.reshuffle?.(); fishing.reshuffle?.(); });
 
-    G = { kit, fx, drops, results, trees, fishing, bugs, work, tickLock };
+    G = { kit, fx, drops, results, trees, fishing, bugs, work, dive, tickLock };
     // 확인·다른 트랙용 (계약 밖): 지금 낚시·곤충 상태, 강제로 놓기
     ctx.services.gather = {
       get busy() { return isBusy(); },
-      drops, bugs, fishing, trees, work, toolbelt, results, garden, fx,   // fx: 반짝이 (9차 손 불꽃 불티가 같이 씀)
+      drops, bugs, fishing, trees, work, toolbelt, results, garden, fx, dive,   // dive: M16 잠수 (gather/dive.js)   // fx: 반짝이 (9차 손 불꽃 불티가 같이 씀)
       habitatAt: (x, z) => fishing.habitatAt(x, z),
       spawnBug: (id, place = 'flower', dist = 1.2) => { const f = kit.player.pointInFront(dist); return bugs.debugSpawn(id, place, f.x, f.z); },
     };
@@ -136,5 +139,6 @@ export default {
     G.fishing.update(dt, paused);
     G.bugs.update(dt, paused);
     G.work.update(dt);
+    G.dive.update(dt, paused);
   },
 };

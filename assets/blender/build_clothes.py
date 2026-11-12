@@ -250,6 +250,49 @@ def build(ns):
                     bmesh.ops.delete(bm, geom=[f for f in bm.faces if not (abs(f.calc_center_median().y - y0) < 0.009 and f.calc_center_median().z > 0.014)], context='FACES')
                     bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
                     B.add(bm, 'sandalStrap', w)
+    # ---------------- 잠수복 (M16, 칸 suit — 바다에서 헤엄칠 때만 게임이 입힌다): 몸통·팔·다리 + 물안경(눈 앞) + 등 공기통
+    elif kind == 'wetsuit':
+        DS, half = D + 0.004, prm('stripe', 0.022)
+        cuffZ = ARMS['L'][1].z + 0.058   # 소매 끝 띠 (sleeves 는 손목 위 +0.032 에서 자른다)
+        torso(DS, lambda c: True, lambda c: 'suitStripe' if abs(c.y) < half and abs(c.x) > BODY_R[0] * 0.55 else 'suit', seg=28, rings=18)
+
+        def arm_mat(c):   # 소매 끝 띠 + 팔 바깥 옆줄 (몸통 옆줄은 팔에 가려서)
+            sh, hand = ARMS['L' if c.x > 0 else 'R']
+            ax = sh.x + (hand.x - sh.x) * max(0.0, min(1.0, (sh.z - c.z) / (sh.z - hand.z)))
+            return 'suitStripe' if c.z < cuffZ or (abs(c.x) - abs(ax) > 0.03 and abs(c.y) < half) else 'suit'
+        sleeves(DS, True, arm_mat)
+        ankle = prm('ankle', 0.075)
+        for side in ('L', 'R'):   # 다리: 발목에서 자르고 바깥 옆줄 · 발목 띠
+            x = LEGS[side][0].x
+            sx = 1 if x > 0 else -1
+            bm = capsule(V((x, 0, ns['legLen'] + 0.05)), V((x, 0, 0.05)), 0.05 + DS, seg=14, rings=8)
+            bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.calc_center_median().z < ankle], context='FACES')
+            bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+            B.add(bm, lambda c, x=x, sx=sx: 'suitStripe' if c.z < ankle + 0.022 or ((c.x - x) * sx > 0.035 and abs(c.y) < half) else 'suit', leg_w(side))
+        # 물안경: 두 눈 앞 테 + 가운데 다리 + 머리 뒤로 두른 끈 (이마 위로 올리지 않는다)
+        EYES, hs, frame = ns['EYES'], ns['hs'], ns['surface_frame']
+        RW, RH = 0.062 * hs, 0.056 * hs
+        ends = {}
+        for side in ('L', 'R'):
+            p, n = EYES[side]
+            r_, u_ = frame(n)
+            c = p + n * 0.016 * hs
+            B.add(tube([c + r_ * math.cos(a) * RW + u_ * math.sin(a) * RH for a in (TAU * i / 16 for i in range(16))], [0.011 * hs] * 16, seg=6, closed=True), 'maskFrame', 'head')
+            B.add(ellipsoid(c + (r_ * 0.028 + u_ * 0.03) * hs + n * 0.004, (0.012 * hs, 0.004 * hs, 0.008 * hs), rot=ns['decal'](n), seg=8, rings=4), 'maskLens', 'head', outline=False)
+            ends[side] = (c - r_ * RW if side == 'L' else c + r_ * RW, c + r_ * RW if side == 'L' else c - r_ * RW)   # (안쪽 끝, 바깥 끝)
+        mid = (ends['L'][0] + ends['R'][0]) / 2 + V((0, -0.006, 0))
+        B.add(tube([ends['L'][0], mid, ends['R'][0]], [0.008 * hs] * 3, seg=6), 'maskFrame', 'head')
+        SR = tuple(r * 1.02 for r in HR)
+        strap = [ell_point(HC, SR, 0.62 + (TAU - 1.24) * i / 12, 0.06 + 0.24 * math.sin(math.pi * i / 12))[0] for i in range(13)]
+        B.add(tube([ends['L'][1]] + strap + [ends['R'][1]], [0.008 * hs] * 15, seg=5), 'maskStrap', 'head')
+        # 등 공기통 (작은 노란 통 + 밸브) + 어깨 끈 둘
+        ty, tz0, tz1 = BODY_R[1] + 0.022, BODY_C.z - 0.05, bodyTop - 0.015
+        B.add(capsule(V((0, ty, tz0)), V((0, ty, tz1)), 0.05, seg=16, rings=8), 'tank', 'spine')
+        B.add(cone(V((0, ty, tz1 + 0.04)), V((0, ty, tz1 + 0.07)), 0.015, 0.015, seg=10), 'tankValve', 'spine')
+        B.add(cone(V((0, ty, tz1 + 0.07)), V((0, ty, tz1 + 0.08)), 0.026, 0.026, seg=10), 'tankValve', 'spine')
+        for sx in (1, -1):
+            pts = [V((sx * 0.045, ty - 0.03, tz1 - 0.02)), V((sx * 0.075, 0.03, bodyTop + 0.004)), front_point(sx * 0.075, bodyTop - 0.05, DS + 0.006)]
+            B.add(tube(pts, [0.009] * 3, seg=6), 'maskStrap', 'spine')
     else:
         raise SystemExit(f'[clothes] 모르는 kind: {kind}')
 

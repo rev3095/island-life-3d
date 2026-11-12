@@ -1,0 +1,62 @@
+{
+  "id": "IC-SE-06",
+  "slug": "sea-oyster",
+  "name": "굴",
+  "group": "sea",
+  "category": "item",
+  "kind": "oyster",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.oyster",
+      "code": "IC-SE-06"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "울퉁불퉁 겹겹이 쌓인 회색 판 껍데기, 경첩 쪽이 좁은 물방울꼴",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "껍데기 길이",
+      "value": 0.24,
+      "min": 0.12,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#A7A49C",
+    "shellLayer": "#C4C0B6",
+    "shellDark": "#6E6A66"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellLayer": "밝은 겹",
+    "shellDark": "아래 껍데기"
+  }
+}

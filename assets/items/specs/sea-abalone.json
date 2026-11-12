@@ -1,0 +1,78 @@
+{
+  "id": "IC-SE-05",
+  "slug": "sea-abalone",
+  "name": "전복",
+  "group": "sea",
+  "category": "item",
+  "kind": "abalone",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.abalone",
+      "code": "IC-SE-05"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "납작한 귀 모양 껍데기를 안쪽이 보이게 — 무지갯빛 진주층, 가장자리에 구멍 한 줄",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "nacre",
+      "nacreB",
+      "nacreC",
+      "hole",
+      "shine"
+    ],
+    "flat": [
+      "shine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "껍데기 길이",
+      "value": 0.24,
+      "min": 0.12,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#6E7A5C",
+    "nacre": "#E6EEF4",
+    "nacreB": "#F3D6E6",
+    "nacreC": "#D4EEDF",
+    "hole": "#2E2A26",
+    "shine": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "shell": "바깥 껍데기",
+    "nacre": "진주층 (은빛)",
+    "nacreB": "진주층 (분홍)",
+    "nacreC": "진주층 (민트)",
+    "hole": "숨구멍",
+    "shine": "반짝임"
+  }
+}

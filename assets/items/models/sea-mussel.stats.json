@@ -1,0 +1,47 @@
+{
+  "id": "IC-SE-20",
+  "slug": "sea-mussel",
+  "name": "홍합",
+  "group": "sea",
+  "kind": "mussel",
+  "version": "0.1",
+  "items": [
+    "sea.mussel"
+  ],
+  "hold": true,
+  "triangles": 980,
+  "parts": 1,
+  "materials": [
+    "byssus",
+    "shell",
+    "shellEdge",
+    "shellRib",
+    "shine"
+  ],
+  "objects": [
+    "mussel"
+  ],
+  "size": [
+    0.133,
+    0.2,
+    0.057
+  ],
+  "bounds": [
+    [
+      -0.067,
+      -0.1,
+      -0.029
+    ],
+    [
+      0.067,
+      0.1,
+      0.029
+    ]
+  ],
+  "glbBytes": 32076,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-mussel_main.png",
+    "sea-mussel_thumb.png"
+  ]
+}

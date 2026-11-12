@@ -1,0 +1,48 @@
+{
+  "id": "IC-SE-12",
+  "slug": "sea-sea-anemone",
+  "name": "말미잘",
+  "group": "sea",
+  "kind": "anemone",
+  "version": "0.1",
+  "items": [
+    "sea.sea-anemone"
+  ],
+  "hold": true,
+  "triangles": 5684,
+  "parts": 1,
+  "materials": [
+    "column",
+    "columnDark",
+    "disk",
+    "mouth",
+    "tentacle",
+    "tentacleTip"
+  ],
+  "objects": [
+    "anemone"
+  ],
+  "size": [
+    0.296,
+    0.297,
+    0.246
+  ],
+  "bounds": [
+    [
+      -0.148,
+      -0.149,
+      -0.123
+    ],
+    [
+      0.148,
+      0.149,
+      0.123
+    ]
+  ],
+  "glbBytes": 111176,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-anemone_main.png",
+    "sea-sea-anemone_thumb.png"
+  ]
+}

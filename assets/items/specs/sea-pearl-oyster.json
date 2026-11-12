@@ -1,0 +1,95 @@
+{
+  "id": "IC-SE-19",
+  "slug": "sea-pearl-oyster",
+  "name": "진주조개",
+  "group": "sea",
+  "category": "item",
+  "kind": "pearl-oyster",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.pearl-oyster",
+      "code": "IC-SE-19"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "살짝 벌어진 짙은 두 장 껍데기 + 안쪽 무지갯빛 + 하얀 진주 하나",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004,
+    "noOutline": [
+      "nacre",
+      "nacreB",
+      "nacreC",
+      "pearlShine"
+    ],
+    "flat": [
+      "pearlShine"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "껍데기 길이",
+      "value": 0.24,
+      "min": 0.14,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    },
+    "open": {
+      "label": "벌어진 각도",
+      "value": 34,
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "live": false
+    },
+    "pearl": {
+      "label": "진주 크기 비",
+      "value": 0.1,
+      "min": 0.05,
+      "max": 0.16,
+      "step": 0.005,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#3A3448",
+    "shellLine": "#4E4660",
+    "nacre": "#E6EEF4",
+    "nacreB": "#F3D6E6",
+    "nacreC": "#D4EEDF",
+    "pearl": "#FBF7EE",
+    "pearlShine": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "shellLine": "결 줄",
+    "nacre": "진주층 (은빛)",
+    "nacreB": "진주층 (분홍)",
+    "nacreC": "진주층 (민트)",
+    "pearl": "진주",
+    "pearlShine": "진주 빛"
+  }
+}

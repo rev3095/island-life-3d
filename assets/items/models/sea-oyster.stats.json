@@ -1,0 +1,45 @@
+{
+  "id": "IC-SE-06",
+  "slug": "sea-oyster",
+  "name": "굴",
+  "group": "sea",
+  "kind": "oyster",
+  "version": "0.1",
+  "items": [
+    "sea.oyster"
+  ],
+  "hold": true,
+  "triangles": 1680,
+  "parts": 1,
+  "materials": [
+    "shell",
+    "shellDark",
+    "shellLayer"
+  ],
+  "objects": [
+    "oyster"
+  ],
+  "size": [
+    0.17,
+    0.257,
+    0.062
+  ],
+  "bounds": [
+    [
+      -0.085,
+      -0.129,
+      -0.031
+    ],
+    [
+      0.085,
+      0.129,
+      0.031
+    ]
+  ],
+  "glbBytes": 99260,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-oyster_main.png",
+    "sea-oyster_thumb.png"
+  ]
+}

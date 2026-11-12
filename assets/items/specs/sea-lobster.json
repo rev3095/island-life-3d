@@ -1,0 +1,134 @@
+{
+  "id": "IC-SE-10",
+  "slug": "sea-lobster",
+  "name": "바닷가재",
+  "group": "sea",
+  "category": "item",
+  "kind": "shrimp",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.lobster",
+      "code": "IC-SE-10"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "큰 집게 둘 달린 붉은 새우형, 곧은 몸과 넓은 꼬리부채",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "length": {
+      "label": "몸 길이",
+      "value": 0.36,
+      "min": 0.12,
+      "max": 0.6,
+      "step": 0.01,
+      "live": false
+    },
+    "curl": {
+      "label": "몸 말림",
+      "value": 0.12,
+      "min": 0,
+      "max": 1,
+      "step": 0.01,
+      "live": false
+    },
+    "girth": {
+      "label": "굵기 비",
+      "value": 0.13,
+      "min": 0.06,
+      "max": 0.2,
+      "step": 0.005,
+      "live": false
+    },
+    "head": {
+      "label": "머리가슴 길이 비",
+      "value": 0.42,
+      "min": 0.25,
+      "max": 0.5,
+      "step": 0.01,
+      "live": false
+    },
+    "claw": {
+      "label": "큰 집게 (0 = 없음)",
+      "value": 1,
+      "min": 0,
+      "max": 1.5,
+      "step": 0.01,
+      "live": false
+    },
+    "antenna": {
+      "label": "더듬이 길이",
+      "value": 1.2,
+      "min": 0.3,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "rostrum": {
+      "label": "이마뿔 길이",
+      "value": 0.08,
+      "min": 0.02,
+      "max": 0.25,
+      "step": 0.01,
+      "live": false
+    },
+    "fan": {
+      "label": "꼬리부채 크기",
+      "value": 1.15,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "body": "#C8463A",
+    "band": "#A8382F",
+    "fan": "#B83F34",
+    "leg": "#D86A50",
+    "antenna": "#D86A50",
+    "claw": "#B83F34",
+    "clawTip": "#F08A5A",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "body": "몸",
+    "band": "마디 띠",
+    "fan": "꼬리부채",
+    "leg": "다리",
+    "antenna": "더듬이",
+    "claw": "집게",
+    "clawTip": "집게 끝",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -70,
+    "pitch": 18
+  }
+}

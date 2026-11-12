@@ -1,0 +1,80 @@
+{
+  "id": "IC-SE-02",
+  "slug": "sea-sea-urchin",
+  "name": "성게",
+  "group": "sea",
+  "category": "item",
+  "kind": "urchin",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.sea-urchin",
+      "code": "IC-SE-02"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "보라·검은 공에 사방으로 뻗은 가시가 빽빽한 밤송이 같은 모양",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "radius": {
+      "label": "몸 반지름",
+      "value": 0.075,
+      "min": 0.04,
+      "max": 0.14,
+      "step": 0.005,
+      "live": false
+    },
+    "spine": {
+      "label": "가시 길이",
+      "value": 0.085,
+      "min": 0.03,
+      "max": 0.15,
+      "step": 0.005,
+      "live": false
+    },
+    "spines": {
+      "label": "가시 수",
+      "value": 120,
+      "min": 40,
+      "max": 200,
+      "step": 1,
+      "live": false
+    }
+  },
+  "palette": {
+    "urchin": "#3B2A48",
+    "spine": "#5A3F6E",
+    "spineTip": "#7E5C94",
+    "mouth": "#1F1826"
+  },
+  "paletteLabels": {
+    "urchin": "몸",
+    "spine": "가시",
+    "spineTip": "밝은 가시",
+    "mouth": "입"
+  }
+}

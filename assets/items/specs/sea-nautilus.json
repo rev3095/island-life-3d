@@ -1,0 +1,74 @@
+{
+  "id": "IC-SE-18",
+  "slug": "sea-nautilus",
+  "name": "앵무조개",
+  "group": "sea",
+  "category": "item",
+  "kind": "nautilus",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.nautilus",
+      "code": "IC-SE-18"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "둥글게 말린 크림색 껍데기에 갈색 불꽃 줄무늬, 입구에서 짧은 촉수가 나옴",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "size": {
+      "label": "껍데기 크기",
+      "value": 0.24,
+      "min": 0.14,
+      "max": 0.4,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "shell": "#F2E6D0",
+    "stripe": "#9A5A34",
+    "shellDark": "#5E4632",
+    "hood": "#8A4A3A",
+    "tentacle": "#F2D2B8",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "shell": "껍데기",
+    "stripe": "줄무늬",
+    "shellDark": "배꼽",
+    "hood": "두건",
+    "tentacle": "촉수",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  },
+  "render": {
+    "yaw": -65,
+    "pitch": 20
+  }
+}

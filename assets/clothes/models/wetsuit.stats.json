@@ -1,0 +1,41 @@
+{
+  "id": "CL-13",
+  "slug": "wetsuit",
+  "name": "잠수복",
+  "slot": "suit",
+  "version": "0.1",
+  "triangles": 2530,
+  "vertices": 1317,
+  "bones": [
+    "arm.L",
+    "arm.R",
+    "head",
+    "hips",
+    "leg.L",
+    "leg.R",
+    "shin.L",
+    "shin.R",
+    "spine"
+  ],
+  "materials": [
+    "maskFrame",
+    "maskLens",
+    "maskStrap",
+    "suit",
+    "suitStripe",
+    "tank",
+    "tankValve"
+  ],
+  "body": "player",
+  "bodyVersion": "0.2.0",
+  "glbBytes": 88000,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "wetsuit_back.png",
+    "wetsuit_front.png",
+    "wetsuit_side.png",
+    "wetsuit_three_quarter.png",
+    "wetsuit_thumb.png",
+    "wetsuit_walk.png"
+  ]
+}

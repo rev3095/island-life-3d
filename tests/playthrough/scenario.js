@@ -1236,6 +1236,66 @@ export function makeScenario(bot, sk, opts = {}) {
     return pass(msg);
   });
 
+  // M16 잠수 (D160–D164): 도토리상점에서 스쿠버 키트 사기 → 해변 물가에서 행동 키로 바다에 → 헤엄 → 잠수해 바다 생물 잡기 → 물가로 나오기 → 도감·섬 일지.
+  add('dive', '잠수: 상점에서 스쿠버 키트 → 해변 물가 → 헤엄 · 잠수로 바다 생물 잡기 → 나오기 (도감 · 섬 일지)', async () => {
+    const D = S().gather?.dive;
+    if (!D) return block('잠수(gather.dive)가 없어요');
+    if (S().house?.inside) await sk.leaveHome();
+    if ((S().time.now().hour ?? 10) < 9 || S().time.now().hour >= 20) await clockTo(10);
+    const KIT = 'tool.scuba-kit', price = bot.item(KIT)?.buy ?? 0;
+    if (!bot.has(KIT)) {
+      if (bot.acorns() < price) await sellSurplus();
+      if (bot.acorns() < price) return awk(`도토리가 모자라 스쿠버 키트를 못 사요 (🌰 ${bot.acorns()} < ${price})`);
+      const w0 = bot.acorns();
+      await sk.shop({ buy: [KIT] });
+      if (S().house?.places?.where === 'shop') await sk.leavePlace();
+      note('dive-buy', { price, spent: w0 - bot.acorns(), has: bot.has(KIT) });
+      if (!bot.has(KIT)) return block('상점에서 스쿠버 키트를 못 샀어요 (늘 파는 목록)');
+    }
+    const j0 = st().journal?.counts?.sea ?? 0, dex0 = (st().encyclopedia?.sea ?? []).length;
+    const r = await sk.dive({ want: 1, timeout: 150 });
+    const dex = (st().encyclopedia?.sea ?? []).length;
+    note('dive', { ...r, dex0, dex, journal: [j0, st().journal?.counts?.sea ?? 0] });
+    let msg = `${r.entered ? '들어감' : '못 들어감'} · 잠수복 ${r.suit ? '입음' : '안 보임'} · 잡은 것 ${r.caught.map(id => bot.item(id)?.name ?? id).join(', ') || '없음'} (${r.tries}번) · 도감 ${dex0}→${dex} · ${r.left ? '나옴' : '물에 남음'}`;
+    if (!r.entered || !r.left) return block(msg);
+    if (!r.caught.length || dex <= dex0 || !r.suit) return awk(msg);
+    // 박물관 바다 생물관 (요청 9 관): 잡은 것을 느루에게 기증 → 로비 🐙 아치 → 관에 전시가 하나 늘었는지
+    const H = S().house?.places?.halls;
+    if (!H) return pass(msg);
+    const m0 = H.status('sea')?.donated ?? 0;
+    const don = await sk.museum();
+    const gave = (don?.donated ?? []).filter(id => id.startsWith('sea.'));
+    const hall = { gave, before: m0 };
+    if (gave.length && (await sk.toDoor('museum', '박물관')) && (await sk.enterPlace('museum', '박물관'))) {
+      const a = H.arches().find(x => x.hall === 'sea');
+      if (a) {
+        await bot.walkLocal({ x: a.door.x + Math.sin(a.facing) * 0.35, z: a.door.z + Math.cos(a.facing) * 0.35 }, { near: 0.2, label: '바다 생물관 아치 앞' });
+        await bot.faceDir(a.facing * 180 / Math.PI);
+        if (bot.peek() === 'museum-hall-in') {
+          bot.press('action');
+          if (await bot.until(() => H.where === 'sea' && !H.busy && !S().house.passing, { timeout: 15, label: '바다 생물관 들어가기' })) {
+            const s = H.status('sea');
+            Object.assign(hall, { shown: H.shown('sea'), donated: s.donated, total: s.total, soon: s.soon });
+            await bot.shot('dive-museum-sea', '박물관 바다 생물관 (잠수로 잡아 기증)');
+            const mat = H.doormat();
+            await bot.walkLocal(mat, { near: 0.15, label: '바다 생물관 문 매트' });
+            bot.stick(0, 1, false);
+            await bot.until(() => !H.where && !H.busy && !S().house.passing, { timeout: 8, ui: false, label: '바다 생물관 나가기' });
+            bot.release();
+            await bot.settle(10);
+            if (H.where) { await H.leave?.(); await bot.settle(10); }
+          }
+        } else hall.peek = bot.peek();
+      }
+      await sk.leavePlace();
+    }
+    note('dive-museum', hall);
+    msg += ` · 바다 생물관 ${hall.shown ?? '?'}/${hall.total ?? '?'}`;
+    if (!gave.length) return awk(`${msg} (기증 못 함)`);
+    if (hall.soon || hall.shown !== hall.donated || !(hall.donated > m0)) return awk(`${msg} (관 ${JSON.stringify(hall)})`);
+    return pass(msg);
+  });
+
   // P35 무인도 투어 (보드 tour D120–D128): 선착장 끝 배 → 여행 묻기 창(첫 여행은 표 선물) → 무인도 → 과일 흔들기·광석 캐기·줍기 → 배로 돌아오기.
   // 투어 섬은 x 900 이라 봇은 섬 밖 좌표처럼 walkLocal(구역 isWalkable 로 0.25칸 길찾기)로 걷는다.
   add('tour', '무인도 투어: 선착장 배 → 표 → 무인도 → 과일·광석 캐기 → 배로 돌아오기', async () => {

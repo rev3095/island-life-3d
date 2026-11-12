@@ -26,7 +26,7 @@ export function createBag(ctx, panels) {
   }
   function whyNot(mode, info) {
     if (mode === 'sell') return '팔 수 없는 물건이에요';
-    if (mode === 'donate') return DEX_CATEGORIES.includes(info.category) ? '이미 기증했어요' : '박물관에는 물고기·곤충·화석만 받아요';
+    if (mode === 'donate') return DEX_CATEGORIES.includes(info.category) ? '이미 기증했어요' : '박물관에는 물고기·곤충·화석·바다 생물만 받아요';
     return '';
   }
 

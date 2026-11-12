@@ -3169,6 +3169,564 @@
       "status": "approved"
     },
     {
+      "id": "IC-SE-01",
+      "slug": "sea-seaweed",
+      "name": "미역",
+      "group": "sea",
+      "kind": "seaweed",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.seaweed",
+          "code": "IC-SE-01",
+          "icon": "assets/items/renders/sea-seaweed_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.368,
+        0.366,
+        0.402
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-02",
+      "slug": "sea-sea-urchin",
+      "name": "성게",
+      "group": "sea",
+      "kind": "urchin",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-urchin",
+          "code": "IC-SE-02",
+          "icon": "assets/items/renders/sea-sea-urchin_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.325,
+        0.33,
+        0.238
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-03",
+      "slug": "sea-sea-cucumber",
+      "name": "해삼",
+      "group": "sea",
+      "kind": "sea-cucumber",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-cucumber",
+          "code": "IC-SE-03",
+          "icon": "assets/items/renders/sea-sea-cucumber_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.146,
+        0.319,
+        0.119
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-04",
+      "slug": "sea-sea-squirt",
+      "name": "멍게",
+      "group": "sea",
+      "kind": "sea-squirt",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-squirt",
+          "code": "IC-SE-04",
+          "icon": "assets/items/renders/sea-sea-squirt_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.17,
+        0.162,
+        0.231
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-05",
+      "slug": "sea-abalone",
+      "name": "전복",
+      "group": "sea",
+      "kind": "abalone",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.abalone",
+          "code": "IC-SE-05",
+          "icon": "assets/items/renders/sea-abalone_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.179,
+        0.247,
+        0.034
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "nacre",
+          "nacreB",
+          "nacreC",
+          "hole",
+          "shine"
+        ],
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-06",
+      "slug": "sea-oyster",
+      "name": "굴",
+      "group": "sea",
+      "kind": "oyster",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.oyster",
+          "code": "IC-SE-06",
+          "icon": "assets/items/renders/sea-oyster_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.17,
+        0.257,
+        0.062
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-07",
+      "slug": "sea-starfish",
+      "name": "불가사리",
+      "group": "sea",
+      "kind": "starfish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.starfish",
+          "code": "IC-SE-07",
+          "icon": "assets/items/renders/sea-starfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.293,
+        0.28,
+        0.056
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-08",
+      "slug": "sea-blue-crab",
+      "name": "꽃게",
+      "group": "sea",
+      "kind": "crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.blue-crab",
+          "code": "IC-SE-08",
+          "icon": "assets/items/renders/sea-blue-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.51,
+        0.444,
+        0.146
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-09",
+      "slug": "sea-sweet-shrimp",
+      "name": "단새우",
+      "group": "sea",
+      "kind": "shrimp",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sweet-shrimp",
+          "code": "IC-SE-09",
+          "icon": "assets/items/renders/sea-sweet-shrimp_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.114,
+        0.205,
+        0.148
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-10",
+      "slug": "sea-lobster",
+      "name": "바닷가재",
+      "group": "sea",
+      "kind": "shrimp",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.lobster",
+          "code": "IC-SE-10",
+          "icon": "assets/items/renders/sea-lobster_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.244,
+        0.593,
+        0.13
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-11",
+      "slug": "sea-moon-jellyfish",
+      "name": "보름달물해파리",
+      "group": "sea",
+      "kind": "jellyfish",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.moon-jellyfish",
+          "code": "IC-SE-11",
+          "icon": "assets/items/renders/sea-moon-jellyfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.29,
+        0.292,
+        0.126
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "bell",
+          "bellRim",
+          "gonad",
+          "tentacle",
+          "oralArm"
+        ],
+        "flat": [
+          "bell",
+          "bellRim",
+          "tentacle",
+          "oralArm"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-12",
+      "slug": "sea-sea-anemone",
+      "name": "말미잘",
+      "group": "sea",
+      "kind": "anemone",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-anemone",
+          "code": "IC-SE-12",
+          "icon": "assets/items/renders/sea-sea-anemone_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.296,
+        0.297,
+        0.246
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-13",
+      "slug": "sea-sea-slug",
+      "name": "갯민숭달팽이",
+      "group": "sea",
+      "kind": "sea-slug",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.sea-slug",
+          "code": "IC-SE-13",
+          "icon": "assets/items/renders/sea-sea-slug_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.114,
+        0.285,
+        0.084
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-14",
+      "slug": "sea-mantis-shrimp",
+      "name": "갯가재",
+      "group": "sea",
+      "kind": "mantis-shrimp",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.mantis-shrimp",
+          "code": "IC-SE-14",
+          "icon": "assets/items/renders/sea-mantis-shrimp_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.111,
+        0.394,
+        0.09
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-15",
+      "slug": "sea-snow-crab",
+      "name": "대게",
+      "group": "sea",
+      "kind": "crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.snow-crab",
+          "code": "IC-SE-15",
+          "icon": "assets/items/renders/sea-snow-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.717,
+        0.485,
+        0.187
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-16",
+      "slug": "sea-spider-crab",
+      "name": "키다리게",
+      "group": "sea",
+      "kind": "crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.spider-crab",
+          "code": "IC-SE-16",
+          "icon": "assets/items/renders/sea-spider-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.821,
+        0.603,
+        0.255
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-17",
+      "slug": "sea-horseshoe-crab",
+      "name": "투구게",
+      "group": "sea",
+      "kind": "horseshoe-crab",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.horseshoe-crab",
+          "code": "IC-SE-17",
+          "icon": "assets/items/renders/sea-horseshoe-crab_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.3,
+        0.484,
+        0.072
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-18",
+      "slug": "sea-nautilus",
+      "name": "앵무조개",
+      "group": "sea",
+      "kind": "nautilus",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.nautilus",
+          "code": "IC-SE-18",
+          "icon": "assets/items/renders/sea-nautilus_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.085,
+        0.201,
+        0.14
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-19",
+      "slug": "sea-pearl-oyster",
+      "name": "진주조개",
+      "group": "sea",
+      "kind": "pearl-oyster",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.pearl-oyster",
+          "code": "IC-SE-19",
+          "icon": "assets/items/renders/sea-pearl-oyster_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.239,
+        0.2,
+        0.126
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "nacre",
+          "nacreB",
+          "nacreC",
+          "pearlShine"
+        ],
+        "flat": [
+          "pearlShine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-SE-20",
+      "slug": "sea-mussel",
+      "name": "홍합",
+      "group": "sea",
+      "kind": "mussel",
+      "hold": true,
+      "items": [
+        {
+          "item": "sea.mussel",
+          "code": "IC-SE-20",
+          "icon": "assets/items/renders/sea-mussel_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.133,
+        0.2,
+        0.057
+      ],
+      "style": {
+        "outlineWidth": 0.004,
+        "noOutline": [
+          "shine"
+        ],
+        "flat": [
+          "shine"
+        ]
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-SH-01",
       "slug": "shell-clam",
       "name": "바지락",
@@ -3476,6 +4034,32 @@
         0.308,
         0.221,
         0.638
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-TL-07",
+      "slug": "tool-scuba-kit",
+      "name": "스쿠버 키트",
+      "group": "tool",
+      "kind": "scuba",
+      "hold": false,
+      "items": [
+        {
+          "item": "tool.scuba-kit",
+          "code": "IC-TL-07",
+          "icon": "assets/items/renders/tool-scuba-kit_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.676,
+        0.529,
+        0.204
       ],
       "style": {
         "outlineWidth": 0.004

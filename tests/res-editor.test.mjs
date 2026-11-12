@@ -97,8 +97,8 @@ test('편집기 홈: 리소스 편집기 줄이 있고, 예전 캐릭터·배경
 const CLOTHES = json('assets/clothes/index.json').models;
 const clothesOf = slug => ({ spec: json(`assets/clothes/specs/${slug}.json`), stats: json(`assets/clothes/models/${slug}.stats.json`), info: glb(`assets/clothes/models/${slug}.glb.json`) });
 
-test('옷 교체 약속: 13벌 모두 ✗ 없이 통과하고, 모델이 있는 옷은 옷 약속을 다 본다', () => {
-  assert.equal(CLOTHES.length, 13);
+test('옷 교체 약속: 14벌 모두 ✗ 없이 통과하고, 모델이 있는 옷은 옷 약속을 다 본다', () => {
+  assert.equal(CLOTHES.length, 14);   // + M16 잠수복 CL-13
   for (const r of CLOTHES) {
     const spec = json(`assets/clothes/specs/${r.slug}.json`);
     const m = r.builtin ? { stats: null, info: null } : clothesOf(r.slug);
@@ -143,10 +143,10 @@ test('옷 약속 값 = 게임 값: 칸별 뼈(wear.js) · 몸 재질(player.json
 test('편집기: 옷 영역 (cloth-<slug> · 칸 = cat · 다시 빌드 명령 · 게시 파일)', { skip: !existsSync(resolve(root, 'assets/res/editor-index.json')) && '묶음 없음 (node tools/build-editor-index.mjs)' }, () => {
   const ix = json('assets/res/editor-index.json');
   const rows = ix.rows.filter(r => r.area === 'clothes');
-  assert.equal(rows.length, 13, '옷 13벌');
+  assert.equal(rows.length, 14, '옷 14벌');
   for (const r of rows) {
     assert.equal(r.key, `cloth-${r.slug}`);
-    assert.ok(['hat', 'top', 'shoes'].includes(r.cat), r.cat);
+    assert.ok(['hat', 'top', 'shoes', 'suit'].includes(r.cat), r.cat);
     assert.equal(r.sum.fail, 0, r.key);
   }
   assert.equal(rows.find(r => r.slug === 'basic-tee').id, 'CL-00');

@@ -45,7 +45,7 @@ test('build-web: 게시 파일은 모듈·css + 에셋 묶음 몇 개 (에셋을
     assert.equal(f.path, f.src);
   }
   assert.equal(plan.publish.filter(f => f.path.startsWith('packs/')).length, plan.packs.length);
-  assert.ok(plan.packs.length <= 19,   // + M13 daily 묶음
+  assert.ok(plan.packs.length <= 20,   // + M13 daily 묶음 + M16 바다 생물 모델로 items 묶음 하나 더 (items-3)
     `묶음 ${plan.packs.length}개`);
   assert.ok(plan.publish.length + 1 <= LIMITS.perPublish, `한 번에 다 올라가는 수 (지금 ${plan.publish.length + 1}개)`);
 });

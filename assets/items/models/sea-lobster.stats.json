@@ -1,0 +1,51 @@
+{
+  "id": "IC-SE-10",
+  "slug": "sea-lobster",
+  "name": "바닷가재",
+  "group": "sea",
+  "kind": "shrimp",
+  "version": "0.1",
+  "items": [
+    "sea.lobster"
+  ],
+  "hold": true,
+  "triangles": 4642,
+  "parts": 1,
+  "materials": [
+    "antenna",
+    "band",
+    "body",
+    "claw",
+    "clawTip",
+    "eye",
+    "eyeHighlight",
+    "fan",
+    "leg"
+  ],
+  "objects": [
+    "shrimp"
+  ],
+  "size": [
+    0.244,
+    0.593,
+    0.13
+  ],
+  "bounds": [
+    [
+      -0.122,
+      -0.297,
+      -0.065
+    ],
+    [
+      0.122,
+      0.297,
+      0.065
+    ]
+  ],
+  "glbBytes": 96192,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-lobster_main.png",
+    "sea-lobster_thumb.png"
+  ]
+}

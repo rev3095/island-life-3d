@@ -1,0 +1,49 @@
+{
+  "id": "IC-SE-14",
+  "slug": "sea-mantis-shrimp",
+  "name": "갯가재",
+  "group": "sea",
+  "kind": "mantis-shrimp",
+  "version": "0.1",
+  "items": [
+    "sea.mantis-shrimp"
+  ],
+  "hold": true,
+  "triangles": 5440,
+  "parts": 1,
+  "materials": [
+    "accent",
+    "body",
+    "bodyDark",
+    "eye",
+    "eyeHighlight",
+    "limb",
+    "limbTip"
+  ],
+  "objects": [
+    "mantis"
+  ],
+  "size": [
+    0.111,
+    0.394,
+    0.09
+  ],
+  "bounds": [
+    [
+      -0.056,
+      -0.197,
+      -0.045
+    ],
+    [
+      0.056,
+      0.197,
+      0.045
+    ]
+  ],
+  "glbBytes": 113268,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-mantis-shrimp_main.png",
+    "sea-mantis-shrimp_thumb.png"
+  ]
+}

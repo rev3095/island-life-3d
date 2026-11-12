@@ -64,7 +64,9 @@ const list = allSlugs().map(readSpec)
       ...(s.builtin ? { builtin: true, part: s.part ?? "player_top" } : { model: `assets/clothes/models/${s.slug}.glb.json`, triangles: st.triangles, bones: st.bones }),
     };
   });
-for (const c of list) if (!SLOTS.includes(c.slot)) throw new Error(`${c.slug}: slot 은 ${SLOTS.join("|")}`);
+// M16 잠수복 칸 suit: 옷장·상점 칸(slots)이 아니라 바다에서만 게임이 입히는 칸 — 목록에는 들어가되 slots 에는 넣지 않는다
+const EXTRA_SLOTS = ["suit"];
+for (const c of list) if (![...SLOTS, ...EXTRA_SLOTS].includes(c.slot)) throw new Error(`${c.slug}: slot 은 ${[...SLOTS, ...EXTRA_SLOTS].join("|")}`);
 writeFileSync(resolve(dir, "index.json"), JSON.stringify({ version: 1, slots: SLOTS, models: list }, null, 2) + "\n");
 console.log(`\n옷 목록 ${list.length}개 → assets/clothes/index.json`);
 process.exit(failed ? 1 : 0);

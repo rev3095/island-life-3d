@@ -1,0 +1,64 @@
+{
+  "id": "IC-SE-07",
+  "slug": "sea-starfish",
+  "name": "불가사리",
+  "group": "sea",
+  "category": "item",
+  "kind": "starfish",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "sea.starfish",
+      "code": "IC-SE-07"
+    }
+  ],
+  "hold": true,
+  "prompt": {
+    "concept": "끝이 살짝 들린 통통한 주황 팔 다섯 + 밝은 점 무늬 + 가운데 작은 눈",
+    "keywords": [
+      "바다",
+      "잠수"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드·다른 게임의 디자인"
+    ],
+    "notes": "M16 잠수 (D160–D164)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    },
+    "radius": {
+      "label": "팔 길이",
+      "value": 0.15,
+      "min": 0.08,
+      "max": 0.25,
+      "step": 0.005,
+      "live": false
+    }
+  },
+  "palette": {
+    "star": "#F08A3C",
+    "starDot": "#FBD08A",
+    "eye": "#2F2A26",
+    "eyeHighlight": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "star": "몸",
+    "starDot": "점 무늬",
+    "eye": "눈",
+    "eyeHighlight": "눈 빛"
+  }
+}

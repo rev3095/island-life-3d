@@ -1,0 +1,76 @@
+{
+  "id": "IC-TL-07",
+  "slug": "tool-scuba-kit",
+  "name": "스쿠버 키트",
+  "group": "tool",
+  "category": "item",
+  "kind": "scuba",
+  "version": "0.1",
+  "status": "review",
+  "items": [
+    {
+      "item": "tool.scuba-kit",
+      "code": "IC-TL-07"
+    }
+  ],
+  "hold": false,
+  "prompt": {
+    "concept": "노란 공기통 + 물안경 + 숨대롱 + 오리발 한 켤레를 한데 놓은 꾸러미",
+    "keywords": [
+      "공기통",
+      "물안경",
+      "숨대롱",
+      "오리발"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 브랜드 로고"
+    ],
+    "notes": "M16 잠수 — 가방에 있으면 바다에 들어간다"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.004
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.6,
+      "step": 0.01,
+      "live": false
+    }
+  },
+  "palette": {
+    "tank": "#F2C53D",
+    "tankBand": "#C8962A",
+    "metal": "#C5CDD4",
+    "metalDark": "#7E888E",
+    "hose": "#3A3A44",
+    "mask": "#3FA7B8",
+    "lens": "#BFE8F2",
+    "strap": "#2E3A4E",
+    "snorkel": "#F08A3C",
+    "fin": "#3E7CC8",
+    "finDark": "#2A5A98"
+  },
+  "paletteLabels": {
+    "tank": "공기통",
+    "tankBand": "통 띠",
+    "metal": "밸브",
+    "metalDark": "밸브 손잡이",
+    "hose": "호스·입에 무는 곳",
+    "mask": "물안경 테",
+    "lens": "물안경 알",
+    "strap": "물안경 끈",
+    "snorkel": "숨대롱",
+    "fin": "오리발",
+    "finDark": "오리발 발 넣는 곳·줄"
+  },
+  "render": {
+    "yaw": -25,
+    "pitch": 42
+  }
+}

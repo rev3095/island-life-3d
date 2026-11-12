@@ -1,0 +1,48 @@
+{
+  "id": "IC-SE-05",
+  "slug": "sea-abalone",
+  "name": "전복",
+  "group": "sea",
+  "kind": "abalone",
+  "version": "0.1",
+  "items": [
+    "sea.abalone"
+  ],
+  "hold": true,
+  "triangles": 3192,
+  "parts": 1,
+  "materials": [
+    "hole",
+    "nacre",
+    "nacreB",
+    "nacreC",
+    "shell",
+    "shine"
+  ],
+  "objects": [
+    "abalone"
+  ],
+  "size": [
+    0.179,
+    0.247,
+    0.034
+  ],
+  "bounds": [
+    [
+      -0.09,
+      -0.123,
+      -0.017
+    ],
+    [
+      0.09,
+      0.123,
+      0.017
+    ]
+  ],
+  "glbBytes": 71376,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-abalone_main.png",
+    "sea-abalone_thumb.png"
+  ]
+}

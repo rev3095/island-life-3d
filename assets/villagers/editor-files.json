@@ -14,6 +14,7 @@
     "src/data/daily-items.js",
     "src/data/art-items.js",
     "src/data/album-items.js",
+    "src/data/sea-items.js",
     "src/data/items.js",
     "src/data/tables.js",
     "src/gameplay/festival/emotes.js",

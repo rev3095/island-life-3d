@@ -1,0 +1,45 @@
+{
+  "id": "IC-SE-04",
+  "slug": "sea-sea-squirt",
+  "name": "멍게",
+  "group": "sea",
+  "kind": "sea-squirt",
+  "version": "0.1",
+  "items": [
+    "sea.sea-squirt"
+  ],
+  "hold": true,
+  "triangles": 1784,
+  "parts": 1,
+  "materials": [
+    "squirt",
+    "squirtDark",
+    "squirtLight"
+  ],
+  "objects": [
+    "squirt"
+  ],
+  "size": [
+    0.17,
+    0.162,
+    0.231
+  ],
+  "bounds": [
+    [
+      -0.085,
+      -0.081,
+      -0.116
+    ],
+    [
+      0.085,
+      0.081,
+      0.116
+    ]
+  ],
+  "glbBytes": 40460,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-sea-squirt_main.png",
+    "sea-sea-squirt_thumb.png"
+  ]
+}

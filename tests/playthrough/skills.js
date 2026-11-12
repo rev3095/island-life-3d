@@ -74,6 +74,8 @@ export function createSkills(bot) {
       }
       if (!stood) { log('  닿는 그림자가 안 보여요'); continue; }
       await bot.tool('rod');
+      // 선착장 배 앞이면 행동 키가 「섬 여행」(95) — 던지면 여행 창이 떠 무인도로 간다. 사람처럼 자리를 옮긴다
+      if (bot.peek() !== 'gather-tool') { log(`  여기선 행동 키가 ${bot.peek()} — 자리 옮김`); await wander(); continue; }
       const before = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
       const got = await castAndWait();
       if (got) {
@@ -664,6 +666,78 @@ export function createSkills(bot) {
     bot.policy = {};
     const sent = (S().town.mail.sent?.() ?? []).slice(sent0);
     return { unread, opened: true, left: S().town.mail.unread?.()?.length ?? 0, sent: sent[0] ?? null, gift: L.gift };
+  };
+
+  // ---------- 잠수 (M16) ----------
+  const dive = () => S().gather.dive;
+  /** 스쿠버 키트를 가방에 둔 채 가까운 해변 물가 → 행동 키로 들어가기 → 생물 그림자 쪽으로 헤엄 → 잠수해 잡기 → 물가로 나오기.
+   *  → { entered, suit, caught: [id], left, tries } — 조이스틱(bot.stick)·행동 키로만, 상태는 읽기만 */
+  sk.dive = async ({ want = 1, timeout = 120 } = {}) => {
+    const D = dive();
+    const out = { entered: false, suit: false, caught: [], left: false, tries: 0, spot: null };
+    if (!D) { bot.issue('major', 'dive', '잠수(gather.dive)가 없어요'); return out; }
+    await bot.tool(null);
+    // 바다 쪽을 보고 설 수 있는 모래 칸 (가까운 순)
+    const I = isl(), p0 = bot.pos(), spots = [];
+    for (let tz = 0; tz < I.h; tz++) for (let tx = 0; tx < I.w; tx++) {
+      if (I.tileAt(tx, tz) !== 'sand') continue;
+      const c = I.toWorld(tx, tz);
+      if (!I.isWalkable(c.x, c.z)) continue;
+      for (const [dx, dz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) if (D.swimmable(c.x + dx * 2.2, c.z + dz * 2.2) && D.swimmable(c.x + dx * 3, c.z + dz * 3)) spots.push({ x: c.x, z: c.z, sea: { x: c.x + dx * 3, z: c.z + dz * 3 } });
+    }
+    spots.sort((a, b) => Math.hypot(a.x - p0.x, a.z - p0.z) - Math.hypot(b.x - p0.x, b.z - p0.z));
+    for (const s of spots.slice(0, 6)) {
+      if (!(await bot.walkTo(s, { near: 0.3, label: '해변 물가', quiet: true }))) continue;
+      await bot.face(s.sea);
+      if (bot.peek() === 'dive-enter') { out.spot = s; break; }
+    }
+    if (!out.spot) { bot.issue('major', 'dive', '물가에서 「바다에 들어가기」가 안 떠요', { peek: bot.peek() }); return out; }
+    bot.press('action');
+    out.entered = await bot.until(() => D.mode === 'swim', { timeout: 8, label: '헤엄' }).then(() => D.mode === 'swim');
+    if (!out.entered) { bot.issue('major', 'dive', '바다에 못 들어갔어요', { mode: D.mode }); return out; }
+    await bot.frames(20);
+    out.suit = !!D.swim?.wearing;
+    // 생물 잡기: 가까운 것(느린 것 먼저)으로 물 위를 헤엄쳐 가서 1칸 앞에서 잠수 → 잠긴 채 따라가기
+    const end = bot.gameT + timeout;
+    const toward = (t, run = false) => { const p = bot.pos(), dx = t.x - p.x, dz = t.z - p.z, d = Math.hypot(dx, dz) || 1; bot.stick(dx / d, dz / d, run); return d; };
+    while (out.caught.length < want && bot.gameT < end) {
+      const p = bot.pos();
+      const list = D.creatures.sort((a, b) => (a.speed - b.speed) * 3 + Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
+      const t = list[0];
+      if (!t) { bot.release(); await bot.frames(15); continue; }
+      out.tries++;
+      for (let k = 0; k < 400 && toward(t) > 1.1 && D.mode === 'swim'; k++) { await bot.frames(1); const now = D.creatures.find(c => c.id === t.id && Math.hypot(c.x - t.x, c.z - t.z) < 3); if (!now) break; Object.assign(t, now); }
+      bot.release();
+      if (D.mode !== 'swim') { await bot.frames(10); continue; }
+      const inv0 = bot.inv().map(s => s && `${s.id}:${s.count}`).join();
+      bot.press('action');   // 잠수
+      await bot.frames(4);
+      for (let k = 0; k < 200 && D.mode === 'diving'; k++) {
+        const now = D.creatures.find(c => c.id === t.id && Math.hypot(c.x - t.x, c.z - t.z) < 3);
+        if (now) { Object.assign(t, now); toward(t, t.speed >= 3); } else bot.release();
+        await bot.frames(1);
+      }
+      bot.release();
+      await bot.until(() => D.mode === 'swim' && !P().frozen, { timeout: 6, label: '떠오르기' });
+      if (inv0 !== bot.inv().map(s => s && `${s.id}:${s.count}`).join()) {
+        const got = bot.inv().find(s => s && cat(s.id) === 'sea' && !inv0.includes(`${s.id}:${s.count}`));
+        out.caught.push(got?.id ?? 'sea');
+      }
+    }
+    // 들어온 물가로 헤엄쳐 가서 나오기 — 먼저 들어온 자리 앞바다(sea)로, 거기서 물가를 똑바로 (비스듬히 가면 얕은 물 띠가 넓어 앞에 뭍이 안 잡힘)
+    const back = out.spot;
+    for (let k = 0; k < 600 && D.mode === 'swim' && toward(back.sea) > 0.4; k++) await bot.frames(1);
+    for (let k = 0; k < 600 && D.mode === 'swim'; k++) {
+      toward(back);
+      await bot.frames(1);
+      if (D.exitPoint()) break;
+    }
+    bot.release();
+    await bot.face(back);
+    if (D.exitPoint()) { bot.press('action'); await bot.until(() => D.mode === 'land', { timeout: 8, label: '나오기' }); }
+    out.left = D.mode === 'land';
+    if (!out.left) bot.issue('major', 'dive', '물에서 못 나왔어요', { mode: D.mode, pos: bot.pos() });
+    return out;
   };
 
   return sk;

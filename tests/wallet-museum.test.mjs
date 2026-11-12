@@ -67,7 +67,8 @@ test('박물관: progress', () => {
   assert.deepEqual(p.bug, [2, 24]);    // + P35 무인도 곤충 둘
   assert.deepEqual(p.fossil, [0, 8]);
   assert.deepEqual(p.art, [0, 16]);   // P54 미술품 진품 16 (가품은 안 받음)
-  assert.deepEqual(p.total, [2, 70]);
+  assert.deepEqual(p.sea, [0, 20]);    // M16 잠수 바다 생물
+  assert.deepEqual(p.total, [2, 90]);
   assert.equal(p.complete, false);
 });
 
@@ -78,4 +79,6 @@ test('도감: 잡은 것 기록', () => {
   assert.equal(m.record('fish.tuna'), false);
   assert.equal(m.record('fossil.amber'), false);
   assert.deepEqual(state.encyclopedia.fish, ['fish.tuna']);
+  assert.equal(m.record('sea.starfish'), true, 'M16 바다 생물도 도감에 적힌다');
+  assert.ok(m.canDonate('sea.starfish'));
 });

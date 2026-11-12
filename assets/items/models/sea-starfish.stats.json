@@ -1,0 +1,46 @@
+{
+  "id": "IC-SE-07",
+  "slug": "sea-starfish",
+  "name": "불가사리",
+  "group": "sea",
+  "kind": "starfish",
+  "version": "0.1",
+  "items": [
+    "sea.starfish"
+  ],
+  "hold": true,
+  "triangles": 4796,
+  "parts": 1,
+  "materials": [
+    "eye",
+    "eyeHighlight",
+    "star",
+    "starDot"
+  ],
+  "objects": [
+    "star"
+  ],
+  "size": [
+    0.293,
+    0.28,
+    0.056
+  ],
+  "bounds": [
+    [
+      -0.146,
+      -0.14,
+      -0.028
+    ],
+    [
+      0.146,
+      0.14,
+      0.028
+    ]
+  ],
+  "glbBytes": 93148,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "sea-starfish_main.png",
+    "sea-starfish_thumb.png"
+  ]
+}
