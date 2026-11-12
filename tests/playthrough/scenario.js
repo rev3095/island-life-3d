@@ -1048,7 +1048,11 @@ export function makeScenario(bot, sk, opts = {}) {
     // ② 새총: 가방에 없으면 도토리상점에서 (도구 진열) — 안 되면 쪽지로 연 레시피로
     const hasSling = () => !!S().data.inventory.hasTool?.('sling');
     if (!hasSling()) await sk.shop({ buy: ['tool.sling'] });
-    if (!hasSling() && D().recipes.known().includes('tool.sling')) await sk.craft('tool.sling');
+    if (!hasSling() && D().recipes.known().includes('tool.sling')) {   // 상점 진열 받침에 새총 자리가 아직 없으면 쪽지 레시피로 (나무 3 · 나뭇가지 4)
+      if (bot.has('mat.wood') < 3) await sk.wood(3);
+      for (const o of sk.objects('tree')) { if (bot.has('mat.branch') >= 4) break; await sk.shakeTree(o); }
+      await sk.craft('tool.sling');
+    }
     res.sling = hasSling();
     // ③ 선물 풍선: 오늘 계획에서 아직 안 한 것의 시각으로 → 풍선 밑으로 따라가 새총 Space
     if (res.sling) {
@@ -1061,10 +1065,14 @@ export function makeScenario(bot, sk, opts = {}) {
         if (seen) {
           await bot.tool('sling');
           let shots = 0;
-          for (let k = 0; k < 14 && !D().balloons.done().includes(e.i); k++) {
+          for (let k = 0; k < 40 && !D().balloons.done().includes(e.i); k++) {
             const b = D().balloons.list()[0];
             if (!b) break;
-            if (!D().balloons.canHit()) { await bot.walkTo({ x: b.x + (b.x > bot.pos().x ? 1.2 : -1.2), z: b.z + 0.8 }, { near: 0.9, timeout: 5, quiet: true, label: '풍선 밑' }); await bot.face(b); }
+            const under = { x: b.x + (b.x > bot.pos().x ? 1.2 : -1.2), z: b.z + 0.8 };
+            const land = S().world.island.isWalkable(under.x, under.z) && !S().world.island.isWater(under.x, under.z);
+            if (!D().balloons.canHit() && land) await bot.walkTo(under, { near: 0.9, timeout: 5, quiet: true, allowTeleport: false, label: '풍선 밑' });
+            else if (!D().balloons.canHit()) await bot.wait(1);   // 아직 바다 위 — 섬으로 올 때까지 기다린다
+            await bot.face(b);
             if (D().balloons.canHit() && bot.peek() === 'daily:sling') { bot.press('action'); shots++; await bot.wait(1.2); }
           }
           await bot.until(() => D().balloons.done().includes(e.i), { timeout: 8, label: '풍선 맞힘' });
@@ -1077,7 +1085,7 @@ export function makeScenario(bot, sk, opts = {}) {
     } else odd.push('새총을 못 구함');
     // ④ 유성우 밤: 이번 주·다음 주 유성우 날까지 넘기고 21시 밖에서 올려다보기(R 꾹) + Space
     let met = null;
-    for (let d = 0; d < 9 && !met; d++) {
+    for (let d = 0; d < 16 && !met; d++) {
       if (D().meteor.tonight()) { met = bot.day(); break; }
       await bot.nextDay(9);
     }
@@ -1106,11 +1114,13 @@ export function makeScenario(bot, sk, opts = {}) {
       for (const s of stars.slice(0, 3)) { await bot.walkTo({ x: s.x, z: s.z + 0.5 }, { near: 0.5, quiet: true, label: '별 조각' }); await sk.pickupAround(1.5); }
       res.starsGot = bot.has('mat.star-yellow') + bot.has('mat.star-pink') + bot.has('mat.star-blue') - before;
       if (res.wishes && !stars.length) odd.push('소원을 빌었는데 다음 날 별 조각이 없음');
-    } else odd.push('9일 안에 맑은 유성우 밤이 없음');
+    } else odd.push('16일 안에 맑은 유성우 밤이 없음');
     // ⑤ 행상: 수·일까지 넘기고 낮 11시 광장 수레 → 구경 → 하나 사기
     for (let d = 0; d < 7 && !D().peddler.today(); d++) await bot.nextDay(9);
     await bot.setHour(11);
     await bot.frames(30);
+    if (bot.acorns() < 2000) await sellSurplus();   // 행상 물건 값 (꽃 모종·묘목 640–1600) — 사람도 팔고 온다
+    res.acorns = bot.acorns();
     const ps = D().peddler.spot();
     res.peddler = !!ps;
     if (ps) {
@@ -1122,12 +1132,24 @@ export function makeScenario(bot, sk, opts = {}) {
       const w0 = bot.acorns();
       let menu = 0;
       bot.policy = {
-        dialog: texts => { const i = texts.findIndex(t => /구경/.test(t)); if (i >= 0) return i; if (texts.some(t => /🌰/.test(t))) { menu++; return menu === 1 ? 0 : texts.length - 1; } return texts.length - 1; },
+        dialog: texts => {
+          const i = texts.findIndex(t => /구경/.test(t));
+          if (i >= 0) return i;
+          if (texts.some(t => /🌰/.test(t))) {   // 살 수 있는 것 중 가장 싼 것 하나 → 다음엔 그만
+            menu++;
+            const price = t => Number((/🌰 ([\d,]+)/.exec(t)?.[1] ?? '0').replace(/,/g, ''));
+            const ok = texts.map((t, k) => [k, price(t)]).filter(([k, v]) => v > 0 && v <= bot.acorns() && !/가지고 있음/.test(texts[k])).sort((a, b) => a[1] - b[1]);
+            return menu === 1 && ok.length ? ok[0][0] : texts.length - 1;
+          }
+          return texts.length - 1;
+        },
         confirm: info => (/사기/.test(info.title) ? Math.max(0, info.buttons.findIndex(b => /살게요/.test(b))) : 0),
       };
       if (res.peddlerPeek === 'daily:peddler') { await bot.act('action', { timeout: 60 }); await bot.settle(20); }
       bot.policy = {};
       res.peddlerSpent = w0 - bot.acorns();
+      res.s24 = !!S().story?.seen?.('s24-peddler-first');
+      if (!res.s24 && S().story?.scene?.('s24-peddler-first')) odd.push('행상 첫 방문인데 장면 s24 가 안 나옴');
       await bot.shot('16-daily-peddler', '행상 송이 수레');
       if (res.peddlerPeek !== 'daily:peddler') odd.push(`행상 앞 행동 키가 ${res.peddlerPeek}`);
       else if (!res.peddlerSpent) odd.push('행상에게서 아무것도 못 삼');
