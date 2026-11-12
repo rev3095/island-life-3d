@@ -110,8 +110,10 @@ export function createCompanion(ctx, { town, lines, toast }) {
     for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
       const tx = t0.tx + dx, tz = t0.tz + dz;
       if (!nav.walkable(tx, tz) || (dx === 0 && dz === 0)) continue;
-      const c = isl.toWorld(tx, tz), d = Math.hypot(c.x - p.x, c.z - p.z);
-      if (d < 0.9 || d > 3.4 || d >= bestD) continue;
+      const c = isl.toWorld(tx, tz), raw = Math.hypot(c.x - p.x, c.z - p.z);
+      // 카메라는 남쪽(+z)에서 내려다본다 → 플레이어보다 남쪽 자리는 가림 투명으로 비쳐 보여서 옆·북쪽을 먼저
+      const d = raw + (c.z > p.z + 0.3 ? 2.5 : 0);
+      if (raw < 0.9 || raw > 3.4 || d >= bestD) continue;
       for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         if (isl.tileAt(tx + ax, tz + az) !== 'water') continue;
         const w = isl.toWorld(tx + ax, tz + az);
@@ -165,7 +167,8 @@ export function createCompanion(ctx, { town, lines, toast }) {
     }
     if (!a.path.length) { a.animateMove(0); return 'arrived'; }
     const run = pd > RUN_FAR;
-    const res = a.walk(dt, run ? V.person.pace.run : V.person.pace.walk * 1.15, (x, z, dx, dz) => town.avoid(V, x, z, dx, dz));
+    // 같이 걸을 땐 플레이어 앞에서 멈춰 기다리지 않는다 (따라가는 사람이 막혀 멈춰 버림) — 비켜 가기만
+    const res = a.walk(dt, run ? V.person.pace.run : V.person.pace.walk * 1.15, (x, z, dx, dz) => ({ ...town.avoid(V, x, z, dx, dz), wait: false }));
     a.animateMove(a.speed, run);
     if (res === 'stuck') { a.stuck = 0; a.path = []; C.goal = null; }
     return res;
@@ -202,7 +205,9 @@ export function createCompanion(ctx, { town, lines, toast }) {
       if (C.spot && Math.hypot(p.x - C.spot.x, p.z - C.spot.z) > 4.5) { C.phase = 'follow'; C.spot = null; castOff(); }
     }
     if (C.phase === 'toSpot') {
-      if (walkToward(dt, C.spot, pd) === 'arrived' || Math.hypot(a.position.x - C.spot.x, a.position.z - C.spot.z) < 0.25) { C.phase = 'fish'; a.path = []; cast(); }
+      C.toSpot = (C.toSpot ?? 0) + dt;
+      if (C.toSpot > 6) a.place(C.spot.x, C.spot.z, C.spot.face);   // 6초 넘게 못 가면 그 자리로
+      if (walkToward(dt, C.spot, pd) === 'arrived' || Math.hypot(a.position.x - C.spot.x, a.position.z - C.spot.z) < 0.3) { C.phase = 'fish'; C.toSpot = 0; a.path = []; cast(); }
       return;
     }
     if (C.phase === 'fish') {
@@ -327,7 +332,7 @@ export function createCompanion(ctx, { town, lines, toast }) {
   return {
     can, start, talk, refusal, finish,
     /** 지금 같이 노는 주민 slug · 종류 · 진행 */
-    get active() { return C ? { slug: C.V.slug, kind: C.kind, phase: C.phase, sec: C.sec, walked: C.walked, caught: C.caught.length, playerCaught: C.playerCaught } : null; },
+    get active() { return C ? { slug: C.V.slug, kind: C.kind, phase: C.phase, sec: C.sec, walked: C.walked, caught: C.caught.length, playerCaught: C.playerCaught, spot: C.spot } : null; },
     with: V => C?.V === V,
   };
 }

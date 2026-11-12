@@ -44,10 +44,10 @@ export function createAlbum(ctx, { toast = () => {} } = {}) {
       const src = r.domElement, { width: W, height: H, quality } = BOND.album;
       cv.width = W; cv.height = H;
       const g = cv.getContext('2d');
-      // 가운데를 16:10 으로 잘라 줄인다
-      const sw = src.width, sh = src.height, want = W / H;
-      let cw = sw, ch = sw / want;
-      if (ch > sh) { ch = sh; cw = sh * want; }
+      // 가운데(플레이어·주민 둘레)를 16:10 으로 잘라 줄인다 — 게임 카메라가 멀리서 내려다봐서 화면 전체면 사람이 너무 작다 (ZOOM)
+      const ZOOM = 0.6, sw = src.width, sh = src.height, want = W / H;
+      let cw = sw * ZOOM, ch = cw / want;
+      if (ch > sh * ZOOM) { ch = sh * ZOOM; cw = ch * want; }
       g.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, W, H);
       return cv.toDataURL('image/jpeg', quality);
     } catch (e) { console.warn('[album] 사진을 못 찍었어요', e); return null; }
@@ -57,7 +57,7 @@ export function createAlbum(ctx, { toast = () => {} } = {}) {
     style();
     const f = h('div', { class: 'pk-album-flash', 'aria-hidden': 'true' });
     document.body.append(f);
-    requestAnimationFrame(() => { f.style.opacity = '0'; setTimeout(() => f.remove(), 500); });
+    setTimeout(() => { f.style.opacity = '0'; setTimeout(() => f.remove(), 500); }, 30);   // rAF 는 탭이 숨으면 안 돌아 플래시가 남는다
   }
 
   /** 사진 한 장 남기기 → 기록 | null. meta = { kind, who: [slug], title, quiet } */

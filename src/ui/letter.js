@@ -63,11 +63,11 @@ export function openLetter(ctx, { people = [], max = 80, canGift = true, why = (
   }
   function drawGift() {
     const s = item(), it = s && data?.items?.get?.(s.id);
-    gift.replaceChildren(
+    gift.replaceChildren(...[
       it ? iconEl(it.icon ?? it.emoji) : h('span', { class: 'pk-icon', 'aria-hidden': 'true' }, '🎁'),
       h('span', null, it ? ui?.bag?.variants?.name?.(s, it.name) ?? it.name : '선물 없음'),
       button(it ? '바꾸기' : '선물 넣기', { cls: 'pk-btn-small', 'data-letter-gift': '', onclick: () => pickGift() }),
-      it && button('빼기', { cls: 'pk-btn-small', onclick: () => { slot = null; drawGift(); } }));
+      it && button('빼기', { cls: 'pk-btn-small', onclick: () => { slot = null; drawGift(); } })].filter(Boolean));
   }
   function draw() {
     count.textContent = `${text.value.length} / ${max}`;

@@ -373,7 +373,7 @@ export default {
       moving: { state: () => moving.state(), lots: () => moving.lots(), stage: slug => moving.stage(slug), asking: slug => moving.asking(slug), count: () => moving.count(),
         /** P35 무인도 투어: 이사 올 수 있는 주민 (순서) · 투어 섬에서 초대한 주민을 다음 이사 주민으로 */
         movers: () => [...MOVERS], invite: slug => { if (MOVERS.includes(slug)) moving.state().invited = slug; } },
-      debug: { nav, spots, town, keepers, chatter, party, movein, moving },
+      debug: { nav, spots, town, keepers, chatter, party, movein, moving, companion, song },
     };
     console.info(`[town] 주민 ${villagers.length}명 준비 ${Math.round(performance.now() - t0)}ms`);
   },

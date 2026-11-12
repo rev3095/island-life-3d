@@ -629,7 +629,8 @@ export function createSkills(bot) {
   };
 
   // ---------- 우편함 ----------
-  sk.mail = async () => {
+  // M15: 다 읽으면 「편지를 써서 보낼까?」 — write = { to: slug, gift: (item, slot) => bool | null } 이면 편지 쓰기 창(UI-26)에서 쓰고 보낸다, 없으면 그만두기
+  sk.mail = async ({ write = null } = {}) => {
     const ph = W().places.playerHouse;
     const unread = S().town.mail.unread?.()?.length ?? 0;
     // 우편함은 집 문 오른쪽(동쪽) 가까이
@@ -637,10 +638,32 @@ export function createSkills(bot) {
     const at = mb?.position ?? { x: ph.door.x + 1.4, z: ph.door.z };
     await bot.approach(at, { dist: 0.75, label: '우편함' });
     if (bot.peek() !== 'town:mail') return { unread, opened: false };
-    bot.policy = { dialog: () => 0 };
+    const sent0 = S().town.mail.sent?.()?.length ?? 0;
+    const L = { gift: write?.gift ? 'want' : 'none', phrase: false, chose: false };
+    bot.policy = {
+      dialog: texts => { const w = texts.indexOf('편지 쓰기'); return w < 0 ? 0 : write ? w : Math.max(0, texts.indexOf('그만두기')); },
+      bag: (mode, slots, title) => {
+        if (mode !== 'pick' || !/편지/.test(title)) return null;
+        const i = slots.findIndex(x => x && !x.variant && write?.gift?.(items().get(x.id), x));
+        L.gift = i >= 0 ? slots[i].id : 'none';
+        return i >= 0 ? i : null;
+      },
+      card: (kind, el, card) => {
+        if (!card?.classList.contains('pk-letter')) return false;
+        const who = card.querySelector(`[data-letter-to="${write?.to}"]`) ?? card.querySelector('[data-letter-to]:not([disabled])');
+        if (who && who.getAttribute('aria-pressed') !== 'true' && !L.chose) { L.chose = true; bot.click(who); return true; }
+        const text = card.querySelector('[data-letter-text]');
+        if (!L.phrase && !text.value.trim()) { L.phrase = true; bot.click(card.querySelector('[data-letter-phrase]')); return true; }
+        if (L.gift === 'want') { L.gift = 'asked'; bot.click(card.querySelector('[data-letter-gift]')); return true; }
+        bot.click(card.querySelector('[data-letter-send]'));
+        return true;
+      },
+    };
     await bot.act('action', { timeout: 60 });
+    await bot.settle(30);
     bot.policy = {};
-    return { unread, opened: true, left: S().town.mail.unread?.()?.length ?? 0 };
+    const sent = (S().town.mail.sent?.() ?? []).slice(sent0);
+    return { unread, opened: true, left: S().town.mail.unread?.()?.length ?? 0, sent: sent[0] ?? null, gift: L.gift };
   };
 
   return sk;

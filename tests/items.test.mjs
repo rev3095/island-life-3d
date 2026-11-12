@@ -7,7 +7,7 @@ test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화�
   assert.equal(items.list('bug').length, 24);    // + P35 보석풍뎅이 · 달빛나방
   assert.equal(items.list('fossil').length, 8);
   assert.equal(items.list('tool').length, 5);
-  assert.equal(items.list('furn').length, 50);   // + 5차 Z5 축제 단체 사진 (FU-34) + 8차 행사 보상 넷 (FU-43–46) + 9차 야외 가구 넷 (FU-47–50) + 10차 좋아하는 가구 셋 (FU-51–53) + 12차 밤·새벽 가구 다섯 (FU-55–59)
+  assert.equal(items.list('furn').length, 52);   // + M15 추억 액자 둘 (FU-71–72) + 5차 Z5 축제 단체 사진 (FU-34) + 8차 행사 보상 넷 (FU-43–46) + 9차 야외 가구 넷 (FU-47–50) + 10차 좋아하는 가구 셋 (FU-51–53) + 12차 밤·새벽 가구 다섯 (FU-55–59)
   assert.equal(items.list('night').length, 4);   // 12차 토요일 밤 야시장 먹거리 (IC-NT-01–04)
   assert.equal(items.list('festival').length, 4);   // 5차 Z5 축제 부스에서 만드는 것 (IC-FE-01–04)
   assert.equal(items.list('fruit').length, 8);   // + P35 망고 · 리치 (투어 섬에만)
