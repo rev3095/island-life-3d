@@ -50,15 +50,13 @@
       "item": "furn.round-rug",
       "gx": 2,
       "gz": 4,
-      "rot": 0,
-      "deco": true
+      "rot": 0
     },
     {
       "item": "furn.round-rug",
       "gx": 9,
       "gz": 4,
-      "rot": 0,
-      "deco": true
+      "rot": 0
     },
     {
       "item": "furn.plant-pot",
