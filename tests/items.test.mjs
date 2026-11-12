@@ -7,7 +7,7 @@ test('컨셉 보드 수량: 물고기 20 · 곤충 20(+4차 들추기 2) · 화�
   assert.equal(items.list('bug').length, 24);    // + P35 보석풍뎅이 · 달빛나방
   assert.equal(items.list('fossil').length, 8);
   assert.equal(items.list('tool').length, 6);   // + M13 새총 TO-07
-  assert.equal(items.list('furn').length, 58);   // + M13 별 조각 가구 FU-63–66 + P54 밤 특별 상점 가구 넷 (FU-73·75·76·78)
+  assert.equal(items.list('furn').length, 60);   // + M15 추억 액자 둘 (FU-71–72)   // + M13 별 조각 가구 FU-63–66 + P54 밤 특별 상점 가구 넷 (FU-73·75·76·78)
   assert.equal(items.list('art').length, 16);   // P54 미술품 진품 (가품 8 은 list 밖 — items.get 으로만)
   assert.equal(items.list('night').length, 4);   // 12차 토요일 밤 야시장 먹거리 (IC-NT-01–04)
   assert.equal(items.list('festival').length, 4);   // 5차 Z5 축제 부스에서 만드는 것 (IC-FE-01–04)

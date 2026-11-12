@@ -28,7 +28,7 @@ export const WEB_FILES = [
   'assets/interior/rooms/rm-01.json', 'assets/interior/rooms/rm-02.json', 'assets/interior/rooms/rm-03.json',
   'assets/interior/rooms/rm-04.json', 'assets/interior/rooms/rm-05.json', 'assets/interior/rooms/rm-06.json',
   'assets/interior/rooms/rm-07.json', 'assets/interior/rooms/rm-12.json', 'assets/interior/rooms/rm-13.json',
-  'assets/interior/rooms/rm-14.json',   // P44 이사 오는 주민 방: 구름 RM-12 · 파도 RM-13 · 달무리 RM-14 (RM-08–11 은 상점·박물관·달빛 가게·새벽 천막)
+  'assets/interior/rooms/rm-14.json', 'assets/interior/rooms/rm-15.json', 'assets/interior/rooms/rm-16.json', 'assets/interior/rooms/rm-17.json',   // M14 내 집 넓힌 1층 · 2층 · 다락   // P44 이사 오는 주민 방: 구름 RM-12 · 파도 RM-13 · 달무리 RM-14 (RM-08–11 은 상점·박물관·달빛 가게·새벽 천막)
 ];
 
 /** 팔레트 키 또는 #색 → #색 (모르면 null) */

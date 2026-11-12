@@ -1,0 +1,35 @@
+{
+  "id": "TI-13",
+  "slug": "bridge-built",
+  "name": "놓는 나무다리",
+  "category": "tile",
+  "kind": "built-bridge",
+  "version": "0.1",
+  "triangles": 2304,
+  "parts": 1,
+  "materials": [
+    "rope",
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "animations": {},
+  "size": [
+    3.02,
+    1.15,
+    0.7
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 41272,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "bridge-built_front.png",
+    "bridge-built_hero.jpg",
+    "bridge-built_main.png",
+    "bridge-built_thumb.png",
+    "bridge-built_top.png"
+  ]
+}

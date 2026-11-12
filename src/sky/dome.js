@@ -237,6 +237,7 @@ export function createDome({ quality = 'mid' } = {}) {
 
   return {
     group,
+    starPoints: stars,   // 요청 8: 별자리 별(stars.js)이 이 재질을 나눠 쓰고 자식으로 달린다
     get quality() { return q; },
     /** 하늘 모양 값 바꾸기 { haze, sunGlow, … } (SKY_FX 이름) — uniform 만 바꾼다. 돌려주는 값 = 지금 값 */
     setFx(v = {}) {

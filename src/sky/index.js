@@ -8,6 +8,7 @@ import { forecast, weatherAt, WEATHERS } from './weather.js';
 import { skyLook } from './look.js';
 import { indoorLook } from './indoor.js';
 import { createDome, SKY_FX } from './dome.js';
+import { createStarSky } from './stars.js';   // 요청 8: 계절 별자리 별 (dome 별 재질을 나눠 씀)
 import { createMeteors } from './meteors.js';   // M13 FX-02 별똥별 (유성우 밤에만 — daily 가 time.meteors.set)
 import { createClouds } from './clouds.js';
 import { createFlare, flareStrength } from './flare.js';
@@ -210,6 +211,7 @@ export function createSky(ctx) {
 
   // 장면 물체
   const dome = createDome({ quality: ctx.quality });   // 하늘 셰이더는 사양(render/quality.js)에 따라 구름 겹 수·빛살·은하수를 줄인다
+  const starSky = createStarSky(dome);
   const meteors = createMeteors({ quality: ctx.quality });
   dome.group.add(meteors.group);   // 실내에선 돔과 같이 숨는다
   service.meteors = { set: on => meteors.set(on), get on() { return meteors.on; } };
@@ -220,7 +222,7 @@ export function createSky(ctx) {
   const surfaces = createSurfaces(ctx.materials.curve);
   let debug = null;
 
-  function syncSeason(season) { try { ctx.services.world?.setSeason?.(season); } catch (e) { console.error('[sky] setSeason 실패', e); } }
+  function syncSeason(season) { try { ctx.services.world?.setSeason?.(season); } catch (e) { console.error('[sky] setSeason 실패', e); } starSky?.setSeason(season); }
 
   function emitAll(initial) {
     const n = now();

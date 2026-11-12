@@ -204,6 +204,9 @@
       "status": "approved",
       "wallpaper": "wp-08",
       "floor": "fl-05"
-    }
+    },
+    { "id": "RM-15", "slug": "rm-15", "owner": "player", "name": "넓힌 1층", "version": 1, "status": "review", "wallpaper": null, "floor": null },
+    { "id": "RM-16", "slug": "rm-16", "owner": "player", "name": "2층 방", "version": 1, "status": "review", "wallpaper": "wp-01", "floor": "fl-01" },
+    { "id": "RM-17", "slug": "rm-17", "owner": "player", "name": "다락방", "version": 1, "status": "review", "wallpaper": "wp-01", "floor": "fl-01" }
   ]
 }

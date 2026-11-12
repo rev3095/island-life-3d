@@ -14,6 +14,7 @@ import { createState } from '../src/core/state.js';
 import { createSave } from '../src/data/save.js';
 import { fakeStorage } from './helpers.mjs';
 import { planWeb } from '../tools/build-web.mjs';
+import { HALL_FILES, hallPlan } from '../src/gameplay/house/museum-hall-data.js';   // 요청 9: 박물관 전시는 로비가 아니라 관 여섯
 
 const ROOT = new URL('../', import.meta.url);
 const json = p => JSON.parse(readFileSync(new URL(p, ROOT), 'utf8'));
@@ -63,26 +64,25 @@ test('실내 배치 검사기가 틀린 배치를 잡는다', () => {
   assert.ok(checkPlace(walled, furn).some(e => e.includes('걸어갈 수 없어요')));
 });
 
-test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은 자리, 케이스·받침 안, 겹치지 않음', () => {
-  const lists = Object.fromEntries(MUSEUM_CATS.map(c => [c, items.list(c).map(it => it.id)]));
+test('박물관 전시: 물고기 22 · 곤충 24 · 화석 8 자리, 늘 같은 자리, 겹치지 않음 (요청 9: 로비 RM-09 → 관 RM-25–27)', () => {
+  const lists = Object.fromEntries(MUSEUM_CATS.map(c => [c, items.list(c).map(it => ({ id: it.id }))]));
   assert.equal(lists.fish.length, 22);   // + P35 무인도 물고기 둘
   assert.equal(lists.bug.length, 24);    // + P35 무인도 곤충 둘
-  assert.equal(lists.fossil.length, specs.museum.fossils.length, '화석 받침 = 화석 종류 수 (알 수 없는 화석 빼고)');
+  assert.equal(lists.fossil.length, 8);
+  assert.equal(exhibitPlan(specs.museum, Object.fromEntries(MUSEUM_CATS.map(c => [c, lists[c].map(x => x.id)])), () => false).length, 0, '로비에는 전시 자리가 없다 (관으로 옮김)');
+  const halls = HALL_FILES.map(f => json(f)).filter(h => MUSEUM_CATS.includes(h.hall));
   const given = new Set(['fish.carp', 'bug.ladybug', 'fossil.ammonite']);
-  const plan = exhibitPlan(specs.museum, lists, id => given.has(id));
-  assert.equal(plan.length, 54);
-  assert.deepEqual(plan.filter(e => e.donated).map(e => e.id).sort(), [...given].sort());
-  // 기증 여부와 상관없이 자리는 같다
-  const again = exhibitPlan(specs.museum, lists, () => true);
-  assert.deepEqual(again.map(e => [e.id, e.lx, e.lz, e.y]), plan.map(e => [e.id, e.lx, e.lz, e.y]));
-  const keys = new Set(plan.map(e => `${e.lx.toFixed(2)},${e.lz.toFixed(2)},${e.y}`));
-  assert.equal(keys.size, plan.length, '두 전시가 한 자리에 겹치지 않는다');
-  for (const e of plan) {
-    if (e.cat === 'fossil') continue;
-    const c = specs.museum.cases.find(x => x.cat === e.cat);
-    assert.ok(e.lx > c.lx0 && e.lx < c.lx1 && e.lz > c.lz0 && e.lz < c.lz1, `${e.id} 가 케이스 안`);
-    assert.ok(e.y > 0.1 && e.y < c.h, `${e.id} 높이`);
+  let total = 0;
+  for (const h of halls) {
+    const plan = hallPlan(h, lists, id => given.has(id));
+    total += plan.length;
+    const again = hallPlan(h, lists, () => true);
+    assert.deepEqual(again.map(e => [e.id, e.lx, e.lz, e.y]), plan.map(e => [e.id, e.lx, e.lz, e.y]), `${h.hall} 기증 여부와 상관없이 자리는 같다`);
+    const keys = new Set(plan.map(e => `${e.lx.toFixed(2)},${e.lz.toFixed(2)},${e.y}`));
+    assert.equal(keys.size, plan.length, `${h.hall} 두 전시가 한 자리에 겹치지 않는다`);
+    for (const e of plan) assert.ok(e.lx > 0 && e.lx < h.size[0] && e.lz > 0 && e.lz < h.size[1] - 1 && e.y >= 0 && e.y < 2, `${e.id} 가 관 안`);
   }
+  assert.equal(total, 54);
   // 케이스 자리 계산: 한 자리면 가운데
   const one = caseSlots({ lx0: 0, lz0: 0, lx1: 2, lz1: 2, levels: [0.5] }, 1)[0];
   assert.deepEqual([one.lx, one.lz, one.y], [1, 1, 0.5]);
@@ -231,7 +231,7 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
   const dir = `${FIXTURE_BASE}/specs/`;
   const fspecs = readdirSync(new URL(dir, ROOT)).map(f => json(dir + f));
   assert.deepEqual(fixtures.models.map(m => m.slug).sort(), fspecs.map(s => s.slug).sort(), '목록 = 스펙 (node tools/build-furniture.mjs --fixtures --index)');
-  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-74', 'FU-77', ...Array.from({ length: 6 }, (_, i) => `FU-${79 + i}`)]);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 · 실내 전수 상점 낮/밤 FU-79–84
+  assert.deepEqual(fixtures.models.map(m => m.id).sort(), [...Array.from({ length: 8 }, (_, i) => `FU-${35 + i}`), 'FU-54', 'FU-60', 'FU-61', 'FU-62', 'FU-67', 'FU-68', 'FU-69', 'FU-70', 'FU-74', 'FU-77', ...Array.from({ length: 6 }, (_, i) => `FU-${79 + i}`), 'FU-85', 'FU-86', 'FU-87', 'FU-88']);   // + P54 미술품 받침 FU-74 · 운세 탁자 FU-77 + 요청 9 박물관 관 + 실내 전수 상점 낮/밤 FU-79–84
   const furnIds = new Set(furnOnly.models.map(m => m.id)), itemIds = new Set(items.list().map(it => it.id));
   for (const m of fixtures.models) {
     const sp = fspecs.find(x => x.slug === m.slug);
@@ -259,10 +259,10 @@ test('붙박이 FU-35–42 + 옷 진열대 FU-54 (11차) + 새벽 천막 FU-60�
       used++;
     }
   }
-  assert.equal(used, 1 + 1 + 2 + 2 + 2 + 1 + 8 + 2 + 3 + 8 + 5 + 4 + 4 + 5 + 4, '상점 1층 계산대·옷 진열대(11차)·실내 문 둘 + 낮 진열 받침 둘 + 밤 덮개 천 둘 · 박물관 안내대·화석 받침 여덟·케이스 둘 · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스·여우 상인·이상한 천막 (5 + 4 + 4) · 실내 전수 정원 코너 도구 받침·씨앗 진열대 둘·받침·화분 선반 · 지하 밤 코너 등불 진열장·받침·도구 받침·무인 계산함');
+  assert.equal(used, 1 + 1 + 2 + 2 + 2 + 1 + 3 + 8 + 5 + 4 + 4 + 5 + 4, '상점 1층 계산대·옷 진열대(11차)·실내 문 둘 + 낮 진열 받침 둘 + 밤 덮개 천 둘 · 박물관 로비 안내대 (요청 9: 화석 받침·케이스는 관 RM-25–30 으로) · M12 달빛 가게 계산대·받침 둘 · 천막 타로 탁자·받침·촛대 둘·휘장 넷 (P44) · P54 운세 부스·여우 상인·이상한 천막 (5 + 4 + 4) · 실내 전수 정원 코너 도구 받침·씨앗 진열대 둘·받침·화분 선반 · 지하 밤 코너 등불 진열장·받침·도구 받침·무인 계산함');
   // 계산대·안내대·받침 윗면 높이가 게임이 물건을 올리는 높이와 맞는다 (진열 0.18 · 도구 0.12 · 씨앗 0.6 · 화석 0.55)
   const top = slug => json(`${FIXTURE_BASE}/models/${slug}.stats.json`);
-  assert.ok(Math.abs(top('fossil-pedestal').size[2] - specs.museum.fossilY) < 0.02, '화석 받침 윗면 = fossilY');
+  assert.ok(Math.abs(top('fossil-pedestal').size[2] - json('assets/interior/halls/fossil.json').racks[0].spots[0][2]) < 0.02, '화석 받침 윗면 = 화석관 받침 자리 높이 (요청 9)');
   for (const k of ['shop-garden', 'shop-night']) for (const row of specs[k].stock) if (/tools|always/.test(row.group) && row.lx > 7) assert.ok(row.y >= 0.1 && row.y <= 0.14, `${k} 도구 받침 윗면`);
   assert.equal(specs['shop-night'].stock.find(row => row.group === 'night-snacks').y, 0.78, '등불 진열장 윗면 0.78 (등불은 뒤쪽 위)');
 });
@@ -271,7 +271,7 @@ test('방 셋 확정: 단풍 방 RM-07 · 상점 RM-08 · 박물관 RM-09 status
   const index = json('assets/interior/index.json');
   assert.equal(index.rooms.find(r => r.id === 'RM-07').status, 'approved');
   assert.equal(json('assets/interior/rooms/rm-07.json').status, 'approved');
-  assert.equal(specs.museum.status, 'approved');
+  assert.ok(['review', 'approved'].includes(specs.museum.status), 'museum: 요청 9 로비 RM-09 v3 은 다시 검수 대기');
   for (const k of ['shop', 'shop-garden', 'shop-night']) assert.ok(['review', 'approved'].includes(specs[k].status), `${k}: 실내 전수 낮/밤 매장 (v6 · RM-21 · RM-22) 검수 대기`);
   for (const k of ['moonshop', 'tent']) assert.ok(['review', 'approved'].includes(specs[k].status), `${k}: M12 새 방은 검수 대기`);
 });

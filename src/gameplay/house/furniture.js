@@ -82,6 +82,7 @@ export function createFurnitureKit(ctx, { base: dir = BASE } = {}) {
       toon.setColor(holdKey, id ? holdColor(THREE, id, holdKey) : (sp.variants?.[variant]?.palette?.[holdKey] ?? base[holdKey]));
     }
     if (variant) setVariant(variant);
+    ctx.services?.album?.dress?.(m.slug, model, variant);   // M15 추억 액자 FU-71–72: 액자 속 'photo' 재질에 앨범 사진
     return {
       root, info: m, spec: sp,
       setVariant, setHolds,

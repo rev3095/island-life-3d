@@ -1,0 +1,52 @@
+{
+  "id": "FU-88",
+  "slug": "star-projector",
+  "item": "fixture.star-projector",
+  "name": "천체 투영기",
+  "category": "fixture",
+  "kind": "star-projector",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 3460,
+  "parts": 2,
+  "materials": [
+    "brass",
+    "glow",
+    "metal",
+    "projector"
+  ],
+  "objects": [
+    "base",
+    "globes"
+  ],
+  "animations": {},
+  "size": [
+    1.56,
+    1.56,
+    1.35
+  ],
+  "bounds": [
+    [
+      -0.78,
+      -0.78,
+      0.0
+    ],
+    [
+      0.78,
+      0.78,
+      1.35
+    ]
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "glbBytes": 68880,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-projector_front.png",
+    "star-projector_main.png",
+    "star-projector_thumb.png",
+    "star-projector_top.png"
+  ]
+}

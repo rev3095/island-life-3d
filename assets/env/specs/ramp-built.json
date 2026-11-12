@@ -1,0 +1,71 @@
+{
+  "id": "TI-14",
+  "slug": "ramp-built",
+  "name": "놓는 경사로",
+  "category": "tile",
+  "kind": "built-ramp",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 꾸미기로 남쪽 절벽 앞 아래칸 둘에 놓는 흙 비탈. 나무 디딤판으로 언덕에 오른다.",
+    "keywords": [
+      "흙 비탈",
+      "나무 디딤판",
+      "말뚝"
+    ],
+    "references": [],
+    "avoid": [
+      "돌계단"
+    ],
+    "notes": "M14 경사로 놓기 (결정 D153). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "grass"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이 (1단 기준)",
+      "value": 1,
+      "min": 0.6,
+      "max": 2,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "path": "#D8B98A",
+    "dirt": "#9A7650",
+    "wood": "#B98957",
+    "grass": "#7FBF5E"
+  },
+  "paletteLabels": {
+    "path": "비탈면",
+    "dirt": "옆면",
+    "wood": "디딤판·말뚝",
+    "grass": "풀"
+  },
+  "footprint": [
+    1,
+    2
+  ],
+  "animations": [],
+  "world": {
+    "extent": [
+      0.5,
+      1
+    ],
+    "ground": "path"
+  }
+}

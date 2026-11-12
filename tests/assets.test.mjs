@@ -20,8 +20,8 @@ const gltfOf = p => {
 
 const SETS = [
   { name: '캐릭터', index: 'assets/models/index.json', models: 'assets/models', specs: 'assets/specs', renders: 'assets/renders', count: 17 },   // + P54 여우 상인 살랑 CH-17 + M13 행상 송이 CH-16   // + 10차 새 주민 CH-11–13 + 12차 별밤(박쥐)·여명(나방) CH-14–15
-  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 83 },   // + P54 BD-13–15 ·   // + M13 선물 풍선 PR-33 · 유리병 PR-34 · 행상 수레 BD-11   // + P35 무인도 투어 BD-10 여행 배 · EN-13 광석 바위   // + 12차 달빛 가게 BD-08 · 새벽 천막 BD-09 · 등불 줄 PR-30 · 「자는 중」 쪽지 PR-32 + 9차 길 TI-09–12 · 울타리 PR-24–25 · 행사 소품 PR-26–29   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18 · 가을 PR-19·PR-20 · 겨울 PR-21·PR-22,
-  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 58 },   // + P54 FU-73·75·76·78 ·   // + M13 별 조각 가구 FU-63–66   // + 12차 밤·새벽 가구 FU-55–59 + 10차 좋아하는 가구 FU-51–53   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
+  { name: '배경', index: 'assets/env/index.json', models: 'assets/env/models', specs: 'assets/env/specs', renders: 'assets/env/renders', count: 89 },   // + M14 커진 내 집 BD-12 ×3 · 놓는 다리 TI-13 · 놓는 경사로 TI-14   // + 요청 8 망원경대 PR-40   // + P54 BD-13–15 ·   // + M13 선물 풍선 PR-33 · 유리병 PR-34 · 행상 수레 BD-11   // + P35 무인도 투어 BD-10 여행 배 · EN-13 광석 바위   // + 12차 달빛 가게 BD-08 · 새벽 천막 BD-09 · 등불 줄 PR-30 · 「자는 중」 쪽지 PR-32 + 9차 길 TI-09–12 · 울타리 PR-24–25 · 행사 소품 PR-26–29   // + 8차 봄 꽃놀이 EN-12·PR-17·PR-23 · 여름 PR-18 · 가을 PR-19·PR-20 · 겨울 PR-21·PR-22,
+  { name: '가구', index: 'assets/furniture/index.json', models: 'assets/furniture/models', specs: 'assets/furniture/specs', renders: 'assets/furniture/renders', count: 60 },   // + M15 추억 액자 FU-71–72   // + P54 FU-73·75·76·78 ·   // + M13 별 조각 가구 FU-63–66   // + 12차 밤·새벽 가구 FU-55–59 + 10차 좋아하는 가구 FU-51–53   // + 9차 야외 가구 FU-47–50   // + 8차 행사 보상 FU-43–46,
 ];
 for (const s of SETS) {
   s.list = json(s.index).models;

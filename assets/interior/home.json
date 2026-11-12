@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "about": "M14 집 증축 (결정 D150-A): 단계마다 도토리 빚으로 짓고, 다음 날 아침에 다 지어진다. 빚을 다 갚아야 다음 단계. 우편함(내 집 앞)에서 묻고 갚는다. 방 배치는 rooms/rm-15–17.json, 집 겉모양은 env house-grown-1–3 (BD-12).",
+  "stages": [
+    {
+      "stage": 0,
+      "name": "처음 집"
+    },
+    {
+      "stage": 1,
+      "name": "방 넓히기",
+      "cost": 20000,
+      "exterior": "house-grown-1",
+      "room": "rm-15",
+      "note": "1층을 10×10 칸으로"
+    },
+    {
+      "stage": 2,
+      "name": "2층 올리기",
+      "cost": 50000,
+      "exterior": "house-grown-2",
+      "room": "rm-16",
+      "note": "계단으로 오르는 2층 방"
+    },
+    {
+      "stage": 3,
+      "name": "다락 올리기",
+      "cost": 100000,
+      "exterior": "house-grown-3",
+      "room": "rm-17",
+      "note": "지붕 밑 다락방"
+    }
+  ],
+  "repay": [
+    1000,
+    10000
+  ],
+  "afterIntro": true
+}

@@ -1,0 +1,50 @@
+{
+  "id": "FU-68",
+  "slug": "attic-stairs",
+  "item": "fixture.attic-stairs",
+  "name": "다락 계단",
+  "category": "fixture",
+  "kind": "attic-stairs",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1244,
+  "parts": 1,
+  "materials": [
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "stairs"
+  ],
+  "animations": {},
+  "size": [
+    0.91,
+    2.04,
+    2.32
+  ],
+  "bounds": [
+    [
+      -0.455,
+      -1.022,
+      0.002
+    ],
+    [
+      0.455,
+      1.022,
+      2.323
+    ]
+  ],
+  "footprint": [
+    1,
+    2
+  ],
+  "glbBytes": 25676,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "attic-stairs_front.png",
+    "attic-stairs_main.png",
+    "attic-stairs_thumb.png",
+    "attic-stairs_top.png"
+  ]
+}

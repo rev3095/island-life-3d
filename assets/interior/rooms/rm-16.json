@@ -1,0 +1,62 @@
+{
+  "id": "RM-16",
+  "slug": "rm-16",
+  "kind": "room",
+  "owner": "player",
+  "ownerName": "나",
+  "name": "2층 방",
+  "version": 1,
+  "status": "review",
+  "floorIndex": 1,
+  "note": "M14 집 증축 2단계 「2층 올리기」. 동쪽 벽 계단 구멍·난간 FU-69 로 1층에 내려간다 (북서쪽이 열림). 3단계부터 서쪽 벽에 다락 계단 FU-68.",
+  "wallpaper": "wp-01",
+  "floor": "fl-01",
+  "size": [
+    8,
+    8
+  ],
+  "origin": {
+    "x": 500,
+    "z": 40
+  },
+  "windows": [
+    "n:2",
+    "n:4"
+  ],
+  "door": null,
+  "fixtures": [
+    {
+      "slug": "stair-rail",
+      "fu": "FU-69",
+      "gx": 6,
+      "gz": 0,
+      "w": 2,
+      "d": 3,
+      "kind": "down",
+      "to": 0,
+      "open": "w"
+    },
+    {
+      "slug": "attic-stairs",
+      "fu": "FU-68",
+      "gx": 0,
+      "gz": 0,
+      "w": 1,
+      "d": 2,
+      "kind": "up",
+      "to": 2,
+      "rail": "e",
+      "top": 1.6,
+      "from": 3
+    }
+  ],
+  "starter": [
+    {
+      "item": "furn.floor-lamp",
+      "gx": 0,
+      "gz": 7,
+      "rot": 0
+    }
+  ],
+  "furniture": []
+}

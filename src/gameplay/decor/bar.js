@@ -51,7 +51,7 @@ export function createDecorBar(ctx, api) {
     const cur = D.pick && key(D.pick);
     const left = items.find(c => key(c) === cur)?.count ?? 0;
     head.replaceChildren(h('span', { 'aria-hidden': 'true' }, '🪴'), h('span', null, '섬 꾸미기'),
-      h('small', null, moving ? `${moving.pick.name} 옮기는 중` : edit ? '앞·누른 칸의 것 고치기' : D.pick ? `${D.pick.name}${D.pick.group === 'furn' ? ` · 남은 ${left}` : ' · 거저'}` : '놓을 것을 골라요'));
+      h('small', null, moving ? `${moving.pick.name} 옮기는 중` : edit ? '앞·누른 칸의 것 고치기' : D.pick ? `${D.pick.name}${D.pick.group === 'furn' ? ` · 남은 ${left}` : D.pick.group === 'build' ? ` · 🌰 ${(D.pick.cost ?? 0).toLocaleString('ko-KR')}` : ' · 거저'}` : '놓을 것을 골라요'));
     const kids = [];
     let lastGroup = null;
     for (const c of items) {

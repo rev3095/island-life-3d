@@ -1,0 +1,68 @@
+{
+  "id": "FU-71",
+  "slug": "album-frame",
+  "item": "furn.album-frame",
+  "name": "추억 액자",
+  "category": "furniture",
+  "kind": "album-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "작은 협탁 위 가로 사진 액자. 모서리 사진 꽂이에 끼운 추억 사진 한 장 — 섬폰 앨범에서 고른 사진이 들어간다.",
+    "keywords": [
+      "사진 액자",
+      "협탁",
+      "모서리 꽂이"
+    ],
+    "references": [],
+    "avoid": [
+      "실제 사람 사진"
+    ],
+    "notes": "M15 「주민과 더 가깝게」 추억 앨범 (13차 보드 로드맵 M15) — 'photo' 칸에 게임이 앨범 사진을 입힌다 (ui/album.js dress)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "mat",
+      "corner",
+      "photo"
+    ],
+    "flat": [
+      "photo"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#F7F1E4",
+    "mat": "#FFFDF6",
+    "corner": "#C98F6B",
+    "photo": "#CFE3EA",
+    "wood": "#C99B68",
+    "woodDark": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "사진틀",
+    "mat": "사진 바탕",
+    "corner": "모서리 꽂이",
+    "photo": "사진 (게임에서 앨범 사진)",
+    "wood": "협탁 상판",
+    "woodDark": "협탁 다리"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

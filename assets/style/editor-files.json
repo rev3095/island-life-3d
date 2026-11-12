@@ -26,6 +26,7 @@
     "src/sky/look.js",
     "src/sky/precip.js",
     "src/sky/seasons.js",
+    "src/sky/starmap.js", "src/sky/stars.js",
     "src/sky/surfaces.js",
     "src/sky/weather.js",
     "assets/style/presets.json",
