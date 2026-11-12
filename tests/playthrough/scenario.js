@@ -134,12 +134,13 @@ export function makeScenario(bot, sk, opts = {}) {
    * 부서진 도구 다시 사기 (도구는 내구도가 있어 다 쓰면 칸이 빈다 — 사람은 상점에서 새로 산다). 낮 매장(8–22시)만. → 산 도구 id[]
    * M17-P5: 살랑 미술품 돈을 모으다 낚싯대가 부서져 「낚싯대가 없어 낚시를 못 해요」 37번 · 번 돈 0 → 축제 부품 모으기에서 「도끼가 없어요」까지 이어졌다.
    */
-  async function ensureTools(tools = ['rod', 'net', 'axe', 'shovel']) {
+  async function ensureTools(tools = ['rod', 'net', 'axe', 'shovel'], { earn = true } = {}) {
     const inv = S().data.inventory, h = S().time.now().hour;
     const need = tools.filter(t => !inv.hasTool?.(t)).map(t => `tool.${t}`);
     if (!need.length || h < 8 || h >= 22) return [];
     const cost = need.reduce((n, id) => n + (S().data.items.get(id)?.buy ?? 0), 0);
     if (bot.acorns() < cost) await sellSurplus({ spare: true });
+    if (bot.acorns() < cost && earn) await earnUntil(cost, { maxRounds: 4, untilHour: 21 });   // 살랑 그림을 사고 🌰80 남은 다음 날처럼
     if (bot.acorns() < cost) return [];
     await sk.shop({ buy: need });
     return need.filter(id => inv.hasTool?.(id.slice(5)));
@@ -153,7 +154,7 @@ export function makeScenario(bot, sk, opts = {}) {
     const money = { acorns0: bot.acorns(), rounds: 0, earned: 0, tools: [] };
     for (let k = 0; k < maxRounds && bot.acorns() < target && hour() >= 5 && hour() < untilHour; k++) {
       money.rounds++;
-      money.tools.push(...(await ensureTools(['rod', 'net'])));   // 낚싯대는 30번 쓰면 부서진다 — 사람은 다시 산다
+      money.tools.push(...(await ensureTools(['rod', 'net'], { earn: false })));   // 낚싯대는 30번 쓰면 부서진다 — 사람은 다시 산다
       await sk.fish({ tries: 3 });
       if (hour() >= 19 || hour() < 5) await sk.bug({ tries: 2 });
       else {
@@ -1677,6 +1678,10 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.setHour(10);
     await bot.tool(null);
     const done = [], miss = [];
+    // 엔딩 뒤엔 우편함 선물 편지로 가방이 꽉 찬다 → 「가방이 꽉 차서 꺼내지 못했다」 뒤 편지 쓰기를 못 함 (M17-P5) — 먼저 팔아 칸을 비운다
+    if (bot.free() < 4) await sellSurplus();
+    // 그래도 차 있으면 주민 편지로 받은 가구(액자·라디오 …)도 판다 — 사진·추억 액자·축제 사진은 남긴다
+    if (bot.free() < 2) await sk.shop({ sell: (it, s) => (it?.category === 'furn' && !s.variant && !/album|festival-photo/.test(it.id) ? s.count : 0) });
     // ① 편지: 가장 친한 주민에게 과일·꽃·조개 하나 넣어서
     const met = residents().filter(s => T.state(s).met).sort((a, b) => T.state(b).friendship - T.state(a).friendship);
     const to = met[0];
