@@ -538,6 +538,33 @@
       "status": "approved"
     },
     {
+      "id": "BD-12-1",
+      "slug": "house-grown-1",
+      "name": "넓힌 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-12-2",
+      "slug": "house-grown-2",
+      "name": "2층 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-12-3",
+      "slug": "house-grown-3",
+      "name": "다락 내 집",
+      "category": "building",
+      "kind": "house-grown",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FB-01",
       "slug": "festival-booth-lantern",
       "name": "등불 길 부스",
@@ -689,6 +716,24 @@
       "kind": "path-flower",
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "TI-13",
+      "slug": "bridge-built",
+      "name": "놓는 나무다리",
+      "category": "tile",
+      "kind": "built-bridge",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "TI-14",
+      "slug": "ramp-built",
+      "name": "놓는 경사로",
+      "category": "tile",
+      "kind": "built-ramp",
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

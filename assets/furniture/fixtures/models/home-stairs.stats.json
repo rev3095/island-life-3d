@@ -1,0 +1,50 @@
+{
+  "id": "FU-67",
+  "slug": "home-stairs",
+  "item": "fixture.home-stairs",
+  "name": "나무 계단",
+  "category": "fixture",
+  "kind": "home-stairs",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1872,
+  "parts": 1,
+  "materials": [
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "stairs"
+  ],
+  "animations": {},
+  "size": [
+    1.89,
+    3.06,
+    2.48
+  ],
+  "bounds": [
+    [
+      -0.96,
+      -1.55,
+      0.0
+    ],
+    [
+      0.93,
+      1.51,
+      2.48
+    ]
+  ],
+  "footprint": [
+    2,
+    3
+  ],
+  "glbBytes": 32508,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "home-stairs_front.png",
+    "home-stairs_main.png",
+    "home-stairs_thumb.png",
+    "home-stairs_top.png"
+  ]
+}

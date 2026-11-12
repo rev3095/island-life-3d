@@ -1,0 +1,83 @@
+{
+  "id": "BD-12-2",
+  "slug": "house-grown-2",
+  "name": "2층 내 집",
+  "category": "building",
+  "kind": "house-grown",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "M14 집 증축 2단계: 2층을 올린 집 — 위 줄 창 둘·꽃 상자. BD-01 과 같은 집터 3×3 · 같은 문 자리.",
+    "keywords": [
+      "박공지붕",
+      "덧붙인 방",
+      "2층 창"
+    ],
+    "references": [
+      "그림책 속 작은 집이 조금씩 커지는 모습"
+    ],
+    "avoid": [
+      "너무 큰 저택"
+    ],
+    "notes": "M14 집과 섬이 자란다 (결정 D150). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.02
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "stage": {
+      "label": "증축 단계",
+      "value": 2,
+      "min": 1,
+      "max": 3,
+      "step": 1
+    }
+  },
+  "palette": {
+    "foundation": "#B8B2A6",
+    "wall": "#F7F1E4",
+    "roof": "#5DB7A8",
+    "door": "#9A6B45",
+    "trim": "#8C6440",
+    "window": "#CDEBF5",
+    "flower": "#F28FA6",
+    "leaf": "#7CB66A"
+  },
+  "paletteLabels": {
+    "foundation": "기초·굴뚝",
+    "wall": "벽",
+    "roof": "지붕",
+    "door": "문",
+    "trim": "창틀·손잡이",
+    "window": "유리",
+    "flower": "꽃 상자 꽃",
+    "leaf": "화분 잎"
+  },
+  "animations": [],
+  "world": {
+    "lot": [
+      3,
+      3
+    ],
+    "collider": {
+      "boxes": [
+        [
+          -1.5,
+          -1.2,
+          1.5,
+          1.14
+        ]
+      ]
+    }
+  }
+}

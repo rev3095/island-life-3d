@@ -740,8 +740,8 @@ export function createIslandApi(gen) {
 
   const deckHeight = (x, z) => {
     for (const b of bridges) {
-      const u = x - b.x, v = z - b.z;
-      if (Math.abs(u) <= 1.55 && Math.abs(v) <= 0.72) return Math.max(0.1, 0.38 - 0.11 * u * u);
+      const u = b.rot ? z - b.z : x - b.x, v = b.rot ? x - b.x : z - b.z;   // M14 놓는 다리: rot 1 = 남북, y = 강 높이 (world/built.js)
+      if (Math.abs(u) <= 1.55 && Math.abs(v) <= 0.72) return (b.y ?? 0) + Math.max(0.1, 0.38 - 0.11 * u * u);
     }
     if (dock && Math.abs(x - dock.x) <= 1.0 && z >= dock.z - 0.1 && z <= dock.z + 4.1) return 0.385;
     for (const p of pads) {
@@ -783,7 +783,7 @@ export function createIslandApi(gen) {
       if (deckHeight(x, z) != null) {
         const { tx, tz } = toTile(x, z);
         const f = inside(tx, tz) ? F[idx(tx, tz)] : 0;
-        if (f || bridges.some(b => Math.abs(x - b.x) <= 1.55 && Math.abs(z - b.z) <= 0.72)) return 'wood';
+        if (f || bridges.some(b => Math.abs((b.rot ? z - b.z : x - b.x)) <= 1.55 && Math.abs((b.rot ? x - b.x : z - b.z)) <= 0.72)) return 'wood';
       }
       return api.tileAt(...Object.values(toTile(x, z)));
     },

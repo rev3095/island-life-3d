@@ -45,7 +45,7 @@ const seasonPacks = [...new Set(SEASON_FILES.values())].map(slug => ({ name: `se
 // 야외 가구는 집 가구와 같은 모델이라 furniture 묶음 그대로
 export const DECOR_FILES = (() => {
   const cfg = JSON.parse(readFileSync(join(ROOT, 'assets/decor/decor.json'), 'utf8'));
-  return new Set([...(cfg.paths ?? []), ...(cfg.fences ?? [])].flatMap(d => [`assets/env/models/${d.kind}.glb.json`, `assets/env/specs/${d.kind}.json`]));
+  return new Set([...(cfg.paths ?? []), ...(cfg.fences ?? []), ...(cfg.builds ?? [])].map(d => d.kind).concat(cfg.homes ?? []).flatMap(k => [`assets/env/models/${k}.glb.json`, `assets/env/specs/${k}.json`]));   // M14 다리·경사로·커진 집
 })();
 // P35 무인도 투어 묶음: 배·광석 바위 배경 모델 (assets/tour/tour.json env) — 처음에 받지 않고 선착장에 다가가거나 배를 놓을 때 (보드 tour D127-A)
 export const TOUR_FILES = (() => {

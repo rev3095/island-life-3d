@@ -1,0 +1,52 @@
+{
+  "id": "FU-70",
+  "slug": "attic-hatch",
+  "item": "fixture.attic-hatch",
+  "name": "다락 문 난간",
+  "category": "fixture",
+  "kind": "attic-hatch",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 984,
+  "parts": 1,
+  "materials": [
+    "hole",
+    "holeStep",
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "rail"
+  ],
+  "animations": {},
+  "size": [
+    0.94,
+    2.1,
+    0.84
+  ],
+  "bounds": [
+    [
+      -0.47,
+      -1.05,
+      0.0
+    ],
+    [
+      0.475,
+      1.05,
+      0.835
+    ]
+  ],
+  "footprint": [
+    1,
+    2
+  ],
+  "glbBytes": 19768,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "attic-hatch_front.png",
+    "attic-hatch_main.png",
+    "attic-hatch_thumb.png",
+    "attic-hatch_top.png"
+  ]
+}

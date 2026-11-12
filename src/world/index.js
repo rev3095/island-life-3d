@@ -9,6 +9,7 @@ import { createOcclusion } from './occlusion.js';
 import { carveFestival } from './festival.js';
 import { FURN_KIND, furnitureWorld } from './variants.js';
 import { buildIslet } from './islets.js';
+import { createBuilt } from './built.js';   // M14 섬 꾸미기 다리·경사로
 
 let kit, terrain, objects, occlusion, stats = null, elapsed = 0;
 let islet = null;          // P35 투어 섬 (buildIslet 결과) — 있으면 world.island·objects·places 의 칸 질문이 그 섬으로 간다
@@ -22,7 +23,7 @@ async function eventKinds(assets) {
  *  길·울타리 (assets/decor/decor.json, 배경 모델) + 야외 가구 'fu:<가구 slug>' (아이템 outdoor: true, 가구 모델) */
 async function decorKinds(assets, data) {
   const cfg = await assets.loadJSON('assets/decor/decor.json').catch(() => null);
-  const env = [...(cfg?.paths ?? []), ...(cfg?.fences ?? [])].map(d => d.kind);
+  const env = [...(cfg?.paths ?? []), ...(cfg?.fences ?? []), ...(cfg?.builds ?? [])].map(d => d.kind).concat(cfg?.homes ?? []);   // M14 다리·경사로 · 커진 집 겉모양
   const furn = (data?.items?.list?.('furn') ?? []).filter(it => it.outdoor).map(it => FURN_KIND + it.id.slice(5));
   return [...env, ...furn];
 }
@@ -189,6 +190,8 @@ export default {
         },
       },
       get season() { return season; },
+      /** M14 놓는 다리·경사로: 본섬 칸 표를 바꾼다 (자리 고르기·놓기·치우기 — world/built.js, 저장은 decor) */
+      build: createBuilt(gen),
       /** 원(반지름 r)을 (fx,fz) → (nx,nz) 로 옮긴다. 막히면 미끄러진 자리 {x, z} */
       collide: (fx, fz, nx, nz, r, y) => {
         const zn = zoneAt(fx, fz);

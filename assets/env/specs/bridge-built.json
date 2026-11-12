@@ -1,0 +1,74 @@
+{
+  "id": "TI-13",
+  "slug": "bridge-built",
+  "name": "놓는 나무다리",
+  "category": "tile",
+  "kind": "built-bridge",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 꾸미기로 강 2칸 위에 놓는 널빤지 다리 (양쪽 둑 반 칸씩). 밧줄 난간.",
+    "keywords": [
+      "널빤지",
+      "밧줄 난간",
+      "말뚝"
+    ],
+    "references": [],
+    "avoid": [
+      "큰 돌다리"
+    ],
+    "notes": "M14 다리 놓기 (결정 D153). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01,
+    "noOutline": [
+      "rope"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이 (3칸 기준)",
+      "value": 1,
+      "min": 0.67,
+      "max": 1.67,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "wood": "#C79A66",
+    "woodLight": "#D9B27F",
+    "woodDark": "#8A6542",
+    "rope": "#E8D7B0"
+  },
+  "paletteLabels": {
+    "wood": "널빤지",
+    "woodLight": "밝은 널빤지",
+    "woodDark": "말뚝·들보",
+    "rope": "밧줄"
+  },
+  "animations": [],
+  "world": {
+    "extent": [
+      1.5,
+      0.6
+    ],
+    "ground": "wood"
+  }
+}

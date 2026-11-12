@@ -100,13 +100,13 @@ export function rotateInPlace(placed, rec, info, opts = {}) {
 
 /**
  * 벽에 걸 자리: 플레이어가 벽 가까이에서 벽을 보고 있으면 { wall, slot }, 아니면 null.
- * reach: 벽까지 거리(칸) 한계
+ * reach: 벽까지 거리(칸) 한계, w·d: 방 크기 (M14 넓힌 방)
  */
-export function wallInFront(lx, lz, facing, { w = ROOM_W, reach = 1.4 } = {}) {
+export function wallInFront(lx, lz, facing, { w = ROOM_W, d = ROOM_D, reach = 1.4 } = {}) {
   const { k } = facingDir(facing);
   if (k === 0 && lz < reach) return { wall: 'n', slot: clampInt(Math.floor(lx), 0, w - 1) };
-  if (k === 1 && lx < reach) return { wall: 'w', slot: clampInt(Math.floor(lz), 0, ROOM_D - 1) };
-  if (k === 3 && lx > w - reach) return { wall: 'e', slot: clampInt(Math.floor(lz), 0, ROOM_D - 1) };
+  if (k === 1 && lx < reach) return { wall: 'w', slot: clampInt(Math.floor(lz), 0, d - 1) };
+  if (k === 3 && lx > w - reach) return { wall: 'e', slot: clampInt(Math.floor(lz), 0, d - 1) };
   return null;
 }
 const clampInt = (v, a, b) => Math.max(a, Math.min(b, v));

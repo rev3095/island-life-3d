@@ -11,5 +11,10 @@
     { "kind": "fence-wood", "id": "PR-24", "name": "나무 울타리", "icon": "🪵" },
     { "kind": "fence-picket", "id": "PR-25", "name": "흰 말뚝 울타리", "icon": "🤍" }
   ],
+  "builds": [
+    { "kind": "bridge-built", "id": "TI-13", "name": "나무다리", "icon": "🌉", "type": "bridge" },
+    { "kind": "ramp-built", "id": "TI-14", "name": "경사로", "icon": "⛰️", "type": "ramp" }
+  ],
+  "homes": ["house-grown-1", "house-grown-2", "house-grown-3"],
   "limit": 400
 }

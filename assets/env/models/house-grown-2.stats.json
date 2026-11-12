@@ -1,0 +1,39 @@
+{
+  "id": "BD-12-2",
+  "slug": "house-grown-2",
+  "name": "2층 내 집",
+  "category": "building",
+  "kind": "house-grown",
+  "version": "0.1",
+  "triangles": 3140,
+  "parts": 1,
+  "materials": [
+    "door",
+    "flower",
+    "foundation",
+    "leaf",
+    "roof",
+    "trim",
+    "wall",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    3.47,
+    2.87,
+    3.77
+  ],
+  "footprint": [
+    4,
+    3
+  ],
+  "glbBytes": 64488,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "house-grown-2_front.png",
+    "house-grown-2_hero.jpg",
+    "house-grown-2_main.png",
+    "house-grown-2_thumb.png",
+    "house-grown-2_top.png"
+  ]
+}

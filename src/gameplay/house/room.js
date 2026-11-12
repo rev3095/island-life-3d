@@ -37,8 +37,9 @@ export const { x0, z0 } = cornerOf(ROOM);
  * 방 하나 짓기. specs = { wallpaper, floor, frame } (스펙 JSON). size = [가로, 깊이] 칸, windows = 북쪽 벽 창 자리, door = 문 매트 칸 { gx0, gx1 }.
  * → { group, materials, origin, x0, z0, w, d, setWallpaper(spec), setFloor(spec), setNight(nf), dispose() }
  */
-export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame, size = [ROOM_W, ROOM_D], windows = WINDOWS, door = DOOR, name = null } = {}) {
+export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame, size = [ROOM_W, ROOM_D], windows = WINDOWS, door = DOOR, name = null, wallH = WALL_H } = {}) {
   const { THREE, materials } = ctx;
+  const WALL_H = wallH;   // M14 다락: 낮은 벽 (door: null 이면 문 매트 없음 — 위층)
   const [ROOM_W, ROOM_D] = size;
   const { x0: rx0, z0: rz0 } = cornerOf(origin, ROOM_W, ROOM_D);
   const parts = {};   // 재질 이름 → [geometry]
@@ -95,9 +96,11 @@ export function buildRoom(ctx, { origin = ROOM, wallpaper, floor, frame, size = 
   }
 
   // ── 문 매트 (앞쪽 가운데: 여기서 나간다) ──
+  if (door) {
   const mx = rx0 + (door.gx0 + door.gx1 + 1) / 2, mz = rz0 + ROOM_D - 0.42;
   add('doormatEdge', 1.36, 0.03, 0.66, mx, 0.012, mz);
   add('doormat', 1.2, 0.034, 0.52, mx, 0.014, mz);
+  }
 
   const group = new THREE.Group();
   group.name = name ?? (origin === ROOM ? 'house-room' : 'visit-room');

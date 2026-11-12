@@ -1639,7 +1639,86 @@ def b_star_drape(M):
     s.add(ellipsoid((-0.225, -0.075, 1.27), (0.06, 0.008, 0.06), seg=16, rings=8), 'drape')
 
 
+# ================================================================ M14 내 집 계단 (assets/furniture/fixtures — 가구 목록·아이템 표 밖, 증축한 방에 붙박이)
+def _rail_line(m, a, b, h=0.78, posts=3, mat='wood'):
+    """a→b 를 따라 기둥 + 손잡이 (바닥 높이 a.z·b.z 에서 h 위)"""
+    a, b = V(a), V(b)
+    for k in range(posts):
+        t = k / max(1, posts - 1)
+        p = a.lerp(b, t)
+        m.add(box((p.x, p.y, p.z + h / 2), (0.07, 0.07, h), bevel=0.015), mat)
+    m.add(cylinder(a + V((0, 0, h + 0.02)), b + V((0, 0, h + 0.02)), 0.035, seg=10), 'woodLight')
+
+
+def b_home_stairs(M):
+    """FU-67 나무 계단 (2×3, 1층 → 2층): 남쪽(-Y)에서 올라 북쪽 벽 쪽 1.7 높이에서 끝난다. 서쪽에 난간. 원점 = 발자국 가운데 바닥"""
+    m = M.part('stairs')
+    n, top, L, W = 6, 1.7, 3.0, 1.8
+    run = L / n
+    for i in range(n):
+        y0 = -L / 2 + i * run
+        z = (i + 1) * top / n
+        m.add(box((0.05, y0 + run / 2, z / 2), (W - 0.1, run, z), bevel=0.02), 'woodDark')            # 계단 몸 (속이 찬 단)
+        m.add(box((0.05, y0 + run / 2 - 0.02, z + 0.02), (W - 0.04, run + 0.06, 0.05), bevel=0.012), 'wood' if i % 2 else 'woodLight')   # 디딤판
+    m.add(box((-W / 2 - 0.02, 0, top / 2 + 0.05), (0.08, L, 0.1), bevel=0.02, rot=rot_xyz(x=math.atan2(top, L))), 'woodDark')   # 옆판
+    for k in range(4):
+        t = k / 3
+        y = -L / 2 + 0.2 + t * (L - 0.4)
+        z = (y + L / 2) / L * top
+        m.add(box((-W / 2, y, z + 0.42), (0.07, 0.07, 0.84), bevel=0.015), 'wood')
+    m.add(cylinder((-W / 2, -L / 2 + 0.2, 0.9), (-W / 2, L / 2 - 0.2, top + 0.75), 0.035, seg=10), 'woodLight')
+
+
+def b_attic_stairs(M):
+    """FU-68 다락 계단 (1×2, 2층 → 다락): 가파른 나무 계단, 양옆 손잡이. 남쪽에서 올라 북쪽 1.6 높이. 원점 = 발자국 가운데 바닥"""
+    m = M.part('stairs')
+    n, top, L, W = 5, 1.6, 2.0, 0.84
+    run = L / n
+    for i in range(n):
+        y0 = -L / 2 + i * run
+        z = (i + 1) * top / n
+        m.add(box((0, y0 + run / 2, z), (W - 0.12, run * 0.8, 0.05), bevel=0.012), 'woodLight')
+    ang = math.atan2(top, L)
+    for sx in (-1, 1):
+        m.add(box((sx * W / 2, 0, top / 2 + 0.04), (0.07, math.hypot(L, top) * 0.98, 0.16), bevel=0.02, rot=rot_xyz(x=ang)), 'woodDark')
+        m.add(cylinder((sx * W / 2, -L / 2 + 0.1, 0.75), (sx * W / 2, L / 2 - 0.05, top + 0.7), 0.03, seg=8), 'wood')
+        for y in (-L / 2 + 0.12, L / 2 - 0.12):
+            z = (y + L / 2) / L * top
+            m.add(box((sx * W / 2, y, z + 0.38), (0.06, 0.06, 0.76), bevel=0.012), 'wood')
+
+
+def _hole(m, w, d, steps, top=1.7):
+    """바닥에 뚫린 아래층 계단 구멍: 어두운 바닥 + 내려가는 디딤판 몇 개 (북쪽이 높다)"""
+    m.add(box((0, 0, 0.004), (w, d, 0.008), bevel=0.0), 'hole', outline=False)
+    for k in range(steps):
+        y = d / 2 - 0.25 - k * (d / (steps + 1))
+        m.add(box((0, y, 0.012 - 0.002 * k), (w - 0.18, 0.16, 0.006), bevel=0.0), 'holeStep', outline=False)
+    for sx in (-1, 1):   # 구멍 테두리 턱
+        m.add(box((sx * (w / 2 + 0.02), 0, 0.02), (0.06, d + 0.06, 0.04), bevel=0.01), 'woodDark')
+    for sy in (-1, 1):
+        m.add(box((0, sy * (d / 2 + 0.02), 0.02), (w + 0.1, 0.06, 0.04), bevel=0.01), 'woodDark')
+
+
+def b_stair_rail(M):
+    """FU-69 계단 난간 (2×3, 2층의 내려가는 곳): 아래층 계단 구멍 + 남쪽·서쪽 난간. 서쪽 북쪽 끝(1칸)은 열려 있어 그쪽으로 걸어 내려간다"""
+    m = M.part('rail')
+    w, d = 1.8, 3.0
+    _hole(m, w, d, 4)
+    _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (w / 2, -d / 2, 0), posts=3)
+    _rail_line(m, (-w / 2 - 0.02, -d / 2, 0), (-w / 2 - 0.02, d / 2 - 1.15, 0), posts=3)
+
+
+def b_attic_hatch(M):
+    """FU-70 다락 문 난간 (1×2, 다락의 내려가는 곳): 2층 계단 구멍 + 남쪽·동쪽 난간. 동쪽 북쪽 끝은 열려 있다"""
+    m = M.part('rail')
+    w, d = 0.84, 2.0
+    _hole(m, w, d, 3)
+    _rail_line(m, (-w / 2, -d / 2, 0), (w / 2 + 0.02, -d / 2, 0), posts=2)
+    _rail_line(m, (w / 2 + 0.02, -d / 2, 0), (w / 2 + 0.02, d / 2 - 0.95, 0), posts=2)
+
+
 BUILDERS = {
+    'home-stairs': b_home_stairs, 'attic-stairs': b_attic_stairs, 'stair-rail': b_stair_rail, 'attic-hatch': b_attic_hatch,   # M14 내 집 계단 FU-67–70
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
     'outdoor-bench': b_outdoor_bench, 'garden-lamp': b_garden_lamp, 'flower-pots': b_flower_pots, 'picnic-table': b_picnic_table,
