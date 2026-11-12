@@ -399,7 +399,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
       const p = bot.pos();
       if (bot.dist(to, p) < near) { bot.release(); await bot.frames(2); bot.stats.walked += bot.gameT - start; return true; }
       let wp = pts[i];
-      while (wp && i < pts.length - 1 && bot.dist(wp, p) < 0.4) wp = pts[++i];
+      // 경유점 0.4칸 안이면 다음 점으로 — 단 거기까지 곧게 갈 수 있을 때만 (다리 끝·무대 모서리를 미리 자르다 걸렸다, M17-P5)
+      while (wp && i < pts.length - 1 && bot.dist(wp, p) < 0.4 && (bot.dist(wp, p) < 0.12 || getNav().lineClear(p.x, p.z, pts[i + 1].x, pts[i + 1].z))) wp = pts[++i];
       const dx = wp.x - p.x, dz = wp.z - p.z, L = Math.hypot(dx, dz) || 1;
       const slow = i === pts.length - 1 && L < 1.2;
       let sx = dx / L, sz = dz / L;
@@ -424,7 +425,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     return false;
   };
   /** 집 안·주민 방처럼 섬 밖 구역: 곧게 걷기 */
-  bot.walkLocal = async (to, { near = 0.3, timeout = 20, label = '방 안' } = {}) => {
+  bot.walkLocal = async (to, { near = 0.3, timeout = 20, label = '방 안', quiet = false } = {}) => {
     const end = bot.gameT + timeout;
     // 방 안 가구를 돌아가는 길 (0.25칸 격자 BFS, 구역의 isWalkable — 플레이어가 구역 안이면 island.isWalkable 이 구역 것)
     const pts = [...(localPath(bot.pos(), to) ?? []), to];
@@ -442,6 +443,7 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
       else if (bot.gameT - lastProg > 2.5) break;
     }
     bot.release();
+    if (quiet) return false;   // 섬 위에서 마지막 한 칸 다가가기(sk.reach)처럼 실패해도 부르는 쪽이 다시 해 보는 경우
     // 사람이라면 돌아서 갔을 자리 — 막힘으로 남기고 그 자리로 옮긴다 (다음 단계가 방에 갇히지 않게)
     bot.issue('minor', 'house', `${label}에서 걷다가 막혔어요 (남은 거리 ${bot.dist(to).toFixed(1)}칸)`, { at: bot.pos(), to });
     bot.stats.teleports++;

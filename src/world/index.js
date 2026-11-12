@@ -103,6 +103,23 @@ export default {
         const { tx, tz } = base.toTile(x, z);
         return base.isWalkableTile(tx, tz) && !collision.blockedAt(x, z, base.heightAt(x, z));
       },
+      /**
+       * M17-P5: 이웃한 두 칸 가운데를 잇는 선이 물체 충돌체를 지나지 않나 (칸 질문 좌표, 길찾기 createNav.step 이 쓴다).
+       * 칸 가운데만 보는 isWalkable 은 칸 경계에 걸친 얇은 벽(축제 무대 BD-06 뒤판 0.2칸 등)을 못 봐서, 주민·봇이 그 벽으로 길을 냈다.
+       * 두 칸(대각선이면 옆 칸 둘까지)에 충돌체가 없으면 바로 true. 집 실내 같은 구역은 구역이 맡으니 true.
+       */
+      edgeClear(ax, az, bx, bz) {
+        const api = cur(), A = api.toWorld(ax, az), B = api.toWorld(bx, bz);
+        const col = islet?.contains(A.x, A.z) ? islet.collision : zoneAt(A.x, A.z) ? null : collision;
+        if (!col) return true;
+        const W = api.w, has = (tx, tz) => !!col.cells.get(tz * W + tx)?.size;
+        if (!has(ax, az) && !has(bx, bz) && !(ax !== bx && az !== bz && (has(bx, az) || has(ax, bz)))) return true;
+        for (let k = 1; k < 10; k++) {
+          const x = A.x + ((B.x - A.x) * k) / 10, z = A.z + ((B.z - A.z) * k) / 10;
+          if (col.blockedAt(x, z, api.heightAt(x, z))) return false;
+        }
+        return true;
+      },
       passable: (...a) => cur().passable(...a), rampAt: (tx, tz) => cur().rampAt(tx, tz), flagsAt: (tx, tz) => cur().flagsAt(tx, tz),
       isWalkableTile: (tx, tz) => cur().isWalkableTile(tx, tz),
       groundAt: (x, z) => {

@@ -103,13 +103,69 @@ export function makeScenario(bot, sk, opts = {}) {
     return null;
   }
   /** 남는 것 팔기 (도구·가구·부품 재료·기증 안 한 것은 남긴다) */
-  async function sellSurplus() {
+  async function sellSurplus({ spare = false } = {}) {
     const m = S().data.museum;
+    const extra = spare ? spareMaterials() : null;
     return sk.shop({ sell: (it, s) => {
-      if (!it || it.category === 'tool' || it.category === 'furn' || it.category === 'festival' || keep.has(it.id) || isMaterialFor(it)) return 0;
+      if (!it || it.category === 'tool' || it.category === 'furn' || it.category === 'festival' || keep.has(it.id)) return 0;
+      if (isMaterialFor(it)) return extra?.get(s) ?? 0;
       if (m.canDonate?.(it.id)) return 0;
       return s.count;
     } });
+  }
+  /**
+   * spare: 부품 재료라도 낼 만큼(곤충 3 · 나무 5 · 꽃 6 · 과일 6 + 섬 특산 아닌 과일 · 큰 물고기 1)만 남기고 넘는 것은 판다 → Map(칸 → 팔 개수).
+   * 축제가 시작되면 물고기·과일·곤충이 모두 「아직 안 낸 재료」라 하나도 안 팔려서, 살랑 미술품 돈을 모으던 봇이 8일 동안 🌰15 를 벌었다 (M17-P5).
+   * 기증 안 한 종류는 남긴다. sk.shop 이 sell 을 칸마다 여러 번 부르므로 처음 가방으로 한 번에 정한다.
+   */
+  function spareMaterials() {
+    const quota = { chorong: 3, coco: 5, mochi: 6, pong: 6, dubu: 1 }, out = new Map(), m = S().data.museum, native = `fruit.${S().world.nativeFruit}`;
+    for (const s of S().data.inventory.slots) {
+      const it = s && bot.item(s.id);
+      if (!it || m.canDonate?.(it.id)) continue;
+      if (it.category === 'fruit' && it.id !== native) continue;   // 퐁에게 낼 다른 섬 과일
+      let keepN = 0;
+      for (const [slug, test] of Object.entries(PART_TESTS)) if (!hasPart(slug) && fest().started && test(bot, it) && quota[slug] > 0) { keepN = Math.min(quota[slug], s.count); quota[slug] -= keepN; break; }
+      out.set(s, s.count - keepN);
+    }
+    return out;
+  }
+  /**
+   * 부서진 도구 다시 사기 (도구는 내구도가 있어 다 쓰면 칸이 빈다 — 사람은 상점에서 새로 산다). 낮 매장(8–22시)만. → 산 도구 id[]
+   * M17-P5: 살랑 미술품 돈을 모으다 낚싯대가 부서져 「낚싯대가 없어 낚시를 못 해요」 37번 · 번 돈 0 → 축제 부품 모으기에서 「도끼가 없어요」까지 이어졌다.
+   */
+  async function ensureTools(tools = ['rod', 'net', 'axe', 'shovel']) {
+    const inv = S().data.inventory, h = S().time.now().hour;
+    const need = tools.filter(t => !inv.hasTool?.(t)).map(t => `tool.${t}`);
+    if (!need.length || h < 8 || h >= 22) return [];
+    const cost = need.reduce((n, id) => n + (S().data.items.get(id)?.buy ?? 0), 0);
+    if (bot.acorns() < cost) await sellSurplus({ spare: true });
+    if (bot.acorns() < cost) return [];
+    await sk.shop({ buy: need });
+    return need.filter(id => inv.hasTool?.(id.slice(5)));
+  }
+  /**
+   * 사람처럼 돈 모으기: 낚시 · 과일 흔들기(저녁엔 곤충) → 상점에 팔기를 target 이 될 때까지 (하루 maxRounds 번, untilHour 시 전까지).
+   * decor(QA-10)·night-shops(M17-P5 살랑 미술품) 가 같이 쓴다. 한 번에 보통 🌰700 안팎.
+   */
+  async function earnUntil(target, { maxRounds = 6, untilHour = 20, from = 0 } = {}) {
+    const hour = () => S().time.now().hour;
+    const money = { acorns0: bot.acorns(), rounds: 0, earned: 0, tools: [] };
+    for (let k = 0; k < maxRounds && bot.acorns() < target && hour() >= 5 && hour() < untilHour; k++) {
+      money.rounds++;
+      money.tools.push(...(await ensureTools(['rod', 'net'])));   // 낚싯대는 30번 쓰면 부서진다 — 사람은 다시 산다
+      await sk.fish({ tries: 3 });
+      if (hour() >= 19 || hour() < 5) await sk.bug({ tries: 2 });
+      else {
+        const trees = sk.objects('fruit-tree'), n = trees.length;
+        for (let j = 0; j < 2 && n; j++) await sk.shakeTree(trees[((from + k) * 2 + j) % n]);
+      }
+      if (bot.free() < 4 && hour() < 18) { await sk.museum(); money.donated = (money.donated ?? 0) + 1; }   // 새 종류는 기증해서 칸을 비운다 (박물관은 18시까지)
+      const sold = await sellSurplus({ spare: true });
+      money.earned += sold?.earned ?? 0;
+    }
+    money.acorns = bot.acorns();
+    return money;
   }
   /** 열린 부스 놀이 하나씩 */
   async function playBooths() {
@@ -326,18 +382,10 @@ export function makeScenario(bot, sk, opts = {}) {
     const decorToday = () => (S().house?.interior?.today?.() ?? []).filter(d => !d.owned && !d.current && d.slug !== (st().house[d.kind] ?? null));
     const want = () => decorToday().sort((x, y) => (x.kind === 'wallpaper' ? 0 : 1) - (y.kind === 'wallpaper' ? 0 : 1) || x.price - y.price);
     const cheapest = () => Math.min(...decorToday().map(d => d.price));
-    const hour = () => S().time.now().hour;
-    let sold = await sellSurplus();
-    const money = { acorns0: bot.acorns(), rounds: 0, earned: sold?.earned ?? 0 };
-    for (let k = 0; k < 6 && decorToday().length && bot.acorns() < cheapest() && hour() < 20; k++) {
-      money.rounds++;
-      await sk.fish({ tries: 3 });
-      if (hour() >= 19 || hour() < 5) await sk.bug({ tries: 2 });
-      else for (const o of sk.objects('fruit-tree').slice(k * 2, k * 2 + 2)) await sk.shakeTree(o);
-      sold = await sellSurplus();
-      money.earned += sold?.earned ?? 0;
-    }
-    money.acorns = bot.acorns();
+    const sold = await sellSurplus();
+    const acorns0 = bot.acorns();
+    const money = decorToday().length ? await earnUntil(cheapest(), { maxRounds: 6, untilHour: 20 }) : { rounds: 0, earned: 0, acorns: bot.acorns() };
+    Object.assign(money, { acorns0, earned: (sold?.earned ?? 0) + money.earned });
     note('decorMoney', money);
     const pickDecor = want().find(d => d.price <= bot.acorns()) ?? null;
     const r = pickDecor ? await sk.shop({ decor: pickDecor.slug }) : { decor: 'none' };
@@ -602,7 +650,57 @@ export function makeScenario(bot, sk, opts = {}) {
       await sk.leavePlace();
     } else odd.push('운세 부스가 안 섬');
     // 2)–4) 여우 상인 · 이상한 천막 · 선물 상자: 올 때까지 밤마다 (최대 8일)
-    for (let d = 0; d < 9 && !(got.fox && got.odd); d++) {
+    // M17-P5: 살랑의 미술품은 🌰4,000–5,600 이라 처음 밤엔 못 산다 (2026-11-13 전체 플레이 「못 삼(도토리)」 → fake-art 건너뜀).
+    // 사람처럼: 값을 들어 두고 → 낮에 낚시·과일로 벌어 판 뒤 → 살랑이 다시 온 밤에 산다. 살랑 말투(「색이 특별하지」·「독특한 판」·「묘한 맛」)로
+    // 가품인 줄 알아채면 그걸 산다 (가품을 느루에게 보여 주는 fake-art 단계를 보려고). 진품만 있는 밤은 그냥 나온다.
+    const FAKE_CUE = /특별하지콩|독특한 판|묘한 맛/;
+    const hasFake = () => S().data.inventory.slots.some(s => s && S().data.items.get(s.id)?.fake);
+    const artPrices = (S().data.items.list?.('art') ?? []).map(it => it.buy).filter(Boolean);
+    let wantPrice = 0;   // 살랑에게 들은 가품 값 (모아야 할 돈)
+    const foxVisit = async () => {
+      const said = [], tried = [], heard = [];
+      let bought = null, n = null;
+      for (let round = 0; round < 4 && !bought; round++) {
+        let pick = null, cue = null, price = null, declined = false;
+        bot.policy = {
+          dialog: (texts, speaker, text) => {
+            said.push(speaker);
+            if (texts.includes('미술품 보기')) return texts.indexOf('미술품 보기');
+            if (texts.includes('살게요')) {
+              const m = /🌰\s*([\d,]+)/.exec(text || '');
+              price = m ? Number(m[1].replace(/,/g, '')) : null;
+              const prev = [...bot.transcript].reverse().find(l => l.who === speaker && l.text && l.text !== text)?.text ?? '';
+              cue = FAKE_CUE.test(prev) ? 'fake' : 'real';
+              heard.push({ name: pick, cue, price });
+              if (cue === 'fake' && price != null && bot.acorns() >= price) return texts.indexOf('살게요');
+              declined = true;
+              return texts.indexOf('그만둘래요');
+            }
+            if (texts[texts.length - 1] === '그만' && texts.length > 1) {   // 고르기: 아직 안 들어 본 작품
+              n ??= texts.length - 1;
+              const i = texts.findIndex((t, k) => k < texts.length - 1 && !tried.includes(t));
+              if (i < 0) return texts.length - 1;
+              tried.push(pick = texts[i]);
+              return i;
+            }
+            return texts.length - 1;
+          },
+        };
+        const before = S().data.inventory.slots.filter(Boolean).map(s => s.id);
+        if (bot.peek() !== 'night:desk') { odd.push(`여우 상인 계산대 앞 행동 키가 ${bot.peek()}`); break; }
+        await bot.act('action', { timeout: 60 });
+        bot.policy = {};
+        await bot.settle(10);
+        bought = S().data.inventory.slots.filter(Boolean).map(s => s.id).find(id => id.startsWith('art.') && !before.includes(id)) ?? null;
+        if (!pick || (n != null && tried.length >= n)) break;   // 다 들어 봄 (또는 고르기까지 못 감)
+        if (declined && cue === 'fake') break;                   // 가품인데 돈이 모자람 → 벌어서 다시
+      }
+      const fakeHeard = heard.find(h => h.cue === 'fake');
+      if (!bought && fakeHeard?.price) wantPrice = fakeHeard.price;
+      return { talked: said.includes('살랑'), heard, bought };
+    };
+    got.foxNights = [];
+    for (let d = 0; d < 9 && !((got.fox?.bought || hasFake()) && got.odd); d++) {
       if (d) { await bot.nextDay(8); got.days++; }
       await bot.settle(20);
       const g = N.giftSpot?.();
@@ -613,25 +711,22 @@ export function makeScenario(bot, sk, opts = {}) {
         if (bot.peek() === 'night:gift') { await bot.act('action'); got.gift = { acorns: bot.acorns() - w0, bag: JSON.stringify(S().data.inventory.slots) !== bag0, gone: !N.giftSpot() }; }
         else odd.push(`선물 상자 앞 행동 키가 ${bot.peek()}`);
       }
+      // 낮: 살랑에게 가품을 살 돈 모으기 (값을 들었으면 그 값, 아직이면 미술품 값 아는 만큼 — 공략을 아는 사람)
+      if (!got.fox?.bought && !hasFake() && d) {
+        const target = wantPrice || (artPrices.length ? Math.max(...artPrices) : 0);
+        if (bot.acorns() < target) {
+          if (S().time.now().hour < 9) await bot.setHour(9);
+          const m = await earnUntil(target, { maxRounds: 8, untilHour: 19, from: d * 3 });
+          (got.earn ??= []).push({ day: bot.day(), target, ...m });
+        }
+      }
       await bot.setHour(21.5);
       await bot.settle(30);
-      if (!got.fox && W().places.foxshop && (await enter('foxshop', '여우 상인 가게'))) {
-        const said = [];
-        bot.policy = {
-          dialog: (texts, speaker) => {
-            said.push(speaker);
-            const i = texts.findIndex(t => /미술품 보기|살게요/.test(t));
-            if (i >= 0) return i;
-            return texts.length > 1 && texts[texts.length - 1] === '그만' ? 0 : texts.length - 1;   // 고르기: 첫 작품
-          },
-        };
-        const before = S().data.inventory.slots.filter(Boolean).map(s => s.id);
-        if (bot.peek() === 'night:desk') await bot.act('action', { timeout: 60 });
-        else odd.push(`여우 상인 계산대 앞 행동 키가 ${bot.peek()}`);
-        bot.policy = {};
-        const art = S().data.inventory.slots.filter(Boolean).map(s => s.id).find(id => id.startsWith('art.') && !before.includes(id)) ?? null;
-        got.fox = { day: bot.day(), talked: said.includes('살랑'), stock: N.debug?.today?.().fox ?? null, bought: art, scene: !!S().story?.seen?.('s27-fox-first'), shown: S().house.places.shown('foxshop') };
-        if (!got.fox.talked) odd.push('살랑과 말을 못 함');
+      if (!got.fox?.bought && !hasFake() && W().places.foxshop && (await enter('foxshop', '여우 상인 가게'))) {
+        const v = await foxVisit();
+        got.foxNights.push({ day: bot.day(), acorns: bot.acorns(), heard: v.heard.map(h => `${h.cue}:${h.price}`), bought: v.bought });
+        got.fox = { day: bot.day(), talked: v.talked || got.fox?.talked, stock: N.debug?.today?.().fox ?? null, bought: v.bought, scene: !!S().story?.seen?.('s27-fox-first'), shown: S().house.places.shown('foxshop') };
+        if (!v.talked) odd.push('살랑과 말을 못 함');
         if (!got.fox.shown) odd.push('여우 상인 받침에 미술품이 없음');
         await sk.leavePlace();
       }
@@ -644,7 +739,7 @@ export function makeScenario(bot, sk, opts = {}) {
     note('nightShops', got);
     if (!got.fox) odd.push(`여우 상인이 ${got.days + 1}밤 동안 안 옴`);
     if (!got.odd) odd.push(`이상한 천막이 ${got.days + 1}밤 동안 안 섬`);
-    const msg = `부스 카드 ${got.booth?.card ?? '-'} · 살랑 ${got.fox ? `${got.fox.stock?.length ?? 0}점${got.fox.bought ? ` · 산 것 ${got.fox.bought}` : ' · 못 삼(도토리)'}` : '-'} · 천막 ${got.odd?.shown?.[0]?.id ?? '-'} · 선물 ${got.gift ? (got.gift.acorns > 0 ? `도토리 ${got.gift.acorns}` : '물건') : '없음'} · ${got.days}일 더`;
+    const msg = `부스 카드 ${got.booth?.card ?? '-'} · 살랑 ${got.fox ? `${got.fox.stock?.length ?? 0}점${got.fox.bought ? ` · 산 것 ${got.fox.bought}` : wantPrice ? ` · 못 삼(도토리 ${wantPrice})` : ' · 가품 없음'} · ${got.foxNights.length}밤${got.earn ? ` · 번 돈 🌰${got.earn.reduce((n, e) => n + e.earned, 0)}` : ''}` : '-'} · 천막 ${got.odd?.shown?.[0]?.id ?? '-'} · 선물 ${got.gift ? (got.gift.acorns > 0 ? `도토리 ${got.gift.acorns}` : '물건') : '없음'} · ${got.days}일 더`;
     return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
   });
 
@@ -689,6 +784,8 @@ export function makeScenario(bot, sk, opts = {}) {
       if (d > 0) { await bot.nextDay(8); await bot.settle(120); dayRec.day = bot.day(); dayRec.weather = S().time.weather; }
       await bot.setHour(9);
       dayRec.talk1 = await talkRound();
+      const bought = await ensureTools();
+      if (bought.length) dayRec.tools = bought;
       dayRec.gather = await gatherForParts();
       await bot.setHour(13);
       dayRec.talk2 = await talkRound();        // 재료를 들고 다시 (마음을 열었으면 🎉)
@@ -1299,6 +1396,7 @@ export function makeScenario(bot, sk, opts = {}) {
     const KIT = 'tool.scuba-kit', price = bot.item(KIT)?.buy ?? 0;
     if (!bot.has(KIT)) {
       if (bot.acorns() < price) await sellSurplus();
+      if (bot.acorns() < price && !new URLSearchParams(window.location.search).get('only')) note('dive-earn', await earnUntil(price, { maxRounds: 6, untilHour: 20 }));   // 사람처럼 벌어서 산다 (M17-P5: 살랑 미술품을 사고 🌰2,450)
       // 단계만 골라 돌릴 때(?only=)는 앞 단계 벌이가 없으니 준비로만 도토리를 채운다 (check-interiors 의 「준비만 직접」과 같은 뜻 — 전체 실행은 그대로)
       if (bot.acorns() < price && new URLSearchParams(window.location.search).get('only')) {
         const short = price - bot.acorns();
@@ -1388,10 +1486,15 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.shot('15-tour-arrive', `무인도 ${cur.shape}`);
     const tag = bot.$('.pk-tour-tag')?.textContent ?? null;   // UI-23 오른쪽 위 섬 이름 칸 (B-13)
     const got = {}, inv0 = Object.fromEntries(bot.inv().filter(Boolean).map(s => [s.id, s.count]));
+    // 물체 앞 설 자리: 남·동·서·북 중 몸(반지름 0.25)이 들어가는 가까운 쪽 — 늘 남쪽으로만 가다 그쪽이 막힌 바위 앞에서 멈췄다 (M17-P5 「광석 바위에서 걷다가 막혔어요」)
+    const frontOf = (o, d) => {
+      const ok = q => [[0, 0], [0.25, 0], [-0.25, 0], [0, 0.25], [0, -0.25]].every(([a, c]) => w.island.isWalkable(q.x + a, q.z + c));
+      return [[0, d], [d, 0], [-d, 0], [0, -d]].map(([a, c]) => ({ x: o.x + a, z: o.z + c })).filter(ok).sort((p, q) => bot.dist(p) - bot.dist(q))[0] ?? { x: o.x, z: o.z + d };
+    };
     // 과일나무 흔들기 (투어 섬 과일 = 망고·리치)
     const ft = w.objects.list('fruit-tree')[0];
     if (ft) {
-      await bot.walkLocal({ x: ft.x, z: ft.z + 0.85 }, { timeout: 40, label: '무인도 과일나무' });
+      await bot.walkLocal(frontOf(ft, 0.85), { timeout: 40, label: '무인도 과일나무' });
       await bot.face(ft);
       if (bot.peek() === 'gather-shake') { await bot.act('action'); await bot.wait(0.8); await sk.pickupAround(2.4); }
     }
@@ -1400,7 +1503,7 @@ export function makeScenario(bot, sk, opts = {}) {
     let oreHits = 0;
     const shovel = bot.has('tool.shovel') > 0;   // 새 게임 첫날엔 삽이 없다 (단계만 돌릴 때)
     if (ore && shovel && (await bot.tool('shovel'))) {
-      await bot.walkLocal({ x: ore.x, z: ore.z + 0.95 }, { timeout: 40, label: '광석 바위' });
+      await bot.walkLocal(frontOf(ore, 0.95), { timeout: 40, label: '광석 바위' });
       await bot.face(ore);
       for (let k = 0; k < 3 && bot.peek() === 'tour-ore'; k++) { await bot.act('action'); oreHits++; }
       await bot.tool(null);
@@ -1625,7 +1728,9 @@ export function makeScenario(bot, sk, opts = {}) {
     if (to && replies.some(l => l.from === to)) done.push(`답장 ${replies.map(l => `${l.from}:${l.kind}`).join(',')} · 친밀도 ${f0}→${T.state(to).friendship}`); else if (to) miss.push('답장이 안 옴');
     // ④ 섬폰 📷 앨범 → 사진 → 추억 액자 (도토리 300)
     const photos = S().album.list().length;
-    if (bot.acorns() < 300) await sellSurplus();
+    // M17-P5: 2026-11-13 전체 플레이 🟡 「액자 못 만듦」 = 도토리는 1565 인데 「가방이 꽉 찼어요」 (엔딩 뒤라 가방이 참) → 사람처럼 먼저 팔아 칸을 비운다
+    const free0 = bot.free();
+    if (bot.acorns() < 300 || free0 < 1) await sellSurplus();
     bot.policy = { card: (kind, el, card) => !!card?.classList.contains('pk-album') };   // 앨범 창은 봇이 직접 누른다 (기본 정책은 모르는 창을 닫는다)
     bot.press('phone');
     let framed = false;
@@ -1645,8 +1750,8 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.frames(3);
     for (let k = 0; k < 4 && bot.top(); k++) { bot.press('esc'); await bot.frames(4); }
     if (photos) done.push(`앨범 ${photos}장${framed ? ' · 추억 액자' : ''}`); else miss.push('앨범에 사진이 없음');
-    if (photos && !framed) miss.push('액자 못 만듦');
-    note('m15', { to, letter: m?.sent ?? null, fished, replies: replies.map(l => l.kind), photos, framed, song: T.song.today() });
+    if (photos && !framed) miss.push(`액자 못 만듦 (도토리 ${bot.acorns()} · 가방 빈칸 ${free0} → ${bot.free()})`);
+    note('m15', { to, letter: m?.sent ?? null, free0, fished, replies: replies.map(l => l.kind), photos, framed, song: T.song.today() });
     return miss.length ? awk(`${miss.join(' · ')} — ${done.join(' · ')}`) : pass(done.join(' · '));
   });
 
