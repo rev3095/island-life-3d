@@ -1639,6 +1639,167 @@ def b_star_drape(M):
     s.add(ellipsoid((-0.225, -0.075, 1.27), (0.06, 0.008, 0.06), seg=16, rings=8), 'drape')
 
 
+# ================================================================ 실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 FU-79–84
+def b_display_cover(M):
+    """FU-79 진열 덮개 천 (2×2): 밤에 1층 진열 받침(FU-35)을 덮은 천 — 받침 모양 그대로 · 모서리로 흘러내린 자락 · 앞 「밤엔 쉬어요」 달 팻말"""
+    m = M.part('stand')
+    W = 1.86
+    m.add(box((0, 0, 0.03), (W - 0.1, W - 0.1, 0.06), bevel=0.012), 'woodDark')
+    c = M.part('cloth')
+    c.add(box((0, 0, 0.16), (W + 0.06, W + 0.06, 0.2), bevel=0.04), 'cloth')
+    c.add(ellipsoid((-0.32, 0.1, 0.26), (0.5, 0.55, 0.42), seg=24, rings=12), 'cloth')   # 덮인 가구 둔덕 둘 (큰 것 · 작은 것)
+    c.add(ellipsoid((0.45, -0.2, 0.26), (0.36, 0.36, 0.3), seg=20, rings=10), 'cloth')
+    c.add(box((-0.32, 0.1, 0.5), (0.5, 0.012, 0.3), bevel=0.004, rot=rot_xyz(z=0.4)), 'clothDark')   # 천 접힌 줄
+    for sx in (1, -1):
+        for sy in (1, -1):   # 모서리로 흘러내린 자락
+            c.add(cone((sx * (W / 2 - 0.02), sy * (W / 2 - 0.02), 0.24), (sx * (W / 2 + 0.03), sy * (W / 2 + 0.03), 0.03), 0.1, 0.05, seg=10), 'cloth')
+    for k in range(-3, 4):   # 앞 주름
+        c.add(box((k * 0.25, -W / 2 - 0.035, 0.14), (0.06, 0.02, 0.16), bevel=0.01), 'clothDark')
+    c.add(box((0, -W / 2 - 0.04, 0.245), (W * 0.9, 0.012, 0.025), bevel=0.004), 'trim')
+    t = M.part('tag')
+    x, y = W / 2 - 0.2, -W / 2 + 0.05
+    t.add(cylinder((x, y, 0.26), (x, y, 0.5), 0.012, seg=8), 'woodDark')
+    t.add(box((x, y - 0.01, 0.56), (0.26, 0.02, 0.15), bevel=0.01), 'tag')
+    t.add(ellipsoid((x - 0.06, y - 0.024, 0.56), (0.04, 0.01, 0.04), seg=12, rings=6), 'moon', outline=False)
+    t.add(ellipsoid((x - 0.045, y - 0.03, 0.57), (0.034, 0.01, 0.034), seg=12, rings=6), 'tag', outline=False)
+    for k in range(2):
+        t.add(box((x + 0.05, y - 0.022, 0.58 - k * 0.04), (0.09, 0.004, 0.012), bevel=0.002), 'woodDark')
+
+
+def wall_door(M, W, H, frame, leaf, trim):
+    """벽 문 (원점 = 벽면 바닥, 앞 -Y): 문틀 · 문짝(판 두 칸) · 문고리"""
+    m = M.part('door')
+    y = -0.03
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 + 0.04), y, H / 2), (0.08, 0.07, H + 0.04), bevel=0.012), frame)
+    m.add(box((0, y, H + 0.06), (W + 0.2, 0.08, 0.12), bevel=0.02), frame)
+    m.add(box((0, y + 0.01, 0.02), (W + 0.16, 0.08, 0.04), bevel=0.01), frame)   # 문지방
+    m.add(box((0, -0.02, H / 2), (W, 0.035, H), bevel=0.012), leaf)
+    for z0, z1 in ((0.12, H * 0.45), (H * 0.52, H - 0.1)):
+        m.add(box((0, -0.04, (z0 + z1) / 2), (W - 0.18, 0.012, z1 - z0), bevel=0.01), trim)
+        m.add(box((0, -0.044, (z0 + z1) / 2), (W - 0.26, 0.012, z1 - z0 - 0.08), bevel=0.008), leaf)
+    m.add(ellipsoid((W / 2 - 0.12, -0.07, H * 0.48), (0.035, 0.035, 0.035), seg=12, rings=6), 'brass')
+    m.add(cylinder((W / 2 - 0.12, -0.04, H * 0.48), (W / 2 - 0.12, -0.07, H * 0.48), 0.02, seg=8), 'brass')
+    return m
+
+
+def b_cellar_door(M):
+    """FU-80 지하 계단 문 (벽): 도토리상점 1층 → 밤 코너 RM-21 (밤에만 열림). 짙은 나무 문 · 문 위 달 팻말과 계단 무늬 · 옆 작은 등불(glow)"""
+    W, H = 0.72, 1.72
+    wall_door(M, W, H, 'frame', 'leaf', 'trim')
+    s = M.part('sign')
+    s.add(box((-0.06, -0.07, H + 0.26), (0.44, 0.03, 0.2), bevel=0.02), 'sign')
+    s.add(ellipsoid((-0.12, -0.09, H + 0.26), (0.06, 0.012, 0.06), seg=14, rings=6), 'moon', outline=False)
+    s.add(ellipsoid((-0.095, -0.095, H + 0.27), (0.05, 0.012, 0.05), seg=14, rings=6), 'sign', outline=False)
+    for k in range(3):   # 계단 무늬 (아래로)
+        s.add(box((0.06 + k * 0.05, -0.088, H + 0.3 - k * 0.04), (0.05, 0.006, 0.014), bevel=0.002), 'trim')
+    l = M.part('lamp')   # 문 위 오른쪽에 매단 작은 등불 (한 칸 안에 들게)
+    lx, lz = W / 2 - 0.02, H + 0.5
+    l.add(box((lx, -0.03, lz + 0.08), (0.04, 0.06, 0.04), bevel=0.006), 'brass')
+    l.add(cylinder((lx, -0.07, lz + 0.08), (lx, -0.07, lz), 0.008, seg=6), 'brass')
+    l.add(cylinder((lx, -0.07, lz), (lx, -0.07, lz - 0.18), 0.06, 0.07, seg=12), 'lamp')
+    l.add(ellipsoid((lx, -0.07, lz - 0.1), (0.045, 0.045, 0.06), seg=12, rings=6), 'glow', outline=False)
+    l.add(cone((lx, -0.07, lz), (lx, -0.07, lz + 0.06), 0.075, 0.02, seg=12), 'brass')
+
+
+def b_garden_door(M):
+    """FU-81 정원 코너 문 (벽): 도토리상점 1층 → 정원 용품·도구 코너 RM-22 (낮에만 열림). 연두 문 · 창살 유리 · 문틀을 감는 덩굴 잎 · 위 화분 팻말"""
+    W, H = 0.72, 1.72
+    wall_door(M, W, H, 'frame', 'leaf', 'trim')
+    g = M.part('glass')
+    g.add(box((0, -0.05, H * 0.76), (0.42, 0.012, 0.34), bevel=0.01), 'window', outline=False)
+    g.add(box((0, -0.058, H * 0.76), (0.025, 0.012, 0.34), bevel=0.003), 'trim')
+    g.add(box((0, -0.058, H * 0.76), (0.42, 0.012, 0.025), bevel=0.003), 'trim')
+    v = M.part('vine')
+    rnd = random.Random(81)
+    pts = [V((-W / 2 - 0.04, -0.08, 0.2)), V((-W / 2 - 0.06, -0.08, 1.0)), V((-W / 2 + 0.05, -0.09, H + 0.16)), V((W / 2 + 0.04, -0.08, H + 0.12))]
+    path = bezier(*pts, 16)
+    v.add(tube(path, [0.014] * len(path), seg=6), 'stem')
+    for i in range(1, 16):   # 잎
+        p = path[i]
+        v.add(ellipsoid((max(-0.44, min(0.44, p.x + rnd.uniform(-0.04, 0.04))), p.y - 0.02, p.z + rnd.uniform(-0.03, 0.03)), (0.05, 0.012, 0.03), rot=rot_xyz(y=rnd.uniform(-1, 1)), seg=10, rings=5), 'leafDark' if i % 3 == 0 else 'leaf2')
+    s = M.part('sign')
+    s.add(box((0, -0.07, H + 0.3), (0.46, 0.03, 0.18), bevel=0.02), 'sign')
+    s.add(cylinder((0.12, -0.09, H + 0.24), (0.12, -0.09, H + 0.3), 0.04, 0.05, seg=12), 'pot')
+    s.add(ellipsoid((0.12, -0.09, H + 0.34), (0.04, 0.012, 0.04), seg=10, rings=5), 'leaf2')
+    petal_flower(s, (-0.1, -0.09, H + 0.3), 0.045, 'flower', 'center', normal=(0, -1, 0.0), n=5)
+
+
+def b_plant_shelf(M):
+    """FU-82 화분 선반 (2×1): 정원 코너 북쪽 벽의 세 단 계단 선반 · 작은 화분 아홉 (새싹·꽃·다육)"""
+    m = M.part('shelf')
+    W, D = 1.86, 0.8
+    for sx in (1, -1):
+        m.add(box((sx * (W / 2 - 0.04), 0, 0.5), (0.06, D - 0.04, 1.0), bevel=0.012), 'woodDark')
+    steps = ((-0.24, 0.32), (0.0, 0.62), (0.24, 0.92))   # (y, 윗면 z) — 앞이 낮다
+    for y, z in steps:
+        m.add(box((0, y, z - 0.02), (W - 0.1, 0.26, 0.04), bevel=0.01), 'wood')
+    p = M.part('pots')
+    rnd = random.Random(82)
+    for j, (y, z) in enumerate(steps):
+        for k in range(3):
+            x = -0.6 + k * 0.6 + rnd.uniform(-0.05, 0.05)
+            r = 0.08 + 0.02 * ((j + k) % 2)
+            p.add(cylinder((x, y, z), (x, y, z + 0.14), r * 0.8, r, seg=14), 'pot' if (j + k) % 2 else 'potLight')
+            p.add(cylinder((x, y, z + 0.12), (x, y, z + 0.135), r * 0.92, seg=14), 'soil')
+            kind = (j * 3 + k) % 3
+            if kind == 0:   # 새싹 두 잎
+                p.add(cylinder((x, y, z + 0.13), (x, y, z + 0.22), 0.008, seg=6), 'stem')
+                for s in (1, -1):
+                    p.add(ellipsoid((x + s * 0.04, y, z + 0.23), (0.045, 0.015, 0.022), rot=rot_xyz(y=s * 0.4), seg=10, rings=5), 'leaf2')
+            elif kind == 1:   # 꽃
+                p.add(cylinder((x, y, z + 0.13), (x, y, z + 0.26), 0.008, seg=6), 'stem')
+                petal_flower(p, (x, y - 0.01, z + 0.28), 0.04, 'flower' if j % 2 else 'flower2', 'center', normal=(0, -0.5, 0.85), n=5, phase=k)
+            else:   # 다육
+                for a in range(5):
+                    ang = a * TAU / 5
+                    p.add(ellipsoid((x + 0.035 * math.cos(ang), y + 0.035 * math.sin(ang), z + 0.17), (0.035, 0.035, 0.05), rot=rot_xyz(x=0.5 * math.sin(ang), y=-0.5 * math.cos(ang)), seg=8, rings=5), 'leafDark')
+
+
+def b_honesty_box(M):
+    """FU-83 무인 계산함 (1×1): 밤 코너 RM-21 — 밤톨이 1층 계산대에 있는 동안 지하에서 고른 물건 값을 넣는 나무 상자. 돈 넣는 틈 · 도토리 패 · 위 작은 초롱(glow) · 쪽지"""
+    m = M.part('box')
+    m.add(box((0, 0, 0.04), (0.6, 0.6, 0.08), bevel=0.02), 'woodDark')
+    m.add(box((0, 0, 0.3), (0.42, 0.42, 0.44), bevel=0.03), 'wood')
+    m.add(box((0, 0, 0.27), (0.44, 0.44, 0.04), bevel=0.01), 'woodDark')   # 띠
+    m.add(box((0, 0, 0.54), (0.5, 0.5, 0.05), bevel=0.016), 'top')
+    m.add(box((0, -0.05, 0.568), (0.2, 0.03, 0.01), bevel=0.003), 'slot', outline=False)
+    m.add(ellipsoid((0, -0.216, 0.36), (0.09, 0.02, 0.09), seg=18, rings=8), 'plaque')
+    m.add(ellipsoid((0, -0.23, 0.345), (0.04, 0.012, 0.05), seg=12, rings=6), 'acorn')
+    m.add(ellipsoid((0, -0.23, 0.39), (0.05, 0.014, 0.024), seg=12, rings=6), 'acornCap')
+    m.add(box((0.12, -0.215, 0.16), (0.16, 0.006, 0.1), bevel=0.003, rot=rot_xyz(y=0.12)), 'paper', outline=False)
+    l = M.part('lamp')
+    l.add(cylinder((0.14, 0.12, 0.565), (0.14, 0.12, 0.6), 0.05, seg=12), 'brass')
+    l.add(ellipsoid((0.14, 0.12, 0.68), (0.06, 0.06, 0.08), seg=14, rings=8), 'lamp')
+    l.add(ellipsoid((0.14, 0.12, 0.68), (0.035, 0.035, 0.05), seg=10, rings=6), 'glow', outline=False)
+    l.add(cylinder((0.14, 0.12, 0.76), (0.14, 0.12, 0.79), 0.03, seg=10), 'brass')
+
+
+def b_lantern_shelf(M):
+    """FU-84 등불 진열장 (2×1): 밤 코너 RM-21 의 두 단 진열장 (윗면 0.78 — 밤 간식이 놓인다) · 윗단 위에 매단 종이 등불 셋(glow) · 아랫단 바구니"""
+    m = M.part('shelf')
+    W, D, H = 1.86, 0.72, 0.78
+    for sx in (1, -1):
+        for sy in (1, -1):
+            m.add(box((sx * (W / 2 - 0.05), sy * (D / 2 - 0.05), H / 2), (0.07, 0.07, H), bevel=0.012), 'woodDark')
+    m.add(box((0, 0, H - 0.02), (W, D, 0.05), bevel=0.016), 'top')
+    m.add(box((0, 0, 0.32), (W - 0.1, D - 0.1, 0.04), bevel=0.01), 'wood')
+    m.add(box((0, D / 2 - 0.03, 0.55), (W - 0.1, 0.02, 0.44), bevel=0.006), 'wood')   # 뒤 판
+    for x in (-0.55, 0.0, 0.55):   # 아랫단 바구니
+        m.add(cylinder((x, 0, 0.34), (x, 0, 0.46), 0.17, 0.2, seg=14), 'basket')
+    b = M.part('lanterns')
+    yb = D / 2 - 0.04   # 뒤쪽 위에 걸어 둔다 (윗면 앞쪽은 물건 자리)
+    for sx in (1, -1):
+        b.add(cylinder((sx * (W / 2 - 0.05), yb, H), (sx * (W / 2 - 0.05), yb, H + 0.62), 0.014, seg=6), 'woodDark')
+    b.add(cylinder((-W / 2 + 0.05, yb, H + 0.6), (W / 2 - 0.05, yb, H + 0.6), 0.008, seg=6), 'string')
+    for k, x in enumerate((-0.6, 0.0, 0.6)):
+        b.add(cylinder((x, yb, H + 0.6), (x, yb, H + 0.52), 0.004, seg=4), 'string')
+        b.add(ellipsoid((x, yb, H + 0.42), (0.085, 0.085, 0.1), seg=14, rings=8), 'lamp' if k != 1 else 'lamp2')
+        b.add(ellipsoid((x, yb - 0.01, H + 0.42), (0.05, 0.05, 0.065), seg=10, rings=6), 'glow', outline=False)
+        for dz in (0.1, -0.1):
+            b.add(cylinder((x, yb, H + 0.42 + dz), (x, yb, H + 0.42 + dz * 1.15), 0.045, seg=10), 'woodDark')
+
+
 BUILDERS = {
     'glow-star-lamp': b_glow_star_lamp, 'moon-lamp': b_moon_lamp, 'firefly-jar': b_firefly_jar, 'star-rug': b_star_rug, 'crystal-ball': b_crystal_ball,
     'paint-easel': b_paint_easel, 'sea-chart-frame': b_sea_chart_frame, 'star-telescope': b_star_telescope,
@@ -1661,6 +1822,8 @@ BUILDERS = {
     'tool-stand': b_tool_stand, 'seed-shelf': b_seed_shelf, 'long-tank': b_long_tank, 'long-terrarium': b_long_terrarium,
     'clothes-rack': b_clothes_rack,   # 11차 D102-A 도토리상점 옷 진열대 FU-54
     'tarot-table': b_tarot_table, 'candle-stand': b_candle_stand, 'star-drape': b_star_drape,   # P44 새벽 천막 붙박이 FU-60–62
+    'display-cover': b_display_cover, 'cellar-door': b_cellar_door, 'garden-door': b_garden_door,   # 실내 전수 — 도토리상점 낮/밤 매장 붙박이 FU-79–84
+    'plant-shelf': b_plant_shelf, 'honesty-box': b_honesty_box, 'lantern-shelf': b_lantern_shelf,
 }
 
 

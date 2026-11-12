@@ -1,0 +1,172 @@
+{
+  "id": "RM-22",
+  "slug": "shop-garden",
+  "kind": "place",
+  "place": "shop-garden",
+  "parent": "shop",
+  "phase": "day",
+  "name": "정원·도구 코너",
+  "version": 1,
+  "status": "review",
+  "note": "실내 전수: 도토리상점 1층 동쪽 정원 코너 문(FU-81)으로 들어가는 낮(8–22시) 방. 동쪽 도구 받침에 도구 다섯, 씨앗 진열대에 꽃씨·묘목, 서쪽 받침에 오늘의 야외 가구, 서쪽 진열대에 늘 파는 것(잠수 용품 tool.scuba-kit · 섬 여행 표 — rules.json shop.always), 북쪽 화분 선반(FU-82). 주인은 없고 진열품 앞 「보기」로 산다 (값은 1층 계산대 밤톨이 받음). 문 매트로 나가면 1층 정원 코너 문 앞.",
+  "size": [
+    8,
+    6
+  ],
+  "wallpaper": "wp-06",
+  "floor": "fl-07",
+  "windows": [
+    "n:1",
+    "n:6"
+  ],
+  "door": {
+    "gx0": 3,
+    "gx1": 4
+  },
+  "furniture": [
+    {
+      "fu": "FU-39",
+      "name": "도구 받침",
+      "box": [
+        1,
+        3,
+        0.12
+      ],
+      "color": "#B98A5A",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-40",
+      "name": "씨앗 진열대",
+      "box": [
+        1,
+        2,
+        0.6
+      ],
+      "color": "#C99A63",
+      "gx": 7,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "fu": "FU-35",
+      "name": "야외 가구 받침",
+      "box": [
+        2,
+        2,
+        0.18
+      ],
+      "color": "#C99A63",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "fu": "FU-40",
+      "name": "늘 파는 것 진열대",
+      "box": [
+        1,
+        2,
+        0.6
+      ],
+      "color": "#C99A63",
+      "gx": 0,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "fu": "FU-82",
+      "name": "화분 선반",
+      "box": [
+        2,
+        1,
+        1
+      ],
+      "color": "#C99A63",
+      "gx": 3,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 2,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 5,
+      "gz": 0,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.umbrella-stand",
+      "gx": 6,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.rod-rack",
+      "wall": "w",
+      "slot": 1
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "n",
+      "slot": 3
+    }
+  ],
+  "stock": [
+    {
+      "group": "outdoor",
+      "lx": 1,
+      "lz": 1,
+      "y": 0.18,
+      "fit": 1.7,
+      "count": 1
+    },
+    {
+      "group": "tools",
+      "lx": 7.5,
+      "lz": 0.35,
+      "y": 0.12,
+      "dz": 0.55,
+      "count": 5
+    },
+    {
+      "group": "seeds",
+      "lx": 7.5,
+      "lz": 3.3,
+      "y": 0.6,
+      "dz": 0.45,
+      "count": 2
+    },
+    {
+      "group": "saplings",
+      "lx": 7.5,
+      "lz": 4.2,
+      "y": 0.6,
+      "dz": 0.45,
+      "count": 2
+    },
+    {
+      "group": "always",
+      "lx": 0.5,
+      "lz": 3.35,
+      "y": 0.6,
+      "dz": 0.6,
+      "count": 3
+    }
+  ]
+}

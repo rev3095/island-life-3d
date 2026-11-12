@@ -9,18 +9,54 @@ import { resolveFurniture, FACE } from './interior.js';
 
 // 웹 빌드는 JS 안에 따옴표로 적힌 에셋 경로 글자로 넣을 파일을 찾는다 (interior.js WEB_FILES 와 같은 까닭)
 // M12 밤·새벽 (보드 night D109-A · D111-A): 달빛 가게 moonshop RM-10 · 새벽 천막 tent RM-11 — 건물은 gameplay/night 가 밤에 섬에 놓고 world.places 에 문을 알린다
-export const PLACE_FILES = ['assets/interior/places/shop.json', 'assets/interior/places/museum.json', 'assets/interior/places/moonshop.json', 'assets/interior/places/tent.json'];
-export const PLACE_KINDS = ['shop', 'museum', 'moonshop', 'tent'];
+// 실내 전수: 도토리상점 딸린 방 — shop-garden 정원·도구 코너 RM-22 (낮) · shop-night 지하 밤 코너 RM-21 (밤). 섬 문이 아니라 1층 실내 문(inner)으로 드나든다
+export const PLACE_FILES = ['assets/interior/places/shop.json', 'assets/interior/places/museum.json', 'assets/interior/places/moonshop.json', 'assets/interior/places/tent.json', 'assets/interior/places/shop-garden.json', 'assets/interior/places/shop-night.json'];
+export const PLACE_KINDS = ['shop', 'museum', 'moonshop', 'tent', 'shop-garden', 'shop-night'];
+/** 딸린 방 → 그 방으로 들어가는 1층 (섬 건물이 없다) */
+export const PLACE_PARENT = { 'shop-garden': 'shop', 'shop-night': 'shop' };
+/** 섬 문으로 들어가는 곳 (딸린 방 빼고) */
+export const OUTER_KINDS = PLACE_KINDS.filter(k => !PLACE_PARENT[k]);
+/** 그 장소의 맨 바깥 (딸린 방이면 1층) */
+export const rootOf = kind => PLACE_PARENT[kind] ?? kind;
 /** 진열(stock) 대신 박물관 전시(cases)를 쓰는 곳 */
 export const EXHIBIT_KINDS = ['museum'];
 /** 상점·박물관 붙박이 모델 (FU-35–42, tools/build-furniture.mjs --fixtures) — 가구 목록·아이템 표 밖 */
 export const FIXTURE_BASE = 'assets/furniture/fixtures';
 export const FIXTURE_INDEX = 'assets/furniture/fixtures/index.json';
 /** 섬 건물 모델 slug (door.js 가 문 크기를 읽는다) */
-export const PLACE_BUILDING = { shop: 'shop', museum: 'museum', moonshop: 'night-shop', tent: 'dawn-tent' };
+export const PLACE_BUILDING = { shop: 'shop', museum: 'museum', moonshop: 'night-shop', tent: 'dawn-tent', 'shop-garden': 'shop', 'shop-night': 'shop' };
 export const MUSEUM_CATS = ['fish', 'bug', 'fossil'];
 /** 케이스 안쪽 여백 (m) */
 const CASE_PAD = 0.22;
+
+/** 이름표(UI-31) 앞 그림 */
+export const PLACE_ICON = { shop: '🏪', 'shop-garden': '🪴', 'shop-night': '🌙', museum: '🏛', moonshop: '🌙', tent: '🔮' };
+/**
+ * 매장(phase)의 진열 묶음 (economy.stockGroups() → 방 배치 stock[].group 이 읽는 이름표). 밤엔 groups.night 의 것에 night- 를 붙여 더한다:
+ * night-furniture · night-tools · night-snacks (rules.json shop.night). 낮·밤 모두 always (rules.json shop.always)
+ */
+export function phaseGroups(groups, phase) {
+  if (phase !== 'night' || !groups) return groups ?? {};
+  const n = groups.night ?? {};
+  return { ...groups, 'night-furniture': n.furniture ?? [], 'night-tools': n.tools ?? [], 'night-snacks': n.snacks ?? [] };
+}
+/** 낮/밤 매장 (실내 전수): 방 배치 phases.{day,night} 를 늘 있는 칸에 더한 배치. phases 가 없으면 그대로 */
+export function phaseSpec(spec, phase) {
+  const P = spec?.phases?.[phase];
+  if (!P) return spec;
+  return { ...spec, furniture: [...(spec.furniture ?? []), ...(P.furniture ?? [])], stock: [...(spec.stock ?? []), ...(P.stock ?? [])], keeper: P.keeper ?? spec.keeper, talk: P.talk ?? spec.talk, phase, phaseName: P.name ?? null };
+}
+/** 방 배치의 매장 갈래 이름들 (phases 가 없으면 [null]) */
+export const phasesOf = spec => (spec?.phases ? Object.keys(spec.phases) : [null]);
+/** 실내 문 (1층 벽 → 딸린 방): { to, wall, slot, phase, name } 가 그 매장에서 열렸나 */
+export const innerOpen = (door, phase) => !door.phase || door.phase === phase;
+/** 실내 문 앞 (방 기준): 문 자리 lx, lz · 문 앞에 설 곳 sx, sz · 문을 보는 방향 facing (player.facing 규칙: 앞 = (-sin f, -cos f)) · 나올 때 볼 방향 back */
+export function innerSpot(spec, door) {
+  const [w, d] = sizeOf(spec), s = door.slot + 0.5;
+  if (door.wall === 'n') return { lx: s, lz: 0, sx: s, sz: 0.75, facing: 0, back: Math.PI };
+  if (door.wall === 'w') return { lx: 0, lz: s, sx: 0.75, sz: s, facing: Math.PI / 2, back: -Math.PI / 2 };
+  return { lx: w, lz: s, sx: w - 0.75, sz: s, facing: -Math.PI / 2, back: Math.PI / 2 };
+}
 
 export const sizeOf = spec => (Array.isArray(spec?.size) && spec.size.length === 2 ? spec.size : [8, 8]);
 export const doorOf = spec => spec?.door ?? { gx0: 3, gx1: 4 };
@@ -142,14 +178,15 @@ export function checkPlace(spec, furnIndex) {
     if (!fits(placed, r.rec, info, { reserved: doorCellsOf(spec), w, d })) out.push(`${name}: (${r.rec.gx}, ${r.rec.gz}) rot ${r.rec.rot} 에 안 들어가요 (벽·문 매트·다른 가구)`);
     placed.push(r.rec);
   }
-  if (!list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
+  const sub = !!spec.parent;   // 딸린 방 (정원 코너·지하 밤 코너): 주인·계산대 없이 진열품 앞 「보기」로 산다
+  if (!sub && !list.some(r => r.entry.role === 'counter')) out.push('계산대·안내대(role: counter)가 없어요');
   const B = boundsOf(spec), inRoom = p => p && Number.isFinite(p.lx) && Number.isFinite(p.lz) && p.lx > B.x0 && p.lx < B.x1 && p.lz > B.z0 && p.lz < B.z1;
   const boxes = blockersOf(spec, list);
   const k = spec.keeper;
-  if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
+  if (sub) { /* 주인·말 거는 자리 없음 */ } else if (!k || !inRoom(k) || !(k.face in FACE) || !k.slug) out.push('keeper = { slug, lx, lz, face: n|e|s|w } 가 방 안에 있어야 해요');
   else if (boxes.slice(0, boxes.length - 1).some(b => inBox(b, k.lx, k.lz))) out.push('keeper 가 가구·케이스 위에 서 있어요');
   const t = spec.talk;
-  if (!inRoom(t)) out.push('talk = { lx, lz } 가 방 안에 있어야 해요');
+  if (sub) { /* 없음 */ } else if (!inRoom(t)) out.push('talk = { lx, lz } 가 방 안에 있어야 해요');
   else if (boxes.some(b => inBox(b, t.lx, t.lz, 0.2))) out.push('talk 자리가 가구·케이스와 겹쳐요');
   for (const c of spec.cases ?? []) {
     if (!(c.lx0 >= 0 && c.lz0 >= 0 && c.lx1 <= w && c.lz1 <= d - 1 && c.lx1 > c.lx0 && c.lz1 > c.lz0)) out.push(`${c.name ?? c.cat}: 케이스가 방 밖이거나 문 매트 줄에 걸려요`);
@@ -160,6 +197,17 @@ export function checkPlace(spec, furnIndex) {
     }
   }
   const m = doormatOf(spec);
-  if (inRoom(t) && !reachable(spec, list, { lx: m.lx, lz: m.entry }, t)) out.push('문 매트에서 talk 자리까지 걸어갈 수 없어요');
+  if (!sub && inRoom(t) && !reachable(spec, list, { lx: m.lx, lz: m.entry }, t)) out.push('문 매트에서 talk 자리까지 걸어갈 수 없어요');
+  // 실내 문: 벽 안 · 그 벽 자리에 문 모델(벽 가구) · 문 매트에서 문 앞까지 길
+  for (const dr2 of spec.inner ?? []) {
+    const max = dr2.wall === 'n' ? w : d;
+    if (!['n', 'e', 'w'].includes(dr2.wall) || !(dr2.slot >= 0 && dr2.slot < max)) { out.push(`실내 문 ${dr2.to}: 벽 자리 ${dr2.wall}:${dr2.slot} 가 방 밖이에요`); continue; }
+    if (!list.some(r => r.rec.wall === dr2.wall && r.rec.slot === dr2.slot)) out.push(`실내 문 ${dr2.to}: ${dr2.wall}:${dr2.slot} 에 문 모델(벽 가구)이 없어요`);
+    const f = innerSpot(spec, dr2);
+    if (boxes.some(b => inBox(b, f.sx, f.sz, 0.15))) out.push(`실내 문 ${dr2.to}: 문 앞이 가구로 막혀요`);
+    else if (!reachable(spec, list, { lx: m.lx, lz: m.entry }, { lx: f.sx, lz: f.sz })) out.push(`실내 문 ${dr2.to}: 문 매트에서 문 앞까지 걸어갈 수 없어요`);
+  }
+  // 진열 줄: 방 안
+  for (const row of spec.stock ?? []) if (!inRoom({ lx: row.lx, lz: row.lz })) out.push(`진열 ${row.group}: (${row.lx}, ${row.lz}) 가 방 밖이에요`);
   return out;
 }

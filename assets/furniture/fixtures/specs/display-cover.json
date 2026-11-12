@@ -1,0 +1,63 @@
+{
+  "id": "FU-79",
+  "slug": "display-cover",
+  "item": "fixture.display-cover",
+  "name": "진열 덮개 천",
+  "category": "fixture",
+  "kind": "display-cover",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "밤에 1층 진열 받침을 덮은 천. 덮인 가구 둔덕, 모서리로 흘러내린 자락, 앞에 「밤엔 쉬어요」 달 팻말.",
+    "keywords": [
+      "천 덮개",
+      "달 팻말",
+      "밤 쉼"
+    ],
+    "references": [
+      "동네 잡화점·작은 가게 지하"
+    ],
+    "avoid": [
+      "번쩍이는 금속",
+      "복잡한 무늬"
+    ],
+    "notes": "실내 전수 (interiors-all) — 도토리상점 낮/밤 매장 붙박이 (가구 목록·아이템 표 밖, assets/furniture/fixtures). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "woodDark": "#8C6440",
+    "cloth": "#5A6A9C",
+    "clothDark": "#46537E",
+    "trim": "#E8C26A",
+    "tag": "#FFF3DC",
+    "moon": "#F2D16B"
+  },
+  "paletteLabels": {
+    "woodDark": "짙은 나무",
+    "cloth": "덮개 천",
+    "clothDark": "천 주름",
+    "trim": "금빛 띠",
+    "tag": "팻말",
+    "moon": "달"
+  },
+  "footprint": [
+    2,
+    2
+  ],
+  "place": "floor",
+  "animations": []
+}

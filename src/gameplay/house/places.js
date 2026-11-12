@@ -8,13 +8,19 @@
 //    모델을 못 읽으면 배치의 box·color 로 임시 상자(케이스는 코드 상자)를 그린다.
 //  - 사양(ctx.quality)이 낮음·매우 낮음이면 배치의 deco 소품·수조 물·물풀 장식을 숨기고, 매우 낮음이면 전시 물고기가 움직이지 않는다 (그림자·외곽선은 render 가 사양대로 끈다).
 //  - 주인(밤톨·느루)을 계산대·안내대 뒤에 세우는 일은 town 이 한다 (keepers.js 가 info(kind).keeper 를 본다). 들고 날 때 place:enter / place:leave { place }.
-// 상태: state.house.place = 실내에서 저장했으면 'shop'|'museum' (이어하기).
+//  - 실내 전수 (사용자 요청 6·7번): 도토리상점은 늘 들어간다. 매장(phase)은 들어갈 때 시각으로 정하고(economy.phase — 영업 시각 = 낮 매장, 그 밖 = 밤 매장)
+//    상점 안(딸린 방 포함)에 있는 동안은 그대로. 방 배치 phases.{day,night} 가 그 매장의 가구·진열을 더하고, 1층 실내 문(inner)이
+//    딸린 방(PLACE_PARENT: 정원·도구 코너 RM-22 낮 · 지하 밤 코너 RM-21 밤)으로 이어진다. 실내 문은 door.js through({ dir: 'pass' }).
+//    진열품은 앞에서 「보기」 → 사기, 주인(밤톨)과 말하면 팔기·주문 창 (town keepers). 들어가면 오른쪽 위 이름표 UI-31.
+// 상태: state.house.place = 실내에서 저장했으면 그 방 kind ('shop'|'museum'|'shop-garden'|…, 이어하기).
 import { boxOf, moveCircle, inBox } from './grid.js';
 import { PLACE_ROOMS, buildRoom, wallMount, cornerOf, cameraBox, CAMERA_CURVE } from './room.js';
 import { resolveFurniture, FACE, DEFAULT } from './interior.js';
-import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, EXHIBIT_KINDS, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan } from './placedata.js';
+import { PLACE_FILES, PLACE_KINDS, PLACE_BUILDING, PLACE_PARENT, OUTER_KINDS, EXHIBIT_KINDS, MUSEUM_CATS, FIXTURE_BASE, sizeOf, doorOf, doormatOf, boundsOf, blockersOf, exhibitPlan, stockPlan,
+  rootOf, phaseSpec, phasesOf, innerOpen, innerSpot, phaseGroups, PLACE_ICON } from './placedata.js';
 import { createFurnitureKit } from './furniture.js';
 import { patternTexture } from './pattern.js';
+import { josa } from './craft.js';
 
 const PUSH_TIME = 0.2;
 const WALL_Y = 1.15;                    // 임시 벽 가구 아래 끝 높이 (visit.js 와 같다)
@@ -31,13 +37,13 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   const { THREE, scene, events, state, materials } = ctx;
   const world = ctx.services.world, player = ctx.services.player;
   const S = state.house;
-  const P = { where: null, busy: false, pushT: 0, pushOutT: 0, clock: 0 };
+  const P = { where: null, busy: false, pushT: 0, pushOutT: 0, clock: 0, phase: null };   // phase: 상점에 들어갈 때 정한 매장 (나올 때까지 그대로)
   const rooms = {};
   /** 사양 낮음·매우 낮음: 작은 장식은 뺀다 */
   const light = () => ctx.quality === 'low' || ctx.quality === 'min';
   function applyQuality(R) {
     const lite = light();
-    for (const o of R.objs) if (o.deco) o.root.visible = !lite;
+    for (const set of Object.values(R.sets)) for (const o of set.objs ?? []) if (o.deco) o.root.visible = !lite;
     for (const c of R.cases) c.group.traverse(m => { if (m.userData.deco) m.visible = !lite; });
   }
   events.on('quality:changed', () => { for (const R of Object.values(rooms)) if (R.room) applyQuality(R); });
@@ -57,13 +63,20 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   function makePlace(kind, spec) {
     const origin = PLACE_ROOMS[kind], [w, d] = sizeOf(spec);
     const corner = cornerOf(origin, w, d);
-    const list = (spec.furniture ?? []).map((e, i) => resolveFurniture(e, { models: models() }, i));
-    const R = { kind, spec, origin, w, d, corner, x0: corner.x0, z0: corner.z0, list, room: null, ready: null, objs: [], shown: [], shownKey: null, cases: [] };
-    // 사양이 낮아 deco 소품을 숨기면 충돌에서도 뺀다 (보이지 않는 것에 부딪히지 않게)
-    const all = blockersOf(spec, list), lite = blockersOf(spec, list.filter(r => !r.entry.deco)), bounds = boundsOf(spec);
-    const blockers = () => (light() ? lite : all);
+    // 매장 갈래(phases)마다 배치 묶음 — 가구·충돌·진열이 갈래마다 다르다 (갈래가 없으면 'all' 하나). 가구는 처음 그 매장일 때 짓는다
+    const sets = {};
+    for (const ph of phasesOf(spec)) {
+      const sp = ph ? phaseSpec(spec, ph) : spec;
+      const list = (sp.furniture ?? []).map((e, i) => resolveFurniture(e, { models: models() }, i));
+      // 사양이 낮아 deco 소품을 숨기면 충돌에서도 뺀다 (보이지 않는 것에 부딪히지 않게)
+      sets[ph ?? 'all'] = { phase: ph, spec: sp, list, all: blockersOf(sp, list), lite: blockersOf(sp, list.filter(r => !r.entry.deco)), objs: null, group: null, ready: null };
+    }
+    const R = { kind, base: spec, origin, w, d, corner, x0: corner.x0, z0: corner.z0, sets, key: Object.keys(sets)[0], room: null, ready: null, shown: [], shownKey: null, cases: [],
+      get set() { return R.sets[R.key]; }, get spec() { return R.set.spec; }, get list() { return R.set.list; }, get objs() { return R.set.objs ?? []; } };
+    const bounds = boundsOf(spec);
+    const blockers = () => (light() ? R.set.lite : R.set.all);
     const local = (x, z) => ({ lx: x - R.x0, lz: z - R.z0 });
-    const onRug = (lx, lz) => list.some(r => r.layer === 'rug' && inBox(boxOf(r.rec, r.footprint), lx, lz, -0.1));
+    const onRug = (lx, lz) => R.list.some(r => r.layer === 'rug' && inBox(boxOf(r.rec, r.footprint), lx, lz, -0.1));
     world.addZone({
       contains: (x, z) => Math.abs(x - origin.x) < w && Math.abs(z - origin.z) < d,
       collide(fx, fz, nx, nz, r) {
@@ -84,7 +97,11 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   // ── 행동 키: 문 매트에서 나가기, 실내에선 도구를 쓰지 않는다 (주민 방과 같은 자리 20) ──
   const I = ctx.services.gameplay.interactions;
   const free = () => !P.busy && !H.busy && !doors.busy;
-  I.add({ name: 'house-place-out', intent: 'action', priority: 90, label: '나가기', test: () => (free() && P.where && onDoormat() ? true : null), run: () => leave() });
+  I.add({ name: 'house-place-out', intent: 'action', priority: 90, label: () => (PLACE_PARENT[P.where] ? '1층으로' : '나가기'), test: () => (free() && P.where && onDoormat() ? true : null), run: () => leave() });
+  // 실내 문 (1층 벽 → 딸린 방): 그 매장에서 열렸으면 「정원·도구 코너로」, 아니면 「닫힘 · 낮 8–22시에 열어요」 (92: 진열품 보기(91)·계산대(90)보다 먼저 — 문 앞엔 진열품이 없다)
+  I.add({ name: 'house-place-inner', intent: 'action', priority: 92,
+    label: t => (t.open ? josa(t.door.name, '으로/로') : `닫힘 · ${closedText(t.door)}`), test: () => (free() && P.where ? innerInFront() : null),
+    run: t => (t.open ? goInner(t.door) : closedDoor(t.door)) });
   I.add({ name: 'house-place-idle', intent: 'action', priority: 20, label: '', test: () => (P.where ? true : null), run: () => {} });
   // P45 (동물의 숲처럼): 가게 진열품 앞에서 바로 「보기」 → 설명·값 → 사기, 박물관 전시물 앞에서 「살펴보기」 → 설명판. 계산대 말 걸기(90)·문(90)보다 아래
   I.add({ name: 'house-place-look', intent: 'action', priority: 91,   // 91: 계산대 옆 견본 판(B-21) 앞에서도 「보기」 (진열품이 바로 앞에 있을 때만 뜸)
@@ -167,9 +184,97 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       if (!d.wallet.spend(price)) { ui.toast?.('도토리가 모자라요', '🌰'); return; }
       if (!(d.inventory.add(m.id, 1) > 0)) { d.wallet.add(price); ui.toast?.('가방이 꽉 찼어요', '🎒'); return; }
       ctx.events.emit('sfx', { name: 'acorn' });
-      ui.toast?.(`${it.name} 샀어요!`, it.icon);
+      // 지하 밤 코너엔 주인이 없다: 값은 무인 계산함(FU-83)에
+      ui.toast?.(rooms[P.where]?.spec?.honesty ? `${it.name} 샀어요! 🌰 ${fmt(price)} 은 무인 계산함에` : `${it.name} 샀어요!`, it.icon);
     } finally { P.busy = false; }
   }
+
+  // ── 실내 문 (1층 → 딸린 방) ──
+  /** 지금 방의 실내 문 중 플레이어가 앞에서 보고 있는 것 → { door, open } | null */
+  function innerInFront() {
+    const R = rooms[P.where];
+    if (!R?.base?.inner?.length) return null;
+    const p = player.position, fx = -Math.sin(player.facing), fz = -Math.cos(player.facing);
+    for (const door of R.base.inner) {
+      const f = innerSpot(R.spec, door);
+      const dx = R.x0 + f.lx - p.x, dz = R.z0 + f.lz - p.z, dist = Math.hypot(R.x0 + f.sx - p.x, R.z0 + f.sz - p.z);
+      if (dist > 0.85 || Math.abs(door.wall === 'n' ? dx : dz) > 0.6) continue;
+      const len = Math.hypot(dx, dz) || 1;
+      if ((dx * fx + dz * fz) / len < 0.45) continue;
+      return { door, open: innerOpen(door, R.set.phase ?? P.phase) && !!rooms[door.to] };
+    }
+    return null;
+  }
+  const hourText = h => `${h % 24}시`;
+  /** 닫힌 실내 문 글자: 낮 매장 문이면 「낮 8–22시에 열어요」, 밤이면 「밤 22–8시에 열어요」 */
+  function closedText(door) {
+    const eco = ctx.services.data?.economy;
+    const open = eco?.hours?.open ?? 8, close = eco?.hours?.close ?? 22;
+    return door.phase === 'night' ? `밤 ${hourText(close)}–${hourText(open)}에 열어요` : `낮 ${hourText(open)}–${hourText(close)}에 열어요`;
+  }
+  function closedDoor(door) {
+    events.emit('sfx', { name: 'door', volume: 0.35 });
+    toast(`${josa(door.name, '은/는')} ${closedText(door)}`, door.phase === 'night' ? '🌙' : '🌼');
+  }
+  /** 1층 실내 문 → 딸린 방 (문 앞까지 걸어가 원이 닫히고, 딸린 방 문 매트에서 한 걸음) */
+  async function goInner(door) {
+    const R = rooms[P.where], T = rooms[door.to];
+    if (!R || !T || !free()) return false;
+    P.busy = H.busy = true;
+    try {
+      await build(T);
+      await refresh(T);
+      const f = innerSpot(R.spec, door), m = roomDoor(T);
+      await doors.through({ dir: 'pass', from: { x: R.x0 + (f.sx + f.lx) / 2, z: R.z0 + (f.sz + f.lz) / 2 }, to: { x: m.x, z: m.front - 0.18, facing: 0 }, step: { x: m.x, z: m.entry },
+        arrive: s => moveTo(T.kind, s) });
+    } finally { P.busy = H.busy = false; }
+    return true;
+  }
+  /** 딸린 방 문 매트 → 1층 그 실내 문 앞 (문을 등지고) */
+  async function backToParent() {
+    const R = rooms[P.where], U = rooms[PLACE_PARENT[P.where]];
+    const door = U?.base?.inner?.find(x => x.to === R?.kind);
+    if (!R || !U || !door) return false;
+    P.busy = H.busy = true;
+    try {
+      const m = roomDoor(R), f = innerSpot(U.spec, door);
+      const step = { x: U.x0 + f.sx + (f.sx - f.lx) * 0.6, z: U.z0 + f.sz + (f.sz - f.lz) * 0.6 };
+      await doors.through({ dir: 'pass', from: { x: m.x, z: m.front + 0.2 }, to: { x: U.x0 + f.sx, z: U.z0 + f.sz, facing: f.back }, step, arrive: s => moveTo(U.kind, s) });
+    } finally { P.busy = H.busy = false; }
+    return true;
+  }
+  /** 방 → 방 (화면이 닫힌 동안): 보이는 방·카메라·자리 */
+  function moveTo(kind, { x, z, facing }) {
+    const A = rooms[P.where], B = rooms[kind];
+    if (A?.room) A.room.group.visible = false;
+    P.where = kind;
+    S.place = kind;
+    B.room.group.visible = true;
+    applyQuality(B);
+    player.camera?.setBounds?.(cameraBox(B.origin, B.w, B.d));
+    player.teleport(x, z, facing ?? 0);
+    showTag(B);
+    events.emit('place:move', { from: A?.kind ?? null, to: kind });
+    saveSoon(0.5);
+  }
+
+  // ── UI-31 이름표: 오른쪽 위 「🏪 도토리상점 · 밤 매장」 (투어 섬 이름 UI-23 과 같은 칸) ──
+  let tag = null;
+  function showTag(R) {
+    hideTag();
+    const box = typeof document !== 'undefined' && document.querySelector('.pk-top-right');
+    if (!box || !R) return;
+    const ph = R.set.spec.phaseName;
+    const open = (R.base.inner ?? []).filter(dr => innerOpen(dr, R.set.phase ?? P.phase)).map(dr => dr.name);
+    tag = document.createElement('div');
+    tag.className = 'pk-bubble pk-tour-tag pk-place-tag';
+    tag.setAttribute('role', 'status');
+    tag.textContent = `${PLACE_ICON[R.kind] ?? '🏠'} ${R.base.name ?? ''}${ph ? ` · ${ph}` : ''}`;
+    tag.title = open.length ? `열린 문: ${open.join(', ')}` : '';
+    if (open.length) tag.setAttribute('aria-label', `${tag.textContent}, 열린 문 ${open.join(', ')}`);
+    box.prepend(tag);
+  }
+  function hideTag() { tag?.remove(); tag = null; }
 
   function onDoormat(margin = 0.85) {
     const R = rooms[P.where];
@@ -179,7 +284,26 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
 
   // ── 짓기: 방·가구·케이스 ──
-  function build(R) {
+  /** 매장 갈래 고르기 (갈래가 없는 방은 그대로). 딸린 방은 자기 갈래가 정해져 있다 */
+  function setPhase(R, ph) { if (ph && R.sets[ph]) R.key = ph; }
+  /** 지금 시각의 매장: 'day' | 'night' (economy.phase — 상점 영업 시각이면 낮) */
+  const phaseNow = () => { const h = ctx.services.time?.now?.()?.hour; return ctx.services.data?.economy?.phase?.(h ?? 12) ?? 'day'; };
+  /** 방 껍데기·케이스 (한 번) + 지금 매장 갈래 가구 (갈래마다 처음 한 번, 다른 갈래 가구는 숨김) */
+  function build(R) { return shell(R).then(() => furnish(R)); }
+  function furnish(R) {
+    const set = R.set;
+    for (const o of Object.values(R.sets)) if (o.group) o.group.visible = o === set;
+    if (set.ready) return set.ready;
+    set.group = new THREE.Group();
+    set.group.name = `place-${R.kind}-${R.key}`;
+    R.room.group.add(set.group);
+    set.ready = Promise.all(set.list.map(async r => {
+      try { return r.real ? await realPiece(R, r) : placeholder(R, r); }
+      catch (e) { console.warn('[house] 실내 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(R, r); }
+    })).then(objs => { set.objs = objs.filter(Boolean); for (const o of set.objs) set.group.add(o.root); applyQuality(R); });
+    return set.ready;
+  }
+  function shell(R) {
     if (R.ready) return R.ready;
     const sp = interior.specs;
     R.room = buildRoom(ctx, {
@@ -188,12 +312,9 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     });
     R.room.group.visible = false;
     scene.add(R.room.group);
-    const cases = Promise.all((R.spec.cases ?? []).map(c => caseFixture(R, c).catch(e => { console.warn('[house] 케이스 모델을 못 만들었어요 → 코드 상자', c.fixture, e); return null; })
+    const cases = Promise.all((R.base.cases ?? []).map(c => caseFixture(R, c).catch(e => { console.warn('[house] 케이스 모델을 못 만들었어요 → 코드 상자', c.fixture, e); return null; })
       .then(made => made ?? buildCase(R, c)))).then(list => { R.cases = list; });
-    R.ready = Promise.all([cases, ...R.list.map(async r => {
-      try { return r.real ? await realPiece(R, r) : placeholder(R, r); }
-      catch (e) { console.warn('[house] 실내 가구를 못 만들었어요 → 임시 상자', r.key, e); return placeholder(R, r); }
-    })]).then(([, ...objs]) => { R.objs = objs.filter(Boolean); for (const o of R.objs) R.room.group.add(o.root); applyQuality(R); });
+    R.ready = cases;
     return R.ready;
   }
   function poseRoot(R, root, r) {
@@ -318,7 +439,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   }
   /** 지금 보여 줄 것의 열쇠 (같으면 다시 놓지 않는다) */
   function shownKey(R) {
-    if (!EXHIBIT_KINDS.includes(R.kind)) return `${R.kind}:${JSON.stringify(stockGroupsOf(R.kind))}:${R.spec.sample ? todayDecor().map(d => d.slug).join(',') : ''}`;
+    if (!EXHIBIT_KINDS.includes(R.kind)) return `${R.kind}:${R.key}:${JSON.stringify(stockGroupsOf(R))}:${R.spec.sample ? todayDecor().map(d => d.slug).join(',') : ''}`;
     const mu = ctx.services.data?.museum;
     return `museum:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).length).join(',')}:${MUSEUM_CATS.map(c => (mu?.list?.(c) ?? []).join('|')).join('/')}`;
   }
@@ -334,9 +455,10 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     for (const o of made) R.room.group.add(o.root);
   }
   /** 진열할 오늘의 물건 묶음: 도토리상점 = economy, M12 달빛 가게·새벽 천막 = night 서비스 */
-  function stockGroupsOf(kind) {
-    if (kind === 'shop') {   // + 11차 D102-A 옷 진열대 (outfit.today — 옷장에 있는 옷도 진열은 그대로)
-      const g = ctx.services.data?.economy?.stockGroups?.() ?? {};
+  function stockGroupsOf(R) {
+    const kind = R.kind;
+    if (rootOf(kind) === 'shop') {   // + 11차 D102-A 옷 진열대 (outfit.today — 옷장에 있는 옷도 진열은 그대로) · 실내 전수: 매장 갈래(낮/밤)의 묶음
+      const g = phaseGroups(ctx.services.data?.economy?.stockGroups?.() ?? {}, R.set.phase ?? R.base.phase ?? P.phase ?? 'day');
       const clothes = ctx.services.outfit?.today?.().map(c => c.id) ?? [];
       return clothes.length ? { ...g, clothes } : g;
     }
@@ -381,7 +503,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       dispose() { g.removeFromParent(); g.traverse(o => { o.geometry?.dispose?.(); o.material?.map?.dispose?.(); }); } })];
   }
   function stockJobs(R) {
-    const groups = stockGroupsOf(R.kind);
+    const groups = stockGroupsOf(R);
     return [...sampleJob(R), ...stockPlan(R.spec, groups).map(async s => {
       const tag = o => (o ? Object.assign(o, { meta: { id: s.id, group: s.group, x: R.x0 + s.lx, z: R.z0 + s.lz } }) : o);   // P45 진열품 앞 「보기」
       try {
@@ -449,9 +571,11 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
 
   async function enter(kind) {
     const R = rooms[kind];
-    if (!R || P.where || !free() || H.inside || H.visits?.where) return false;
+    if (!R || PLACE_PARENT[kind] || P.where || !free() || H.inside || H.visits?.where) return false;
     P.busy = H.busy = true;
     try {
+      P.phase = phaseNow();   // 실내 전수: 들어갈 때 매장(낮/밤)을 정하고 나올 때까지 그대로
+      setPhase(R, P.phase);
       await ctx.services.night?.firstVisit?.(kind);   // M12 s20·s21: 밤 가게 첫 방문이면 문 앞 장면이 끝날 때까지
       await build(R);
       await refresh(R);
@@ -464,6 +588,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   async function leave() {
     const R = rooms[P.where];
     if (!R || !free()) return false;
+    if (PLACE_PARENT[R.kind]) return backToParent();   // 딸린 방 문 매트 → 1층
     P.busy = H.busy = true;
     try {
       await doors.through({ dir: 'out', place: world.places?.[R.kind], kind: PLACE_BUILDING[R.kind], room: roomDoor(R), arrive: s => goOut({ spot: s }) });
@@ -481,9 +606,10 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     player.camera?.setCurveScale?.(CAMERA_CURVE);
     player.teleport(R.x0 + lx, R.z0 + lz, facing);
     ctx.services.time?.setIndoor?.(true);
-    ctx.services.audio?.bgm?.(kind);
+    ctx.services.audio?.bgm?.(rootOf(kind));
     const k = keeperSpot(R);
-    events.emit('place:enter', { place: kind, name: R.spec.name ?? '', keeper: k, room: roomBox(R) });
+    showTag(R);
+    events.emit('place:enter', { place: kind, name: R.spec.name ?? '', keeper: k, room: roomBox(R), phase: R.set.phase ?? null });
     saveSoon(0.5);
   }
 
@@ -495,14 +621,16 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     player.camera?.setBounds?.(null);   // 범위를 먼저 풀어야 순간이동 때 카메라가 바로 섬으로 온다
     player.camera?.setCurveScale?.(1);
     if (!quiet) {
-      const d = world.places?.[kind]?.door ?? world.places?.spawn ?? { x: 0, z: 0 };
+      const d = world.places?.[rootOf(kind)]?.door ?? world.places?.spawn ?? { x: 0, z: 0 };
       const s = spot ?? { x: d.x, z: d.z + 0.15, facing: Math.PI };
       player.teleport(s.x, s.z, s.facing ?? Math.PI);
     }
     if (R?.room) R.room.group.visible = false;
+    hideTag();
+    P.phase = null;
     ctx.services.time?.setIndoor?.(false);
     ctx.services.audio?.bgm?.('auto');
-    events.emit('place:leave', { place: kind });
+    events.emit('place:leave', { place: rootOf(kind), from: kind });
     saveSoon(0.5);
   }
 
@@ -510,6 +638,8 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
   async function resume(kind) {
     const R = rooms[kind];
     if (!R) { S.place = null; return; }
+    P.phase = R.base.phase ?? phaseNow();
+    setPhase(R, P.phase);
     await build(R);
     await refresh(R);
     const p = state.player, lx = p.x - R.x0, lz = p.z - R.z0;
@@ -534,7 +664,7 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
       if (!P.where) {
         // 문 쪽으로 밀어서 들어가기 (town 이 연 곳만 — 상점은 영업시간)
         let hit = null;
-        for (const kind of PLACE_KINDS) {
+        for (const kind of OUTER_KINDS) {
           const d = world.places?.[kind]?.door;
           if (d && rooms[kind] && Math.abs(p.x - d.x) < 0.45 && p.z < d.z - 0.2 && p.z > d.z - 1.0) hit = kind;
         }
@@ -570,7 +700,17 @@ export async function createPlaces(ctx, { H, kit, interior, doors, toast, saveSo
     /** 진열품·전시물 자리 (P45 「보기」·「살펴보기」 — 봇·점검이 앞에 서 볼 곳) → [{ id, group, x, z, exhibit? }] */
     shownSpots: kind => (rooms[kind]?.shown ?? []).filter(o => o.meta).map(o => ({ ...o.meta })),
     fixtures: () => fixtures.list.map(m => m.slug),
-    placeholders: kind => (rooms[kind]?.list ?? []).filter(r => !r.real).map(r => r.fu ?? r.key),
+    placeholders: kind => Object.values(rooms[kind]?.sets ?? {}).flatMap(set => set.list).filter(r => !r.real).map(r => r.fu ?? r.key),
+    /** 실내 전수: 지금 매장 ('day'|'night'|null) · 방의 실내 문 [{ to, name, phase, open, x, z (문 앞 월드), facing }] · 그 방으로 가기 (점검·봇) */
+    get phase() { return P.phase; },
+    inner(kind = P.where) {
+      const R = rooms[kind];
+      return (R?.base?.inner ?? []).map(dr => { const f = innerSpot(R.spec, dr); return { to: dr.to, name: dr.name, phase: dr.phase ?? null, open: innerOpen(dr, R.set.phase ?? P.phase), x: R.x0 + f.sx, z: R.z0 + f.sz, facing: f.facing }; });
+    },
+    /** 딸린 방 → 1층 (딸린 방이 아니면 null) */
+    parentOf: kind => PLACE_PARENT[kind] ?? null,
+    /** 매장 갈래 이름 (방 배치 phases) */
+    phases: kind => Object.keys(rooms[kind]?.sets ?? {}),
   };
 
   return {

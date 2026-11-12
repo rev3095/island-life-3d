@@ -264,7 +264,7 @@ export default {
     ctx.events.on('house:enter', (e = {}) => {
       const slug = ownerOf(e);
       roomOwner = slug;
-      if (!slug) return;
+      if (!slug || e.absent) return;   // 실내 전수: 외출·자는 중에 들어간 빈 방 — 주민을 세우지 않는다
       const V = villagers.find(v => v.slug === slug);
       if (!V) return;
       const p = player.position;

@@ -147,14 +147,15 @@ test('D108-A 야행성 달무리: 19시–5시 깨어 있고 낮엔 잠, 새벽�
 });
 
 test('달빛 가게 RM-10 · 새벽 천막 RM-11: 실내 자리 · 건물 · 방 자리가 겹치지 않음', () => {
-  assert.deepEqual(PLACE_KINDS.slice(2), ['moonshop', 'tent']);
+  assert.deepEqual(PLACE_KINDS.slice(2, 4), ['moonshop', 'tent']);
   assert.equal(PLACE_BUILDING.moonshop, CFG.shop.building);
   assert.equal(PLACE_BUILDING.tent, CFG.tent.building);
   for (const [i, k] of PLACE_KINDS.entries()) assert.equal(json(PLACE_FILES[i]).place, k);
   const src = readFileSync(resolve(root, 'src/gameplay/house/room.js'), 'utf8');   // room.js 는 three 를 불러서 글로 읽는다
-  const xs = [...src.match(/PLACE_ROOMS = \{([^}]*\}){4,}[^;]*;/)[0].matchAll(/x: (\d+)/g)].map(m => Number(m[1])).sort((a, b) => a - b);
-  assert.equal(xs.length, 4);
-  for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 32, '실내끼리 32 넘게 떨어짐 (방 가장 큰 16칸 × 2)');
+  // 실내 전수: 상점 딸린 방(정원 코너·지하 밤 코너)은 같은 x 에 z ±40 — 실내끼리 (x, z) 가 32 넘게 떨어짐 (방 가장 큰 16칸 × 2)
+  const pts = [...src.match(/PLACE_ROOMS = \{([^}]*\}){4,}[^;]*;/)[0].matchAll(/x: (-?\d+), z: (-?\d+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+  assert.equal(pts.length, PLACE_KINDS.length);
+  for (const [i, a] of pts.entries()) for (const b of pts.slice(i + 1)) assert.ok(Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])) >= 32, '실내끼리 32 넘게 떨어짐 (방 가장 큰 16칸 × 2)');
   assert.equal(json('assets/interior/places/moonshop.json').keeper.slug, CFG.shop.keeper);
   assert.equal(json('assets/interior/places/tent.json').keeper.slug, CFG.tent.keeper);
 });

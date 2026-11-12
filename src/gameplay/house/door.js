@@ -1,6 +1,7 @@
 // 문 드나들기 (실내 검수 보드 interiors — AN-06 문 열기 · AN-07 걸어 들어가기 · UI-12 원형 전환). 내 집·주민 집·상점·박물관이 같이 쓴다.
 //  들어갈 때: 문 쪽으로 돌아서고 문짝이 안으로 열림(문 소리) → 문간까지 두세 걸음 → 원이 좁아짐 → (어두운 동안) 실내로 → 원이 열리며 문 매트에서 한두 걸음.
 //  나올 때: 문 매트에서 화면 앞으로 걸어 나감 → 원이 좁아짐 → 섬의 문간(문은 열린 채)으로 → 원이 열리며 문 밖으로 두 걸음 → 문이 닫힘.
+//  실내 문 (실내 전수 — 방 → 방, dir 'pass'): 문 쪽으로 몇 걸음 → 원이 좁아짐 → 다른 방 문 앞으로 → 원이 열리며 한 걸음. 섬 건물·문짝 없이 화면 전환만.
 //  흔들림 줄이기(ui.access.calm)면 걷기·문 동작 없이 문 소리와 화면 전환만 (원 없이 전체).
 // 문짝은 건물 모델(assets/env 의 'door' 재질 부분) 크기 그대로 덧씌운 판. 섬 건물은 묶음(InstancedMesh)이라 진짜 문은 못 움직여서,
 // 문간을 어두운 상자로 덮고 그 앞에 같은 색 문짝을 두어 경첩 쪽으로 접어(가로로 줄어들며 어두워짐) 안으로 열리는 것처럼 보이게 한다.
@@ -152,13 +153,13 @@ export function createDoors(ctx, { fadeTo }) {
   }
 
   /**
-   * 문 지나가기. dir 'in' (섬 → 실내) | 'out' (실내 → 섬).
+   * 문 지나가기. dir 'in' (섬 → 실내) | 'out' (실내 → 섬) | 'pass' (실내 문, 방 → 방: from 걸어갈 문 앞 { x, z } · to 도착 { x, z, facing } · step 도착 뒤 걸음 { x, z }).
    *  place: world.places 의 건물 { x, z, door, tx, tz }, kind: 건물 모델 slug, variant: 색 변형 (주민 집 = 주민 slug)
    *  room: 실내 문 매트 { x, front (방 앞 끝 z), entry (들어와서 설 z) } (월드)
    *  arrive({ x, z, facing }): 화면이 닫힌 동안 부른다 — 그 자리로 옮기고 방·카메라·소리를 바꾼다 (Promise 여도 된다)
    * → Promise (다 끝나면). 이미 지나가는 중이면 false
    */
-  async function through({ dir, place, kind, variant = null, room, arrive }) {
+  async function through({ dir, place, kind, variant = null, room, arrive, from = null, to = null, step: after = null }) {
     if (busy) return false;
     busy = true;
     player.freeze(true);
@@ -171,7 +172,20 @@ export function createDoors(ctx, { fadeTo }) {
     try {
       if (motion !== 'none' && place) L = await leafFor(place, kind, variant);
       const outside = L?.front ?? (place?.door ? { x: place.door.x, z: place.door.z - 0.6 } : null);
-      if (dir === 'in') {
+      if (dir === 'pass') {
+        events.emit('sfx', { name: 'door' });
+        if (motion === 'walk' && from) {
+          player.face(from.x, from.z);
+          const plan = walkPlan(player.position, from);
+          const walk = player.walkTo(from.x, from.z, { speed: plan.speed });
+          await wait(plan.fadeAt);
+          await Promise.all([fade(true, plain), walk]);
+        } else await fade(true, plain);
+        await arrive(to);
+        if (motion === 'walk' && after) await Promise.all([fade(false, plain), player.walkTo(after.x, after.z, { speed: TIMING.walk })]);
+        else await fade(false, plain);
+        events.emit('sfx', { name: 'door', volume: 0.45 });
+      } else if (dir === 'in') {
         events.emit('sfx', { name: 'door' });
         if (L) {
           player.face(L.front.x, L.front.z - 3);

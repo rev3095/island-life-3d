@@ -1,0 +1,62 @@
+{
+  "id": "FU-81",
+  "slug": "garden-door",
+  "item": "fixture.garden-door",
+  "name": "정원 코너 문",
+  "category": "fixture",
+  "kind": "garden-door",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 3292,
+  "parts": 4,
+  "materials": [
+    "brass",
+    "center",
+    "flower",
+    "frame",
+    "leaf",
+    "leaf2",
+    "leafDark",
+    "pot",
+    "sign",
+    "stem",
+    "trim",
+    "window"
+  ],
+  "objects": [
+    "door",
+    "glass",
+    "sign",
+    "vine"
+  ],
+  "animations": {},
+  "size": [
+    0.92,
+    0.16,
+    2.11
+  ],
+  "bounds": [
+    [
+      -0.46,
+      -0.14,
+      -0.02
+    ],
+    [
+      0.46,
+      0.02,
+      2.11
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 69896,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "garden-door_front.png",
+    "garden-door_main.png",
+    "garden-door_thumb.png",
+    "garden-door_top.png"
+  ]
+}

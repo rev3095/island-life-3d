@@ -1,8 +1,8 @@
 // 주민 집 들어가기 · 주민 방 (5차 Z2, 검수 보드 D9-A 주민마다 테마 방).
 //  - 주민 집 문(world.places.villagerHouses[].door) 앞에서 행동 키(우선순위 91) 또는 문 쪽으로 밀기 → 그 주민 방으로. 문 매트에서 나온다.
 //    드나드는 동작(문 열기·걷기·원형 전환)은 door.js — 내 집·상점·박물관과 같다.
-//    문 규칙은 town 이 정한다 (Z4 약속, notes/z2-interior.md): town.atHome(slug) 'home' → 들어간다, 'out' → 잠김 알림,
-//    'sleep'·'room' → 이 처리기는 비켜서 town:knock(90) 이 노크한다. town.residents() 에 없는 주민(이사 오기 전) 집 문은 없다.
+//    문 규칙은 town 이 정한다 (Z4 약속, notes/z2-interior.md): town.atHome(slug) 'home' → 들어간다 (방 안에 주민). 실내 전수(사용자 요청 6번)부터
+//    'out' 외출 중 → 들어가면 빈 방 · 'sleep' 자는 중 → 살금살금 빈 방 (house:enter 에 absent 를 실어 town 이 주민을 세우지 않는다). town.residents() 에 없는 주민(이사 오기 전) 집 문은 없다.
 //    atHome 이 없는 town 이면 언제나 열린다.
 //  - 방은 x = 540 에 하나 지어 두고 들어갈 때마다 그 주민 방 스펙(assets/interior/rooms/rm-0N.json)대로 벽지·바닥·가구를 바꿔 끼운다.
 //  - 가구: 아이템 id(item) 또는 FU 번호(fu). 가구 목록(assets/furniture/index.json)에 없으면 스펙의 box 크기·색으로 임시 상자 → 목록에 들어오면 저절로 모델.
@@ -61,9 +61,9 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
   // ── 행동 키 ──
   const I = ctx.services.gameplay.interactions;
   const free = () => !H.busy && !V.busy && !H.inside && !doors.busy;
-  I.add({ name: 'house-visit-in', intent: 'action', priority: 91, label: t => (t.rule === 'locked' ? '노크' : '들어가기'),
+  I.add({ name: 'house-visit-in', intent: 'action', priority: 91, label: t => (t.rule === 'away' ? '들어가기 · 외출 중' : t.rule === 'asleep' ? '살금살금 들어가기' : '들어가기'),
     test: () => { const h = free() && !V.where ? doorInFront(true) : null; const rule = h && doorRule(h.slug); return rule ? { ...h, rule } : null; },
-    run: t => (t.rule === 'locked' ? locked(t.slug) : enter(t.slug)) });
+    run: t => (t.rule === 'locked' ? locked(t.slug) : enter(t.slug)) });   // locked: 예전 규칙 (지금 visitRule 은 내지 않는다)
   I.add({ name: 'house-visit-out', intent: 'action', priority: 90, label: '나가기', test: () => (free() && V.where && onDoormat() ? true : null), run: () => leave() });
   // 주민 방 안에선 도구를 쓰지 않는다 (집 안 빈 바닥과 같은 자리 20)
   I.add({ name: 'house-visit-idle', intent: 'action', priority: 20, label: '', test: () => (V.where ? true : null), run: () => {} });
@@ -170,6 +170,8 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
     if (H.busy || V.busy || H.inside || V.where || !slug || doors.busy) return false;
     V.busy = H.busy = true;
     try {
+      const rule = doorRule(slug);
+      V.absent = rule === 'away' ? 'out' : rule === 'asleep' ? 'sleep' : null;
       const spec = await roomSpecOf(slug);
       await doors.through({ dir: 'in', place: houseOf(slug), kind: 'house-villager', variant: ctx.services.town?.houseVariant?.(slug) ?? slug, room: roomDoor(),
         arrive: async s => { await furnish(spec); goIn(slug, { lx: s.x - vx0, lz: s.z - vz0, facing: s.facing }); } });
@@ -198,8 +200,10 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
     ctx.services.audio?.bgm?.('indoor');
     const spot = hostSpot();
     // room = 방 범위(월드, Z4 town 이 주인 세울 때 씀), roomId = 방 스펙 slug
+    // absent: 'out' 외출 중 · 'sleep' 자는 중 — town 은 주민을 방에 세우지 않는다 (실내 전수)
     events.emit('house:enter', { owner: slug, roomId: V.spec?.slug ?? null, name: V.spec?.name ?? '', spot: spot && { x: spot.x, z: spot.z }, facing: spot?.facing ?? Math.PI,
-      room: { x0: vx0, z0: vz0, x1: vx0 + ROOM_W, z1: vz0 + ROOM_D } });
+      room: { x0: vx0, z0: vz0, x1: vx0 + ROOM_W, z1: vz0 + ROOM_D }, absent: V.absent ?? null });
+    if (V.absent) toast(V.absent === 'sleep' ? `쉿… ${josa(nameOf(slug), '은/는')} 안쪽에서 자고 있어요. 조용히 둘러봐요` : `${josa(nameOf(slug), '은/는')} 외출 중이에요. 문이 열려 있어 잠깐 구경해요`, V.absent === 'sleep' ? '💤' : '🚪');
     saveSoon(0.5);
   }
 
@@ -219,12 +223,15 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
     clearFurniture();
     ctx.services.time?.setIndoor?.(false);
     ctx.services.audio?.bgm?.('auto');
-    events.emit('house:leave', { owner: slug });
+    events.emit('house:leave', { owner: slug, absent: V.absent ?? null });
+    V.absent = null;
     saveSoon(0.5);
   }
 
   /** 저장에서 이어하기: 주민 방 안에서 끝냈으면 다시 그 방에 */
   async function resume(slug) {
+    const rule = doorRule(slug);
+    V.absent = rule === 'away' ? 'out' : rule === 'asleep' ? 'sleep' : null;
     const spec = await roomSpecOf(slug);
     await furnish(spec);
     const p = state.player, lx = p.x - vx0, lz = p.z - vz0;
@@ -245,7 +252,7 @@ export function createVisits(ctx, { H, kit, interior, doors, toast, saveSoon }) 
       if (!V.where) {
         // 문 쪽으로 밀어서 들어가기
         const h = doorInFront(false), p = player.position;
-        const atDoor = h && doorRule(h.slug) === 'open' && Math.abs(p.x - h.door.x) < 0.45 && p.z < h.door.z - 0.2 && p.z > h.door.z - 1.0;
+        const atDoor = h && ['open', 'away', 'asleep'].includes(doorRule(h.slug)) && Math.abs(p.x - h.door.x) < 0.45 && p.z < h.door.z - 0.2 && p.z > h.door.z - 1.0;
         V.pushT = atDoor && input.move.z < -0.5 ? V.pushT + dt : 0;
         if (V.pushT > PUSH_TIME) { V.pushT = 0; enter(h.slug); }
       } else {
