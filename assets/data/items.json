@@ -202,7 +202,14 @@
     { "slug": "sapling", "name": "어린 나무", "emoji": "🌳", "price": 160, "buy": 640, "tree": "tree" },
     { "slug": "cedar-sapling", "name": "삼나무 묘목", "emoji": "🌲", "price": 160, "buy": 640, "tree": "cedar" }
   ],
-  "scubaKit": { "name": "스쿠버 키트", "emoji": "🤿", "price": 750, "buy": 3000, "use": "가방에 넣고 해변 물가에서 행동 키 → 헤엄 · 잠수", "from": "도토리상점 (늘 팔아요)" },
+  "scubaKit": {
+    "name": "스쿠버 키트",
+    "emoji": "🤿",
+    "price": 750,
+    "buy": 3000,
+    "use": "가방에 넣고 해변 물가에서 행동 키 → 헤엄 · 잠수",
+    "from": "도토리상점 (늘 팔아요)"
+  },
   "sea": [
     { "slug": "seaweed", "name": "미역", "time": "종일", "season": "겨울~봄", "shadow": 2, "speed": 0, "price": 600, "rare": false, "emoji": "🌿", "desc": "바위에 붙어 물결 따라 하늘거리는 넓은 잎. 겨울 바다에서 가장 부드럽다." },
     { "slug": "sea-urchin", "name": "성게", "time": "종일", "season": "봄~여름", "shadow": 2, "speed": 1, "price": 1700, "rare": false, "emoji": "✴️", "desc": "가시투성이 밤송이 같은 바다 생물. 가시를 천천히 움직여 바닥을 기어 다닌다." },

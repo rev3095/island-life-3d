@@ -11,6 +11,7 @@
     "src/data/event-items.js",
     "src/data/decor-items.js",
     "src/data/night-items.js",
+    "src/data/sea-items.js",
     "src/data/items.js",
     "src/data/tables.js",
     "src/gameplay/festival/emotes.js",

@@ -3,7 +3,7 @@
 //   다른 트랙(M13·M15)도 주인공 동작을 더할 수 있어 .glb.json 충돌을 피하려는 것 — 나중에 build_character.py 클립(swim·dive)으로 옮겨도
 //   이 파일의 pose() 만 바꾸면 된다. 서기 클립(idle)을 그대로 틀어 두고(dive.js 가 setGait/setStance('idle')) 그 위에 덧돌린다.
 // 잠수복은 옷 칸(모자·윗옷·신발)과 따로 — 바다에 있는 동안만 입고 나오면 원래 옷으로 (assets/clothes/index.json 의 slot 'suit').
-import { Euler, Quaternion, Vector3 } from 'three';
+// three 를 import 하지 않는다 (node 테스트가 pose·bodyPlace 를 읽게) — Euler·Quaternion·Vector3 는 모델의 것으로 만든다
 import { bindClothes } from './wear.js';
 
 export const SUIT_SLUG = 'wetsuit';
@@ -48,6 +48,7 @@ export function createSwim(ctx) {
   const root = scene.children.find(o => o.isGroup && o.name === 'player');
   const model = root?.children?.[0];
   if (!model) return null;
+  const Euler = model.rotation.constructor, Quaternion = model.quaternion.constructor, Vector3 = model.position.constructor;
   const bone = {};
   for (const b of BONES) bone[b] = model.getObjectByName(b) ?? model.getObjectByName(b.replace(/([LR])$/, '.$1'));
   const base = {}, last = {};
