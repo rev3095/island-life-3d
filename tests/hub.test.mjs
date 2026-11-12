@@ -207,7 +207,7 @@ test('목록 도구(tools/hub-catalog.mjs): 저장소 파일 수와 같고, 링�
       // 스토리 편집기: #<탭> (story-editor.html TABS — claude.ai 는 #a/b 를 넘기지 않아 탭까지만)
       if (d.editor === 'story') assert.ok(hash === 'villager' && story.includes("const TABS = ['scenes', 'villager',"), `스토리 편집기 #${hash}`);
       // 요소 편집기: #<표 id> (elem-editor/sheets.js) 또는 방 배치 #rooms.<방·가게 slug>
-      if (d.editor === 'elem') assert.ok(/^rooms\.[\w-]+$/.test(hash) ? existsSync(resolve(root, `assets/interior/rooms/${hash.slice(6)}.json`)) || existsSync(resolve(root, `assets/interior/places/${hash.slice(6)}.json`)) : elemSheets.includes(`{ id: '${hash}', name:`), `요소 편집기 #${hash}`);
+      if (d.editor === 'elem') assert.ok(/^rooms\.[\w-]+$/.test(hash) ? existsSync(resolve(root, `assets/interior/rooms/${hash.slice(6)}.json`)) || existsSync(resolve(root, `assets/interior/places/${hash.slice(6)}.json`)) || existsSync(resolve(root, `assets/interior/halls/${hash.slice(11)}.json`)) : elemSheets.includes(`{ id: '${hash}', name:`), `요소 편집기 #${hash}`);
       if (d.editor === 'sound') assert.ok(soundTabs.includes(`'${hash}'`), `곡 편집기 #${hash}`);
     }
   }

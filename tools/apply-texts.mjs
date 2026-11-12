@@ -1,6 +1,6 @@
 // "스토리 반영" 때 스토리 편집기 「그 밖의 글」 탭 초안(texts/<id>)의 바뀐 글을 파일에 얹는다 (P36).
 //   node tools/apply-texts.mjs <초안.json> [--dry]
-// <초안.json> = 저장소 문서 그대로 ({ which: 'night'|'events'|'tour', file, base, changes: { '<파일 안 경로>': '새 글' }, request }).
+// <초안.json> = 저장소 문서 그대로 ({ which: 'night'|'events'|'tour'|'daily', file, base, changes: { '<파일 안 경로>': '새 글' }, request }).
 // 고칠 수 있는 것: 지금 파일에서 글(한글이 든 문자열)인 칸만 — 숫자·때·id·구조는 「요소」 편집기 몫이라 여기서는 막는다.
 // 파일 모양(줄바꿈·들여쓰기)은 그대로 두려고 글자 단위로 바꾸고, 결과를 다시 읽어 기대한 값과 같은지 본다 (다르면 JSON.stringify 2칸으로 통째로).
 // 바뀐 파일은 version +1. 기준 버전(base)이 지금 파일과 다르면 알린다. 걸리는 칸이 하나라도 있으면 아무것도 쓰지 않고 exit 1.
@@ -11,7 +11,7 @@ import { getAt, same, splitPath } from './edits.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 /** 이 탭이 고치는 파일 (편집기 story-editor/words.js TEXT_FILES 와 같다) */
-export const TEXT_FILES = { night: 'assets/night/night.json', events: 'assets/events/events.json', tour: 'assets/tour/tour.json' };
+export const TEXT_FILES = { night: 'assets/night/night.json', events: 'assets/events/events.json', tour: 'assets/tour/tour.json', daily: 'assets/daily/daily.json' };   // daily = M13 섬 일상 (M17-P4)
 const SKIP = new Set(['about', 'note', 'id', 'sym', 'color', 'kind', 'host', 'keeper', 'building', 'lanterns', 'side', 'near']);
 const isText = (root, path) => typeof getAt(root, path) === 'string' && /[가-힣]/.test(getAt(root, path)) && !splitPath(path).some(k => SKIP.has(k));
 

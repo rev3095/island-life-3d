@@ -1,7 +1,7 @@
 // 요소 편집기 표 정의 — 탭 묶음(GROUPS)과 표(SHEETS). tools/hub-catalog.mjs 가 이 파일의 `  { id: '…', name: '…'` 줄로 홈 「전체 관리」 목록을 만든다
 // (주소 끝 #<표 id> 로 그 표가 열린다). 칸 경로의 첫 칸은 파일 이름: items · rules · events · night · tour · layout · rooms/<slug> · places/<slug>
-// (tools/apply-edits.mjs ELEM_FILES). 각 칸의 fx = "바꾸면 게임에서 무엇이 달라지는지" 한 줄.
-import { CAT_KO, WEEKDAY_KO, TOUR_SHAPES, hourKo } from '../tools/elem-checks.mjs';
+// (tools/apply-edits.mjs ELEM_FILES — M17-P4 부터 halls/<관> · home · rating · journal 도). 각 칸의 fx = "바꾸면 게임에서 무엇이 달라지는지" 한 줄.
+import { CAT_KO, WEEKDAY_KO, TOUR_SHAPES, hourKo, SEA_SPEED_KO, ART_KIND_KO } from '../tools/elem-checks.mjs';
 
 export const SOURCE_KO = { craft: '제작', shop: '상점', gift: '주민 선물', friend: '친밀도 선물', museum: '박물관 보상', birthday: '생일 선물' };
 export const VILLAGER_KO = { coco: '코코', bori: '보리', mochi: '모찌', dubu: '두부', pong: '퐁', chorong: '초롱', danpung: '단풍', gureum: '구름', pado: '파도', dalmuri: '달무리', bamtol: '밤톨', neuru: '느루', byeolbam: '별밤', yeomyeong: '여명' };
@@ -17,6 +17,7 @@ export const GROUPS = [
   { id: 'night', name: '밤·새벽', emo: '🌙' },
   { id: 'tour', name: '투어', emo: '⛵' },
   { id: 'moving', name: '이사', emo: '📦' },
+  { id: 'home', name: '집·별점·일지', emo: '🏠' },
   { id: 'map', name: '섬 지도', emo: '🗺' },
   { id: 'rooms', name: '방 배치', emo: '🛋' },
 ];
@@ -144,8 +145,42 @@ export const SHEETS = [
       { key: 'from', label: '얻는 법 (글)', type: 'text', w: 'w-m' },
       { key: 'size', label: '크기', derived: r => r.size },
     ] },
+  { id: 'sea', name: '바다 생물', group: 'items', file: 'items', section: 'sea', emo: '🐙', hint: '스쿠버 키트를 가방에 넣고 바다에 들어가 잠수(M16)하면 물속 그림자로 보이는 것들이에요. 빠르기 = 다가가면 달아나는 정도 (0 가만히 ~ 3 빠름). 출현 몫은 비우면 값으로 정해요. 박물관 「바다 생물관」에 전시돼요.',
+    cols: T => [
+      { key: '#', label: '번호', derived: (r, i) => code('IC-SE', i) },
+      { key: 'emoji', label: '', derived: r => r.emoji, emo: true },
+      { key: 'name', label: '이름', type: 'text', w: 'w-s', stick: true, fx: '도감·가방·말풍선에 보이는 이름.' },
+      { key: 'price', label: '값', type: 'int', max: 999999, fx: FX_PRICE },
+      { key: 'time', label: '시간', type: 'select', options: keys(T.times), fx: '이 시간대에만 물속에 나와요.' },
+      { key: 'season', label: '계절', type: 'select', options: keys(T.seasons), fx: '이 달들에만 나와요 (달 칸이 따라 바뀜).' },
+      { key: 'months', label: '달', derived: r => (T.seasons[r.season] ?? []).join('·') },
+      { key: 'shadow', label: '그림자', type: 'int', min: 1, max: 6, w: 'w-s', fx: '물속 그림자 크기 — 잡기 전에 크기로 짐작해요.' },
+      { key: 'speed', label: '빠르기', type: 'int', min: 0, max: 3, w: 'w-s', fx: '0 가만히 · 1 느림 · 2 보통 · 3 빠름 — 클수록 다가가면 멀리 달아나요 (dive.js).' },
+      { key: 'speedKo', label: '', derived: r => SEA_SPEED_KO[r.speed ?? 1] ?? '' },
+      { key: 'rare', label: '희귀', type: 'bool', fx: '희귀면 출현 몫이 1 이 되고 잡을 때 반짝여요.' },
+      { key: 'weight', label: '출현 몫', type: 'weight', auto: r => weightOf(T, r.price, r.rare), fx: FX_WEIGHT },
+      { key: 'desc', label: '도감 설명', type: 'text', w: 'w-l' },
+    ] },
+  { id: 'art', name: '미술품', group: 'items', file: 'items', section: 'art', emo: '🖼️', hint: '밤의 특별 상점(여우 상인 가게)·선물 상자에서 얻는 그림·조각 (P54). 가품이 있는 작품은 같은 모델의 색 하나가 달라요 — 가품은 박물관이 받지 않고 팔면 30 도토리. 진품은 박물관 「미술관」에 걸려요 (그림 = 액자 열, 조각 = 받침).',
+    cols: () => [
+      { key: 'code', label: '번호', derived: r => r.code },
+      { key: 'emoji', label: '', derived: r => r.emoji, emo: true },
+      { key: 'name', label: '이름', type: 'text', w: 'w-m', stick: true, fx: '도감·가방·미술관 안내에 보이는 이름 (가품도 같은 이름).' },
+      { key: 'kind', label: '갈래', type: 'select', options: keys(ART_KIND_KO), labels: ART_KIND_KO, fx: '그림은 미술관 액자 열에, 조각은 받침에 놓여요.' },
+      { key: 'price', label: '값', type: 'int', max: 999999, fx: FX_PRICE },
+      { key: 'buy', label: '사는 값', type: 'int', max: 999999, fx: '여우 상인 가게에서 살 때 내는 도토리.' },
+      { key: 'fake', label: '가품', derived: r => (r.fake ? `있음 — ${r.fake.tell}` : '없음') },
+      { key: 'desc', label: '도감 설명', type: 'text', w: 'w-l' },
+    ] },
+  { id: 'dive', name: '잠수·스쿠버', group: 'items', emo: '🤿', object: true, hint: '스쿠버 키트(TL-07)는 손에 드는 도구가 아니라 가방에 있으면 해변 물가에서 행동 키로 헤엄·잠수하게 해 줘요 (입으면 잠수복 CL-13). 도토리상점 정원·도구 코너가 늘 팔아요 (rules.json shop.always).', groups: W => [
+    ['🤿 스쿠버 키트', W.items.scubaKit ? [
+      ['items/scubaKit/buy', '사는 값', 'int', { min: 1, max: 999999 }, '도토리상점에서 살 때 내는 도토리.'],
+      ['items/scubaKit/price', '파는 값', 'int', { max: 999999 }, '상점(밤톨)에 팔 때 받는 도토리.'],
+    ] : []],
+    ['가방', W.items.stack?.sea != null ? [['items/stack/sea', '바다 생물 한 칸에 쌓이는 수', 'int', { min: 1, max: 99 }]] : []],
+  ] },
   { id: 'recipes', name: '레시피', group: 'items', file: 'rules', section: 'recipes', emo: '🔨', recipes: true, hint: '작업대에서 만드는 법. 재료는 정확한 아이템이나 "분류 아무거나"(예: 조개 아무거나 6). 바꾸면 작업대 목록과 필요한 재료가 바로 바뀌어요.' },
-  { id: 'rules', name: '규칙 숫자', group: 'rules', emo: '🎲', object: true, hint: '채집 확률은 0~1 (0.08 = 8%). 나무 흔들기·바위 치기 확률은 더해서 1 을 넘을 수 없어요.', groups: () => [
+  { id: 'rules', name: '규칙 숫자', group: 'rules', emo: '🎲', object: true, hint: '채집 확률은 0~1 (0.08 = 8%). 나무 흔들기·바위 치기 확률은 더해서 1 을 넘을 수 없어요.', groups: W => [
     ['채집', [['rules/gather/fruitPerTree', '과일나무 열매 수', 'int', { min: 1, max: 9 }, '나무를 흔들면 떨어지는 과일 수.'], ['rules/gather/coconutPerPalm', '야자열매 수', 'int', { min: 1, max: 9 }],
       ['rules/gather/rockMaxHits', '바위 하루 칠 수 있는 횟수', 'int', { min: 1, max: 20 }, '바위 하나를 하루에 이만큼 치면 그날은 끝.'], ['rules/gather/chopMaxHits', '나무 하루 도끼질 횟수', 'int', { min: 1, max: 20 }],
       ['rules/gather/shakeBugChance', '나무 흔들기 → 곤충 떨어짐', 'prob'], ['rules/gather/rockBugChance', '바위 치기 → 곤충 튀어나옴', 'prob'],
@@ -163,7 +198,7 @@ export const SHEETS = [
       ['rules/time/whenClosed', '게임을 닫아 둔 동안 (빠르게일 때)', 'select', { options: ['pause', 'catchUp'], labels: { pause: '멈춰 있다가 이어서', catchUp: '흐른 만큼 따라잡기' } }, '「실제와 같게」는 언제나 실제 시계를 따라요. 따라잡기면 오래 닫아 두면 여러 날이 한 번에 지나요 (하루 일은 한 번만).']]],
     ['출현 몫 (값으로 정할 때)', [['items/weight/rare', '희귀', 'num', { min: 0.1, max: 100 }], ['items/weight/byPrice/0/1', '값 1000 이상', 'num', { min: 0.1, max: 100 }],
       ['items/weight/byPrice/1/1', '값 400 이상', 'num', { min: 0.1, max: 100 }], ['items/weight/base', '그 밖', 'num', { min: 0.1, max: 100 }]]],
-    ['가방 한 칸에 쌓이는 수', Object.keys(CAT_KO).map(c => [`items/stack/${c}`, CAT_KO[c], 'int', { min: 1, max: 99 }])],
+    ['가방 한 칸에 쌓이는 수', Object.keys(CAT_KO).filter(c => W.items.stack?.[c] != null).map(c => [`items/stack/${c}`, CAT_KO[c], 'int', { min: 1, max: 99 }])],
     ['그 밖 아이템', [['items/acornBag/price', '도토리 주머니 값', 'int', { max: 99999 }], ['items/acornBag/acorns', '도토리 주머니에 든 도토리', 'int', { min: 1, max: 99999 }, '주머니를 열면 지갑에 들어오는 도토리.'],
       ['items/unknownFossil/price', '감정 전 화석 값', 'int', { max: 99999 }]]],
   ] },
@@ -262,8 +297,42 @@ export const SHEETS = [
       ['rules/moving/letters/max', '편지 수', 'int', { max: 20 }],
     ]],
   ] },
+  { id: 'home', name: '집 증축', group: 'home', emo: '🏠', object: true, hint: '내 집 우편함(92)에서 도토리 빚으로 다음 단계를 짓고, 다음 날 아침에 다 지어져요. 빚을 다 갚아야 다음 단계를 물어요 (M14 · D150-A). 층마다의 방 배치·계단은 「방 배치」 탭 → 내 집 1층·2층·다락.', groups: W => [
+    ['단계', (W.home?.stages ?? []).map((st, i) => [st, i]).filter(([st]) => st.stage > 0).map(([st, i]) => [`home/stages/${i}/cost`, `${st.stage}단계 「${st.name}」 짓는 값`, 'int', { min: 1, max: 9999999 }, `${st.note ? `${st.note} — ` : ''}이 도토리만큼 빚이 생기고, 우편함에서 갚아요.`])],
+    ['갚기', [
+      ['home/repay/0', '갚기 단추 (작게)', 'int', { min: 1, max: 9999999 }, '우편함 「갚기」 창의 첫 단추 금액 (그 밖에 「다 갚기」).'],
+      ['home/repay/1', '갚기 단추 (크게)', 'int', { min: 1, max: 9999999 }],
+      ['home/afterIntro', '첫날 할 일 뒤부터 묻기', 'bool', {}, '켜면 첫날 안내가 끝나야 우편함이 증축을 물어요.'],
+    ]],
+  ] },
+  { id: 'rating', name: '섬 별점', group: 'home', emo: '⭐', object: true, hint: '섬폰 「⭐ 섬 평가」: 꽃·나무·꾸민 가구·울타리·길·다리·집·주민 점수를 더하고 잡초를 빼서 별 1–5 (M14 · D152-A). 하루 리셋·창을 열 때 다시 재요. 처음 오른 별마다 도토리, 별 다섯 처음이면 장면 s25.', groups: W => [
+    ['항목마다 점수', (W.rating?.parts ?? []).flatMap((p, i) => (p.band ? [
+      [`rating/parts/${i}/band`, `${p.icon} ${p.name}: 알맞은 수 (적게~많게)`, 'pair', { max: 999 }, '이 사이면 점수를 다 받아요 (적거나 많으면 줄어요).'],
+      [`rating/parts/${i}/pts`, `${p.icon} ${p.name}: 알맞을 때 점수`, 'int', { max: 999 }],
+    ] : [
+      [`rating/parts/${i}/per`, `${p.icon} ${p.name}: 하나에 점수${p.bad ? ' (빼는 값)' : ''}`, 'num', p.bad ? { min: -99, max: 0 } : { min: 0, max: 99 }, p.bad ? '하나마다 이만큼 빠져요.' : '하나마다 이만큼 더해요.'],
+      [`rating/parts/${i}/max`, `${p.icon} ${p.name}: 세는 최대 수`, 'int', { min: 1, max: 999 }, '이보다 많아도 이만큼만 세요.'],
+    ]).concat([[`rating/parts/${i}/want`, `${p.icon} ${p.name}: 조언하는 기준`, 'int', { max: 999 }, `이보다 ${p.bad ? '많으면' : '적으면'} 섬 평가 창이 「${p.tip}」 하고 알려 줘요.`]]))],
+    ['별 문턱 (점수)', [1, 2, 3, 4].map(n => [`rating/stars/${n}`, `별 ${n + 1}개가 되는 점수`, 'int', { max: 9999 }, '점수 합이 이만큼이면 별이 하나 더 켜져요.'])],
+    ['처음 오른 별 상', [2, 3, 4, 5].map(n => [`rating/rewards/${n}`, `별 ${n}개 처음`, 'int', { max: 999999 }, '처음 이 별에 오르면 받는 도토리.'])],
+  ] },
+  { id: 'journal', name: '섬 일지', group: 'home', emo: '📔', object: true, hint: '섬폰 「📔 섬 일지」(M13): 날마다 할 일 몇 개가 뽑히고, 다 하면 덤 포인트. 오래 하는 목표는 단계마다 포인트, 포인트는 일지 상점에서 바꿔요 (상점 줄은 이 표에 없어요 — 채팅으로).', groups: W => [
+    ['하루', [
+      ['journal/daily', '하루 할 일 수', 'int', { min: 1, max: (W.journal?.tasks ?? []).length || 1 }, '날마다 할 일 목록에서 이만큼 뽑혀요.'],
+      ['journal/allDoneBonus', '다 하면 덤 포인트', 'int', { max: 9999 }],
+      ['journal/afterIntro', '첫날 할 일 뒤부터', 'bool', {}, '켜면 첫날 안내가 끝나야 일지가 열려요.'],
+    ]],
+    ['하루 할 일 (뽑힐 수 있는 것)', (W.journal?.tasks ?? []).flatMap((t, i) => [
+      [`journal/tasks/${i}/need`, `${t.icon} ${t.label}: 몇 번`, 'int', { min: 1, max: 99 }, '이만큼 하면 그 칸이 채워져요.'],
+      [`journal/tasks/${i}/pts`, `${t.icon} ${t.label}: 포인트`, 'int', { max: 9999 }],
+    ])],
+    ['오래 하는 목표', (W.journal?.goals ?? []).flatMap((g, i) => g.steps.flatMap((_, k) => [
+      [`journal/goals/${i}/steps/${k}`, `${g.icon} ${g.label} ${k + 1}단계: 몇 번`, 'int', { min: 1, max: 99999 }],
+      [`journal/goals/${i}/pts/${k}`, `${g.icon} ${g.label} ${k + 1}단계: 포인트`, 'int', { max: 99999 }],
+    ]))],
+  ] },
   { id: 'map', name: '섬 지도', group: 'map', emo: '🗺', custom: 'map', hint: '건물·광장·다리·선착장·축제 광장 자리를 끌어 옮기고, 시드와 나무·꽃 밀도를 바꿔 보세요. 고칠 때마다 섬이 게임과 같은 규칙으로 다시 만들어져요.' },
-  { id: 'rooms', name: '방 배치', group: 'rooms', emo: '🛋', custom: 'rooms', hint: '주민 방 7 · 도토리상점 · 박물관 · 달빛 가게 · 새벽 천막의 가구 자리. 끌어 옮기고(칸에 맞춤) ↻ 로 돌리고, 게임과 같은 배치 검사를 바로 보여 줘요.' },
+  { id: 'rooms', name: '방 배치', group: 'rooms', emo: '🛋', custom: 'rooms', hint: '주민 방 · 내 집 증축 층(1층·2층·다락, 계단) · 도토리상점(낮/밤 매장 · 실내 문 · 딸린 방 정원 코너·지하 밤 코너) · 박물관 로비와 관 여섯 · 밤 가게들의 가구 자리. 끌어 옮기고(칸에 맞춤) ↻ 로 돌리고, 게임과 같은 배치 검사를 바로 보여 줘요.' },
 ];
 export const sheetOf = id => SHEETS.find(s => s.id === id);
 export { CAT_KO, hourKo };

@@ -97,3 +97,24 @@ test('편지 탭: 주민 파일의 편지 종류마다 「언제 나오나」 �
   for (const f of VILLAGER_FILES) for (const k of Object.keys(readJSON(f).lines.letters ?? {})) kinds.add(k);
   for (const k of kinds) assert.ok(LETTER_WHEN[k], `편지 ${k} 의 설명`);
 });
+
+test('M17-P4: 그 밖의 글이 섬 일상(daily.json)과 밤 특별 상점 글을 보이고, 편집기와 반영 도구의 글 파일 목록이 같다', () => {
+  const words = read('story-editor/words.js');
+  const edTF = Function(`return ${words.match(/const TEXT_FILES = (\{[^}]+\})/)[1]}`)();
+  assert.deepEqual(edTF, TEXT_FILES, 'words.js TEXT_FILES = apply-texts.mjs TEXT_FILES');
+  assert.ok(readJSON('assets/story/editor-files.json').files.includes(TEXT_FILES.daily), '게시 목록에 daily.json');
+  const daily = readJSON(TEXT_FILES.daily), leaves = textLeaves(daily);
+  assert.ok(leaves.some(p => p.startsWith('peddler/')) && leaves.some(p => p.startsWith('meteor/')), '행상·유성우 글 칸');
+  const edited = structuredClone(daily);
+  const p = leaves.find(x => x.startsWith('peddler/'));
+  const seg = p.split('/'); let o = edited; for (const k of seg.slice(0, -1)) o = o[k]; o[seg.at(-1)] = '떠돌이 행상 송이가 왔어요!';
+  const r = planTexts({ which: 'daily', changes: textDiff(daily, edited) });
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.after.version, daily.version + 1);
+  // 밤: 살랑·이상한 천막·선물 상자 글이 묶음에 든다 (어느 묶음에도 없으면 「그 밖」)
+  const night = readJSON('assets/night/night.json');
+  for (const g of ['lines/salang', 'fox', 'odd', 'gift']) if (getPath(night, g)) assert.ok(words.includes(`'${g}'`) || words.includes(` ${g}:`), `밤 묶음 ${g}`);
+  assert.ok(words.includes("label: '그 밖'"), '남은 글 칸 묶음');
+  assert.ok(words.includes("'nightShop'"), '밤톨 밤 매장 안내 (편지 탭)');
+});
+function getPath(o, p) { return p.split('/').reduce((a, k) => a?.[k], o); }

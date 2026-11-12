@@ -120,6 +120,9 @@ function rowsFor(g, R, ctx) {
       // 상점·박물관·달빛 가게·새벽 천막 (RM-08–11): 요소 편집기 방 배치 #rooms.<slug>
       for (const { file, data: r } of R.dir('assets/interior/places')) rows.push({
         id: `place-${r.slug}`, ref: r.id, name: r.name, sub: `${r.size?.join('×') ?? ''} 실내`, state: stateOf(r.status), version: version(r.version), hash: `rooms.${r.slug}`, file });
+      // 박물관 관 여섯 (RM-25–30, M17-P4): 방 배치 #rooms.hall-<관>
+      for (const { file, data: r } of R.dir('assets/interior/halls')) rows.push({
+        id: `hall-${r.hall}`, ref: r.id, name: r.name, sub: `박물관 관 · ${r.size?.join('×') ?? ''}`, state: stateOf(r.status), version: version(r.version), hash: `rooms.hall-${r.hall}`, file });
       return rows;
     }
     case 'scene': {
@@ -150,7 +153,7 @@ function rowsFor(g, R, ctx) {
       });
     }
     case 'data': {
-      const SHEET_FILE = { events: 'assets/events/events.json', night: 'assets/night/night.json', tour: 'assets/tour/tour.json' };
+      const SHEET_FILE = { events: 'assets/events/events.json', night: 'assets/night/night.json', tour: 'assets/tour/tour.json', dive: 'assets/data/items.json', home: 'assets/interior/home.json', rating: 'assets/rating/rating.json', journal: 'assets/journal/journal.json' };
       const files = { items: R.json('assets/data/items.json'), rules: R.json('assets/data/rules.json') };
       // 요소 편집기의 값 표 = elem-editor/sheets.js SHEETS 의 id·이름 (주소 끝 #<표 id> 로 그 표가 열린다). 섬 지도·방 배치 탭은 map·room 분류가 따로 센다
       const sheets = [...R.text('elem-editor/sheets.js').split('export const SHEETS')[1].matchAll(/^ {2}\{ id: '(\w+)', name: '([^']+)'(?:, group: '\w+')?(?:, file: '(\w+)', section: '(\w+)')?/gm)].filter(([, id]) => !['map', 'rooms'].includes(id));

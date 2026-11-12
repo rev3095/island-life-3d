@@ -3,7 +3,7 @@
 //   주민   = assets/villagers/<slug>.json 의 성격·말버릇·선물·부탁·이모티콘 규칙·글 대사·시간표, 생일(assets/data/rules.json)
 //            (예전 캐릭터 편집기 「성격·대화」 탭을 옮겨 옴 — 판정·선물 반응·대사 고르기는 게임 코드 그대로 import)
 //   편지   = 주민 파일 lines.letters (친구·단짝·고마워·생일·이사·떠난 뒤) + 밤톨 편지·안내 글
-//   그 밖의 글 = assets/night/night.json · assets/events/events.json 의 말·이름 (+ 행사 기간 주민 대사), assets/tour/tour.json (글은 코드 안 → 의견)
+//   그 밖의 글 = assets/night/night.json · assets/events/events.json 의 말·이름 (+ 행사 기간 주민 대사), assets/tour/tour.json (글은 코드 안 → 의견) · assets/daily/daily.json (M13 섬 일상, M17-P4)
 // 고친 것은 바로 이 페이지 저장소에 남는다: talk/<slug> (= tools/apply-traits.mjs 요청 모양 kind:'traits'),
 // texts/<night|events|tour> (= tools/apply-texts.mjs 모양). 채팅 "스토리 반영" 때 Claude 가 파일에 얹는다 (docs/notes/p36-story-editor.md).
 // 저장 기준(base)은 파일 version — 반영되어 파일 version 이 오르면 예전 초안은 저절로 안 읽힌다.
@@ -50,7 +50,7 @@ const WHEN = {
   letters: '우편함 편지 (편지 탭)', birthday: '그 주민 생일 (하루 종일 집에서 파티)',
   together: '친구 이상 주민에게 「같이 놀자」 (🎣 낚싯대 · 🏃) — 같이 낚시·산책하는 동안과 끝날 때 (M15)', song: '저녁 18–20시 광장에서 주민 둘이 번갈아 노래할 때 — 가사는 머리 위 🎵 말풍선 (M15)',
   // 가게 주인
-  firstday: '첫날 안내 (밤톨)', today: '오늘 들어온 가구 안내', after: '첫날 할 일을 마친 뒤', closed: '가게 문 닫은 때 (8–22시 밖)',
+  firstday: '첫날 안내 (밤톨)', today: '오늘 들어온 가구 안내', after: '첫날 할 일을 마친 뒤', closed: '가게 문 닫은 때 (8–22시 밖)', nightShop: '밤 매장 (22–8시) — 지하 밤 코너·덮개 천 안내 (실내 전수)',
   firstVisit: '박물관에 처음 왔을 때', none: '기증할 게 없을 때', firstDonation: '첫 기증', thanks: '기증 고마워', thanksMany: '여러 개 기증', fossil: '화석 감정',
   milestone: '기증 수 이정표', milestoneAny: '이정표 (그 밖)', complete: '한 분류를 다 모았을 때', allComplete: '모두 모았을 때', appraise: '화석 감정', bagFull: '가방이 꽉 찼을 때', story: '느루의 옛이야기',
 };
@@ -64,11 +64,11 @@ export const LETTER_WHEN = {
 };
 const LETTER_ORDER = ['friend', 'close', 'thanks', 'gift', 'reply', 'replyLove', 'replyDislike', 'together', 'birthday', 'playerBirthday', 'festival', 'festivalAgain', 'moving', 'movein', 'away', 'welcome', 'lot'];
 const LETTER_NAME = { friend: '친구', close: '단짝', thanks: '고마워', gift: '선물 동봉', birthday: '주민 생일', playerBirthday: '내 생일', moving: '이사 전날', movein: '이사 온 날', away: '떠난 뒤', welcome: '환영 (밤톨)', lot: '집터 (밤톨)', guide: '밤톨 안내 글', festival: '첫 축제 축하', festivalAgain: '해마다 축제 축하', reply: '내 편지 답장', replyLove: '답장 · 아주 좋은 선물', replyDislike: '답장 · 취향 아닌 선물', together: '같이 논 다음 날' };
-const GUIDE_POOLS = ['intro', 'firstday', 'today', 'after', 'closed'];   // 밤톨 안내 글 (편지 탭)
+const GUIDE_POOLS = ['intro', 'firstday', 'today', 'after', 'closed', 'nightShop'];   // 밤톨 안내 글 (편지 탭 — nightShop = 실내 전수 밤 매장)
 
 /** 그 밖의 글: 파일 · 언제 · 글 칸 이름 */
-const TEXT_FILES = { night: 'assets/night/night.json', events: 'assets/events/events.json', tour: 'assets/tour/tour.json' };
-const TEXT_TITLE = { night: '밤 · 새벽', events: '계절 행사', tour: '무인도 투어' };
+const TEXT_FILES = { night: 'assets/night/night.json', events: 'assets/events/events.json', tour: 'assets/tour/tour.json', daily: 'assets/daily/daily.json' };   // daily = M13 섬 일상 (M17-P4)
+const TEXT_TITLE = { night: '밤 · 새벽', events: '계절 행사', tour: '무인도 투어', daily: '섬 일상' };
 const KEY_LABEL = { name: '이름', text: '카드 글', effect: '효과 설명', greet: '인사', first: '처음 만남', after: '그다음', bye: '잘 가', closed: '문 닫은 때', already: '오늘 이미 뽑음',
   start: '열렸을 때 알림', morning: '아침 알림', ringIntro: '고리 던지기 안내', ringLose: '하나도 못 걸었을 때', ringWin: '걸었을 때', sleepNote: '자는 중 쪽지', visit: '밤에 놀러 갔을 때',
   label: '할 일', beforeLine: '축제 전에 행사 날이 오면 (주민 한마디)' };
@@ -605,7 +605,31 @@ export function createWords({ saveSoon, busy, writable, onChange }) {
     'lines/yeomyeong': `새벽 천막 주인 여명 — ${hourOf(n.tent.hours[0])}–${hourOf(n.tent.hours[1])}`,
     'lines/market': '야시장 알림 · 고리 던지기',
     'lines/nocturnal': `야행성 주민 집 — ${hourOf(n.nocturnal.houseOpen[0])}–${hourOf(n.nocturnal.houseOpen[1])}만 열림`,
+    ...(n.fortune ? { fortune: `운세 부스 (여명) — ${hourOf(n.fortune.hours[0])}–${hourOf(n.fortune.hours[1])} 광장 남서쪽 (P54)` } : {}),
+    ...(n.fox ? { fox: `여우 상인 가게 (살랑) — 오는 밤 ${hourOf(n.fox.hours[0])}–${hourOf(n.fox.hours[1])} (P54)`, 'lines/salang': `여우 상인 살랑의 말 — 오는 밤 ${hourOf(n.fox.hours[0])}부터`, 'lines/fox': '여우 상인이 온 밤 알림' } : {}),
+    ...(n.odd ? { odd: `이상한 천막 — 오는 밤 ${hourOf(n.odd.hours[0])}–${hourOf(n.odd.hours[1])}, 주인 없음 (P54)`, 'lines/odd': '이상한 천막 알림 · 닫힌 때' } : {}),
+    ...(n.gift ? { gift: '선물 상자 — 날마다 섬 어딘가 풀밭 (P54)', 'lines/gift': '선물 상자 열 때' } : {}),
   });
+  /** 그 밖의 글 묶음 제목 (밤 · 섬 일상) */
+  const GROUP_LABEL = { market: '🏮 야시장', shop: '🌙 달빛 가게', tent: '⛺ 새벽 천막', tarot: '🔮 타로 카드', 'lines/byeolbam': '별밤의 말', 'lines/yeomyeong': '여명의 말', 'lines/market': '야시장 알림', 'lines/nocturnal': '야행성 주민',
+    fortune: '🔮 운세 부스', fox: '🦊 여우 상인 가게', 'lines/salang': '살랑(여우 상인)의 말', 'lines/fox': '여우 상인 알림', odd: '🎪 이상한 천막', 'lines/odd': '이상한 천막 알림', gift: '🎁 선물 상자', 'lines/gift': '선물 상자 열 때',
+    meteor: '🌠 유성우', balloons: '🎈 선물 풍선', bottle: '🍾 유리병', recipes: '📜 레시피 쪽지', peddler: '🛒 행상 송이' };
+  /** 섬 일상 (daily.json): 묶음 → 언제 */
+  const DAILY_WHEN = d => ({
+    meteor: `유성우 — 맑은 밤 ${hourOf(d.meteor?.hours?.[0] ?? 20)}–${hourOf(d.meteor?.hours?.[1] ?? 28)} (올려다보고 소원)`,
+    balloons: `선물 풍선 — 낮 ${hourOf(d.balloons?.hours?.[0] ?? 9)}–${hourOf(d.balloons?.hours?.[1] ?? 18)}, 하루 ${d.balloons?.perDay ?? 3}번 (새총으로)`,
+    bottle: '유리병 — 날마다 아침 바닷가',
+    recipes: '레시피 쪽지 펼칠 때',
+    peddler: `떠돌이 행상 송이 — ${(d.peddler?.weekdays ?? []).map(w => '일월화수목금토'[w]).join('·')}요일 ${hourOf(d.peddler?.hours?.[0] ?? 9)}–${hourOf(d.peddler?.hours?.[1] ?? 17)} 광장`,
+  });
+  /** 묶음(앞 칸)마다 글 칸을 모으고, 어느 묶음에도 안 든 칸은 「그 밖」으로 (새 칸이 생겨도 숨지 않게) */
+  function groupedTexts(t, W) {
+    const leaves = textLeaves(t.draft), used = new Set();
+    const groups = Object.keys(W).map(g => { const paths = leaves.filter(p => (p === g || p.startsWith(`${g}/`)) && !used.has(p)); paths.forEach(p => used.add(p)); return { g, label: GROUP_LABEL[g] ?? leafLabel(g), when: W[g], paths }; }).filter(x => x.paths.length);
+    const rest = leaves.filter(p => !used.has(p));
+    if (rest.length) groups.push({ g: '', label: '그 밖', when: '위 묶음에 들지 않은 글', paths: rest });
+    return groups.map(({ label, when, paths }) => `<div class="lgroup"><div class="lwho"><b>${esc(label)}</b><span class="when">🕰 ${esc(when)}</span></div><div class="txgrid">${textFields(t, paths)}</div></div>`).join('');
+  }
   const leafLabel = p => segs(p).map((k, i, a) => (/^\d+$/.test(k) ? `${+k + 1}` : KEY_LABEL[k] ?? TK.Tr.LINE_LABELS[k] ?? k)).join(' › ');
   function textFields(t, paths) {
     return paths.map(p => {
@@ -620,10 +644,9 @@ export function createWords({ saveSoon, busy, writable, onChange }) {
     const t = T[tsel];
     let body = '';
     if (tsel === 'night') {
-      const n = t.draft, W = NIGHT_WHEN(n), leaves = textLeaves(n);
-      const groups = Object.keys(W).map(g => ({ g, paths: leaves.filter(p => p === g || p.startsWith(`${g}/`)) })).filter(x => x.paths.length);
+      const n = t.draft, W = NIGHT_WHEN(n);
       body = `<p class="small muted">밤은 둘째 날부터 열려요 (opensAfterDay ${n.opensAfterDay}). 말 안의 <code>{cost}</code> <code>{n}</code> <code>{hits}</code> <code>{prize}</code> 는 게임이 채워요.</p>`
-        + groups.map(({ g, paths }) => `<div class="lgroup"><div class="lwho"><b>${esc(leafLabel(g))}</b><span class="when">🕰 ${esc(W[g])}</span></div><div class="txgrid">${textFields(t, paths)}</div></div>`).join('');
+        + groupedTexts(t, W);
     } else if (tsel === 'events') {
       const E = t.draft;
       body = `<div class="lgroup"><div class="lwho"><b>행사 전</b><span class="when">🕰 엔딩(섬 축제) 전에 행사 날이 오면</span></div><div class="txgrid">${textFields(t, ['open/beforeLine'])}</div></div>`
@@ -635,13 +658,17 @@ export function createWords({ saveSoon, busy, writable, onChange }) {
               ${vill.map(slug => `<div class="lwho"><img src="${thumb(slug)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(vs(slug).draft.name)}</b></div>
               <div class="lines">${vs(slug).draft.lines.event[ev.id].map((e, k) => lineCard(e, k, true, { data: `data-letter="${slug}" data-path="lines/event/${ev.id}"` })).join('')}</div>`).join('')}</details></div>`;
         }).join('');
+    } else if (tsel === 'daily') {
+      const d = t.draft;
+      body = `<p class="small muted">섬 일상은 게임을 시작하고 ${d.opensAfterDay ?? 1}일째부터 (M13). 말 안의 <code>{name}</code> <code>{n}</code> 는 게임이 채워요. 행상 송이의 이름·말도 여기서.</p>`
+        + groupedTexts(t, DAILY_WHEN(d));
     } else {
       const o = t.draft;
       body = `<div class="lgroup"><div class="lwho"><b>무인도 투어</b><span class="when">🕰 선착장 끝 배 — 표 ${o.ticket?.price ?? 1000} 도토리 (첫 여행 무료), 하루 ${o.ticket?.perDay ?? 1}번, ${o.returnHour ?? 5}시에 저절로 돌아옴 · 손님 주민은 ${o.guest?.every ?? 5}번째 여행마다</span></div>
         <p class="small">투어의 글(배 안내 · 여행 묻기 창 · 돌아올 때 말)은 아직 데이터가 아니라 게임 코드 <code>src/gameplay/tour/index.js</code> 안에 있어요. 바꾸고 싶은 말을 아래 의견에 적어 주시면 "스토리 반영" 때 Claude 가 코드에서 고치거나 이 파일로 옮겨요.</p></div>`;
     }
     host.innerHTML = `<div class="box" style="gap:14px">
-      <div class="board-head"><h2>그 밖의 글</h2><span class="small muted">밤·새벽 · 계절 행사 · 투어에 들어간 말과 이름. 숫자·때는 「요소」 편집기에서 고쳐요 — 여기서는 글만.</span></div>
+      <div class="board-head"><h2>그 밖의 글</h2><span class="small muted">밤·새벽(밤 특별 상점·선물 상자 포함) · 계절 행사 · 투어 · 섬 일상(유성우·풍선·유리병·행상)에 들어간 말과 이름. 숫자·때는 「요소」 편집기에서 고쳐요 — 여기서는 글만.</span></div>
       <div class="subtabs" id="textKinds">${Object.keys(T).map(k => `<button type="button" data-tk2="${k}" aria-pressed="${k === tsel}">${esc(TEXT_TITLE[k])}<span class="n">${Object.keys(tChanges(T[k])).length || ''}</span></button>`).join('')}</div>
       <p class="small muted mono">${esc(t.file)} · v${t.doc.version ?? 0}</p>
       ${body}${footHTML('t')}</div>`;
