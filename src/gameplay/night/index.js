@@ -463,7 +463,8 @@ function createNight(ctx, cfg) {
     if (!KEEPER_PLACES.includes(where)) return null;
     const info = S().house?.places?.info?.(where), p = S().player?.position;
     if (!info?.keeper || !p) return null;
-    return Math.hypot(info.keeper.x - p.x, info.keeper.z - p.z) < DESK_DIST ? where : null;
+    const nearTalk = info.talk && Math.hypot(info.talk.x - p.x, info.talk.z - p.z) < 0.9;   // P54 운세 탁자(2×2)처럼 말 거는 자리가 주인에게서 먼 곳도
+    return nearTalk || Math.hypot(info.keeper.x - p.x, info.keeper.z - p.z) < DESK_DIST ? where : null;
   }
   /** 섬에서 달빛 가게·천막 문 앞 */
   function doorInFront() {
