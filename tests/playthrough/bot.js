@@ -108,7 +108,8 @@ export function createBot(win, { log = () => {}, dt = 1 / 30, renderEvery = 1 } 
     while (performance.now() - lastOpen < 200) await bot.stepFrame();
     bot.stats.clicks++;
     el.dispatchEvent(new win.PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }));
-    el.click();
+    if (typeof el.click === 'function') el.click();   // SVG 요소(시계 다이얼 등)는 click() 이 없다 — 사람 손가락처럼 click 이벤트를 보낸다
+    else el.dispatchEvent(new win.MouseEvent('click', { bubbles: true, cancelable: true }));
     return true;
   };
 
