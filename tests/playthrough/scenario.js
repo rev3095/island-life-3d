@@ -1882,6 +1882,7 @@ export function makeScenario(bot, sk, opts = {}) {
     await bot.tool(null);
     await bot.walkTo(desk.front, { near: 0.3, label: '대회 접수 탁자' });
     await bot.face(desk.desk);
+    await bot.until(() => bot.peek() !== 'gather-busy', { timeout: 4, label: '손 비우기' });   // 낚시·채집 동작이 끝난 뒤 (사람도 다 감고 나서 누른다)
     const again = bot.peek();
     if (again !== 'contest:desk') odd.push(`대회 뒤 접수 탁자 행동 키 ${again}`);
     await bot.act('action', { timeout: 20 });
