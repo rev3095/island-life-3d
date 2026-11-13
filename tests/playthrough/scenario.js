@@ -1601,7 +1601,13 @@ export function makeScenario(bot, sk, opts = {}) {
     bot.policy = {};
     // ② 새총: 가방에 없으면 도토리상점에서 (도구 진열) — 안 되면 쪽지로 연 레시피로
     const hasSling = () => !!S().data.inventory.hasTool?.('sling');
-    if (!hasSling()) await sk.shop({ buy: ['tool.sling'] });
+    if (!hasSling()) {
+      // 출시 점검: 잠수 키트 등을 산 뒤엔 도토리가 모자랄 수 있다 — 사람처럼 새총 값만큼 벌고 낮에 산다
+      const price = S().data.items.get('tool.sling')?.buy ?? 1000;
+      if (bot.acorns() < price) await earnUntil(price + 100);
+      { const h = S().time.now().hour; if (h >= 20 || h < 9) await bot.setHour(10); }
+      await sk.shop({ buy: ['tool.sling'] });
+    }
     if (!hasSling() && D().recipes.known().includes('tool.sling')) {   // 상점 진열 받침에 새총 자리가 아직 없으면 쪽지 레시피로 (나무 3 · 나뭇가지 4)
       if (bot.has('mat.wood') < 3) await sk.wood(3);
       for (const o of sk.objects('tree')) { if (bot.has('mat.branch') >= 4) break; await sk.shakeTree(o); }
