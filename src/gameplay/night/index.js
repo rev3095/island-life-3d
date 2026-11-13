@@ -261,7 +261,13 @@ function createNight(ctx, cfg) {
     if (!c) return {};
     const have = id => !!S().data?.items?.get?.(id);
     if (kind === 'foxshop') return { art: foxLeft(), furniture: (c.stock ?? []).filter(have) };   // P54 받침 셋에 미술품, 앞에 여우불 등
-    if (kind === 'oddtent') { const o = oddToday(); return o && have(o.id) && !holding(o.id) ? { [o.group]: [o.id] } : {}; }
+    if (kind === 'oddtent') {
+      const o = oddToday();
+      if (o && have(o.id) && (o.group !== 'art' || !holding(o.id))) return { [o.group]: [o.id] };
+      // 오늘 작품을 이미 가방에 갖고 있으면(여우 가게·선물 상자에서 먼저 얻음) 받침을 비우지 않고 수상한 물건 하나를 대신 놓는다 (출시 점검)
+      if (o?.group === 'art') { const alt = (c.stock ?? []).filter(have); if (alt.length) return { furniture: [alt[0]] }; }   // 가구는 여우 가게 앞 가구처럼 가졌어도 놓는다
+      return {};
+    }
     return { furniture: (c.stock ?? []).filter(have) };
   }
 
