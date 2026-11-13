@@ -1832,7 +1832,13 @@ export function makeScenario(bot, sk, opts = {}) {
     res.contest = `${c.id} ${c.name} ${bot.day()}`;
     // ② 무대 접수 탁자 앞에서 Space → 초롱 대화 (첫 고르기 = 「나갈래요!」)
     const tool = kind === 'fish' ? 'tool.rod' : 'tool.net';
-    if (!bot.has(tool)) await sk.shop({ buy: [tool] });
+    // 출시 점검: 대회 3분 동안 도구가 부서지면 못 겨룬다 — 사람처럼 남은 횟수가 적으면 하나 더 사 둔다
+    const usesLeft = () => (S().data.inventory.slots ?? []).filter(x => x?.id === tool).reduce((n, x) => n + (x.uses ?? 0), 0);
+    if (!bot.has(tool) || usesLeft() < 20) {
+      const price = S().data.items.get(tool)?.buy ?? 400;
+      if (bot.acorns() < price) await earnUntil(price + 100, { maxRounds: 3, untilHour: 8.9 });
+      await sk.shop({ buy: [tool] });
+    }
     if (!(await bot.until(() => !!C().desk(), { timeout: 10, label: '무대' }))) return block('대회 무대가 안 놓임');
     const desk = C().desk();
     await bot.tool(null);
