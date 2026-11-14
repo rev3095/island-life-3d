@@ -80,7 +80,8 @@ for (const dir of ["assets/env", "assets/furniture"]) {
   const index = json(`${dir}/index.json`);
   const { at, count } = bundleModels(dir, index.models.map(m => m.slug));
   let models = index.models.map(m => ({ ...m, bundle: at[m.slug], spec: json(`${dir}/specs/${m.slug}.json`), stats: json(`${dir}/models/${m.slug}.stats.json`) }));
-  const rp = bundleRenders(dir, models);
+  // 위에서 본 그림(_top)은 빼서 버전 한도 256MB 안에 둔다 (M19 — 3D 보기로 대신, 2026-11-15)
+  const rp = bundleRenders(dir, models, `${dir}/renders`, f => !/_top\.png$/.test(f));
   models = models.map(m => ({ ...m, renders: rp.at[m.slug] ?? null }));
   write(`${dir}/editor-index.json`, { ...index, bundles: count, renderBundles: rp.count, thumbs: "editor-thumbs.json", models });
   counts[dir] = { models: count, renders: rp.count };
