@@ -5,6 +5,10 @@
     "cozy": "포근 (동숲풍)",
     "toon": "툰 (예전)"
   },
+  "shortLabels": {
+    "cozy": "포근",
+    "toon": "툰 (예전)"
+  },
   "presets": {
     "cozy": {
       "bands": 3,

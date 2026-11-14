@@ -186,7 +186,7 @@ export async function createKeepers(ctx, town, lines) {
       ctx.state.flags ??= {};
       ctx.state.flags.intro = true;
       intro.pending = false;
-      ctx.events.emit('town:intro', { done: true });
+      ctx.events.emit('town:intro', { done: true, short: ctx.state.flags.firstday?.skip === 'short' });   // B-09: 짧게 = s02 안 나옴
       town.mail?.post('bamtol', 'welcome');
       // 가게로 걸어간다 (길이 없으면 그냥 옮긴다)
       const pts = town.route(B.actor.position, B.spot);

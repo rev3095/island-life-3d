@@ -11,7 +11,9 @@ const CSS = `
 .ev-chip .ev-e { font-size: 20px; }
 .ev-chip b { font-weight: 700; }
 .ev-chip:focus-visible { outline: 3px solid #2F86A6; outline-offset: 2px; }
-@media (max-width: 600px) and (orientation: portrait) { .ev-chip { bottom: auto; top: calc(96px + var(--safe-t, 0px)); right: auto; left: calc(10px + var(--safe-l, 0px)); font-size: 13px; } }
+@media (max-width: 600px) and (orientation: portrait) { .ev-chip { bottom: auto; top: calc(96px + var(--safe-t, 0px) + var(--pk-clock-extra, 0px)); right: auto; left: calc(10px + var(--safe-l, 0px)); font-size: 13px; }
+  /* B-16: 축제 날 저녁엔 축제 진행판(.fe-hud, 시계 밑 76px · 높이 약 28px)이 같은 자리 → 그 밑으로 */
+  body:has(.fe-hud:not([hidden])) .ev-chip { top: calc(112px + var(--safe-t, 0px) + var(--pk-clock-extra, 0px)); } }
 .ev-card { width: min(520px, calc(100vw - 24px)); }
 .ev-body { display: grid; gap: 14px; }
 .ev-head { font-size: 15px; margin: 0; color: #5F7268; }

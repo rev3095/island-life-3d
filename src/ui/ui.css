@@ -371,6 +371,13 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
   .pk-dlg-box { padding: 24px 22px 22px; border-radius: 24px; min-height: 96px; }
   .pk-name { left: 20px; }
   .pk-choices { margin-right: 8px; }
+  /* B-23: 꾸미기 선택지(벽지·바닥 목록이 길다)는 화면 밖으로 안 나가게 스크롤, 줄은 손가락 높이 그대로 */
+  .pk-choices { max-height: min(58vh, 420px); overflow-y: auto; overscroll-behavior: contain; }
+  .pk-choice { flex: none; min-height: 44px; line-height: 1.25; }
+  /* B-23: 상점 코너(오늘의 벽지·바닥·옷) 줄 — 긴 이름·「상점 한정」이 값 칸을 밀지 않게 */
+  .pk-stock-item { min-height: 52px; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 8px; padding: 6px 10px 6px 6px; }
+  .pk-stock-name { min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
+  .pk-stock-item .pk-price { white-space: nowrap; }
   /* 작업대: 고른 레시피를 위에 붙여 두고 목록만 스크롤 */
   .pk-craft-detail { position: sticky; top: -8px; z-index: 1; justify-items: stretch; gap: 6px; padding: 10px 12px; text-align: left; box-shadow: 0 6px 10px -6px rgba(74, 59, 50, .25); }
   .pk-craft-head { grid-auto-flow: column; justify-content: start; align-items: center; gap: 10px; }

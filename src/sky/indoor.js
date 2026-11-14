@@ -5,7 +5,8 @@ const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 const DAY = { hemiSky: hex('#FFF7EA'), hemiGround: hex('#D9B98F'), hemiI: 1.75, sunColor: hex('#FFF1DC'), sunI: 1.45 };
-const NIGHT = { hemiSky: hex('#FFE2B8'), hemiGround: hex('#B98A5E'), hemiI: 1.35, sunColor: hex('#FFD08A'), sunI: 1.1 };
+// B-22: 밤 빛을 조금 덜 노랗게 (예전 #FFE2B8 · #FFD08A — 하늘 체크·흰 타일이 베이지로 보였다)
+const NIGHT = { hemiSky: hex('#FFEAD0'), hemiGround: hex('#B98A5E'), hemiI: 1.35, sunColor: hex('#FFDDAA'), sunI: 1.1 };
 
 /** 방 밖(벽 너머·바닥 아래) 어둠 */
 export const INDOOR_BACKGROUND = hex('#2E2420');
