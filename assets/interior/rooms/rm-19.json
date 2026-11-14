@@ -1,0 +1,78 @@
+{
+  "id": "RM-19",
+  "slug": "rm-19",
+  "kind": "room",
+  "owner": "boreum",
+  "ownerName": "보름",
+  "name": "보름 할머니 추억의 방",
+  "version": 1,
+  "status": "review",
+  "note": "다정한 이야기꾼 코끼리 (M19-P1). 소파와 라디오, 앨범 액자와 주민 사진이 걸린 벽, 꽃 화분, 둥근 깔개. 차분한 벽 · 짙은 판자.",
+  "wallpaper": "wp-03",
+  "floor": "fl-05",
+  "host": {
+    "lx": 4.5,
+    "lz": 4.6,
+    "face": "s"
+  },
+  "furniture": [
+    {
+      "item": "furn.sofa",
+      "gx": 3,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.round-rug",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.radio",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.flower-pots",
+      "gx": 7,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.flower-shelf",
+      "gx": 0,
+      "gz": 3,
+      "rot": 1
+    },
+    {
+      "item": "furn.cushion-bed",
+      "gx": 6,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "item": "furn.floor-lamp",
+      "gx": 0,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.album-frame-wall",
+      "wall": "n",
+      "slot": 2
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "n",
+      "slot": 4
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "e",
+      "slot": 1
+    }
+  ]
+}

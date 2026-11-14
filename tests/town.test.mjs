@@ -216,7 +216,7 @@ test('편지: 부탁 들어준 다음 날 고맙다는 편지, 친구 이상은 
     for (const x of p) { assert.equal(x.kind, 'close'); if (x.gift) assert.ok(items.get(x.gift)); }
     total += p.length;
   }
-  assert.ok(total > 20 && total < 84, `4주 동안 ${total}통`);
+  assert.ok(total > 20 && total <= 28 * R.LETTERS_PER_DAY, `4주 동안 ${total}통`);   // M19-P1: 주민 12명이 모두 절친이면 날마다 한도까지 찰 수 있다
   // 못 만난 주민은 안 보낸다
   assert.equal(R.planLetters({ villagers: { bori: { friendship: 99 } } }, PEOPLE, DAY).length, 0);
 });

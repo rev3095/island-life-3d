@@ -68,3 +68,21 @@
 - devlog 「게시물」 표에 같은 줄 · 「현재 상태」 에 「검수 대기 40 확정 (M19-P1), 새 주민 보드 선택 대기」.
 - 편집기 홈 `editors.html` `editors-list` 와 `archive-index` 에 `newfolk` (16차 뒤, 「16-newfolk」 처럼) 한 줄.
 - 바깥 `Subculture projects/.claude/launch.json` 에 미리보기 설정 `m19-p1-newfolk` (포트 4301) 를 더했다 (저장소 밖).
+
+## 3. 반영 v1 (2026-11-15, "추천안대로" — D210–D217 모두 A)
+main d553089 로 맞춘 뒤 진행. 보드 저장소 `applied/newfolk` v1 · `history/newfolk-v1` 기록 (사용자가 채팅으로 골라 `boards/newfolk` 는 비어 있음).
+
+| 무엇 | 쌀알 CH-18 (햄스터) | 보름 CH-19 (코끼리) |
+|---|---|---|
+| 스펙 | `assets/specs/ssalal.json` 0.1 review | `assets/specs/boreum.json` 0.1 review |
+| 빌더 부품 (`build_character.py FEATURES`) | `hamster`: 곰 둥근 귀(작게) · 짧은 꼬리 · 새 부품 볼주머니 `cheeks` | `elephant`: 새 부품 부채 귀 `ears:'elephant'` · 긴 코 `trunk` (머리에 고정) · 끝 털 꼬리 `tail:'rope'` |
+| 옷 | 크림 윗옷 + 파란 앞치마(`apron`, 멜빵 대신) · 연필은 모델에 없음 | 분홍 윗옷(숄 색) + 동그란 안경(`glasses`, 돋보기 대신) |
+| 주민 파일 | `assets/villagers/ssalal.json` 약 230줄, 말끝 '쪼르', TK-11 | `assets/villagers/boreum.json` 약 230줄, 말끝 '뿌우', TK-12 |
+| 생일 · 목소리 | 07-30 · `voices.json ssalal` (높고 빠름) | 09-15 · `voices.json boreum` (낮고 느긋) |
+| 집 · 방 | `house-villager` 변형 `ssalal` 지붕 #E9A35E · RM-18 꼬마 목공방 (review) | 변형 `boreum` 지붕 #8C9BB0 · RM-19 추억의 방 (review) |
+| 이사 | `"arrives": "moving"` → `MOVERS` 뒤 둘 | 같음 |
+
+- 연결: `town/files.js` · `villagers/editor-files.json` · `story/editor-files.json` (파일·썸네일) · `elem-editor/files.json` (방) · `house/interior.js` · `ui/dom.js` · `elem-editor/sheets.js`.
+- 이사: 섬 최대 12 = 처음 9 + 구름·파도·달무리라, 두 주민은 누가 떠나 집터가 빌 때 온다 (moving.js 그대로). 첫 만남 장면·편지 연결·순서 조정은 P5.
+- 개수 테스트: 캐릭터 17→19 · 주민 방 10→12 · 대화 규칙 TK-11·12 · 미술품 대사 주민 10→12 · 편지 4주 한도 `<=` · 집터 수는 섬 최대 기준.
+- **확인 안 함** (사용자 원칙: 플레이·스크린샷 없음): Blender 렌더 그림·게임 안 모습·목소리 소리. 빌드 로그만 봄 (보름 12,480 삼각형 · 뼈 14 · 동작 7).

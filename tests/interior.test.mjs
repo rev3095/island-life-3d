@@ -73,16 +73,17 @@ test('웹 빌드가 interior 파일을 모두 넣는다 (WEB_FILES = 목록 + �
   for (const p of want) assert.ok(files.has(p), `빌드에 ${p}`);
 });
 
-test('주민 방 10곳: 주민마다 하나 (이사 오는 셋 포함), 보드대로 벽지·바닥, WP-08·FL-08 은 상점 한정', () => {
+test('주민 방 12곳: 주민마다 하나 (이사 오는 셋 + M19-P1 이사 후보 둘 포함), 보드대로 벽지·바닥, WP-08·FL-08 은 상점 한정', () => {
   const want = { coco: ['wp-02', 'fl-02'], bori: ['wp-03', 'fl-03'], mochi: ['wp-04', 'fl-04'], dubu: ['wp-05', 'fl-05'], pong: ['wp-06', 'fl-06'], chorong: ['wp-07', 'fl-07'], danpung: ['wp-01', 'fl-05'],   // 단풍 RM-07 = 실내 보드 interiors
-    gureum: ['wp-01', 'fl-02'], pado: ['wp-03', 'fl-07'], dalmuri: ['wp-08', 'fl-05'] };   // P44 이사 오는 주민 RM-12–14 (달무리 밤하늘 벽지 = P46 FB-05 예외)
+    gureum: ['wp-01', 'fl-02'], pado: ['wp-03', 'fl-07'], dalmuri: ['wp-08', 'fl-05'],
+    ssalal: ['wp-01', 'fl-02'], boreum: ['wp-03', 'fl-05'] };   // M19-P1 RM-18 · RM-19   // P44 이사 오는 주민 RM-12–14 (달무리 밤하늘 벽지 = P46 FB-05 예외)
   const ALL = [...VILLAGERS, ...MOVERS];
-  assert.equal(rooms.length, 10);
+  assert.equal(rooms.length, 12);
   for (const r of rooms) {
     assert.ok(ALL.includes(r.owner), `${r.slug} 주인 ${r.owner}`);
     assert.deepEqual([r.wallpaper, r.floor], want[r.owner], r.slug);
   }
-  assert.equal(new Set(rooms.map(r => r.owner)).size, 10);
+  assert.equal(new Set(rooms.map(r => r.owner)).size, 12);
   assert.deepEqual(rooms.map(r => r.owner).sort(), [...ALL].sort(), '섬 주민 모두 방이 있다 (이사 오는 구름·파도·달무리까지)');
   const used = new Set(rooms.flatMap(r => [r.wallpaper, r.floor]));
   const usedNot = new Set(rooms.filter(r => r.owner !== 'dalmuri').flatMap(r => [r.wallpaper, r.floor]));   // 상점 한정 무늬는 주민 방에 안 씀 — 달무리 방 밤하늘만 예외 (FB-05)

@@ -49,6 +49,9 @@ FEATURES = {
     'bat': {'ears': 'bat', 'muzzle': 'small', 'fangs': True, 'eyes': 'iris', 'batWings': True, 'head': (1.08, 0.95, 0.9)},   # 큰 귀 + 금빛 눈 + 접은 박쥐 날개 (꼬리 없음)
     'hedgehog': {'ears': 'round', 'muzzle': 'small', 'tail': 'stub', 'spines': True, 'head': (1.04, 0.96, 0.92)},   # M13 행상 송이 (CH-16): 곰 둥근 귀 + 머리 뒤·등에 가시 (13차 보드 D145-A)
     'moth': {'mouth': 'smile', 'eyes': 'iris', 'antennae': True, 'mothWings': True, 'ruff': True, 'head': (1.04, 0.95, 0.92)},   # 깃털 더듬이 + 등 날개 넷 + 목털
+    # M19-P1 새 주민 (새 주민 보드 newfolk D210-A · D211-A · D214-A): 뼈대·동작 그대로, 특징 부품만
+    'hamster': {'ears': 'round', 'muzzle': 'small', 'tail': 'stub', 'cheeks': True, 'head': (1.12, 0.95, 0.9)},   # CH-18 쌀알: 곰 둥근 귀(작게) + 짧은 꼬리 + 통통한 볼주머니
+    'elephant': {'ears': 'elephant', 'mouth': 'smile', 'trunk': True, 'tail': 'rope', 'head': (1.08, 0.96, 0.92)},   # CH-19 보름: 큰 부채 귀 + 긴 코 (고정) + 끝에 털 난 가는 꼬리
 }
 SPECIES = spec.get('species', 'cat')
 F = {**FEATURES.get(SPECIES, {}), **spec.get('features', {})}
@@ -523,6 +526,14 @@ for side, sx in (('L', 1), ('R', -1)):
         ib = base + V((0, -0.03 * hs, 0)) + d * 0.025 * hs
         B.add(cone(ib, ib + d * L * 0.72, 0.09 * E * hs, 0.01, squash=0.3), col('innerEar', 'muzzle'), ear, outline=False)
         EARS[side] = (base, tip)
+    elif ear_kind == 'elephant':   # 코끼리 (M19-P1): 머리 옆에 붙은 크고 납작한 부채 귀 + 안쪽 분홍
+        p, n = head_point(sx * 1.25, 0.25)
+        c = p + V((sx * 0.06, 0.035, -0.02)) * hs * E
+        R = Matrix.Rotation(sx * 0.5, 3, 'Z') @ Matrix.Rotation(-sx * 0.12, 3, 'Y')
+        B.add(ellipsoid(c, (0.16 * E * hs, 0.026 * hs, 0.17 * E * hs), rot=R, seg=24, rings=14), 'fur', ear)
+        B.add(ellipsoid(c + R @ V((0, -0.016 * hs, 0)), (0.115 * E * hs, 0.012 * hs, 0.125 * E * hs), rot=R, seg=20, rings=12),
+              col('innerEar', 'muzzle'), ear, outline=False)
+        EARS[side] = (p, c + V((sx * 0.12, 0, 0)) * hs * E)
     elif ear_kind == 'human':
         p, n = head_point(sx * 1.5, -0.02)
         B.add(ellipsoid(p, (0.022 * hs, 0.032 * hs, 0.045 * hs), seg=14, rings=10), 'fur', 'head')
@@ -619,6 +630,27 @@ if F.get('spines'):
             d = (n * 0.5 + V((0, 0.8, 0.25))).normalized()
             B.add(cone(p, p + d * 0.07, 0.028, 0.003, squash=0.6, seg=6), smat, 'spine')
 
+# 볼주머니 (햄스터, M19-P1): 주둥이 양옆 아래로 통통하게 부푼 볼 (배·주둥이 색)
+if F.get('cheeks'):
+    for sx in (1, -1):
+        p, n = head_point(sx * 0.62, -0.32, inset=0.03 * hs)
+        B.add(ellipsoid(p + n * 0.012 * hs, (0.09 * hs, 0.07 * hs, 0.075 * hs), rot=decal(n), seg=20, rings=12), col('cheek', 'muzzle'), 'head')
+
+# 긴 코 (코끼리, M19-P1): 두 눈 사이 아래에서 앞으로 나와 아래로 늘어졌다 끝이 살짝 들린다. 뼈 없이 머리에 고정
+if F.get('trunk'):
+    bp, bn = head_point(0, -0.12, inset=0.02 * hs)
+    pts = bezier(bp, bp + bn * 0.1 * hs + V((0, 0, -0.02 * hs)), bp + bn * 0.16 * hs + V((0, 0, -0.17 * hs)),
+                 bp + bn * 0.22 * hs + V((0, 0, -0.16 * hs)), 12)
+    rads = [0.05 * hs - 0.024 * hs * i / 12 for i in range(13)]
+    B.add(tube(pts, rads, seg=14), 'fur', 'head')
+    B.add(ellipsoid(pts[-1], (rads[-1] * 1.05,) * 3, seg=12, rings=8), 'fur', 'head')
+    tip_n = (pts[-1] - pts[-2]).normalized()
+    B.add(ellipsoid(pts[-1] + tip_n * rads[-1] * 0.8, (rads[-1] * 0.6, rads[-1] * 0.6, rads[-1] * 0.25), rot=align_z(tip_n), seg=10, rings=6),
+          col('nose', 'eye'), 'head', outline=False)
+    for k in (3, 5, 7):   # 코 주름 세 줄
+        d = (pts[k + 1] - pts[k - 1]).normalized()
+        line_tube(ring_points(pts[k], d, rads[k] * 1.02, seg=14)[3:12], r=0.0035)
+
 # 등껍질 (거북)
 if F.get('shell'):
     SC = V((0, BODY_R[1] * 0.62, BODY_C.z + 0.015))
@@ -671,6 +703,10 @@ elif tail_kind == 'feather':
 elif tail_kind == 'stub':
     B.add(cone(t0, t0 + V((0, 0.06, -0.01)) * tl, 0.03, 0.008), 'fur', 'tail.1')
     TAIL = [t0, t0 + V((0, 0.06, -0.01)) * tl]
+elif tail_kind == 'rope':   # 코끼리 (M19-P1): 아래로 늘어진 가는 꼬리 + 끝 털 뭉치
+    TAIL = bezier(t0, t0 + V((0, 0.06, 0.0)) * tl, t0 + V((0, 0.09, -0.06)) * tl, t0 + V((0, 0.1, -0.13)) * tl, 8)
+    B.add(tube(TAIL, [0.014] * 9, seg=10), 'fur', 'tail.1')
+    B.add(ellipsoid(TAIL[-1] + V((0, 0, -0.012)), (0.02, 0.02, 0.03), seg=12, rings=8), col('tailTip', 'tail'), 'tail.1')
 
 # 소품: 안경 · 나비넥타이
 if 'glasses' in ACC:

@@ -1,0 +1,72 @@
+{
+  "id": "CH-19",
+  "slug": "boreum",
+  "name": "보름",
+  "species": "elephant",
+  "version": "0.1",
+  "triangles": 12480,
+  "vertices": 6300,
+  "bones": 14,
+  "materials": [
+    "pants",
+    "shirt",
+    "feet",
+    "fur",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "nose",
+    "tailTip",
+    "glasses"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 1.06,
+  "glbBytes": 460860,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0554,
+    "forward": -0.0043
+  },
+  "renders": [
+    "boreum_back.png",
+    "boreum_front.png",
+    "boreum_happy.png",
+    "boreum_hero.png",
+    "boreum_run.png",
+    "boreum_side.png",
+    "boreum_sit.png",
+    "boreum_three_quarter.png",
+    "boreum_thumb.png",
+    "boreum_walk.png"
+  ]
+}

@@ -158,7 +158,7 @@ test('미술품 부탁 고르기: 친구 이상 주민 · 가진 작품을 더 �
 test('미술품 대사: 주민마다 lines.art 여덟 칸 + 계절 레시피 한 줄, 자리 {art}, 검사 통과', () => {
   assert.ok(PLACEHOLDERS.art);
   const villagers = Object.keys(PEOPLE).map(slug => ({ slug }));
-  assert.equal(villagers.length, 10);
+  assert.equal(villagers.length, 12);   // + M19-P1 쌀알·보름
   for (const p of villagers) {
     const A = LINES[p.slug].art;
     for (const k of ['ask', 'remind', 'notYet', 'fake', 'show', 'trade', 'reward', 'later', 'recipe']) assert.ok(A?.[k]?.length, `${p.slug}.art.${k}`);

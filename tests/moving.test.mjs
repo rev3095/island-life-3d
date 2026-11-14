@@ -135,7 +135,8 @@ test('남는 집터: 섬에 셋 (11차 D103-A), 다른 집·건물·서로 안 �
   // 앞 집터는 10차 그대로 (예전 저장의 spare-1 이사 주민이 같은 자리)
   assert.deepEqual([g.places.spareLots[0].x, g.places.spareLots[0].z], [8.5, 5.5]);
   // 처음 주민 7 + 남는 집터 3 = 새 주민 셋이 모두 들어갈 자리
-  assert.ok(g.places.villagerHouses.length + g.places.spareLots.length >= VILLAGERS.length + MOVERS.length);
+  // M19-P1 이사 후보 둘(쌀알·보름)은 집터가 빌 때만 온다 — 집 수는 섬 최대(가게 주인 둘 빼고)만큼이면 된다
+  assert.ok(g.places.villagerHouses.length + g.places.spareLots.length >= Math.min(VILLAGERS.length + MOVERS.length, MOVING.max - 2));
   for (const sp of g.places.spareLots) {
     assert.equal(sp.slug, null);
     assert.ok(sp.lot && sp.site && sp.lot.pad.off, `${sp.id} 빈 집터 · 계단 꺼짐`);

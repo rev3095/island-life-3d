@@ -1,0 +1,80 @@
+{
+  "id": "CH-18",
+  "slug": "ssalal",
+  "name": "쌀알",
+  "species": "hamster",
+  "role": "주민 · 햄스터 (이사 후보)",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "바지런한 정리왕 햄스터. 목공을 막 배우는 중이라 귀에 몽당연필을 꽂고 다니고, 볼주머니에 고향 해바라기씨를 넣어 왔다.",
+    "keywords": [
+      "동글동글",
+      "소프트비닐 피규어",
+      "2.5등신",
+      "큰 머리",
+      "짧은 팔다리",
+      "주황 등",
+      "크림 배와 볼",
+      "통통한 볼주머니",
+      "파란 작업 앞치마"
+    ],
+    "references": [
+      "매끈한 소프트비닐 토이 피규어의 표면감",
+      "새 주민 보드 CH-18 쌀알 스케치 (concept/newfolk-board.html, D210-A)"
+    ],
+    "avoid": [
+      "사실적인 털 표현",
+      "쥐처럼 보이는 긴 꼬리",
+      "기존 게임 캐릭터와 똑같은 디자인"
+    ],
+    "notes": "M19-P1 (newfolk D210-A · D214-A): 곰 둥근 귀(작게) + 짧은 꼬리 다시 쓰고, 새 부품은 볼주머니 하나. 멜빵 작업복은 앞치마 부품(apron)으로 — 몽당연필은 모델에 없음 (스케치만). 테마 색 #E9A35E."
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.94,
+    "headScale": 1.02,
+    "bodyWidth": 1.08,
+    "limbLength": 0.92,
+    "earSize": 0.78,
+    "earPointiness": 1,
+    "tailLength": 0.8,
+    "eyeSize": 1.05,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#E9A35E",
+    "muzzle": "#F6E7CC",
+    "cheek": "#F6E7CC",
+    "innerEar": "#F4B6C8",
+    "eye": "#3A2A22",
+    "nose": "#C9707A",
+    "blush": "#F6A8A0",
+    "shirt": "#F6E7CC",
+    "pants": "#4A78AC",
+    "apron": "#5B8FC9",
+    "feet": "#F4B6C8",
+    "outline": "#5A3A22"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "bottom": "shorts"
+  },
+  "accessories": [
+    "apron"
+  ],
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy",
+    "sit_down",
+    "sit",
+    "stand_up"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "RM-18",
+  "slug": "rm-18",
+  "kind": "room",
+  "owner": "ssalal",
+  "ownerName": "쌀알",
+  "name": "쌀알 꼬마 목공방",
+  "version": 1,
+  "status": "review",
+  "note": "바지런한 정리왕 햄스터 (M19-P1). 반듯하게 줄 선 통나무 의자·탁자, 장작더미와 책장, 벽엔 시계와 액자. 크림 벽 · 밝은 판자.",
+  "wallpaper": "wp-01",
+  "floor": "fl-02",
+  "host": {
+    "lx": 4.5,
+    "lz": 4.6,
+    "face": "s"
+  },
+  "furniture": [
+    {
+      "item": "furn.log-table",
+      "gx": 3,
+      "gz": 2,
+      "rot": 0
+    },
+    {
+      "item": "furn.log-chair",
+      "gx": 2,
+      "gz": 2,
+      "rot": 1
+    },
+    {
+      "item": "furn.log-chair",
+      "gx": 5,
+      "gz": 2,
+      "rot": 3
+    },
+    {
+      "item": "furn.woodpile",
+      "gx": 0,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.bookshelf",
+      "gx": 6,
+      "gz": 0,
+      "rot": 0
+    },
+    {
+      "item": "furn.harvest-basket",
+      "gx": 0,
+      "gz": 3,
+      "rot": 1
+    },
+    {
+      "item": "furn.cushion-bed",
+      "gx": 6,
+      "gz": 3,
+      "rot": 0
+    },
+    {
+      "item": "furn.plant-pot",
+      "gx": 7,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.floor-lamp",
+      "gx": 0,
+      "gz": 5,
+      "rot": 0,
+      "deco": true
+    },
+    {
+      "item": "furn.wall-clock",
+      "wall": "n",
+      "slot": 3
+    },
+    {
+      "item": "furn.picture-frame",
+      "wall": "w",
+      "slot": 1
+    }
+  ]
+}

@@ -233,6 +233,34 @@
         "hip": 0.0534,
         "forward": -0.0042
       }
+    },
+    {
+      "id": "CH-18",
+      "slug": "ssalal",
+      "name": "쌀알",
+      "species": "hamster",
+      "role": "주민 · 햄스터 (이사 후보)",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0394,
+        "forward": -0.0039
+      }
+    },
+    {
+      "id": "CH-19",
+      "slug": "boreum",
+      "name": "보름",
+      "species": "elephant",
+      "role": "주민 · 코끼리 (이사 후보)",
+      "category": "character",
+      "version": "0.1",
+      "status": "review",
+      "sit": {
+        "hip": 0.0554,
+        "forward": -0.0043
+      }
     }
   ]
 }

@@ -76,6 +76,30 @@
       "droop": 3,
       "gain": 2.2
     },
+    "ssalal": {
+      "name": "쌀알",
+      "desc": "높고 또박또박 빠름 (M19-P1)",
+      "f0": 470,
+      "syl": 0.062,
+      "gap": 0.018,
+      "formant": 1.28,
+      "jitter": 1.4,
+      "wave": "soft",
+      "bounce": 2.5,
+      "gain": -1.6
+    },
+    "boreum": {
+      "name": "보름",
+      "desc": "낮고 느긋한 할머니 (M19-P1)",
+      "f0": 205,
+      "syl": 0.16,
+      "gap": 0.045,
+      "formant": 0.88,
+      "jitter": 2.2,
+      "wave": "nasal",
+      "droop": 2,
+      "gain": 1.8
+    },
     "player": { "name": "플레이어", "desc": "보통", "f0": 320, "syl": 0.085, "gap": 0.02, "formant": 1.08, "jitter": 2, "wave": "glottal", "gain": -0.4 }
   }
 }
