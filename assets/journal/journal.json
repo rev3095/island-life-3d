@@ -32,7 +32,8 @@
     { "id": "diary", "on": "allDone", "steps": [3, 10, 30], "pts": [150, 400, 1000], "icon": "📔", "label": "일지 다 채운 날" },
     { "id": "wisher", "on": "wish", "steps": [1, 10, 40], "pts": [100, 300, 800], "icon": "🌠", "label": "별똥별 소원" },
     { "id": "sharpshot", "on": "balloon", "steps": [5, 30, 100], "pts": [100, 300, 800], "icon": "🎈", "label": "풍선 명사수" },
-    { "id": "contester", "on": "contest", "steps": [1, 5, 15], "pts": [150, 400, 1000], "icon": "🏆", "label": "대회 나가기" }
+    { "id": "contester", "on": "contest", "steps": [1, 5, 15], "pts": [150, 400, 1000], "icon": "🏆", "label": "대회 나가기" },
+    { "id": "peacemaker", "on": "makeup", "steps": [1, 3, 6], "pts": [150, 400, 1000], "icon": "🤝", "label": "짝 화해시키기" }
   ],
   "shop": [
     { "id": "acorns", "kind": "acorns", "n": 300, "cost": 100, "icon": "🌰", "label": "도토리 300" },

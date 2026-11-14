@@ -21,6 +21,7 @@ export const TRIGGERS = {
   'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
   'meteor-big': { label: '큰 유성우 밤 별똥별이 처음 떨어질 때 (M18-P2 — daily 가 보내는 daily:meteor 의 bigFirst)', event: 'daily:meteor', test: p => !!p?.bigFirst },
   'special-day': { label: '그날만 날씨를 처음 맞을 때 (M18-P2 — trigger.kind = monsoon · first-snow, daily 가 보내는 daily:special 의 first)', event: 'daily:special', test: (p, t) => !!t.kind && p?.kind === t.kind && !!p?.first },
+  'pair-makeup': { label: '짝 화해 저녁 (M19-P3 — town/pairs.js 가 보내는 town:pair 의 makeup, 자리 x·z · 배우 바꾸기 cast · 글 자리 {a} {b} {ab})', event: 'town:pair', test: p => !!p?.makeup },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
@@ -315,4 +316,13 @@ export function validateIndex(index, sceneIds) {
   if (new Set(listed).size !== listed.length) err.push('index: 장면이 두 번 나와요');
   for (const r of index?.timeline ?? []) if (!r.scene && !(r.fixed && r.title)) err.push(`index: 줄 모양 ${JSON.stringify(r)}`);
   return err;
+}
+
+// ---------- 배우 바꾸기 (M19-P3) ----------
+
+/** 연출안의 배우를 바꿔 끼운다 (map = { 파일 속 slug: 실제 slug }) — 짝 화해 s53 처럼 한 장면을 여러 짝이 돌려 쓸 때. 배우·face·cam.target 글자를 바꾼다 */
+export function recastTake(take, map) {
+  if (!take || !map || typeof map !== 'object' || !Object.keys(map).length) return take;
+  const m = v => (typeof v === 'string' && Object.hasOwn(map, v) ? map[v] : v);
+  return { ...take, shots: (take.shots ?? []).map(sh => ({ ...sh, ...(sh.cam ? { cam: { ...sh.cam, target: m(sh.cam.target) } } : {}), actors: (sh.actors ?? []).map(a => ({ ...a, who: m(a.who), face: m(a.face) })) })) };
 }

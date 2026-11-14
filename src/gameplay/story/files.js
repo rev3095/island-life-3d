@@ -33,4 +33,5 @@ export const SCENE_FILES = [
   'assets/story/scenes/s30-monsoon-day.json',   // M18-P2 장마 하루 (trigger special-day kind monsoon)
   'assets/story/scenes/s31-big-meteor.json',   // M18-P2 큰 유성우 밤 (trigger meteor-big)
   'assets/story/scenes/s32-first-snow.json',   // M18-P2 첫눈 아침 (trigger special-day kind first-snow)
+  'assets/story/scenes/s53-pair-makeup.json',   // M19-P3 짝 화해 저녁 (trigger pair-makeup, 배우는 vars.cast 로 바뀜, once false)
 ];

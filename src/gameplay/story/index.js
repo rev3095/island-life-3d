@@ -129,7 +129,7 @@ export default {
 
     // ---- 장면 틀기 ----
     async function run(sc, opts = {}) {
-      const take = R.takeOf(sc, opts.take);
+      const take = R.recastTake(R.takeOf(sc, opts.take), opts.vars?.cast);   // M19-P3 짝 화해 s53: 배우 바꿔 끼우기 (vars.cast)
       const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, night: sc.trigger?.on === 'night-first' ? sc.trigger.kind : undefined, ...(opts.vars ?? {}) };
       if (vars.night && vars.name == null) vars.name = svc().night?.config?.[vars.night === 'moonshop' ? 'shop' : 'tent']?.name;   // 미리 보기: 가게 이름
       if (sc.trigger?.on === 'tour-first' && vars.name == null) vars.name = '무인도';

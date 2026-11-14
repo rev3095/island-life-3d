@@ -1894,6 +1894,71 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
   });
 
+  add('pairs', 'M19-P3 짝: 다툼 날까지 날짜 넘기기 → 💢 둘에게 차례로 「이야기 들어 줄게」 → 저녁 화해 장면 s53 → 우편함 둘이 같이 쓴 편지·선물 · 섬 일지', async () => {
+    const PR = () => S().town?.pairs;
+    if (!PR()) return block('짝(town.pairs) 서비스가 없어요');
+    if (!fest().endedDay) return skip('엔딩 전 (다툼 날은 첫 섬 축제 뒤부터)');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    const odd = [], res = {};
+    // ① 다툼 날까지 하루씩 (시계만 당긴다 — 날짜·날씨·행사는 게임이 정한다)
+    let n = 0;
+    while (PR().today()?.status !== 'fight' && n < 75) { S().time.setHour(29); await bot.frames(4); n++; }
+    res.daysSkipped = n;
+    const f = PR().today();
+    if (f?.status !== 'fight') return block(`${n}일 넘겨도 다툼 날이 아님 (짝 ${PR().list().length})`);
+    res.pair = f.pair; res.day = bot.day();
+    res.weather = S().time.weather;
+    await bot.setHour(10);
+    await bot.settle(60);
+    if (bot.free() < 2) await sellSurplus();
+    await bot.tool(null);
+    // ② 둘에게 차례로 — 밖에 없으면(낮잠·밤 주민) 나올 시각까지 시계를 당긴다
+    const town = S().town, V$ = s => town.villagers.find(V => V.slug === s);
+    for (const slug of [f.a, f.b]) {
+      for (let h = Math.max(10, Math.floor(S().time.now().hourF)); h <= 27 && !(town.atHome(slug) === 'out' && V$(slug)?.talkable); h++) { await bot.setHour(h); await bot.settle(20); await bot.frames(30); }
+      const V = V$(slug);
+      if (V?.bubble !== '💢') odd.push(`${slug} 머리 위 💢 가 없음 (${V?.bubble ?? '없음'})`);
+      if (!res.shot) { res.shot = true; await bot.walkTo(V.actor.position, { near: 2.2, label: V.person.name }); await bot.shot('18-pair-fight', `다툼 날 ${f.pair} — 💢 · 팔짱 AN-17`); }
+      if (!(await sk.reach(slug))) { odd.push(`${slug} 에게 못 감`); continue; }
+      bot.policy = { dialog: texts => Math.max(0, texts.indexOf('이야기 들어 줄게')) };
+      bot.press('action');
+      await bot.frames(3);
+      await bot.settle(60, 0.5);
+      bot.policy = {};
+      if (!PR().today()?.heard?.[slug]) odd.push(`${slug} 이야기 들어 주기가 안 셈`);
+    }
+    res.heard = PR().today()?.status;
+    if (res.heard !== 'heard') return block(`둘 다 들어 줬는데 상태 ${res.heard} (${JSON.stringify(PR().today()?.heard)})`);
+    // ③ 저녁 — 화해 장면 s53 → 편지·선물
+    const scene = PR().config.fight.scene, gift = PR().config.pairs.find(p => p.id === f.pair)?.gift;
+    const unread0 = town.mail.unread().length;
+    if (S().time.now().hourF < PR().config.fight.makeupHour) await bot.setHour(PR().config.fight.makeupHour);
+    let shot = false;
+    await bot.until(() => {
+      if (!shot && S().story?.playing?.id === scene && S().story.playing.shot === 'c4') { shot = true; bot.shot('18-pair-s53', `화해 장면 s53 (${f.pair})`); }
+      return PR().today()?.status === 'made' || PR().state().fight?.status === 'made';
+    }, { timeout: 90, label: '화해 장면' });
+    bot.policy = { dialog: () => 0 };
+    await bot.settle(60);
+    bot.policy = {};
+    res.made = PR().state().fight?.status;
+    res.scene = !!st().story?.seen?.[scene];
+    if (res.made !== 'made') return block(`화해가 안 끝남 (상태 ${res.made}, 장면 ${res.scene ? '봄' : '안 봄'})`);
+    if (!res.scene) odd.push('화해 장면 s53 이 안 나옴');
+    const letter = town.mail.unread().find(l => l.kind === 'pair');
+    if (!letter) odd.push(`우편함에 짝 편지가 없음 (안 읽은 편지 ${unread0} → ${town.mail.unread().length})`);
+    const g0 = gift ? bot.has(gift) : 0;
+    await sk.mail();
+    res.gift = gift && bot.has(gift) > g0 ? gift : null;
+    if (gift && !res.gift) odd.push(`선물 ${gift} 을 못 받음`);
+    res.journal = st().journal?.counts?.makeup ?? 0;
+    if (!res.journal && st().flags?.firstday?.finished) odd.push('섬 일지 「짝 화해시키기」가 안 셈');
+    note('pairs', res);
+    const msg = `${res.pair} ${res.day} (${n}일 넘김, ${res.weather}) · 둘 다 들어 줌 → s53 → 편지${res.gift ? ` + ${res.gift}` : ''} · 일지 ${res.journal}`;
+    return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;
