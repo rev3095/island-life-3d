@@ -52,6 +52,7 @@ export default {
       ...eventSpots(),
       ...(ctx.services.night?.clearSpots?.() ?? []),   // M12 야시장 노점 앞 · 달빛 가게·천막 문 앞
       ...(ctx.services.contest?.clearSpots?.() ?? []),   // M18-P3 대회 날 무대 접수 탁자 앞
+      ...(ctx.services.lighthouse?.clearSpots?.() ?? []),   // M19-P4 옛 등대 앞
     ].filter(Boolean);
     // 8차 행사 시간엔 그 행사 자리(간판·돗자리·솥·눈덩이)도 — 행동 거리(1.4~1.9) + 말 걸기 거리(1.3). 주인공이 1.4칸 둘레에 서서
     // 간판 앞 Space 가 「소원 빌기」 대신 말 걸기로 가던 것 (M8-P8 행사 점검 EV-02, 가끔)

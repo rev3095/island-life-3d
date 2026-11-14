@@ -1,0 +1,225 @@
+{
+  "id": "s56-lighthouse-stairs",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "새 계단",
+  "summary": "단풍이 옛 계단 치수를 꼼꼼히 재고, 보리가 느긋하게 널빤지를 맞춘다. 삐걱이던 계단 대신 튼튼한 새 계단이 놓인다.",
+  "trigger": {
+    "on": "lighthouse",
+    "kind": "stairs"
+  },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "recommended": true,
+      "title": "2단계 — 둘이 돕고 · 끝나고 함께 기뻐하기",
+      "desc": "단풍이 치수 재기 → 기록 → 보리 망치질 → 셋이 새 계단 앞.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "단풍이 줄자를 들고, 보리는 널빤지 옆에서 하품",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "crane"
+          },
+          "caption": "삐걱이던 옛 계단을 뜯어내고",
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "danpung",
+              "at": [
+                -1.4,
+                0.8
+              ],
+              "to": [
+                -0.9,
+                0.3
+              ],
+              "do": "walk",
+              "face": 0,
+              "emote": "📏",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                1.5,
+                0.9
+              ],
+              "face": 0,
+              "emote": "😴",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.2,
+                1.4
+              ],
+              "face": 0
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "단풍이 수첩에 치수를 적음",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "danpung",
+            "angle": -20,
+            "move": "push"
+          },
+          "caption": "단풍이 옛 계단 치수를 다 재 뒀어요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "danpung",
+              "face": "player",
+              "do": "happy",
+              "emote": "📝",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "danpung",
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "보리가 의외로 척척 망치질",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "bori",
+            "angle": 20,
+            "move": "static"
+          },
+          "caption": "보리는 느긋하게, 그래도 튼튼하게",
+          "wait": true,
+          "actors": [
+            {
+              "who": "bori",
+              "face": "player",
+              "do": "happy",
+              "emote": "🔨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "bori",
+              "emote": "😊",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "셋이 새 계단 앞에서",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "caption": "새 계단이 놓였어요!",
+          "actors": [
+            {
+              "who": "danpung",
+              "face": 0,
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 — 다 같이 등대를 올려다보기",
+      "desc": "셋이 등대 앞에서 올려다보며 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "셋이 새 계단 앞에서",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "static"
+          },
+          "caption": "새 계단이 놓였어요!",
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "danpung",
+              "at": [
+                -1.1,
+                0.5
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "📏",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                1.1,
+                0.6
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "😴",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                1
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

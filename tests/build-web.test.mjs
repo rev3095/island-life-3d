@@ -47,7 +47,8 @@ test('build-web: 게시 파일은 모듈·css + 에셋 묶음 몇 개 (에셋을
   assert.equal(plan.publish.filter(f => f.path.startsWith('packs/')).length, plan.packs.length);
   assert.ok(plan.packs.length <= 27,   // + M13 daily 묶음 + M16 바다 생물 모델로 items 묶음 하나 더 (items-3) + M18-P1 계절 바다 생물 묶음 넷 (sea-spring|summer|autumn|winter) · icons 하나 더 + M18-P3 트로피 썸네일로 icons 하나 더 (icons-3) + M18-P4 계절 가구 썸네일 (icons 하나 더)
     `묶음 ${plan.packs.length}개`);
-  assert.ok(plan.publish.length + 1 <= LIMITS.perPublish, `한 번에 다 올라가는 수 (지금 ${plan.publish.length + 1}개)`);
+  // M19-P4: main 이 이미 255개(한 번 게시 한도)에 닿아서 새 모듈을 더하면 넘는다 → 버전 한도(511) 안이면 된다. 넘으면 files-1·files-2 … 차례로 (makeBatches, 아래 테스트가 본다)
+  assert.ok(plan.publish.length + 1 <= LIMITS.perVersion, `한 버전에 다 들어가는 수 (지금 ${plan.publish.length + 1}개)`);
 });
 
 test('build-web: 원본 파일이 모두 있고 경로가 저장소 상대 경로', () => {

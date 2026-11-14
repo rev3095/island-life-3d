@@ -38,6 +38,14 @@
     {"scene":"s25-five-stars"},
     {"scene":"s30-monsoon-day"},
     {"scene":"s31-big-meteor"},
-    {"scene":"s32-first-snow"}
+    {"scene":"s32-first-snow"},
+    {"scene":"s54-lighthouse-start"},
+    {"scene":"s55-lighthouse-path"},
+    {"scene":"s56-lighthouse-stairs"},
+    {"scene":"s57-lighthouse-lens"},
+    {"scene":"s58-lighthouse-lantern"},
+    {"scene":"s59-lighthouse-ready"},
+    {"scene":"s60-lighthouse-lit"},
+    {"scene":"s61-lighthouse-morning"}
   ]
 }

@@ -1,0 +1,42 @@
+{
+  "id": "BD-18-3",
+  "slug": "lighthouse-lit",
+  "name": "옛 등대 (켜진 모습)",
+  "category": "building",
+  "kind": "lighthouse",
+  "version": "0.1",
+  "triangles": 3818,
+  "parts": 5,
+  "materials": [
+    "band",
+    "door",
+    "glow",
+    "paint",
+    "rail",
+    "rock",
+    "rockDark",
+    "roof",
+    "stone",
+    "trim",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.57,
+    2.27,
+    4.81
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 114388,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-lit_front.png",
+    "lighthouse-lit_hero.jpg",
+    "lighthouse-lit_main.png",
+    "lighthouse-lit_thumb.png",
+    "lighthouse-lit_top.png"
+  ]
+}

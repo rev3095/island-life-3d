@@ -18,6 +18,7 @@ const PARTS = [
   ['daily', './daily/index.js'],         // M13-P2–P5 매일 할 거리: 유성우·소원 · 선물 풍선·새총 · 유리병·레시피 · 방문 행상 (assets/daily/, D142–D147 A)
   ['rating', './rating/index.js'],
   ['contest', './contest/index.js'],     // M18-P3 계절 낚시·곤충 대회: 광장 무대 BD-17 · 대회 창 UI-34 · 트로피 FU-89–91 · s29 (assets/contest/, D194-A)       // M14 섬 별점 평가: 섬폰 ⭐ · 별 상 · s25 (assets/rating/, 결정 D152-A)
+  ['lighthouse', './lighthouse/index.js'],   // M19-P4 등대 다시 켜기: 옛 등대 BD-18 · 단계 다섯 · 진행판 UI-37 · s54–s61 (assets/lighthouse/, D203-A · D206-A)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */

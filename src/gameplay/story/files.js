@@ -33,4 +33,12 @@ export const SCENE_FILES = [
   'assets/story/scenes/s30-monsoon-day.json',   // M18-P2 장마 하루 (trigger special-day kind monsoon)
   'assets/story/scenes/s31-big-meteor.json',   // M18-P2 큰 유성우 밤 (trigger meteor-big)
   'assets/story/scenes/s32-first-snow.json',   // M18-P2 첫눈 아침 (trigger special-day kind first-snow)
+  'assets/story/scenes/s54-lighthouse-start.json',   // M19-P4 등대 시작 — 구름의 옛 그림 (trigger lighthouse kind start)
+  'assets/story/scenes/s55-lighthouse-path.json',   // M19-P4 등대 1단계 길 내기 (kind path)
+  'assets/story/scenes/s56-lighthouse-stairs.json',   // M19-P4 등대 2단계 계단 고치기 (kind stairs)
+  'assets/story/scenes/s57-lighthouse-lens.json',   // M19-P4 등대 3단계 렌즈 닦기 (kind lens)
+  'assets/story/scenes/s58-lighthouse-lantern.json',   // M19-P4 등대 4단계 별 조각 등불 (kind lantern)
+  'assets/story/scenes/s59-lighthouse-ready.json',   // M19-P4 등대 5단계 불 켜는 날 준비 (kind night)
+  'assets/story/scenes/s60-lighthouse-lit.json',   // M19-P4 등대 불 켜는 밤 — 섬 사람 모두 + 밤 상인들 (kind lit)
+  'assets/story/scenes/s61-lighthouse-morning.json',   // M19-P4 등대 다음 날 아침 (kind morning)
 ];

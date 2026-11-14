@@ -1,0 +1,225 @@
+{
+  "id": "s58-lighthouse-lantern",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "별 조각 등불",
+  "summary": "달무리가 별빛을 담는 법을 알려 주고, 초롱이 온 섬에 소식을 알리겠다며 들뜬다. 기름 대신 별 조각을 담은 등불이 처음으로 은은하게 빛난다.",
+  "trigger": {
+    "on": "lighthouse",
+    "kind": "lantern"
+  },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "recommended": true,
+      "title": "4단계 — 둘이 돕고 · 끝나고 함께 기뻐하기",
+      "desc": "달무리 별 이야기 → 별 조각 넣기 → 초롱 들뜸 → 등불이 은은히.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "달무리가 하늘을 가리키고 초롱은 수첩을 듦",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "crane"
+          },
+          "caption": "기름 대신 별 조각을 담기로 했어요",
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "at": [
+                -1.4,
+                0.8
+              ],
+              "to": [
+                -0.9,
+                0.3
+              ],
+              "do": "walk",
+              "face": 0,
+              "emote": "🌙",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.5,
+                0.9
+              ],
+              "face": 0,
+              "emote": "📣",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.2,
+                1.4
+              ],
+              "face": 0
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "달무리가 별빛 담는 법을 알려 줌",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "dalmuri",
+            "angle": -20,
+            "move": "push"
+          },
+          "caption": "달무리가 별빛을 담는 법을 알려 줬어요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": "player",
+              "do": "happy",
+              "emote": "⭐",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "dalmuri",
+              "emote": "❓",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "초롱이 「1면감!」 하며 들뜸",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "chorong",
+            "angle": 20,
+            "move": "static"
+          },
+          "caption": "초롱이 섬 소식에 싣겠대요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "chorong",
+              "face": "player",
+              "do": "happy",
+              "emote": "📰",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": "chorong",
+              "emote": "😊",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "셋이 등불을 들여다봄",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 0,
+            "move": "pull"
+          },
+          "caption": "별 조각 등불이 은은하게 빛나요",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "face": 0,
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 — 다 같이 등대를 올려다보기",
+      "desc": "셋이 등대 앞에서 올려다보며 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "셋이 등불을 들여다봄",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "static"
+          },
+          "caption": "별 조각 등불이 은은하게 빛나요",
+          "transition": "fade",
+          "actors": [
+            {
+              "who": "dalmuri",
+              "at": [
+                -1.1,
+                0.5
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "🌙",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.1,
+                0.6
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "📣",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                1
+              ],
+              "face": 0,
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

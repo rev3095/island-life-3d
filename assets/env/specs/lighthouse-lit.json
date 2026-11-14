@@ -1,0 +1,109 @@
+{
+  "id": "BD-18-3",
+  "slug": "lighthouse-lit",
+  "name": "옛 등대 (켜진 모습)",
+  "category": "building",
+  "kind": "lighthouse",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "다시 켠 등대. 새 칠 · 빨간 띠, 등실 안 별 조각 등이 밤마다 빛나고(빛 띠는 게임 셰이더), 창도 밤에 켜진다.",
+    "keywords": [
+      "하얀 등대",
+      "빨간 띠",
+      "바위 끝",
+      "등실 유리"
+    ],
+    "references": [
+      "그림책 속 바닷가 작은 등대"
+    ],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인",
+      "너무 큰 탑"
+    ],
+    "notes": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A) — 등대 단계에 따라 src/gameplay/lighthouse 가 놓음 (persist:false, 단계는 state.lighthouse 에 저장). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.016
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01,
+      "live": true
+    },
+    "look": {
+      "label": "모습 (0 꺼짐 · 1 고치는 중 · 2 켜짐)",
+      "value": 2,
+      "min": 0,
+      "max": 2,
+      "step": 1
+    }
+  },
+  "palette": {
+    "rock": "#9AA3A8",
+    "rockDark": "#6F787E",
+    "stone": "#C9C3B6",
+    "trim": "#3F4E5C",
+    "rail": "#2F3A44",
+    "roof": "#C9473E",
+    "door": "#7A5236",
+    "doorDark": "#2B2420",
+    "plank": "#9C7A55",
+    "rope": "#C8A46E",
+    "crack": "#5A5550",
+    "ivy": "#5E9A5A",
+    "paint": "#FFFBF4",
+    "paintOld": "#FFFBF4",
+    "band": "#E0503F",
+    "window": "#FFE3A3",
+    "glassDark": "#4C5A66",
+    "glassClean": "#A9D3E4",
+    "lampDark": "#C9C2B0",
+    "glow": "#FFE07A"
+  },
+  "paletteLabels": {
+    "rock": "바위 받침",
+    "rockDark": "바위 그늘",
+    "stone": "돌단",
+    "trim": "문틀·난간 바닥·테",
+    "rail": "난간·창살",
+    "roof": "등실 지붕",
+    "door": "문",
+    "doorDark": "열린 문 안",
+    "plank": "막은 판자",
+    "rope": "밧줄",
+    "crack": "금",
+    "ivy": "담쟁이",
+    "paint": "탑 칠",
+    "paintOld": "옛 칠",
+    "band": "띠",
+    "window": "창 (밤에 켜짐)",
+    "glassDark": "어두운 유리",
+    "glassClean": "닦은 유리",
+    "lampDark": "안 켠 등",
+    "glow": "별 조각 등 (밤에 빛남)"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "circles": [
+        [
+          0,
+          0,
+          0.98
+        ]
+      ]
+    },
+    "extent": [
+      1.15,
+      1.05
+    ]
+  }
+}

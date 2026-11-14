@@ -1,0 +1,1019 @@
+{
+  "id": "s60-lighthouse-lit",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "불 켜는 밤",
+  "summary": "밤, 섬 사람 모두와 밤 상인들(별밤·여명·살랑)까지 등대 앞에 모였다. 주인공이 별 조각 등불을 올리고 「하나, 둘, 셋!」 — 등대에 불이 켜지고 빛 띠가 바다를 한 바퀴 돈다.",
+  "trigger": {
+    "on": "lighthouse",
+    "kind": "lit"
+  },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "recommended": true,
+      "title": "모두 모임 → 하나 둘 셋 → 불 켜짐 → 빛이 도는 바다",
+      "desc": "등대 앞 반원으로 모인 섬 사람들 → 주인공이 등대 앞으로 → 하얗게 번쩍, 불 켜짐 → 모두 환호.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "등대 앞 반원으로 모인 섬 사람 모두 + 밤 상인들",
+          "dur": 4.5,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              0.6
+            ],
+            "angle": 0,
+            "move": "crane"
+          },
+          "caption": "섬 사람들이 모두 등대 앞에 모였어요",
+          "transition": "fade",
+          "music": "night",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                -2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🏮",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                -2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "mochi",
+              "at": [
+                -1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🌸",
+              "text": ""
+            },
+            {
+              "who": "dubu",
+              "at": [
+                -0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "…",
+              "text": ""
+            },
+            {
+              "who": "pong",
+              "at": [
+                0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🍙",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "📣",
+              "text": ""
+            },
+            {
+              "who": "danpung",
+              "at": [
+                2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "📝",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "at": [
+                2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🖼️",
+              "text": ""
+            },
+            {
+              "who": "pado",
+              "at": [
+                -3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🌊",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                -2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🌙",
+              "text": ""
+            },
+            {
+              "who": "bamtol",
+              "at": [
+                -1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🌰",
+              "text": ""
+            },
+            {
+              "who": "neuru",
+              "at": [
+                0,
+                2.45
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🦴",
+              "text": ""
+            },
+            {
+              "who": "byeolbam",
+              "at": [
+                1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "⭐",
+              "text": ""
+            },
+            {
+              "who": "yeomyeong",
+              "at": [
+                2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🔮",
+              "text": ""
+            },
+            {
+              "who": "salang",
+              "at": [
+                3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "🦊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                1.6
+              ],
+              "face": 0
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "주인공이 등대 앞으로 걸어가 별 조각 등불을 든다",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": -15,
+            "move": "push"
+          },
+          "caption": "하나, 둘…",
+          "wait": true,
+          "actors": [
+            {
+              "who": "player",
+              "to": [
+                0,
+                0.2
+              ],
+              "do": "walk",
+              "face": 0,
+              "emote": "⭐",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "face": "player",
+              "emote": "🥺",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "하얗게 번쩍 — 등대 꼭대기에 불이 켜짐",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "pull"
+          },
+          "caption": "셋! 등대에 불이 켜졌어요!",
+          "transition": "white",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                -2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                -2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "mochi",
+              "at": [
+                -1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "dubu",
+              "at": [
+                -0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "💛",
+              "text": ""
+            },
+            {
+              "who": "pong",
+              "at": [
+                0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "danpung",
+              "at": [
+                2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "at": [
+                2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "💛",
+              "text": ""
+            },
+            {
+              "who": "pado",
+              "at": [
+                -3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                -2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "bamtol",
+              "at": [
+                -1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "neuru",
+              "at": [
+                0,
+                2.45
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "💛",
+              "text": ""
+            },
+            {
+              "who": "byeolbam",
+              "at": [
+                1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "yeomyeong",
+              "at": [
+                2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "salang",
+              "at": [
+                3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c4",
+          "note": "빛 띠가 바다를 한 바퀴 — 모두 올려다봄",
+          "dur": 4.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 180,
+            "move": "orbit"
+          },
+          "caption": "빛이 밤바다를 한 바퀴 돌아요",
+          "actors": [
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "💛",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "face": 0,
+              "emote": "😭",
+              "text": ""
+            },
+            {
+              "who": "coco",
+              "face": 0,
+              "do": "happy",
+              "emote": "🙌",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "face": 0,
+              "emote": "🌟",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "두 컷 — 모임 · 불 켜짐",
+      "desc": "모두 모인 넓은 컷 → 하얗게 번쩍 불 켜짐.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "모두 모인 등대 앞",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              0.6
+            ],
+            "angle": 0,
+            "move": "static"
+          },
+          "caption": "섬 사람들이 모두 모였어요",
+          "transition": "fade",
+          "music": "night",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                -2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                -2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "mochi",
+              "at": [
+                -1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "dubu",
+              "at": [
+                -0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "pong",
+              "at": [
+                0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "danpung",
+              "at": [
+                2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "at": [
+                2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "pado",
+              "at": [
+                -3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                -2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "bamtol",
+              "at": [
+                -1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "neuru",
+              "at": [
+                0,
+                2.45
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "byeolbam",
+              "at": [
+                1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "yeomyeong",
+              "at": [
+                2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "✨",
+              "text": ""
+            },
+            {
+              "who": "salang",
+              "at": [
+                3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0.4
+              ],
+              "face": 0,
+              "emote": "⭐",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "불 켜짐",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "pull"
+          },
+          "caption": "등대에 불이 켜졌어요!",
+          "transition": "white",
+          "actors": [
+            {
+              "who": "coco",
+              "at": [
+                -2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "bori",
+              "at": [
+                -2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "mochi",
+              "at": [
+                -1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "dubu",
+              "at": [
+                -0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "pong",
+              "at": [
+                0.46,
+                1.11
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "chorong",
+              "at": [
+                1.34,
+                0.83
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "danpung",
+              "at": [
+                2.09,
+                0.3
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "gureum",
+              "at": [
+                2.65,
+                -0.44
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "pado",
+              "at": [
+                -3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "dalmuri",
+              "at": [
+                -2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "bamtol",
+              "at": [
+                -1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "neuru",
+              "at": [
+                0,
+                2.45
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "byeolbam",
+              "at": [
+                1.19,
+                2.28
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "yeomyeong",
+              "at": [
+                2.28,
+                1.8
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "👏",
+              "text": ""
+            },
+            {
+              "who": "salang",
+              "at": [
+                3.2,
+                1.03
+              ],
+              "face": [
+                0,
+                -1.85
+              ],
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "do": "happy",
+              "emote": "🎉",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

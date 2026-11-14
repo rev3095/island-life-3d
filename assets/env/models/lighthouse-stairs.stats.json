@@ -1,0 +1,34 @@
+{
+  "id": "PR-42",
+  "slug": "lighthouse-stairs",
+  "name": "등대 새 계단",
+  "category": "prop",
+  "kind": "lighthouse-stairs",
+  "version": "0.1",
+  "triangles": 800,
+  "parts": 1,
+  "materials": [
+    "stone",
+    "stoneEdge",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    0.89,
+    0.86,
+    0.88
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 15536,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-stairs_front.png",
+    "lighthouse-stairs_hero.jpg",
+    "lighthouse-stairs_main.png",
+    "lighthouse-stairs_thumb.png",
+    "lighthouse-stairs_top.png"
+  ]
+}

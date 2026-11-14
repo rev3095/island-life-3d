@@ -1,0 +1,44 @@
+{
+  "id": "BD-18-1",
+  "slug": "lighthouse-dark",
+  "name": "옛 등대 (꺼진 모습)",
+  "category": "building",
+  "kind": "lighthouse",
+  "version": "0.1",
+  "triangles": 4600,
+  "parts": 6,
+  "materials": [
+    "band",
+    "crack",
+    "door",
+    "glassDark",
+    "ivy",
+    "paint",
+    "plank",
+    "rail",
+    "rock",
+    "rockDark",
+    "roof",
+    "stone",
+    "trim"
+  ],
+  "animations": {},
+  "size": [
+    2.57,
+    2.27,
+    4.81
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 128856,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-dark_front.png",
+    "lighthouse-dark_hero.jpg",
+    "lighthouse-dark_main.png",
+    "lighthouse-dark_thumb.png",
+    "lighthouse-dark_top.png"
+  ]
+}

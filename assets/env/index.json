@@ -493,6 +493,42 @@
       "status": "approved"
     },
     {
+      "id": "PR-41",
+      "slug": "lighthouse-scaffold",
+      "name": "등대 비계",
+      "category": "prop",
+      "kind": "lighthouse-scaffold",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-42",
+      "slug": "lighthouse-stairs",
+      "name": "등대 새 계단",
+      "category": "prop",
+      "kind": "lighthouse-stairs",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-43",
+      "slug": "lighthouse-lens",
+      "name": "등대 렌즈",
+      "category": "prop",
+      "kind": "lighthouse-lens",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-44",
+      "slug": "star-lantern",
+      "name": "별 조각 등불",
+      "category": "prop",
+      "kind": "star-lantern",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -642,6 +678,33 @@
       "name": "대회 무대",
       "category": "building",
       "kind": "contest-stage",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-18-1",
+      "slug": "lighthouse-dark",
+      "name": "옛 등대 (꺼진 모습)",
+      "category": "building",
+      "kind": "lighthouse",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-18-2",
+      "slug": "lighthouse-repair",
+      "name": "옛 등대 (고치는 중)",
+      "category": "building",
+      "kind": "lighthouse",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-18-3",
+      "slug": "lighthouse-lit",
+      "name": "옛 등대 (켜진 모습)",
+      "category": "building",
+      "kind": "lighthouse",
       "version": "0.1",
       "status": "review"
     },

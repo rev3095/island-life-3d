@@ -1,0 +1,45 @@
+{
+  "id": "BD-18-2",
+  "slug": "lighthouse-repair",
+  "name": "옛 등대 (고치는 중)",
+  "category": "building",
+  "kind": "lighthouse",
+  "version": "0.1",
+  "triangles": 4054,
+  "parts": 6,
+  "materials": [
+    "band",
+    "doorDark",
+    "glassClean",
+    "lampDark",
+    "paint",
+    "paintOld",
+    "rail",
+    "rock",
+    "rockDark",
+    "roof",
+    "rope",
+    "stone",
+    "trim",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.57,
+    2.27,
+    4.81
+  ],
+  "footprint": [
+    3,
+    3
+  ],
+  "glbBytes": 120512,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-repair_front.png",
+    "lighthouse-repair_hero.jpg",
+    "lighthouse-repair_main.png",
+    "lighthouse-repair_thumb.png",
+    "lighthouse-repair_top.png"
+  ]
+}

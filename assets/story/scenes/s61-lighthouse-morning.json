@@ -1,0 +1,168 @@
+{
+  "id": "s61-lighthouse-morning",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "등대가 있는 아침",
+  "summary": "불을 켠 다음 날 아침. 구름이 바위 끝에서 켜진 등대를 새로 그리고 있다. 옛 그림 옆에 새 그림 한 장 — 「이제 밤마다 섬을 비춰 줄 거야.」",
+  "trigger": {
+    "on": "lighthouse",
+    "kind": "morning"
+  },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "recommended": true,
+      "title": "아침 등대 → 새 그림 → 나란히",
+      "desc": "아침 햇살 속 등대 → 구름이 새 그림을 보여 줌 → 둘이 나란히 바다를 봄.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "아침 햇살 속 새로 칠한 등대",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "crane"
+          },
+          "caption": "등대에 불을 켠 다음 날 아침",
+          "transition": "fade",
+          "music": "morning",
+          "actors": [
+            {
+              "who": "gureum",
+              "at": [
+                -0.9,
+                0.5
+              ],
+              "face": 0,
+              "emote": "🎨",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.8,
+                1.4
+              ],
+              "face": "gureum"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "note": "구름이 새 그림을 보여 줌",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "gureum",
+            "angle": -20,
+            "move": "push"
+          },
+          "caption": "구름이 켜진 등대를 새로 그렸어요",
+          "wait": true,
+          "actors": [
+            {
+              "who": "gureum",
+              "face": "player",
+              "do": "happy",
+              "emote": "🖼️",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "to": [
+                0,
+                0.8
+              ],
+              "do": "walk",
+              "face": "gureum",
+              "emote": "😍",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "둘이 나란히 바다 쪽을 봄",
+          "dur": 3.5,
+          "cam": {
+            "size": "group",
+            "target": "group",
+            "angle": 180,
+            "move": "pull"
+          },
+          "caption": "이제 밤마다 섬을 비춰 줄 거예요",
+          "actors": [
+            {
+              "who": "gureum",
+              "face": 0,
+              "emote": "😊",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "face": 0,
+              "emote": "💛",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 — 새 그림",
+      "desc": "구름이 새 그림을 보여 주며 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "등대 앞 구름의 새 그림",
+          "dur": 4,
+          "cam": {
+            "size": "wide",
+            "target": [
+              0,
+              -1.85
+            ],
+            "angle": 0,
+            "move": "static"
+          },
+          "caption": "이제 밤마다 섬을 비춰 줄 거예요",
+          "transition": "fade",
+          "music": "morning",
+          "actors": [
+            {
+              "who": "gureum",
+              "at": [
+                -0.7,
+                0.5
+              ],
+              "face": "player",
+              "do": "happy",
+              "emote": "🖼️",
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                0.6,
+                1
+              ],
+              "face": "gureum",
+              "emote": "💛",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

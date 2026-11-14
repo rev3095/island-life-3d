@@ -21,6 +21,7 @@ export const TRIGGERS = {
   'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
   'meteor-big': { label: '큰 유성우 밤 별똥별이 처음 떨어질 때 (M18-P2 — daily 가 보내는 daily:meteor 의 bigFirst)', event: 'daily:meteor', test: p => !!p?.bigFirst },
   'special-day': { label: '그날만 날씨를 처음 맞을 때 (M18-P2 — trigger.kind = monsoon · first-snow, daily 가 보내는 daily:special 의 first)', event: 'daily:special', test: (p, t) => !!t.kind && p?.kind === t.kind && !!p?.first },
+  lighthouse: { label: '등대 다시 켜기 (M19-P4 — trigger.kind = start · path · stairs · lens · lantern · night · lit · morning, lighthouse 가 보내는 lighthouse:scene)', event: 'lighthouse:scene', test: (p, t) => !!t.kind && p?.kind === t.kind },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
@@ -31,7 +32,7 @@ export const SPECIAL_KINDS = { monsoon: '장마 하루 (6월 셋째 수요일)',
 Object.assign(NIGHT_KINDS, { foxshop: '여우 상인 가게 (오는 밤 20–5시, P54)', oddtent: '이상한 천막 (오는 밤 21–5시, P54)', fortune: '운세 부스 (20–3시, P54)' });
 
 /** 장면 기준 자리 = world.places 의 이름 (건물은 문 앞) */
-export const PLACES = { event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포' };
+export const PLACES = { event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포', lighthouse: '옛 등대 앞 (M19-P4)' };
 export const MOTIONS = { idle: '서 있기', walk: '걷기', run: '달리기', happy: '기뻐하기' };
 /** 카메라 크기: dist = 대상까지 거리(칸), pitch = 내려다보는 각도(도), lift = 바라보는 높이 */
 export const CAM_SIZES = {

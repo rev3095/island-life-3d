@@ -14,6 +14,7 @@ const OCCLUDERS = {
   'house-player': 'box', 'house-grown-1': 'box', 'house-grown-2': 'box', 'house-grown-3': 'box', 'house-villager': 'box', shop: 'box', museum: 'box', signboard: 'box',
   // 5차 Z5 축제 광장의 키 큰 것 (무대 3.7 · 아치 3.0 · 부스·덮개 2.6칸). 빠져 있어서 그 뒤(북쪽)에 서면 플레이어가 안 보였다 (QA-07)
   'festival-stage': 'box', 'festival-arch': 'box', 'festival-cover': 'box',
+  'lighthouse-dark': 'box', 'lighthouse-repair': 'box', 'lighthouse-lit': 'box', 'lighthouse-scaffold': 'box',   // M19-P4 옛 등대 (탑 4.6칸)
   'festival-booth-lantern': 'box', 'festival-booth-music': 'box', 'festival-booth-flower': 'box', 'festival-booth-food': 'box', 'festival-booth-fish': 'box',
 };
 const BANDS = 8;               // 나무 모양 높이 띠 수
