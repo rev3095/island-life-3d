@@ -1834,7 +1834,8 @@ export function makeScenario(bot, sk, opts = {}) {
     const tool = kind === 'fish' ? 'tool.rod' : 'tool.net';
     // 출시 점검: 대회 3분 동안 도구가 부서지면 못 겨룬다 — 사람처럼 남은 횟수가 적으면 하나 더 사 둔다
     const usesLeft = () => (S().data.inventory.slots ?? []).filter(x => x?.id === tool).reduce((n, x) => n + (x.uses ?? 0), 0);
-    if (!bot.has(tool) || usesLeft() < 20) {
+    // 3분 동안 30번 넘게 던질 수 있어서 (내구 30) 넉넉히 45번 몫을 챙긴다 — 대회 중 낚싯대가 부러져 26번 헛손질 (11-14 휴대폰 판)
+    for (let k = 0; k < 2 && (!bot.has(tool) || usesLeft() < 45); k++) {
       const price = S().data.items.get(tool)?.buy ?? 400;
       if (bot.acorns() < price) await earnUntil(price + 100, { maxRounds: 3, untilHour: 8.9 });
       await sk.shop({ buy: [tool] });
