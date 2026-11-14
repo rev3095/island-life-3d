@@ -1,0 +1,250 @@
+{
+ "id": "s43-mochi-flowerbed",
+ "version": 1,
+ "status": "review",
+ "chapter": "주민 이야기",
+ "title": "시든 꽃밭 되살리기",
+ "summary": "모찌네 집 앞 꽃밭이 시들었다. 둘이 물을 주고 흙을 돋우자 다음 날 아침 새싹이 — 「같이 키운 꽃이깡」.",
+ "trigger": {
+  "on": "bond-tier",
+  "slug": "mochi",
+  "tier": "friend"
+ },
+ "place": "home",
+ "once": true,
+ "pick": "A",
+ "takes": [
+  {
+   "key": "A",
+   "title": "사연 따라가기 → 친구 사진",
+   "recommended": true,
+   "desc": "그 주민이 자주 가는 곳에서 사연을 다섯 컷으로 → 마지막 사진 컷이 앨범에 들어간다.",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "시든 꽃밭 앞 모찌",
+     "dur": 3.5,
+     "cam": {
+      "size": "wide",
+      "target": "place",
+      "angle": 0,
+      "move": "crane"
+     },
+     "transition": "fade",
+     "music": "morning",
+     "caption": "모찌네 꽃밭이 시들었어요",
+     "actors": [
+      {
+       "who": "mochi",
+       "at": [
+        -1.2,
+        1.4
+       ],
+       "face": 180,
+       "emote": "😢",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.8,
+        4.2
+       ],
+       "face": 0,
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "주인공이 다가간다",
+     "dur": 3.5,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "push"
+     },
+     "caption": "「어떡하지깡…」",
+     "actors": [
+      {
+       "who": "mochi",
+       "face": "player",
+       "emote": "🌸",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "to": [
+        0.7,
+        1.9
+       ],
+       "do": "walk",
+       "face": "mochi",
+       "emote": "❓",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c3",
+     "note": "같이 꽃밭 돌보기",
+     "dur": 4,
+     "cam": {
+      "size": "medium",
+      "target": "group",
+      "angle": 10,
+      "move": "static",
+      "dist": 5.2
+     },
+     "wait": true,
+     "caption": "둘이 물을 주고 흙을 돋워요",
+     "actors": [
+      {
+       "who": "mochi",
+       "face": "player",
+       "emote": "💪",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "mochi",
+       "emote": "💪",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c4",
+     "note": "되살아난 꽃밭",
+     "dur": 3.5,
+     "cam": {
+      "size": "full",
+      "target": "group",
+      "angle": -15,
+      "move": "orbit"
+     },
+     "caption": "새싹이 쏙! 「같이 키운 꽃이깡」",
+     "actors": [
+      {
+       "who": "mochi",
+       "face": "player",
+       "do": "happy",
+       "emote": "🌸",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "mochi",
+       "do": "happy",
+       "emote": "😊",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c5",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "모찌와 친구가 되었어요",
+     "actors": [
+      {
+       "who": "mochi",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😄",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "✌️",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "B",
+   "title": "짧게 두 컷",
+   "desc": "사연 한 컷 + 사진 한 컷 (빨리 넘기고 싶을 때)",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "꽃밭 앞",
+     "dur": 4,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "pull"
+     },
+     "transition": "fade",
+     "wait": true,
+     "caption": "모찌와 꽃밭을 되살렸어요",
+     "actors": [
+      {
+       "who": "mochi",
+       "at": [
+        -0.7,
+        1.4
+       ],
+       "face": "player",
+       "do": "happy",
+       "emote": "🌸",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.7,
+        1.9
+       ],
+       "face": "mochi",
+       "emote": "😊",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "모찌와 친구가 되었어요",
+     "actors": [
+      {
+       "who": "mochi",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😄",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "✌️",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

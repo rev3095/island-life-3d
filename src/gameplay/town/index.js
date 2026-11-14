@@ -8,7 +8,7 @@ import { createVillager } from './villager.js';
 import { RADIUS } from './actor.js';
 import { createKeepers } from './keepers.js';
 import { createLabels } from './labels.js';
-import { createTalk, context } from './talk.js';
+import { createTalk, context, createBondStories } from './talk.js';   // + M19-P2 사연 장면 답례·사진 (talk.js 끝)
 import { createChatter } from './chatter.js';
 import { createMail } from './mail.js';
 import { villagerState, pickWeighted, ownerOf, isAsleep, setLateHook, addFriendship } from './rules.js';
@@ -212,6 +212,7 @@ export default {
     const talk = createTalk(ctx, { lines: LINES, party, companion });
     const art = createArtWish(ctx, { residents, people: PEOPLE, lines: LINES });
     const song = createSong(ctx, { town, lines: LINES, villagers: () => villagers, companion });
+    const bondStories = createBondStories(ctx, { toast });   // M19-P2 주민 사연 장면 s33–s52: 앨범 사진 · ② 답례 (talk.js createBondStories)
     const chatter = createChatter(villagers, LINES);
 
     /** 이사 온 주민을 섬에 들인다 (모델을 불러 villagers 에 더한다) */
@@ -337,7 +338,7 @@ export default {
     gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, umbrellas: createUmbrellas(ctx) };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, bondStories, umbrellas: createUmbrellas(ctx) };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** M18-P4 미술품 주고받기: today() → 오늘 미술품을 바라는 { slug, id } | null · wishes() · config */
@@ -374,6 +375,7 @@ export default {
         write: () => mail.write() },
       /** M15 같이 하기: active() 지금 같이 노는 것 · can(slug) 놀 수 있나 {ok, why} */
       together: { active: () => companion.active, can: slug => { const V = villagers.find(v => v.slug === slug); return V ? companion.can(V) : { ok: false, why: 'none' }; } },
+      stories: bondStories,   // M19-P2 { got(), emotes() }
       /** M15 저녁 광장 노래: today() 오늘 계획 · now() 지금 부르는 둘 */
       song: { today: () => song.plan(), now: () => song.active },
       /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */
@@ -392,6 +394,7 @@ export default {
     const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving, song } = T;
     movein.update();
     song.update(dt);
+    T.bondStories.update(dt);   // M19-P2 사연 사진 컷 (게임 시간으로 잰다)
     moving.update(dt);
     const time = ctx.services.time;
     const now = time?.now?.() ?? null;

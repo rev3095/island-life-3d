@@ -67,6 +67,8 @@ export default {
         if (vars.moveIn) { const h = p.villagerHouses?.find(x => x.slug === vars.moveIn) ?? p.spareLots?.[0]; if (h?.door) return { x: h.door.x, z: h.door.z }; }
         return p.festival ?? p.plaza ?? { x: 0, z: 0 };
       }
+      // M19-P2 사연 장면: 그 주민 집 문 앞 (vars.slug = 트리거 주민)
+      if (name === 'home') { const h = p.villagerHouses?.find(x => x.slug === vars.slug); if (h?.door) return { x: h.door.x, z: h.door.z }; return p.plaza ?? { x: 0, z: 0 }; }
       const v = p[name];
       if (v?.door) return { x: v.door.x, z: v.door.z };
       if (Number.isFinite(v?.x)) return { x: v.x, z: v.z };
@@ -92,7 +94,16 @@ export default {
     }
     keepQueue();
     const trigEvents = new Set(Object.values(R.TRIGGERS).map(t => t.event).filter(Boolean));
-    for (const ev of trigEvents) events.on(ev, payload => enqueue(R.scenesFor(ev, payload ?? {}, ordered(), st().seen), payload ?? {}));
+    const todayKey = () => svc().time?.now?.()?.dayKey ?? svc().data?.day?.key?.() ?? null;
+    for (const ev of trigEvents) events.on(ev, payload => {
+      let ids = R.scenesFor(ev, payload ?? {}, ordered(), st().seen);
+      // M19-P2 사연 장면 (town:bond): 방금 오른 단계면 그 장면, 이미 그 단계인 저장이면 하루 하나만 (D222-A)
+      if (ev === 'town:bond' && ids.length) {
+        ids = R.bondPick(ids, payload, id => scenes.get(id), { lastDay: st().bondDay, today: todayKey(), queued: [...(running ? [running.id] : []), ...queue.map(q => q.id), ...(P ? [P.id] : [])] });
+        if (ids.length) st().bondDay = todayKey();
+      }
+      enqueue(ids, payload ?? {});
+    });
     // ---- 화면 막 (update 가 움직인다 — 창이 숨겨져도 ctx.step 으로 돌 수 있게) ----
     const fade = { v: 0, from: 0, to: 0, t: 0, dur: 0, color: '#2E2420' };
     function fadeTo(to, dur, color) {
@@ -130,7 +141,7 @@ export default {
     // ---- 장면 틀기 ----
     async function run(sc, opts = {}) {
       const take = R.takeOf(sc, opts.take);
-      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, night: sc.trigger?.on === 'night-first' ? sc.trigger.kind : undefined, ...(opts.vars ?? {}) };
+      const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, night: sc.trigger?.on === 'night-first' ? sc.trigger.kind : undefined, slug: sc.trigger?.on === 'bond-tier' ? sc.trigger.slug : undefined, ...(opts.vars ?? {}) };
       if (vars.night && vars.name == null) vars.name = svc().night?.config?.[vars.night === 'moonshop' ? 'shop' : 'tent']?.name;   // 미리 보기: 가게 이름
       if (sc.trigger?.on === 'tour-first' && vars.name == null) vars.name = '무인도';
       const id = sc.id;
@@ -326,7 +337,8 @@ export default {
           layer.fade(fade.v, fade.color);
         }
         // 줄 선 장면
-        if (!P && queue.length && free()) {
+        // 사연 장면(bond-tier)은 같이 낚시·산책이 끝난 뒤에 (장면이 같이 하기를 끊지 않게)
+        if (!P && queue.length && free() && !(scenes.get(queue[0].id)?.trigger?.on === 'bond-tier' && svc().town?.together?.active?.())) {
           const q = queue[0];
           if ((q.wait -= dt) <= 0) {
             queue.shift();

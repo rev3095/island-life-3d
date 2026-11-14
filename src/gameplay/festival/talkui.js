@@ -100,7 +100,9 @@ export function openTalkUI(ctx, emo, who) {
   }
   function drawGrid() {
     const cat = cats[tab]?.key;
-    const list = [...new Set([...emo.player.filter(e => e.cat === cat).map(e => e.key), ...(cat === 'thing' ? extra : [])])];
+    // M19-P2: 사연 ② 답례로 배운 주민 말버릇 이모티콘 (state.town.giftEmotes) 은 「감정」 칸 끝에
+    const learned = cat === 'feel' ? (ctx.state?.town?.giftEmotes ?? []).filter(k => emo.byKey.has(k)) : [];
+    const list = [...new Set([...emo.player.filter(e => e.cat === cat).map(e => e.key), ...learned, ...(cat === 'thing' ? extra : [])])];
     grid.replaceChildren(...list.map(k => {
       const name = String(k).startsWith('item:') ? emo.say([k], items()) : emo.name(k);
       const b = el('button', 'fe-cell', { type: 'button', 'aria-label': name });

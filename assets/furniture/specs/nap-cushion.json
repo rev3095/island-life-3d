@@ -1,0 +1,73 @@
+{
+  "id": "FU-105",
+  "slug": "nap-cushion",
+  "item": "furn.nap-cushion",
+  "name": "낮잠 방석",
+  "category": "furniture",
+  "kind": "nap-cushion",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "보리가 낮잠 자던 둥글넓적한 방석. 도톰한 테 · 윗면에 뼈다귀 무늬 둘 · 뒤쪽에 접힌 담요 · 작은 달 모양 베개.",
+    "keywords": [
+      "둥근 방석",
+      "뼈다귀 무늬",
+      "접힌 담요",
+      "달 베개"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "16차 보드 wave16 D201-A · M19-P2 주민 사연 ② 답례 (보리, 장면 s34)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "puff": {
+      "label": "도톰함",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "cushion": "#E9B872",
+    "cushionEdge": "#D49A55",
+    "cushionTop": "#F4D9A6",
+    "stitch": "#8C6440",
+    "bone": "#FFF8EC",
+    "blanket": "#8FB3D9",
+    "blanketLine": "#C9DBEE",
+    "pillow": "#F6E38A"
+  },
+  "paletteLabels": {
+    "cushion": "방석",
+    "cushionEdge": "방석 테",
+    "cushionTop": "윗면",
+    "stitch": "바느질 땀",
+    "bone": "뼈다귀 무늬",
+    "blanket": "담요",
+    "blanketLine": "담요 줄",
+    "pillow": "달 베개"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

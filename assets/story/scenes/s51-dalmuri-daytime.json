@@ -1,0 +1,250 @@
+{
+ "id": "s51-dalmuri-daytime",
+ "version": 1,
+ "status": "review",
+ "chapter": "주민 이야기",
+ "title": "낮에 깨어 있어 보기",
+ "summary": "야행성 달무리가 주인공과 놀려고 낮에 깨어 있어 본다. 꾸벅꾸벅 졸음을 참다가 결국 벤치에서 잠들고, 주인공이 그늘을 만들어 준다.",
+ "trigger": {
+  "on": "bond-tier",
+  "slug": "dalmuri",
+  "tier": "friend"
+ },
+ "place": "plaza",
+ "once": true,
+ "pick": "A",
+ "takes": [
+  {
+   "key": "A",
+   "title": "사연 따라가기 → 친구 사진",
+   "recommended": true,
+   "desc": "그 주민이 자주 가는 곳에서 사연을 다섯 컷으로 → 마지막 사진 컷이 앨범에 들어간다.",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "눈이 반쯤 감긴 달무리",
+     "dur": 3.5,
+     "cam": {
+      "size": "wide",
+      "target": "place",
+      "angle": 0,
+      "move": "crane"
+     },
+     "transition": "fade",
+     "music": "afternoon",
+     "caption": "한낮의 광장에 달무리가?",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "at": [
+        -1.4,
+        1.6
+       ],
+       "face": 180,
+       "emote": "😴",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.8,
+        4.2
+       ],
+       "face": 0,
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "주인공이 다가간다",
+     "dur": 3.5,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "push"
+     },
+     "caption": "「오늘은 낮에 놀아 보겠부엉…」",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "face": "player",
+       "emote": "💪",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "to": [
+        0.7,
+        1.9
+       ],
+       "do": "walk",
+       "face": "dalmuri",
+       "emote": "😮",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c3",
+     "note": "졸음 참기",
+     "dur": 4,
+     "cam": {
+      "size": "medium",
+      "target": "group",
+      "angle": 10,
+      "move": "static",
+      "dist": 5.2
+     },
+     "wait": true,
+     "caption": "꾸벅… 꾸벅…",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "face": "player",
+       "emote": "😴",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "dalmuri",
+       "emote": "😅",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c4",
+     "note": "주인공이 그늘을 만든다",
+     "dur": 3.5,
+     "cam": {
+      "size": "full",
+      "target": "group",
+      "angle": -15,
+      "move": "orbit"
+     },
+     "caption": "결국 잠든 달무리 곁에서 그늘이 되어 줘요",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "face": "player",
+       "do": "idle",
+       "emote": "😴",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "dalmuri",
+       "do": "happy",
+       "emote": "🤫",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c5",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "달무리와 친구가 되었어요",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😴",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "🤫",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "B",
+   "title": "짧게 두 컷",
+   "desc": "사연 한 컷 + 사진 한 컷 (빨리 넘기고 싶을 때)",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "조는 달무리",
+     "dur": 4,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "pull"
+     },
+     "transition": "fade",
+     "wait": true,
+     "caption": "달무리의 낮 나들이",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "at": [
+        -0.7,
+        1.4
+       ],
+       "face": "player",
+       "do": "happy",
+       "emote": "😴",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.7,
+        1.9
+       ],
+       "face": "dalmuri",
+       "emote": "😊",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "달무리와 친구가 되었어요",
+     "actors": [
+      {
+       "who": "dalmuri",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😄",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "✌️",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

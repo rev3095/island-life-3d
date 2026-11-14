@@ -1,0 +1,250 @@
+{
+ "id": "s42-dubu-sea-letter",
+ "version": 1,
+ "status": "review",
+ "chapter": "주민 이야기",
+ "title": "바다에 띄운 편지",
+ "summary": "노을 진 선착장, 두부가 유리병 편지를 바다에 띄운다. 섬에 남은 이유는 「…여기 사람들이 좋아서.」 말줄임 … 을 가르쳐 준다 (답례 이모티콘).",
+ "trigger": {
+  "on": "bond-tier",
+  "slug": "dubu",
+  "tier": "close"
+ },
+ "place": "dock",
+ "once": true,
+ "pick": "A",
+ "takes": [
+  {
+   "key": "A",
+   "title": "사연 따라가기 → 답례 · 단짝 사진",
+   "recommended": true,
+   "desc": "그 주민 집·추억의 자리에서 사연을 다섯 컷으로 → 답례를 건네고 → 마지막 사진 컷이 앨범에.",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "유리병을 든 두부",
+     "dur": 3.5,
+     "cam": {
+      "size": "wide",
+      "target": "place",
+      "angle": 0,
+      "move": "crane"
+     },
+     "transition": "fade",
+     "music": "evening",
+     "caption": "노을 진 선착장",
+     "actors": [
+      {
+       "who": "dubu",
+       "at": [
+        -0.8,
+        1.2
+       ],
+       "face": 0,
+       "emote": "✉️",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.8,
+        4.2
+       ],
+       "face": 0,
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "주인공이 다가간다",
+     "dur": 3.5,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "push"
+     },
+     "caption": "두부가 돌아봐요",
+     "actors": [
+      {
+       "who": "dubu",
+       "face": "player",
+       "emote": "…",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "to": [
+        0.7,
+        1.9
+       ],
+       "do": "walk",
+       "face": "dubu",
+       "emote": "❓",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c3",
+     "note": "섬에 남은 이유",
+     "dur": 4,
+     "cam": {
+      "size": "medium",
+      "target": "group",
+      "angle": 10,
+      "move": "static",
+      "dist": 5.2
+     },
+     "wait": true,
+     "caption": "「…여기 사람들이 좋아서. 남았어.」",
+     "actors": [
+      {
+       "who": "dubu",
+       "face": "player",
+       "emote": "🌅",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "dubu",
+       "emote": "🥹",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c4",
+     "note": "답례: 말줄임 이모티콘",
+     "dur": 3.5,
+     "cam": {
+      "size": "full",
+      "target": "group",
+      "angle": -15,
+      "move": "orbit"
+     },
+     "caption": "「…이거면 다 통해.」 — … 를 배웠어요",
+     "actors": [
+      {
+       "who": "dubu",
+       "face": "player",
+       "do": "happy",
+       "emote": "…",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "dubu",
+       "do": "happy",
+       "emote": "❤️",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c5",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "두부와 단짝가 되었어요",
+     "actors": [
+      {
+       "who": "dubu",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😄",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "✌️",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "B",
+   "title": "짧게 두 컷",
+   "desc": "사연 한 컷 + 사진 한 컷 (빨리 넘기고 싶을 때)",
+   "shots": [
+    {
+     "id": "c1",
+     "note": "선착장 두부",
+     "dur": 4,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "pull"
+     },
+     "transition": "fade",
+     "wait": true,
+     "caption": "「…여기 사람들이 좋아서.」",
+     "actors": [
+      {
+       "who": "dubu",
+       "at": [
+        -0.7,
+        1.4
+       ],
+       "face": "player",
+       "do": "happy",
+       "emote": "…",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "at": [
+        0.7,
+        1.9
+       ],
+       "face": "dubu",
+       "emote": "❤️",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "id": "c2",
+     "note": "사진 한 장 — 앨범에 들어간다",
+     "dur": 3,
+     "cam": {
+      "size": "group",
+      "target": "group",
+      "angle": 0,
+      "move": "static"
+     },
+     "transition": "white",
+     "photo": true,
+     "caption": "두부와 단짝가 되었어요",
+     "actors": [
+      {
+       "who": "dubu",
+       "face": "camera",
+       "do": "happy",
+       "emote": "😄",
+       "text": ""
+      },
+      {
+       "who": "player",
+       "face": "camera",
+       "emote": "✌️",
+       "text": ""
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
