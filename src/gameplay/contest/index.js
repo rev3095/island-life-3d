@@ -140,7 +140,7 @@ export function createContest(ctx, cfg) {
     if (!run || category !== run.c.kind || !id) return;
     const it = S().data?.items?.get?.(id);
     const size = R.sizeOf(cfg, run.c.kind, it, Math.random());
-    run.catches.push({ t: Math.round(run.t * 10) / 10, size, item: id });
+    run.catches.push({ t: Math.floor(run.t * 10) / 10, size, item: id });
     const v = view();
     toast(`📏 ${it?.name ?? id} ${size}cm! (${v.me.count}${v.unit} · ${v.me.score}점 · ${v.me.rank}위)`, run.c.emoji);
     ctx.events.emit('contest:catch', { id: run.c.id, item: id, size, n: run.catches.length });
@@ -177,7 +177,7 @@ export function createContest(ctx, cfg) {
     if (prize.item) {
       const it = d?.items?.get?.(prize.item);
       if ((d?.inventory?.add?.(prize.item, 1) ?? 0) > 0) { toast(`${it?.name ?? prize.item}를 받았어요!`, it?.emoji ?? '🏆'); ctx.events.emit('sfx', { name: 'acorn' }); }
-      else { st().owed.push(prize.item); toast(`가방이 꽉 찼어요. ${it?.name ?? '트로피'}는 대회 무대 접수 탁자에 맡겨 둘게요 (다음 대회 날 받아요)`, '🎒'); }
+      else { st().owed.push(prize.item); toast(`가방이 꽉 찼어요. ${it?.name ?? '트로피'}는 대회 무대 접수 탁자에 맡겨 둘게요 (가방을 비우고 탁자에서 받아요 — 오늘이나 다음 대회 날)`, '🎒'); }
     }
   }
   async function giveOwed() {

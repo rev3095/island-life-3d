@@ -1876,7 +1876,7 @@ export function makeScenario(bot, sk, opts = {}) {
     res.rank = rec.rank; res.score = rec.score; res.count = rec.count; res.prize = rec.prize;
     if (rec.prize?.item && !bot.has(rec.prize.item) && !(st().contest?.owed ?? []).includes(rec.prize.item)) odd.push(`상 ${rec.prize.item} 을 못 받음`);
     res.journal = st().journal?.counts?.contest ?? 0;
-    if (!res.journal) odd.push('섬 일지 「대회 나가기」가 안 셈');
+    if (!res.journal && st().flags?.firstday?.finished) odd.push('섬 일지 「대회 나가기」가 안 셈');   // 섬 일지는 첫날 할 일 뒤부터 센다
     res.uiGone = !!bot.$('.ct-box')?.hidden;
     if (!res.uiGone) odd.push('대회가 끝났는데 대회 창이 남음');
     // ⑤ 다시 Space → 「벌써 나갔어요」 (접수는 하루 한 번)

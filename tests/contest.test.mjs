@@ -59,6 +59,8 @@ test('크기: 물고기는 그림자 크기, 곤충은 값 구간 — 기준 ± 
 });
 
 test('점수 = 가장 큰 것 + 마릿수 × perCatch · 순위 = 점수 → 먼저 닿은 쪽 → 플레이어', () => {
+  assert.equal(R.scoreOf(cfg, [{ size: 20, t: 1 }, { size: 30, t: 2 }]).score, 30 + 2 * cfg.score.perCatch);
+  { const cfg = { ...JSON.parse(read('assets/contest/contest.json')), score: { perCatch: 10 } };   // 아래 숫자는 perCatch 10 기준
   assert.deepEqual(R.scoreOf(cfg, []), { best: 0, count: 0, score: 0 });
   assert.deepEqual(R.scoreOf(cfg, [{ size: 20, t: 5 }, { size: 31.5, t: 9 }]), { best: 31.5, count: 2, score: 51.5 });
   const rows = R.standings(cfg, [
@@ -72,6 +74,7 @@ test('점수 = 가장 큰 것 + 마릿수 × perCatch · 순위 = 점수 → 먼
   assert.equal(early[0].who, 'player');   // 60초엔 pong 이 32점 · 플레이어 40점
   const tie = R.standings(cfg, [{ who: 'bori', catches: [{ size: 30, t: 20 }] }, { who: 'player', catches: [{ size: 30, t: 20 }] }]);
   assert.equal(tie[0].who, 'player');
+  }
 });
 
 test('주민 참가자: 사회 주민 빼고 셋, 날짜로 늘 같고, 제한 시간 안에 잡는다', () => {
@@ -96,15 +99,18 @@ test('주민 참가자: 사회 주민 빼고 셋, 날짜로 늘 같고, 제한 �
 });
 
 test('주민 점수가 3분 대회에서 해 볼 만한 범위 (봇이 흉내 낸 기록과 비교)', () => {
-  // 3분 동안 보통 물고기 3~5마리 · 곤충 2~4마리 (자동 플레이 기록 기준) — 1등 주민을 넘을 수 있는 날도, 못 넘는 날도 있어야 한다
+  // 3분 동안 보통 물고기 8마리 · 곤충 5마리쯤 (봇은 물고기 18마리, 2026-11-14) — 보통이면 1등 주민을 넘을 수 있는 날도, 못 넘는 날도 있고, 봇만큼 잡으면 1등
   const residents = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'danpung'];
   for (const c of cfg.list) {
-    const typical = c.kind === 'fish' ? [14, 28, 28, 45] : [4, 6, 6];
-    const me = typical.map((s, i) => ({ size: s, t: 30 + i * 30 }));
+    const typical = c.kind === 'fish' ? [14, 28, 6, 14, 28, 45, 14, 28] : [4, 6, 6, 4, 8];
+    const many = (c.kind === 'fish' ? [6, 14, 28, 45, 54] : [4, 6, 8, 11, 6]).flatMap(x => [x, x, x]).map((s, i) => ({ size: s, t: 5 + i * 8 }));
+    const me = typical.map((s, i) => ({ size: s, t: 10 + i * 20 }));
     let wins = 0, losses = 0;
     for (let y = 2027; y < 2047; y++) {
       const rank = R.standings(cfg, [{ who: 'player', catches: me }, ...R.rivalsOf(cfg, c, R.dateOf(c, y), residents, 3).map(r => ({ who: r.slug, catches: r.catches }))]).find(r => r.who === 'player').rank;
       if (rank === 1) wins++; else losses++;
+      const top = R.standings(cfg, [{ who: 'player', catches: many }, ...R.rivalsOf(cfg, c, R.dateOf(c, y), residents, 3).map(r => ({ who: r.slug, catches: r.catches }))])[0].who;
+      assert.equal(top, 'player', `${c.name} ${y}: 15마리 잡고도 1등이 아님`);
     }
     assert.ok(wins >= 2 && losses >= 2, `${c.name}: 20년 중 1등 ${wins} · 아님 ${losses}`);
   }
