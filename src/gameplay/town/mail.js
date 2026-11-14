@@ -117,7 +117,6 @@ export function createMail(ctx, { lines, residents = null }) {
     ctx.events.emit('sfx', { name: 'bag-open', volume: 0.6 });
     if (!list.length) { await offerWrite(say, true); return; }
     await say([`(편지가 ${list.length}통 와 있다.)`]);
-    let full = false;
     for (const l of list) {
       const P = who(l.from);
       const vars = { item: l.gift ? itemName(l.gift) : '' };
@@ -130,12 +129,12 @@ export function createMail(ctx, { lines, residents = null }) {
         // 가방이 꽉 찼으면 선물만 남은 쪽지로 남겨 둔다
         Object.assign(l, { read: false, stub: true, lines: ['(지난번에 꺼내지 못한 {item:이} 아직 들어 있다.)'] });
         await say(['(가방이 꽉 차서 꺼내지 못했다. 가방을 비우고 다시 열어 보자.)']);
-        full = true;
         break;
       }
       l.gift = null;
     }
-    if (!full) await offerWrite(say, false);
+    // 가방이 꽉 차도 편지는 쓸 수 있다 (선물은 안 넣어도 됨) — 출시 뒤 다듬기: 선물 편지가 쌓이면 쓰기를 못 하던 것
+    await offerWrite(say, false);
   }
 
   return { spot, deliver, post, unread, read, box, write, canWrite, sent: () => sentBox(ctx.state) };
