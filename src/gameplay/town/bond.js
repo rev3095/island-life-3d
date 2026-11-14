@@ -186,3 +186,33 @@ export function addPhoto(state, { img, day, kind, who = [], title }) {
 /** 액자 아이템 변형 이름 ↔ 사진 id ('사진12') — 가방 칸 변형 이름표에 그대로 보인다 */
 export const frameVariant = id => `사진${id}`;
 export const photoOfVariant = v => { const m = /^사진(\d+)$/.exec(String(v ?? '')); return m ? Number(m[1]) : null; };
+
+// ---- M19-P2 주민 사연 장면 (16차 보드 D201-A, 장면 s33–s52 · 트리거 story bond-tier) ----
+/**
+ * 사연 ② (단짝) 답례: item = 답례 가구 (FU-105–108, src/data/album-items.js STORY_FURN) · emote = 그 주민 말버릇 이모티콘
+ * (주민 대답 전용 reply 이모티콘을 플레이어 팔레트 「감정」 칸에 열어 준다 — 저장 state.town.giftEmotes, D223-A).
+ * 사연이 끝나면 (① ② 모두) 그 주민 사진이 앨범에 (장면의 photo 컷, kind 'story').
+ */
+export const BOND_STORY = {
+  bori: { item: 'furn.nap-cushion' },
+  chorong: { emote: 'bubble' },
+  coco: { emote: 'sweat' },
+  danpung: { emote: 'sparkle' },
+  dubu: { emote: 'dots' },
+  mochi: { item: 'furn.flower-word-frame' },
+  pong: { item: 'furn.grandma-cookbook' },
+  gureum: { item: 'furn.lighthouse-painting' },
+  pado: { emote: 'bang' },
+  dalmuri: { emote: 'zz' },
+};
+/** 받은 말버릇 이모티콘 목록 (없으면 만든다) */
+export function giftEmotes(state) {
+  const t = (state.town ??= {});
+  return (t.giftEmotes ??= []);
+}
+/** 사연 장면이 끝났을 때 줄 것 → { item?, emote?, photo: true } | null. tier = 장면 trigger.tier, got = 이미 준 장면 id 목록 */
+export function bondReward(slug, tier, sceneId, got = []) {
+  if (!slug || got.includes(sceneId)) return null;
+  const r = BOND_STORY[slug];
+  return tier === 'close' && r ? { ...r, photo: true } : { photo: true };
+}

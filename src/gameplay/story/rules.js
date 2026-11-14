@@ -21,8 +21,31 @@ export const TRIGGERS = {
   'peddler-first': { label: '방문 행상 수레에 처음 다가갈 때 (M13 — daily 가 보내는 daily:peddler 의 first)', event: 'daily:peddler', test: p => !!p?.first },
   'meteor-big': { label: '큰 유성우 밤 별똥별이 처음 떨어질 때 (M18-P2 — daily 가 보내는 daily:meteor 의 bigFirst)', event: 'daily:meteor', test: p => !!p?.bigFirst },
   'special-day': { label: '그날만 날씨를 처음 맞을 때 (M18-P2 — trigger.kind = monsoon · first-snow, daily 가 보내는 daily:special 의 first)', event: 'daily:special', test: (p, t) => !!t.kind && p?.kind === t.kind && !!p?.first },
+  'bond-tier': { label: '주민과 친밀도 단계가 오를 때 (M19-P2 — trigger.slug = 주민, trigger.tier = friend · close, town/talk.js 가 보내는 town:bond — 이미 그 단계면 다음에 말할 때 하루 하나)', event: 'town:bond', test: (p, t) => !!t.slug && p?.slug === t.slug && tierReached(p?.tier, t.tier) },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
+/** bond-tier 트리거의 tier (rules.json town.tiers 의 이름 — 사연 ① 친구 · ② 단짝) */
+export const BOND_TIERS = { friend: '친구가 되는 날 (사연 ①)', close: '단짝이 되는 날 (사연 ②)' };
+const TIER_ORDER = ['new', 'known', 'friend', 'close', 'best'];
+/** 지금 단계 have 가 want 단계 이상인가 */
+export function tierReached(have, want) {
+  const a = TIER_ORDER.indexOf(have), b = TIER_ORDER.indexOf(want);
+  return a >= 0 && b >= 0 && a >= b;
+}
+/**
+ * M19-P2 사연 장면 고르기 (town:bond 로 scenesFor 가 고른 ids 중에서).
+ * payload = { slug, tier, up } — up = 방금 오른 단계(그 단계 장면만, 날 제한 없음), 없으면 이미 그 단계인 저장의 따라잡기:
+ * 하루 하나(lastDay === today 면 없음), 낮은 단계부터. 이미 줄 선 사연이 있으면 따라잡기는 쉰다.
+ * → 줄 세울 id 목록 (0~1개)
+ */
+export function bondPick(ids, payload, byId, { lastDay = null, today = null, queued = [] } = {}) {
+  const bonds = ids.map(id => byId(id)).filter(sc => sc?.trigger?.on === 'bond-tier');
+  if (payload?.up) return bonds.filter(sc => sc.trigger.tier === payload.up).slice(0, 1).map(sc => sc.id);
+  if (today != null && lastDay === today) return [];
+  if (queued.some(id => byId(id)?.trigger?.on === 'bond-tier')) return [];
+  bonds.sort((a, b) => TIER_ORDER.indexOf(a.trigger.tier) - TIER_ORDER.indexOf(b.trigger.tier));
+  return bonds.slice(0, 1).map(sc => sc.id);
+}
 export const TRIGGER_KINDS = Object.keys(TRIGGERS);
 /** night-first 트리거의 kind (밤 가게 둘) */
 export const NIGHT_KINDS = { moonshop: '달빛 가게 (22–3시)', tent: '새벽 천막 (3–5시)' };
@@ -31,7 +54,7 @@ export const SPECIAL_KINDS = { monsoon: '장마 하루 (6월 셋째 수요일)',
 Object.assign(NIGHT_KINDS, { foxshop: '여우 상인 가게 (오는 밤 20–5시, P54)', oddtent: '이상한 천막 (오는 밤 21–5시, P54)', fortune: '운세 부스 (20–3시, P54)' });
 
 /** 장면 기준 자리 = world.places 의 이름 (건물은 문 앞) */
-export const PLACES = { event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포' };
+export const PLACES = { home: '트리거 주민 집 앞 (사연 장면 — vars.slug, 문 앞)', event: '트리거가 알려 준 자리 (부스 등, 없으면 광장)', dock: '선착장', spawn: '선착장 앞', plaza: '광장', shop: '도토리상점 앞', museum: '박물관 앞', playerHouse: '내 집 앞', pond: '연못', orchard: '과수원', waterfall: '폭포' };
 export const MOTIONS = { idle: '서 있기', walk: '걷기', run: '달리기', happy: '기뻐하기' };
 /** 카메라 크기: dist = 대상까지 거리(칸), pitch = 내려다보는 각도(도), lift = 바라보는 높이 */
 export const CAM_SIZES = {
@@ -254,6 +277,8 @@ export function validateScene(sc, { cast = null, ids = null } = {}) {
     if (t.on === 'move-in' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('move-in 의 slug 는 주민 slug'));
     if (t.on === 'night-first' && !NIGHT_KINDS[t.kind]) err.push(at(`night-first 의 kind 는 ${Object.keys(NIGHT_KINDS).join(' · ')}`));
     if (t.on === 'special-day' && !SPECIAL_KINDS[t.kind]) err.push(at(`special-day 의 kind 는 ${Object.keys(SPECIAL_KINDS).join(' · ')}`));
+    if (t.on === 'bond-tier' && !/^[a-z][a-z0-9-]*$/.test(t.slug ?? '')) err.push(at('bond-tier 의 slug 는 주민 slug'));
+    if (t.on === 'bond-tier' && !BOND_TIERS[t.tier]) err.push(at(`bond-tier 의 tier 는 ${Object.keys(BOND_TIERS).join(' · ')}`));
   }
   if (!PLACES[sc.place]) err.push(at(`place ${sc.place}`));
   const takes = sc.takes ?? [];

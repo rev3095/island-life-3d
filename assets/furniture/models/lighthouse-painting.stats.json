@@ -1,0 +1,60 @@
+{
+  "id": "FU-108",
+  "slug": "lighthouse-painting",
+  "item": "furn.lighthouse-painting",
+  "name": "등대 그림",
+  "category": "furniture",
+  "kind": "lighthouse-painting",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 984,
+  "parts": 1,
+  "materials": [
+    "beam",
+    "frame",
+    "frameDark",
+    "lamp",
+    "land",
+    "landDark",
+    "sea",
+    "sky",
+    "skyGlow",
+    "string",
+    "tower",
+    "towerBand",
+    "wave"
+  ],
+  "objects": [
+    "frame"
+  ],
+  "animations": {},
+  "size": [
+    0.9,
+    0.06,
+    1.95
+  ],
+  "bounds": [
+    [
+      -0.45,
+      -0.07,
+      1.19
+    ],
+    [
+      0.45,
+      -0.008,
+      1.948
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 28168,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-painting_front.png",
+    "lighthouse-painting_main.png",
+    "lighthouse-painting_thumb.png",
+    "lighthouse-painting_top.png"
+  ]
+}

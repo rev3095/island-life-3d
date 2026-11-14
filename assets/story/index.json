@@ -38,6 +38,26 @@
     {"scene":"s25-five-stars"},
     {"scene":"s30-monsoon-day"},
     {"scene":"s31-big-meteor"},
-    {"scene":"s32-first-snow"}
+    {"scene":"s32-first-snow"},
+    {"scene":"s33-bori-nap-spot"},
+    {"scene":"s34-bori-first-nap"},
+    {"scene":"s35-chorong-frog-choir"},
+    {"scene":"s36-chorong-worry"},
+    {"scene":"s37-coco-island-run"},
+    {"scene":"s38-coco-rest"},
+    {"scene":"s39-danpung-notebook"},
+    {"scene":"s40-danpung-exhibit"},
+    {"scene":"s41-dubu-old-rod"},
+    {"scene":"s42-dubu-sea-letter"},
+    {"scene":"s43-mochi-flowerbed"},
+    {"scene":"s44-mochi-flower-words"},
+    {"scene":"s45-pong-first-dish"},
+    {"scene":"s46-pong-cookbook"},
+    {"scene":"s47-gureum-first-show"},
+    {"scene":"s48-gureum-lighthouse"},
+    {"scene":"s49-pado-swim-race"},
+    {"scene":"s50-pado-south-sea"},
+    {"scene":"s51-dalmuri-daytime"},
+    {"scene":"s52-dalmuri-star-name"}
   ]
 }

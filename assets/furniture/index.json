@@ -328,6 +328,86 @@
       "status": "approved"
     },
     {
+      "id": "FU-105",
+      "slug": "nap-cushion",
+      "item": "furn.nap-cushion",
+      "name": "낮잠 방석",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.88,
+        0.86,
+        0.29
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-106",
+      "slug": "flower-word-frame",
+      "item": "furn.flower-word-frame",
+      "name": "꽃말 액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.78,
+        0.06,
+        1.92
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-107",
+      "slug": "grandma-cookbook",
+      "item": "furn.grandma-cookbook",
+      "name": "할머니 요리책",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.56,
+        0.41,
+        0.81
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-108",
+      "slug": "lighthouse-painting",
+      "item": "furn.lighthouse-painting",
+      "name": "등대 그림",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.9,
+        0.06,
+        1.95
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-11",
       "slug": "sofa",
       "item": "furn.sofa",

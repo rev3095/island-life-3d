@@ -12,7 +12,7 @@ export const FRAMES = {
   wall: { item: 'furn.album-frame-wall', slug: 'album-frame-wall', name: '추억 벽 액자', price: 500 },   // FU-72
 };
 const FRAME_SLUGS = new Set(Object.values(FRAMES).map(f => f.slug));
-const KIND = { together: '🤝 같이 놀기', song: '🎵 저녁 노래', birthday: '🎂 생일', festival: '🎉 섬 축제', event: '🌸 계절 행사', snap: '📷 찰칵', letter: '✉️ 편지' };
+const KIND = { together: '🤝 같이 놀기', song: '🎵 저녁 노래', birthday: '🎂 생일', festival: '🎉 섬 축제', event: '🌸 계절 행사', snap: '📷 찰칵', letter: '✉️ 편지', story: '🎬 주민 이야기' };
 
 const CSS = `
 .pk-album { width: min(560px, 100%); }

@@ -18,6 +18,8 @@ import { DAILY_FURN, dailyItems } from './daily-items.js';
 import { CONTEST_FURN } from './contest-items.js';
 // M18-P4 계절 가구 FU-92–104 (벚꽃·조개·단풍·눈 결정 — 계절 레시피로만) 는 seasonal-items.js 에서
 import { SEASON_FURN } from './seasonal-items.js';
+// M19-P2 주민 사연 ② 답례 가구 FU-105–108 (낮잠 방석 · 꽃말 액자 · 할머니 요리책 · 등대 그림) 는 album-items.js 의 STORY_FURN
+import { STORY_FURN } from './album-items.js';
 // P54 밤 특별 상점 미술품 분류(IC-AR, 표 items.json art · 가품 = 색 변형)는 art-items.js 에서
 import { ART_CATEGORY as AC, artItems } from './art-items.js';
 // M16 잠수: 바다 생물 분류(IC-SE-01–20)와 스쿠버 키트는 sea-items.js 에서 (표 값은 items.json sea · scubaKit)
@@ -108,7 +110,7 @@ export const ITEMS = [
   // 친밀도 선물 가구(source 'friend')는 items.json 의 owner = 주는 주민 slug (B-24)
   ...[...T.furniture, ...FESTIVAL_FURN.map(([slug, name, size, from, emoji, price, buy, source]) => ({ slug, name, size, from, emoji, price, buy, source })),
     ...EVENT_FURN.map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id })),
-    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN, ...ALBUM_FURN, ...CONTEST_FURN, ...SEASON_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
+    ...[...DECOR_FURN, ...FAVOR_FURN, ...NIGHT_FURN, ...DAILY_FURN, ...ALBUM_FURN, ...CONTEST_FURN, ...SEASON_FURN, ...STORY_FURN].map(([slug, name, size, from, emoji, price, buy, source, id]) => ({ slug, name, size, from, emoji, price, buy, source, id }))]
     .map(({ slug, name, emoji, price, buy, size, source, from, id, owner }, i) => ({
     id: `furn.${slug}`, category: 'furn', code: id ?? code('FU', i), name, icon: `assets/furniture/renders/${slug}_thumb.png`, emoji, price, ...(buy ? { buy } : {}),
     size: sizeOf(size), place: placeOf(size), sizeText: size, from, source, ...(owner ? { owner } : {}),

@@ -7,3 +7,13 @@ export const ALBUM_FURN = [
   ['album-frame', '추억 액자', '1×1', '섬폰 앨범에서 만들기 (도토리 300)', '🖼️', 150, 0, 'album', 'FU-71'],
   ['album-frame-wall', '추억 벽 액자', '벽', '섬폰 앨범에서 만들기 (도토리 500)', '🖼️', 250, 0, 'album', 'FU-72'],
 ];
+
+// ---- M19-P2 주민 사연 ② 답례 가구 (16차 보드 wave16 D201-A): FU-105–108 — 주는 곳은 town/talk.js createBondStories (답례 표 town/bond.js BOND_STORY).
+// 게시 파일 수 한도(255) 때문에 새 모듈을 만들지 않고 여기에 둔다. 출처 'story' (상점·나무 흔들기 가구에 안 섞인다).
+export const STORY_FURN = [
+  ['nap-cushion', '낮잠 방석', '1×1', '보리와 단짝이 된 날 답례 (사연 s34)', '🛏️', 1200, 0, 'story', 'FU-105'],
+  ['flower-word-frame', '꽃말 액자', '벽', '모찌와 단짝이 된 날 답례 (사연 s44)', '💐', 1200, 0, 'story', 'FU-106'],
+  ['grandma-cookbook', '할머니 요리책', '1×1', '퐁과 단짝이 된 날 답례 (사연 s46)', '📖', 1200, 0, 'story', 'FU-107'],
+  ['lighthouse-painting', '등대 그림', '벽', '구름과 단짝이 된 날 답례 (사연 s48)', '🖼️', 1500, 0, 'story', 'FU-108'],
+];
+export const STORY_FURN_IDS = STORY_FURN.map(([slug]) => `furn.${slug}`);

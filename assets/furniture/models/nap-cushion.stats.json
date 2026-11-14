@@ -1,0 +1,55 @@
+{
+  "id": "FU-105",
+  "slug": "nap-cushion",
+  "item": "furn.nap-cushion",
+  "name": "낮잠 방석",
+  "category": "furniture",
+  "kind": "nap-cushion",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 2532,
+  "parts": 1,
+  "materials": [
+    "blanket",
+    "blanketLine",
+    "bone",
+    "cushion",
+    "cushionEdge",
+    "cushionTop",
+    "pillow",
+    "stitch"
+  ],
+  "objects": [
+    "cushion"
+  ],
+  "animations": {},
+  "size": [
+    0.88,
+    0.86,
+    0.29
+  ],
+  "bounds": [
+    [
+      -0.44,
+      -0.43,
+      -0.01
+    ],
+    [
+      0.44,
+      0.43,
+      0.29
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 52580,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "nap-cushion_front.png",
+    "nap-cushion_main.png",
+    "nap-cushion_thumb.png",
+    "nap-cushion_top.png"
+  ]
+}

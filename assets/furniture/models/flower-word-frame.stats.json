@@ -1,0 +1,59 @@
+{
+  "id": "FU-106",
+  "slug": "flower-word-frame",
+  "item": "furn.flower-word-frame",
+  "name": "꽃말 액자",
+  "category": "furniture",
+  "kind": "flower-word-frame",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 3056,
+  "parts": 1,
+  "materials": [
+    "center",
+    "frame",
+    "frameDark",
+    "paper",
+    "petalA",
+    "petalB",
+    "petalC",
+    "petalD",
+    "petalE",
+    "ribbon",
+    "stem",
+    "string"
+  ],
+  "objects": [
+    "frame"
+  ],
+  "animations": {},
+  "size": [
+    0.78,
+    0.06,
+    1.92
+  ],
+  "bounds": [
+    [
+      -0.39,
+      -0.07,
+      1.22
+    ],
+    [
+      0.39,
+      -0.008,
+      1.918
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 67116,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "flower-word-frame_front.png",
+    "flower-word-frame_main.png",
+    "flower-word-frame_thumb.png",
+    "flower-word-frame_top.png"
+  ]
+}

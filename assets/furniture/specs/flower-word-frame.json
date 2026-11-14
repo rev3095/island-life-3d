@@ -1,0 +1,85 @@
+{
+  "id": "FU-106",
+  "slug": "flower-word-frame",
+  "item": "furn.flower-word-frame",
+  "name": "꽃말 액자",
+  "category": "furniture",
+  "kind": "flower-word-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "모찌가 섬 모두에게 꽃을 나눈 날의 답례. 연분홍 테 액자 안 크림 종이 위에 눌러 말린 꽃 다섯(튤립·데이지·제비꽃·장미·안개꽃)과 줄기를 묶은 리본. 벽에 건다.",
+    "keywords": [
+      "눌러 말린 꽃",
+      "꽃 다섯",
+      "리본",
+      "연분홍 테"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "16차 보드 wave16 D201-A · M19-P2 주민 사연 ② 답례 (모찌, 장면 s44)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "petalA",
+      "petalB",
+      "petalC",
+      "petalD",
+      "petalE",
+      "center",
+      "stem",
+      "ribbon",
+      "string"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#F2B8C6",
+    "frameDark": "#D98EA2",
+    "paper": "#FFF6E6",
+    "petalA": "#E8504F",
+    "petalB": "#FFFFFF",
+    "petalC": "#9B7CD6",
+    "petalD": "#F27BA0",
+    "petalE": "#F4EEF8",
+    "center": "#F6C84C",
+    "stem": "#6FAF5B",
+    "ribbon": "#7EC4C1",
+    "string": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "연분홍 테",
+    "frameDark": "걸이 못",
+    "paper": "크림 종이",
+    "petalA": "튤립",
+    "petalB": "데이지",
+    "petalC": "제비꽃",
+    "petalD": "장미",
+    "petalE": "안개꽃",
+    "center": "꽃술",
+    "stem": "줄기·잎",
+    "ribbon": "리본",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

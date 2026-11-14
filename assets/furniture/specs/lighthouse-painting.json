@@ -1,0 +1,89 @@
+{
+  "id": "FU-108",
+  "slug": "lighthouse-painting",
+  "item": "furn.lighthouse-painting",
+  "name": "등대 그림",
+  "category": "furniture",
+  "kind": "lighthouse-painting",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "구름이 오래 간직한 섬 풍경 그림 — 노을 하늘 · 바다 · 곶 위 빨강·하양 띠 등대와 불빛 줄기 · 먼 작은 섬. 지금은 꺼진 섬 등대가 켜져 있던 옛 모습 (M19-P4 「등대 다시 켜기」로 이어짐). 나무 테, 벽에 건다.",
+    "keywords": [
+      "노을",
+      "빨강·하양 등대",
+      "불빛 줄기",
+      "나무 테"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "16차 보드 wave16 D201-A · M19-P2 주민 사연 ② 답례 (구름, 장면 s48)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "sky",
+      "skyGlow",
+      "sea",
+      "wave",
+      "land",
+      "landDark",
+      "tower",
+      "towerBand",
+      "lamp",
+      "beam",
+      "string"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#9C6B45",
+    "frameDark": "#6E4A31",
+    "sky": "#F4B67A",
+    "skyGlow": "#F7D9A0",
+    "sea": "#5E8FC2",
+    "wave": "#C9E2F2",
+    "land": "#7DB36A",
+    "landDark": "#4E7C55",
+    "tower": "#FFFFFF",
+    "towerBand": "#D9483B",
+    "lamp": "#FFE27A",
+    "beam": "#FFF2B0",
+    "string": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "나무 테",
+    "frameDark": "걸이 못·서명 자리",
+    "sky": "노을 하늘",
+    "skyGlow": "노을 빛",
+    "sea": "바다",
+    "wave": "물결",
+    "land": "곶",
+    "landDark": "먼 섬",
+    "tower": "등대 하양 띠",
+    "towerBand": "등대 빨강 띠·지붕",
+    "lamp": "불빛 칸",
+    "beam": "불빛 줄기·별",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

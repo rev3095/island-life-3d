@@ -1,0 +1,66 @@
+{
+  "id": "FU-107",
+  "slug": "grandma-cookbook",
+  "item": "furn.grandma-cookbook",
+  "name": "할머니 요리책",
+  "category": "furniture",
+  "kind": "grandma-cookbook",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "퐁이 할머니에게 물려받은 두꺼운 요리책 — 빠진 쪽을 찾아 다시 채운 날의 답례. 나무 책 받침대 위에 펼쳐 두고, 끼운 쪽지와 책갈피 끈, 아래 선반에 작은 국자.",
+    "keywords": [
+      "책 받침대",
+      "펼친 요리책",
+      "끼운 쪽지",
+      "국자"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "16차 보드 wave16 D201-A · M19-P2 주민 사연 ② 답례 (퐁, 장면 s46)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#B07A4E",
+    "woodDark": "#8A5A3B",
+    "cover": "#C9583B",
+    "page": "#FBF1DC",
+    "ink": "#8C6E5A",
+    "note": "#F6E38A",
+    "ribbon": "#3F8F5C",
+    "metal": "#C9CED6"
+  },
+  "paletteLabels": {
+    "wood": "받침대",
+    "woodDark": "받침판",
+    "cover": "책 표지",
+    "page": "책 쪽",
+    "ink": "레시피 줄",
+    "note": "끼운 쪽지",
+    "ribbon": "책갈피 끈",
+    "metal": "국자"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

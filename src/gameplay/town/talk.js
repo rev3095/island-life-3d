@@ -8,6 +8,7 @@ import {
   REQUEST_POINTS, FRIEND_MAX, josa, noteBond,
 } from './rules.js';
 import { artStep } from './artwish.js';   // M18-P4 미술품 주고받기 (D195-A)
+import { bondReward, giftEmotes } from './bond.js';   // M19-P2 사연 답례 (createBondStories)
 
 export const MENU = ['잡담', '부탁 있어?', '선물 주기', '잘 가'];
 export const TOGETHER_MENU = '같이 놀자';   // M15 (친구 이상일 때 잘 가 앞에)
@@ -91,6 +92,7 @@ export function createTalk(ctx, { lines, party = null, companion = null }) {
     const tierUp = up => {
       V.happy();
       if (TIER_NAME[up]) ui().toast(`${josa(P.name, '와')} ${josa(TIER_NAME[up], '이')} 되었어요`, '💛');
+      ctx.events.emit('town:bond', { slug: V.slug, tier: up, up });   // M19-P2 사연 장면 트리거 (story bond-tier — 대화가 끝난 뒤 튼다)
       return pickLines(L.tierUp?.[up], r);
     };
 
@@ -198,6 +200,8 @@ export function createTalk(ctx, { lines, party = null, companion = null }) {
     // 부탁·선물로 단계가 올랐으면 한마디, 친밀도 최고면 사진 한 번
     if (ups.length) await say(tierUp(ups.at(-1)), null, ['heart', 'sparkle']);
     if (v.friendship >= FRIEND_MAX && !v.photo) await givePhoto([]);
+    // M19-P2: 이미 친구·단짝인데 못 본 사연이 있으면 (엔딩 뒤 오래 한 저장) 대화가 끝난 뒤 하루 하나 — 같이 놀러 가는 길이면 다음에
+    if (!V.togetherWish) ctx.events.emit('town:bond', { slug: V.slug, tier: tierOf(v.friendship), up: null });
 
     async function givePhoto(before) {
       v.photo = true;
@@ -344,3 +348,57 @@ function giveLater(v, id, left) {
   for (let i = 0; i < left; i++) v.pending.push(id);
 }
 
+
+// ---- M19-P2 주민 사연 장면 (16차 보드 D201-A) — 게시 파일 수 한도 때문에 따로 모듈을 만들지 않고 여기에 ----
+// M19-P2 주민 사연 장면 (16차 보드 D201-A): 장면 s33–s52 은 데이터(assets/story/scenes/), 트리거는 story bond-tier (town/talk.js 가 town:bond 를 보낸다).
+// 여기서는 장면 동안·끝날 때 줄 것만: 사진 컷(photo)에서 그 주민 사진을 앨범에 · ② 단짝이 끝나면 답례 가구 또는 말버릇 이모티콘 (town/bond.js BOND_STORY).
+// 저장: state.town.storyGot (답례를 준 장면 id) · state.town.giftEmotes (열린 이모티콘 key — festival/talkui.js 가 「감정」 칸에 보여 준다).
+export function createBondStories(ctx, { toast = () => {} } = {}) {
+  const S = () => ctx.services;
+  const bondOf = id => { const sc = S().story?.scene?.(id); return sc?.trigger?.on === 'bond-tier' ? sc : null; };
+  const name = slug => S().town?.villagers?.find(V => V.slug === slug)?.person?.name ?? slug;
+  const snapped = new Set();
+  let skipped = null, pending = null;
+
+  function snap(sc) {
+    if (snapped.has(sc.id)) return;
+    snapped.add(sc.id);
+    const slug = sc.trigger.slug;
+    Promise.resolve(S().album?.snap?.({ kind: 'story', who: [slug], title: sc.title || `${name(slug)} 이야기` })).catch(() => {});
+  }
+  ctx.events.on('story:shot', ({ id, take, shot } = {}) => {
+    const sc = bondOf(id);
+    if (!sc) return;
+    const t = sc.takes?.find(x => x.key === take), s = t?.shots?.find(x => x.id === shot);
+    if (s?.photo) pending = { sc, t: 0 };   // 배우·카메라가 자리 잡은 뒤 찍는다 (update — 사진 틀·하얀 번쩍임은 DOM 이라 사진에 안 찍힌다)
+  });
+  ctx.events.on('story:end', ({ id, skipped: sk } = {}) => {
+    const sc = bondOf(id);
+    if (!sc) return;
+    skipped = sk;
+    const slug = sc.trigger.slug, tier = sc.trigger.tier;
+    const town = (ctx.state.town ??= {}), got = (town.storyGot ??= []);
+    const r = bondReward(slug, tier, sc.id, got);
+    if (!r) return;
+    got.push(sc.id);
+    if (pending?.sc === sc) pending = null;
+    if (!snapped.has(sc.id)) setTimeout(() => snap(sc), 400);   // 건너뛰었으면 끝난 자리에서라도 한 장
+    if (r.item) {
+      const left = giveItem(ctx, r.item);
+      if (left > 0) { { const v = villagerState(ctx.state, slug); for (let i = 0; i < left; i++) v.pending.push(r.item); } toast(`가방이 꽉 차서 ${name(slug)}의 선물은 다음에 받아요`, '🎁'); }
+    }
+    if (r.emote) {
+      const list = giftEmotes(ctx.state);
+      if (!list.includes(r.emote)) list.push(r.emote);
+      const glyph = S().festival?.emotes?.glyph?.(r.emote) ?? '';
+      toast(`${name(slug)}의 말버릇 이모티콘 ${glyph}을 배웠어요 (이모티콘 「감정」 칸)`, '💬');
+    }
+    ctx.events.emit('town:story', { id: sc.id, slug, tier, ...r, skipped });
+  });
+  /** 사진 컷이 시작되고 게임 시간 0.6초 뒤 한 장 (town update 가 부른다) */
+  function update(dt) {
+    if (!pending) return;
+    if ((pending.t += dt) >= 0.6) { const sc = pending.sc; pending = null; snap(sc); }
+  }
+  return { update, got: () => ((ctx.state.town ??= {}).storyGot ??= []).slice(), emotes: () => giftEmotes(ctx.state).slice() };
+}
