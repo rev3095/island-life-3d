@@ -1,0 +1,73 @@
+{
+  "id": "CH-18",
+  "slug": "ssalal",
+  "name": "쌀알",
+  "species": "hamster",
+  "version": "0.1",
+  "triangles": 11504,
+  "vertices": 5804,
+  "bones": 13,
+  "materials": [
+    "shirt",
+    "pants",
+    "apron",
+    "feet",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "cheek"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    },
+    "sit_down": {
+      "frames": 14,
+      "seconds": 0.58
+    },
+    "sit": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "stand_up": {
+      "frames": 12,
+      "seconds": 0.5
+    }
+  },
+  "height": 0.94,
+  "glbBytes": 429436,
+  "blender": "5.2.3 LTS",
+  "sit": {
+    "hip": 0.0394,
+    "forward": -0.0039
+  },
+  "renders": [
+    "ssalal_back.png",
+    "ssalal_front.png",
+    "ssalal_happy.png",
+    "ssalal_hero.png",
+    "ssalal_run.png",
+    "ssalal_side.png",
+    "ssalal_sit.png",
+    "ssalal_three_quarter.png",
+    "ssalal_thumb.png",
+    "ssalal_walk.png"
+  ]
+}

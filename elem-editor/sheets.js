@@ -4,7 +4,7 @@
 import { CAT_KO, WEEKDAY_KO, TOUR_SHAPES, hourKo, SEA_SPEED_KO, ART_KIND_KO } from '../tools/elem-checks.mjs';
 
 export const SOURCE_KO = { craft: '제작', shop: '상점', gift: '주민 선물', friend: '친밀도 선물', museum: '박물관 보상', birthday: '생일 선물' };
-export const VILLAGER_KO = { coco: '코코', bori: '보리', mochi: '모찌', dubu: '두부', pong: '퐁', chorong: '초롱', danpung: '단풍', gureum: '구름', pado: '파도', dalmuri: '달무리', bamtol: '밤톨', neuru: '느루', byeolbam: '별밤', yeomyeong: '여명' };
+export const VILLAGER_KO = { coco: '코코', bori: '보리', mochi: '모찌', dubu: '두부', pong: '퐁', chorong: '초롱', danpung: '단풍', gureum: '구름', pado: '파도', dalmuri: '달무리', ssalal: '쌀알', boreum: '보름', bamtol: '밤톨', neuru: '느루', byeolbam: '별밤', yeomyeong: '여명' };
 const TIER_KO = { new: '처음', known: '아는 사이', friend: '친구', close: '친한 친구', best: '단짝' };
 const EVENT_KO = { 'EV-01': '봄 꽃놀이', 'EV-02': '여름 불꽃놀이', 'EV-03': '가을 수확 잔치', 'EV-04': '겨울 눈사람 날' };
 

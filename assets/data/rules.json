@@ -72,7 +72,7 @@
     { "result": "furn.snowflake-wall", "needs": [{ "id": "event.snow-crystal", "n": 4 }, { "id": "mat.iron", "n": 1 }], "unlock": true, "season": "winter", "note": "M18-P4 D196-A 겨울 눈 결정 계절 레시피 FU-104 (그 계절 유리병·친구 주민 선물로 열림)" }
   ],
   "birthdays": {
-    "dates": { "coco": "07-14", "bori": "03-21", "mochi": "04-08", "dubu": "11-03", "pong": "09-27", "chorong": "06-18", "danpung": null, "gureum": "05-16", "pado": "08-11", "dalmuri": "10-29" },
+    "dates": { "coco": "07-14", "bori": "03-21", "mochi": "04-08", "dubu": "11-03", "pong": "09-27", "chorong": "06-18", "danpung": null, "gureum": "05-16", "pado": "08-11", "dalmuri": "10-29", "ssalal": "07-30", "boreum": "09-15" },
     "giftMult": 3,
     "cake": "furn.birthday-cake"
   },

@@ -138,6 +138,18 @@
       "palette": {
         "roof": "#3B4A78"
       }
+    },
+    "ssalal": {
+      "label": "쌀알 (M19-P1)",
+      "palette": {
+        "roof": "#E9A35E"
+      }
+    },
+    "boreum": {
+      "label": "보름 (M19-P1)",
+      "palette": {
+        "roof": "#8C9BB0"
+      }
     }
   },
   "awning": true,
