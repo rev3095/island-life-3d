@@ -114,6 +114,7 @@ export function checkStyle(data) {
   for (const name of names) {
     if (!/^[a-z][a-z0-9-]*$/.test(name)) out.push(`프리셋 이름 '${name}' 은 영문 소문자·숫자·- 로`);
     if (typeof data.labels?.[name] !== 'string' || !data.labels[name]) out.push(`labels.${name} 이름이 없어요`);
+    if (data.shortLabels != null && data.shortLabels[name] != null && (typeof data.shortLabels[name] !== 'string' || !data.shortLabels[name])) out.push(`shortLabels.${name} 은 빈칸 아닌 글`);
     const v = data.presets[name] ?? {};
     for (const p of PARAMS) {
       if (!(p.key in v)) { out.push(`${name}.${p.key} 값이 없어요`); continue; }
@@ -157,6 +158,8 @@ export const PRESETS = structuredClone(data?.presets ?? {});
 export const INDOOR = structuredClone(data?.indoor ?? {});
 export const DEFAULT_PRESET = data?.default ?? 'cozy';
 export const PRESET_LABELS = { ...(data?.labels ?? {}) };
+/** B-28: 게임 화면(섬폰 「화면 모습」)용 짧은 이름 — labels 는 편집기용(「포근 (동숲풍)」)이라 게임엔 못 쓴다. 없으면 labels */
+export const PRESET_SHORT = Object.fromEntries(Object.keys(data?.presets ?? {}).map(k => [k, data?.shortLabels?.[k] || data?.labels?.[k] || k]));
 /** 하늘 값 { haze, …, cloudSpeed, cloudShadow } — sky 모듈이 처음에 SKY_FX 위에 얹는다 (없으면 코드 기본값) */
 export const SKY = structuredClone(data?.sky ?? {});
 /** 게임에 들어간 스타일 반영 버전 (편집기의 applied/style 과 같다) */

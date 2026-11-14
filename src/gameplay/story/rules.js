@@ -6,7 +6,7 @@ export const TRIGGERS = {
   newgame: { label: '새 게임 (이름을 처음 정한 뒤)', event: 'intro:named', test: p => !p?.renamed },
   'firstday-done': { label: '첫날 할 일 끝 (밤톨 선물 뒤)', event: 'intro:reward' },
   after: { label: '다른 장면이 끝난 뒤 바로', event: 'story:end', test: (p, t) => p?.id === t.scene },
-  'guide-done': { label: '밤톨 첫 안내 대화가 끝난 뒤', event: 'town:intro', test: p => !!p?.done },
+  'guide-done': { label: '밤톨 첫 안내 대화가 끝난 뒤 (안내를 짧게 고른 사람은 빼고 — B-09)', event: 'town:intro', test: p => !!p?.done && !p?.short },
   newday: { label: '다른 장면을 본 다음 날', event: 'data:newday' },
   'festival-part': { label: '축제 부품 n개째', event: 'festival:part', test: (p, t) => Number(p?.n) === Number(t.n) },
   festival: { label: '축제 시작', event: 'festival:start' },

@@ -152,6 +152,24 @@ export function createPost(renderer, scene, camera, { quality = 'high', lite = f
   }
   setSize(size.x, size.y);
 
+  // B-30: 올려다볼수록(tilt 0→1) 틸트 흐림을 0 쪽으로 — 높이 볼 때 하늘·마을이 뿌옇지 않게
+  let lastP = null, upK = 1;
+  function setTilt(p) {
+    if (!tilt) return;
+    const top = p.tiltTop * upK, bottom = p.tiltBottom * upK;
+    tilt.enabled = top > 0.001 || bottom > 0.001;
+    // 탭 간격(픽셀) = 흐림 값 × 화면 높이 비율 → 해상도가 달라도 같은 정도로 흐려 보인다
+    const k = Math.max(1, state.height * renderer.getPixelRatio() / 900);
+    tilt.setProfile(top * k, bottom * k, p.tiltFocus, p.tiltRange);
+    grade.uniforms.uTiltOn.value = tilt.enabled ? 1 : 0;
+  }
+  /** 시점 올려다보기 정도 t (−1~1, camera look.tilt) — 0 이하는 그대로, 1 이면 흐림 0 */
+  function lookUp(t) {
+    const k = 1 - Math.min(1, Math.max(0, Number(t) || 0));
+    if (Math.abs(k - upK) < 0.02 && !(k === 1 && upK !== 1)) return;
+    upK = k;
+    if (lastP) setTilt(lastP);
+  }
   /** 스타일 값(p) → 패스 켜기·uniform */
   function apply(p) {
     if (bloom) {
@@ -160,12 +178,8 @@ export function createPost(renderer, scene, camera, { quality = 'high', lite = f
       bloom.radius = p.bloomRadius;
       bloom.threshold = p.bloomThreshold;
     }
-    if (tilt) {
-      tilt.enabled = p.tiltTop > 0.001 || p.tiltBottom > 0.001;
-      // 탭 간격(픽셀) = 흐림 값 × 화면 높이 비율 → 해상도가 달라도 같은 정도로 흐려 보인다
-      const k = Math.max(1, state.height * renderer.getPixelRatio() / 900);
-      tilt.setProfile(p.tiltTop * k, p.tiltBottom * k, p.tiltFocus, p.tiltRange);
-    }
+    lastP = p;
+    setTilt(p);
     const g = grade.uniforms;
     g.uTiltOn.value = tilt?.enabled ? 1 : 0; g.uFocus.value = p.tiltFocus; g.uRange.value = p.tiltRange;
     g.uExposure.value = p.exposure; g.uShoulder.value = p.shoulder; g.uWarmth.value = p.warmth;
@@ -177,7 +191,7 @@ export function createPost(renderer, scene, camera, { quality = 'high', lite = f
 
   return {
     composer, passes: { scene: scenePass, bloom, tilt, grade, fxaa },
-    setSize, apply,
+    setSize, apply, lookUp,
     render(dt) { composer.render(dt); },
     dispose() { composer.dispose?.(); tilt?.dispose(); rt.dispose(); },
   };

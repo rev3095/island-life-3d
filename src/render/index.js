@@ -10,7 +10,7 @@
 // 매 프레임 그리기 전에 cull.js 가 화면 밖 캐릭터를 빼고 그림자 범위를 보이는 땅에 맞춘다.
 import * as THREE from 'three';
 import * as materials from '../core/materials.js';
-import { PARAMS, PRESETS, PRESET_LABELS, DEFAULT_PRESET, INDOOR } from './presets.js';
+import { PARAMS, PRESETS, PRESET_LABELS, PRESET_SHORT, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 import { createCuller } from './cull.js';
 import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, DEFAULT_QUALITY, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
@@ -126,6 +126,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
   function frame(p, dt) {
     if (p.post && postOn()) {
       linearOut.value = 1;
+      post.lookUp?.(ctx.services.player?.camera?.look?.tilt ?? 0);   // B-30
       post.render(dt);
     } else {
       linearOut.value = 0;
@@ -138,6 +139,8 @@ export function createView(ctx, { preset: startPreset } = {}) {
     get preset() { return presetName; },
     get presets() { return clone(PRESETS); },
     labels: { ...PRESET_LABELS },
+    /** B-28: 게임 화면용 짧은 이름 { cozy: '포근', toon: '툰 (예전)' } — 섬폰 「화면 모습」 단추가 이것으로 그린다 */
+    shortLabels: { ...PRESET_SHORT },
     params: PARAMS,
     get quality() { return quality; },
     /** 사양 차례 (무거운 것부터 high · mid · low · min = 높음 · 적정 · 낮음 · 매우 낮음) */

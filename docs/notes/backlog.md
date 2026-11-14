@@ -19,7 +19,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-06 | story | H3 엔딩 사진 뒤 주민 축하 편지 (s12-C) — `festival:end` 듣고 `mail.post(slug, 'festival')`, 편지 글 `letters.festival` 없음 | 큼 | **고침 (p50)** — 주민 열 명 `letters.festival`(첫 축제)·`festivalAgain`(해마다), `festival:end` 에 하루 한 번 섬 주민 모두 보냄 (`town/index.js`) | 스토리 s12 | `src/gameplay/town/mail.js` · `assets/villagers/*.json` |
 | B-07 | story | H4 장면 이모티콘을 Z5 이모티콘 id 로 (`emote.glyph(id)`), 말풍선 모양 맞추기 — 지금은 `EMOTES` 글자 50개 | 큼 | 남음 | Z5 축제 보드 | `story/rules.js` · `layer.js` · `story.css` |
 | B-08 | story | 장면 시작 대기열을 저장하지 않음 (부품 얻고 바로 새로고침하면 그 장면은 다음 트리거까지 안 나옴) | 작음 | **고침 (p43)** — `state.story.queue` 에 줄 선 장면·트는 중인 장면을 적어 두고 다시 열면 이어서 | — | `src/gameplay/story/index.js` |
-| B-09 | p11-tune | 짧게 고른 사람에게도 s02(할 일 목록 건네기)가 나옴 → 트리거 `guide-done` 에 `skip` 조건 | 작음 | 남음 | wave7 D44 | `src/gameplay/story/rules.js` (또는 `s02-guide-after.json`) |
+| B-09 | p11-tune | 짧게 고른 사람에게도 s02(할 일 목록 건네기)가 나옴 → 트리거 `guide-done` 에 `skip` 조건 | 작음 | 고침 (M19-P6) — `town:intro` 에 `short`, `guide-done` 이 짧게면 안 맞음 | wave7 D44 | `src/gameplay/story/rules.js` (또는 `s02-guide-after.json`) |
 | B-10 | m6-p0-pack | `?story=s11-ending-photo` 미리 보기에서 카메라가 나무에 붙어 보임 — 축제 자리(`places.festival`)가 생겼으니 다시 보기 | 작음 | 반쯤 (다시 볼 것) | — | `story/rules.js cameraAt` · `world/festival.js` |
 
 ### 밤·투어
@@ -36,7 +36,7 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
 | B-15 | m8-events | 도장(UI-15)을 달력 창 아래 칸 → 도감 탭으로 옮기기 | 큼 | 남음 | wave8 UI-15 | `src/ui/phone.js` · `gameplay/events/eventsui.js` |
-| B-16 | m8-events | 휴대폰 세로: 행사 칸과 축제 진행판(600px 아래)이 축제 날 저녁에 겹칠 수 있음 — 확인 | 작음 | 남음 | wave8 | `events/eventsui.js` · `festival/` 진행판 |
+| B-16 | m8-events | 휴대폰 세로: 행사 칸과 축제 진행판(600px 아래)이 축제 날 저녁에 겹칠 수 있음 — 확인 | 작음 | 고침 (M19-P6) — 진행판이 있으면 행사 칸을 그 밑으로 (`:has`) | wave8 | `events/eventsui.js` · `festival/` 진행판 |
 
 ### 집·실내·꾸미기
 
@@ -47,8 +47,8 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 | B-19 | m9-decor | 휴대폰에서 놓을 칸을 손가락으로 고르기 (지금은 앞 칸) | 큼 | **이미 됨 (M10 D96-A)** — 꾸미기 동안 땅을 짧게 누르면(손가락 톡 포함) 그 칸 (`mouse.js setClickHandler` · `decor onCell`) | wave9 | `src/gameplay/decor/` · `core/input.js` |
 | B-20 | m9-decor | 상점 가구 후보가 넷 늘어 하루 진열이 섞임 — 밸런스 정하기 | 큼 | 남음 | wave9 D92 | `assets/data/rules.json shop` |
 | B-21 | p12-interiors | 상점 실내에 「오늘의 벽지·바닥」 견본 걸기 (지금은 창에서만) | 큼 | **고침 (p51)** — 상점 북쪽 벽 6번에 견본 판 (위 벽지 · 아래 바닥), 판 앞 「보기」로 골라 사기·바로 붙이기 (`places.js sampleJob`, shop.json `sample`) | interiors | `src/gameplay/house/places.js` · `pattern.js` |
-| B-22 | z2-interior | 밤엔 실내 따뜻한 빛 때문에 하늘 체크·흰 타일이 베이지로 보임 — 실내 값 보고 고르기 | 작음 | 남음 | interiors | `src/render/presets.js INDOOR` · `sky/indoor.js` |
-| B-23 | z2-interior | 휴대폰 화면에서 꾸미기 선택지·상점 코너 줄 높이 확인 | 작음 | 남음 | — | `src/ui/ui.css` · `house/` |
+| B-22 | z2-interior | 밤엔 실내 따뜻한 빛 때문에 하늘 체크·흰 타일이 베이지로 보임 — 실내 값 보고 고르기 | 작음 | 고침 (M19-P6) — `sky/indoor.js` NIGHT 빛 색을 덜 노랗게 | interiors | `src/render/presets.js INDOOR` · `sky/indoor.js` |
+| B-23 | z2-interior | 휴대폰 화면에서 꾸미기 선택지·상점 코너 줄 높이 확인 | 작음 | 고침 (M19-P6) — 560px 이하 선택지 스크롤·상점 코너 줄 칸 | — | `src/ui/ui.css` · `house/` |
 | B-24 | z3-furniture | 친밀도 선물 가구의 주인 주민을 FURN 표 칸으로 (지금은 얻는 법 글자 `from` 에만) | 작음 | **고침 (p43)** — items.json 친밀도 가구 6줄에 `owner` (v2), items.js 가 넘김 | — | `src/data/items.js` FURN |
 
 ### 주민·마을
@@ -62,15 +62,15 @@ P39 에서 바로 고친 작은 것 6 (B-25 · B-26 · B-44 · B-45 · B-60 · B
 
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
-| B-27 | p33-clock | HUD 날씨 아이콘이 밤에도 ☀️ — 밤엔 🌙 로 할지 | 작음 | 남음 | 다음 보드 QA 칸 후보 | `src/ui/hud.js setWeather` · `dom.js WEATHER_ICON` |
-| B-28 | m6-p6-style | 섬폰 「화면 모습」 단추가 `cozy`·`toon` 을 글자로 박아 둠 → `style.labels` 로 그리기 | 작음 | 남음 — `presets.json labels` 에 「동숲풍」이 있어 게임 화면엔 그대로 못 씀 → 게임용 짧은 이름 칸부터 | — | `src/ui/phone.js` (213줄 근처) |
+| B-27 | p33-clock | HUD 날씨 아이콘이 밤에도 ☀️ — 밤엔 🌙 로 할지 | 작음 | 고침 (M19-P6) — 19–5시 맑음 🌙 | 다음 보드 QA 칸 후보 | `src/ui/hud.js setWeather` · `dom.js WEATHER_ICON` |
+| B-28 | m6-p6-style | 섬폰 「화면 모습」 단추가 `cozy`·`toon` 을 글자로 박아 둠 → `style.labels` 로 그리기 | 작음 | 일부 (M19-P6) — `presets.json shortLabels` · `style.shortLabels` 까지, phone.js 한 줄은 P5 합친 뒤 | — | `src/ui/phone.js` (213줄 근처) |
 | B-29 | ui | `index.html` `.core-check` 안내가 좁은 화면에서 HUD 시계와 겹침 (world 없을 때만 보이는 개발용) | 작음 | **고침 (p43)** — 720px 아래에선 화면 아래로 | — | `index.html` |
 
 ### 렌더·성능·하늘
 
 | # | 노트 | 남은 일 (한 줄) | 크기 | 상태 | 닿는 보드·결정 | 어디 |
 |---|---|---|---|---|---|---|
-| B-30 | p12-camera | 올려다볼수록 틸트 흐림(`tiltTop`·`tiltBottom`)을 0 쪽으로 — 높음에서 하늘·마을이 뿌옇게 됨 | 작음 | 남음 | — | `src/render/post.js apply` · `player/camera.js look.tilt` |
+| B-30 | p12-camera | 올려다볼수록 틸트 흐림(`tiltTop`·`tiltBottom`)을 0 쪽으로 — 높음에서 하늘·마을이 뿌옇게 됨 | 작음 | 고침 (M19-P6) — `post.lookUp(tilt)` 로 흐림 × (1 − 올려다보기) | — | `src/render/post.js apply` · `player/camera.js look.tilt` |
 | B-31 | p12-camera | 하늘 보드에 「올려다보기」 장면 칸 — 구름층·천정 그라데이션·3D 솜구름을 올려다본 화면으로도 고르기 | 큼 | 남음 | sky 보드 | `src/sky/` · `clouds.js` · `concept/sky-board.html` |
 | B-32 | p12-camera | 곡면 축을 `uCurveDir` 로 → 둘레 돌기 한 바퀴 | 큼 | 남음 | — | `core/materials.js` · `mouse.js` · `world/kit.js` · `occlusion.js` · `render/cull.js` |
 | B-33 | perf · render · shader | 실제 휴대폰·다른 GPU·진짜 rAF 로 오래 걸으며 fps 재기 (내장 그래픽에서만 잼) | 큼 | 최적화 세션 | — | `src/render/quality.js` |

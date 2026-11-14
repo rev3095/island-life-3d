@@ -34,19 +34,22 @@ export function createHud(ctx, { openBag, openPhone, openMap, openTools, setHint
 
   const root = h('div', { class: 'pk-hud' }, clock, h('div', { class: 'pk-top-right' }, acorns, quickRow), tool, hint, actRoot);
 
-  let lastAcorns = null, gotTick = false, lastMinute = -1;
+  let lastAcorns = null, gotTick = false, lastMinute = -1, isNight = false, curW = null;
   const api = {
     root,
     setClock(now) {
       if (!now) return;
+      const night = (now.hour ?? 12) >= 19 || (now.hour ?? 12) < 5;   // B-27: 밤 19–5시 맑음 = 🌙
+      if (night !== isNight) { isNight = night; if (curW) api.setWeather(curW); }
       const t = clockText(now);
       time.textContent = t.time;
       date.textContent = t.date;
       clock.setAttribute('aria-label', `${t.time}, ${t.date}`);
     },
     setWeather(w) {
+      curW = w;
       wx.hidden = !w;
-      wx.textContent = WEATHER_ICON[w] ?? '';
+      wx.textContent = w === 'clear' && isNight ? '🌙' : (WEATHER_ICON[w] ?? '');
       wx.setAttribute('aria-label', WEATHER_NAME[w] ?? '');
     },
     setAcorns(n) {
