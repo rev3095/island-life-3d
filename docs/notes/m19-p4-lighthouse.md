@@ -29,7 +29,7 @@
 
 - 게임에서 직접 (개발 서버 4304, `?date=2027-04-20`, 준비는 미리 보기 저장에 `festival.endedDay` 만): 등대가 칸 28,6 북쪽 모래 끝에 놓임 → 낮 11시 s54 → 비 오는 날은 두부·퐁이 집에 있어 부탁 못 함(맞음) → 맑은 날 두부·퐁 앞 「등대 부탁」 → 등대 앞 「등대 고치기」 → 「시작하기!」 → 돌 10·나무 5 빠짐 · s55 · 고치는 중 모델 · 비계 · 돌길 3칸 · 진행판 「2단계 — 7일 뒤 (4/26)」 → 시계로 날을 넘기면 4/20–4/25 기다림 · 4/26 2단계 열림. 단계를 5로 당겨(확인용) 22시 「불 켜기」 → s60 (섬 사람 모두 + 밤 상인) · 켜진 모델 · 소품은 새 계단만 → 다음 날 8시 s61 → 낮 빛 띠 0 · 밤 1. 사양 바꾸면 높음·적정 셰이더 / 낮음·매우 낮음 판. 콘솔 오류 0.
 - `node tools/check-interiors.mjs --port=4304`: 팝업만 뜬 문 0 · 못 들어간 문 0 · 상점 실내 문 문제 0 (기존 문 영향 없음).
-- GPU: `node tools/perf-bench.mjs --port=4304 --scenes=plaza-night,lighthouse-off,lighthouse-night` (새 장면 둘 = 같은 등대 앞 21시 안 켬·켬) — 결과는 아래 「GPU」.
+- GPU: `node tools/perf-bench.mjs --port=4304 --scenes=plaza-night,lighthouse-off,lighthouse-night` (새 장면 둘 = 같은 등대 앞 21시 안 켬·켬) — **안 잼** (사용자 원칙: 검증 줄이기). 장면 둘만 더해 둠.
 - 자동 플레이 봇 단계 `lighthouse` (`tests/playthrough/scenario.js`, `contest` 다음): 시작까지 날 넘기기 → s54 → 돌(새 `sk.stone` — 도끼로 바위)·나무 모으기 → 돕는 주민 찾아가 Space → 등대 앞 Space → s55·비계·일지 → 7일 간격. 지름길 없음, 시계만.
 
 ## 남은 것
