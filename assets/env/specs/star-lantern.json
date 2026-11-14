@@ -1,0 +1,60 @@
+{
+  "id": "PR-44",
+  "slug": "star-lantern",
+  "name": "별 조각 등불",
+  "category": "prop",
+  "kind": "star-lantern",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "기름 대신 별 조각을 담은 쇠 등 — 밤에 안에서 노랗게 빛난다.",
+    "keywords": [
+      "쇠 등",
+      "별 조각",
+      "밤에 빛남"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A) — 등대 단계에 따라 src/gameplay/lighthouse 가 놓음 (persist:false, 단계는 state.lighthouse 에 저장). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "iron": "#3F4E5C",
+    "pane": "#E8F4F8",
+    "glow": "#FFE07A",
+    "starPink": "#F7A8C4"
+  },
+  "paletteLabels": {
+    "iron": "쇠 틀",
+    "pane": "유리",
+    "glow": "별 조각 (밤에 빛남)",
+    "starPink": "분홍 별 조각"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.22
+    },
+    "extent": [
+      0.22,
+      0.22
+    ]
+  }
+}

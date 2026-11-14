@@ -37,6 +37,9 @@ const SCENES = {
   'monsoon-day': { date: 'monsoon', hour: 12, weather: 'rain' },
   'snow-day': { date: 'firstsnow', hour: 15, weather: 'snow' },
   'meteor-night': { date: 'bigmeteor', hour: 22 },
+  // M19-P4 (--scenes=lighthouse-off,lighthouse-night): 북쪽 옛 등대 앞 21시 — 같은 자리에서 안 켬 · 켬(빛 띠 beam.js) 을 견준다. 켜는 것은 준비만 state.lighthouse
+  'lighthouse-off': { date: 'weekday', hour: 21 },
+  'lighthouse-night': { date: 'weekday', hour: 21 },
 };
 
 // ---- 페이지 안에서 도는 쪽 (문자열로 보낸다) ----
@@ -124,6 +127,18 @@ async function driver({ scenes, rounds, shots, probe, variants = [], looks = [] 
         step(4); c.events.emit('time:tick', { now: T.now() }); step(10); await wait(300); await settle();
         for (let i = 0; i < 40 && !(c.services.night?.debug?.placed?.()?.market?.length); i++) { step(4); await wait(150); }
         const pl = W.places.plaza; P.teleport(pl.x, pl.z + 2.5);
+      } else if (name === 'lighthouse-off' || name === 'lighthouse-night') {
+        const LH = c.services.lighthouse;
+        if (!LH) throw new Error('등대 모듈이 없음');
+        const S = (c.state.lighthouse ||= {});
+        if (name === 'lighthouse-night') Object.assign(S, { started: '2027-04-01', stage: 5, lit: '2027-04-02', morning: '2027-04-03' });
+        else Object.assign(S, { started: null, stage: 0, lit: null, morning: null });
+        for (let i = 0; i < 30 && !LH.site(); i++) { step(4); await wait(100); }
+        LH.debug.refresh(); step(10);
+        for (let i = 0; i < 30 && !(LH.debug.placed.main && W.objects.get(LH.debug.placed.main)); i++) { step(4); await wait(150); }
+        T.setHour(SC_HOUR[name]); c.events.emit('time:tick', { now: T.now() });
+        const s = LH.site(); P.teleport(s.front.x, s.front.z + 5);
+        step(10);
       } else if (name === 'museum-night') {
         T.setHour(SC_HOUR[name]); c.events.emit('time:tick', { now: T.now() });
         const d = W.places.museum?.door ?? W.places.plaza; P.teleport(d.x + 2, d.z + 3);

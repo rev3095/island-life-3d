@@ -1,0 +1,34 @@
+{
+  "id": "PR-41",
+  "slug": "lighthouse-scaffold",
+  "name": "등대 비계",
+  "category": "prop",
+  "kind": "lighthouse-scaffold",
+  "version": "0.1",
+  "triangles": 1568,
+  "parts": 1,
+  "materials": [
+    "plank",
+    "pole",
+    "rope"
+  ],
+  "animations": {},
+  "size": [
+    0.98,
+    0.82,
+    3.19
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 32236,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-scaffold_front.png",
+    "lighthouse-scaffold_hero.jpg",
+    "lighthouse-scaffold_main.png",
+    "lighthouse-scaffold_thumb.png",
+    "lighthouse-scaffold_top.png"
+  ]
+}

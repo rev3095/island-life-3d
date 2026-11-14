@@ -1,0 +1,36 @@
+{
+  "id": "PR-43",
+  "slug": "lighthouse-lens",
+  "name": "등대 렌즈",
+  "category": "prop",
+  "kind": "lighthouse-lens",
+  "version": "0.1",
+  "triangles": 1128,
+  "parts": 2,
+  "materials": [
+    "brass",
+    "cloth",
+    "lens",
+    "shine",
+    "wood"
+  ],
+  "animations": {},
+  "size": [
+    0.6,
+    0.4,
+    1.08
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 25120,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "lighthouse-lens_front.png",
+    "lighthouse-lens_hero.jpg",
+    "lighthouse-lens_main.png",
+    "lighthouse-lens_thumb.png",
+    "lighthouse-lens_top.png"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈) · needs = 그 아이템을 가방에 가졌을 때만 뽑힘 (M17-P2 D183-A)",
   "daily": 5,
   "allDoneBonus": 50,
@@ -33,7 +33,8 @@
     { "id": "wisher", "on": "wish", "steps": [1, 10, 40], "pts": [100, 300, 800], "icon": "🌠", "label": "별똥별 소원" },
     { "id": "sharpshot", "on": "balloon", "steps": [5, 30, 100], "pts": [100, 300, 800], "icon": "🎈", "label": "풍선 명사수" },
     { "id": "contester", "on": "contest", "steps": [1, 5, 15], "pts": [150, 400, 1000], "icon": "🏆", "label": "대회 나가기" },
-    { "id": "peacemaker", "on": "makeup", "steps": [1, 3, 6], "pts": [150, 400, 1000], "icon": "🤝", "label": "짝 화해시키기" }
+    { "id": "peacemaker", "on": "makeup", "steps": [1, 3, 6], "pts": [150, 400, 1000], "icon": "🤝", "label": "짝 화해시키기" },
+    { "id": "lighthouse", "on": "lighthouse", "steps": [1, 3, 5], "pts": [200, 500, 1200], "icon": "🗼", "label": "등대 다시 켜기" }
   ],
   "shop": [
     { "id": "acorns", "kind": "acorns", "n": 300, "cost": 100, "icon": "🌰", "label": "도토리 300" },

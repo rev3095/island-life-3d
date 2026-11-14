@@ -1,0 +1,62 @@
+{
+  "id": "PR-43",
+  "slug": "lighthouse-lens",
+  "name": "등대 렌즈",
+  "category": "prop",
+  "kind": "lighthouse-lens",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "닦는 동안 받침대에 올려 둔 겹겹 고리 렌즈(놋쇠 테) — 옆에 닦는 천.",
+    "keywords": [
+      "고리 렌즈",
+      "놋쇠",
+      "받침대"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A) — 등대 단계에 따라 src/gameplay/lighthouse 가 놓음 (persist:false, 단계는 state.lighthouse 에 저장). 검수 대기"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#9A6B45",
+    "cloth": "#F4B6C8",
+    "brass": "#C9A44E",
+    "lens": "#BFE3EF",
+    "shine": "#FFFFFF"
+  },
+  "paletteLabels": {
+    "wood": "나무",
+    "cloth": "닦는 천",
+    "brass": "놋쇠 테",
+    "lens": "렌즈 유리",
+    "shine": "반짝임"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "r": 0.3
+    },
+    "extent": [
+      0.3,
+      0.25
+    ]
+  }
+}

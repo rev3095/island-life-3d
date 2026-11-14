@@ -46,6 +46,12 @@ async function contestKinds(assets) {
   return cfg?.assets?.env ?? [];
 }
 
+/** M19-P4 옛 등대 BD-18 · 단계 소품 PR-41–44 (assets/lighthouse/lighthouse.json assets.env) — 처음에 받지 않고 등대를 놓을 때 (game:ready 뒤) */
+async function lighthouseKinds(assets) {
+  const cfg = await assets.loadJSON('assets/lighthouse/lighthouse.json').catch(() => null);
+  return cfg?.assets?.env ?? [];
+}
+
 /** P35 무인도 투어 모델 (배·광석 바위, assets/tour/tour.json env) — 처음에 받지 않고 선착장에 배를 놓을 때·투어 섬을 세울 때 */
 async function tourKinds(assets) {
   const cfg = await assets.loadJSON('assets/tour/tour.json').catch(() => null);
@@ -71,6 +77,7 @@ export default {
     for (const k of await tourKinds(assets)) lazy.add(k);
     for (const k of await dailyKinds(assets)) lazy.add(k);
     for (const k of await contestKinds(assets)) lazy.add(k);   // M18-P3 대회 무대
+    for (const k of await lighthouseKinds(assets)) lazy.add(k);   // M19-P4 옛 등대·단계 소품
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });

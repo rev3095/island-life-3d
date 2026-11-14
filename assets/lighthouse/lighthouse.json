@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "about": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A · D206-A). 엔딩 뒤 구름의 옛 그림(s54)에서 시작 → 단계 다섯(재료 + 주민 둘 도움 + 장면 s55–s59, 다음 단계는 7일 뒤) → 불 켜는 밤 s60 → 다음 날 아침 s61. 읽는 곳 src/gameplay/lighthouse/ (규칙 rules.js). 노트 docs/notes/m19-p4-lighthouse.md",
+  "open": { "after": "ending", "host": "gureum", "fallbackHost": "coco", "fallbackDays": 14, "hours": [9, 18] },
+  "gapDays": 7,
+  "nightHours": [19, 4],
+  "beamHours": [18.5, 5.5],
+  "site": { "at": [0.45, 0.1], "radius": 9, "kinds": ["sand", "grass"] },
+  "assets": {
+    "env": ["lighthouse-dark", "lighthouse-repair", "lighthouse-lit", "lighthouse-scaffold", "lighthouse-stairs", "lighthouse-lens", "star-lantern"]
+  },
+  "models": { "dark": "lighthouse-dark", "repair": "lighthouse-repair", "lit": "lighthouse-lit" },
+  "props": [
+    { "env": "lighthouse-scaffold", "from": 1, "until": "lit", "at": [1.2, -0.15] },
+    { "env": "lighthouse-stairs", "from": 2, "at": [0, 0.98] },
+    { "env": "lighthouse-lens", "from": 3, "until": "lit", "at": [-1.25, 0.55] },
+    { "env": "star-lantern", "from": 4, "until": "lit", "at": [1.15, 0.95] }
+  ],
+  "path": { "from": 1, "env": "path-stone", "tiles": 6 },
+  "lamp": { "height": 3.8, "speed": 0.55, "length": 15, "radius": 1.7 },
+  "stages": [
+    {
+      "id": "path", "n": 1, "name": "길 내기", "emoji": "🪨", "scene": "s55-lighthouse-path",
+      "needs": [{ "id": "mat.stone", "n": 10 }, { "id": "mat.wood", "n": 5 }],
+      "helpers": ["dubu", "pong", "coco", "bori"],
+      "goal": "등대까지 돌길을 깔아요",
+      "ask": {
+        "dubu": ["…등대 가는 길? 돌은 무거우니까, 내가 나를게.", "…같이 하자."],
+        "pong": ["길을 내면 등대에서 도시락 먹을 수 있겠다꽥!", "나도 끼워 줘꽥!"]
+      }
+    },
+    {
+      "id": "stairs", "n": 2, "name": "계단 고치기", "emoji": "🪜", "scene": "s56-lighthouse-stairs",
+      "needs": [{ "id": "mat.wood", "n": 10 }, { "id": "mat.hardwood", "n": 5 }, { "id": "mat.iron", "n": 2 }],
+      "helpers": ["bori", "danpung", "dubu", "mochi"],
+      "goal": "삐걱이는 계단을 새로 놓아요",
+      "ask": {
+        "bori": ["계단이라… 올라가다 쉬어 갈 자리도 만들자멍.", "느긋하게, 그래도 튼튼하게 도울게멍."],
+        "danpung": ["옛 계단 치수는 제가 다 재 둘게요콘.", "기록으로 남길 일이에요콘!"]
+      }
+    },
+    {
+      "id": "lens", "n": 3, "name": "렌즈 닦기", "emoji": "🔍", "scene": "s57-lighthouse-lens",
+      "needs": [{ "category": "shell", "n": 6, "label": "조개껍데기" }, { "id": "mat.clay", "n": 3 }],
+      "helpers": ["mochi", "pado", "chorong", "coco"],
+      "goal": "뿌연 렌즈를 조개껍데기 가루로 닦아요",
+      "ask": {
+        "mochi": ["렌즈가 반짝이면 꽃밭까지 비추겠다깡!", "부드러운 천을 가져올게깡."],
+        "pado": ["바다에서 보면 그 빛이 얼마나 반가운지 알지펭!", "조개껍데기는 내가 잘 안다펭!"]
+      }
+    },
+    {
+      "id": "lantern", "n": 4, "name": "별 조각 등불", "emoji": "⭐", "scene": "s58-lighthouse-lantern",
+      "needs": [{ "prefix": "mat.star-", "n": 3, "label": "별 조각" }, { "id": "mat.iron", "n": 3 }],
+      "helpers": ["dalmuri", "chorong", "coco", "danpung"],
+      "goal": "기름 대신 별 조각으로 불씨를 만들어요",
+      "ask": {
+        "dalmuri": ["별 조각이라면… 밤하늘 얘기는 내가 제일 잘해부엉.", "별빛을 담는 법을 알려 줄게부엉."],
+        "chorong": ["별 조각 등불! 섬 소식 1면감이다개굴!", "온 섬에 알려야지개굴!"]
+      }
+    },
+    {
+      "id": "night", "n": 5, "name": "불 켜는 밤", "emoji": "🗼", "scene": "s59-lighthouse-ready",
+      "needs": [{ "category": "flower", "n": 10, "label": "꽃" }, { "id": "mat.wood", "n": 5 }],
+      "helpers": ["gureum", "coco", "mochi", "bori"],
+      "goal": "꽃으로 꾸미고 섬 사람들을 불러요 — 그날 밤 불을 켜요",
+      "ask": {
+        "gureum": ["그, 그림 속 불빛을… 정말 보게 되는 거구나뭉.", "꽃 장식은 내가 그려 둔 대로 할게뭉."],
+        "coco": ["불 켜는 날엔 다 같이 모여야지냥!", "섬 끝까지 달려가서 다 불러 올게냥!"]
+      }
+    }
+  ],
+  "litScene": "s60-lighthouse-lit",
+  "morningScene": "s61-lighthouse-morning",
+  "startScene": "s54-lighthouse-start",
+  "lines": {
+    "look": ["오래된 등대예요. 불이 꺼진 지 아주 오래된 것 같아요."],
+    "wait": "다음 일은 {days}일 뒤부터 할 수 있어요. ({date})",
+    "need": "{stage}에 필요한 것",
+    "helpWanted": "도와줄 주민: {helpers}",
+    "allReady": "재료도 모였고 {helpers}도 와 있어요! 시작할까요?",
+    "start": "시작하기!",
+    "later": "다음에",
+    "night": "꽃 장식도 끝났어요. 밤이 되면(19시 뒤) 등대에 불을 켜요.",
+    "lightAsk": "섬 사람들이 다 모였어요. 등대에 불을 켤까요?",
+    "light": "불 켜기!",
+    "lit": ["등대가 밤마다 섬을 비춰요."],
+    "askLabel": "등대 부탁",
+    "askGeneric": ["등대 일이라고? 좋아, 나도 도울게!"],
+    "helped": "{name}{josa} 등대 일을 돕기로 했어요 ({n}/2)",
+    "begin": "등대 다시 켜기를 시작했어요 — 오른쪽 아래 진행판에서 할 일을 볼 수 있어요",
+    "next": "다음 단계 「{stage}」는 {days}일 뒤에 열려요",
+    "openNow": "등대 다음 단계 「{stage}」를 할 수 있어요!"
+  }
+}

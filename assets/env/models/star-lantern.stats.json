@@ -1,0 +1,35 @@
+{
+  "id": "PR-44",
+  "slug": "star-lantern",
+  "name": "별 조각 등불",
+  "category": "prop",
+  "kind": "star-lantern",
+  "version": "0.1",
+  "triangles": 756,
+  "parts": 2,
+  "materials": [
+    "glow",
+    "iron",
+    "pane",
+    "starPink"
+  ],
+  "animations": {},
+  "size": [
+    0.4,
+    0.4,
+    0.81
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 17932,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "star-lantern_front.png",
+    "star-lantern_hero.jpg",
+    "star-lantern_main.png",
+    "star-lantern_thumb.png",
+    "star-lantern_top.png"
+  ]
+}

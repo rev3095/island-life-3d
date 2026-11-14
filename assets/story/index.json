@@ -59,6 +59,14 @@
     {"scene":"s50-pado-south-sea"},
     {"scene":"s51-dalmuri-daytime"},
     {"scene":"s52-dalmuri-star-name"},
-    {"scene":"s53-pair-makeup"}
+    {"scene":"s53-pair-makeup"},
+    {"scene":"s54-lighthouse-start"},
+    {"scene":"s55-lighthouse-path"},
+    {"scene":"s56-lighthouse-stairs"},
+    {"scene":"s57-lighthouse-lens"},
+    {"scene":"s58-lighthouse-lantern"},
+    {"scene":"s59-lighthouse-ready"},
+    {"scene":"s60-lighthouse-lit"},
+    {"scene":"s61-lighthouse-morning"}
   ]
 }
