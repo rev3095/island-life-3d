@@ -22,7 +22,7 @@ const daily = json('assets/daily/daily.json');
 const night = json('assets/night/night.json');
 const days = (from, n) => Array.from({ length: n }, (_, i) => D.addDays(from, i));
 
-test('계절 가구 13 (FU-92–104): 아이템·스펙·모델·썸네일, 봄 4 · 여름 3 · 가을 3 · 겨울 3, 새 모델은 검수 대기', () => {
+test('계절 가구 13 (FU-92–104): 아이템·스펙·모델·썸네일, 봄 4 · 여름 3 · 가을 3 · 겨울 3, 모델 확정 (M19-P1)', () => {
   assert.equal(SEASON_FURN.length, 13);
   assert.deepEqual(SEASON_FURN.map(r => r[8]), Array.from({ length: 13 }, (_, i) => `FU-${92 + i}`));
   assert.deepEqual(SEASONS.map(s => SEASON_FURN.filter(r => r[9] === s).length), [4, 3, 3, 3]);
@@ -33,7 +33,7 @@ test('계절 가구 13 (FU-92–104): 아이템·스펙·모델·썸네일, 봄 
     assert.equal(it.code, id);
     assert.equal(it.source, 'season');
     const spec = json(`assets/furniture/specs/${slug}.json`);
-    assert.equal(spec.id, id); assert.equal(spec.season, season); assert.equal(spec.status, 'review', `${slug} 검수 대기`);
+    assert.equal(spec.id, id); assert.equal(spec.season, season); assert.equal(spec.status, 'approved', `${slug} 확정 (M19-P1 D207-A)`);
     assert.equal(spec.place, size === '벽' ? 'wall' : 'floor');
     for (const f of [`assets/furniture/models/${slug}.glb.json`, `assets/furniture/models/${slug}.stats.json`, `assets/furniture/renders/${slug}_thumb.png`]) assert.ok(existsSync(new URL(`../${f}`, import.meta.url)), f);
     assert.ok(index.find(m => m.slug === slug), `${slug} 가구 목록`);

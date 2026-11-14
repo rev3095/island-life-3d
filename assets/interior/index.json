@@ -82,7 +82,7 @@
       "kind": "wallpaper",
       "name": "벚꽃 비",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 0,
       "peddler": true,
       "season": "spring"
@@ -93,7 +93,7 @@
       "kind": "wallpaper",
       "name": "조개 모래",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 0,
       "peddler": true,
       "season": "summer"
@@ -104,7 +104,7 @@
       "kind": "wallpaper",
       "name": "단풍 바람",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 0,
       "peddler": true,
       "season": "autumn"
@@ -115,7 +115,7 @@
       "kind": "wallpaper",
       "name": "눈 결정",
       "version": 1,
-      "status": "review",
+      "status": "approved",
       "price": 0,
       "peddler": true,
       "season": "winter"

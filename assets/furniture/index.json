@@ -245,7 +245,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-101",
@@ -265,7 +265,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-102",
@@ -285,7 +285,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-103",
@@ -305,7 +305,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-104",
@@ -325,7 +325,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-11",
@@ -1402,7 +1402,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-90",
@@ -1422,7 +1422,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-91",
@@ -1442,7 +1442,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-92",
@@ -1462,7 +1462,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-93",
@@ -1482,7 +1482,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-94",
@@ -1502,7 +1502,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-95",
@@ -1522,7 +1522,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-96",
@@ -1542,7 +1542,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-97",
@@ -1562,7 +1562,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-98",
@@ -1582,7 +1582,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FU-99",
@@ -1602,7 +1602,7 @@
       "variants": [],
       "animations": [],
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

@@ -128,13 +128,13 @@ test('상: 1–3등 트로피 FU-89–91 + 도토리, 4등 아래·못 잡음은
   }
 });
 
-test('연결: 무대 BD-17 · 트로피 모델(review) · 섬 일지 목표 · 장면 s29 · 모듈 목록 · 묶음', () => {
+test('연결: 무대 BD-17 · 트로피 모델(확정 M19-P1) · 섬 일지 목표 · 장면 s29 · 모듈 목록 · 묶음', () => {
   const stage = JSON.parse(read('assets/env/specs/contest-stage.json'));
-  assert.equal(stage.id, 'BD-17'); assert.equal(stage.status, 'review');
+  assert.equal(stage.id, 'BD-17'); assert.equal(stage.status, 'approved');
   assert.ok(existsSync(new URL('../assets/env/models/contest-stage.glb.json', import.meta.url)));
   assert.deepEqual(cfg.assets.env, [cfg.stage.env]);
   for (const s of ['trophy-gold', 'trophy-silver', 'trophy-bronze']) {
-    assert.equal(JSON.parse(read(`assets/furniture/specs/${s}.json`)).status, 'review');
+    assert.equal(JSON.parse(read(`assets/furniture/specs/${s}.json`)).status, 'approved');
     assert.ok(existsSync(new URL(`../assets/furniture/models/${s}.glb.json`, import.meta.url)), s);
   }
   const jn = JSON.parse(read('assets/journal/journal.json'));
