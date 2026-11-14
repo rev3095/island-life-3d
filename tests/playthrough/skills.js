@@ -181,6 +181,23 @@ export function createSkills(bot) {
     }
     return bot.has('mat.wood') - start;
   };
+  /** 돌 n 개 얻기 (도끼로 바위 치기 — 바위마다 하루 몇 번만 나오니 여러 바위를 돈다, M19-P4 등대 길 내기) */
+  sk.stone = async (n = 10) => {
+    if (!S().data.inventory.hasTool?.('axe')) { bot.issue('major', 'gather', '도끼가 없어요'); return 0; }
+    const start = bot.has('mat.stone');
+    const tried = new Set();
+    for (let k = 0; k < 20 && bot.has('mat.stone') - start < n; k++) {
+      const o = sk.objects('rock', x => !tried.has(x.id))[0];
+      if (!o) break;
+      tried.add(o.id);
+      await bot.tool(null);
+      if (!(await bot.approach(o, { dist: 0.8, label: '바위' }))) continue;
+      await bot.tool('axe');
+      for (let h = 0; h < 8 && bot.has('mat.stone') - start < n; h++) { await bot.act('action', { timeout: 8 }); await bot.wait(0.3); }
+      await sk.pickupAround(2.2);
+    }
+    return bot.has('mat.stone') - start;
+  };
   /** 화석 자리 파기 (삽) → 판 수 */
   sk.fossils = async (max = 4) => {
     if (!S().data.inventory.hasTool?.('shovel')) { bot.issue('major', 'gather', '삽이 없어요'); return 0; }

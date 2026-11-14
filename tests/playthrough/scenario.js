@@ -1894,6 +1894,90 @@ export function makeScenario(bot, sk, opts = {}) {
     return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
   });
 
+  add('lighthouse', 'M19-P4 등대 다시 켜기: 시작 장면 s54 → 1단계 길 내기 (돌·나무 모으기 · 두부·퐁 부탁 · 등대 앞 Space) → s55 · 비계 · 진행판 · 일지 → 7일 뒤 2단계 열림', async () => {
+    const L = () => S().lighthouse;
+    if (!L()) return block('등대(lighthouse) 서비스가 없어요');
+    if (!fest().endedDay) return skip('엔딩 전 (등대는 첫 섬 축제 뒤부터)');
+    if (S().house?.inside) await sk.leaveHome();
+    if (S().house?.places?.where) await sk.leavePlace();
+    const odd = [], res = {};
+    const t0 = performance.now();
+    // ① 시작: 구름이 이사 온 뒤(또는 엔딩 14일 뒤) 낮에 섬에 나와 있으면 s54 — 날을 넘기며 낮 10시에 기다린다
+    let n = 0;
+    while (L().phase() === 'closed' && n < 30) {
+      await bot.setHour(10); await bot.settle(60);
+      if (L().phase() !== 'closed') break;
+      S().time.setHour(29); await bot.frames(4); n++;
+    }
+    res.daysSkipped = n;
+    if (L().phase() === 'closed') return block(`${n}일 넘겨도 등대 이야기가 시작 안 됨`);
+    await bot.settle(60);
+    res.s54 = !!st().story?.seen?.['s54-lighthouse-start'];
+    if (!res.s54) odd.push('시작 장면 s54 가 안 나옴');
+    if (L().state().stage > 0) return skip(`이미 ${L().state().stage}단계까지 함`);
+    // 1단계가 열릴 때까지 (시작한 날 바로 열린다)
+    for (let k = 0; k < 8 && L().phase() === 'wait'; k++) { S().time.setHour(29); await bot.frames(4); await bot.setHour(10); await bot.settle(60); }
+    if (L().phase() !== 'work') return block(`1단계가 안 열림 (${L().phase()})`);
+    res.box = !bot.$('.lh-box')?.hidden;
+    if (!res.box) odd.push('진행판 UI-37 이 안 보임');
+    // ② 재료: 돌 10 (도끼로 바위) · 나무 5 (도끼로 나무) — 사람처럼, 모자라면 다음 날 또
+    for (let d = 0; d < 4 && (bot.has('mat.stone') < 10 || bot.has('mat.wood') < 5); d++) {
+      if (bot.has('mat.stone') < 10) await sk.stone(10 - bot.has('mat.stone'));
+      if (bot.has('mat.wood') < 5) await sk.wood(5 - bot.has('mat.wood'));
+      if (bot.has('mat.stone') < 10 || bot.has('mat.wood') < 5) { S().time.setHour(29); await bot.frames(4); await bot.setHour(10); await bot.settle(60); }
+    }
+    res.stone = bot.has('mat.stone'); res.wood = bot.has('mat.wood');
+    if (res.stone < 10 || res.wood < 5) return awk(`재료가 모자라요 (돌 ${res.stone}/10 · 나무 ${res.wood}/5)`);
+    // ③ 돕는 주민 둘: 찾아가서 「등대 부탁」 (집에 있으면 맑은 낮에 다시)
+    await bot.tool(null);
+    const helpers = L().helpers();
+    res.helpers = helpers.join(',');
+    for (const slug of helpers) {
+      for (let tryN = 0; tryN < 3 && !L().state().helped[slug]; tryN++) {
+        const V = S().town.villagers.find(v => v.slug === slug);
+        if (!V || S().town.atHome(slug) !== 'out') { await bot.setHour(11 + tryN * 2); await bot.settle(30); continue; }
+        await bot.approach(V.actor.position, { dist: 0.9, label: V.person?.name ?? slug });
+        await bot.face(V.actor.position);
+        if (bot.peek() === 'lighthouse:ask') { await bot.act('action', { timeout: 15 }); await bot.settle(30); }
+      }
+      if (!L().state().helped[slug]) odd.push(`${slug} 에게 부탁을 못 함`);
+    }
+    // ④ 등대 앞 Space → 「시작하기!」
+    const site = L().site();
+    await bot.walkTo(site.front, { near: 0.35, label: '등대 앞' });
+    await bot.face({ x: site.x, z: site.z });
+    res.peek = bot.peek();
+    if (res.peek !== 'lighthouse:site') odd.push(`등대 앞 행동 키가 ${res.peek}`);
+    bot.policy = { dialog: () => 0 };
+    bot.press('action');
+    await bot.until(() => L().state().stage >= 1, { timeout: 30, label: '1단계 끝' });
+    bot.policy = {};
+    await bot.settle(80);
+    const S1 = L().state();
+    res.stage = S1.stage;
+    if (S1.stage < 1) return block('1단계가 안 끝남');
+    res.s55 = !!st().story?.seen?.['s55-lighthouse-path'];
+    if (!res.s55) odd.push('1단계 장면 s55 가 안 나옴');
+    res.props = [...L().debug.placed.props.keys()].join(',');
+    if (!res.props.includes('lighthouse-scaffold')) odd.push('비계 PR-41 이 안 놓임');
+    res.model = L().debug.placed.main;
+    res.path = L().debug.placed.path.length;
+    res.left = { stone: bot.has('mat.stone'), wood: bot.has('mat.wood') };
+    if (res.left.stone > res.stone - 10 || res.left.wood > res.wood - 5) odd.push('재료가 안 빠짐');
+    res.journal = st().journal?.counts?.lighthouse ?? 0;
+    if (!res.journal && st().flags?.firstday?.finished) odd.push('섬 일지 「등대 다시 켜기」가 안 셈');
+    await bot.shot('18-lighthouse-stage1', `등대 1단계 끝 — ${res.model} · 비계 · 돌길 ${res.path}칸 · 진행판`);
+    // ⑤ 7일 간격: 6일째까지 기다림, 7일째 2단계
+    const days = [];
+    for (let d = 1; d <= 7; d++) { S().time.setHour(29); await bot.frames(4); await bot.setHour(10); await bot.settle(60); days.push(L().phase()); }
+    res.days = days.join(' ');
+    if (days.slice(0, 6).some(p => p !== 'wait') || days[6] !== 'work') odd.push(`7일 간격이 안 맞음 (${res.days})`);
+    res.realSec = Math.round((performance.now() - t0) / 1000);
+    note('lighthouse', res);
+    const msg = `시작 ${res.daysSkipped}일 넘김 · 돌 ${res.stone} 나무 ${res.wood} · ${res.helpers} 도움 → 1단계 끝 · ${res.model} · 돌길 ${res.path}칸 · 7일 뒤 2단계 (${res.realSec}초)`;
+    return odd.length ? awk(`${odd.join(' · ')} — ${msg}`) : pass(msg);
+  });
+
   add('yearly', '해마다 축제 (1년 뒤 같은 날)', async () => {
     if (!fest().heldDay || !opts.yearly) return skip(opts.yearly ? '엔딩 전' : '건너뜀 (?yearly=1 로 켜기)');
     const target = `${Number(fest().heldDay.slice(0, 4)) + 1}${fest().heldDay.slice(4)}`;
