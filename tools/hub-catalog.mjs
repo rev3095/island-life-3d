@@ -58,10 +58,10 @@ export function editorsList(html) {
   if (!m) throw new Error('editors.html 에 editors-list 가 없어요');
   return JSON.parse(m[1]);
 }
-/** 보드 html 의 const DECISIONS = [ … ] 를 꺼내 값으로 (보드 페이지 글 그대로 — 따옴표 안 괄호는 건너뜀) */
-export function boardDecisions(html) {
-  const at = html.indexOf('const DECISIONS = [');
-  if (at < 0) return [];
+/** 보드 html 의 const <name> = [ … ] 글자 (따옴표 안 괄호는 건너뜀) */
+function arrayText(html, name) {
+  const at = html.indexOf(`const ${name} = [`);
+  if (at < 0) return null;
   let i = html.indexOf('[', at), depth = 0, q = null;
   const start = i;
   for (; i < html.length; i++) {
@@ -71,7 +71,17 @@ export function boardDecisions(html) {
     else if (c === '[') depth++;
     else if (c === ']' && --depth === 0) break;
   }
-  return vm.runInNewContext(`(${html.slice(start, i + 1)})`, {});
+  return html.slice(start, i + 1);
+}
+/** 보드 html 의 const DECISIONS = [ … ] 를 꺼내 값으로 (보드 페이지 글 그대로). 새 주민 보드처럼 DECISIONS 가 SLOTS 를 펼쳐 쓰면 SLOTS 도 같이 */
+export function boardDecisions(html) {
+  const text = arrayText(html, 'DECISIONS');
+  if (!text) return [];
+  try { return vm.runInNewContext(`(${text})`, {}); } catch { /* 다른 상수를 펼쳐 쓰는 보드 (새 주민 보드 SLOTS) — 아래에서 글자로 */ }
+  // 결정 칸만 글자로: { id: 'D210', q: '…' } — 선택지는 그 칸 안 [k, '이름'] 줄
+  const out = [];
+  for (const m of html.matchAll(/\{\s*id:\s*'(D\d+)',[^}]*?q:\s*'([^']*)'/g)) if (!out.some(d => d.id === m[1])) out.push({ id: m[1], q: m[2], opts: [] });
+  return out;
 }
 const version = v => (v === undefined || v === null ? null : v);
 const stateOf = s => (s === 'approved' ? 'approved' : 'review');   // 스펙에 status 가 없으면 검수 대기 (tests/assets.test.mjs 와 같은 규칙)

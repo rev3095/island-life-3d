@@ -376,7 +376,7 @@ test('보관함 계산 (HubLogic.archiveDoc · archiveRows · tools/hub-archive.
   assert.equal(cd.picksFrom, 'recommended');
   assert.equal(cd.applied.version, 0);
   // 화면: 차례 순서, 저장소 문서가 있으면 그것, 차례에 없는 새 문서(17차)는 끝에
-  const rows = plain(H.archiveRows(AINDEX, LIST, { '07-wave7': doc, '17-wave17': { seq: 19, cha: 17, label: '17차', board: 'wave17', name: '17차', history: [] } }));
+  const rows = plain(H.archiveRows(AINDEX, LIST, { '07-wave7': doc, '17-wave17': { seq: 20, cha: 17, label: '17차', board: 'wave17', name: '17차', history: [] } }));
   assert.equal(rows.length, AINDEX.length + 1);
   assert.deepEqual(rows.slice(0, AINDEX.length).map(r => r.id), AINDEX.map(a => a.id));
   assert.equal(rows.find(r => r.id === '07-wave7').stored, true);
