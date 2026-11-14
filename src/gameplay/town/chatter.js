@@ -6,7 +6,7 @@ const NEAR = 2.2;             // 이 거리 안의 두 주민
 const CHANCE = 0.35;
 const COOLDOWN = 45;          // 한 번 수다 떤 주민은 잠깐 쉰다
 
-export function createChatter(villagers, lines) {
+export function createChatter(villagers, lines, { avoid = null } = {}) {   // M19-P3: avoid(a, b) → 이 둘은 짝짓지 않는다 (다투는 짝)
   let look = LOOK_EVERY;
   const pairs = [];
 
@@ -14,7 +14,7 @@ export function createChatter(villagers, lines) {
     const free = villagers.filter(V => V.mode === 'idle' && V.talkable && V.clock - V.chatAt > COOLDOWN);
     for (let i = 0; i < free.length; i++) for (let j = i + 1; j < free.length; j++) {
       const a = free[i], b = free[j], p = a.actor.position, q = b.actor.position;
-      if (Math.hypot(p.x - q.x, p.z - q.z) > NEAR || Math.abs(p.y - q.y) > 0.5 || Math.random() > CHANCE) continue;
+      if (Math.hypot(p.x - q.x, p.z - q.z) > NEAR || Math.abs(p.y - q.y) > 0.5 || avoid?.(a, b) || Math.random() > CHANCE) continue;
       const t = 6 + Math.random() * 5;
       a.startChat(b, t); b.startChat(a, t);
       pairs.push({ who: [a, b], turn: Math.random() < 0.5 ? 0 : 1, t: 0.4 });

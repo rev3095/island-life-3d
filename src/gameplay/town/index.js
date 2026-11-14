@@ -19,6 +19,7 @@ import LINES from './lines/index.js';
 import { createCompanion } from './companion.js';   // M15 같이 낚시·산책
 import { createSong } from './song.js';             // M15 저녁 광장 주민 노래 (s26)
 import { createUmbrellas } from './umbrella.js';   // M18-P2 장마·태풍 날 우산 쓴 주민
+import { createPairs } from './pairs.js';           // M19-P3 주민끼리 짝 · 다툼 날 · 화해 s53 (D202-A)
 import { createAlbum } from '../../ui/album.js';    // M15 UI-27 추억 앨범 · 액자 FU-71–72
 
 const TALK_DIST = 1.3;
@@ -213,7 +214,8 @@ export default {
     const art = createArtWish(ctx, { residents, people: PEOPLE, lines: LINES });
     const song = createSong(ctx, { town, lines: LINES, villagers: () => villagers, companion });
     const bondStories = createBondStories(ctx, { toast });   // M19-P2 주민 사연 장면 s33–s52: 앨범 사진 · ② 답례 (talk.js createBondStories)
-    const chatter = createChatter(villagers, LINES);
+    const pairs = await createPairs(ctx, { town, villagers: () => villagers, residents, mail, party, companion, song, toast });
+    const chatter = createChatter(villagers, LINES, { avoid: (a, b) => !!pairs?.avoid(a.slug, b.slug) });   // M19-P3: 다투는 짝끼리는 수다 안 떤다
 
     /** 이사 온 주민을 섬에 들인다 (모델을 불러 villagers 에 더한다) */
     let adding = Promise.resolve();
@@ -332,13 +334,14 @@ export default {
     gp.add({ name: 'town:talk', intent: 'action', priority: 100, test: villagerInFront, run: V => town.conversation(V, async () => {
       if (await companion.talk(V)) return;   // M15 같이 노는 중: 계속 / 그만
       if (await song.talk(V)) return;        // M15 노래하는 중
+      if (await pairs?.talk(V)) return;      // M19-P3 짝: 다툼 날 이야기 들어 주기 · 같이 걷는 중
       if (!(await moving.talk(V))) await talk.converse(V);
     }).then(() => { const k = V.togetherWish; V.togetherWish = null; if (k) companion.start(V, k); }) });
     gp.add({ name: 'town:knock', intent: 'action', priority: 90, test: homeDoorInFront, run: V => town.conversation(V, () => talk.knock(V), { face: true }) });
     gp.add({ name: 'town:mail', intent: 'action', priority: 91, test: mailboxInFront, run: box => town.conversation({ actor: box }, () => mail.read()) });
     keepers.register(gp);
 
-    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, bondStories, umbrellas: createUmbrellas(ctx) };
+    T = { ctx, villagers, keepers, labels, talk, town, nav, spots, solid, chatter, mail, mailbox, movein, moving, song, bondStories, pairs, umbrellas: createUmbrellas(ctx) };
     ctx.services.town = {
       villagers, keepers: keepers.all,
       /** M18-P4 미술품 주고받기: today() → 오늘 미술품을 바라는 { slug, id } | null · wishes() · config */
@@ -378,23 +381,26 @@ export default {
       stories: bondStories,   // M19-P2 { got(), emotes() }
       /** M15 저녁 광장 노래: today() 오늘 계획 · now() 지금 부르는 둘 */
       song: { today: () => song.plan(), now: () => song.active },
+      /** M19-P3 주민끼리 짝: list() · today() 오늘 다툼 · walking() 같이 걷는 짝 · partners(slug) · state() · config */
+      pairs: pairs?.service ?? null,
       /** 10차 이사 오가기: state() 저장 칸, lots() 집터 표, stage(slug), asking(slug) 떠나 볼까 물을 마음, count() 섬 주민 수 */
       /** 주민 집 색 변형 이름 (10차 새 주민은 lilac·blue·navy) — house/visit.js 문 덧판이 쓴다 */
       houseVariant: slug => moving.variantOf(slug),
       moving: { state: () => moving.state(), lots: () => moving.lots(), stage: slug => moving.stage(slug), asking: slug => moving.asking(slug), count: () => moving.count(),
         /** P35 무인도 투어: 이사 올 수 있는 주민 (순서) · 투어 섬에서 초대한 주민을 다음 이사 주민으로 */
         movers: () => [...MOVERS], invite: slug => { if (MOVERS.includes(slug)) moving.state().invited = slug; } },
-      debug: { nav, spots, town, keepers, chatter, party, movein, moving, companion, song },
+      debug: { nav, spots, town, keepers, chatter, party, movein, moving, companion, song, pairs },
     };
     console.info(`[town] 주민 ${villagers.length}명 준비 ${Math.round(performance.now() - t0)}ms`);
   },
 
   update(dt) {
     if (!T) return;
-    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving, song } = T;
+    const { ctx, villagers, keepers, labels, solid, chatter, mail, mailbox, movein, moving, song, pairs } = T;
     movein.update();
     song.update(dt);
     T.bondStories.update(dt);   // M19-P2 사연 사진 컷 (게임 시간으로 잰다)
+    pairs?.update(dt);
     moving.update(dt);
     const time = ctx.services.time;
     const now = time?.now?.() ?? null;

@@ -53,4 +53,5 @@ export const SCENE_FILES = [
   'assets/story/scenes/s50-pado-south-sea.json',   // M19-P2 주민 사연 ② 단짝 (trigger bond-tier)
   'assets/story/scenes/s51-dalmuri-daytime.json',   // M19-P2 주민 사연 ① 친구 (trigger bond-tier)
   'assets/story/scenes/s52-dalmuri-star-name.json',   // M19-P2 주민 사연 ② 단짝 (trigger bond-tier)
+  'assets/story/scenes/s53-pair-makeup.json',   // M19-P3 짝 화해 저녁 (trigger pair-makeup, 배우는 vars.cast 로 바뀜, once false)
 ];
