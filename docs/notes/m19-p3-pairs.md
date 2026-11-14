@@ -26,10 +26,14 @@
 - 개발 서버 4303 (`?date=2027-03-10`, 엔딩 뒤 미리 보기 저장): 3/14 비라 건너뛰고 3/15 초롱–모찌 다툼 날 · 💢 · 알림 · 팔짱 자세 렌더로 확인 (화면 밖 캐릭터는 cull.js 가 뼈 계산을 쉬니 렌더 점검 땐 플레이어를 옆에).
 - 고친 것: 날짜 흉내로 날짜가 뒤로 가면 다툼이 self 로 닫히던 것.
 
+- 자동 플레이 (2026-11-15): 엔딩 뒤 미리 보기 저장(`endedDay` 만, 첫날 할 일 전)으로 `/tests/playthrough/index.html?keep=1&date=2027-03-10&only=pairs` → **✅ pass** — 6일 넘겨 3/15 초롱–모찌 다툼 날 · 💢 · 둘에게 걸어가 Space → 「이야기 들어 줄게」 · 17시 s53 재생 · 우편함 편지 + 화분 셋(furn.flower-pots). 콘솔 오류 0. 섬 일지는 준비한 저장이 첫날 할 일 전이라 안 셈(봇도 그때는 안 봄).
+  - 첫 판은 🟡 「선물을 못 받음」: 며칠 넘긴 사이 편지가 30여 통 쌓여 봇의 우편함 읽기가 짝 편지 전에 끝남 → 봇이 짝 편지를 읽을 때까지 우편함을 다시 열게 고침 (게임 문제 아님).
+- `node tools/playtest.mjs --port=4303 --only=boot,naming,pairs`: 2✅ · pairs 는 skip(새 게임 = 엔딩 전) · 콘솔 오류 0 — 실행기로 짝 단계를 보려면 전체 플레이(엔딩까지, 약 20분+)가 필요하다.
+
 ## 확인 못 한 것
-- 게임 안에서 실제 키로 「이야기 들어 줄게」→ s53 재생 → 우편함 선물까지 한 바퀴는 못 봤다 (한도).
-- 자동 플레이 봇 단계 `pairs` (scenario.js, contest 뒤)는 썼지만 `node tools/playtest.mjs --port=4303 --only=...` 로 돌리지 못했다. 엔딩이 필요해 --only 만으로는 skip — 전체 실행이나 엔딩 저장 + `tests/playthrough/index.html?keep=1&only=pairs` 로 볼 것.
-- s53 글 칸(text)은 비워 둠 — 스토리 편집기 검수(status review).
+- 처음부터 엔딩까지 전체 자동 플레이(짝 단계 포함)는 돌리지 않았다 (M19-P6 QA 에서).
+- 같이 걷기는 개발 서버에서 눈으로만 잠깐 (확률 놀이라 봇 단계 없음).
+- s53 글 칸(text)은 비워 둠 — 스토리 편집기 검수(status review). 휴대폰 화면 확인 안 함.
 
 ## 문서 세션이 반영할 문장
 - CLAUDE.md 「큰 구조」: **주민끼리 짝 (M19-P3, `src/gameplay/town/pairs.js`, 설정 `assets/town/pairs.json`)** — 짝 여섯 같이 걷기 · 엔딩 뒤 한 달에 한 번 다툼 날(💢 · 서로 피함 · AN-17 코드 자세) → 둘 이야기 들어 주기 → 저녁 s53 (`pair-makeup`, `vars.cast` 배우 바꾸기) → 편지·선물. 저장 `state.town.pairs`, 이벤트 `town:pair {phase: fight|listen|walk|walked|makeup|made}`, 일지 `makeup`. 노트 `docs/notes/m19-p3-pairs.md`.

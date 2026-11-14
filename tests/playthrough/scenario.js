@@ -1949,7 +1949,8 @@ export function makeScenario(bot, sk, opts = {}) {
     const letter = town.mail.unread().find(l => l.kind === 'pair');
     if (!letter) odd.push(`우편함에 짝 편지가 없음 (안 읽은 편지 ${unread0} → ${town.mail.unread().length})`);
     const g0 = gift ? bot.has(gift) : 0;
-    await sk.mail();
+    // 며칠을 넘기면 편지가 수십 통 쌓여 한 번에 다 못 읽는다 → 짝 편지를 읽을 때까지 사람처럼 다시 연다
+    for (let k = 0; k < 5 && town.mail.unread().some(l => l.kind === 'pair'); k++) { bot.policy = { dialog: () => 0 }; await sk.mail(); bot.policy = {}; await bot.settle(30); }
     res.gift = gift && bot.has(gift) > g0 ? gift : null;
     if (gift && !res.gift) odd.push(`선물 ${gift} 을 못 받음`);
     res.journal = st().journal?.counts?.makeup ?? 0;
