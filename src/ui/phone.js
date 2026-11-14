@@ -258,7 +258,7 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
     const styleRow = h('div', { class: 'pk-seg', role: 'group', 'aria-label': '화면 모습' });
     const drawStyle = () => {
       const cur = style?.preset ?? s.style ?? 'cozy';
-      styleRow.replaceChildren(...[['cozy', '포근'], ['toon', '툰 (예전)']].map(([m, t]) => h('button', {
+      styleRow.replaceChildren(...Object.entries(style?.shortLabels ?? { cozy: '포근', toon: '툰 (예전)' }).map(([m, t]) => h('button', {
         type: 'button', class: 'pk-seg-btn', 'aria-pressed': String(cur === m), disabled: !style,
         onclick: () => { setSetting('style', m); drawStyle(); styleRow.querySelector('[aria-pressed="true"]')?.focus(); },
       }, t)));
