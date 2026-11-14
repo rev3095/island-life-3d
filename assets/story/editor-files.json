@@ -131,6 +131,12 @@
     "assets/story/scenes/s49-pado-swim-race.json",
     "assets/story/scenes/s50-pado-south-sea.json",
     "assets/story/scenes/s51-dalmuri-daytime.json",
-    "assets/story/scenes/s52-dalmuri-star-name.json"
+    "assets/story/scenes/s52-dalmuri-star-name.json",
+    "assets/story/scenes/s62-ssalal-first-chair.json",
+    "assets/story/scenes/s63-ssalal-cheek-seeds.json",
+    "assets/story/scenes/s64-boreum-faded-photo.json",
+    "assets/story/scenes/s65-boreum-trunk-song.json",
+    "assets/town/pairs.json",
+    "assets/lighthouse/lighthouse.json"
   ]
 }

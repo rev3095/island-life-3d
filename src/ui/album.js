@@ -6,6 +6,8 @@
 import { h } from './dom.js';
 import { panelShell, button, confirmBox } from './panels.js';
 import { BOND, albumOf, addPhoto, frameVariant, photoOfVariant } from '../gameplay/town/bond.js';
+import { VILLAGERS as FOLK } from '../gameplay/town/people.js';
+import { MEMORY_GROUPS } from '../gameplay/story/rules.js';
 
 export const FRAMES = {
   desk: { item: 'furn.album-frame', slug: 'album-frame', name: '추억 액자', price: 300 },        // FU-71
@@ -24,6 +26,15 @@ const CSS = `
 .pk-album-big { background: #fff; padding: 8px 8px 12px; border-radius: 6px; border: 1px solid #E3D6BE; }
 .pk-album-big img { image-rendering: auto; }
 .pk-album-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pk-album-tabs, .pk-mem-groups { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.pk-album-tabs button, .pk-mem-groups button { font: inherit; padding: 4px 12px; border-radius: 999px; border: 1px solid #E3D6BE; background: #FFF8EC; cursor: pointer; }
+.pk-album-tabs button[aria-pressed="true"], .pk-mem-groups button[aria-pressed="true"] { background: #F2C4B8; border-color: #D99A8A; font-weight: 700; }
+.pk-mem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.pk-mem-cell { display: flex; flex-direction: column; gap: 4px; padding: 8px; min-height: 64px; background: #fff; border: 1px solid #E3D6BE; border-radius: 6px; font: inherit; text-align: left; cursor: pointer; }
+.pk-mem-cell b { font-size: calc(13px * var(--pk-fs, 1)); line-height: 1.25; }
+.pk-mem-cell span { font-size: calc(11px * var(--pk-fs, 1)); color: var(--pk-ink-soft, #7A6A5C); }
+.pk-mem-cell.is-unseen { background: #F4EEE3; border-style: dashed; cursor: default; }
+.pk-mem-cell.is-unseen b { font-size: calc(18px * var(--pk-fs, 1)); color: #B9A88F; }
 .pk-album-flash { position: fixed; inset: 0; background: #fff; opacity: .75; pointer-events: none; z-index: 60; transition: opacity .45s ease-out; }
 `;
 let styled = false;
@@ -137,17 +148,56 @@ export function createAlbum(ctx, { toast = () => {} } = {}) {
 
   // ---- 창 (섬폰 앱) ----
   let current = null;
-  function open() {
+  // ---- M19-P5 UI-36 🎬 추억: 본 장면 다시 보기 (재생 전용 — story.replay) ----
+  const nameOf = slug => FOLK.find(d => d.slug === slug)?.name ?? S().town?.villagers?.find(V => V.slug === slug)?.person?.name ?? slug;
+  /** 장면 파일 없이 s17 을 돌려 쓰는 이사 주민 첫 만남 (주민 파일 welcome 칸) */
+  const welcomes = () => FOLK.filter(d => d.welcome && d.arrives === 'moving').map(d => ({ slug: d.slug, title: d.welcome.title, welcome: d.welcome }));
+  const memories = () => S().story?.memories?.({ welcomes: welcomes(), nameOf }) ?? [];
+  function replay(m) {
+    const st = S().story;
+    if (!st?.replay || !m?.seen) return false;
+    S().ui?.closeAll?.();
+    setTimeout(() => {
+      const r = st.replay(m.scene, m.vars ?? {});
+      if (!r) { toast('지금은 다시 볼 수 없어요 (집 안·바닷속·무인도에서는 안 돼요)', '🎬'); open({ tab: 'memories' }); return; }
+      Promise.resolve(r).catch(e => console.error('[album] 다시 보기', e)).finally(() => setTimeout(() => open({ tab: 'memories', group: m.group }), 120));
+    }, 60);
+    return true;
+  }
+
+  function open({ tab = 'photos', group = 'story' } = {}) {
     if (current) return current.result;
     style();
-    let p = null, view = 'grid', sel = null;
+    let p = null, view = tab === 'memories' ? 'memories' : 'grid', sel = null, memGroup = group;
     const shell = panelShell({ cls: 'pk-album', title: '📷 추억 앨범', tagColor: '#E8B4A8', onClose: () => p?.close(null), onOutside: () => p?.close(null) });
     const body = h('div', { class: 'pk-album-body' });
-    shell.body.append(body);
+    const tabs = h('div', { class: 'pk-album-tabs', role: 'group', 'aria-label': '앨범 칸' });
+    shell.body.append(tabs, body);
     const foot = shell.foot;
+    function drawTabs() {
+      const on = view === 'memories' ? 'memories' : 'photos';
+      tabs.replaceChildren(...[['photos', '📷 사진'], ['memories', '🎬 추억']].map(([k, label]) => h('button', { type: 'button', 'aria-pressed': String(on === k), dataset: { albumTab: k }, onclick: () => { view = k === 'memories' ? 'memories' : 'grid'; draw(); } }, label)));
+    }
+    function drawMemories() {
+      const all = memories();
+      const list = all.filter(m => m.group === memGroup);
+      const seenN = all.filter(m => m.seen).length;
+      body.replaceChildren(
+        h('div', { class: 'pk-mem-groups', role: 'group', 'aria-label': '추억 묶음' }, Object.entries(MEMORY_GROUPS).map(([k, label]) => {
+          const n = all.filter(m => m.group === k), s = n.filter(m => m.seen).length;
+          return h('button', { type: 'button', 'aria-pressed': String(memGroup === k), dataset: { memGroup: k }, onclick: () => { memGroup = k; draw(); } }, `${label} ${s}/${n.length}`);
+        })),
+        list.length ? h('div', { class: 'pk-mem-grid' }, list.map(m => (m.seen
+          ? h('button', { type: 'button', class: 'pk-mem-cell', dataset: { memory: m.id }, title: '다시 보기', onclick: () => replay(m) }, h('b', null, `🎬 ${m.title}`), h('span', null, `${m.day ?? ''} · ▶ 다시 보기`))
+          : h('div', { class: 'pk-mem-cell is-unseen', dataset: { memory: m.id }, 'aria-label': `아직 못 본 이야기 — ${m.hint}` }, h('b', null, '?'), h('span', null, m.hint)))))
+          : h('p', { class: 'pk-muted' }, '아직 이야기가 없어요.'));
+      foot.append(h('span', { class: 'pk-muted pk-small', style: { marginRight: 'auto' } }, `본 이야기 ${seenN} / ${all.length} · 다시 봐도 시간·친밀도·선물은 그대로예요`));
+    }
     function draw() {
       const list = A().list.slice().reverse();
       foot.replaceChildren();
+      drawTabs();
+      if (view === 'memories') { drawMemories(); return; }
       if (view === 'one' && (sel = get(sel?.id))) {
         const who = sel.who.map(s => S().town?.villagers?.find(V => V.slug === s)?.person?.name).filter(Boolean).join(' · ');
         const wallet = S().data?.wallet?.get?.() ?? 0;
@@ -184,6 +234,7 @@ export function createAlbum(ctx, { toast = () => {} } = {}) {
     draw();
     p = S().ui.panel('album', shell.root, {
       onCancel: () => (view === 'one' ? (view = 'grid', draw()) : p.close(null)),
+      initialFocus: () => tabs.querySelector('[aria-pressed="true"]'),
       onClose: () => { current = null; },
     });
     current = p;
@@ -192,6 +243,7 @@ export function createAlbum(ctx, { toast = () => {} } = {}) {
 
   return {
     open,
+    openMemories: () => open({ tab: 'memories' }),
     service: { snap, list: () => A().list.slice(), get, frame, dress, capture, frames: FRAMES },
   };
 }

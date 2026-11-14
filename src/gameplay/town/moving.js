@@ -441,7 +441,8 @@ export function createMoving(ctx, { canLive = () => true } = {}) {
       const door = V?.door;
       if (!door) continue;
       M.welcomed[slug] = now.dayKey ?? today();
-      ctx.events.emit('town:welcome', { slug, x: door.x, z: door.z });
+      // welcome = 주민 파일 welcome 칸 — 장면 파일이 따로 없는 주민(쌀알·보름, M19-P5)은 story 가 s17 을 배우만 바꿔 튼다
+      ctx.events.emit('town:welcome', { slug, x: door.x, z: door.z, welcome: FILES.find(d => d.slug === slug)?.welcome ?? null });
       break;
     }
   }

@@ -90,7 +90,7 @@ export default {
       if (added) keepQueue();
     }
     for (const q of Array.isArray(st().queue) ? st().queue : []) {
-      if (q?.id && scenes.has(q.id) && !st().seen[q.id] && !queue.some(x => x.id === q.id)) queue.push({ id: q.id, vars: q.vars ?? {}, wait: START_DELAY });
+      if (q?.id && scenes.has(q.id) && !st().seen[q.vars?.seenKey ?? q.id] && !queue.some(x => x.id === q.id)) queue.push({ id: q.id, vars: q.vars ?? {}, wait: START_DELAY });
     }
     keepQueue();
     const trigEvents = new Set(Object.values(R.TRIGGERS).map(t => t.event).filter(Boolean));
@@ -101,6 +101,15 @@ export default {
       if (ev === 'town:bond' && ids.length) {
         ids = R.bondPick(ids, payload, id => scenes.get(id), { lastDay: st().bondDay, today: todayKey(), queued: [...(running ? [running.id] : []), ...queue.map(q => q.id), ...(P ? [P.id] : [])] });
         if (ids.length) st().bondDay = todayKey();
+      }
+      // M19-P5 장면 파일이 없는 이사 주민(쌀알·보름)의 첫 만남: s17 을 배우만 바꿔 (주민 파일 welcome 칸, 본 기록 welcome:<slug>)
+      if (ev === 'town:welcome' && !ids.length && payload?.welcome && payload.slug && scenes.has(R.WELCOME_BASE.scene)) {
+        const key = R.welcomeKey(payload.slug);
+        if (!st().seen[key] && !queue.some(q => q.vars?.seenKey === key)) {
+          queue.push({ id: R.WELCOME_BASE.scene, vars: plain({ ...payload, welcomeSlug: payload.slug, moveIn: payload.slug, seenKey: key }), wait: START_DELAY });
+          keepQueue();
+        }
+        return;
       }
       enqueue(ids, payload ?? {});
     });
@@ -140,24 +149,30 @@ export default {
 
     // ---- 장면 틀기 ----
     async function run(sc, opts = {}) {
-      const take = R.recastTake(R.takeOf(sc, opts.take), opts.vars?.cast);   // M19-P3 짝 화해 s53: 배우 바꿔 끼우기 (vars.cast)
+      let take = R.recastTake(R.takeOf(sc, opts.take), opts.vars?.cast);   // M19-P3 짝 화해 s53: 배우 바꿔 끼우기 (vars.cast)
+      if (opts.vars?.welcomeSlug) take = R.welcomeTake(take, opts.vars.welcomeSlug, opts.vars.welcome);   // M19-P5 새 주민 첫 만남
+      // M19-P5 추억 다시 보기 (replay): 본 기록·저장·시각·보상을 건드리지 않는다 — 장면 이벤트 대신 story:replay 만, 시계는 멈춤
+      const replay = !!opts.replay;
+      const emit = (name, p) => (replay ? events.emit('story:replay', { phase: name.slice(6), ...p }) : events.emit(name, p));
+      if (replay) svc().time?.setPaused?.(true);
       const vars = { ...PREVIEW_VARS, n: sc.trigger?.n, moveIn: sc.trigger?.on === 'move-in' ? sc.trigger.slug : undefined, night: sc.trigger?.on === 'night-first' ? sc.trigger.kind : undefined, slug: sc.trigger?.on === 'bond-tier' ? sc.trigger.slug : undefined, ...(opts.vars ?? {}) };
       if (vars.night && vars.name == null) vars.name = svc().night?.config?.[vars.night === 'moonshop' ? 'shop' : 'tent']?.name;   // 미리 보기: 가게 이름
       if (sc.trigger?.on === 'tour-first' && vars.name == null) vars.name = '무인도';
       const id = sc.id;
-      if (!take) return { id, skipped: true };
+      if (!take) { if (replay) svc().time?.setPaused?.(false); return { id, skipped: true }; }
       if (!take.shots?.length) {          // '연출 없음' 연출안
-        events.emit('story:start', { id, take: take.key });
+        emit('story:start', { id, take: take.key });
         finishSeen(sc, opts);
-        events.emit('story:end', { id, take: take.key, skipped: false });
+        emit('story:end', { id, take: take.key, skipped: false });
+        if (replay) svc().time?.setPaused?.(false);
         return { id, take: take.key, skipped: false };
       }
       const placeName = take.place ?? sc.place;
       const base = placeXZ(placeName, vars);
       const cast = new Set(R.castOf({ takes: [take] }));
       // P 를 먼저 세운다 → 모델을 읽는 동안에도 ui.isBlocking() 이 true (주민 자동 대화가 끼어들지 않게)
-      P = { id, sc, take, vars, base, cast, st: {}, t: 0, dur: 0, shot: null, cam: null, lastCam: null, skip: false, tapWait: false, choosing: false, music: false, photo: false };
-      events.emit('story:start', { id, take: take.key });
+      P = { id, sc, take, vars, base, cast, replay, st: {}, t: 0, dur: 0, shot: null, cam: null, lastCam: null, skip: false, tapWait: false, choosing: false, music: false, photo: false };
+      emit('story:start', { id, take: take.key });
       const fill = text => {
         let s = R.fillTokens(text, vars);
         s = svc().intro?.fill ? svc().intro.fill(s) : s.replace(/\{player(?::[^}]*)?\}/g, '친구').replace(/\{island(?::[^}]*)?\}/g, '포근섬');
@@ -180,7 +195,7 @@ export default {
         const shot = shots[i];
         if (i > 0 && shot.transition === 'fade') await fadeTo(1, 0.3);
         applyShot(shot, i, fill);
-        events.emit('story:shot', { id, take: take.key, shot: shot.id, index: i });
+        emit('story:shot', { id, take: take.key, shot: shot.id, index: i });
         if (i === 0 || shot.transition === 'fade') await fadeTo(0, i === 0 ? FADE_IN : 0.35);
         else if (shot.transition === 'white') { fade.v = 1; fade.color = '#FFFFFF'; await fadeTo(0, 0.9, '#FFFFFF'); fade.color = '#2E2420'; }
         if (shot.photo) { P.photo = true; layer.photo(true, fill(shot.caption ?? '')); }
@@ -191,7 +206,7 @@ export default {
           const k = await layer.choose(shot.choice.options.map(o => fill(o.emote)));
           P.choosing = false;
           const o = shot.choice.options[k] ?? shot.choice.options[0];
-          events.emit('story:choice', { id, shot: shot.id, emote: o.emote, index: k });
+          emit('story:choice', { id, shot: shot.id, emote: o.emote, index: k });
           next = o.goto ?? next;
         }
         if (shot.wait && !P.skip) { P.tapWait = true; layer.tapHint(true); await until(() => P.skip || !P.tapWait); layer.tapHint(false); }
@@ -208,7 +223,7 @@ export default {
       layer.caption('');
       const stand = actors.get('player');
       if (realPlayer) realPlayer.visible = true;
-      if (sc.playerEnd === 'stay' && stand?.root.visible) svc().player?.teleport?.(stand.position.x, stand.position.z, stand.facing);
+      if (sc.playerEnd === 'stay' && stand?.root.visible && !replay) svc().player?.teleport?.(stand.position.x, stand.position.z, stand.facing);
       else svc().player?.camera?.snap?.(svc().player.position);
       for (const slug of cast) { const a = actors.get(slug); if (a) a.root.visible = false; }
       restoreTown(cast);
@@ -221,14 +236,15 @@ export default {
       layer.end();
       finishSeen(sc, opts);
       fadeTo(0, FADE_IN);
-      events.emit('story:end', { id, take: done.take.key, skipped });
+      if (replay) svc().time?.setPaused?.(false);
+      emit('story:end', { id, take: done.take.key, skipped });
       return { id, take: done.take.key, skipped };
     }
 
     function finishSeen(sc, opts) {
       if (running?.id === sc.id) { running = null; keepQueue(); }
-      if (opts.preview) return;
-      st().seen[sc.id] = svc().time?.now?.().dayKey ?? svc().data?.day?.key?.() ?? true;
+      if (opts.preview || opts.replay) return;
+      st().seen[opts.vars?.seenKey ?? sc.id] = svc().time?.now?.().dayKey ?? svc().data?.day?.key?.() ?? true;
       svc().data?.save?.save?.();
     }
 
@@ -346,7 +362,7 @@ export default {
             keepQueue();
             const sc = scenes.get(q.id);
             const clear = () => { if (running === q) { running = null; keepQueue(); } };
-            if (sc && !(sc.once !== false && st().seen[sc.id])) run(sc, { vars: q.vars }).catch(e => console.error('[story] 장면', e)).finally(clear);
+            if (sc && !(sc.once !== false && st().seen[q.vars?.seenKey ?? sc.id])) run(sc, { vars: q.vars }).catch(e => console.error('[story] 장면', e)).finally(clear);
             else clear();
           }
         }
@@ -399,6 +415,14 @@ export default {
       },
       /** 편집기에서 고친 장면 객체를 바로 틀어 보기 (본 기록에 안 남는다) */
       preview(scene, take) { if (P || !scene) return null; return run(scene, { take, preview: true }); },
+      /** M19-P5 추억 다시 보기: 본 장면을 재생 전용으로 (본 기록·저장·시각·친밀도·보상 그대로) → Promise | null */
+      replay(id, vars = {}) {
+        const sc = scenes.get(id);
+        if (!sc || P || !free() || svc().gather?.dive?.active || svc().tour?.active) return null;
+        return run(sc, { replay: true, vars });
+      },
+      /** M19-P5 섬폰 🎬 추억 목록 (rules.memoryList) — welcomes = [{slug, title, welcome}] */
+      memories: (opts = {}) => R.memoryList(ordered(), st().seen, opts),
       stop: skip,
       get playing() { return P ? { id: P.id, take: P.take.key, shot: P.shot?.id } : null; },
       get queue() { return queue.map(q => q.id); },

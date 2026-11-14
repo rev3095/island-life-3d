@@ -352,3 +352,77 @@ export function recastTake(take, map) {
   const m = v => (typeof v === 'string' && Object.hasOwn(map, v) ? map[v] : v);
   return { ...take, shots: (take.shots ?? []).map(sh => ({ ...sh, ...(sh.cam ? { cam: { ...sh.cam, target: m(sh.cam.target) } } : {}), actors: (sh.actors ?? []).map(a => ({ ...a, who: m(a.who), face: m(a.face) })) })) };
 }
+
+// ---------- 새 주민 첫 만남 (M19-P5, D251-A) ----------
+
+/** 장면 파일이 따로 없는 이사 주민(쌀알·보름)의 첫 만남은 이 장면을 배우만 바꿔 돌려 쓴다 (주민 파일 welcome 칸) */
+export const WELCOME_BASE = { scene: 's17-gureum-arrival', who: 'gureum' };
+/** 첫 만남을 본 기록 칸 (state.story.seen 의 열쇠 — 장면 id 와 안 겹친다) */
+export const welcomeKey = slug => `welcome:${slug}`;
+/**
+ * 첫 만남 연출안 = 바탕 장면의 배우 바꾸기 + 주민 파일 welcome.takes 덮어쓰기.
+ * w = { takes: { A: { c4: { emote: '🪵' }, c5: { caption: '…' } }, B: {…} } } — emote 는 그 주민 말풍선, caption 은 자막
+ */
+export function welcomeTake(take, slug, w, base = WELCOME_BASE.who) {
+  const t = recastTake(take, { [base]: slug });
+  const over = w?.takes?.[take?.key] ?? {};
+  if (!t || !Object.keys(over).length) return t;
+  return { ...t, shots: t.shots.map(sh => {
+    const o = over[sh.id];
+    if (!o) return sh;
+    return { ...sh, ...(o.caption != null ? { caption: o.caption } : {}), actors: (sh.actors ?? []).map(a => (a.who === slug && o.emote != null && a.emote != null ? { ...a, emote: o.emote } : a)) };
+  }) };
+}
+
+// ---------- 섬폰 🎬 추억 (M19-P5 UI-36, D205-A) ----------
+
+/** 추억 칸 묶음: 이야기 · 주민 · 계절 */
+export const MEMORY_GROUPS = { story: '📖 이야기', folk: '🐾 주민', season: '🍂 계절' };
+const FOLK_ON = new Set(['bond-tier', 'move-in', 'pair-makeup', 'song-first', 'welcome']);
+const SEASON_ON = new Set(['event-start', 'special-day', 'meteor-first', 'meteor-big', 'contest-first']);
+/** 장면(또는 첫 만남 칸 {trigger:{on:'welcome'}}) → 묶음 키 */
+export const memoryGroup = sc => (FOLK_ON.has(sc?.trigger?.on) ? 'folk' : SEASON_ON.has(sc?.trigger?.on) ? 'season' : 'story');
+const EVENT_NAME = { 'EV-01': '봄 꽃놀이', 'EV-02': '여름 불꽃놀이', 'EV-03': '가을 수확 잔치', 'EV-04': '겨울 눈사람 날' };
+/** 받침 따라 조사 (와/과 · 이/가) */
+const jo = (n, a, b) => { const c = n ? n.charCodeAt(n.length - 1) - 0xac00 : -1; return n + (c >= 0 && c <= 11171 && c % 28 ? a : b); };
+const LIGHT_HINT = { start: '섬 축제가 끝난 다음 날 낮, 구름이 옛 그림을 보여 줘요', lit: '등대 고치기를 모두 마치면', morning: '등대 불을 켠 다음 날 아침' };
+/** 못 본 칸의 힌트 한 줄 (nameOf(slug) → 이름) */
+export function memoryHint(sc, nameOf = s => s) {
+  const t = sc?.trigger ?? {}, n = t.slug ? nameOf(t.slug) : '';
+  switch (t.on) {
+    case 'bond-tier': return `${jo(n, '과', '와')} ${t.tier === 'close' ? '단짝이' : '친구가'} 되면 들려줄 이야기예요`;
+    case 'move-in': case 'welcome': return n ? `${jo(n, '이', '가')} 섬에 이사 온 날 저녁에` : '새 주민이 이사 온 날 저녁에';
+    case 'pair-makeup': return '다툰 두 주민의 이야기를 모두 들어 주면';
+    case 'song-first': return '저녁에 광장에 가 보면';
+    case 'event-start': return `${EVENT_NAME[t.event] ?? '계절 행사'} 날에`;
+    case 'special-day': return t.kind === 'first-snow' ? '12월 첫눈 오는 날에' : '6월 장마 오는 날에';
+    case 'meteor-first': return '맑은 밤 별똥별이 쏟아질 때';
+    case 'meteor-big': return '8·12월 큰 유성우 밤에';
+    case 'contest-first': return '광장 계절 대회에 나가 보면';
+    case 'night-first': return '늦은 밤, 처음 보는 가게에 들어가 보면';
+    case 'tour-first': return '선착장 배를 타고 무인도에 가 보면';
+    case 'peddler-first': return '수·일요일 낮 광장 행상 수레에 다가가 보면';
+    case 'rating-five': return '섬 평가 별 다섯을 받으면';
+    case 'lighthouse': return LIGHT_HINT[t.kind] ?? '등대를 한 단계 더 고치면';
+    case 'festival-part': return `축제 부품 ${t.n ?? ''}개째를 찾으면`;
+    case 'festival': return '섬 축제 날 저녁에';
+    default: return '섬에서 지내다 보면';
+  }
+}
+/**
+ * 추억 목록 (순수): scenes = 타임라인 차례의 장면들, seen = state.story.seen, welcomes = [{slug, title}] (장면 파일 없는 이사 주민 첫 만남)
+ * → [{ id, title, group, seen, day, hint, scene, vars }] — 재생은 scene 을 vars 로 (replay)
+ */
+export function memoryList(scenes, seen = {}, { welcomes = [], nameOf = s => s } = {}) {
+  const out = [];
+  for (const sc of scenes) {
+    if (sc?.trigger?.on === 'manual') continue;
+    const vars = sc.trigger?.on === 'bond-tier' ? { slug: sc.trigger.slug } : {};
+    out.push({ id: sc.id, title: sc.title || sc.id, group: memoryGroup(sc), seen: !!seen[sc.id], day: typeof seen[sc.id] === 'string' ? seen[sc.id] : null, hint: memoryHint(sc, nameOf), scene: sc.id, vars });
+    if (sc.id === WELCOME_BASE.scene) for (const w of welcomes) {
+      const key = welcomeKey(w.slug), fake = { trigger: { on: 'welcome', slug: w.slug } };
+      out.push({ id: key, title: w.title || `${nameOf(w.slug)}의 이삿날 저녁`, group: 'folk', seen: !!seen[key], day: typeof seen[key] === 'string' ? seen[key] : null, hint: memoryHint(fake, nameOf), scene: sc.id, vars: { welcome: w.welcome ?? {}, welcomeSlug: w.slug, moveIn: w.slug } });
+    }
+  }
+  return out;
+}
