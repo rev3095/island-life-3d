@@ -7,6 +7,8 @@
   "name": "쌀알",
   "role": "villager",
   "arrives": "moving",
+  "welcome": { "title": "쌀알의 이삿날 저녁", "about": "M19-P5 첫 만남 — 장면 파일 없이 s17 을 배우만 바꿔 튼다 (story/rules.js welcomeTake). takes.<연출안>.<컷> = 말풍선 emote · 자막 caption",
+    "takes": { "A": { "c2": { "emote": "🐹" }, "c4": { "emote": "🪵" }, "c5": { "caption": "쌀알은 집 앞에서 나무를 다듬고 상자를 반듯하게 쌓아요" } }, "B": { "c1": { "caption": "쌀알이 이사 왔어요" } } } },
   "traits": {
     "species": "햄스터",
     "personality": "바지런한 정리왕 · 목공을 막 배우는 중 · 작은 일에 크게 기뻐함",

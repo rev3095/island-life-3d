@@ -67,7 +67,7 @@ test('bondPick: 방금 오른 단계는 그 장면만 · 따라잡기는 하루 
 });
 
 test('답례: ② 단짝만 · 가구 넷(FU-105–108) + 말버릇 이모티콘 여섯(주민 대답 전용 reply) · 한 번만', () => {
-  assert.deepEqual(Object.keys(BOND_STORY).sort(), [...SLUGS].sort());
+  assert.deepEqual(Object.keys(BOND_STORY).sort(), [...SLUGS, 'ssalal', 'boreum'].sort());   // + M19-P5 새 주민 둘
   const emotes = JSON.parse(read('assets/emotes/emotes.json')).emotes;
   const reply = emotes.filter(e => e.cat === 'reply').map(e => e.key).sort();
   assert.deepEqual(Object.values(BOND_STORY).filter(r => r.emote).map(r => r.emote).sort(), reply);

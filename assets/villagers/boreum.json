@@ -7,6 +7,8 @@
   "name": "보름",
   "role": "villager",
   "arrives": "moving",
+  "welcome": { "title": "보름의 이삿날 저녁", "about": "M19-P5 첫 만남 — 장면 파일 없이 s17 을 배우만 바꿔 튼다 (story/rules.js welcomeTake). takes.<연출안>.<컷> = 말풍선 emote · 자막 caption",
+    "takes": { "A": { "c2": { "emote": "🐘" }, "c4": { "emote": "📷" }, "c5": { "caption": "보름은 저녁마다 꽃밭에 앉아 옛날이야기를 들려준단다" } }, "B": { "c1": { "caption": "보름이 이사 왔어요" } } } },
   "traits": {
     "species": "코끼리",
     "personality": "섬에서 제일 나이 많은 다정한 어르신 · 옛날이야기꾼 · 잘 잊어버림",

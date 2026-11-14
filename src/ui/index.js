@@ -213,7 +213,8 @@ export default {
       fade,                                        // fade(on, 초, 색?, { shape: 'plain'|'circle', at: {x, y} }?) → Promise (화면 전환 막)
       confirm: opts => confirmBox(panels, opts),   // 계약 밖 추가: 예/아니요 확인 창 → Promise<value>
       isBlocking: () => panels.blocking(),
-      panel: (name, root, opts) => panels.open(name, root, opts),   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)
+      panel: (name, root, opts) => panels.open(name, root, opts),
+      closeAll: () => { for (let t, n = 0; (t = panels.top()) && n < 30; n++) t.close(null); },   // M19-P5 추억 다시 보기 전에 섬폰·창을 모두 닫는다   // 5차 Z5: 다른 모듈이 자기 DOM 을 창으로 (이모티콘 대화)
       /** 7차 UI-10 보기 편하게: 지금 걸린 값 { textSize, scale, shapes, calm, emoteText, soundText } (camera 가 calm 을 본다) */
       get access() { return access; },
       setSetting,                                  // 7차: 설정 바꾸기 (state.settings + settings:changed) — 섬폰 밖에서 바꿀 때

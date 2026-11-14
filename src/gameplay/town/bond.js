@@ -204,6 +204,8 @@ export const BOND_STORY = {
   gureum: { item: 'furn.lighthouse-painting' },
   pado: { emote: 'bang' },
   dalmuri: { emote: 'zz' },
+  ssalal: { item: 'seed.cosmos' },          // M19-P5 s63 볼주머니 씨앗 — 나눠 준 씨앗
+  boreum: { item: 'furn.radio' },           // M19-P5 s65 코로 부는 노래 — 옛 노래가 나오는 라디오
 };
 /** 받은 말버릇 이모티콘 목록 (없으면 만든다) */
 export function giftEmotes(state) {

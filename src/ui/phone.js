@@ -17,6 +17,7 @@ export const APPS = [
   { id: 'journal', name: '섬 일지', icon: '📔', color: '#F6D8A8', panel: 'journal' },
   { id: 'rating', name: '섬 평가', icon: '⭐', color: '#F7E2A0', panel: 'rating' },   // M14 UI-25 (창은 gameplay/rating 이 ui.rating 으로 채운다)   // M13-P1 (창은 gameplay/journal 이 ui.journal 로 채운다)
   { id: 'album', name: '앨범', icon: '📷', color: '#F2C4B8', panel: 'album' },   // M15 UI-27 추억 앨범 (창은 ui/album.js — town 이 ui.album 으로 채운다)
+  { id: 'memories', name: '추억', icon: '🎬', color: '#E9C2D8', panel: 'memories' },   // M19-P5 UI-36 본 장면 다시 보기 (앨범 창의 🎬 추억 칸 — town 이 ui.memories 로 채운다)
   { id: 'calendar', name: '달력', icon: '📅', color: '#F4C9D6', panel: 'calendar' },
   { id: 'clock', name: '시계', icon: '🕰️', color: '#E9D3A8', panel: 'clock' },   // 11차 시계 (p33-clock): 바늘을 돌려 게임 시각 바꾸기 (창은 ui/clock.js → ui.clock)   // 8차 UI-13 (창은 gameplay/events 가 ui.calendar 로 채운다)
   { id: 'guide', name: '안내', icon: '💡', color: '#F6E3A1', panel: 'guide' },   // 7차 M7-P5: 첫날 할 일·조작·지난 힌트 (창은 intro 가 ui.guide 로 채운다)

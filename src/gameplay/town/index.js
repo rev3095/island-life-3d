@@ -209,6 +209,7 @@ export default {
     const album = createAlbum(ctx, { toast });
     ctx.services.album = album.service;
     if (ctx.services.ui?.panel && !ctx.services.ui.album) ctx.services.ui.album = { open: () => album.open() };
+    if (ctx.services.ui?.panel && !ctx.services.ui.memories) ctx.services.ui.memories = { open: () => album.openMemories() };   // M19-P5 UI-36 🎬 추억 (앨범 창의 추억 칸)
     town.nav = nav;
     const companion = createCompanion(ctx, { town, lines: LINES, toast });
     const talk = createTalk(ctx, { lines: LINES, party, companion });

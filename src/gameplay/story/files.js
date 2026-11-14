@@ -62,4 +62,8 @@ export const SCENE_FILES = [
   'assets/story/scenes/s59-lighthouse-ready.json',   // M19-P4 등대 5단계 불 켜는 날 준비 (kind night)
   'assets/story/scenes/s60-lighthouse-lit.json',   // M19-P4 등대 불 켜는 밤 — 섬 사람 모두 + 밤 상인들 (kind lit)
   'assets/story/scenes/s61-lighthouse-morning.json',   // M19-P4 등대 다음 날 아침 (kind morning)
+  'assets/story/scenes/s62-ssalal-first-chair.json',   // M19-P5 쌀알 사연 ① 친구 (bond-tier)
+  'assets/story/scenes/s63-ssalal-cheek-seeds.json',   // M19-P5 쌀알 사연 ② 단짝
+  'assets/story/scenes/s64-boreum-faded-photo.json',   // M19-P5 보름 사연 ① 친구 — 등대 실마리
+  'assets/story/scenes/s65-boreum-trunk-song.json',   // M19-P5 보름 사연 ② 단짝
 ];
