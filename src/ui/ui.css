@@ -547,3 +547,67 @@ img.pk-craft-big { width: 104px; height: 104px; object-fit: contain; }
   .pk-closet-thumb { width: 52px; height: 52px; }
 }
 img.pk-stock-thumb { width: 44px; height: 44px; object-fit: contain; }
+
+/* ---------- 알림 칸 묶음 (M20 D267, ui/tray.js): 행사 칩 · 밤 운세 칩 · 등대 진행판 ----------
+   예전엔 셋이 따로 오른쪽 아래(148 · 196 · 196px)에 떠서 운세 칩과 등대 판이 겹치고, 휴대폰에선 도구 단추·A 를 덮었다.
+   넓은 화면: 오른쪽 아래 세로 쌓기 (행사가 맨 아래). 휴대폰 세로·가로: 시계 밑 한 줄 — 등대는 머리 줄만, 누르면 할 것이 펼쳐진다. */
+.pk-tray { position: absolute; right: calc(12px + var(--sar)); bottom: calc(148px + var(--sab)); display: flex; flex-direction: column-reverse; align-items: flex-end; gap: 8px; max-width: calc(100% - 24px - var(--sal) - var(--sar)); pointer-events: none; }
+.pk-tray:empty { display: none; }
+.pk-tray > .ev-chip, .pk-tray > .nt-chip, .pk-tray > .lh-box { position: relative; inset: auto; z-index: auto; flex: none; max-width: 100%; pointer-events: auto; }
+.pk-tray > .ev-chip { order: 1; }
+.pk-tray > .nt-chip { order: 2; }
+.pk-tray > .lh-box { order: 3; }
+.pk-touch .pk-tray { bottom: calc(244px + var(--sab)); }   /* 도구 단추(아래 150 + 둥근 칸·이름표) 위 */
+.pk-touch .pk-tray > * { min-height: 44px; }
+@media (orientation: portrait) and (max-width: 600px), (orientation: landscape) and (max-height: 560px) {
+  .pk-tray, .pk-touch .pk-tray { top: calc(96px + var(--sat) + var(--pk-clock-extra, 0px)); bottom: auto; left: calc(10px + var(--sal)); right: auto;
+    flex-direction: row; flex-wrap: nowrap; align-items: flex-start; gap: 6px; max-width: calc(100% - 20px - var(--sal) - var(--sar)); }
+  .pk-tray > .ev-chip, .pk-tray > .nt-chip, .pk-tray > .lh-box { flex: 0 1 auto; min-width: 0; min-height: 44px; font-size: calc(13px * var(--pk-fs, 1)); }
+  .pk-tray > .ev-chip > span:last-child, .pk-tray > .nt-chip > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pk-tray > .nt-chip svg { width: 22px; height: 30px; }
+  .pk-tray > .lh-box { width: auto; padding: 6px 12px; border-radius: 22px; display: flex; flex-direction: column; justify-content: center; }
+  .pk-tray > .lh-box .lh-head { min-width: 0; font-size: calc(13px * var(--pk-fs, 1)); }
+  .pk-tray > .lh-box .lh-head > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* 한 줄에선 접힌 게 기본: 누르면(.is-folded 가 켜지면) 그때 펼친다 */
+  .pk-tray > .lh-box:not(.is-folded) .lh-stage, .pk-tray > .lh-box:not(.is-folded) .lh-list { display: none; }
+  .pk-tray > .lh-box.is-folded { flex-shrink: 0; width: min(240px, 100%); border-radius: 14px; }
+  .pk-tray > .lh-box.is-folded .lh-list { display: grid; }
+  /* 축제 날 저녁 진행판(.fe-hud, 시계 밑) · 대회 칸(.ct-box, 128px 한 줄)이 떠 있으면 그 밑으로 */
+  body:has(.fe-hud:not([hidden])) .pk-tray { top: calc(112px + var(--sat) + var(--pk-clock-extra, 0px)); }
+  body:has(.ct-box:not([hidden])) .pk-tray { top: calc(162px + var(--sat) + var(--pk-clock-extra, 0px)); }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .pk-tray, .pk-touch .pk-tray { max-width: calc(100% - 200px - var(--sal) - var(--sar)); }   /* 오른쪽 위 메뉴 단추 줄과 안 겹치게 */
+  body:has(.ct-box:not([hidden])) .pk-tray { top: calc(96px + var(--sat) + var(--pk-clock-extra, 0px)); }   /* 가로는 대회 칸이 가운데 위라 겹치지 않는다 */
+}
+
+/* ---------- M20 휴대폰 마무리: M13–M19 에 늘어난 창의 손가락 크기(44px)·좁은 화면 ----------
+   편지·앨범 css 는 ui/letter.js·album.js, 일지·별점·망원경·행사·운세는 gameplay 쪽이 <style> 로 넣는다 → .pk-root 를 붙여 이긴다 */
+.pk-touch .pk-letter-who, .pk-touch .pk-letter-chip, .pk-touch .pk-letter-gift .pk-btn-small,
+.pk-touch .pk-album-tabs button, .pk-touch .pk-mem-groups button, .pk-touch .pk-dex-only,
+.pk-touch .jn-shop button, .pk-touch .pk-scope-card button, .pk-touch .pk-decor-acts button { min-height: 44px; }
+.pk-touch .pk-set-names .pk-set-row { min-height: 44px; }
+.pk-touch .pk-scope-close { min-height: 48px; }
+.pk-touch .pk-app { min-height: 88px; }
+@media (max-width: 560px) {
+  .pk-app { font-size: calc(13px * var(--pk-fs, 1)); word-break: keep-all; line-height: 1.2; }
+  .pk-app i { width: 56px; height: 56px; font-size: 27px; }
+  .pk-root .pk-letter-gift { flex-wrap: wrap; }
+  .pk-root .pk-letter-who { max-width: 100%; }
+  .pk-root .pk-album-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .pk-root .pk-mem-grid { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); }
+  .pk-root .pk-album-cell b, .pk-root .pk-mem-cell b { overflow-wrap: anywhere; }
+  .pk-root .pk-album-acts .pk-btn { flex: 1 1 auto; }
+  .pk-root .jn-list li, .pk-root .rt-list li { gap: 6px; padding: 7px 8px; }
+  .pk-root .jn-t, .pk-root .jn-list li > span:nth-child(2), .pk-root .rt-list li > span:nth-child(2) { min-width: 0; overflow-wrap: anywhere; }
+  .pk-root .jn-pts { flex-wrap: wrap; }
+  .pk-root .jn-shop { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+  .pk-root .ev-row { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 2px 8px; }
+  .pk-root .ev-todo li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .pk-root .ev-stamps { gap: 6px; }
+  .pk-root .nt-pick { width: 88px; }
+  .pk-root .pk-scope-msg { white-space: normal; width: max-content; max-width: calc(100% - 32px); text-align: center; }
+  .pk-root .pk-scope-top { width: calc(100% - 140px); }
+  .pk-root .pk-scope-card canvas { width: 160px; height: 160px; }
+  .pk-root .pk-card-title { max-width: calc(100% - 56px); overflow-wrap: anywhere; }
+}

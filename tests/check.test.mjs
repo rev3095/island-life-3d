@@ -222,7 +222,7 @@ test('사양: 주소로 고르기 — 로컬 ?quality=, claude.ai 게시본 #low
 
 test('사양: main.js 는 처음 사양을 주소 또는 적정으로, 그림자는 QUALITY 값, 매우 낮음은 초당 장수 상한', () => {
   const src = read('src/main.js');
-  assert.match(src, /urlQuality\(location\) \?\? saved \?\? DEFAULT_QUALITY/);   // 주소 > 저장된 섬폰 사양 > 적정
+  assert.match(src, /urlQuality\(location\) \?\? saved \?\? deviceQuality\(\)/);   // 주소 > 저장된 섬폰 사양 > 처음 사양(적정, 휴대폰 낮음)
   assert.match(src, /sun\.castShadow = QUALITY\[quality\]\.shadows/);
   assert.match(src, /gate\(clock\.getDelta\(\), QUALITY\[ctx\.quality\]\?\.fps\)/);
   assert.match(src, /prefetchPacks/);

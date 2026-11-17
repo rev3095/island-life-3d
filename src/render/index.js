@@ -13,7 +13,7 @@ import * as materials from '../core/materials.js';
 import { PARAMS, PRESETS, PRESET_LABELS, PRESET_SHORT, DEFAULT_PRESET, INDOOR } from './presets.js';
 import { createPost } from './post.js';
 import { createCuller } from './cull.js';
-import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, DEFAULT_QUALITY, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
+import { createAutoQuality, createPlazaWatch, QUALITY, QUALITY_ORDER, deviceQuality, lowerQuality, urlQuality, normalizeQuality, ratioFor } from './quality.js';
 import { createCheck, checkRequested } from './check.js';
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -216,7 +216,7 @@ export function createView(ctx, { preset: startPreset } = {}) {
   // 주소로 고른 사양은 끝까지, 섬폰 「그래픽 사양」으로 고른 사양은 「자동」으로 돌릴 때까지 그대로 둔다.
   const LAST = QUALITY_ORDER[QUALITY_ORDER.length - 1];
   const urlQ = typeof location !== 'undefined' ? urlQuality(location) : null;
-  const startQ = urlQ ?? DEFAULT_QUALITY;          // 「자동으로」 = 주소 사양 또는 적정에서 다시 (저장된 사양으로 열었어도)
+  const startQ = urlQ ?? deviceQuality();          // 「자동으로」 = 주소 사양 또는 처음 사양(적정, 휴대폰은 낮음)에서 다시 (저장된 사양으로 열었어도)
   let fixed = !!urlQ;
   let plazaQ = null;
   const armPlaza = () => { plazaQ = fixed || quality === LAST || !ctx.lights ? null : createPlazaWatch(ctx, { onSlow: stepDown }); };
