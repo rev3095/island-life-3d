@@ -1,0 +1,81 @@
+{
+  "id": "BD-19-1",
+  "slug": "fish-dock",
+  "name": "어선 부두",
+  "category": "building",
+  "kind": "fish-dock",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 동쪽 끝 바닷가에서 바다로 뻗은 짧은 나무 부두. 끝 말뚝에 어선이 묶여 있고, 등불과 어망 상자가 놓였다. 뱃사공 너울이 뿌리 쪽 모래밭에 선다.",
+    "keywords": [
+      "짧은 나무 잔교",
+      "등불 기둥",
+      "어망 상자",
+      "말뚝"
+    ],
+    "references": [
+      "작은 어촌 고깃배·나무 부두"
+    ],
+    "avoid": [
+      "큰 철선",
+      "모터보트 엔진 소음 같은 현대 장비"
+    ],
+    "notes": "east-fishboat D275 — 섬 동쪽 끝 어선 선착장"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.014
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "wood": "#C09160",
+    "woodDark": "#7F5A36",
+    "rope": "#E8D5A8",
+    "glow": "#FFD98A",
+    "roof": "#5E7C8E",
+    "crate": "#A6784C",
+    "net": "#7FA88E",
+    "buoy": "#E8604C"
+  },
+  "paletteLabels": {
+    "wood": "판자",
+    "woodDark": "기둥·테",
+    "rope": "밧줄",
+    "glow": "등불",
+    "roof": "등불 지붕",
+    "crate": "상자",
+    "net": "그물",
+    "buoy": "부표"
+  },
+  "footprint": [
+    3,
+    1
+  ],
+  "animations": [],
+  "world": {}
+}

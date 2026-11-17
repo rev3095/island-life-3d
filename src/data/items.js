@@ -24,6 +24,8 @@ import { STORY_FURN } from './album-items.js';
 import { ART_CATEGORY as AC, artItems } from './art-items.js';
 // M16 잠수: 바다 생물 분류(IC-SE-01–20)와 스쿠버 키트는 sea-items.js 에서 (표 값은 items.json sea · scubaKit)
 import { SEA_CATEGORY as SC, seaItems } from './sea-items.js';
+// 먼바다 낚시 (east-fishboat): 어선 타고 나가야 잡히는 물고기 IC-OF-01–12 (분류 fish, 표 값은 items.json offshore)
+import { offshoreItems } from './offshore-items.js';
 
 export const CATEGORIES = ['fish', 'bug', 'fossil', 'fruit', 'shell', 'flower', 'mat', 'tool', 'furn', 'seed'];
 export const CATEGORY_NAMES = { fish: '물고기', bug: '곤충', fossil: '화석', fruit: '과일', shell: '조개', flower: '꽃', mat: '재료', tool: '도구', furn: '가구', seed: '씨앗·묘목' };
@@ -127,6 +129,7 @@ ITEMS.push(...eventItems(itemIcon));      // IC-EV-01– 계절 행사 채집 (8
 ITEMS.push(...nightItems(itemIcon));      // IC-NT-01–04 토요일 밤 야시장 먹거리 (12차)
 ITEMS.push(...dailyItems(itemIcon));      // IC-MA-11 별 조각 셋 · IC-MA-12 레시피 쪽지 (M13)
 ITEMS.push(...artItems(T.art, itemIcon)); // IC-AR-01–16 미술품 진품 16 + 가품 (P54 밤 특별 상점)
+ITEMS.push(...offshoreItems(T, { itemIcon, weightOf }));   // 먼바다 물고기 IC-OF-01–12 (east-fishboat)
 ITEMS.push(...seaItems(T, { itemIcon, weightOf }));   // M16 잠수: 바다 생물 IC-SE-01–20 (+ M18-P1 계절 생물 IC-SE-21–38) + 스쿠버 키트 (TL-07)
 
 const deepFreeze = v => {

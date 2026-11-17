@@ -54,6 +54,8 @@ FEATURES = {
     'elephant': {'ears': 'elephant', 'mouth': 'smile', 'trunk': True, 'tail': 'rope', 'head': (1.08, 0.96, 0.92)},   # CH-19 보름: 큰 부채 귀 + 긴 코 (고정) + 끝에 털 난 가는 꼬리
     # 서쪽 등대 (west-lighthouse D271-A): 등대지기 CH-20 윤슬 (바다표범) — 귀 없음 + 곰 주둥이 + 볼 + 수염 + 짧은 꼬리, 둥글고 매끈한 머리
     'seal': {'muzzle': 'bear', 'cheeks': True, 'whiskers': True, 'tail': 'stub', 'head': (1.1, 0.96, 0.9)},
+    # east-fishboat 뱃사공 너울 CH-21: 해달 — 곰 둥근 귀(작게) + 넓적한 곰 주둥이 + 길고 굵은 꼬리 (새 부품 없음)
+    'otter': {'ears': 'round', 'muzzle': 'bear', 'tail': 'cat', 'head': (1.1, 0.95, 0.88), 'eyeSpread': 1.06},
 }
 SPECIES = spec.get('species', 'cat')
 F = {**FEATURES.get(SPECIES, {}), **spec.get('features', {})}

@@ -3100,6 +3100,318 @@
       "status": "approved"
     },
     {
+      "id": "IC-OF-01",
+      "slug": "fish-flying-fish",
+      "name": "날치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.flying-fish",
+          "code": "IC-OF-01",
+          "icon": "assets/items/renders/fish-flying-fish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.13,
+        0.41,
+        0.126
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-02",
+      "slug": "fish-yellowtail",
+      "name": "방어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.yellowtail",
+          "code": "IC-OF-02",
+          "icon": "assets/items/renders/fish-yellowtail_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.124,
+        0.63,
+        0.181
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-03",
+      "slug": "fish-hairtail",
+      "name": "갈치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.hairtail",
+          "code": "IC-OF-03",
+          "icon": "assets/items/renders/fish-hairtail_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.091,
+        0.86,
+        0.098
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-04",
+      "slug": "fish-mahi-mahi",
+      "name": "만새기",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.mahi-mahi",
+          "code": "IC-OF-04",
+          "icon": "assets/items/renders/fish-mahi-mahi_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.124,
+        0.614,
+        0.284
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-05",
+      "slug": "fish-skipjack",
+      "name": "가다랑어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.skipjack",
+          "code": "IC-OF-05",
+          "icon": "assets/items/renders/fish-skipjack_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.13,
+        0.579,
+        0.199
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-06",
+      "slug": "fish-grouper",
+      "name": "능성어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.grouper",
+          "code": "IC-OF-06",
+          "icon": "assets/items/renders/fish-grouper_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.151,
+        0.598,
+        0.247
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-07",
+      "slug": "fish-rockfish",
+      "name": "볼락",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.rockfish",
+          "code": "IC-OF-07",
+          "icon": "assets/items/renders/fish-rockfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.086,
+        0.43,
+        0.165
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-08",
+      "slug": "fish-sunfish",
+      "name": "개복치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.sunfish",
+          "code": "IC-OF-08",
+          "icon": "assets/items/renders/fish-sunfish_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.101,
+        0.673,
+        0.899
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-09",
+      "slug": "fish-marlin",
+      "name": "청새치",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.marlin",
+          "code": "IC-OF-09",
+          "icon": "assets/items/renders/fish-marlin_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.426,
+        0.764,
+        0.269
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-10",
+      "slug": "fish-hammerhead",
+      "name": "귀상어",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.hammerhead",
+          "code": "IC-OF-10",
+          "icon": "assets/items/renders/fish-hammerhead_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.18,
+        0.873,
+        0.223
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-11",
+      "slug": "fish-john-dory",
+      "name": "달고기",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.john-dory",
+          "code": "IC-OF-11",
+          "icon": "assets/items/renders/fish-john-dory_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.07,
+        0.45,
+        0.3
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "IC-OF-12",
+      "slug": "fish-alfonsino",
+      "name": "금눈돔",
+      "group": "fish",
+      "kind": "fish",
+      "hold": true,
+      "items": [
+        {
+          "item": "fish.alfonsino",
+          "code": "IC-OF-12",
+          "icon": "assets/items/renders/fish-alfonsino_thumb.png"
+        }
+      ],
+      "variants": [],
+      "size": [
+        0.09,
+        0.47,
+        0.206
+      ],
+      "style": {
+        "outlineWidth": 0.004
+      },
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "IC-SD-01",
       "slug": "seed-bag",
       "name": "씨앗 봉투",

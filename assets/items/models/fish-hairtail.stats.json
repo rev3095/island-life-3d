@@ -1,0 +1,48 @@
+{
+  "id": "IC-OF-03",
+  "slug": "fish-hairtail",
+  "name": "갈치",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.hairtail"
+  ],
+  "hold": true,
+  "triangles": 1420,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.091,
+    0.86,
+    0.098
+  ],
+  "bounds": [
+    [
+      -0.046,
+      -0.43,
+      -0.049
+    ],
+    [
+      0.046,
+      0.43,
+      0.049
+    ]
+  ],
+  "glbBytes": 36272,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-hairtail_main.png",
+    "fish-hairtail_thumb.png"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "IC-OF-06",
+  "slug": "fish-grouper",
+  "name": "능성어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.grouper"
+  ],
+  "hold": true,
+  "triangles": 2576,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.151,
+    0.598,
+    0.247
+  ],
+  "bounds": [
+    [
+      -0.075,
+      -0.299,
+      -0.124
+    ],
+    [
+      0.075,
+      0.299,
+      0.124
+    ]
+  ],
+  "glbBytes": 59012,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-grouper_main.png",
+    "fish-grouper_thumb.png"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "IC-OF-08",
+  "slug": "fish-sunfish",
+  "name": "개복치",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.sunfish"
+  ],
+  "hold": true,
+  "triangles": 1404,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.101,
+    0.673,
+    0.899
+  ],
+  "bounds": [
+    [
+      -0.05,
+      -0.336,
+      -0.449
+    ],
+    [
+      0.05,
+      0.336,
+      0.449
+    ]
+  ],
+  "glbBytes": 35544,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-sunfish_main.png",
+    "fish-sunfish_thumb.png"
+  ]
+}

@@ -709,6 +709,24 @@
       "status": "approved"
     },
     {
+      "id": "BD-19-1",
+      "slug": "fish-dock",
+      "name": "어선 부두",
+      "category": "building",
+      "kind": "fish-dock",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "BD-19-2",
+      "slug": "fish-boat",
+      "name": "어선",
+      "category": "building",
+      "kind": "fish-boat",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FB-01",
       "slug": "festival-booth-lantern",
       "name": "등불 길 부스",

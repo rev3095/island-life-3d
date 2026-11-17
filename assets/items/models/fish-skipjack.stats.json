@@ -1,0 +1,49 @@
+{
+  "id": "IC-OF-05",
+  "slug": "fish-skipjack",
+  "name": "가다랑어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.skipjack"
+  ],
+  "hold": true,
+  "triangles": 2612,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.13,
+    0.579,
+    0.199
+  ],
+  "bounds": [
+    [
+      -0.065,
+      -0.29,
+      -0.1
+    ],
+    [
+      0.065,
+      0.29,
+      0.1
+    ]
+  ],
+  "glbBytes": 61976,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-skipjack_main.png",
+    "fish-skipjack_thumb.png"
+  ]
+}

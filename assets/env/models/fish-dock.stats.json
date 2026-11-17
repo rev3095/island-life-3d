@@ -1,0 +1,39 @@
+{
+  "id": "BD-19",
+  "slug": "fish-dock",
+  "name": "어선 부두",
+  "category": "building",
+  "kind": "fish-dock",
+  "version": "0.1",
+  "triangles": 2944,
+  "parts": 3,
+  "materials": [
+    "buoy",
+    "crate",
+    "glow",
+    "net",
+    "roof",
+    "rope",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    3.0,
+    1.21,
+    1.27
+  ],
+  "footprint": [
+    3,
+    1
+  ],
+  "glbBytes": 60888,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-dock_front.png",
+    "fish-dock_hero.jpg",
+    "fish-dock_main.png",
+    "fish-dock_thumb.png",
+    "fish-dock_top.png"
+  ]
+}

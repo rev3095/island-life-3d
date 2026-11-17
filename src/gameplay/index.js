@@ -14,6 +14,7 @@ const PARTS = [
   ['stars', './stars/index.js'],         // 요청 8 별자리: 박물관 앞 망원경 · 망원경 보기 UI-32 · 찍기 UI-33 · 별자리 도감 (IC-ST-01–12)
   ['night', './night/index.js'],         // M12 밤·새벽: 야시장 · 달빛 가게 · 새벽 천막 타로 · 야행성 주민 (assets/night/, 보드 night)
   ['tour', './tour/index.js'],           // P35 무인도 투어 (assets/tour/, 보드 tour D120–D128)
+  ['boat', './boat/index.js'],           // east-fishboat 어선 선착장 BD-19 · 뱃사공 너울 CH-21 · 먼바다 낚시 x 1100 (assets/boat/, D275–D279) — tour 뒤 (game:ready 순서)
   ['journal', './journal/index.js'],     // M13-P1 섬 일지: 하루 할 일 · 오래 하는 목표 · 포인트 교환 (assets/journal/, 13차 보드 D141-A)
   ['daily', './daily/index.js'],         // M13-P2–P5 매일 할 거리: 유성우·소원 · 선물 풍선·새총 · 유리병·레시피 · 방문 행상 (assets/daily/, D142–D147 A)
   ['rating', './rating/index.js'],

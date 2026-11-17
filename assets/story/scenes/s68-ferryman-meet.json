@@ -1,0 +1,238 @@
+{
+  "id": "s68-ferryman-meet",
+  "version": 1,
+  "status": "review",
+  "chapter": "먼바다",
+  "title": "뱃사공 너울",
+  "summary": "섬 동쪽 끝 바닷가에 처음 보는 나무 부두와 어선이 있다. 부두 뿌리에서 그물을 손질하던 해달 뱃사공 너울이 손을 흔들며, 도토리 몇 알이면 먼바다 낚시에 데려가 준다고 소개한다.",
+  "trigger": {
+    "on": "boat-meet"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "부두 → 너울 인사 → 어선",
+      "recommended": true,
+      "desc": "부두와 어선을 넓게 → 너울이 손 흔들기 → 플레이어가 다가감 → 바다 쪽 어선을 보여 주고 끝.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "섬 동쪽 끝 나무 부두와 묶인 어선",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": -30,
+            "move": "crane"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 180,
+              "text": "",
+              "emote": "🎣"
+            },
+            {
+              "who": "player",
+              "at": [
+                -1.6,
+                0
+              ],
+              "face": 270,
+              "text": ""
+            }
+          ],
+          "transition": "fade",
+          "caption": "섬 동쪽 끝, 처음 보는 부두"
+        },
+        {
+          "id": "c2",
+          "note": "너울이 손을 흔든다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "place",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 270,
+              "text": "",
+              "do": "happy",
+              "emote": "👋"
+            },
+            {
+              "who": "player",
+              "at": [
+                -1.6,
+                0
+              ],
+              "face": 90,
+              "text": "",
+              "to": [
+                -0.4,
+                0.4
+              ],
+              "do": "walk"
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "어선 쪽으로 — 먼바다 이야기",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 40,
+            "move": "orbit"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 90,
+              "text": "",
+              "emote": "🌊"
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.4,
+                0.4
+              ],
+              "face": 90,
+              "text": "",
+              "emote": "❓"
+            }
+          ],
+          "caption": "뱃사공 너울 — 도토리를 내면 먼바다 낚시에 데려가 줘요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "그물 손질하는 너울 가까이",
+      "desc": "그물을 손질하던 너울을 가까이 → 고개 들어 반기기 → 둘이 나란히 바다를 봄.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "그물 손질하는 너울",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "place",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 180,
+              "text": "",
+              "emote": "🕸️"
+            },
+            {
+              "who": "player",
+              "at": [
+                -1.4,
+                0.2
+              ],
+              "face": 90,
+              "text": ""
+            }
+          ],
+          "transition": "fade"
+        },
+        {
+          "id": "c2",
+          "note": "반가워하는 너울",
+          "dur": 3,
+          "cam": {
+            "size": "full",
+            "target": "place",
+            "angle": -20,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 270,
+              "text": "",
+              "do": "happy",
+              "emote": "😄"
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.4,
+                0.4
+              ],
+              "face": 90,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "둘이 바다를 본다",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 180,
+            "move": "crane"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.85,
+                0.7
+              ],
+              "face": 90,
+              "text": ""
+            },
+            {
+              "who": "player",
+              "at": [
+                -0.2,
+                0.5
+              ],
+              "face": 90,
+              "text": "",
+              "emote": "🌊"
+            }
+          ],
+          "caption": "뱃사공 너울",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

@@ -107,6 +107,14 @@ export const LIGHTHOUSE_FILES = (() => {
   // 서쪽 등대: 등대지기 윤슬 CH-20 모델도 같이 (등대와 함께 game:ready 뒤에 세움)
   return new Set([...(a.env ?? []).map(k => `assets/env/models/${k}.glb.json`), ...(j.keeper?.slug ? [`assets/models/${j.keeper.slug}.glb.json`] : [])]);
 })();
+// east-fishboat 어선 부두·어선 BD-19 · 뱃사공 너울 CH-21 (assets/boat/boat.json assets) — 섬을 연 뒤 놓여서 처음엔 안 받고 daily 묶음에 같이
+export const BOAT_FILES = (() => {
+  const a = JSON.parse(readFileSync(join(ROOT, 'assets/boat/boat.json'), 'utf8')).assets ?? {};
+  return new Set([
+    ...(a.env ?? []).map(k => `assets/env/models/${k}.glb.json`),
+    ...(a.characters ?? []).map(k => `assets/models/${k}.glb.json`),
+  ]);
+})();
 // 묶을 때 모델 줄이기 (tools/glb-quantize.mjs). --no-quantize 로 끄면 원본 그대로 (비교용)
 const QUANTIZE = !process.argv.includes('--no-quantize');
 export const PACKS = [
@@ -118,8 +126,8 @@ export const PACKS = [
   { name: 'tour', test: p => TOUR_FILES.has(p) },                                   // P35 무인도 투어 배·광석 바위 (배를 놓을 때)
   { name: 'night', test: p => NIGHT_FILES.has(p) },                                 // P40 밤 건물·등불·밤 가게 주인 (밤에 처음 나올 때)
   { name: 'movers', test: p => MOVER_FILES.has(p) },
-  { name: 'daily', test: p => DAILY_FILES.has(p) || CONTEST_FILES.has(p) || LIGHTHOUSE_FILES.has(p) },                                 // M13 풍선·유리병·행상 수레·행상 (처음 나올 때)                                // P40 이사 오는 주민 모델 (이사 와서 처음 세울 때)
-  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|night|tour|journal|daily|rating|contest|town|lighthouse)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' || p === 'assets/clothes/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
+  { name: 'daily', test: p => DAILY_FILES.has(p) || CONTEST_FILES.has(p) || LIGHTHOUSE_FILES.has(p) || BOAT_FILES.has(p) },                                 // M13 풍선·유리병·행상 수레·행상 (처음 나올 때)                                // P40 이사 오는 주민 모델 (이사 와서 처음 세울 때)
+  { name: 'island', boot: true, test: p => /^assets\/(env|interior|story|island|data|sound|style|emotes|festival|villagers|events|decor|night|tour|journal|daily|rating|contest|town|lighthouse|boat)\//.test(p) || p === 'assets/furniture/index.json' || p === 'assets/furniture/fixtures/index.json' || p === 'assets/clothes/index.json' },   // 섬 배경·집 안·장면·표 (+ 가구·붙박이 목록) (island·data·sound·style 은 6차 P4–P6, emotes·festival·villagers 는 5차 Z5, events 는 8차 M8)
   { name: 'people', boot: true, test: p => /^assets\/(models|specs)\//.test(p) },  // 주인공·주민 모델·스펙
   { name: 'furniture', test: p => p.startsWith('assets/furniture/') },             // 가구 모델·스펙 (집에 들어갈 때, 저장에 가구가 있으면 시작할 때) · 상점·박물관 붙박이 (처음 들어갈 때)
   { name: 'items', test: p => p.startsWith('assets/items/') },                     // 들어 보이는 아이템 모델 (처음 잡았을 때)

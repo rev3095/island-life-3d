@@ -1,0 +1,44 @@
+{
+  "id": "BD-19",
+  "slug": "fish-boat",
+  "name": "어선",
+  "category": "building",
+  "kind": "fish-boat",
+  "version": "0.1",
+  "triangles": 2776,
+  "parts": 4,
+  "materials": [
+    "buoy",
+    "cabin",
+    "cooler",
+    "deck",
+    "flag",
+    "glow",
+    "hull",
+    "hullDark",
+    "roof",
+    "rope",
+    "stripe",
+    "trim",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.84,
+    1.31,
+    1.45
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 60908,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-boat_front.png",
+    "fish-boat_hero.jpg",
+    "fish-boat_main.png",
+    "fish-boat_thumb.png",
+    "fish-boat_top.png"
+  ]
+}

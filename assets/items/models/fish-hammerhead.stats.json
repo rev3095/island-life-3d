@@ -1,0 +1,48 @@
+{
+  "id": "IC-OF-10",
+  "slug": "fish-hammerhead",
+  "name": "귀상어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.hammerhead"
+  ],
+  "hold": true,
+  "triangles": 1412,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.18,
+    0.873,
+    0.223
+  ],
+  "bounds": [
+    [
+      -0.09,
+      -0.436,
+      -0.112
+    ],
+    [
+      0.09,
+      0.436,
+      0.112
+    ]
+  ],
+  "glbBytes": 36032,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-hammerhead_main.png",
+    "fish-hammerhead_thumb.png"
+  ]
+}

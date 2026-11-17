@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "about": "어선·먼바다 낚시 설정 (east-fishboat, D275–D279). 읽는 곳 src/gameplay/boat/index.js · rules.js · src/world/index.js(assets.env 를 나중에 받기) · tools/build-web.mjs(assets → daily 묶음). 노트 docs/notes/east-fishboat.md. 먼바다 물고기 표 값(이름·시간·계절·크기·값)은 assets/data/items.json offshore (IC-OF-01–12), 여기 fish 는 먼바다에서 더 잘 무는 정도",
+  "assets": { "env": ["fish-dock", "fish-boat"], "characters": ["neoul"] },
+  "keeper": "neoul",
+  "dialog": "assets/boat/neoul.json",
+  "ox": 1100,
+  "fare": { "price": 300, "firstFree": true, "perDay": 0 },
+  "trip": { "hours": 2, "warnMinutes": 20 },
+  "returnHour": 5,
+  "boat": { "sail": 3, "deck": 0.18, "deckRx": 1.05, "deckRz": 0.42, "maxX": 0.05, "spawn": [-0.7, 0], "keeperAt": [0.02, -0.3] },
+  "dock": { "pier": 3, "boat": [3.75, 0.05], "keeper": [-0.55, 0.9], "front": [-1.4, 0.2] },
+  "sea": { "size": 220, "color": "#3F8CB8", "deep": "#2F6F99" },
+  "fish": { "max": 8, "bonusRare": 1.5 },
+  "journal": "offshore"
+}

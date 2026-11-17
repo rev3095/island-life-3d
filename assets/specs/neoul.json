@@ -1,0 +1,68 @@
+{
+  "id": "CH-21",
+  "slug": "neoul",
+  "name": "너울",
+  "species": "otter",
+  "role": "어선 뱃사공 · 해달",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 동쪽 끝 어선 부두를 지키는 해달 뱃사공. 도토리 몇 알이면 어선에 태워 먼바다 낚시에 데려간다. 짙은 밤색 털, 크림빛 얼굴·주둥이, 노란 비옷 윗옷에 남색 바지. 느긋하고 바다 이야기를 좋아하며 말끝에 「~이여」를 붙인다.",
+    "keywords": [
+      "2.5등신",
+      "해달",
+      "짙은 밤색 털",
+      "크림빛 얼굴",
+      "노란 비옷"
+    ],
+    "references": [
+      "어촌 뱃사공",
+      "해달 봉제 인형"
+    ],
+    "avoid": [
+      "기존 게임 캐릭터와 똑같은 디자인",
+      "무서운 선장"
+    ],
+    "notes": "east-fishboat D276 — 종족은 지금 섬에 없는 해달 (바다·배와 어울림). 이름 너울 = 바다의 큰 물결"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.006
+  },
+  "proportions": {
+    "height": 0.98,
+    "headScale": 1,
+    "bodyWidth": 1.08,
+    "limbLength": 0.95,
+    "earSize": 0.6,
+    "earPointiness": 1,
+    "tailLength": 0.9,
+    "eyeSize": 1,
+    "eyeSpacing": 1
+  },
+  "palette": {
+    "fur": "#7A5A44",
+    "muzzle": "#EADBC4",
+    "innerEar": "#C9A58E",
+    "nose": "#2E2420",
+    "tail": "#6A4C38",
+    "shirt": "#E8C64A",
+    "pants": "#3F5876",
+    "eye": "#241C1A",
+    "blush": "#E9A2A0",
+    "outline": "#3A2C24"
+  },
+  "outfit": {
+    "top": "plain-tee",
+    "stripes": 0,
+    "bottom": "shorts"
+  },
+  "markings": "none",
+  "animations": [
+    "idle",
+    "walk",
+    "run",
+    "happy"
+  ]
+}
