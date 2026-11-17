@@ -8,13 +8,14 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs
 import { join, posix } from 'node:path';
 import { tmpdir } from 'node:os';
 import { resolveObjectURL } from 'node:buffer';
-import { planWeb, writeWeb, makeBatches, splitBySize, planTransition, parseLive, FAMILIES, LIMITS, PACKS, PACK_BYTES, ROOT } from '../tools/build-web.mjs';
+import { planWeb, writeWeb, makeBatches, splitBySize, planTransition, parseLive, transformModule, srcRuntime, FAMILIES, LIMITS, PACKS, PACK_BYTES, SRC_PACK_BYTES, ROOT } from '../tools/build-web.mjs';
 
 const plan = planWeb();
 const sources = new Set(plan.files.map(f => f.path));   // 빌드에 든 원본 (plan.files)
 const published = new Set(plan.publish.map(f => f.path));   // 게시할 파일 (plan.publish)
 const read = p => readFileSync(join(ROOT, p), 'utf8');
 const packOf = new Map(plan.packs.flatMap(p => p.files.map(f => [f.path, p])));
+const srcOf = new Map(plan.srcPacks.flatMap(p => p.ids.map(id => [id, p])));   // M20-S3: 모듈 → 모듈 묶음
 // 다른 트랙 브랜치에서 올 모듈 (합치기 전엔 이 작업 트리에 없다): 없을 때만 '없는 모듈 글자' 주의를 기다려 준다. 합친 뒤 비운다.
 //   7차 M7-P4 저장 옮기기·문제 알리기 창 — src/ui/index.js 의 EXTRA_PANELS 가 있으면 불러온다 (M7-P3)
 const PENDING_MODULES = {};   // 7차 P3·P4 가 합쳐져 비움 (다음 트랙이 아직 없는 모듈을 부를 때만 채운다)
@@ -25,7 +26,7 @@ test('build-web: 오류·주의·알림 없이 계획이 선다', () => {
   assert.deepEqual(plan.errors, []);
   assert.deepEqual(warnings, []);
   assert.deepEqual(plan.notes, []);
-  assert.ok(sources.has('src/main.js') && published.has('src/main.js'));
+  assert.ok(sources.has('src/main.js') && srcOf.has('src/main.js'));
 });
 
 test('build-web: .glb·렌더·stats 는 빠지고 모델은 .glb.json 만', () => {
@@ -38,13 +39,16 @@ test('build-web: .glb·렌더·stats 는 빠지고 모델은 .glb.json 만', () 
   }
 });
 
-test('build-web: 게시 파일은 모듈·css + 에셋 묶음 몇 개 (에셋을 따로 올리지 않는다)', () => {
+test('build-web: 게시 파일은 css + 모듈 묶음 + 에셋 묶음 몇 개 (모듈·에셋을 따로 올리지 않는다)', () => {
   for (const f of plan.publish) {
-    if (f.path.startsWith('packs/')) { assert.match(f.path, /^packs\/[a-z]+(-[a-z]+)?-\d+\.json$/); assert.equal(f.src, `dist/web/${f.path}`); continue; }
-    assert.match(f.path, /\.(m?js|css)$/, `따로 올라가는 에셋: ${f.path}`);
+    if (f.path.startsWith('packs/')) { assert.match(f.path, /^packs\/([a-z]+(-[a-z]+)?-\d+\.json|src-[a-z]+-\d+\.js)$/); assert.equal(f.src, `dist/web/${f.path}`); continue; }
+    assert.match(f.path, /\.css$/, `따로 올라가는 파일: ${f.path}`);
     assert.equal(f.path, f.src);
   }
-  assert.equal(plan.publish.filter(f => f.path.startsWith('packs/')).length, plan.packs.length);
+  assert.equal(plan.publish.filter(f => f.path.startsWith('packs/')).length, plan.packs.length + plan.srcPacks.length);
+  // M20-S3: 모듈을 묶어 게시 파일이 한 번 게시(255) 안에 넉넉히 든다 (전: 261개 → files-1·files-2 로 나눠 올림)
+  assert.ok(plan.publish.length + 1 <= 150, `게시 파일 ${plan.publish.length + 1}개`);
+  assert.equal(plan.batches.length, 1, '한 번에 올린다');
   assert.ok(plan.packs.length <= 27,   // + M13 daily 묶음 + M16 바다 생물 모델로 items 묶음 하나 더 (items-3) + M18-P1 계절 바다 생물 묶음 넷 (sea-spring|summer|autumn|winter) · icons 하나 더 + M18-P3 트로피 썸네일로 icons 하나 더 (icons-3) + M18-P4 계절 가구 썸네일 (icons 하나 더)
     `묶음 ${plan.packs.length}개`);
   // M19-P3: 모듈이 늘어 페이지 포함 256개 → 한 번(255)에 안 들어가면 files-1.json · files-2.json 으로 나눠 올린다 (아래 「255개가 넘으면」 테스트) — 버전 한도 안이면 된다
@@ -62,7 +66,7 @@ test('build-web: 원본 파일이 모두 있고 경로가 저장소 상대 경�
 });
 
 test('build-web: 목록에 든 모듈이 읽는 상대 경로·에셋이 모두 들어간다', () => {
-  for (const file of [...published].filter(p => p.endsWith('.js'))) {
+  for (const file of srcOf.keys()) {
     const text = read(file);
     const refs = [
       ...[...text.matchAll(/\bfrom\s*['"](\.{1,2}\/[^'"]+)['"]/g)].map(m => m[1]),
@@ -71,7 +75,7 @@ test('build-web: 목록에 든 모듈이 읽는 상대 경로·에셋이 모두 
     ];
     for (const ref of refs) {
       const p = posix.normalize(posix.join(posix.dirname(file), ref));
-      if (!pending(p)) assert.ok(published.has(p), `${file} → ${ref}`);
+      if (!pending(p)) assert.ok(published.has(p) || srcOf.has(p), `${file} → ${ref}`);
     }
     for (const m of text.matchAll(/['"`](assets\/[^'"`\s${}]+\.\w+)['"`]/g)) assert.ok(packOf.has(m[1]), `${file} → ${m[1]} (묶음에 없음)`);
   }
@@ -122,7 +126,7 @@ test('build-web: 고른 크기로 나누기 — 차례를 지키고 cap 을 넘�
   }
 });
 
-test('build-web: 페이지는 뼈대 없이, 제목이 앞쪽에, importmap → modulepreload → 묶음 목록 → main.js 순서', () => {
+test('build-web: 페이지는 뼈대 없이, 제목이 앞쪽에, importmap → modulepreload → 묶음 목록 → 모듈 실행기 → 시작 순서', () => {
   const page = plan.page;
   for (const tag of [/<!doctype/i, /<html[\s>]/i, /<head[\s>]/i, /<body[\s>]/i]) assert.doesNotMatch(page, tag);
   const title = page.indexOf('<title>');
@@ -130,7 +134,13 @@ test('build-web: 페이지는 뼈대 없이, 제목이 앞쪽에, importmap → 
   const map = page.indexOf('<script type="importmap">');
   const firstPreload = page.indexOf('<link rel="modulepreload"');
   const packList = page.indexOf('<script type="application/json" id="island-packs">');
-  const main = page.indexOf('<script type="module" src="src/main.js">');
+  const main = page.indexOf('<script type="module" id="island-src">');
+  const runtime = page.indexOf('g.__islandSrc = {');
+  assert.ok(runtime > packList && runtime < main, '모듈 실행기가 시작 앞에');
+  const entry = page.match(/<script type="module" id="island-src">([^<]*)<\/script>/)[1];
+  assert.deepEqual([...entry.matchAll(/import "\.\/([^"]+)";/g)].map(m => m[1]), plan.srcPacks.map(p => p.path), '모듈 묶음을 모두 불러온다');
+  assert.match(entry, /__islandSrc\.run\("src\/main\.js"\)/);
+  assert.ok(!page.includes('src="src/main.js"'), '모듈 파일을 따로 부르지 않는다');
   assert.ok(map >= 0 && firstPreload > map && packList > firstPreload && main > packList, '순서');
   assert.ok(page.indexOf('id="loader"') > 0 && page.indexOf('id="loader"') < main, '로딩 화면이 main.js 앞에');
   for (const [, href] of page.matchAll(/<link rel="modulepreload" href="([^"]+)">/g)) {
@@ -204,13 +214,14 @@ test('build-web: writeWeb 은 페이지·묶음·files.json(게시 경로 → �
     const files = JSON.parse(readFileSync(join(dir, 'files.json'), 'utf8'));
     assert.deepEqual(Object.keys(files), plan.publish.map(f => f.path));
     for (const [k, v] of Object.entries(files)) {
-      if (k.startsWith('packs/')) assert.equal(readFileSync(join(ROOT, v), 'utf8'), plan.packs.find(p => p.path === k).text, `${k} → ${v}`);
+      if (k.startsWith('packs/')) assert.equal(readFileSync(join(ROOT, v), 'utf8'), [...plan.packs, ...plan.srcPacks].find(p => p.path === k).text, `${k} → ${v}`);
       else assert.equal(k, v);
     }
     const info = JSON.parse(readFileSync(join(dir, 'build.json'), 'utf8'));
     assert.equal(info.files, plan.publish.length + 1);
     assert.equal(info.batches.length, plan.batches.length);
-    assert.deepEqual(info.packs.map(p => p.hash), plan.packs.map(p => p.hash));
+    assert.deepEqual(info.packs.map(p => p.hash), [...plan.packs, ...plan.srcPacks].map(p => p.hash), 'build.json 해시에 모듈 묶음도 (바뀐 묶음만 다시 게시)');
+    assert.deepEqual(info.packs.filter(p => p.kind === 'src').map(p => p.modules), plan.srcPacks.map(p => p.ids));
     if (plan.batches.length > 1) plan.batches.forEach((b, i) => assert.equal(Object.keys(JSON.parse(readFileSync(join(dir, `files-${i + 1}.json`), 'utf8'))).length, b.length));
     const first = JSON.parse(readFileSync(join(dir, 'publish-1.json'), 'utf8'));
     assert.equal(first['assets/env/index.json'], null, '묶음으로 들어간 예전 경로는 null');
@@ -318,4 +329,67 @@ test('build-web: M18-P1 계절 바다 생물 모델은 그 계절 묶음에만 (
     assert.ok(p.files.every(f => f.path.startsWith('assets/items/models/sea-')), p.path);
   }
   for (const p of plan.packs.filter(p => p.boot)) assert.ok(!p.files.some(f => f.path.startsWith('assets/items/models/')), `${p.path} 에 아이템 모델이 없다`);
+});
+
+test('build-web: M20-S3 모듈 묶음 — 모듈마다 한 번씩, 크기 안, 처음 받는 크기가 크게 늘지 않는다', () => {
+  const js = plan.files.filter(f => /\.m?js$/.test(f.path)).map(f => f.path).sort();
+  assert.deepEqual([...srcOf.keys()].sort(), js, '모든 모듈이 한 번씩');
+  assert.equal(plan.srcPacks.flatMap(p => p.ids).length, js.length, '겹침 없음');
+  for (const p of plan.srcPacks) {
+    assert.ok(p.bytes <= SRC_PACK_BYTES * 1.1 || p.ids.length === 1, `${p.path} ${p.bytes}`);
+    assert.match(p.text, /^\/\/ [^\n]*\n(import \* as \$isl_e\d+ from "[^"]+";\n)*const \$isl_def = globalThis\.__islandSrc\.def;\n/);
+    for (const [, spec] of p.text.matchAll(/^import \* as \$isl_e\d+ from "([^"]+)";$/gm)) assert.ok(!spec.startsWith('.'), `묶음 맨 위 import 는 바깥 모듈만: ${spec}`);
+  }
+  // 예전에도 모듈 전부를 modulepreload 로 처음에 받았다 → 묶음 합이 모듈 합보다 10% 넘게 늘지 않게
+  const before = plan.files.filter(f => srcOf.has(f.path)).reduce((s, f) => s + f.bytes, 0);
+  const after = plan.srcPacks.reduce((s, p) => s + p.bytes, 0);
+  assert.ok(after < before * 1.1, `모듈 ${before} → 묶음 ${after}`);
+});
+
+test('build-web: M20-S3 모듈 바꾸기 + 실행기 — import·export 모양이 ES 모듈과 같게 돈다', async () => {
+  const mods = {
+    'src/a.js': [
+      "import def, { b as bee, c } from './lib/b.js';",
+      "import * as ns from './lib/b.js';",
+      "import './side.js';",
+      "import { V } from 'ext';",
+      'export const [x, y] = [def, bee];',
+      'export const { p, q: qq = 3 } = { p: c, q: undefined }, z = ns.c + 1;',
+      'export function f() { return counter.n; }',
+      "export async function g() { return (await import('./lib/late.js')).default; }",
+      'export { y as why };',
+      "export default { name: 'a', url: import.meta.url, v: V };",
+      "import { counter } from './side.js';",
+    ].join('\n'),
+    'src/lib/b.js': "const hidden = 1;\nexport default 'B';\nexport const b = 'b', c = 2;\nexport { LATE as late } from './late.js';\n",
+    'src/lib/late.js': "export const LATE = await Promise.resolve('late');\nexport default { ok: true };\n",
+    'src/side.js': "export const counter = { n: 0 };\ncounter.n++;\nglobalThis.__islOrder.push('side');\n",
+  };
+  const g = { document: { baseURI: 'https://x.test/game/' } };
+  srcRuntime(g);
+  const ext = { ext: { V: 'v' } };
+  for (const [id, text] of Object.entries(mods)) {
+    const t = transformModule(id, text);
+    assert.deepEqual(t.problems, [], id);
+    const alias = t.externals.map((s, k) => `const $isl_x${k} = ext[${JSON.stringify(s)}];`).join(' ');
+    const fn = new Function('ext', `return ${/await Promise/.test(text) ? 'async ' : ''}function ($isl_exp, $isl_req, $isl_dyn, $isl_meta) {${alias}\n${t.body}\n}`)(ext);
+    g.__islandSrc.def(id, t.deps, fn);
+  }
+  globalThis.__islOrder = [];
+  try {
+    const a = await g.__islandSrc.run('src/a.js');
+    assert.deepEqual([a.x, a.y, a.p, a.qq, a.z, a.why], ['B', 'b', 2, 3, 3, 'b']);
+    assert.deepEqual({ ...a.default }, { name: 'a', url: 'https://x.test/game/src/a.js', v: 'v' });
+    assert.equal(a.f(), 1);
+    assert.deepEqual(await a.g(), { ok: true }, '동적 import 는 상대 경로를 그 모듈 기준으로');
+    const b = await g.__islandSrc.run('src/lib/b.js');
+    assert.equal(b.late, 'late', '다시 내보내기 + top-level await');
+    assert.ok(!('hidden' in b));
+    assert.deepEqual(globalThis.__islOrder, ['side'], '한 번만 실행');
+    await assert.rejects(g.__islandSrc.run('src/none.js'), /게시 모듈 묶음에 없음/);
+  } finally { delete globalThis.__islOrder; }
+  // 못 다루는 모양은 빌드 오류
+  assert.match(transformModule('src/x.js', 'export let n = 1;\n').problems.join(), /export let/);
+  assert.match(transformModule('src/x.js', 'let n = 1;\nexport { n };\n').problems.join(), /let\/var/);
+  assert.match(transformModule('src/x.js', "export * from './y.js';\n").problems.join(), /못 바꾼 export/);
 });
