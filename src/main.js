@@ -9,7 +9,7 @@ import * as assets from './core/assets.js';
 import * as materials from './core/materials.js';
 import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
-import { QUALITY, DEFAULT_QUALITY, urlQuality, ratioFor, createFrameGate, savedSpec } from './render/quality.js';
+import { QUALITY, deviceQuality, urlQuality, ratioFor, createFrameGate, savedSpec } from './render/quality.js';
 import { previewOf } from './core/preview.js';
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
@@ -37,7 +37,7 @@ async function boot() {
   // powerPreference: 그래픽 카드가 둘인 노트북에서 빠른 쪽을 쓴다
   let saved = null;
   try { saved = savedSpec(localStorage.getItem('island-life-save-v1')); } catch { /* 막힌 저장소 */ }
-  const quality = urlQuality(location) ?? saved ?? DEFAULT_QUALITY;
+  const quality = urlQuality(location) ?? saved ?? deviceQuality();   // 휴대폰(터치·좁은 화면)은 낮음부터 (M20 D265)
   materials.setShaderTier(QUALITY[quality].shaderFx);   // 툰 셰이더 등급은 재질을 만들기 전에 (낮음·매우 낮음 = 가벼운 등급)
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: QUALITY[quality].aa !== false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(ratioFor(quality, innerWidth, innerHeight, devicePixelRatio));

@@ -13,6 +13,7 @@ import { createCloset } from './closet.js';   // 11차 UI-19 옷장 창
 import { createMuseum } from './museum.js';
 import { createCraft } from './craft.js';
 import { createToolRing } from './toolring.js';
+import { createTray } from './tray.js';   // M20 D267 알림 칸 묶음 (행사·밤 운세·등대)
 import { ACCESS_KEYS, resolveAccess, applyAccess, captionFor, createCaptions } from './access.js';
 
 /**
@@ -135,7 +136,8 @@ export default {
     const hudClock = createHudClock(ctx, { toast: (t, i) => ctx.services.ui?.toast?.(t, i), blocking: () => panels.blocking() });
     hudClock.mount(hud.root.querySelector('.pk-clock'));
 
-    root.append(hud.root, captions.root, fadeEl, irisEl, stackEl, toasts.root);
+    const tray = createTray(ctx.uiRoot);
+    root.append(hud.root, tray.root, captions.root, fadeEl, irisEl, stackEl, toasts.root);
     ctx.uiRoot.prepend(root);
     // 소리 신호 글자: 켜 두었을 때만 sfx 를 자막으로 (장면·창이 열려 있어도 — 소리는 그대로 나니까)
     events.on('sfx', p => { if (access.soundText) captions.show(captionFor(p)); });

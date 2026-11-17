@@ -1,5 +1,5 @@
 // 사양(품질) 단계와 자동 판단.
-// 단계 넷 (가벼운 것 ← → 무거운 것): min 매우 낮음 · low 낮음 · mid 적정 · high 높음. 처음은 적정(DEFAULT_QUALITY).
+// 단계 넷 (가벼운 것 ← → 무거운 것): min 매우 낮음 · low 낮음 · mid 적정 · high 높음. 처음은 적정(DEFAULT_QUALITY), 휴대폰은 낮음(deviceQuality).
 // 주소(?quality=low · 게시본 #low)나 섬폰 설정 「그래픽 사양」(state.settings.spec)으로 고르면 그대로, 아니면 자동:
 // 처음 몇 초가 느리면 한 칸 낮추고, 그 뒤에도 광장(축제 광장)에서 평균 프레임이 33ms 를 넘으면 한 칸씩 (createPlazaWatch, 아래 「광장 기준」).
 // 재는 것: 화면이 보이는 동안의 실제 프레임 간격(rAF). 숨겨진 창·디버거 멈춤처럼 너무 긴 간격(50ms 넘음)은 버린다.
@@ -36,6 +36,20 @@ export function savedSpec(raw) {
   return m ? normalizeQuality(m[1]) : null;
 }
 export const DEFAULT_QUALITY = 'mid';
+/** 휴대폰(터치 + 좁은 화면, 짧은 변 560px 이하)은 처음 사양을 낮음으로 (M20 D265). 주소·저장된 섬폰 사양이 있으면 그쪽이 먼저.
+ *  env 를 안 주면 지금 창을 본다 (pointer: coarse · innerWidth/Height). → 'low' | DEFAULT_QUALITY */
+export const PHONE_SHORT_SIDE = 560;
+export function deviceQuality(env) {
+  let e = env;
+  if (!e) {
+    const g = globalThis;
+    let coarse = false;
+    try { coarse = !!g.matchMedia?.('(pointer: coarse)').matches; } catch { /* 없는 환경 */ }
+    e = { coarse, w: g.innerWidth ?? 0, h: g.innerHeight ?? 0 };
+  }
+  const short = Math.min(e.w || Infinity, e.h || Infinity);
+  return e.coarse && short <= PHONE_SHORT_SIDE ? 'low' : DEFAULT_QUALITY;
+}
 /** 무거운 것부터. 자동 판단은 느리면 한 칸씩 내려간다 */
 export const QUALITY_ORDER = ['high', 'mid', 'low', 'min'];
 export const QUALITY_LABELS = { high: '높음', mid: '적정', low: '낮음', min: '매우 낮음' };
