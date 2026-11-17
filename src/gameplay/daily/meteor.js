@@ -45,7 +45,7 @@ export function createMeteor(K) {
   }
 
   function sync(n) {
-    const open = K.isOpen(n);
+    const open = K.isOpen(n, 'meteor');
     const t = open && tonight(n);
     const s = st();
     if (open) dropStars(n);

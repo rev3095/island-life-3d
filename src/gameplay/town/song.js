@@ -73,6 +73,8 @@ export function createSong(ctx, { town, lines, villagers, companion }) {
       if ((check -= dt) > 0) return;
       check = CHECK;
       const c = context(ctx), p = todayPlan();
+      // M20-S1: 첫날 할 일을 마치기 전엔 노래(첫 노래 장면 s26)를 열지 않는다 — 첫 저녁에 할 일과 장면이 겹치지 않게
+      if (S().intro && !ctx.state.flags?.firstday?.finished) return;
       if (!p || st().song?.day === c.dayKey || !songTime(p, c.now) || companion?.active || S().ui?.isBlocking?.()) return;
       const free = villagers().filter(V => (V.mode === 'idle' || V.mode === 'walk') && V.talkable && shouldBeOut(V.person, c.now, c.weather)).map(V => V.slug);
       const pair = songPair(free, c.dayKey, !!st().songFirst);

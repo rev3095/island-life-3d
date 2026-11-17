@@ -184,3 +184,13 @@
 @media (prefers-reduced-motion: reduce) {
   .fd-root *, .fd-root *::before, .fd-root *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
 }
+
+/* ---------- M20-S1 첫 30분: 어디로 · 선물 · 막혔을 때 ---------- */
+.fd-where { grid-column: 2; margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--fd-accent-deep); font-weight: 600; word-break: keep-all; }
+.fd-gift { margin: 6px 8px 2px; padding: 5px 10px; border-radius: 10px; background: #FFF4D6; font-size: 12.5px; line-height: 1.4; color: var(--fd-ink-soft); word-break: keep-all; }
+.fd-gift.is-ready { background: #FBE3B4; color: var(--fd-accent-deep); font-weight: 600; animation: fd-cheer .6s ease; }
+.fd-list.is-collapsed .fd-gift:not(.is-ready) { display: none; }
+.fd-step.is-nudge { animation: fd-nudge .9s ease; }
+@keyframes fd-nudge { 0%, 100% { transform: none; } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+@media (max-width: 640px) { .fd-where { font-size: 12.5px; } .fd-gift { font-size: 12px; } }
+.pk-calm .fd-step.is-nudge, .pk-calm .fd-gift.is-ready { animation: none; }

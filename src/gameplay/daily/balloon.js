@@ -92,7 +92,7 @@ export function createBalloons(K) {
   }
 
   function sync(n) {
-    if (!K.isOpen(n)) return;
+    if (!K.isOpen(n, 'balloons')) return;
     const done = doneList(n);
     if (!K.onIsland() || flying.length) return;
     for (const e of R.balloonPlan(n.dayKey, seed(), cfg)) {

@@ -1,6 +1,7 @@
 // 첫날 할 일 목록 (왼쪽 위 시계 아래, 자기 DOM). 머리를 누르면 접기·펴기 — 접으면 지금 할 일만 보인다.
 // 지금 할 일 아래에 짧은 안내와 (가야 할 곳이 있으면) 화살표·거리. 머리 옆 ✕ = 건너뛰기 (7차 D44-A, 물어본 뒤 index.js 가 처리).
 import { el } from './dom.js';
+import { REWARD_TEXT } from './rules.js';
 
 const REWARD_ROW = { id: 'reward', label: '밤톨에게 알려 주기', icon: '🎁' };
 
@@ -13,7 +14,10 @@ export function createChecklist(root, { onToggle, onSkip } = {}) {
   const skip = el('button', { type: 'button', class: 'fd-skip', 'aria-label': '첫날 할 일 건너뛰기', title: '건너뛰기 (섬폰 💡 안내에서 다시 볼 수 있어요)',
     onclick: e => { onSkip?.(); if (e.detail > 0) skip.blur(); } }, '✕');
   const list = el('ol', { class: 'fd-steps', 'aria-label': '첫날 할 일' });
-  const box = el('aside', { class: 'fd-list is-away', 'aria-label': '첫날 할 일', role: 'region' }, el('div', { class: 'fd-head-row' }, head, skip), list);
+  // M20-S1: 다 하면 받는 선물을 처음부터 목록 밑에 보인다
+  const gift = el('p', { class: 'fd-gift' });
+  const box = el('aside', { class: 'fd-list is-away', 'aria-label': '첫날 할 일', role: 'region' }, el('div', { class: 'fd-head-row' }, head, skip), list, gift);
+  const where = el('p', { class: 'fd-where' });
   const hint = el('p', { class: 'fd-hint', 'aria-live': 'polite' });
   const arrow = el('span', { class: 'fd-arrow', 'aria-hidden': 'true' }, '⬆');
   const far = el('span');
@@ -34,6 +38,12 @@ export function createChecklist(root, { onToggle, onSkip } = {}) {
       box.classList.toggle('is-done', !!view.finished);
       head.setAttribute('aria-expanded', view.collapsed ? 'false' : 'true');
       if (hint.textContent !== (view.hint ?? '')) hint.textContent = view.hint ?? '';   // 같은 글이면 다시 읽어 주지 않게
+      const w = view.where ? `📍 ${view.where}` : '';
+      if (where.textContent !== w) where.textContent = w;
+      where.hidden = !w;
+      const g = view.finished ? `🎁 밤톨에게 가면 받아요: ${REWARD_TEXT}` : `🎁 다 하면 밤톨의 선물: ${REWARD_TEXT}`;
+      if (gift.textContent !== g) gift.textContent = g;
+      gift.classList.toggle('is-ready', !!view.finished);
       if (key === lastKey) return;
       lastKey = key;
       const steps = view.reward ? [...view.steps, { ...REWARD_ROW, done: false, current: true }] : view.steps;
@@ -43,7 +53,7 @@ export function createChecklist(root, { onToggle, onSkip } = {}) {
           el('span', { class: 'fd-mark', 'aria-hidden': 'true' }, s.done ? '✔' : ''),
           el('span', { class: 'fd-label-t' }, `${s.icon} ${s.label}`),
           el('span', { class: 'fd-sr', text: s.done ? ' (했어요)' : s.current ? ' (지금 할 일)' : '' }));
-        if (s.current) li.append(hint, dir);
+        if (s.current) li.append(where, hint, dir);
         rows.set(s.id, li);
         return li;
       }));
@@ -60,6 +70,12 @@ export function createChecklist(root, { onToggle, onSkip } = {}) {
       const li = rows.get(id);
       if (!li) return;
       li.classList.remove('is-pop'); void li.offsetWidth; li.classList.add('is-pop');
+    },
+    /** M20-S1 막혔을 때: 지금 할 일 줄을 한 번 크게 흔든다 */
+    nudge(id) {
+      const li = rows.get(id);
+      if (!li) return;
+      li.classList.remove('is-nudge'); void li.offsetWidth; li.classList.add('is-nudge');
     },
     show(on) { box.classList.toggle('is-away', !on); },
     get shown() { return !box.classList.contains('is-away'); },
