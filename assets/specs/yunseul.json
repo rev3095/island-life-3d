@@ -1,0 +1,37 @@
+{
+  "id": "CH-20",
+  "slug": "yunseul",
+  "name": "윤슬",
+  "species": "seal",
+  "role": "서쪽 등대지기 · 바다표범 노인",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "섬 서쪽 끝 옛 등대를 홀로 지켜 온 바다표범 할아버지. 등대 불이 꺼진 뒤에도 날마다 등대 앞에 서서 바다를 본다. 회색 점박이 털, 크림빛 주둥이와 하얀 수염, 남색 뱃사람 조끼. 느릿하고 따뜻한 '~네' 말투. 등대를 다시 켤 재료와 도토리를 알려 주고 받아 간다.",
+    "keywords": ["2.5등신", "둥글고 매끈한 머리", "하얀 수염", "남색 조끼", "점박이 회색 털"],
+    "references": ["서쪽 등대 노트 docs/notes/west-lighthouse.md (D271-A — 지금 섬에 없는 종족)", "바다표범 봉제 인형"],
+    "avoid": ["기존 게임 캐릭터와 똑같은 디자인", "사납거나 축 처진 표정"],
+    "notes": "west-lighthouse D271-A — 종족은 지금 섬(주민·상인·밤 상인)에 없는 바다표범 (새 부품 whiskers, 귀 없음)"
+  },
+  "style": { "shading": "toon", "outline": true, "outlineWidth": 0.006 },
+  "proportions": {
+    "height": 0.96, "headScale": 1.04, "bodyWidth": 1.12, "limbLength": 0.88,
+    "earSize": 0.8, "earPointiness": 1, "tailLength": 0.5, "eyeSize": 0.95, "eyeSpacing": 1.05
+  },
+  "palette": {
+    "fur": "#9AA3AB",
+    "muzzle": "#EDE6DA",
+    "cheek": "#E3DACB",
+    "whisker": "#FFFFFF",
+    "nose": "#2E2A2C",
+    "tail": "#7C858E",
+    "shirt": "#34507A",
+    "pants": "#5B5048",
+    "eye": "#232028",
+    "blush": "#E9A9A8",
+    "outline": "#3E4148"
+  },
+  "outfit": { "top": "plain-tee", "stripes": 0, "bottom": "shorts" },
+  "markings": "none",
+  "animations": ["idle", "walk", "run", "happy"]
+}

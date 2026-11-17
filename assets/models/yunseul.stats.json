@@ -1,0 +1,54 @@
+{
+  "id": "CH-20",
+  "slug": "yunseul",
+  "name": "윤슬",
+  "species": "seal",
+  "version": "0.1",
+  "triangles": 10212,
+  "vertices": 5164,
+  "bones": 11,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "cheek",
+    "whisker"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 0.96,
+  "glbBytes": 344676,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "yunseul_back.png",
+    "yunseul_front.png",
+    "yunseul_happy.png",
+    "yunseul_hero.png",
+    "yunseul_run.png",
+    "yunseul_side.png",
+    "yunseul_three_quarter.png",
+    "yunseul_thumb.png",
+    "yunseul_walk.png"
+  ]
+}

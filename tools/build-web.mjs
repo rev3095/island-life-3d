@@ -103,8 +103,9 @@ export const CONTEST_FILES = (() => {
 })();
 // M19-P4 옛 등대 BD-18 · 단계 소품 PR-41–44 (assets/lighthouse/lighthouse.json assets.env) — game:ready 뒤에 놓여서 처음엔 안 받고 daily 묶음에 같이 (묶음 수를 늘리지 않게)
 export const LIGHTHOUSE_FILES = (() => {
-  const a = JSON.parse(readFileSync(join(ROOT, 'assets/lighthouse/lighthouse.json'), 'utf8')).assets ?? {};
-  return new Set((a.env ?? []).map(k => `assets/env/models/${k}.glb.json`));
+  const j = JSON.parse(readFileSync(join(ROOT, 'assets/lighthouse/lighthouse.json'), 'utf8')), a = j.assets ?? {};
+  // 서쪽 등대: 등대지기 윤슬 CH-20 모델도 같이 (등대와 함께 game:ready 뒤에 세움)
+  return new Set([...(a.env ?? []).map(k => `assets/env/models/${k}.glb.json`), ...(j.keeper?.slug ? [`assets/models/${j.keeper.slug}.glb.json`] : [])]);
 })();
 // 묶을 때 모델 줄이기 (tools/glb-quantize.mjs). --no-quantize 로 끄면 원본 그대로 (비교용)
 const QUANTIZE = !process.argv.includes('--no-quantize');

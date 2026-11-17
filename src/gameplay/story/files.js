@@ -66,4 +66,6 @@ export const SCENE_FILES = [
   'assets/story/scenes/s63-ssalal-cheek-seeds.json',   // M19-P5 쌀알 사연 ② 단짝
   'assets/story/scenes/s64-boreum-faded-photo.json',   // M19-P5 보름 사연 ① 친구 — 등대 실마리
   'assets/story/scenes/s65-boreum-trunk-song.json',   // M19-P5 보름 사연 ② 단짝
+  'assets/story/scenes/s66-lighthouse-keeper.json',   // 서쪽 등대 등대지기 윤슬 첫 만남 (kind keeper)
+  'assets/story/scenes/s67-lighthouse-keeper-night.json',   // 서쪽 등대 불 켠 밤 뒤 등대지기 한마디 (kind lit-keeper)
 ];

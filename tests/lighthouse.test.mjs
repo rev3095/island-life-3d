@@ -158,6 +158,16 @@ test('빛 띠: 밤에만, 켜질 때·꺼질 때 반 시간 동안 천천히', (
 
 test('저장 모양: 깨진 값은 처음 값으로', () => {
   assert.deepEqual(R.normalize(null), R.fresh());
+  // 예전(M19-P4) 저장: 북쪽 자리 · siteV 없음 → 판 1 → 서쪽 등대 설정(v2)에선 자리만 다시 고르고 단계·도움·날짜는 그대로
+  const old = R.normalize({ site: { tx: 29, tz: 5 }, started: '2027-04-02', stage: 2, done: { path: '2027-04-02', stairs: '2027-04-09' }, helped: { mochi: true } });
+  assert.equal(old.siteV, 1);
+  assert.equal(R.siteFor(cfg, old), null);
+  assert.equal(old.stage, 2);
+  assert.deepEqual(old.helped, { mochi: true });
+  assert.equal(R.phase(cfg, old, '2027-04-16'), 'work');
+  assert.deepEqual(R.siteFor(cfg, { ...old, siteV: cfg.site.v }), { tx: 29, tz: 5 });
+  assert.equal(cfg.site.v, 2);
+  assert.equal(R.normalize({ keeperMet: '2027-04-02' }).keeperMet, '2027-04-02');
   const s = R.normalize({ stage: 9, site: { tx: 1.5 }, done: 3, started: '2027-04-02' });
   assert.equal(s.stage, 5);
   assert.equal(s.site, null);
@@ -165,7 +175,7 @@ test('저장 모양: 깨진 값은 처음 값으로', () => {
   assert.equal(s.started, '2027-04-02');
 });
 
-test('자리: 섬 북쪽 바위 끝 — 몸통·소품·앞 칸이 땅이고 비어 있음 · 돌길은 남쪽으로', () => {
+test('자리: 섬 서쪽 끝 곶 (서쪽 등대 D270-A) — 몸통·소품·앞 칸이 땅이고 비어 있음 · 돌길은 남쪽으로 · 등대지기 자리', () => {
   const spec = s => J(`assets/env/specs/${s}.json`);
   const lots = lotsOf(Object.fromEntries(BUILDING_KINDS.map(k => [k, spec(k)])));
   const layout = J('assets/island/layout.json');
@@ -174,12 +184,20 @@ test('자리: 섬 북쪽 바위 끝 — 몸통·소품·앞 칸이 땅이고 비
     const api = createIslandApi(gen);
     const occ = new Map(gen.objects.map(o => [`${o.tx},${o.tz}`, o.kind]));
     const ignorable = t => /^(shell|weed|flower|tulip|cosmos|pansy)/.test(t ?? '');
-    const q = { w: api.w, h: api.h, tileAt: api.tileAt, levelAt: api.levelAt, toWorld: api.toWorld, isFree: (tx, tz) => !occ.has(`${tx},${tz}`) || ignorable(occ.get(`${tx},${tz}`)) };
+    const q = { w: api.w, h: api.h, tileAt: api.tileAt, levelAt: api.levelAt, toWorld: api.toWorld, toTile: api.toTile, isFree: (tx, tz) => !occ.has(`${tx},${tz}`) || ignorable(occ.get(`${tx},${tz}`)) };
     const s = R.siteSpot(cfg, q);
     assert.ok(s, `시드 ${seed}: 자리`);
-    // 지금 섬(layout 시드)은 북쪽 바위 끝, 다른 시드 섬은 북쪽 끝이 숲·언덕이면 조금 안쪽까지 (북쪽 절반)
-    assert.ok(s.tz < api.h * (seed === layout.seed ? 0.2 : 0.5), `시드 ${seed}: 북쪽 (${s.tz})`);
-    if (seed === layout.seed) assert.equal(api.tileAt(s.tx, s.tz), 'sand', '바닷가 모래 끝');
+    // 지금 섬(layout 시드)은 서쪽 바닷가 끝, 다른 시드 섬은 서쪽 끝이 숲·언덕이면 조금 안쪽까지 (서쪽 절반)
+    assert.ok(s.tx < api.w * (seed === layout.seed ? 0.2 : 0.5), `시드 ${seed}: 서쪽 (${s.tx})`);
+    if (seed === layout.seed) {
+      assert.equal(api.tileAt(s.tx, s.tz), 'sand', '바닷가 모래 끝');
+      // 광장과 비슷한 줄 (남쪽에서 내려다보는 카메라로 광장에서 서쪽으로 걸어가면 보이게) — 섬 북쪽 1/5 이 아님
+      assert.ok(s.tz > api.h * 0.3 && s.tz < api.h * 0.7, `광장 줄 가까이 (${s.tz})`);
+      assert.equal(api.tileAt(s.tx - 3, s.tz), 'sea', '등대 서쪽 세 칸 = 바다 (바닷가 끝)');
+    }
+    const kp = R.keeperSpot(cfg.keeper, s, api.toWorld(s.tx, s.tz), q);
+    const kt = api.toTile(kp.x, kp.z);
+    assert.ok(['sand', 'grass', 'path'].includes(api.tileAt(kt.tx, kt.tz)), `시드 ${seed}: 등대지기 땅 위`);
     const w = R.siteWorld(s, api.toWorld);
     assert.ok(w.front.z > w.z, '앞 = 남쪽');
     for (const p of cfg.props) {
@@ -224,4 +242,51 @@ test('장면 s54–s61: 파일·트리거 lighthouse·자리·첫 장면부터 �
     for (const h of R.helpersOf(s, ALL)) assert.ok(who.has(h), `${s.scene} 에 ${h}`);
   }
   assert.deepEqual(scenesFor('lighthouse:scene', { kind: 'lens' }, ids.map(id => J(`assets/story/scenes/${id}.json`))), ['s57-lighthouse-lens']);
+});
+
+test('서쪽 등대: 등대지기 CH-20 · 단계마다 도토리 (D271-A · D273-A)', () => {
+  // 등대지기 — 모델·스펙·대사 파일 · 종족은 섬 주민·상인과 안 겹침
+  const K = cfg.keeper;
+  assert.equal(K.slug, 'yunseul');
+  const spec = J(`assets/specs/${K.slug}.json`);
+  assert.equal(spec.id, 'CH-20');
+  assert.equal(spec.species, 'seal');
+  const others = ['coco', 'bori', 'mochi', 'dubu', 'pong', 'chorong', 'danpung', 'gureum', 'pado', 'dalmuri', 'ssalal', 'boreum', 'bamtol', 'neuru', 'byeolbam', 'yeomyeong', 'songi', 'salang'];
+  for (const o of others) assert.notEqual(J(`assets/specs/${o}.json`).species, 'seal', o);
+  assert.ok(!others.map(o => J(`assets/specs/${o}.json`).name).includes(spec.name), '이름 겹침 없음');
+  assert.ok(existsSync(new URL(`../assets/models/${K.slug}.glb.json`, import.meta.url)), '모델');
+  const v = J(`assets/villagers/${K.slug}.json`);
+  assert.equal(v.role, 'keeper');
+  for (const k of ['first', 'greet', 'closed', 'stage', 'needs', 'short', 'helpers', 'ready', 'thanks', 'wait', 'night', 'lit', 'bye']) assert.ok(v.lines[k]?.length, `대사 ${k}`);
+  // 도토리: 단계마다 · 늘어남 · 상점 가구 값 정도 (1,000 ~ 3,000)
+  const ac = cfg.stages.map(R.acornsOf);
+  assert.deepEqual(ac, [1000, 1500, 2000, 2500, 3000]);
+  // 재료는 다 있는데 도토리가 모자라면 'acorns' · 모자란 수
+  const st = R.normalize({ started: '2027-04-02' });
+  helpAll(st);
+  const poor = R.canFinish(cfg, st, '2027-04-02', { slots: fullBag(), getItem, residents: ALL, acorns: 400 });
+  assert.equal(poor.ok, false);
+  assert.equal(poor.why, 'acorns');
+  assert.deepEqual(poor.short, [{ label: '도토리', short: 600, acorn: true }]);
+  // 재료도 모자라면 재료부터, 모자란 것 목록엔 둘 다
+  const none = R.canFinish(cfg, st, '2027-04-02', { slots: [{ id: 'mat.stone', count: 4 }], getItem, residents: ALL, acorns: 0 });
+  assert.equal(none.why, 'needs');
+  assert.deepEqual(none.short.map(x => [x.label, x.short]), [['돌', 6], ['나무', 5], ['도토리', 1000]]);
+  assert.equal(R.canFinish(cfg, st, '2027-04-02', { slots: fullBag(), getItem, residents: ALL, acorns: 1000 }).ok, true);
+  const row = R.acornRow(cfg.stages[1], 2000);
+  assert.deepEqual([row.have, row.n, row.ok], [2000, 1500, true]);
+});
+
+test('장면 s66–s67: 등대지기 첫 만남 · 불 켠 밤 한마디 (kind keeper · lit-keeper)', () => {
+  const index = J('assets/story/index.json').timeline.map(r => r.scene).filter(Boolean);
+  for (const [id, kind] of [['s66-lighthouse-keeper', 'keeper'], ['s67-lighthouse-keeper-night', 'lit-keeper']]) {
+    assert.ok(SCENE_FILES.includes(`assets/story/scenes/${id}.json`), id);
+    assert.ok(index.includes(id), `${id} 타임라인`);
+    const sc = J(`assets/story/scenes/${id}.json`);
+    assert.equal(sc.trigger.on, 'lighthouse');
+    assert.equal(sc.trigger.kind, kind);
+    assert.equal(sc.place, 'lighthouse');
+    assert.ok(TRIGGERS.lighthouse.test({ kind }, sc.trigger));
+    assert.ok(sc.takes[0].shots.flatMap(x => x.actors.map(a => a.who)).includes(cfg.keeper.slug), `${id} 에 등대지기`);
+  }
 });
