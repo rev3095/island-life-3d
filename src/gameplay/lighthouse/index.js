@@ -1,7 +1,10 @@
 // M19-P4 등대 다시 켜기 (16차 검수 보드 wave16 https://claude.ai/artifact/7vq1nQedDmmGB45RJGxTNU, D203-A · D206-A). 노트 docs/notes/m19-p4-lighthouse.md
 // 설정 assets/lighthouse/lighthouse.json · 규칙(순수) rules.js · 진행판 UI-37 ui.js · 밤 빛 띠 beam.js.
 //
-// 섬 북쪽 바위 끝(lighthouse.json site — layout 비율 자리에서 가까운 빈 모래·풀밭)에 옛 등대 BD-18 이 늘 서 있다 (게임이 열리고 game:ready 뒤에 놓음 —
+// 서쪽 등대 (west-lighthouse D270–D274): 자리는 섬 서쪽 끝 바닷가 곶 (site v2 — 예전 북쪽 자리 저장은 자리만 다시 고르고 단계는 그대로, R.siteFor).
+// 등대 앞에 등대지기 윤슬 CH-20 (keeper.js) — 말 걸면 지금 단계 · 재료(가방에 있는 수) · 도토리를 알려 주고, 다 모이면 재료 + 도토리(stages[].acorns)를 받아 단계를 진행.
+// 처음 가까이 오면 s66 (lighthouse:scene kind 'keeper'). 불 켜는 밤 s60 뒤 등대지기 한마디 s67 (kind 'lit-keeper').
+// (예전 M19-P4 설명) 섬 북쪽 바위 끝(lighthouse.json site — layout 비율 자리에서 가까운 빈 모래·풀밭)에 옛 등대 BD-18 이 늘 서 있다 (게임이 열리고 game:ready 뒤에 놓음 —
 // 모델은 처음에 받지 않는 daily 묶음). 엔딩(첫 섬 축제) 다음 날부터 구름이 섬에 살면, 섬에 나와 있는 낮(9–18시)에 s54 「구름의 옛 그림」 → 시작.
 // 단계 다섯 (길 내기 · 계단 고치기 · 렌즈 닦기 · 별 조각 등불 · 불 켜는 밤) — 단계마다 재료 + 주민 둘 도움(그 주민 앞에서 행동 키 「등대 부탁」) →
 // 등대 앞 Space → 재료를 내고 장면(s55–s59). 다음 단계는 그 단계를 끝낸 날부터 7일 뒤(time.now 의 dayKey). 다섯째 뒤 밤(19–4시)에 등대 앞 Space →
@@ -17,6 +20,8 @@
 import * as R from './rules.js';
 import { createProgressBox } from './ui.js';
 import { createBeam } from './beam.js';
+import { createKeeper } from './keeper.js';
+import { LINES } from '../town/people.js';
 
 export const CONFIG_FILE = 'assets/lighthouse/lighthouse.json';
 const NEAR = 1.6;            // 등대 앞 행동 거리
@@ -36,6 +41,11 @@ export function createLighthouse(ctx, cfg) {
   const nameOf = slug => villager(slug)?.person?.name ?? slug;
   const getItem = id => S().data?.items?.get?.(id) ?? null;
   const slots = () => S().data?.inventory?.slots ?? ctx.state.inventory ?? [];
+  const acorns = () => S().data?.wallet?.get?.() ?? 0;
+  const K = cfg.keeper ?? null;
+  const KL = (K && LINES[K.slug]) || {};
+  const kpick = k => { const l = KL[k]; return Array.isArray(l) ? l[Math.floor(Math.random() * l.length)] : l; };
+  const kline = (k, v) => [kpick(k)].flat().filter(Boolean).map(x => R.fill(x, v));
   const inTour = () => !!S().tour?.active;
   const outdoors = () => {
     const p = S().player?.position;
@@ -56,9 +66,10 @@ export function createLighthouse(ctx, cfg) {
     if (site) return site;
     const q = query();
     if (!q) return null;
-    const s = ST.site ?? R.siteSpot(cfg, q);
+    const s = R.siteFor(cfg, ST) ?? R.siteSpot(cfg, q);
     if (!s) { console.warn('[lighthouse] 등대 자리를 못 찾았어요'); return null; }
     ST.site = { tx: s.tx, tz: s.tz };
+    ST.siteV = cfg.site?.v ?? 1;
     site = { ...ST.site, ...R.siteWorld(ST.site, q.toWorld) };
     // 몸통·소품 칸의 조개·잡초·꽃은 치운다 (등대 밑에 묻히지 않게)
     const W = world();
@@ -67,6 +78,7 @@ export function createLighthouse(ctx, cfg) {
     }
     // 장면 자리 'lighthouse' (story PLACES) — 문(앞 일하는 자리)을 기준으로
     if (W.places) W.places.lighthouse = { x: site.x, z: site.z, door: { ...site.front } };
+    if (K) site.keeper = R.keeperSpot(K, ST.site, site, q);
     return site;
   }
   function addObj(kind, x, z) {
@@ -99,6 +111,7 @@ export function createLighthouse(ctx, cfg) {
       }
     }
     beamAt();
+    if (keeper && s.keeper && keeper.spot !== s.keeper) keeper.show(s.keeper);
   }
 
   // ── 빛 띠 ──
@@ -134,8 +147,9 @@ export function createLighthouse(ctx, cfg) {
     if (ph === 'work') {
       const helpers = R.helpersOf(s, residents());
       const rows = R.needsOf(s, slots(), getItem).map(r => ({ text: r.label, n: `${r.have}/${r.n}`, ok: r.ok }));
+      if (R.acornsOf(s)) { const a = R.acornRow(s, acorns()); rows.push({ text: '🌰 도토리', n: `${Math.min(a.have, a.n).toLocaleString()}/${a.n.toLocaleString()}`, ok: a.ok }); }
       rows.push(...helperRows(s, helpers));
-      if (rows.every(r => r.ok)) rows.push({ text: '등대 앞에서 시작하기', ok: false });
+      if (rows.every(r => r.ok)) rows.push({ text: K ? `등대지기 ${K.name}에게 건네기` : '등대 앞에서 시작하기', ok: false });
       return { stages, line: `${s.n}단계 ${s.emoji} ${s.name} — ${s.goal}`, rows };
     }
     if (ph === 'night') return { stages, line: '🗼 불 켜는 밤 — 밤(19시 뒤)에 등대 앞에서', rows: [{ text: '섬 사람들이 등대 앞에 모여요', ok: true }] };
@@ -180,8 +194,49 @@ export function createLighthouse(ctx, cfg) {
     return df < 0.7 || (dx * -Math.sin(pl.facing) + dz * -Math.cos(pl.facing)) / Math.max(1e-4, dc) > 0.3 ? s : null;
   }
   const dialog = (lines, choices) => S().ui.dialog.open({ speaker: '옛 등대', color: '#3F7FC9', lines: [lines].flat().filter(Boolean), choices });
+  const ksay = (lines, choices) => S().ui.dialog.open({ speaker: K.name, color: K.color, voice: K.voice, lines: [lines].flat().filter(Boolean), choices });
+  const needText = r => `${r.acorn ? '🌰 ' : ''}${r.label} ${r.acorn ? `${Math.min(r.have, r.n).toLocaleString()}/${r.n.toLocaleString()}` : `${r.have}/${r.n}`}${r.ok ? ' ✓' : ''}`;
+
+  /** 등대지기 말 걸기: 지금 단계 · 필요한 재료와 개수 · 가방에 있는 수 · 도토리 → 다 모이면 건네기 (D272-A · D273-A) */
+  async function keeperTalk() {
+    const n = now();
+    if (!n || !K) return;
+    keeper?.lookAtPlayer();
+    if (!ST.keeperMet) { ST.keeperMet = n.dayKey; await ksay(kline('first')); }
+    const ph = R.phase(cfg, ST, n.dayKey), s = R.stageNow(cfg, ST), L = cfg.lines;
+    if (ph === 'closed') { await ksay([...kline('greet'), ...kline('closed')]); return; }
+    if (ph === 'lit' || ph === 'done') { await ksay(kline('lit')); return; }
+    if (ph === 'wait') {
+      const od = R.openDay(cfg, ST);
+      await ksay([...kline('stage', { item: `${s.n}단계 ${s.emoji} ${s.name}` }), ...kline('wait', { n: R.daysLeft(cfg, ST, n.dayKey) }), `(${R.md(od)}부터)`]);
+      return;
+    }
+    if (ph === 'night') {
+      if (!R.isNight(cfg, n.hourF)) { await ksay(kline('night')); return; }
+      if ((await ksay(L.lightAsk, [L.light, L.later])) !== 0) return;
+      lightUp(n);
+      return;
+    }
+    const res = R.canFinish(cfg, ST, n.dayKey, { slots: slots(), getItem, residents: residents(), acorns: acorns() });
+    const rows = [...(res.rows ?? R.needsOf(s, slots(), getItem))];
+    if (R.acornsOf(s)) rows.push(res.acorn ?? R.acornRow(s, acorns()));
+    const helpers = res.helpers ?? R.helpersOf(s, residents());
+    const lines = [...kline('stage', { item: `${s.n}단계 ${s.emoji} ${s.name}` }), `${s.goal}`,
+      ...kline('needs'), rows.map(needText).join(' · ')];
+    const missing = res.short ?? R.shortOf(rows);
+    if (missing.length) lines.push(...kline('short', { n: missing.length }), `모자란 것: ${missing.map(m => `${m.acorn ? '🌰 ' : ''}${m.label} ${m.short.toLocaleString()}개`).join(' · ')}`);
+    if (helpers.length) {
+      lines.push(R.fill(L.helpWanted, { helpers: helpers.map(h => `${nameOf(h)}${ST.helped[h] ? ' ✓' : ''}`).join(' · ') }));
+      if (!R.helpedAll(ST, helpers)) lines.push(...kline('helpers'));
+    }
+    if (!res.ok) { await ksay([...lines, ...kline('bye')]); return; }
+    const pick = await ksay([...lines, ...kline('ready')], [kpick('give') ?? '건네기', kpick('later') ?? L.later]);
+    if (pick !== 0) return;
+    if (finish(n)) await ksay(kline('thanks'));
+  }
 
   async function atSite() {
+    if (K) { await keeperTalk(); return; }   // 서쪽 등대: 등대 앞 Space 도 등대지기와 같은 이야기
     const n = now();
     if (!n) return;
     const ph = R.phase(cfg, ST, n.dayKey), s = R.stageNow(cfg, ST), L = cfg.lines;
@@ -214,7 +269,9 @@ export function createLighthouse(ctx, cfg) {
   function finish(n) {
     const s = R.stageNow(cfg, ST);
     const plan = R.takePlan(s, slots(), getItem);
-    if (!plan) { toast('재료가 모자라요'); return; }
+    if (!plan) { toast('재료가 모자라요'); return false; }
+    const cost = R.acornsOf(s), wallet = S().data?.wallet;
+    if (cost && !(wallet?.spend?.(cost))) { toast('도토리가 모자라요', '🌰'); return false; }
     const inv = S().data?.inventory;
     for (const { id, n: k } of plan) inv?.removeId?.(id, k);
     const done = R.finishStage(cfg, ST, n.dayKey);
@@ -226,6 +283,7 @@ export function createLighthouse(ctx, cfg) {
       const next = R.stageNow(cfg, ST);
       setTimeout(() => toast(R.fill(cfg.lines.next, { stage: next.name, days: cfg.gapDays ?? 7 })), 400);
     } else setTimeout(() => toast(cfg.lines.night), 400);
+    return true;
   }
   function lightUp(n) {
     if (!R.light(ST, n.dayKey)) return;
@@ -233,7 +291,23 @@ export function createLighthouse(ctx, cfg) {
     ctx.events.emit('lighthouse:lit', { dayKey: n.dayKey });
     ctx.events.emit('lighthouse:scene', { kind: 'lit', x: site.front.x, z: site.front.z });
     refresh();
+    if (K) litKeeper = true;   // s60 이 끝나면 등대지기 한마디 s67
   }
+  let litKeeper = false;
+  ctx.events.on('story:end', () => {
+    if (!litKeeper || !site) return;
+    litKeeper = false;
+    setTimeout(() => ctx.events.emit('lighthouse:scene', { kind: 'lit-keeper', x: site.front.x, z: site.front.z }), 300);
+  });
+
+  // ── 등대지기 ──
+  const keeper = K ? createKeeper(ctx, K, {
+    onTalk: () => keeperTalk(),
+    onFirst: () => {
+      ST.keeperMet = now()?.dayKey ?? 'met';
+      ctx.events.emit('lighthouse:scene', { kind: 'keeper', x: site.front.x, z: site.front.z });
+    },
+  }) : null;
 
   // ── 돕는 주민 앞 ──
   function helperInFront() {
@@ -271,6 +345,7 @@ export function createLighthouse(ctx, cfg) {
   }
 
   function register(gp) {
+    keeper?.register(gp, outdoors, () => `${K.name}에게 말 걸기`);
     gp.add({ name: 'lighthouse:ask', intent: 'action', priority: 101, label: () => cfg.lines.askLabel ?? '등대 부탁', test: () => helperInFront(), run: V => askHelper(V) });
     gp.add({
       name: 'lighthouse:site', intent: 'action', priority: 98,
@@ -292,12 +367,14 @@ export function createLighthouse(ctx, cfg) {
     refresh();
     const n = now();
     if (!n) return;
+    if (keeper && !busy()) keeper.near(outdoors(), ST.keeperMet);
     tryStart(n);
     tryMorning(n);
     tellOpen(n);
   }
   function update(dt) {
     beamUpdate(dt);
+    keeper?.update(dt);
     if ((tick += dt) >= 1) {
       tick = 0;
       sync();
@@ -312,6 +389,7 @@ export function createLighthouse(ctx, cfg) {
       for (const id of placed.path) W.objects.remove(id);
     }
     Object.assign(placed, { main: null, mainKind: null, props: new Map(), path: [] });
+    keeper?.hide();
     site = null;
     ST = st();
     sync();
@@ -328,7 +406,9 @@ export function createLighthouse(ctx, cfg) {
       view: () => view(),
       site: () => (site ? JSON.parse(JSON.stringify(site)) : null),
       /** town.keepClear: 주민이 서지 않을 자리 (등대 앞) */
-      clearSpots: () => (site ? [{ x: site.front.x, z: site.front.z, r: CLEAR }] : []),
+      clearSpots: () => (site ? [{ x: site.front.x, z: site.front.z, r: CLEAR }, ...(keeper?.clear() ?? [])] : []),
+      /** 등대지기 자리 (서쪽 등대) */
+      keeper: () => (keeper?.spot ? { slug: K.slug, ...keeper.spot } : null),
       helpers: () => R.helpersOf(R.stageNow(cfg, ST), residents()),
       debug: { refresh, reset, get beam() { return beam; }, get placed() { return placed; } },
     },

@@ -1,0 +1,65 @@
+{
+  "id": "s67-lighthouse-keeper-night",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "등대지기의 밤",
+  "summary": "불 켜는 밤(s60)이 끝나고 섬 사람들이 돌아간 뒤, 윤슬이 다시 도는 불빛을 오래 올려다본다. 플레이어에게 고맙다고 하고, 이제 배들이 이 빛을 보고 길을 찾을 거라고 웃는다 (서쪽 등대 D272-A).",
+  "trigger": { "on": "lighthouse", "kind": "lit-keeper" },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "불빛 올려다보기 → 고맙다는 인사",
+      "recommended": true,
+      "desc": "밤바다 위를 도는 불빛과 윤슬의 뒷모습 → 플레이어를 돌아보며 고맙다는 말 → 둘이 나란히 불빛을 본다.",
+      "shots": [
+        {
+          "id": "c1", "note": "밤, 다시 켜진 등대 불빛과 올려다보는 윤슬", "dur": 3.5,
+          "cam": { "size": "wide", "target": [0, -1.85], "angle": 0, "move": "crane" },
+          "transition": "fade", "caption": "모두 돌아간 뒤",
+          "actors": [
+            { "who": "yunseul", "at": [-1.2, 0.4], "face": 0, "emote": "🗼", "text": "" },
+            { "who": "player", "at": [0.9, 1.2], "face": 0, "text": "" }
+          ]
+        },
+        {
+          "id": "c2", "note": "윤슬이 돌아보며 고맙다고", "dur": 4,
+          "cam": { "size": "medium", "target": "yunseul", "angle": 15, "move": "static" },
+          "caption": "고맙네, 정말 고마워", "wait": true,
+          "actors": [
+            { "who": "yunseul", "face": "player", "do": "happy", "emote": "🥹", "text": "" },
+            { "who": "player", "face": "yunseul", "emote": "😊", "text": "" }
+          ]
+        },
+        {
+          "id": "c3", "note": "나란히 서서 바다를 건너가는 빛을 본다", "dur": 3.5,
+          "cam": { "size": "full", "target": "group", "angle": -10, "move": "pull" },
+          "caption": "배들이 이 빛을 보고 길을 찾겠지요", "wait": true,
+          "actors": [
+            { "who": "yunseul", "face": 270, "emote": "🌊", "text": "" },
+            { "who": "player", "face": 270, "emote": "✨", "text": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "불빛 아래 윤슬이 고맙다고 하고 끝.",
+      "shots": [
+        {
+          "id": "c1", "note": "불빛 아래 윤슬", "dur": 4,
+          "cam": { "size": "group", "target": "group", "angle": 0, "move": "pull" },
+          "transition": "fade", "caption": "윤슬이 고맙다고 해요", "wait": true,
+          "actors": [
+            { "who": "yunseul", "at": [-1.2, 0.4], "face": "player", "do": "happy", "emote": "🥹", "text": "" },
+            { "who": "player", "at": [0.9, 1.2], "face": "yunseul", "emote": "😊", "text": "" }
+          ]
+        }
+      ]
+    }
+  ]
+}

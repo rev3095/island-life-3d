@@ -1,11 +1,12 @@
 {
-  "version": 1,
-  "about": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A · D206-A). 엔딩 뒤 구름의 옛 그림(s54)에서 시작 → 단계 다섯(재료 + 주민 둘 도움 + 장면 s55–s59, 다음 단계는 7일 뒤) → 불 켜는 밤 s60 → 다음 날 아침 s61. 읽는 곳 src/gameplay/lighthouse/ (규칙 rules.js). 노트 docs/notes/m19-p4-lighthouse.md",
+  "version": 2,
+  "about": "M19-P4 등대 다시 켜기 (16차 보드 wave16 D203-A · D206-A). 엔딩 뒤 구름의 옛 그림(s54)에서 시작 → 단계 다섯(재료 + 주민 둘 도움 + 장면 s55–s59, 다음 단계는 7일 뒤) → 불 켜는 밤 s60 → 다음 날 아침 s61. 읽는 곳 src/gameplay/lighthouse/ (규칙 rules.js). 노트 docs/notes/m19-p4-lighthouse.md. 서쪽 등대 (west-lighthouse D270–D274): 자리를 섬 서쪽 끝 바닷가로 (site v2 — 예전 북쪽 자리 저장은 다시 고름, 단계는 그대로), 등대지기 윤슬 CH-20 (keeper) 이 단계마다 재료 + 도토리(acorns)를 받는다 — 노트 docs/notes/west-lighthouse.md",
   "open": { "after": "ending", "host": "gureum", "fallbackHost": "coco", "fallbackDays": 14, "hours": [9, 18] },
   "gapDays": 7,
   "nightHours": [19, 4],
   "beamHours": [18.5, 5.5],
-  "site": { "at": [0.45, 0.1], "radius": 9, "kinds": ["sand", "grass"] },
+  "site": { "v": 2, "at": [0.12, 0.56], "side": "west", "radius": 9, "kinds": ["sand", "grass"] },
+  "keeper": { "slug": "yunseul", "name": "윤슬", "color": "#34507A", "voice": "dubu", "at": [-2.1, 2.2], "alt": [[2.3, 2.2], [-2.1, 3.2], [2.3, 3.2], [0, 3.6]], "see": 7 },
   "assets": {
     "env": ["lighthouse-dark", "lighthouse-repair", "lighthouse-lit", "lighthouse-scaffold", "lighthouse-stairs", "lighthouse-lens", "star-lantern"]
   },
@@ -20,7 +21,7 @@
   "lamp": { "height": 3.8, "speed": 0.55, "length": 15, "radius": 1.7 },
   "stages": [
     {
-      "id": "path", "n": 1, "name": "길 내기", "emoji": "🪨", "scene": "s55-lighthouse-path",
+      "id": "path", "n": 1, "name": "길 내기", "emoji": "🪨", "scene": "s55-lighthouse-path", "acorns": 1000,
       "needs": [{ "id": "mat.stone", "n": 10 }, { "id": "mat.wood", "n": 5 }],
       "helpers": ["dubu", "pong", "coco", "bori"],
       "goal": "등대까지 돌길을 깔아요",
@@ -30,7 +31,7 @@
       }
     },
     {
-      "id": "stairs", "n": 2, "name": "계단 고치기", "emoji": "🪜", "scene": "s56-lighthouse-stairs",
+      "id": "stairs", "n": 2, "name": "계단 고치기", "emoji": "🪜", "scene": "s56-lighthouse-stairs", "acorns": 1500,
       "needs": [{ "id": "mat.wood", "n": 10 }, { "id": "mat.hardwood", "n": 5 }, { "id": "mat.iron", "n": 2 }],
       "helpers": ["bori", "danpung", "dubu", "mochi"],
       "goal": "삐걱이는 계단을 새로 놓아요",
@@ -40,7 +41,7 @@
       }
     },
     {
-      "id": "lens", "n": 3, "name": "렌즈 닦기", "emoji": "🔍", "scene": "s57-lighthouse-lens",
+      "id": "lens", "n": 3, "name": "렌즈 닦기", "emoji": "🔍", "scene": "s57-lighthouse-lens", "acorns": 2000,
       "needs": [{ "category": "shell", "n": 6, "label": "조개껍데기" }, { "id": "mat.clay", "n": 3 }],
       "helpers": ["mochi", "pado", "chorong", "coco"],
       "goal": "뿌연 렌즈를 조개껍데기 가루로 닦아요",
@@ -50,7 +51,7 @@
       }
     },
     {
-      "id": "lantern", "n": 4, "name": "별 조각 등불", "emoji": "⭐", "scene": "s58-lighthouse-lantern",
+      "id": "lantern", "n": 4, "name": "별 조각 등불", "emoji": "⭐", "scene": "s58-lighthouse-lantern", "acorns": 2500,
       "needs": [{ "prefix": "mat.star-", "n": 3, "label": "별 조각" }, { "id": "mat.iron", "n": 3 }],
       "helpers": ["dalmuri", "chorong", "coco", "danpung"],
       "goal": "기름 대신 별 조각으로 불씨를 만들어요",
@@ -60,7 +61,7 @@
       }
     },
     {
-      "id": "night", "n": 5, "name": "불 켜는 밤", "emoji": "🗼", "scene": "s59-lighthouse-ready",
+      "id": "night", "n": 5, "name": "불 켜는 밤", "emoji": "🗼", "scene": "s59-lighthouse-ready", "acorns": 3000,
       "needs": [{ "category": "flower", "n": 10, "label": "꽃" }, { "id": "mat.wood", "n": 5 }],
       "helpers": ["gureum", "coco", "mochi", "bori"],
       "goal": "꽃으로 꾸미고 섬 사람들을 불러요 — 그날 밤 불을 켜요",

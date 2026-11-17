@@ -15,5 +15,6 @@ export const VILLAGER_FILES = [
   'assets/villagers/boreum.json',
   'assets/villagers/bamtol.json',
   'assets/villagers/neuru.json',
+  'assets/villagers/yunseul.json',   // 서쪽 등대 등대지기 CH-20 (west-lighthouse D271-A, role keeper — lighthouse/keeper.js 가 등대 앞에 세움)
 ];
 export const villagerFile = slug => `assets/villagers/${slug}.json`;

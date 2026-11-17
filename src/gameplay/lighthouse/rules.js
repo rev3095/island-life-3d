@@ -3,6 +3,8 @@
 //
 // 상태 st = state.lighthouse = {
 //   site: { tx, tz } | null        등대 자리 (처음 놓을 때 한 번 정해 저장 — 조개·잡초가 날마다 바뀌어도 자리가 안 움직이게)
+//   siteV: 정수 | null              그 자리를 고른 설정 판 (cfg.site.v — 서쪽 등대 v2. 다르면 자리만 다시 고르고 단계는 그대로, siteFor)
+//   keeperMet: dayKey | null       등대지기 윤슬을 처음 만난 날 (s66, 서쪽 등대)
 //   started: dayKey | null         s54 를 본 날 (= 첫 단계가 열린 날)
 //   stage: 0..5                    끝낸 단계 수
 //   done: { <단계 id>: dayKey }    단계를 끝낸 날
@@ -20,21 +22,30 @@ export const addDays = (key, n) => keyOf(dateOf(key) + n * DAY);
 export const md = key => `${Number(key.slice(5, 7))}/${Number(key.slice(8, 10))}`;
 
 export function fresh() {
-  return { site: null, started: null, stage: 0, done: {}, helped: {}, lit: null, morning: null };
+  return { site: null, siteV: null, started: null, stage: 0, done: {}, helped: {}, lit: null, morning: null, keeperMet: null };
 }
 /** 저장에서 읽은 값을 모양에 맞춘다 (없거나 깨진 칸은 처음 값) */
 export function normalize(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const f = fresh();
+  const site = s.site && Number.isInteger(s.site.tx) && Number.isInteger(s.site.tz) ? { tx: s.site.tx, tz: s.site.tz } : f.site;
   return {
-    site: s.site && Number.isInteger(s.site.tx) && Number.isInteger(s.site.tz) ? { tx: s.site.tx, tz: s.site.tz } : f.site,
+    site,
+    // 예전 저장(M19-P4)엔 siteV 가 없다 → 북쪽 자리 = 판 1
+    siteV: !site ? null : Number.isInteger(s.siteV) ? s.siteV : 1,
     started: typeof s.started === 'string' ? s.started : null,
     stage: Number.isInteger(s.stage) ? Math.max(0, Math.min(5, s.stage)) : 0,
     done: s.done && typeof s.done === 'object' ? { ...s.done } : {},
     helped: s.helped && typeof s.helped === 'object' ? { ...s.helped } : {},
     lit: typeof s.lit === 'string' ? s.lit : null,
     morning: typeof s.morning === 'string' ? s.morning : null,
+    keeperMet: typeof s.keeperMet === 'string' ? s.keeperMet : null,
   };
+}
+/** 저장된 자리를 그대로 써도 되는지 → { tx, tz } | null (설정 판이 바뀌었으면 null — 다시 고른다. 단계·도움·날짜는 건드리지 않음) */
+export function siteFor(cfg, st) {
+  if (!st?.site) return null;
+  return (st.siteV ?? 1) === (cfg.site?.v ?? 1) ? st.site : null;
 }
 
 /** 시각이 [from, to) 안인지 — to < from 이면 자정을 넘는다 (19 → 4) */
@@ -113,6 +124,15 @@ export function needsOf(stage, slots, getItem = () => null) {
   });
 }
 export const needsMet = rows => rows.every(r => r.ok);
+/** 그 단계에 내는 도토리 (서쪽 등대 D273-A — lighthouse.json stages[].acorns, 없으면 0) */
+export const acornsOf = stage => Math.max(0, Math.floor(stage?.acorns ?? 0));
+/** 도토리 줄 { label, have, n, ok } (have = 지갑, 넘쳐도 그대로 보여 줌) */
+export function acornRow(stage, wallet = 0) {
+  const n = acornsOf(stage), have = Math.max(0, Math.floor(wallet ?? 0));
+  return { acorn: true, label: '도토리', have, n, ok: have >= n };
+}
+/** 모자란 것 [{ label, short }] — 재료 줄 + 도토리 줄에서 */
+export const shortOf = rows => rows.filter(r => !r.ok).map(r => ({ label: r.label, short: r.n - r.have, acorn: !!r.acorn }));
 /**
  * 가져갈 것 정하기: 필요한 것마다 가방 칸을 앞에서부터 → [{ id, n }] (같은 id 는 합침).
  * 분류·앞부분으로 받는 칸(조개·꽃·별 조각)은 값이 싼 것부터 가져간다 (getItem(id).price).
@@ -156,14 +176,17 @@ export function finishStage(cfg, st, dayKey) {
   st.helped = {};
   return s;
 }
-export function canFinish(cfg, st, dayKey, { slots, getItem, residents }) {
+export function canFinish(cfg, st, dayKey, { slots, getItem, residents, acorns = Infinity }) {
   if (phase(cfg, st, dayKey) !== 'work') return { ok: false, why: 'phase' };
   const s = stageNow(cfg, st);
   const rows = needsOf(s, slots, getItem);
+  const acorn = acornRow(s, acorns);
   const helpers = helpersOf(s, residents);
-  if (!needsMet(rows)) return { ok: false, why: 'needs', rows, helpers };
-  if (!helpedAll(st, helpers)) return { ok: false, why: 'helpers', rows, helpers };
-  return { ok: true, rows, helpers };
+  const short = shortOf([...rows, acorn]);
+  if (!needsMet(rows)) return { ok: false, why: 'needs', rows, acorn, helpers, short };
+  if (!acorn.ok) return { ok: false, why: 'acorns', rows, acorn, helpers, short };
+  if (!helpedAll(st, helpers)) return { ok: false, why: 'helpers', rows, acorn, helpers, short };
+  return { ok: true, rows, acorn, helpers, short };
 }
 export function light(st, dayKey) { if (!st.lit) st.lit = dayKey; return st.lit === dayKey; }
 
@@ -177,7 +200,7 @@ export function propsOf(cfg, st) {
 
 // ── 자리 ──
 /**
- * 등대 자리: layout 비율 자리(cfg.site.at — 섬 북쪽 바위 끝)에서 가까운 칸부터.
+ * 등대 자리: layout 비율 자리(cfg.site.at — 서쪽 등대 v2 는 섬 서쪽 끝 곶 side "west", 예전 v1 은 북쪽 바위 끝)에서 가까운 칸부터.
  * q = { w, h, tileAt(tx,tz) → 'sand'…, levelAt, isFree(tx,tz), toWorld(tx,tz) → {x,z} }
  * 몸통 3×3 (가운데 tx,tz 둘레) + 소품 자리 (양옆 tx±2 의 z, z+1) + 앞 일하는 칸 (tz+2, tx-1..tx+1) 이 모두 땅·높이 0 같은 단·비어 있어야.
  * 같은 거리면 북쪽(작은 z)부터 → { tx, tz }
@@ -186,10 +209,12 @@ export function siteSpot(cfg, q) {
   const S = cfg.site ?? {};
   const kinds = new Set(S.kinds ?? ['sand', 'grass']);
   const at = S.at ?? [0.45, 0.1];
+  const west = S.side === 'west';   // 서쪽 등대 (v2): 섬 서쪽 절반 · 같은 거리면 서쪽(작은 x)부터 · 서쪽 귀퉁이가 바다여도 됨
   const ax = Math.round(at[0] * q.w), az = Math.round(at[1] * q.h);
   const cells = [];
   for (let dz = -1; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) {
     if (dz === -1 && Math.abs(dx) === 2) continue;   // 북쪽 귀퉁이는 바다여도 된다 (바위 끝)
+    if (west && dx === -2 && dz <= 0) continue;        // 서쪽 끝: 뒤 서쪽 귀퉁이도 바다여도 된다 (곶 끝)
     cells.push([dx, dz]);
   }
   // 시드가 다른 섬(layout.seed = null)은 북쪽 끝이 언덕·숲일 수 있다 → 반지름을 넓히고, 그래도 없으면 높은 단(언덕 위)도 본다.
@@ -199,10 +224,10 @@ export function siteSpot(cfg, q) {
     const cand = [];
     for (let dz = -Math.ceil(rad); dz <= rad; dz++) for (let dx = -Math.ceil(rad); dx <= rad; dx++) {
       const d = Math.hypot(dx, dz);
-      if (d > rad || az + dz >= q.h / 2) continue;
+      if (d > rad || (west ? ax + dx >= q.w / 2 : az + dz >= q.h / 2)) continue;
       cand.push({ tx: ax + dx, tz: az + dz, d });
     }
-    cand.sort((a, b) => a.d - b.d || a.tz - b.tz || a.tx - b.tx);
+    cand.sort(west ? (a, b) => a.d - b.d || a.tx - b.tx || a.tz - b.tz : (a, b) => a.d - b.d || a.tz - b.tz || a.tx - b.tx);
     for (const c of cand) {
       const lv = q.levelAt(c.tx, c.tz);
       if (!levels.includes(lv)) continue;
@@ -214,6 +239,18 @@ export function siteSpot(cfg, q) {
     }
   }
   return null;
+}
+/**
+ * 등대지기 자리 (서쪽 등대 D272-A): 등대 가운데에서 keeper.at, 안 되면 keeper.alt 차례로 — 땅(바다·강 아님)·등대와 같은 단·비어 있는 칸.
+ * q = { tileAt, levelAt, toTile, isFree } · c = 등대 가운데 월드 {x, z} → { x, z } (다 안 되면 앞 일하는 자리 옆)
+ */
+export function keeperSpot(K, site, c, q) {
+  const lv = q.levelAt(site.tx, site.tz);
+  for (const [dx, dz] of [K?.at ?? [-2.1, 2.2], ...(K?.alt ?? [])]) {
+    const x = c.x + dx, z = c.z + dz, t = q.toTile(x, z);
+    if (['sand', 'grass', 'path'].includes(q.tileAt(t.tx, t.tz)) && q.levelAt(t.tx, t.tz) === lv && q.isFree(t.tx, t.tz)) return { x, z };
+  }
+  return { x: c.x + 1.2, z: c.z + 2.4 };
 }
 /** 자리 칸 → 월드 자리들: 등대 가운데 · 앞 일하는 자리(Space) · 장면 기준 자리 */
 export function siteWorld(site, toWorld) {

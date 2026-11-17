@@ -89,6 +89,7 @@
     "assets/villagers/boreum.json",
     "assets/villagers/bamtol.json",
     "assets/villagers/neuru.json",
+    "assets/villagers/yunseul.json",
     "assets/night/night.json",
     "assets/events/events.json",
     "assets/tour/tour.json",
@@ -102,6 +103,7 @@
     "assets/renders/chorong_thumb.png",
     "assets/renders/bamtol_thumb.png",
     "assets/renders/neuru_thumb.png",
+    "assets/renders/yunseul_thumb.png",
     "assets/renders/danpung_thumb.png",
     "assets/renders/gureum_thumb.png",
     "assets/renders/pado_thumb.png",
@@ -136,6 +138,8 @@
     "assets/story/scenes/s63-ssalal-cheek-seeds.json",
     "assets/story/scenes/s64-boreum-faded-photo.json",
     "assets/story/scenes/s65-boreum-trunk-song.json",
+    "assets/story/scenes/s66-lighthouse-keeper.json",
+    "assets/story/scenes/s67-lighthouse-keeper-night.json",
     "assets/town/pairs.json",
     "assets/lighthouse/lighthouse.json"
   ]

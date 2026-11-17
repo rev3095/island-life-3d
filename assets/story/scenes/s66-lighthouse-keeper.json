@@ -1,0 +1,73 @@
+{
+  "id": "s66-lighthouse-keeper",
+  "version": 1,
+  "status": "review",
+  "chapter": "등대 다시 켜기",
+  "title": "서쪽 등대지기 윤슬",
+  "summary": "섬 서쪽 끝 바닷가 곶, 불 꺼진 옛 등대 앞에 늙은 바다표범 윤슬이 바다를 보고 서 있다. 플레이어를 보고 반갑게 돌아서서, 오래 등대를 지켜 왔고 언젠가 불을 다시 켜고 싶다고 말한다 (서쪽 등대 D272-A).",
+  "trigger": { "on": "lighthouse", "kind": "keeper" },
+  "place": "lighthouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "바다를 보는 뒷모습 → 돌아봄 → 등대 이야기",
+      "recommended": true,
+      "desc": "서쪽 바다 앞 등대와 윤슬을 넓게 → 윤슬이 돌아보며 인사 → 등대를 올려다보며 옛 불빛 이야기.",
+      "shots": [
+        {
+          "id": "c1", "note": "서쪽 끝 곶의 불 꺼진 등대, 그 앞에서 바다를 보는 윤슬", "dur": 3.5,
+          "cam": { "size": "wide", "target": [0, -1.85], "angle": 0, "move": "crane" },
+          "transition": "fade", "caption": "섬 서쪽 끝, 오래된 등대",
+          "actors": [
+            { "who": "yunseul", "at": [-2.1, 0.35], "face": 270, "emote": "🌊", "text": "" },
+            { "who": "player", "at": [0.6, 3.4], "face": 0, "text": "" }
+          ]
+        },
+        {
+          "id": "c2", "note": "플레이어가 다가가고 윤슬이 돌아본다", "dur": 3,
+          "cam": { "size": "group", "target": "group", "angle": 0, "move": "push" },
+          "actors": [
+            { "who": "yunseul", "face": "player", "do": "happy", "emote": "👋", "text": "" },
+            { "who": "player", "to": [0, 0.9], "do": "walk", "face": "yunseul", "emote": "❓", "text": "" }
+          ]
+        },
+        {
+          "id": "c3", "note": "윤슬 소개 — 이 등대를 오래 지켜 온 등대지기", "dur": 4,
+          "cam": { "size": "medium", "target": "yunseul", "angle": 15, "move": "static" },
+          "caption": "등대지기 윤슬", "wait": true,
+          "actors": [
+            { "who": "yunseul", "face": "player", "emote": "🗼", "text": "" },
+            { "who": "player", "face": "yunseul", "emote": "😊", "text": "" }
+          ]
+        },
+        {
+          "id": "c4", "note": "둘이 꺼진 등대 꼭대기를 올려다본다", "dur": 3.5,
+          "cam": { "size": "full", "target": [0, -1.85], "angle": -10, "move": "pull" },
+          "caption": "언젠가 이 불을 다시 켤 수 있을까요", "wait": true,
+          "actors": [
+            { "who": "yunseul", "face": 0, "emote": "💭", "text": "" },
+            { "who": "player", "face": 0, "emote": "✨", "text": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷 인사",
+      "desc": "등대 앞 윤슬이 인사하고 끝.",
+      "shots": [
+        {
+          "id": "c1", "note": "등대 앞 윤슬", "dur": 4,
+          "cam": { "size": "group", "target": "group", "angle": 0, "move": "pull" },
+          "transition": "fade", "caption": "등대지기 윤슬을 만났어요", "wait": true,
+          "actors": [
+            { "who": "yunseul", "at": [-2.1, 0.35], "face": "player", "do": "happy", "emote": "👋", "text": "" },
+            { "who": "player", "at": [0, 0.9], "face": "yunseul", "emote": "😊", "text": "" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -52,6 +52,8 @@ FEATURES = {
     # M19-P1 새 주민 (새 주민 보드 newfolk D210-A · D211-A · D214-A): 뼈대·동작 그대로, 특징 부품만
     'hamster': {'ears': 'round', 'muzzle': 'small', 'tail': 'stub', 'cheeks': True, 'head': (1.12, 0.95, 0.9)},   # CH-18 쌀알: 곰 둥근 귀(작게) + 짧은 꼬리 + 통통한 볼주머니
     'elephant': {'ears': 'elephant', 'mouth': 'smile', 'trunk': True, 'tail': 'rope', 'head': (1.08, 0.96, 0.92)},   # CH-19 보름: 큰 부채 귀 + 긴 코 (고정) + 끝에 털 난 가는 꼬리
+    # 서쪽 등대 (west-lighthouse D271-A): 등대지기 CH-20 윤슬 (바다표범) — 귀 없음 + 곰 주둥이 + 볼 + 수염 + 짧은 꼬리, 둥글고 매끈한 머리
+    'seal': {'muzzle': 'bear', 'cheeks': True, 'whiskers': True, 'tail': 'stub', 'head': (1.1, 0.96, 0.9)},
 }
 SPECIES = spec.get('species', 'cat')
 F = {**FEATURES.get(SPECIES, {}), **spec.get('features', {})}
@@ -635,6 +637,15 @@ if F.get('cheeks'):
     for sx in (1, -1):
         p, n = head_point(sx * 0.62, -0.32, inset=0.03 * hs)
         B.add(ellipsoid(p + n * 0.012 * hs, (0.09 * hs, 0.07 * hs, 0.075 * hs), rot=decal(n), seg=20, rings=12), col('cheek', 'muzzle'), 'head')
+
+# 수염 (바다표범, 서쪽 등대 CH-20): 볼 바깥으로 가는 선 셋씩
+if F.get('whiskers'):
+    for sx in (1, -1):
+        p, n = head_point(sx * 0.5, -0.3, inset=0.0)
+        for k, dz in enumerate((0.03, 0.0, -0.03)):
+            d = (n * 0.4 + V((sx, 0, dz * 6))).normalized()
+            B.add(cone(p + n * 0.02 * hs + V((0, 0, dz * hs)), p + n * 0.02 * hs + d * 0.12 * hs + V((0, 0, dz * hs)), 0.004 * hs, 0.0015, seg=6),
+                  col('whisker', 'eye'), 'head', outline=False)
 
 # 긴 코 (코끼리, M19-P1): 두 눈 사이 아래에서 앞으로 나와 아래로 늘어졌다 끝이 살짝 들린다. 뼈 없이 머리에 고정
 if F.get('trunk'):

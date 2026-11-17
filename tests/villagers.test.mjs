@@ -124,13 +124,13 @@ function fingerprint(D) {
 
 // ---------- 테스트 ----------
 
-test('주민 파일: 폴더 = files.js 목록, 이름 = 파일 이름, 주민 7 · 가게 주인 2, 순서 = 주민 순서', () => {
+test('주민 파일: 폴더 = files.js 목록, 이름 = 파일 이름, 주민 7 · 가게 주인 3 (+ 서쪽 등대지기 윤슬), 순서 = 주민 순서', () => {
   const inDir = readdirSync(new URL('assets/villagers/', ROOT)).filter(f => f.endsWith('.json') && f !== 'editor-files.json').map(f => `assets/villagers/${f}`).sort();
   assert.deepEqual([...VILLAGER_FILES].sort(), inDir, 'assets/villagers/ 의 파일과 src/gameplay/town/files.js 가 다르다 (웹 빌드는 files.js 글자로 묶는다)');
   VILLAGERS.forEach((d, i) => assert.equal(VILLAGER_FILES[i], `assets/villagers/${d.slug}.json`));
   assert.deepEqual(Object.keys(PEOPLE), ALL_RES, '주민 순서 = core/constants.js VILLAGERS (편지·목록 순서) + 이사 오는 주민');
-  assert.deepEqual(Object.keys(KEEPERS), ['bamtol', 'neuru']);
-  assert.deepEqual(Object.keys(LINES), [...ALL_RES, 'bamtol', 'neuru']);
+  assert.deepEqual(Object.keys(KEEPERS), ['bamtol', 'neuru', 'yunseul']);
+  assert.deepEqual(Object.keys(LINES), [...ALL_RES, 'bamtol', 'neuru', 'yunseul']);
   const models = readJSON('assets/models/index.json').models;
   for (const d of VILLAGERS) assert.equal(models.find(m => m.slug === d.slug)?.id, d.id, `${d.slug}: 캐릭터 ID 가 모델 목록과 같다`);
 });
