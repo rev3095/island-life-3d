@@ -1,7 +1,8 @@
 {
-  "version": 2,
+  "version": 3,
   "about": "밤·새벽 콘텐츠 설정 (M12, 밤·새벽 검수 보드 night 반영 v1 = D106–D114 모두 A, https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU). 시각은 게임 하루 시각 5~29 (24 = 자정, 27 = 새벽 3시). 읽는 곳 src/gameplay/night/ · 약속 docs/CONTRACTS.md 「밤」",
-  "opensAfterDay": 1,
+  "opensAfterDay": 2,
+  "opensNote": "M20-S1: 첫날 안내를 들은 날 + 2일(셋째 날)부터 밤 가게·야시장 — 둘째 날은 축제 이야기(s04)·섬 일지·유리병만",
   "market": {
     "id": "D106-A",
     "name": "야시장",

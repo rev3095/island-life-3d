@@ -129,7 +129,7 @@ export default {
       events.emit('intro:step', { id, n: R.doneCount(p), total: R.STEPS.length });
       if (!quiet) {
         if (id === 'intro' && p.skip === 'short') { skipRest('short'); return; }
-        if (id === 'intro') { toast('첫날 할 일이 생겼어요! 왼쪽 목록을 봐요', '📋'); sfx('menu', { pitch: 1.2 }); }
+        if (id === 'intro') { toast('첫날 할 일이 생겼어요! 다 하면 밤톨이 선물을 줘요', '📋'); sfx('menu', { pitch: 1.2 }); }
         else if (shown) { toast(`${s.label} 완료! (${R.doneCount(p)}/${R.STEPS.length})`, '✅'); sfx('menu', { pitch: 1.3 }); }
       }
       if (R.allDone(p) && !p.finished) {
@@ -174,6 +174,9 @@ export default {
       p.rewarded = true;
       events.emit('intro:reward', { ...R.REWARD });
       hideT = HIDE_AFTER;
+      // M20-S1: 받은 선물을 눈에 띄게 — s03 장면이 끝난 뒤 카드로
+      later.push({ icon: '🎁', title: '환영 선물을 받았어요!', again: false,
+        text: `${R.REWARD_TEXT}을 가방에 넣었어요. 라디오는 집 안에 놓으면 음악이 흘러요. 도토리로는 도구를 하나 더 장만해 봐요.` });
       S().data?.save?.save?.();
       refresh();
       return true;
@@ -250,6 +253,49 @@ export default {
       if (!waiting || naming || storyBusy()) return;
       card.show(waiting);
       waiting = null;
+    }
+    // M20-S1: 급하지 않은 카드(선물 · 막혔을 때 · 처음 소개)는 줄을 세워, 떠 있는 카드·장면·창이 다 끝난 뒤 하나씩
+    const later = [];
+    let calm = 0;   // 조용히 지난 시간 (초) — 장면이 막 끝나자마자 덮치지 않게
+    function flushLater(dt) {
+      const quiet = !naming && !storyBusy() && !waiting && !card.shown && !S().ui?.isBlocking?.();
+      calm = quiet ? calm + dt : 0;
+      if (calm < 2.5) return;
+      if (!later.length) introCard();
+      const next = later.shift();
+      if (!next) return;
+      card.show(next, { again: next.again !== false });
+      calm = 0;
+    }
+    /** 처음 소개 카드 (tips.js INTRO_CARDS): 첫날 안내를 들은 날부터 n일째, 하루에 하나 */
+    function introCard() {
+      const d0 = rec().done.intro, n = S().time?.now?.();
+      if (typeof d0 !== 'string' || !n?.dayKey || rec().legacy) return;
+      const t = tipRec(), seen = (t.last.cards ??= {});
+      if (Object.values(seen).includes(n.dayKey)) return;   // 오늘 이미 하나 보였다
+      const days = Math.round((Date.parse(n.dayKey) - Date.parse(d0)) / 864e5);
+      const c = T.introCardFor(days, { seen, has: k => !k || !!S()[k], hour: n.hour });
+      if (!c) return;
+      seen[c.id] = n.dayKey;
+      events.emit('intro:card', { id: c.id, day: days });
+      saveSoon();
+      later.push(c);
+    }
+    // 막혔을 때 (같은 할 일에 오래 머묾) — 그 할 일의 '어디로' + 하는 법을 카드로 다시
+    const stuck = { id: null, t: 0, n: 0 };
+    function watchStuck(dt) {
+      const cur = listOn() ? R.viewOf(rec(), { blocked: blocked() }).current : null;
+      if (cur !== stuck.id) { Object.assign(stuck, { id: cur, t: 0, n: 0 }); return; }
+      if (!cur || !list.shown || naming || storyBusy() || S().ui?.isBlocking?.() || stuck.n >= R.STUCK.max) return;
+      if ((stuck.t += dt) < (stuck.n ? R.STUCK.again : R.STUCK.after)) return;
+      stuck.t = 0;
+      stuck.n++;
+      const s = R.stepOf(cur) ?? { icon: '🎁', label: '밤톨에게 알려 주기' };
+      const o = hintOpts();
+      later.push({ icon: s.icon, title: `${s.label} — 이렇게 해 봐요`, again: false, text: `📍 ${R.whereFor(cur, o)}. ${R.hintFor(cur, o)}` });
+      if (collapsed()) { rec().collapsed = false; saveSoon(); refresh(); }
+      list.nudge(cur);
+      events.emit('intro:stuck', { id: cur, n: stuck.n });
     }
     // 장면이 시작되면 카드를 내렸다가 장면이 끝난 뒤 다시 띄운다 (첫 안내 바로 뒤 s02 처럼 같은 때 오는 것)
     events.on('story:start', () => { if (card.current) { waiting ??= card.current; card.hide(); } });
@@ -353,7 +399,7 @@ export default {
       const o = hintOpts();
       const view = R.viewOf(rec(), { blocked: blocked(o) });
       if (on && (view.ahead || (!o.shopOpen && view.current === 'sell'))) tip('night');
-      list.render({ ...view, hint: R.hintFor(view.current, o), collapsed: collapsed() && !view.finished });
+      list.render({ ...view, hint: R.hintFor(view.current, o), where: R.whereFor(view.current, o), collapsed: collapsed() && !view.finished });
       arrow(view.current);
     }
 
@@ -366,7 +412,7 @@ export default {
       await S().ui.dialog.open({ speaker: K?.person?.name ?? '밤톨', color: K?.person?.color, voice: KEEPER, lines: touch() ? lines.touch : lines.keys });
     }
     const guideSrc = {
-      steps: () => R.STEPS.map(s => ({ id: s.id, icon: s.icon, label: s.label, done: !!rec().done[s.id], hint: R.hintFor(s.id, { touch: touch() }) })),
+      steps: () => R.STEPS.map(s => ({ id: s.id, icon: s.icon, label: s.label, done: !!rec().done[s.id], hint: `📍 ${s.where} · ${R.hintFor(s.id, { touch: touch() })}` })),
       listShown: () => listOn(),
       canToggleList: () => !!state.player.name && !!rec().done.intro,
       toggleList() {
@@ -421,7 +467,7 @@ export default {
       update(dt) {
         if (saveT >= 0 && (saveT -= dt) < 0) S().data?.save?.save?.();
         if (hideT >= 0 && (hideT -= dt) < 0) { rec().hidden = true; S().data?.save?.save?.(); refresh(); }
-        if ((t += dt) >= TICK) { t = 0; refresh(); checkTonight(); flushTip(); }
+        if ((t += dt) >= TICK) { const d = t; t = 0; refresh(); checkTonight(); flushTip(); watchStuck(d); flushLater(d); }
       },
     };
     console.info(`[intro] 첫날 흐름 준비됨 · ${state.player.name ? `${state.player.name} · ${names().island}` : '이름 정하기 전'} · 할 일 ${R.doneCount(rec())}/${R.STEPS.length}`);

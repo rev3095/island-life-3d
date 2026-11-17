@@ -9,17 +9,28 @@ export const ISLAND_SUFFIX = '섬';
 export const DEFAULT_NAMES = { player: '친구', island: '포근섬' };
 /** 다 마치면 밤톨이 주는 선물: 가구 하나 + 도토리 */
 export const REWARD = { item: 'furn.radio', acorns: 1000 };
+/** 목록 밑·카드에 보일 선물 글 (M20-S1: 다 하면 무엇을 받는지 처음부터 보이게) */
+export const REWARD_TEXT = '📻 라디오 + 🌰 도토리 1,000개';
 
-/** 첫날 할 일. target = 화살표가 가리킬 곳 (index.js 가 자리를 찾는다) */
+/** M20-S1 막혔을 때: 같은 할 일에서 이만큼(실제 초, 창·장면이 열린 동안은 안 셈) 머물면 힌트 카드로 다시 알려 준다 */
+export const STUCK = { after: 150, again: 240, max: 3 };
+
+/** 첫날 할 일. target = 화살표가 가리킬 곳 (index.js 가 자리를 찾는다)
+ *  where = 어디로 가면 되는지 한 줄 (M20-S1, 목록의 지금 할 일 밑 📍) */
 export const STEPS = [
-  { id: 'intro', label: '밤톨 이야기 듣기', icon: '🐿️', target: 'bamtol' },
-  { id: 'tool', label: '도구 들어 보기', icon: '🎣' },
-  { id: 'gather', label: '나무 흔들기나 줍기', icon: '🌳' },
-  { id: 'catch', label: '물고기나 곤충 잡기', icon: '🐟' },
-  { id: 'sell', label: '밤톨 상점에서 팔기', icon: '🌰', target: 'shop' },
-  { id: 'donate', label: '느루에게 기증하기', icon: '🏛️', target: 'museum' },
-  { id: 'home', label: '내 집에 들어가 보기', icon: '🏠', target: 'home' },
+  { id: 'intro', label: '밤톨 이야기 듣기', icon: '🐿️', target: 'bamtol', where: '배에서 내린 선착장 — 밤톨이 기다려요' },
+  { id: 'tool', label: '도구 들어 보기', icon: '🎣', where: '어디서든 — 지금 선 자리에서 해 봐요' },
+  { id: 'gather', label: '나무 흔들기나 줍기', icon: '🌳', where: '나무가 있는 풀밭 아무 데나' },
+  { id: 'catch', label: '물고기나 곤충 잡기', icon: '🐟', where: '물고기는 냇가·바닷가, 곤충은 꽃밭·나무 둘레' },
+  { id: 'sell', label: '밤톨 상점에서 팔기', icon: '🌰', target: 'shop', where: '도토리상점 — 화살표를 따라가요' },
+  { id: 'donate', label: '느루에게 기증하기', icon: '🏛️', target: 'museum', where: '언덕 위 박물관 — 화살표를 따라가요' },
+  { id: 'home', label: '내 집에 들어가 보기', icon: '🏠', target: 'home', where: '우편함이 있는 내 집 — 화살표를 따라가요' },
 ];
+/** 지금 할 일의 '어디로' 한 줄 (reward = 밤톨에게 알려 주기) */
+export function whereFor(id, { inside = false } = {}) {
+  if (id === 'reward') return inside ? '집 밖으로 나가 봐요 — 밤톨이 찾아와요' : '밤톨 — 보통 도토리상점 앞에 있어요';
+  return stepOf(id)?.where ?? '';
+}
 export const STEP_IDS = STEPS.map(s => s.id);
 export const stepOf = id => STEPS.find(s => s.id === id) ?? null;
 

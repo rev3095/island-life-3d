@@ -142,7 +142,7 @@ export function createPeddler(K) {
   }
 
   function sync(n) {
-    const open = K.isOpen(n);
+    const open = K.isOpen(n, 'peddler');
     here = open && R.peddlerHere(n.dayKey, n.hourF, cfg);
     if (here) putCart(); else takeCart();
     const s = ps();

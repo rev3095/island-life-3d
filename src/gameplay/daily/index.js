@@ -48,10 +48,12 @@ function createDaily(ctx, cfg) {
     if (typeof d === 'string') return d;
     return d || f.intro ? '2000-01-01' : null;
   }
-  function isOpen(n = now()) {
+  /** feat = 'balloons'·'bottle'·'meteor'·'peddler' — M20-S1: 놀이마다 첫 소개 날을 나눈다 (daily.json 그 칸의 opensAfterDay, 없으면 맨 위 값) */
+  function isOpen(n = now(), feat = null) {
     if (!n) return false;
     const day = introDay();
-    return !!day && R.daysBetween(day, n.dayKey) >= (cfg.opensAfterDay ?? 1);
+    const after = (feat && cfg[feat]?.opensAfterDay) ?? cfg.opensAfterDay ?? 1;
+    return !!day && R.daysBetween(day, n.dayKey) >= after;
   }
   /** 플레이어가 섬 밖(실내 x 500– · 투어 섬 x 900)이 아닌가 */
   function onIsland() {
@@ -157,7 +159,7 @@ function createDaily(ctx, cfg) {
   function syncBottle(n) {
     const W = world(), I = isl(), s = st();
     if (!W?.objects || !I) return;
-    if (!isOpen(n)) { takeBottle(); return; }
+    if (!isOpen(n, 'bottle')) { takeBottle(); return; }
     if (s.bottle?.day !== n.dayKey) s.bottle = { day: n.dayKey, opened: false };
     if (s.bottle.opened) { takeBottle(); return; }
     if (bottle.id && bottle.day === n.dayKey) return;

@@ -34,7 +34,14 @@ function ensureCss() {
 function createJournal(ctx, cfg) {
   const S = () => ctx.services;
   const dayKey = () => S().time?.now?.().dayKey ?? S().data?.day?.key?.() ?? '';
-  const live = () => !cfg.afterIntro || !!ctx.state.flags?.firstday?.finished;
+  // M20-S1: 첫날 할 일을 마친 '다음 날'부터 센다 (startsNextDay) — 첫날 저녁 선물·s03 장면 뒤에 일지 알림이 겹치지 않게
+  const live = () => {
+    if (!cfg.afterIntro) return true;
+    const f = ctx.state.flags?.firstday?.finished;
+    if (!f) return false;
+    if (!cfg.startsNextDay || typeof f !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(f)) return true;   // 'legacy'·true = 예전 저장
+    return dayKey() > f;
+  };
   // M17-P2 (D183-A) 할 일 조건 needs: 그 아이템(스쿠버 키트·새총 …)을 가방에 가졌나 — 그날 할 일을 처음 뽑을 때 본다
   const has = id => (S().data?.inventory?.count?.(id) ?? 0) > 0;
   const J = () => R.ensure(ctx.state, cfg, dayKey(), ctx.state.island?.seed ?? 0, S().data?.inventory ? has : null);
@@ -87,7 +94,7 @@ function createJournal(ctx, cfg) {
       const v = R.view(J(), cfg);
       body.replaceChildren(
         el('div', { class: 'jn-pts' }, el('span', {}, `📔 포인트 ${v.points.toLocaleString()}`), el('small', {}, `오늘 ${v.n} / ${v.total}${v.allDone ? ' · 다 했어요!' : ''}`)),
-        ...(live() ? [] : [el('p', { class: 'jn-note', text: '첫날 할 일을 마치면 섬 일지가 시작돼요.' })]),
+        ...(live() ? [] : [el('p', { class: 'jn-note', text: cfg.startsNextDay ? '첫날 할 일을 마친 다음 날부터 섬 일지가 시작돼요.' : '첫날 할 일을 마치면 섬 일지가 시작돼요.' })]),
         el('h3', { class: 'jn-h', text: `오늘 할 일 (다 하면 덤 +${cfg.allDoneBonus ?? 0})` }),
         el('ul', { class: 'jn-list', 'aria-label': '오늘 할 일' }, v.tasks.map(t => el('li', { class: t.done ? 'is-done' : '', 'data-task': t.id },
           el('span', { 'aria-hidden': 'true', text: t.done ? '✅' : t.icon }), el('span', { class: 'jn-t', text: t.label }),

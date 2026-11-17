@@ -74,6 +74,23 @@ export const TIPS = {
   },
 };
 
+/**
+ * M20-S1 처음 소개 카드: 첫날 안내를 들은 날 + day 일째부터, 하루에 하나씩 (장면·창·다른 힌트가 끝난 뒤).
+ * 다른 놀이(유리병·풍선·유성우·행상)는 처음 만날 때 그 모듈이 스스로 알려 주므로 여기선 섬폰 안에 숨은 것만.
+ * needs = 그 서비스가 있을 때만 · from = 그 시각(게임 시) 뒤에만. 순서표는 docs/notes/m20-firsthour.md
+ */
+export const INTRO_CARDS = [
+  { id: 'journal', day: 1, needs: 'journal', icon: '📔', title: '섬 일지가 시작됐어요',
+    text: '섬폰 📔「섬 일지」에 오늘 할 일 다섯 가지가 있어요. 하나씩 하면 포인트가 쌓이고, 포인트는 가구랑 바꿀 수 있어요.' },
+  { id: 'night', day: 2, needs: 'night', from: 17, icon: '🌙', title: '밤에도 섬이 깨어 있어요',
+    text: '저녁 8시엔 운세 부스, 밤 10시엔 언덕 위 달빛 가게가 열려요. 졸리면 내일 아침에 와도 괜찮아요.' },
+];
+/** 오늘 띄울 처음 소개 카드 하나 (없으면 null). days = 첫날 안내를 들은 날부터 지난 날 수 */
+export function introCardFor(days, { seen = {}, has = () => true, hour = 12 } = {}) {
+  if (!(days >= 1)) return null;
+  return INTRO_CARDS.find(c => !seen[c.id] && days >= c.day && has(c.needs) && hour >= (c.from ?? 0)) ?? null;
+}
+
 /** 안내를 짧게 고른 사람에게 밤톨이 하는 말 (긴 첫 안내 대신) */
 export const SHORT_INTRO = [
   '어서 와요, {player} 씨! {island}에 온 걸 환영해요! 저는 도토리상점 밤톨이에요.',

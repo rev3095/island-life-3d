@@ -1,9 +1,10 @@
 {
-  "version": 6,
+  "version": 7,
   "note": "M13-P1 섬 일지 (13차 보드 D141-A 추천안): 하루 할 일 daily 개 · 오래 하는 목표 · 포인트 교환. on = 셀 일 (src/gameplay/journal/index.js 가 이벤트로 셈) · needs = 그 아이템을 가방에 가졌을 때만 뽑힘 (M17-P2 D183-A)",
   "daily": 5,
   "allDoneBonus": 50,
   "afterIntro": true,
+  "startsNextDay": true,
   "tasks": [
     { "id": "fish3", "on": "fish", "need": 3, "pts": 30, "icon": "🎣", "label": "물고기 3마리 낚기" },
     { "id": "fish1", "on": "fish", "need": 1, "pts": 15, "icon": "🐟", "label": "물고기 한 마리 낚기" },
