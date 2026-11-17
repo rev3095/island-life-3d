@@ -5,7 +5,7 @@
 //   node tools/build-web.mjs --live <게시본 파일 목록>  → 위에 더해 publish-1.json, publish-2.json … (게시본에서 이 빌드로 옮기는 차례: 없어질 경로 null 먼저)
 // - 페이지는 index.html 을 바탕으로 만든다. 아티팩트가 <!doctype>·<head>·<body> 뼈대를 씌우므로 뼈대 없이 쓰고,
 //   tools/web-loader.html (로딩 화면·소리 안내), 묶음 목록(<script id="island-packs">), 모듈 미리 받기(modulepreload)를 넣는다.
-// - 게시 경로 = 저장소 경로. 모듈은 상대 경로 import 라 페이지 옆에 같은 모양으로 올리면 그대로 돈다.
+// - 게시 경로 = 저장소 경로. JS 모듈은 모듈 묶음 packs/src-<폴더>-<n>.js 로 (M20-S3, 아래 transformModule·srcRuntime), css 는 따로.
 // - 에셋(assets/ 의 JSON · .glb.json · 그림)은 아티팩트 한 버전 511파일 제한 때문에 묶음 파일 몇 개로 모은다 (PACKS 표).
 //   src/core/packs.js 가 게시본에서 묶음에서 꺼내 준다. 개발 서버(/index.html)는 묶음 없이 파일을 하나씩.
 // - 넣는 파일: main.js 에서 닿는 모듈·css + 게임이 읽는 에셋(.glb.json·스펙·목록·가구 썸네일). .glb·렌더·stats 는 빼고.
@@ -14,6 +14,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import { join, posix, relative } from 'node:path';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import vm from 'node:vm';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { imageType } from '../src/core/packs.js';
 import { seaPackOf } from '../src/data/sea-items.js';
@@ -275,14 +276,19 @@ export function planWeb() {
   const more = packs.filter(p => p.group === 'more').reduce((n, p) => n + p.files.length, 0);
   if (more) notes.push(`묶음 갈래가 없는 에셋 ${more}개 → more 묶음 (필요할 때 받음). 시작할 때 읽는 것이면 PACKS 표에 boot 갈래를 더해 주세요`);
   for (const p of packs) if (p.bytes > LIMITS.textBytes) errors.push(`묶음이 너무 커요 (${fmt(p.bytes)} > ${fmt(LIMITS.textBytes)}): ${p.path}`);
-  const published = [...loose, ...packs.map(p => ({ path: p.path, src: `dist/web/${p.path}`, bytes: p.bytes, group: '묶음 (packs)' }))];
+  // M20-S3: JS 모듈은 모듈 묶음 packs/src-*.js 로 (css·css 가 부르는 파일만 따로)
+  const srcPacks = makeSrcPacks(loose.filter(f => f.group === '모듈 (js)'), errors);
+  const published = [
+    ...srcPacks.map(p => ({ path: p.path, src: `dist/web/${p.path}`, bytes: p.bytes, group: '모듈 묶음 (src)' })),
+    ...loose.filter(f => f.group !== '모듈 (js)'),
+    ...packs.map(p => ({ path: p.path, src: `dist/web/${p.path}`, bytes: p.bytes, group: '묶음 (packs)' })),
+  ];
   const manifest = { v: 1, packs: packs.map(p => ({ path: p.path, boot: p.boot, ...(p.season ? { season: p.season } : {}), bytes: p.bytes, hash: p.hash, files: p.files.map(f => f.path) })) };
 
   // 5) 페이지
   const modules = readModules();
   for (const m of modules) if (!files.has(`src/${m}/index.js`)) warnings.push(`main.js 모듈 '${m}' 이 빌드에 없어요 (로딩 화면이 실패로 보여 줘요)`);
-  const js = loose.filter(f => f.group === '모듈 (js)');
-  const page = buildPage({ html, js, external: [...external].sort(), modules, manifest });
+  const page = buildPage({ html, srcPacks, external: [...external].sort(), modules, manifest });
   if (Buffer.byteLength(page) > LIMITS.textBytes) errors.push('페이지가 16MB 를 넘어요');
 
   const batches = makeBatches(published, Buffer.byteLength(page));
@@ -290,7 +296,272 @@ export function planWeb() {
   if (published.length + 1 > LIMITS.perVersion) errors.push(`파일이 버전당 ${LIMITS.perVersion}개를 넘어요 (${published.length + 1})`);
   if (totalBytes > LIMITS.versionBytes) errors.push(`총 용량이 버전당 ${fmt(LIMITS.versionBytes)} 를 넘어요`);
 
-  return { page, files: sources, publish: published, packs, manifest, batches, external: [...external].sort(), modules, errors, warnings, notes, totalBytes };
+  return { page, files: sources, publish: published, packs, srcPacks, manifest, batches, external: [...external].sort(), modules, errors, warnings, notes, totalBytes };
+}
+
+// ---------- M20-S3 모듈 묶음 (packs/src-<갈래>-<n>.js) ----------
+// 게시 파일 수를 줄이려고 src 의 JS 모듈을 묶음 파일 몇 개에 넣는다. 아티팩트 CSP 는 스크립트를 같은 출처 파일·인라인·jsdelivr 만
+// 받는다고 보고(blob:·data: 모듈은 dev-server CSP 에서도 막힘) 묶음은 진짜 .js 모듈 파일로 둔다:
+//   - 모듈 하나 = 등록 함수 하나. import 는 $isl_req('src/…') (먼저 실행된 모듈의 내보내기 객체), export 는 그 객체의 getter (값이 바뀌어도 따라감).
+//   - import('./x.js')·import(path) 는 $isl_dyn — 상대 경로는 그 모듈 기준으로 풀고, 'three/addons/…' 같은 이름은 진짜 import (importmap).
+//   - import.meta 는 { url: 페이지 기준 원래 경로 } → new URL('./ui.css', import.meta.url) 이 원래 자리의 css 를 가리킨다 (css 는 따로 올린다).
+//   - 'three' 등 바깥 모듈은 묶음 파일 맨 위의 진짜 import 로 받고 등록 함수가 그 내보내기를 쓴다.
+//   - 실행 순서는 ES 모듈과 같게: 의존 모듈부터 import 순서대로, 한 번만. top-level await 모듈(data/tables.js)은 async 함수.
+// 실행기는 srcRuntime (페이지 안 인라인 <script>), 시작은 인라인 <script type="module"> 이 묶음을 import 한 뒤 run('src/main.js').
+// 개발 서버(/index.html)는 그대로 모듈 파일 하나씩. 바꾸는 규칙이 못 다루는 모양(순환 import · export let 다시 넣기 · export *)이면 빌드 오류.
+export const SRC_PACK_BYTES = 640 * 1024;
+const SRC_DIR_ORDER = ['core', 'data', 'render', 'sky', 'world', 'player', 'ui', 'audio', 'gameplay'];
+/** 모듈 → 묶음 갈래: src/<폴더>/ (main.js 는 core). gameplay 는 크기로 나뉜다 */
+export const srcGroupOf = p => (p === 'src/main.js' ? 'core' : p.split('/')[1]?.replace(/\.m?js$/, '') ?? 'core');
+const ID = '[A-Za-z_$][\\w$]*';
+const IMPORT_RE = new RegExp(`^[ \\t]*import\\s*(?:(?:(${ID})\\s*,?\\s*)?(?:\\*\\s*as\\s+(${ID})|\\{([^}]*)\\})?\\s*from\\s*)?(['"])([^'"\\n]+)\\4[ \\t]*;?`, 'gm');
+
+/** 자리 i 에서 JS 식 하나를 건너뛴다: 괄호·글자·템플릿·주석·정규식을 따라가며 깊이 0 의 ',' 또는 ';' 또는 문장 끝 줄바꿈에서 멈춤 → 멈춘 자리 */
+function skipExpr(s, i) {
+  const stack = [];
+  let last = '=';   // 앞의 의미 있는 글자 (정규식/나눗셈 가르기)
+  for (; i < s.length; i++) {
+    const c = s[i];
+    if (c === '/' && s[i + 1] === '/') { i = s.indexOf('\n', i) - 1; if (i < 0) return s.length; continue; }
+    if (c === '/' && s[i + 1] === '*') { i = s.indexOf('*/', i + 2) + 1; continue; }
+    if (c === '"' || c === "'") { for (i++; i < s.length && s[i] !== c; i++) if (s[i] === '\\') i++; last = c; continue; }
+    if (c === '`') { stack.push('`'); i = skipTemplate(s, i + 1, stack); last = '`'; continue; }
+    if (c === '/' && /[(,=:[!&|?{};+\-*%<>~^]/.test(last)) {   // 정규식
+      let cls = false;
+      for (i++; i < s.length; i++) { const d = s[i]; if (d === '\\') { i++; continue; } if (d === '[') cls = true; else if (d === ']') cls = false; else if (d === '/' && !cls) break; }
+      while (/[a-z]/i.test(s[i + 1] ?? '')) i++;
+      last = '/'; continue;
+    }
+    if ('([{'.includes(c)) stack.push(c);
+    else if (')]}'.includes(c)) { if (!stack.length) return i; stack.pop(); }
+    else if (!stack.length && (c === ',' || c === ';')) return i;
+    else if (!stack.length && c === '\n') {
+      const next = s.slice(i + 1).match(/^\s*(\S)/)?.[1] ?? '';
+      if (!/[,=([{+\-*/%&|?:<>!~^.]/.test(last) && !/[.,?:+\-*/%&|=<>]/.test(next)) return i;
+    }
+    if (!/\s/.test(c)) last = c;
+  }
+  return i;
+}
+/** 템플릿 글자 안 (여는 ` 다음부터) → 닫는 ` 자리 */
+function skipTemplate(s, i, stack) {
+  for (; i < s.length; i++) {
+    if (s[i] === '\\') { i++; continue; }
+    if (s[i] === '`') { stack.pop(); return i; }
+    if (s[i] === '$' && s[i + 1] === '{') {
+      let depth = 1;
+      for (i += 2; i < s.length && depth; i++) {
+        if (s[i] === '`') { const st = ['`']; i = skipTemplate(s, i + 1, st); continue; }
+        if (s[i] === '"' || s[i] === "'") { const q = s[i]; for (i++; i < s.length && s[i] !== q; i++) if (s[i] === '\\') i++; continue; }
+        if (s[i] === '{') depth++; else if (s[i] === '}') depth--;
+      }
+      i--;
+    }
+  }
+  return i;
+}
+/** 깊이 0 의 쉼표로 나누기 */
+function splitTop(s) {
+  const out = [];
+  let depth = 0, cur = '';
+  for (const c of s) {
+    if ('([{'.includes(c)) depth++; else if (')]}'.includes(c)) depth--;
+    if (c === ',' && !depth) { out.push(cur); cur = ''; } else cur += c;
+  }
+  if (cur.trim()) out.push(cur);
+  return out;
+}
+/** 묶는 꼴(구조 분해)에서 이름들: [a, b] · { x, y: z, ...r } · a = 기본값 */
+function patternNames(p) {
+  p = p.trim();
+  if (p.startsWith('[') || p.startsWith('{')) {
+    const obj = p.startsWith('{');
+    return splitTop(p.slice(1, -1)).flatMap(part => {
+      let t = part.trim().replace(/^\.\.\./, '');
+      if (obj) t = t.replace(new RegExp(`^(?:${ID}|'[^']*'|"[^"]*")\\s*:`), '');   // { 키: 이름 }
+      return t ? patternNames(t) : [];   // 이름 = 기본값 → patternNames 가 앞 이름만 읽는다
+    });
+  }
+  const m = p.match(new RegExp(`^(${ID})`));
+  return m ? [m[1]] : [];
+}
+/** `export const|let|var` 뒤 자리 i 부터 선언 이름들 */
+function declNames(s, i) {
+  const names = [];
+  for (;;) {
+    while (/\s/.test(s[i])) i++;
+    let end = i;
+    if (s[i] === '[' || s[i] === '{') { const st = []; for (; end < s.length; end++) { if ('[{'.includes(s[end])) st.push(1); else if (']}'.includes(s[end])) { st.pop(); if (!st.length) { end++; break; } } } }
+    else end = i + (s.slice(i).match(new RegExp(`^${ID}`))?.[0].length ?? 0);
+    names.push(...patternNames(s.slice(i, end)));
+    i = end;
+    while (/[ \t]/.test(s[i])) i++;
+    if (s[i] === '=') i = skipExpr(s, i + 1);
+    if (s[i] !== ',') return names;
+    i++;
+  }
+}
+
+/** 모듈 글 하나 → 등록 함수 몸 { body, deps, externals, exports, imports, async }. deps = import 순서의 src 경로 */
+export function transformModule(path, text) {
+  const deps = [], externals = [], imports = [], exportsMap = {}, problems = [];
+  const ext = spec => { let k = externals.indexOf(spec); if (k < 0) { externals.push(spec); k = externals.length - 1; } return `$isl_x${k}`; };
+  const rel = spec => /^\.{1,2}\//.test(spec);
+  const target = spec => {
+    if (!rel(spec)) return ext(spec);
+    const id = norm(posix.join(posix.dirname(path), spec));
+    if (!deps.includes(id)) deps.push(id);
+    return `$isl_req(${JSON.stringify(id)})`;
+  };
+  const keepLines = (orig, code) => code + '\n'.repeat((orig.match(/\n/g) ?? []).length);
+  let n = 0;
+  // 1) import 문
+  let body = text.replace(IMPORT_RE, (all, def, star, named, _q, spec) => {
+    const ref = target(spec);
+    const id = rel(spec) ? norm(posix.join(posix.dirname(path), spec)) : spec;
+    const names = (named ?? '').split(',').map(x => x.trim()).filter(Boolean).map(x => {
+      const m = x.match(new RegExp(`^(${ID}|default)(?:\\s+as\\s+(${ID}))?$`));
+      if (!m) problems.push(`${path}: 못 읽는 import 이름 '${x}'`);
+      return m ? [m[1], m[2] ?? m[1]] : [x, x];
+    });
+    imports.push({ from: id, names: [...(def ? ['default'] : []), ...names.map(([a]) => a)] });
+    if (!def && !star && !named) return keepLines(all, `${ref};`);
+    const tmp = `$isl_i${n++}`;
+    const parts = [`const ${tmp} = ${ref};`];
+    if (def) parts.push(`const ${def} = ${tmp}.default;`);
+    if (star) parts.push(`const ${star} = ${tmp};`);
+    if (names.length) parts.push(`const { ${names.map(([a, b]) => (a === b ? a : `${a}: ${b}`)).join(', ')} } = ${tmp};`);
+    return keepLines(all, parts.join(' '));
+  });
+  // 2) export 문
+  const reexports = [];
+  body = body.replace(new RegExp(`^export\\s*\\{([^}]*)\\}\\s*from\\s*(['"])([^'"\\n]+)\\2[ \\t]*;?`, 'gm'), (all, list, _q, spec) => {
+    const tmp = `$isl_r${n++}`;
+    reexports.push(`const ${tmp} = ${target(spec)};`);
+    const id = rel(spec) ? norm(posix.join(posix.dirname(path), spec)) : spec;
+    const names = [];
+    for (const x of list.split(',').map(t => t.trim()).filter(Boolean)) {
+      const [a, b = a] = x.split(/\s+as\s+/);
+      exportsMap[b] = `${tmp}.${a}`;
+      names.push(a);
+    }
+    imports.push({ from: id, names });
+    return keepLines(all, '');
+  });
+  body = body.replace(/^export\s*\{([^}]*)\}[ \t]*;?/gm, (all, list) => {
+    for (const x of list.split(',').map(t => t.trim()).filter(Boolean)) { const [a, b = a] = x.split(/\s+as\s+/); exportsMap[b] = a; }
+    return keepLines(all, '');
+  });
+  body = body.replace(/^export\s+default\s+(?:(async\s+function\s*\*?|function\s*\*?|class)\s*(\w*))?/gm, (all, kind, name) => {
+    if (!kind) { exportsMap.default = '$isl_default'; return 'const $isl_default = '; }
+    exportsMap.default = name || '$isl_default';
+    return `${kind.trim()} ${name || '$isl_default'}`;
+  });
+  body = body.replace(new RegExp(`^export\\s+(async\\s+function\\s*\\*?|function\\s*\\*?|class)\\s*(${ID})`, 'gm'), (all, kind, name) => { exportsMap[name] = name; return `${kind.trim()} ${name}`; });
+  body = body.replace(/^export\s+(const|let|var)(\s+)/gm, (all, kind, sp, off, whole) => {
+    for (const name of declNames(whole, off + all.length)) exportsMap[name] = name;
+    if (kind !== 'const') problems.push(`${path}: export ${kind} 은 묶음에서 가져간 쪽이 바뀐 값을 못 봐요 — const 나 함수로`);
+    return kind + sp;
+  });
+  for (const [name, local] of Object.entries(exportsMap)) if (new RegExp(`^(?:let|var)\\s+[^;\\n]*\\b${local.replace(/\$/g, '\\$')}\\b`, 'm').test(body)) problems.push(`${path}: export { ${name} } 이 let/var 이에요 — 묶음에서는 가져간 쪽이 바뀐 값을 못 봐요`);
+  if (/^export\b/m.test(body)) problems.push(`${path}: 못 바꾼 export 문 '${body.match(/^export\b.*$/m)[0].slice(0, 60)}'`);
+  // 3) 동적 import · import.meta
+  body = body.replace(/\bimport\s*\(\s*(?:(['"])([^'"\n]+)\1)?/g, (all, q, spec) => (spec && !rel(spec) ? all : `$isl_dyn(${spec ? q + spec + q : ''}`));
+  body = body.replace(/\bimport\.meta\b/g, '$isl_meta');
+  const getters = Object.entries(exportsMap).map(([k, v]) => `${JSON.stringify(k)}: () => ${v}`).join(', ');
+  body = `${reexports.join(' ')}$isl_exp({ ${getters} });\n${body}`;
+  return { body, deps, externals, exports: Object.keys(exportsMap), imports, problems };
+}
+
+/** 한 모듈 몸이 동기 함수로 읽히는지 (아니면 top-level await → async). 둘 다 안 되면 오류 글 */
+function compileKind(path, body) {
+  const wrap = a => `"use strict";(${a}function ($isl_exp, $isl_req, $isl_dyn, $isl_meta) {\n${body}\n})`;
+  try { new vm.Script(wrap(''), { filename: path }); return { async: false }; } catch (e) {
+    try { new vm.Script(wrap('async '), { filename: path }); return { async: true }; } catch { return { error: `${path}: 바꾼 모듈이 JS 로 안 읽혀요 (${e.message})` }; }
+  }
+}
+
+/** 모듈들 → 모듈 묶음 [{ name, group, path, ids, text, bytes, hash, files }]. 갈래(폴더)마다 경로 순, SRC_PACK_BYTES 를 넘으면 나눈다 */
+export function makeSrcPacks(modules, errors = []) {
+  const info = new Map();
+  for (const f of modules) {
+    const t = transformModule(f.path, read(f.path));
+    errors.push(...t.problems);
+    const kind = compileKind(f.path, t.body);
+    if (kind.error) errors.push(kind.error);
+    info.set(f.path, { ...t, async: !!kind.async, f });
+  }
+  // 가져가는 이름이 그 모듈 내보내기에 있는지 (묶음에서는 없는 이름이 조용히 undefined 가 되므로 빌드에서 막는다)
+  for (const [p, t] of info) for (const imp of t.imports) {
+    const from = info.get(imp.from);
+    if (!from) { if (/^\.|^src\//.test(imp.from)) errors.push(`${p}: 묶음에 없는 모듈 ${imp.from}`); continue; }
+    for (const name of imp.names) if (!from.exports.includes(name)) errors.push(`${p}: ${imp.from} 에 없는 내보내기 '${name}'`);
+  }
+  // 순환 import 는 못 다룬다 (가져간 값을 한 번 꺼내 두므로)
+  const state = new Map();
+  const visit = (id, stack) => {
+    state.set(id, 1);
+    for (const d of info.get(id)?.deps ?? []) {
+      if (state.get(d) === 1) errors.push(`순환 import: ${[...stack.slice(stack.indexOf(d)), d].join(' → ')}`);
+      else if (!state.get(d)) visit(d, [...stack, d]);
+    }
+    state.set(id, 2);
+  };
+  for (const id of info.keys()) if (!state.get(id)) visit(id, [id]);
+  const out = [];
+  const groups = [...new Set([...info.keys()].map(srcGroupOf))].sort((a, b) => (SRC_DIR_ORDER.indexOf(a) + 1 || 99) - (SRC_DIR_ORDER.indexOf(b) + 1 || 99) || a.localeCompare(b));
+  for (const g of groups) {
+    const list = [...info.values()].filter(t => srcGroupOf(t.f.path) === g).sort((a, b) => a.f.path.localeCompare(b.f.path));
+    splitBySize(list, t => Buffer.byteLength(t.body), SRC_PACK_BYTES).forEach((part, i) => {
+      const name = `src-${g}-${i + 1}`;
+      const ext = [...new Set(part.flatMap(t => t.externals))];
+      const head = ext.map((spec, k) => `import * as $isl_e${k} from ${JSON.stringify(spec)};\n`).join('');
+      const defs = part.map(t => {
+        const alias = t.externals.map((spec, k) => `const $isl_x${k} = $isl_e${ext.indexOf(spec)};`).join(' ');
+        return `// ── ${t.f.path}\n$isl_def(${JSON.stringify(t.f.path)}, ${JSON.stringify(t.deps)}, ${t.async ? 'async ' : ''}function ($isl_exp, $isl_req, $isl_dyn, $isl_meta) {${alias}\n${t.body}\n});`;
+      }).join('\n');
+      const text = `// 포근섬 이야기 모듈 묶음 ${name} — node tools/build-web.mjs 가 src/ 모듈로 만든 것 (직접 고치지 말 것)\n${head}const $isl_def = globalThis.__islandSrc.def;\n${defs}\n`;
+      out.push({
+        name, group: g, path: `packs/${name}.js`, ids: part.map(t => t.f.path), files: part.map(t => t.f), text,
+        bytes: Buffer.byteLength(text), hash: createHash('sha256').update(text).digest('hex').slice(0, 12),
+      });
+    });
+  }
+  return out;
+}
+
+/** 페이지 안 모듈 실행기 (인라인 <script> 로 들어간다 — 이 함수의 글자 그대로). globalThis.__islandSrc = { def, run, status } */
+export function srcRuntime(g) {
+  const defs = new Map(), spaces = new Map(), jobs = new Map();
+  const resolve = (spec, from) => new URL(spec, `http://m/${from}`).pathname.slice(1);
+  const space = id => {
+    let ns = spaces.get(id);
+    if (!ns) { ns = Object.create(null); Object.defineProperty(ns, Symbol.toStringTag, { value: 'Module' }); spaces.set(id, ns); }
+    return ns;
+  };
+  const req = id => {
+    if (!defs.has(id)) throw new Error(`묶음에 없는 모듈: ${id}`);
+    return space(id);
+  };
+  const dyn = (spec, from) => (typeof spec === 'string' && /^\.{0,2}\//.test(spec) ? run(resolve(spec, from)) : import(spec));
+  function run(id) {
+    if (!jobs.has(id)) {
+      const d = defs.get(id);
+      jobs.set(id, !d ? Promise.reject(new TypeError(`모듈을 불러오지 못했어요: ${id} (게시 모듈 묶음에 없음)`)) : (async () => {
+        for (const dep of d.deps) await run(dep);
+        const ns = space(id);
+        const exp = getters => { for (const k of Object.keys(getters)) Object.defineProperty(ns, k, { get: getters[k], enumerable: true }); };
+        await d.fn(exp, req, spec => dyn(spec, id), { url: new URL(id, g.document?.baseURI ?? 'http://localhost/').href });
+        return ns;
+      })());
+    }
+    return jobs.get(id);
+  }
+  g.__islandSrc = {
+    def(id, deps, fn) { defs.set(id, { deps, fn }); },
+    run,
+    status: () => ({ defined: defs.size, ran: jobs.size }),
+  };
 }
 
 /** 묶음에 들어갈 글자: JSON 은 공백을 줄여 그대로, 그림은 base64 글자 */
@@ -390,7 +661,7 @@ function readModules() {
 }
 
 /** index.html → 아티팩트 페이지 (뼈대 없이) */
-function buildPage({ html, js, external, modules, manifest }) {
+function buildPage({ html, srcPacks, external, modules, manifest }) {
   const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? '';
   const body = html.match(/<body>([\s\S]*?)<\/body>/)?.[1] ?? '';
   const title = head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? '<title>포근섬 이야기</title>';
@@ -403,17 +674,21 @@ function buildPage({ html, js, external, modules, manifest }) {
     build: buildStamp(),
     modules,
     stages: Object.fromEntries(modules.map(m => [m, { service: STAGES[m]?.[0] ?? m, label: STAGES[m]?.[1] ?? '준비하는 중', name: STAGES[m]?.[2] ?? m }])),
-    js: js.length,
+    js: srcPacks.length,   // M20-S3: 받는 같은 출처 .js = 모듈 묶음 수
     assets: bootAssets,
   };
   const loader = read('tools/web-loader.html').replace('/*CONFIG*/{}', () => JSON.stringify(config));
   // 묶음 목록: src/core/packs.js 가 읽는다. 실행되지 않는 JSON 글자 ('<' 는 \u003c 로 적어 </script> 가 끼지 않게)
   const packList = `<script type="application/json" id="island-packs">${JSON.stringify(manifest).replace(/</g, '\\u003c')}</script>`;
   // 모듈 미리 받기: main.js 가 모듈을 하나씩 차례로 불러오므로, 목록을 먼저 알려 주면 한꺼번에 받는다 (importmap 뒤에 둬야 한다)
-  const preload = [...external, ...js.map(f => f.path)].map(href => `<link rel="modulepreload" href="${href}">`).join('\n');
+  const preload = [...external, ...srcPacks.map(p => p.path)].map(href => `<link rel="modulepreload" href="${href}">`).join('\n');
   const mainTag = body.match(/<script type="module"[^>]*><\/script>/)?.[0];
-  if (!mainTag) throw new Error('index.html 에 <script type="module" src="src/main.js"> 가 없어요');
-  const bodyOut = body.replace(mainTag, `${packList}\n${loader.trim()}\n${mainTag}`).trim();
+  const entry = mainTag?.match(/src="([^"]+)"/)?.[1];
+  if (!entry) throw new Error('index.html 에 <script type="module" src="src/main.js"> 가 없어요');
+  // M20-S3: main.js 대신 — 모듈 실행기(인라인) → 모듈 묶음을 모두 import (등록만) → 첫 모듈 실행
+  const start = `<script>(${srcRuntime.toString()})(globalThis);</script>\n`
+    + `<script type="module" id="island-src">${srcPacks.map(p => `import "./${p.path}";`).join(' ')}\nglobalThis.__islandSrc.run(${JSON.stringify(entry)});</script>`;
+  const bodyOut = body.replace(mainTag, () => `${packList}\n${loader.trim()}\n${start}`).trim();
   return [
     title,
     viewport,
@@ -437,8 +712,8 @@ export function writeWeb(plan, outDir = join(ROOT, 'dist/web'), { live } = {}) {
   mkdirSync(join(outDir, 'packs'), { recursive: true });
   for (const f of readdirSync(outDir)) if (/^(files|publish)(-\d+)?\.json$/.test(f)) rmSync(join(outDir, f));   // 예전 묶음·차례 지우기
   for (const f of readdirSync(join(outDir, 'packs'))) rmSync(join(outDir, 'packs', f));
-  for (const p of plan.packs) writeFileSync(join(outDir, p.path), p.text);
-  const packSrc = new Map(plan.packs.map(p => [p.path, relative(ROOT, join(outDir, p.path)).replaceAll('\\', '/')]));
+  for (const p of [...plan.packs, ...plan.srcPacks]) writeFileSync(join(outDir, p.path), p.text);
+  const packSrc = new Map([...plan.packs, ...plan.srcPacks].map(p => [p.path, relative(ROOT, join(outDir, p.path)).replaceAll('\\', '/')]));
   const srcOf = f => (f.src == null ? null : packSrc.get(f.path) ?? f.src);
   const map = list => Object.fromEntries(list.map(f => [f.path, srcOf(f)]));
   writeFileSync(join(outDir, 'index.html'), plan.page);
@@ -452,7 +727,10 @@ export function writeWeb(plan, outDir = join(ROOT, 'dist/web'), { live } = {}) {
     bytes: plan.totalBytes,
     batches: plan.batches.map((b, i) => ({ file: plan.batches.length > 1 ? `files-${i + 1}.json` : 'files.json', count: b.length, bytes: b.reduce((s, f) => s + f.bytes, 0) })),
     groups: summarize(plan.publish),
-    packs: plan.packs.map(p => ({ path: p.path, boot: p.boot, count: p.files.length, bytes: p.bytes, hash: p.hash, groups: summarize(p.files) })),
+    packs: [
+      ...plan.packs.map(p => ({ path: p.path, boot: p.boot, count: p.files.length, bytes: p.bytes, hash: p.hash, groups: summarize(p.files) })),
+      ...plan.srcPacks.map(p => ({ path: p.path, boot: true, kind: 'src', count: p.files.length, bytes: p.bytes, hash: p.hash, modules: p.ids })),   // M20-S3 모듈 묶음 (늘 boot)
+    ],
     assets: summarize(plan.files.filter(f => f.path.startsWith('assets/'))),
     ...(steps ? { transition: steps.map((b, i) => ({ file: `publish-${i + 1}.json`, remove: b.filter(f => f.src == null).length, upload: b.filter(f => f.src != null).length })) } : {}),
     largest: [...plan.publish].sort((a, b) => b.bytes - a.bytes).slice(0, 10).map(f => ({ path: f.path, bytes: f.bytes })),
@@ -486,6 +764,9 @@ function report(plan, outDir, live) {
     const what = Object.entries(summarize(p.files)).map(([g, { count }]) => `${g} ${count}`).join(' · ');
     console.log(`  ${pad(p.path, 24)}${p.boot ? 'boot' : '    '}${lpad(p.files.length, 5)}개${lpad(fmt(p.bytes), 11)}  ${what}`);
   }
+  const srcIn = plan.srcPacks.reduce((s, p) => s + p.files.reduce((t, f) => t + f.bytes, 0), 0);
+  console.log(`모듈 묶음 ${plan.srcPacks.length}개 (모듈 ${plan.srcPacks.reduce((n, p) => n + p.files.length, 0)}개 원본 ${fmt(srcIn)}, 모두 boot)`);
+  for (const p of plan.srcPacks) console.log(`  ${pad(p.path, 24)}boot${lpad(p.files.length, 5)}개${lpad(fmt(p.bytes), 11)}`);
   console.log(line);
   console.log('가장 큰 게시 파일');
   for (const f of [...plan.publish].sort((a, b) => b.bytes - a.bytes).slice(0, 5)) console.log(`  ${lpad(fmt(f.bytes), 10)}  ${f.path}`);
