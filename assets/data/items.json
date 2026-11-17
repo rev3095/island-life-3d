@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "about": "아이템 사전 — 이름·파는 값(price)·사는 값(buy)·출현(장소·시간·계절·희귀). 표 편집기(data-editor.html)에서 고치고 채팅 \"숫자 반영\" 으로 들어온다. 읽는 곳 src/data/items.js. 모양: docs/notes/m6-p5-mapdata.md",
   "stack": {
     "fish": 1,
@@ -44,7 +44,8 @@
     "하구": ["river", "mouth"],
     "바다": ["sea"],
     "선착장": ["pier"],
-    "무인도 바다": ["islet"]
+    "무인도 바다": ["islet"],
+    "먼바다": ["offshore"]
   },
   "bugPlaces": {
     "꽃 주변": ["flower"],
@@ -277,5 +278,19 @@
     { "slug": "herring", "name": "청어", "time": "낮", "season": "겨울", "shadow": 2, "speed": 3, "price": 600, "rare": false, "emoji": "🐟", "desc": "푸른 등과 은빛 배의 날씬한 물고기. 찬 바닷바람에 꾸덕꾸덕 말리면 겨울 별미 과메기가 된다." },
     { "slug": "red-snow-crab", "name": "홍게", "time": "종일", "season": "겨울", "shadow": 4, "speed": 2, "price": 4000, "rare": false, "emoji": "🦀", "desc": "대게와 닮았지만 등딱지부터 다리 끝까지 붉은 게. 깊고 찬 바다 밑을 긴 다리로 걸어 다닌다." },
     { "slug": "scallop", "name": "가리비", "time": "종일", "season": "겨울", "shadow": 2, "speed": 1, "price": 1200, "rare": false, "emoji": "🐚", "desc": "부채꼴 껍데기에 골이 곧게 뻗은 조개. 껍데기를 여닫으며 물을 뿜어 통통 튀듯 헤엄친다." }
+  ],
+  "offshore": [
+    { "slug": "flying-fish", "name": "날치", "place": "먼바다", "time": "낮", "season": "여름", "shadow": 2, "price": 900, "rare": false, "emoji": "🐟", "colors": ["#7FB2D9", "#3D6F9E", "#EEF4F8", "#A9CBE6"], "desc": "배 옆으로 휙 날아올랐다 떨어지는 물고기. 커다란 가슴지느러미가 날개 같다." },
+    { "slug": "yellowtail", "name": "방어", "place": "먼바다", "time": "종일", "season": "겨울", "shadow": 5, "price": 4500, "rare": false, "emoji": "🐟", "colors": ["#9DB5C6", "#4E6E8A", "#F2F4F0", "#E8C64A"], "desc": "겨울 먼바다에서 살이 오르는 큰 물고기. 옆구리의 노란 줄이 반짝인다." },
+    { "slug": "hairtail", "name": "갈치", "place": "먼바다", "time": "밤", "season": "여름~가을", "shadow": 4, "price": 3200, "rare": false, "emoji": "🐟", "colors": ["#D8E2EA", "#AFC0CE", "#F7FAFC", "#C7D3DD"], "desc": "은빛 칼처럼 길쭉한 몸. 밤바다에서 머리를 위로 하고 서서 헤엄친다." },
+    { "slug": "mahi-mahi", "name": "만새기", "place": "먼바다", "time": "낮", "season": "여름", "shadow": 5, "price": 5000, "rare": false, "emoji": "🐠", "colors": ["#6CC27A", "#2F8F7A", "#F4E06A", "#3E9FC9"], "desc": "초록과 금빛이 섞인 화려한 몸. 뭉툭한 이마가 특징인 여름 먼바다 손님." },
+    { "slug": "skipjack", "name": "가다랑어", "place": "먼바다", "time": "종일", "season": "봄~가을", "shadow": 4, "price": 2500, "rare": false, "emoji": "🐟", "colors": ["#7E93B0", "#3A4D72", "#EEF0F2", "#5E7396"], "desc": "배에 굵은 줄무늬가 있는 날렵한 물고기. 떼 지어 빠르게 지나간다." },
+    { "slug": "grouper", "name": "능성어", "place": "먼바다", "time": "종일", "season": "연중", "shadow": 5, "price": 4000, "rare": false, "emoji": "🐡", "colors": ["#A98A6E", "#7A5E48", "#E9D9C4", "#8E7058"], "desc": "먼바다 깊은 바위 곁에 사는 듬직한 물고기. 몸에 짙은 띠가 있다." },
+    { "slug": "rockfish", "name": "볼락", "place": "먼바다", "time": "밤", "season": "겨울~봄", "shadow": 3, "price": 1500, "rare": false, "emoji": "🐟", "colors": ["#B07A5A", "#7E5240", "#E9C8AE", "#9A6A4E"], "desc": "눈이 크고 밤에 잘 무는 물고기. 추운 철 먼바다 낚시의 단골." },
+    { "slug": "sunfish", "name": "개복치", "place": "먼바다", "time": "낮", "season": "봄~가을", "shadow": 6, "price": 8000, "rare": true, "emoji": "🐡", "colors": ["#B8C4CC", "#8496A4", "#E8EEF0", "#9AAAB6"], "desc": "꼬리가 없는 듯 둥글넓적한 커다란 물고기. 맑은 날 물 위에 누워 햇볕을 쬔다." },
+    { "slug": "marlin", "name": "청새치", "place": "먼바다", "time": "종일", "season": "여름", "shadow": 6, "price": 15000, "rare": true, "emoji": "🗡️", "colors": ["#4F7FB8", "#22406E", "#E6EEF4", "#3E68A0"], "desc": "창처럼 긴 주둥이를 가진 먼바다의 왕. 낚싯대가 휘어질 만큼 힘이 세다!" },
+    { "slug": "hammerhead", "name": "귀상어", "place": "먼바다", "time": "밤", "season": "여름~가을", "shadow": 6, "price": 12000, "rare": true, "emoji": "🦈", "colors": ["#8C9AA6", "#66727E", "#EEF0EE", "#76828E"], "desc": "망치처럼 생긴 머리 양 끝에 눈이 달린 상어. 밤 먼바다에서 드물게 보인다." },
+    { "slug": "john-dory", "name": "달고기", "place": "먼바다", "time": "종일", "season": "가을~겨울", "shadow": 3, "price": 2200, "rare": false, "emoji": "🐟", "colors": ["#C9BFA0", "#9E946E", "#EDE6CF", "#B2A47E"], "desc": "옆구리에 보름달 같은 까만 점이 하나. 납작한 몸으로 살금살금 다가간다." },
+    { "slug": "alfonsino", "name": "금눈돔", "place": "먼바다", "time": "밤", "season": "겨울~봄", "shadow": 3, "price": 3000, "rare": false, "emoji": "🐠", "colors": ["#E0503E", "#B2322A", "#F6C8B8", "#E8763C"], "desc": "새빨간 몸에 금빛 큰 눈. 깊은 바다에서 밤에만 올라온다." }
   ]
 }

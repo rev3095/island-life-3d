@@ -1,0 +1,49 @@
+{
+  "id": "IC-OF-02",
+  "slug": "fish-yellowtail",
+  "name": "방어",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.yellowtail"
+  ],
+  "hold": true,
+  "triangles": 1616,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.124,
+    0.63,
+    0.181
+  ],
+  "bounds": [
+    [
+      -0.062,
+      -0.315,
+      -0.091
+    ],
+    [
+      0.062,
+      0.315,
+      0.091
+    ]
+  ],
+  "glbBytes": 43032,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-yellowtail_main.png",
+    "fish-yellowtail_thumb.png"
+  ]
+}

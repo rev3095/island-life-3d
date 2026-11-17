@@ -1,0 +1,105 @@
+{
+  "id": "BD-19-2",
+  "slug": "fish-boat",
+  "name": "어선",
+  "category": "building",
+  "kind": "fish-boat",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "통통한 나무 고깃배. 앞쪽에 작은 하늘색 조타실, 뒤쪽 갑판은 낚싯대 꽂이와 아이스박스가 있는 낚시 자리. 먼바다 낚시를 떠나는 배.",
+    "keywords": [
+      "나무 고깃배",
+      "하늘색 조타실",
+      "빨간 띠",
+      "뒤 갑판 낚시 자리"
+    ],
+    "references": [
+      "작은 어촌 고깃배·나무 부두"
+    ],
+    "avoid": [
+      "큰 철선",
+      "모터보트 엔진 소음 같은 현대 장비"
+    ],
+    "notes": "east-fishboat D275 — 섬 동쪽 끝 어선 선착장"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.014
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.5,
+      "max": 1.6,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "mastHeight": {
+      "label": "돛대 높이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "hull": "#F2EBDD",
+    "hullDark": "#5E4632",
+    "stripe": "#D2553F",
+    "deck": "#C9A36E",
+    "trim": "#E8C64A",
+    "buoy": "#F2F2EE",
+    "cabin": "#8EC5DA",
+    "roof": "#3F6F8E",
+    "window": "#CFEFF8",
+    "glow": "#FFD98A",
+    "flag": "#E8604C",
+    "rope": "#E8D5A8",
+    "cooler": "#4F9BC9"
+  },
+  "paletteLabels": {
+    "hull": "배 몸",
+    "hullDark": "뱃전·돛대",
+    "stripe": "띠",
+    "deck": "갑판",
+    "trim": "장식",
+    "buoy": "부표",
+    "cabin": "조타실",
+    "roof": "조타실 지붕",
+    "window": "창",
+    "glow": "등",
+    "flag": "깃발",
+    "rope": "밧줄",
+    "cooler": "아이스박스"
+  },
+  "footprint": [
+    3,
+    2
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        2.6,
+        1.2
+      ]
+    }
+  }
+}

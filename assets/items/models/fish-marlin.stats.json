@@ -1,0 +1,49 @@
+{
+  "id": "IC-OF-09",
+  "slug": "fish-marlin",
+  "name": "청새치",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.marlin"
+  ],
+  "hold": true,
+  "triangles": 2692,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.426,
+    0.764,
+    0.269
+  ],
+  "bounds": [
+    [
+      -0.213,
+      -0.382,
+      -0.135
+    ],
+    [
+      0.213,
+      0.382,
+      0.135
+    ]
+  ],
+  "glbBytes": 60144,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-marlin_main.png",
+    "fish-marlin_thumb.png"
+  ]
+}

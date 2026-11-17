@@ -1771,6 +1771,7 @@ BUILDERS = {
 import night_special_env; BUILDERS.update(night_special_env.builders(globals()))   # P54 밤 특별 상점 BD-13–15 · PR-35
 import contest_env; BUILDERS.update(contest_env.builders(globals()))   # M18-P3 광장 대회 무대 BD-17
 import lighthouse_env; BUILDERS.update(lighthouse_env.builders(globals()))   # M19-P4 옛 등대 BD-18 · 단계 소품 PR-41–44
+import fishboat_env; BUILDERS.update(fishboat_env.builders(globals()))   # east-fishboat 어선 선착장 BD-19 (부두 · 어선)
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

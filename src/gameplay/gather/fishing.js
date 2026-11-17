@@ -22,6 +22,9 @@ export function createFishing(ctx, kit, { mk, fx, results, toolbelt, act }) {
   // ---------- 물 자리 → 서식지 ----------
   const mouthCache = new Map();
   function habitatAt(x, z) {
+    // east-fishboat: 먼바다 배 위에서는 boat 가 서식지를 정한다 ('offshore' | null, 먼바다가 아니면 undefined → 아래 섬 물 판정)
+    const off = ctx.services.boat?.habitatAt?.(x, z);
+    if (off !== undefined) return off;
     const world = kit.world;
     if (!world) return null;
     const isl = world.island;

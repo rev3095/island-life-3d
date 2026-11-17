@@ -1,0 +1,54 @@
+{
+  "id": "CH-21",
+  "slug": "neoul",
+  "name": "너울",
+  "species": "otter",
+  "version": "0.1",
+  "triangles": 11204,
+  "vertices": 5654,
+  "bones": 14,
+  "materials": [
+    "shirt",
+    "pants",
+    "fur",
+    "muzzle",
+    "nose",
+    "eye",
+    "eyeHighlight",
+    "blush",
+    "innerEar",
+    "tail"
+  ],
+  "animations": {
+    "idle": {
+      "frames": 48,
+      "seconds": 2.0
+    },
+    "walk": {
+      "frames": 24,
+      "seconds": 1.0
+    },
+    "run": {
+      "frames": 16,
+      "seconds": 0.67
+    },
+    "happy": {
+      "frames": 36,
+      "seconds": 1.5
+    }
+  },
+  "height": 0.98,
+  "glbBytes": 384800,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "neoul_back.png",
+    "neoul_front.png",
+    "neoul_happy.png",
+    "neoul_hero.png",
+    "neoul_run.png",
+    "neoul_side.png",
+    "neoul_three_quarter.png",
+    "neoul_thumb.png",
+    "neoul_walk.png"
+  ]
+}

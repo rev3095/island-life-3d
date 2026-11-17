@@ -8,7 +8,7 @@ import { luck } from './luck.js';
 const G = RULES.gather;
 
 /** 낚시 자리 → 잡히는 서식지. 선착장은 바다 물고기도, 하구는 강 물고기도 잡힌다 */
-export const HABITAT_POOLS = { river: ['river'], pond: ['pond'], sea: ['sea'], pier: ['sea', 'pier'], mouth: ['river', 'mouth'] };
+export const HABITAT_POOLS = { river: ['river'], pond: ['pond'], sea: ['sea'], pier: ['sea', 'pier'], mouth: ['river', 'mouth'], offshore: ['offshore'] };   // offshore = 어선 타고 나간 먼바다 (gameplay/boat — 섬 물에는 없다)
 // P35 무인도 투어: 투어 섬(opts.islet)에서는 바다에 'islet' 물고기가, 곤충 자리마다 'islet-<자리>' 곤충이 더 나온다 (본섬에선 안 나온다)
 const isletPool = (pool, islet) => (islet ? [...pool, ...pool.filter(p => p === 'sea' || p === 'pier').map(() => 'islet')] : pool);
 export const BUG_PLACES = ['flower', 'tree', 'ground', 'air', 'rock', 'water', 'lamp', 'fruit', 'palm', 'shake', 'under'];

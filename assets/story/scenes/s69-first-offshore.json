@@ -1,0 +1,215 @@
+{
+  "id": "s69-first-offshore",
+  "version": 1,
+  "status": "review",
+  "chapter": "먼바다",
+  "title": "첫 먼바다",
+  "summary": "어선이 섬을 떠나 사방이 바다뿐인 먼바다에 닿는다. 너울이 조타실 옆에서 「여기가 먼바다여」 하고, 주인공은 뒤 갑판에서 깊은 바다를 내려다보며 낚싯대를 든다. 먼바다에만 사는 물고기가 있다고 알려 준다.",
+  "trigger": {
+    "on": "boat-sail"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "하늘에서 → 갑판 → 낚싯대",
+      "recommended": true,
+      "desc": "사방이 바다인 어선을 하늘에서 → 너울이 바다를 가리킴 → 주인공이 기뻐하며 뒤 갑판으로.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "바다 한가운데 어선 — 하늘에서",
+          "dur": 4,
+          "cam": {
+            "size": "overhead",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 270,
+              "text": ""
+            },
+            {
+              "who": "neoul",
+              "at": [
+                0.72,
+                -0.3
+              ],
+              "face": 90,
+              "text": ""
+            }
+          ],
+          "transition": "fade",
+          "music": "auto",
+          "caption": "먼바다"
+        },
+        {
+          "id": "c2",
+          "note": "너울이 바다를 가리킨다",
+          "dur": 3,
+          "cam": {
+            "size": "group",
+            "target": "place",
+            "angle": -25,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.72,
+                -0.3
+              ],
+              "face": 270,
+              "text": "",
+              "do": "happy",
+              "emote": "🌊"
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 90,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "주인공 — 먼바다 물고기를 낚아 보자",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": 20,
+            "move": "orbit"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "🎣"
+            }
+          ],
+          "caption": "먼바다에서만 잡히는 물고기가 있어요 · 게임 시간 2시간",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "떠나는 섬을 돌아보기",
+      "desc": "멀어진 섬 쪽(서쪽)을 돌아보는 주인공 → 너울의 한마디 → 바다 쪽으로 몸을 돌림.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "서쪽을 돌아보는 주인공",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "player",
+            "angle": 180,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 90,
+              "text": "",
+              "emote": "🏝️"
+            },
+            {
+              "who": "neoul",
+              "at": [
+                0.72,
+                -0.3
+              ],
+              "face": 90,
+              "text": ""
+            }
+          ],
+          "transition": "fade"
+        },
+        {
+          "id": "c2",
+          "note": "너울의 한마디",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "place",
+            "angle": -20,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "neoul",
+              "at": [
+                0.72,
+                -0.3
+              ],
+              "face": 270,
+              "text": "",
+              "emote": "🐟"
+            },
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 270,
+              "text": ""
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "바다를 향해 낚싯대",
+          "dur": 3.5,
+          "cam": {
+            "size": "wide",
+            "target": "place",
+            "angle": 30,
+            "move": "crane"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 270,
+              "text": "",
+              "do": "happy",
+              "emote": "🎣"
+            }
+          ],
+          "caption": "먼바다",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

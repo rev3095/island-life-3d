@@ -24,6 +24,8 @@ export const TRIGGERS = {
   'bond-tier': { label: '주민과 친밀도 단계가 오를 때 (M19-P2 — trigger.slug = 주민, trigger.tier = friend · close, town/talk.js 가 보내는 town:bond — 이미 그 단계면 다음에 말할 때 하루 하나)', event: 'town:bond', test: (p, t) => !!t.slug && p?.slug === t.slug && tierReached(p?.tier, t.tier) },
   'pair-makeup': { label: '짝 화해 저녁 (M19-P3 — town/pairs.js 가 보내는 town:pair 의 makeup, 자리 x·z · 배우 바꾸기 cast · 글 자리 {a} {b} {ab})', event: 'town:pair', test: p => !!p?.makeup },
   lighthouse: { label: '등대 다시 켜기 (M19-P4 — trigger.kind = start · path · stairs · lens · lantern · night · lit · morning, lighthouse 가 보내는 lighthouse:scene)', event: 'lighthouse:scene', test: (p, t) => !!t.kind && p?.kind === t.kind },
+  'boat-meet': { label: '섬 동쪽 끝 어선 부두에 처음 다가갈 때 (east-fishboat — boat 가 보내는 boat:meet 의 first, 자리 x·z = 부두 앞)', event: 'boat:meet', test: p => !!p?.first },
+  'boat-sail': { label: '어선을 타고 먼바다에 처음 나갔을 때 (east-fishboat — boat 가 보내는 boat:sail 의 first, 자리 x·z = 갑판)', event: 'boat:sail', test: p => !!p?.first },
   manual: { label: '직접 부를 때만 (story.play)', event: null },
 };
 /** bond-tier 트리거의 tier (rules.json town.tiers 의 이름 — 사연 ① 친구 · ② 단짝) */
@@ -401,6 +403,8 @@ export function memoryHint(sc, nameOf = s => s) {
     case 'contest-first': return '광장 계절 대회에 나가 보면';
     case 'night-first': return '늦은 밤, 처음 보는 가게에 들어가 보면';
     case 'tour-first': return '선착장 배를 타고 무인도에 가 보면';
+    case 'boat-meet': return '섬 동쪽 끝 바닷가에 가 보면';
+    case 'boat-sail': return '어선을 타고 먼바다에 나가 보면';
     case 'peddler-first': return '수·일요일 낮 광장 행상 수레에 다가가 보면';
     case 'rating-five': return '섬 평가 별 다섯을 받으면';
     case 'lighthouse': return LIGHT_HINT[t.kind] ?? '등대를 한 단계 더 고치면';

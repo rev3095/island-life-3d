@@ -66,4 +66,6 @@ export const SCENE_FILES = [
   'assets/story/scenes/s63-ssalal-cheek-seeds.json',   // M19-P5 쌀알 사연 ② 단짝
   'assets/story/scenes/s64-boreum-faded-photo.json',   // M19-P5 보름 사연 ① 친구 — 등대 실마리
   'assets/story/scenes/s65-boreum-trunk-song.json',   // M19-P5 보름 사연 ② 단짝
+  'assets/story/scenes/s68-ferryman-meet.json',   // east-fishboat 뱃사공 너울 첫 만남 (trigger boat-meet)
+  'assets/story/scenes/s69-first-offshore.json',   // east-fishboat 첫 먼바다 (trigger boat-sail)
 ];

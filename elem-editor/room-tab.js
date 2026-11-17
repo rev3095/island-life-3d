@@ -24,7 +24,7 @@ const HALL_SLUGS = HALLS.map(h => `hall-${h}`);
 /** 박물관 관 전시 자리 수를 셀 아이템 목록 (items.js list(c) 와 같은 순서 — 표 순서) */
 export function hallLists(T = {}) {
   return {
-    fish: (T.fish ?? []).map(r => ({ id: `fish.${r.slug}` })),
+    fish: [...(T.fish ?? []), ...(T.offshore ?? [])].map(r => ({ id: `fish.${r.slug}` })),   // + 먼바다 물고기 IC-OF (items.json offshore, east-fishboat)
     bug: (T.bugs ?? []).map(r => ({ id: `bug.${r.slug}` })),
     fossil: (T.fossils ?? []).map(r => ({ id: `fossil.${r.slug}` })),
     sea: (T.sea ?? []).map(r => ({ id: `sea.${r.slug}` })),

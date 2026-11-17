@@ -261,6 +261,16 @@
         "hip": 0.0554,
         "forward": -0.0043
       }
+    },
+    {
+      "id": "CH-21",
+      "slug": "neoul",
+      "name": "너울",
+      "species": "otter",
+      "role": "어선 뱃사공 · 해달",
+      "category": "character",
+      "version": "0.1",
+      "status": "review"
     }
   ]
 }

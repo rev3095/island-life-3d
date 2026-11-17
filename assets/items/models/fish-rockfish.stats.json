@@ -1,0 +1,49 @@
+{
+  "id": "IC-OF-07",
+  "slug": "fish-rockfish",
+  "name": "볼락",
+  "group": "fish",
+  "kind": "fish",
+  "version": "0.1",
+  "items": [
+    "fish.rockfish"
+  ],
+  "hold": true,
+  "triangles": 1632,
+  "parts": 1,
+  "materials": [
+    "back",
+    "belly",
+    "body",
+    "eye",
+    "eyeHighlight",
+    "fin",
+    "mark"
+  ],
+  "objects": [
+    "fish"
+  ],
+  "size": [
+    0.086,
+    0.43,
+    0.165
+  ],
+  "bounds": [
+    [
+      -0.043,
+      -0.215,
+      -0.083
+    ],
+    [
+      0.043,
+      0.215,
+      0.083
+    ]
+  ],
+  "glbBytes": 41308,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "fish-rockfish_main.png",
+    "fish-rockfish_thumb.png"
+  ]
+}
