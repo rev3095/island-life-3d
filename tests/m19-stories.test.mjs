@@ -77,7 +77,7 @@ test('답례: ② 단짝만 · 가구 넷(FU-105–108) + 말버릇 이모티콘
     assert.ok(Object.values(BOND_STORY).some(r => r.item === id));
     const slug = id.slice(5);
     const spec = JSON.parse(read(`assets/furniture/specs/${slug}.json`));
-    assert.equal(spec.id, code); assert.equal(spec.status, 'review');
+    assert.equal(spec.id, code); assert.equal(spec.status, 'approved');
     assert.ok(existsSync(new URL(`../assets/furniture/models/${slug}.glb.json`, import.meta.url)), `${slug} 모델`);
   }
   assert.deepEqual(bondReward('bori', 'friend', 's33-bori-nap-spot'), { photo: true });

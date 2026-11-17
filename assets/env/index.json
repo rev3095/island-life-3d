@@ -499,7 +499,7 @@
       "category": "prop",
       "kind": "lighthouse-scaffold",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-42",
@@ -508,7 +508,7 @@
       "category": "prop",
       "kind": "lighthouse-stairs",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-43",
@@ -517,7 +517,7 @@
       "category": "prop",
       "kind": "lighthouse-lens",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "PR-44",
@@ -526,7 +526,7 @@
       "category": "prop",
       "kind": "star-lantern",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-01",
@@ -688,7 +688,7 @@
       "category": "building",
       "kind": "lighthouse",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-18-2",
@@ -697,7 +697,7 @@
       "category": "building",
       "kind": "lighthouse",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-18-3",
@@ -706,7 +706,7 @@
       "category": "building",
       "kind": "lighthouse",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "FB-01",

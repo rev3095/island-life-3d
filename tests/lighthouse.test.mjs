@@ -47,12 +47,12 @@ test('설정: 단계 다섯 · id·장면 겹침 없음 · 재료 · 돕는 주�
   for (const s of cfg.stages) for (const n of s.needs) if (n.id) assert.ok(mats.has(n.id), n.id);
 });
 
-test('설정 ↔ 모델·스펙: 등대 셋 · 소품 넷이 배경 목록에 있고 검수 대기', () => {
+test('설정 ↔ 모델·스펙: 등대 셋 · 소품 넷이 배경 목록에 있고 확정 (M20)', () => {
   const env = new Map(J('assets/env/index.json').models.map(m => [m.slug, m]));
   for (const slug of cfg.assets.env) {
     assert.ok(env.has(slug), slug);
     assert.ok(existsSync(new URL(`../assets/env/models/${slug}.glb.json`, import.meta.url)), `${slug} 모델`);
-    assert.equal(J(`assets/env/specs/${slug}.json`).status, 'review', slug);
+    assert.equal(J(`assets/env/specs/${slug}.json`).status, 'approved', slug);
   }
   for (const k of Object.values(cfg.models)) assert.ok(cfg.assets.env.includes(k), k);
   for (const p of cfg.props) assert.ok(cfg.assets.env.includes(p.env), p.env);
