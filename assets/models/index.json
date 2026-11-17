@@ -242,7 +242,7 @@
       "role": "주민 · 햄스터 (이사 후보)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0394,
         "forward": -0.0039
@@ -256,7 +256,7 @@
       "role": "주민 · 코끼리 (이사 후보)",
       "category": "character",
       "version": "0.1",
-      "status": "review",
+      "status": "approved",
       "sit": {
         "hip": 0.0554,
         "forward": -0.0043

@@ -5,7 +5,7 @@
   "category": "building",
   "kind": "lighthouse",
   "version": "0.1",
-  "status": "review",
+  "status": "approved",
   "prompt": {
     "concept": "다시 켠 등대. 새 칠 · 빨간 띠, 등실 안 별 조각 등이 밤마다 빛나고(빛 띠는 게임 셰이더), 창도 밤에 켜진다.",
     "keywords": [
