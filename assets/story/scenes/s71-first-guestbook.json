@@ -1,0 +1,111 @@
+{
+  "id": "s71-first-guestbook",
+  "version": 1,
+  "status": "review",
+  "chapter": "친구 섬 구경",
+  "title": "첫 방명록 도장",
+  "summary": "친구 섬 방명록에 처음 도장을 찍는다. 도장이 모이면 섬 일지 목표와 기념 가구가 생긴다고 알려 준다.",
+  "trigger": {
+    "on": "visit-stamp"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "콕 → 기뻐하기",
+      "recommended": true,
+      "desc": "받침 앞 주인공이 도장을 콕 → 기뻐하며 도장 모음 안내.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "받침 앞 주인공",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": 25,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 90,
+              "text": "",
+              "emote": "🔖"
+            }
+          ],
+          "transition": "fade",
+          "music": "auto"
+        },
+        {
+          "id": "c2",
+          "note": "기뻐하기",
+          "dur": 3.5,
+          "cam": {
+            "size": "full",
+            "target": "player",
+            "angle": -20,
+            "move": "orbit"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "🎉"
+            }
+          ],
+          "caption": "도장 모음은 섬폰 「친구 섬」에서 · 1·3·5·10곳마다 기념 가구",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷",
+      "recommended": false,
+      "desc": "도장 찍고 바로 안내.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": 0,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "🔖"
+            }
+          ],
+          "transition": "fade",
+          "music": "auto",
+          "caption": "첫 방명록 도장!",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

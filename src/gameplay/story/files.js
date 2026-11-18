@@ -70,4 +70,7 @@ export const SCENE_FILES = [
   'assets/story/scenes/s67-lighthouse-keeper-night.json',   // 서쪽 등대 불 켠 밤 뒤 등대지기 한마디 (kind lit-keeper)
   'assets/story/scenes/s68-ferryman-meet.json',   // east-fishboat 뱃사공 너울 첫 만남 (trigger boat-meet)
   'assets/story/scenes/s69-first-offshore.json',   // east-fishboat 첫 먼바다 (trigger boat-sail)
+  'assets/story/scenes/s70-first-friend-island.json',   // M21-P4 친구 섬 구경 (trigger visit-first)
+  'assets/story/scenes/s71-first-guestbook.json',   // M21-P4 친구 섬 구경 (trigger visit-stamp)
+  'assets/story/scenes/s72-first-friend-letter.json',   // M21-P4 친구 섬 구경 (trigger visit-letter)
 ];

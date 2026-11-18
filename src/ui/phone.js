@@ -22,6 +22,7 @@ export const APPS = [
   { id: 'clock', name: '시계', icon: '🕰️', color: '#E9D3A8', panel: 'clock' },   // 11차 시계 (p33-clock): 바늘을 돌려 게임 시각 바꾸기 (창은 ui/clock.js → ui.clock)   // 8차 UI-13 (창은 gameplay/events 가 ui.calendar 로 채운다)
   { id: 'guide', name: '안내', icon: '💡', color: '#F6E3A1', panel: 'guide' },   // 7차 M7-P5: 첫날 할 일·조작·지난 힌트 (창은 intro 가 ui.guide 로 채운다)
   { id: 'transfer', name: '저장 옮기기', icon: '📦', color: '#E8C9A0', panel: 'transfer' },   // 7차 UI-09 (M7-P4)
+  { id: 'friends', name: '친구 섬', icon: '🏝️', color: '#9CCBE8', panel: 'friends' },   // M21-P4 UI-38·UI-40 (창은 gameplay/visit/ui.js → ui.friends)
   { id: 'report', name: '문제 알리기', icon: '📮', color: '#F0B8B0', panel: 'report' },       // 7차 UI-08 (M7-P4)
 ];
 /** 지금 보일 앱 (P4 창이 아직 없으면 그 줄을 뺀다) */

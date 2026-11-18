@@ -41,6 +41,17 @@ export function createMail(ctx, { lines, residents = null }) {
     return letter;
   }
 
+  /** M21-P4 친구 섬 편지·선물 (visit/guestbook.js 가 넣는다): from = { name, island }, lines = 이미 고른 문장 글 → 편지 | null */
+  function friend({ from, lines: text, gift = null } = {}) {
+    if (!Array.isArray(text) || !text.length) return null;
+    const m = box();
+    const letter = { id: m.nextId++, from: 'friend', friend: { name: String(from?.name ?? '').slice(0, 20), island: String(from?.island ?? '').slice(0, 20) }, kind: 'friend', day: context(ctx).dayKey, lines: text.map(String), gift, read: false };
+    m.list.push(letter);
+    while (m.list.length > KEEP) { const i = m.list.findIndex(l => l.read); if (i < 0) break; m.list.splice(i, 1); }
+    ctx.events.emit('mail:new', { from: 'friend', kind: 'friend' });
+    return letter;
+  }
+
   /** 그날 아침 편지 배달 (하루 한 번, 첫날 안내 뒤부터) → 넣은 수 */
   function deliver(dayKey = context(ctx).dayKey) {
     const m = box();
@@ -118,11 +129,11 @@ export function createMail(ctx, { lines, residents = null }) {
     if (!list.length) { await offerWrite(say, true); return; }
     await say([`(편지가 ${list.length}통 와 있다.)`]);
     for (const l of list) {
-      const P = who(l.from);
+      const P = l.friend ? { name: l.friend.name || '친구', color: '#9CCBE8' } : who(l.from);   // M21-P4 친구 섬 편지
       const vars = { item: l.gift ? itemName(l.gift) : '' };
       const text = [...(l.about ? [`(내가 보낸 「${l.about}」 편지의 답장이다.)`] : []), ...l.lines];
-      if (l.gift && !l.stub) text.push(...pickLines(lines[l.from]?.letters?.gift, Math.random), '(편지에 {item:이} 들어 있다!)');
-      await speaker(ctx, { name: P ? `${P.name}의 편지` : '편지', color: P?.color ?? BOX.color, voice: '' }, vars)(text);
+      if (l.gift && !l.stub) text.push(...(l.friend ? [] : pickLines(lines[l.from]?.letters?.gift, Math.random)), '(편지에 {item:이} 들어 있다!)');
+      await speaker(ctx, { name: P ? `${P.name}의 편지${l.friend?.island ? ` · ${l.friend.island}` : ''}` : '편지', color: P?.color ?? BOX.color, voice: '' }, vars)(text);
       l.read = true;
       if (!l.gift) continue;
       if (giveItem(ctx, l.gift) > 0) {
@@ -137,5 +148,5 @@ export function createMail(ctx, { lines, residents = null }) {
     await offerWrite(say, false);
   }
 
-  return { spot, deliver, post, unread, read, box, write, canWrite, sent: () => sentBox(ctx.state) };
+  return { spot, deliver, post, friend, unread, read, box, write, canWrite, sent: () => sentBox(ctx.state) };
 }

@@ -1,0 +1,110 @@
+{
+  "id": "s72-first-friend-letter",
+  "version": 1,
+  "status": "review",
+  "chapter": "친구 섬 구경",
+  "title": "첫 친구 편지",
+  "summary": "내 섬에 구경 온 친구가 남긴 편지가 처음 우편함에 도착한다. 받은 편지·도장은 섬폰 「친구 섬」에서 보고, 마음에 안 들면 숨기거나 알릴 수 있다.",
+  "trigger": {
+    "on": "visit-letter"
+  },
+  "place": "playerHouse",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "우편함 → 편지 펼치기",
+      "recommended": true,
+      "desc": "내 집 우편함 앞 → 주인공이 편지를 꺼내 기뻐함 → 섬폰 안내.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "내 집 앞 우편함",
+          "dur": 3,
+          "cam": {
+            "size": "full",
+            "target": "place",
+            "angle": 15,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0.6,
+                0.4
+              ],
+              "face": 0,
+              "text": ""
+            }
+          ],
+          "transition": "fade",
+          "music": "auto"
+        },
+        {
+          "id": "c2",
+          "note": "편지를 펼친다",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": -20,
+            "move": "orbit"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0.6,
+                0.4
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "✉️"
+            }
+          ],
+          "caption": "친구 섬에서 편지가 왔어요 · 섬폰 「친구 섬」에서 다시 보고 숨기기·알리기도 돼요",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "한 컷",
+      "recommended": false,
+      "desc": "편지를 들고 기뻐하기.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공",
+          "dur": 3,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": 0,
+            "move": "static"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "💌"
+            }
+          ],
+          "transition": "fade",
+          "music": "auto",
+          "caption": "친구 섬 편지가 왔어요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

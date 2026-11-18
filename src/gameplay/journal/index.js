@@ -145,6 +145,7 @@ function createJournal(ctx, cfg) {
     ev.on('contest:enter', () => count('contest'));   // M18-P3 계절 대회 나가기 (gameplay/contest)
     ev.on('town:pair', ({ phase } = {}) => { if (phase === 'made') count('makeup'); });   // M19-P3 짝 화해시키기 (town/pairs.js)
     ev.on('lighthouse:stage', () => count('lighthouse'));
+    ev.on('visit:stamp', ({ newIsland } = {}) => { if (newIsland) count('stamp'); });   // M21-P4 친구 섬 방명록 도장 (처음 찍는 섬만 — gameplay/visit/guestbook.js)
     ev.on('boat:catch', () => count('offshore'));   // east-fishboat 먼바다 물고기 잡기 (gameplay/boat)   // M19-P4 등대 다시 켜기 단계 (gameplay/lighthouse)
     ev.on('museum:changed', ({ id } = {}) => { if (id) count('donate'); });
     ev.on('dialog:line', ({ speaker } = {}) => {

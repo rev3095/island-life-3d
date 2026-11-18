@@ -1,0 +1,134 @@
+{
+  "id": "s70-first-friend-island",
+  "version": 1,
+  "status": "review",
+  "chapter": "친구 섬 구경",
+  "title": "첫 친구 섬 구경",
+  "summary": "처음으로 친구의 섬에 내린다. 낯선 섬을 둘러보며 두근거리고, 우편함 옆 방명록 받침에 도장·편지·선물을 남길 수 있다고 알려 준다.",
+  "trigger": {
+    "on": "visit-first"
+  },
+  "place": "event",
+  "once": true,
+  "pick": "A",
+  "takes": [
+    {
+      "key": "A",
+      "title": "하늘에서 → 두리번 → 방명록",
+      "recommended": true,
+      "desc": "친구 섬을 하늘에서 내려다본 뒤 → 주인공이 두리번거리며 설렘 → 방명록 안내.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "친구 섬 — 하늘에서",
+          "dur": 4,
+          "cam": {
+            "size": "overhead",
+            "target": "place",
+            "angle": 0,
+            "move": "crane"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": 270,
+              "text": ""
+            }
+          ],
+          "transition": "fade",
+          "music": "auto",
+          "caption": "친구 섬"
+        },
+        {
+          "id": "c2",
+          "note": "주인공이 두리번거린다",
+          "dur": 3,
+          "cam": {
+            "size": "full",
+            "target": "player",
+            "angle": 20,
+            "move": "orbit"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "✨"
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "note": "방명록 안내",
+          "dur": 3.5,
+          "cam": {
+            "size": "medium",
+            "target": "player",
+            "angle": -15,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "emote": "📖"
+            }
+          ],
+          "caption": "우편함 옆 방명록에 도장·편지·선물을 남길 수 있어요 · 하루 세 섬까지",
+          "wait": true
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "title": "바로 가까이",
+      "recommended": false,
+      "desc": "내리자마자 얼굴 가까이 → 기뻐하기.",
+      "shots": [
+        {
+          "id": "c1",
+          "note": "주인공 얼굴",
+          "dur": 3,
+          "cam": {
+            "size": "close",
+            "target": "player",
+            "angle": 0,
+            "move": "push"
+          },
+          "actors": [
+            {
+              "who": "player",
+              "at": [
+                0,
+                0
+              ],
+              "face": "camera",
+              "text": "",
+              "do": "happy",
+              "emote": "🏝️"
+            }
+          ],
+          "transition": "fade",
+          "music": "auto",
+          "caption": "친구 섬에 왔어요",
+          "wait": true
+        }
+      ]
+    }
+  ]
+}

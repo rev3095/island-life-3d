@@ -6,6 +6,7 @@
 // 노트 docs/notes/m21-p2-share.md.
 import * as R from './rules.js';
 import { openStore } from './store.js';
+import { attachGuestbook } from './guestbook.js';   // M21-P4 방명록·편지·선물
 
 const WHY_TEXT = {
   'no-store': '이 창에서는 섬을 보여 줄 수 없어요.',
@@ -58,7 +59,7 @@ export default {
       busy = true;
       try {
         if (!v.code) v.code = await freshCode();
-        const doc = R.islandDoc({ code: v.code, user: store.uid, snap: photo(), dayKey: dayKey(), now: Date.now() });
+        const doc = R.islandDoc({ code: v.code, user: store.uid, snap: photo(), dayKey: dayKey(), now: Date.now(), hide: v.hide });   // M21-P4 hide = 주인이 숨긴 글
         let res = await store.put(doc);
         if (!res?.ok && res?.why === 'code-taken') {   // 드물게 겹치면 새 코드로 한 번 더
           v.code = await freshCode();
@@ -129,6 +130,7 @@ export default {
     ctx.services.visit = api;
     // M21-P3 구경 가기: 친구 섬 배 BD-20 · 섬 고르기 UI-39 · x 1300 구경 섬 · visit.trip() (visit/travel.js)
     travel = await import('./travel.js').then(m => m.attachTravel(ctx, api)).catch(e => { console.warn('[visit] 구경 가기를 못 붙였다', e); return null; });
+    await attachGuestbook(ctx, api).catch(e => console.warn('[visit] 방명록을 못 붙임', e));   // M21-P4 방명록·편지·선물 (api.guestbook · ui.friends · 행동 키 visit-guestbook)
 
     // 하루 한 번 올리기
     ctx.events.on('data:newday', () => { if (R.needsUpload(V(), dayKey())) upload(); });
