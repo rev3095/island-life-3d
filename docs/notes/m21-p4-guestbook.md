@@ -16,7 +16,11 @@ P2 노트의 제안 `visits/<섬 코드>/<쓴 사람 id>/<글 id>` 는 쓰지 �
 - 개발 서버 `GET /api/db/visits` · `GET|PUT /api/db/visits/<uid>` → `assets/review/visits.json`, 쓰기는 같은 `canWriteVisit` 로 403 (머리글 `x-island-user`, P2 와 같은 localStorage 열쇠).
 - 테스트 `tests/visit.test.mjs` 에 셋 더함: 남의 글 덮어쓰기(남의 칸·남의 user)·자유 글 칸·남의 섬 숨기기 거절 · 받는 쪽 고르기 · 하루 세 섬 · 기념 가구 · 문장 표.
 
-## 게임 capabilities `visits` 규칙 (최종 — 조정 세션이 게시 때 선언)
+## 게임 capabilities `visits` 규칙 (2026-11-18 선언함 — 버전 1794992420-0be4)
+
+**실제 선언은 `{self}` 두 줄이 `write: "interact"`** — 플랫폼이 `view` 쓰기를 거절했다 (「people held to view cannot write shared data whatever the rules say」). 그래서 보여 주기·남기기는 **Contributor(interact) 이상으로 공유받은 사람만** 되고, 공개 링크로 보는 사람은 구경(읽기 `view`)만 된다 (`user.can('data.write')` false → 「이 링크로는 섬을 올릴 수 없어요」). 또 공개(public) 아티팩트에서는 규칙을 넓히는 선언이 거절되어, 공개 공유를 잠깐 끄고 선언한 뒤 다시 켰다.
+
+아래는 처음 제안 (`view` 쓰기 부분만 실제와 다름):
 
 P2 제안의 `visits` 두 줄이 이 모양에 그대로 맞는다 (`visits/{self}` = 둘째 칸 = 쓴 사람 uid):
 
