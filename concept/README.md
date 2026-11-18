@@ -24,6 +24,7 @@
 | 15차 검수 보드 v1 (M18 방향 — 계절이 깊어진다: 계절 생물 · 별자리·큰 유성우 · 장마/태풍/첫눈 · 대회 · 미술품 주고받기 · 계절 레시피, D190–D197) | `wave15-board.html` + `board-kit.js` | https://claude.ai/artifact/3hoiPoHF3nZJS2fDj5nSVc | `wave15` |
 | 16차 검수 보드 v1 (M19 방향 — 섬 이야기 2부: 주민 사연 장면 · 주민끼리 사이 · 등대 다시 켜기 · 새 주민 둘 · 추억 다시 보기, D200–D207) | `wave16-board.html` + `board-kit.js` | https://claude.ai/artifact/7vq1nQedDmmGB45RJGxTNU | `wave16` |
 | 새 주민 컨셉 보드 v1 (M19-P1 — CH-18 · CH-19 후보 셋씩, D210–D217) | `newfolk-board.html` + `board-kit.js` | https://claude.ai/artifact/ELNHkTZpbyjHvzqLy2jY65 | `newfolk` |
+| 17차 검수 보드 v1 (M21 방향 — 친구 섬 구경: 보여 주기 · 섬 코드 · 구경 · 방명록·편지·선물 · 안전, D280–D287) | `wave17-board.html` + `board-kit.js` | https://claude.ai/artifact/YSDCYaTUxgzq3CYZnWMLvq | `wave17` |
 | 밤·새벽 검수 보드 v0.1 (M12 야시장 · 야행성 주민 · 밤 상점 · 밤에만 여는 집 · 새벽 타로 천막, D106–D114 — 반영 v1 = 모두 A, main de3117f) | `night-board.html` + `board-kit.js` | https://claude.ai/artifact/PLWgpRtW8quwEBFBVJiyWU | `night` |
 | 무인도 투어 검수 보드 v0.1 (선착장 배 · 무작위 섬 · 희귀 채집, D120–D128 — 11차 D100-B 「새 곳」의 작은 섬을 따로 정함 · 반영 v1 = 모두 A, main 1c9480f) | `tour-board.html` + `board-kit.js` | https://claude.ai/artifact/Nf9TMCFMXbHRCP8Y3xiUvx | `tour` |
 
@@ -31,7 +32,7 @@
 
 | 접두사 | 무엇 | 쓴 번호 |
 |---|---|---|
-| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) · D130–D139 (shader) · D140–D147 (wave13) · D150–D179 (M14–M16 트랙, 보드 없이 → wave14 에서 확정) · D180–D187 (wave14) · D190–D197 (wave15) · D200–D207 (wave16) · D210–D217 (newfolk) |
+| D | 결정 | D1–D7 (v0.1) · D8–D13 (wave5) · D14–D25 (z5) · D26–D35 (wave6) · D36–D48 (wave7) · D49–D57 (wave7 QA 결과) · D58–D66 (sky) · D67–D73 (interiors) · D74–D85 (wave8) · D86–D92 (wave9) · D93–D99 (wave10) · D100–D105 (wave11) · D106–D114 (night) · D120–D128 (tour) · D130–D139 (shader) · D140–D147 (wave13) · D150–D179 (M14–M16 트랙, 보드 없이 → wave14 에서 확정) · D180–D187 (wave14) · D190–D197 (wave15) · D200–D207 (wave16) · D210–D217 (newfolk) · D280–D287 (wave17) |
 | CH | 캐릭터 | CH-01–10 (+wave10 CH-11 구름 양 · CH-12 파도 펭귄 · CH-13 달무리 부엉이, M10-P3 검수 대기) (+night CH-14 별밤 박쥐 · CH-15 여명 나방 — 가게 주인, M12 검수 대기) |
 | EN · PR · BD · TI | 배경: 자연 · 소품 · 건물 · 타일 | EN-01–11 (+wave8 EN-12 벚나무) · PR-01–12 (+z5 PR-13–16) (+wave8 PR-17–23) (+wave9 PR-24–25 울타리 · PR-26–29 주민 행사 소품) (+night PR-30 등불 줄 · PR-31 노점 덮개 · PR-32 자는 중 쪽지) · BD-01–05 (+z5 BD-06–07) (+night BD-08 달빛 가게 · BD-09 새벽 천막, 검수 대기) · TI-01–07 (+z5 TI-08) (+wave9 TI-09–12 길) (+tour BD-10 여행 배 · EN-13 광석 바위, P35 검수 대기) |
 | FU | 가구 | FU-01–33 (+z5 FU-34) (+interiors FU-35–42 붙박이) (+wave8 FU-43–46 행사 보상) (+wave9 FU-47–50 야외) (+wave10 FU-51 그림 이젤 · FU-52 바다 지도 액자 · FU-53 별 망원경, M10-P5 검수 대기) (+night FU-55–58 밤 가구 · FU-59 수정 구슬, 검수 대기) |
