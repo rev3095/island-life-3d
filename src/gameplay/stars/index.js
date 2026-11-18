@@ -159,6 +159,6 @@ export default {
   },
   update(dt) {
     S.scope?.update(dt);
-    if ((S.checkT -= dt) <= 0) { S.checkT = 5; if (!S.ctx.services.tour?.active) placeStand(); }
+    if ((S.checkT -= dt) <= 0) { S.checkT = 5; if (!S.ctx.services.tour?.active && !S.ctx.services.world?.islet?.active) placeStand(); }   // 투어·구경 섬(M21-P3)에선 world 칸 질문이 그 섬으로 간다
   },
 };

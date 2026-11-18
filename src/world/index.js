@@ -58,6 +58,12 @@ async function boatKinds(assets) {
   return cfg?.assets?.env ?? [];
 }
 
+/** M21-P3 친구 섬 구경 모델 (배 BD-20 · 방명록 받침 PR-45 · 도장 판 PR-46, assets/visit/visit.json assets.env) — 처음에 받지 않고 놓을 때 */
+async function visitKinds(assets) {
+  const cfg = await assets.loadJSON('assets/visit/visit.json').catch(() => null);
+  return cfg?.assets?.env ?? [];
+}
+
 /** P35 무인도 투어 모델 (배·광석 바위, assets/tour/tour.json env) — 처음에 받지 않고 선착장에 배를 놓을 때·투어 섬을 세울 때 */
 async function tourKinds(assets) {
   const cfg = await assets.loadJSON('assets/tour/tour.json').catch(() => null);
@@ -85,6 +91,7 @@ export default {
     for (const k of await contestKinds(assets)) lazy.add(k);   // M18-P3 대회 무대
     for (const k of await lighthouseKinds(assets)) lazy.add(k);   // M19-P4 옛 등대·단계 소품
     for (const k of await boatKinds(assets)) lazy.add(k);   // east-fishboat 어선 부두·어선
+    for (const k of await visitKinds(assets)) lazy.add(k);   // M21-P3 친구 섬 배·방명록 받침·도장 판
     const load = async slug => (slug.startsWith(FURN_KIND)
       ? { gltf: await assets.loadModel(`assets/furniture/models/${slug.slice(FURN_KIND.length)}`), spec: furnitureWorld(await assets.loadJSON(`assets/furniture/specs/${slug.slice(FURN_KIND.length)}.json`)) }
       : { gltf: await assets.loadEnv(slug), spec: await assets.loadEnvSpec(slug) });
@@ -204,14 +211,14 @@ export default {
       islet: {
         get active() { return !!islet; },
         get current() { return islet; },
-        async enter(g, ox = 900) {
+        async enter(g, ox = 900, { island = null } = {}) {   // island: M21-P3 구경 섬의 { removed, added } (저장 안 함)
           this.leave();
           // 처음 받는 모델(투어 묶음)을 먼저 받는다
           const need = [...new Set(g.objects.map(o => o.kind))].filter(k => !models[k] && lazy.has(k));
           await Promise.all(need.map(async k => { models[k] = await load(k); }));
           const unknown = g.objects.filter(o => !models[o.kind]).map(o => o.kind);
           if (unknown.length) { console.warn('[world] 투어 섬: 모르는 물체 종류는 뺀다', [...new Set(unknown)]); g.objects = g.objects.filter(o => models[o.kind]); }
-          islet = buildIslet(ctx, g, ox, env);
+          islet = buildIslet(ctx, g, ox, { ...env, island });
           if (season) recolor(islet.terrain, islet.objects);
           const it = islet;
           isletZone = this.zone = ctx.services.world.addZone({

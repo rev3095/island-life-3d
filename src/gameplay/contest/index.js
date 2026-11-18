@@ -192,7 +192,7 @@ export function createContest(ctx, cfg) {
   let ready = false;   // game:ready 뒤에만 무대를 놓는다 (망원경대·행상 수레 같은 persist:false 물체가 먼저 자리 잡게)
   function sync() {
     const n = now();
-    if (!n || !world()?.objects || !ready || S().tour?.active) return;   // 투어 섬에 가 있는 동안은 world 칸 질문이 그 섬으로 간다
+    if (!n || !world()?.objects || !ready || S().tour?.active || world()?.islet?.active) return;   // 투어 섬에 가 있는 동안은 world 칸 질문이 그 섬으로 간다
     const c = today(n);
     if (c) putStage(n); else takeStage();
     if (!c) return;
