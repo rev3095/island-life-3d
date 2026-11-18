@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포근섬 이야기 개발 보고서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 읽는 글은 한 줄 기둥(약 68자), 그림·표·다이어그램만 넓게. 바다 안개빛 바탕 + 석호 청록 강조 + 도토리 갈색 보조 */
+:root {
+  --bg: #eef3f1;
+  --surface: #ffffff;
+  --ink: #1d2a2c;
+  --muted: #586a6c;
+  --line: #d3dedb;
+  --accent: #1d7a70;
+  --acorn: #9a5a26;
+  --accent-soft: #dcefeb;
+  --acorn-soft: #f3e6d9;
+  --warn: #a3611a;
+  --warn-soft: #f8ead6;
+  --tile: #e4ecea;
+  --font-display: "Jua", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121a1b; --surface: #192425; --ink: #e3edeb; --muted: #9fb1b0; --line: #2c3d3e;
+    --accent: #5cc3b5; --acorn: #e0a56e; --accent-soft: #1b3533; --acorn-soft: #33281d;
+    --warn: #e8b06a; --warn-soft: #362a1a; --tile: #d9e3e1;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121a1b; --surface: #192425; --ink: #e3edeb; --muted: #9fb1b0; --line: #2c3d3e;
+  --accent: #5cc3b5; --acorn: #e0a56e; --accent-soft: #1b3533; --acorn-soft: #33281d;
+  --warn: #e8b06a; --warn-soft: #362a1a; --tile: #d9e3e1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.75;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.3; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.1rem); }
+h3 { font-size: 1.22rem; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+.wrap { width: min(1040px, 100% - 32px); margin-inline: auto; }
+.col { width: min(720px, 100%); }
+
+/* 머리 */
+header.hero { padding: 40px 0 28px; }
+.hero-top { display: grid; gap: 28px; grid-template-columns: 1fr; align-items: end; }
+@media (min-width: 860px) { .hero-top { grid-template-columns: 1.05fr 1fr; } }
+.kicker { font-size: .9rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.kicker b { color: var(--accent); font-weight: 700; }
+h1 { font-size: clamp(2.4rem, 1.6rem + 3.6vw, 3.9rem); margin: 10px 0 14px; letter-spacing: -.01em; }
+h1 small { display: block; font-size: .42em; color: var(--acorn); margin-top: 6px; }
+.lede { font-size: 1.08rem; color: var(--ink); max-width: 36em; }
+.hero-shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.hero-shot figcaption { font-size: .82rem; color: var(--muted); padding: 8px 12px; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: .95rem; border: 1.5px solid var(--accent); }
+.btn.primary { background: var(--accent); color: var(--surface); }
+.btn.ghost { color: var(--accent); background: transparent; }
+
+/* 수치 */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 26px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.stat .v { font-family: var(--font-display); font-size: 1.85rem; line-height: 1.15; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat .v span { font-size: .55em; color: var(--muted); margin-left: 2px; }
+.stat .k { font-size: .84rem; color: var(--muted); line-height: 1.45; margin-top: 4px; }
+.basis { font-size: .82rem; color: var(--muted); margin-top: 10px; }
+
+/* 목차 */
+nav.toc { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+nav.toc ol { list-style: none; margin: 0 auto; padding: 8px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; width: min(1040px, 100% - 32px); }
+nav.toc ol::-webkit-scrollbar { display: none; }
+nav.toc a { display: block; white-space: nowrap; padding: 5px 12px; border-radius: 999px; text-decoration: none; color: var(--muted); font-size: .88rem; border: 1px solid transparent; }
+nav.toc a:hover { color: var(--accent); border-color: var(--line); background: var(--surface); }
+
+section { padding: 52px 0 8px; scroll-margin-top: 48px; }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.sec-head .no { font-family: var(--font-display); color: var(--acorn); font-size: 1.1rem; }
+.sec-intro { color: var(--muted); margin-bottom: 22px; }
+.stack { display: grid; gap: 14px; }
+
+/* 핵심 흐름 */
+.loop { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 22px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.loop li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; counter-increment: s; font-size: .94rem; line-height: 1.6; }
+.loop li::before { content: counter(s); font-family: var(--font-display); color: var(--accent); font-size: 1.3rem; display: block; line-height: 1; margin-bottom: 4px; }
+.loop b { display: block; }
+
+/* 주민 */
+.cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 22px; }
+.cast figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 4px 8px; text-align: center; }
+.cast img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--tile); border-radius: 8px; }
+.cast figcaption { font-size: .8rem; line-height: 1.35; margin-top: 5px; }
+.cast figcaption b { display: block; font-size: .9rem; }
+.cast figcaption span { color: var(--muted); }
+
+/* 화면 모음 */
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.gallery figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.gallery figcaption { font-size: .82rem; color: var(--muted); padding: 7px 10px; line-height: 1.5; }
+
+/* 마일스톤 */
+.ms { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.ms-row { display: grid; grid-template-columns: 64px 1fr; gap: 4px 14px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.ms-row:first-child { border-top: 0; }
+@media (min-width: 760px) { .ms-row { grid-template-columns: 64px 220px 1fr 150px; align-items: start; } }
+.ms-code { font-family: var(--font-display); color: var(--accent); font-size: 1.1rem; }
+.ms-name { font-weight: 700; }
+.ms-what { font-size: .93rem; color: var(--ink); grid-column: 2 / -1; line-height: 1.6; }
+@media (min-width: 760px) { .ms-what { grid-column: auto; } }
+.ms-when { font-size: .84rem; color: var(--muted); grid-column: 2 / -1; }
+@media (min-width: 760px) { .ms-when { grid-column: auto; text-align: right; } }
+.pill { display: inline-block; font-size: .74rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; margin-top: 3px; white-space: nowrap; }
+.pill.done { background: var(--accent-soft); color: var(--accent); }
+.pill.merged { background: var(--acorn-soft); color: var(--acorn); }
+.pill.wip { background: var(--warn-soft); color: var(--warn); border: 1px dashed var(--warn); }
+
+/* 강점 */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.card h3 { margin-bottom: 6px; }
+.card p { font-size: .95rem; }
+.card .proof { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: .84rem; color: var(--muted); line-height: 1.6; }
+.card .proof b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* 보완 */
+.gaps { display: grid; gap: 10px; }
+.gap { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 10px; padding: 12px 16px; display: grid; gap: 4px; }
+.gap.mid { border-left-color: var(--acorn); }
+.gap-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.gap-head b { font-size: 1rem; }
+.tag { font-size: .74rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
+.gap.mid .tag { background: var(--acorn-soft); color: var(--acorn); }
+.gap p { font-size: .93rem; }
+.gap .ev { font-size: .82rem; color: var(--muted); }
+
+/* 레퍼런스 */
+.ref { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 760px) { .ref { grid-template-columns: 1fr 1fr; } }
+.ref-col { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.ref-col h3 { margin-bottom: 8px; }
+.ref-col.own { border-color: var(--accent); }
+.ref-col ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: .94rem; }
+.note { background: var(--acorn-soft); border-radius: 10px; padding: 12px 16px; font-size: .92rem; margin-top: 12px; }
+
+/* 그림 */
+figure.diagram { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+figure.diagram .scroll { overflow-x: auto; }
+figure.diagram svg { display: block; width: 100%; height: auto; color: var(--ink); }
+figure.diagram figcaption { font-size: .85rem; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+.dg-box { fill: var(--surface); stroke: currentColor; stroke-width: 1.3; }
+.dg-hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
+.dg-t { fill: currentColor; font-family: var(--font-body); font-size: 14px; font-weight: 700; }
+.dg-s { fill: var(--muted); font-family: var(--font-body); font-size: 12px; }
+.dg-l { fill: var(--acorn); font-family: var(--font-body); font-size: 12px; font-weight: 500; }
+.dg-line { stroke: currentColor; stroke-width: 1.4; fill: none; }
+.dg-loop { stroke: var(--acorn); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.two-diagrams { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+.two-diagrams > *, .stack > *, figure.diagram { min-width: 0; }
+@media (min-width: 960px) { .two-diagrams { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; } }
+
+.method { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 14px; }
+.method .card h3 { font-size: 1.1rem; }
+.method ul { margin: 6px 0 0; padding-left: 1.1em; font-size: .92rem; display: grid; gap: 4px; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--tile); color: #1d2a2c; padding: 1px 5px; border-radius: 4px; }
+
+/* 연대기 차트 */
+.chart .bar { fill: var(--accent); }
+.chart .bar:hover { fill: var(--acorn); }
+.chart .zero { fill: var(--line); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .yl, .chart .xl { fill: var(--muted); font-family: var(--font-body); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .vl { fill: var(--ink); font-family: var(--font-body); font-size: 12px; font-weight: 700; }
+.chart .ann { fill: var(--acorn); font-family: var(--font-body); font-size: 11px; }
+.timeline { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 74px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: .94rem; line-height: 1.6; }
+.timeline time { font-family: var(--font-display); color: var(--accent); font-size: 1.05rem; }
+.timeline .v { color: var(--acorn); font-weight: 700; font-size: .85rem; }
+
+/* 계획 */
+.plan { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: p; }
+.plan li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px 12px 52px; position: relative; counter-increment: p; font-size: .95rem; }
+.plan li::before { content: counter(p); position: absolute; left: 16px; top: 10px; font-family: var(--font-display); color: var(--accent); font-size: 1.4rem; }
+.plan .who { font-size: .8rem; color: var(--muted); display: block; margin-top: 2px; }
+
+/* 링크 */
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.links a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; text-decoration: none; color: var(--ink); }
+.links a:hover { border-color: var(--accent); }
+.links b { display: block; color: var(--accent); }
+.links span { font-size: .84rem; color: var(--muted); }
+
+footer { padding: 40px 0 56px; color: var(--muted); font-size: .84rem; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <div class="kicker"><span><b>개발 보고서</b> · 2026-11-12 기준</span><span>개발 16일째 · 게임 링크 v39</span></div>
+        <h1>포근섬 이야기<small>웹 브라우저에서 바로 하는 3D 섬 생활 게임</small></h1>
+        <p class="lede">작은 섬에 이사 와서 채집하고, 동물 주민과 이모티콘으로 이야기하며 친해지고, 집과 섬을 꾸미다가 섬 축제를 여는 오리지널 IP 게임입니다. 설치 없이 링크 하나로 열리고, 모든 3D 모델은 Blender 스크립트로 직접 만들었습니다. 2026년 10월 28일 기획부터 16일 동안 Claude Code 병렬 세션으로 개발했습니다.</p>
+        <div class="cta">
+          <a class="btn primary" href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ">게임 바로 하기</a>
+          <a class="btn ghost" href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv">편집기 홈 열기</a>
+        </div>
+      </div>
+      <figure class="hero-shot">
+        <img src="img/plaza-day.jpg" width="640" height="400" alt="낮의 섬 광장. 모닥불이 있는 원형 광장 둘레에 깃발 줄이 걸려 있고, 무대와 단풍 든 나무, 파란 지붕 집이 보인다.">
+        <figcaption>게임 화면 · 축제 광장 낮 (사양 높음, 1280×800 캡처를 줄임)</figcaption>
+      </figure>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="v num">16<span>일</span></div><div class="k">10-28 첫 커밋부터 11-12까지</div></div>
+      <div class="stat"><div class="v num">489<span>커밋</span></div><div class="k">그중 브랜치 합치기 115</div></div>
+      <div class="stat"><div class="v num">322<span>개</span></div><div class="k">Blender 스크립트로 만든 3D 모델</div></div>
+      <div class="stat"><div class="v num">525<span>개</span></div><div class="k">규칙 테스트 (통과 524 · 건너뜀 1)</div></div>
+      <div class="stat"><div class="v num">6.1<span>MB</span></div><div class="k">처음 받는 크기 (11.5MB에서 줄임)</div></div>
+      <div class="stat"><div class="v num">5.0<span>ms</span></div><div class="k">광장 GPU 시간, 적정 사양 · 내장 그래픽</div></div>
+    </div>
+    <p class="basis">숫자는 저장소 main <code>e6956d4</code>에서 직접 센 값입니다. GPU 시간은 Intel UHD 내장 그래픽, 1280×800, 광장 낮 기준 (<code>docs/notes/p40-perf.md</code>). 확인하지 못한 값은 적지 않았습니다.</p>
+  </div>
+</header>
+
+<nav class="toc" aria-label="목차">
+  <ol>
+    <li><a href="#intro">소개</a></li>
+    <li><a href="#features">게임 기능</a></li>
+    <li><a href="#strengths">강점</a></li>
+    <li><a href="#gaps">보완할 점</a></li>
+    <li><a href="#reference">레퍼런스작</a></li>
+    <li><a href="#method">개발 방법론</a></li>
+    <li><a href="#history">연대기</a></li>
+    <li><a href="#plan">앞으로</a></li>
+    <li><a href="#links">링크</a></li>
+  </ol>
+</nav>
+
+<main>
+<section id="intro">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">01</span><h2>한눈에 보는 포근섬</h2></div>
+    <div class="col stack">
+      <p>플레이어는 섬 이름과 자기 이름을 정하고 배에서 내립니다. 상점 주인 밤톨의 첫날 안내를 따라 도구를 들고 채집하고, 상점에 팔고, 박물관에 기증하고, 집에 들어가 봅니다. 그 뒤로는 주민 여섯과 친해지며 축제 부품 다섯을 모으고, 섬 축제와 단체 사진으로 첫 이야기를 마무리합니다. 엔딩 뒤에도 계절 행사, 이사 오가기, 무인도 여행, 밤 시장이 이어집니다.</p>
+      <p>게임 시간은 처음에 실제보다 12배 빠르게 흘러 게임 하루가 실제 2시간입니다. 왼쪽 위 원형 시계로 오늘 안에서 낮과 밤을 자유롭게 오갈 수 있고, 날짜는 앞으로만 넘어갑니다.</p>
+    </div>
+    <ol class="loop" aria-label="하루의 기본 흐름">
+      <li><b>채집</b>나무 흔들기 · 낚시 · 곤충 · 화석 · 꽃 · 무인도 광석</li>
+      <li><b>팔고 모으기</b>도토리상점에 팔기 · 박물관 여섯 관에 기증 · 도감</li>
+      <li><b>꾸미기</b>가구 · 벽지 · 바닥 · 옷 · 섬에 길과 울타리 · 집 증축</li>
+      <li><b>주민과 지내기</b>이모티콘 대화 · 선물 · 편지 · 같이 낚시 · 이사 오가기</li>
+      <li><b>때마다 열리는 것</b>계절 행사 넷 · 토요일 야시장 · 새벽 타로 · 유성우</li>
+    </ol>
+
+    <h3 style="margin-top:34px">섬 사람들 17명</h3>
+    <p class="sec-intro" style="margin:6px 0 0">모두 스펙 JSON 하나에서 Blender로 다시 만들 수 있는 리깅된 3D 모델입니다. 걷기·달리기·기뻐하기·앉기 동작을 함께 굽습니다.</p>
+    <div class="cast">
+      <figure><img src="img/cast/player.png" width="240" height="260" alt="주인공"><figcaption><b>주인공</b><span>사람 · 옷 갈아입기</span></figcaption></figure>
+      <figure><img src="img/cast/coco.png" width="240" height="260" alt="코코"><figcaption><b>코코</b><span>고양이</span></figcaption></figure>
+      <figure><img src="img/cast/bori.png" width="240" height="260" alt="보리"><figcaption><b>보리</b><span>강아지</span></figcaption></figure>
+      <figure><img src="img/cast/mochi.png" width="240" height="260" alt="모찌"><figcaption><b>모찌</b><span>토끼</span></figcaption></figure>
+      <figure><img src="img/cast/dubu.png" width="240" height="260" alt="두부"><figcaption><b>두부</b><span>곰</span></figcaption></figure>
+      <figure><img src="img/cast/pong.png" width="240" height="260" alt="퐁"><figcaption><b>퐁</b><span>오리</span></figcaption></figure>
+      <figure><img src="img/cast/chorong.png" width="240" height="260" alt="초롱"><figcaption><b>초롱</b><span>개구리</span></figcaption></figure>
+      <figure><img src="img/cast/bamtol.png" width="240" height="260" alt="밤톨"><figcaption><b>밤톨</b><span>다람쥐 · 상점</span></figcaption></figure>
+      <figure><img src="img/cast/neuru.png" width="240" height="260" alt="느루"><figcaption><b>느루</b><span>거북 · 박물관</span></figcaption></figure>
+      <figure><img src="img/cast/danpung.png" width="240" height="260" alt="단풍"><figcaption><b>단풍</b><span>여우 · 이사 옴</span></figcaption></figure>
+      <figure><img src="img/cast/gureum.png" width="240" height="260" alt="구름"><figcaption><b>구름</b><span>양 · 이사 옴</span></figcaption></figure>
+      <figure><img src="img/cast/pado.png" width="240" height="260" alt="파도"><figcaption><b>파도</b><span>펭귄 · 이사 옴</span></figcaption></figure>
+      <figure><img src="img/cast/dalmuri.png" width="240" height="260" alt="달무리"><figcaption><b>달무리</b><span>부엉이 · 밤에 깸</span></figcaption></figure>
+      <figure><img src="img/cast/byeolbam.png" width="240" height="260" alt="별밤"><figcaption><b>별밤</b><span>박쥐 · 달빛 가게</span></figcaption></figure>
+      <figure><img src="img/cast/yeomyeong.png" width="240" height="260" alt="여명"><figcaption><b>여명</b><span>나방 · 타로</span></figcaption></figure>
+      <figure><img src="img/cast/songi.png" width="240" height="260" alt="송이"><figcaption><b>송이</b><span>고슴도치 · 행상</span></figcaption></figure>
+      <figure><img src="img/cast/salang.png" width="240" height="260" alt="살랑"><figcaption><b>살랑</b><span>여우 · 밤 미술상</span></figcaption></figure>
+    </div>
+
+    <h3 style="margin-top:34px">같은 광장, 다른 시간</h3>
+    <p class="sec-intro" style="margin:6px 0 14px">하늘·조명·안개·셰이더 효과가 실제 시각과 날씨를 따라 바뀝니다. 아래는 모두 게임 안 캡처입니다.</p>
+    <div class="gallery">
+      <figure><img src="img/plaza-night.jpg" width="640" height="400" loading="lazy" alt="밤의 광장. 가로등과 깃발 줄 아래로 노란 불빛이 번지고 모닥불이 타오른다."><figcaption>밤 · 가로등과 창문이 켜지는 시각 (적정)</figcaption></figure>
+      <figure><img src="img/plaza-snow.jpg" width="640" height="400" loading="lazy" alt="눈 오는 겨울 광장. 지붕과 나무, 땅에 눈이 쌓였다."><figcaption>겨울 · 눈 오는 날에만 켜지는 눈 쌓임 셰이더</figcaption></figure>
+      <figure><img src="img/village-dusk.jpg" width="640" height="400" loading="lazy" alt="노을 진 하늘 아래 주민 집과 단풍나무가 늘어선 마을. 북쪽 하늘에 둥근 솜구름이 떠 있다."><figcaption>노을 · 하늘 셰이더와 북쪽 솜구름</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">02</span><h2>게임 기능 · 마일스톤 순서</h2></div>
+    <p class="sec-intro col">M은 마일스톤, 끝나면 할 수 있는 큰 목표입니다. 「완료」는 게임 링크에 게시된 것, 「main 합침」은 저장소에는 들어갔지만 아직 게임 링크에 올리지 않은 것입니다.</p>
+    <div class="ms">
+      <div class="ms-row"><span class="ms-code">M0</span><div><div class="ms-name">리소스 기초</div><span class="pill done">완료</span></div><div class="ms-what">캐릭터 9종 · 배경 32종 Blender 파이프라인, 캐릭터·배경 편집기, 컨셉 보드</div><div class="ms-when num">10-28</div></div>
+      <div class="ms-row"><span class="ms-code">M1</span><div><div class="ms-name">기본 게임</div><span class="pill done">완료</span></div><div class="ms-what">64×56 섬 생성 · 곡면 월드 · 채집 · 주민 · 상점 · 박물관 · 집과 가구 · 제작 · 합성 소리 · 시간과 날씨 · 툰 셰이더</div><div class="ms-when num">10-28 – 10-29</div></div>
+      <div class="ms-row"><span class="ms-code">M2</span><div><div class="ms-name">휴대폰 · 웹 배포</div><span class="pill done">완료</span></div><div class="ms-what">터치 패드와 A·B 단추, 성능·카메라·해안선, 첫날 흐름, claude.ai 아티팩트로 게임 링크</div><div class="ms-when num">10-29 · v2</div></div>
+      <div class="ms-row"><span class="ms-code">M3–M4</span><div><div class="ms-name">다듬기 · 섬 생활 확장</div><span class="pill done">완료</span></div><div class="ms-what">상황 맞춤 단추 글자, 화석 감정, 아이템 3D 아이콘, 벽지·바닥, 주민 방, 새 가구, 이사·생일, 장면 12</div><div class="ms-when num">10-29 · v6</div></div>
+      <div class="ms-row"><span class="ms-code">M5</span><div><div class="ms-name">축제와 엔딩</div><span class="pill done">완료</span></div><div class="ms-what">이모티콘 대화, 축제 부품 다섯과 부스 놀이, 축제 날, 단체 사진 엔딩, 해마다 축제</div><div class="ms-when num">10-30 · v10</div></div>
+      <div class="ms-row"><span class="ms-code">M6</span><div><div class="ms-name">편집기 완성</div><span class="pill done">완료</span></div><div class="ms-what">에셋 묶음 파일, 편집기 홈과 전체 관리 표, 곡·지도·숫자·스타일 편집기, 주민 성격·대화 탭</div><div class="ms-when num">10-30 · v10</div></div>
+      <div class="ms-row"><span class="ms-code">M7</span><div><div class="ms-name">출시 준비</div><span class="pill wip">손 점검 남음</span></div><div class="ms-what">자동 플레이 QA, 기기 점검 <code>#check</code>, 접근성, 저장 내보내기, 문제 알리기, 그래픽 사양 4단계, 하늘 셰이더, 마우스 걷기, 상점·박물관 실내</div><div class="ms-when num">10-31 – 11-05 · v12–v23</div></div>
+      <div class="ms-row"><span class="ms-code">M8</span><div><div class="ms-name">계절 행사</div><span class="pill done">완료</span></div><div class="ms-what">봄 꽃놀이 · 여름 불꽃놀이 · 가을 수확 잔치 · 겨울 눈사람 날 (실제 날짜, 날짜 흉내로 미리 해 보기)</div><div class="ms-when num">11-05 – 11-06 · v24</div></div>
+      <div class="ms-row"><span class="ms-code">M9</span><div><div class="ms-name">섬 꾸미기</div><span class="pill done">완료</span></div><div class="ms-what">섬 밖에 길 · 울타리 · 야외 가구 놓기 (이어지는 길, 주민 길찾기 반영)</div><div class="ms-when num">11-08 · v25</div></div>
+      <div class="ms-row"><span class="ms-code">M10</span><div><div class="ms-name">새 주민 · 이사 오가기</div><span class="pill done">완료</span></div><div class="ms-what">새 주민 셋, 7일마다 이사 오고 묻고 허락해야 떠나기, 앉기, 꾸밈 옮기기</div><div class="ms-when num">11-10 · v26</div></div>
+      <div class="ms-row"><span class="ms-code">M11</span><div><div class="ms-name">옷 갈아입기</div><span class="pill done">완료</span></div><div class="ms-what">모자 · 윗옷 · 신발 12벌, 상점 옷 진열대, 옷장, 섬 주민 12명까지</div><div class="ms-when num">11-11 · v30</div></div>
+      <div class="ms-row"><span class="ms-code">M12</span><div><div class="ms-name">밤 · 새벽</div><span class="pill done">완료</span></div><div class="ms-what">토요일 야시장, 달빛 가게 22–3시, 새벽 타로 천막 3–5시 (하루 운세 효과), 야행성 주민</div><div class="ms-when num">11-11 · v27–v29</div></div>
+      <div class="ms-row"><span class="ms-code">P35·41·47·48</span><div><div class="ms-name">투어 · 시계 · 셰이더</div><span class="pill done">완료</span></div><div class="ms-what">무인도 투어 (모양 틀 넷 + 날마다 씨앗), 시간 빠르기와 원형 시계, 오늘 안 낮밤 이동, 날씨에 맞춘 셰이더 효과 일곱</div><div class="ms-when num">11-11 – 11-12 · v35–v36</div></div>
+      <div class="ms-row"><span class="ms-code">M13</span><div><div class="ms-name">매일 할 거리</div><span class="pill merged">일부 게시 · main 합침</span></div><div class="ms-what">섬 일지 (v39 게시), 유성우 소원, 선물 풍선과 새총, 바닷가 유리병 레시피, 방문 행상</div><div class="ms-when num">11-12 · v39</div></div>
+      <div class="ms-row"><span class="ms-code">M14</span><div><div class="ms-name">집과 섬이 자란다</div><span class="pill merged">main 합침</span></div><div class="ms-what">집 증축 (방 넓히기 · 2층 · 다락, 걸어 오르는 계단), 섬 별점, 다리 · 경사로</div><div class="ms-when num">11-12</div></div>
+      <div class="ms-row"><span class="ms-code">M15</span><div><div class="ms-name">주민과 더 가깝게</div><span class="pill merged">main 합침</span></div><div class="ms-what">주민에게 편지와 선물, 같이 낚시 · 산책, 추억 앨범, 저녁 광장 노래</div><div class="ms-when num">11-12</div></div>
+      <div class="ms-row"><span class="ms-code">M16</span><div><div class="ms-name">모으기 넓히기</div><span class="pill wip">잠수 마무리 중</span></div><div class="ms-what">박물관 관 여섯 · 별자리 12개와 망원경 · 밤 미술상과 미술품 진품/가품 (main 합침), 잠수와 바다 생물 (브랜치 점검 중)</div><div class="ms-when num">11-12</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="strengths">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">03</span><h2>강점</h2></div>
+    <div class="cards">
+      <article class="card">
+        <h3>링크 하나로 바로 열린다</h3>
+        <p>설치도 앱 스토어도 없이 브라우저에서 3D 게임이 열립니다. 빌드 도구 없이 브라우저 ES 모듈과 three.js로 짜서, 개발 서버에서 되는 코드가 게시본에서도 같은 보안 정책으로 돕니다.</p>
+        <p class="proof">처음 받는 크기 <b>11.48 → 6.10MB</b> (모델 양자화 + 밤·이사 주민 모델 나중에 받기). 전체 묶음 26.6 → 21.5MB.</p>
+      </article>
+      <article class="card">
+        <h3>느린 컴퓨터를 기준으로 만든다</h3>
+        <p>성능은 개발 PC의 Intel 내장 그래픽에서 GPU 타이머로 잽니다. 사양 4단계에 자동 낮추기가 있고, 새 셰이더 효과는 그 효과가 필요한 날에만 셰이더 코드째 넣습니다. 낮음 이하는 같은 효과를 CPU로 흉내 내 GPU 비용이 늘지 않습니다.</p>
+        <p class="proof">광장 GPU 시간: 높음 <b>10.5</b> · 적정 <b>5.0</b> · 낮음 <b>2.9</b> · 매우 낮음 <b>1.8ms</b>. 자동 낮춤 기준은 33ms.</p>
+      </article>
+      <article class="card">
+        <h3>진짜 3D, 다시 만들 수 있는 모델</h3>
+        <p>모든 모델은 스펙 JSON을 Blender 헤드리스 스크립트가 읽어 만듭니다. 색이나 크기를 바꾸고 싶으면 값을 고쳐 다시 빌드하면 되고, 바꿀 때 지켜야 할 약속(재질 이름 · 뼈 · 충돌 크기)은 테스트가 잡습니다.</p>
+        <p class="proof">모델 <b>322</b> = 캐릭터 17 · 배경 89 · 가구 60 · 붙박이 22 · 아이템 122 · 옷 12. 빌더 스크립트 9개 8,816줄.</p>
+      </article>
+      <article class="card">
+        <h3>값은 데이터, 고치는 건 편집기</h3>
+        <p>아이템 값, 출현 확률, 행사 날짜, 주민 성격과 대사, 장면, 곡, 셰이더 값, 섬 지도가 모두 JSON입니다. 브라우저 편집기에서 고쳐 저장하고 채팅에 「요소 반영」처럼 한 줄을 보내면 게임에 들어갑니다.</p>
+        <p class="proof">장면 <b>28</b> · 곡 <b>10</b> · 주민 파일 <b>12</b>. 편집기: 리소스 · 스토리 · 요소 · 곡 · 스타일 + 편집기 홈.</p>
+      </article>
+      <article class="card">
+        <h3>만들기 전에 고르게 한다</h3>
+        <p>새 리소스나 큰 방향은 검수 보드에서 먼저 정합니다. 선택지마다 그림과 추천안이 있고, 고른 결과는 반영 기록으로 남아 되돌릴 수 있습니다. 지난 보드는 편집기 홈 보관함에 n차로 모입니다.</p>
+        <p class="proof">검수 보드 <b>15</b>개 · 결정 번호 D1–D147 (보드), 트랙 결정 D150 이후는 노트에 기록.</p>
+      </article>
+      <article class="card">
+        <h3>봇이 끝까지 해 본다</h3>
+        <p>자동 플레이 봇이 사람처럼 키와 단추만으로 새 게임부터 엔딩, 1년 뒤 축제까지 합니다. 계절 행사 · 실내 · 시계는 따로 점검 도구가 있고, 콘솔 오류가 하나라도 나면 실패입니다.</p>
+        <p class="proof">최근 자동 플레이 <b>30 통과 · 어색함 0 · 막힘 0</b> (11-12, P51). 행사 점검 8/8 · 시계 점검 15/15 · 규칙 테스트 525.</p>
+      </article>
+      <article class="card">
+        <h3>여러 세션이 동시에 만든다</h3>
+        <p>조정 세션이 일을 파일이 겹치지 않는 트랙으로 나누고, 트랙 세션마다 자기 git worktree에서 만듭니다. 모듈끼리는 이벤트와 서비스 약속으로만 이어져서 다른 트랙이 없어도 각자 확인할 수 있습니다.</p>
+        <p class="proof">16일 동안 커밋 <b>489</b> · 합치기 <b>115</b>. 11-12 하루에 트랙 8개를 동시에 돌려 6개를 main에 합침.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="gaps">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">04</span><h2>보완해야 할 점</h2></div>
+    <p class="sec-intro col">개발 일지와 점검 노트에 남은 것을 그대로 옮겼습니다. 주황 띠는 공개 전에 꼭 풀어야 할 것, 갈색 띠는 다음 차수에 다룰 것입니다.</p>
+    <div class="gaps">
+      <div class="gap">
+        <div class="gap-head"><b>실제 사용자 피드백이 아직 없다</b><span class="tag">공개 전</span></div>
+        <p>지금까지 플레이는 개발자와 자동 플레이 봇뿐입니다. 게임 안 「문제 알리기」와 기기 점검 기록 저장소도 비어 있습니다.</p>
+        <p class="ev">근거: devlog 11-08 「게임 저장소 문제 0 · 기기 점검 0」. 봇 점검은 막힘을 찾을 뿐 재미와 밸런스는 판단하지 못합니다.</p>
+      </div>
+      <div class="gap">
+        <div class="gap-head"><b>사용자 손 점검(RC) 다섯 항목이 대기 중</b><span class="tag">공개 전</span></div>
+        <p>claude.ai에서 게시본 직접 열기, iPhone · Android 실기기, 다른 GPU, 휴대폰 데이터로 첫 로딩 시간, 다른 계정으로 공유 링크 열기는 사람이 해야 하는 점검입니다.</p>
+        <p class="ev">근거: <code>docs/notes/release.md</code> RC-05 · 06 · 07 · 08 · 12 「대기」. RC-01–04 · 09–11은 Claude가 확인함.</p>
+      </div>
+      <div class="gap">
+        <div class="gap-head"><b>휴대폰은 화면 흉내로만 확인했다</b><span class="tag">공개 전</span></div>
+        <p>터치 패드, 두 손가락, 안전 영역, 가로·세로 창 배치를 만들고 375px 터치 흉내로 엔딩까지 봇을 돌렸지만, 실제 휴대폰 GPU와 발열, 터치 감은 모릅니다. 휴대폰은 지금 적정 사양으로 시작해 느리면 낮춥니다.</p>
+        <p class="ev">근거: 자동 플레이 휴대폰 375×812 21 통과 · 막힘 0 (11-05). 일지 추천 「휴대폰은 처음 사양을 낮음으로 시작하는 것도 고려」.</p>
+      </div>
+      <div class="gap">
+        <div class="gap-head"><b>검수 대기 리소스가 많다</b><span class="tag">공개 전</span></div>
+        <p>병렬 트랙에서 새로 만든 모델과 장면이 아직 사용자 확인 전입니다. 게임은 확정 여부와 상관없이 쓰고 있어서, 모양이 마음에 안 들면 나중에 교체해야 합니다.</p>
+        <p class="ev">근거: 스펙 status 「review」 — 모델 56 (캐릭터 3 · 배경 14 · 가구 10 · 붙박이 10 · 아이템 19) · 장면 12.</p>
+      </div>
+      <div class="gap">
+        <div class="gap-head"><b>저장소와 게임 링크 사이에 간격이 있다</b><span class="tag">공개 전</span></div>
+        <p>M13 나머지 · M14 · M15 · 밤 미술상 · 박물관 관은 main에 합쳤지만 게임 링크는 아직 v39입니다. 합친 main에서 전체 자동 플레이와 실내 점검을 다시 돌리지 않았습니다.</p>
+        <p class="ev">근거: devlog 세션 5 「확인 못 함」.</p>
+      </div>
+      <div class="gap mid">
+        <div class="gap-head"><b>후반 콘텐츠가 장르 문법을 많이 따른다</b><span class="tag">다음 차수</span></div>
+        <p>매일 할 거리, 집 증축, 잠수, 미술품 감정은 레퍼런스작의 익숙한 문법에 가깝습니다. 이모티콘 대화와 밤·새벽, 무인도 투어처럼 포근섬만의 것을 더 키워야 소개할 거리가 생깁니다.</p>
+        <p class="ev">근거: 13차 보드 주제 「레퍼런스작처럼 풍성하게」 (D140–D147). 아래 「레퍼런스작」 절 참고.</p>
+      </div>
+      <div class="gap mid">
+        <div class="gap-head"><b>소리는 모두 합성음이다</b><span class="tag">다음 차수</span></div>
+        <p>배경음 10곡, 효과음, 주민 목소리를 Web Audio로 합성합니다. 파일이 없어 가볍지만 악기 질감과 목소리 표현의 폭이 좁고, 곡 편집기로 사람이 들어 보고 고친 기록이 아직 없습니다.</p>
+        <p class="ev">근거: 곡 편집기 반영 기록 v0 (devlog 게시물 표).</p>
+      </div>
+      <div class="gap mid">
+        <div class="gap-head"><b>남은 큰 일 표</b><span class="tag">다음 차수</span></div>
+        <p>첫 장면을 이름 정하기 전 배 위로 옮기기, 둘레를 한 바퀴 도는 시점, 해안 비탈로 물가까지 걸어 들어가기, 요소 편집기에서 방 배치를 3D로 고치기 같은 큰 일이 남아 있습니다. 축제까지 걸리는 날 수(D41) 밸런스도 보류 중입니다.</p>
+        <p class="ev">근거: <code>docs/notes/backlog.md</code> 11-11 기준 116줄 중 「남음 · 큼」 18줄 (B-04 · B-32 · B-35 · B-47 등).</p>
+      </div>
+      <div class="gap mid">
+        <div class="gap-head"><b>성능은 한 기기에서만 쟀다</b><span class="tag">다음 차수</span></div>
+        <p>GPU 숫자는 모두 개발 PC 한 대에서 머리 없는 Chrome으로 잰 값입니다. 양자화한 모델의 게시본 화면 비교도 아직 하지 않았습니다.</p>
+        <p class="ev">근거: <code>docs/notes/p40-perf.md</code> 「남은 일」.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">05</span><h2>레퍼런스작과 오리지널</h2></div>
+    <p class="sec-intro col">장르 레퍼런스는 섬에서 느긋하게 사는 생활 시뮬레이션 대표작(이 문서에서는 「레퍼런스작」)입니다. 그 게임의 이름 · 에셋 · 이미지 · 대사는 쓰지 않았고, 모델과 글은 모두 이 프로젝트에서 새로 만들었습니다.</p>
+    <div class="ref">
+      <div class="ref-col">
+        <h3>장르 문법으로 참고한 것</h3>
+        <ul>
+          <li>채집 → 팔기 → 박물관 기증 → 집 꾸미기로 돌아가는 하루</li>
+          <li>실제 시계와 계절, 새벽 5시 하루 리셋</li>
+          <li>비스듬히 내려다보는 고정 카메라와 둥글게 휘어 보이는 지평선</li>
+          <li>부드러운 파스텔 톤의 툰 명암과 외곽선</li>
+          <li>동물 주민과의 친밀도 · 선물 · 편지, 이사 오가기</li>
+          <li>유성우 소원, 선물 풍선, 바닷가 유리병, 방문 행상, 집 증축과 빚, 섬 평가, 잠수, 미술품 감정 같은 매일 할 거리</li>
+        </ul>
+      </div>
+      <div class="ref-col own">
+        <h3>포근섬이 새로 만든 것</h3>
+        <ul>
+          <li><b>세계와 이름</b> — 포근섬, 화폐 도토리, 주민 17명의 이름 · 종족 · 성격, 한국어 대사 전부</li>
+          <li><b>이모티콘 대화</b> — 글 선택지 대신 이모티콘을 주고받고, 주민마다 이모티콘을 읽는 규칙이 다릅니다. 외부 AI 호출 없이 규칙으로 판정합니다</li>
+          <li><b>끝이 있는 첫 이야기</b> — 축제 부품 다섯을 모아 섬 축제와 단체 사진 엔딩, 그 뒤로 계속 사는 구조</li>
+          <li><b>짧게 해도 되는 시간</b> — 처음 12배 빠르기, 원형 시계로 오늘 안에서 낮밤 이동 (날짜는 앞으로만)</li>
+          <li><b>밤과 새벽</b> — 토요일 야시장, 달빛 가게, 하루 운세 효과가 있는 타로 12장, 운세 부스, 이상한 천막</li>
+          <li><b>날마다 다른 무인도</b> — 모양 틀 넷 + 날짜 씨앗으로 만드는 섬, 다른 섬 주민 초대</li>
+          <li><b>섬 일지 · 별자리 · 미술품</b> — 하루 할 일과 포인트 교환, 섬 오리지널 별자리 12개를 망원경으로 조준해 찍기, 오리지널 그림 · 조각 16점</li>
+          <li><b>플레이어가 고치는 게임</b> — 브라우저 편집기에서 모델 · 값 · 대사 · 곡을 고쳐 반영하는 구조</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note col">이모티콘 대화는 사용자의 다른 프로젝트 「모두의 축제」에서 쓰던 방식을 가져와 주민 성격 데이터와 묶었습니다.</p>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">06</span><h2>개발 방법론</h2></div>
+    <p class="sec-intro col">사람 한 명이 채팅으로 방향을 정하고, Claude Code 세션 여럿이 나눠 만듭니다. 결정은 검수 보드에서, 구현은 트랙 세션에서, 합치기와 게시는 조정 세션에서 합니다.</p>
+
+    <div class="two-diagrams">
+      <figure class="diagram">
+        <div class="scroll">
+        <svg viewBox="0 0 560 668" role="img" aria-label="개발 한 바퀴: 사용자 요청이 검수 보드와 반영을 거쳐 조정 세션이 트랙 셋으로 나누고, 트랙이 각자 만든 것을 조정 세션이 합쳐 게시하면, 플레이와 편집기 요청이 다시 사용자 요청으로 돌아온다." style="min-width:420px">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+            <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b07a45"/></marker>
+          </defs>
+          <!-- 1 -->
+          <rect class="dg-box" x="150" y="16" width="260" height="52" rx="10"/>
+          <text class="dg-t" x="280" y="38" text-anchor="middle">사용자 요청</text>
+          <text class="dg-s" x="280" y="56" text-anchor="middle">채팅 한 줄 · 편집기에 남긴 요청</text>
+          <line class="dg-line" x1="280" y1="68" x2="280" y2="102" marker-end="url(#ar)"/>
+          <text class="dg-l" x="290" y="90">큰 결정 · 새 리소스면</text>
+          <!-- 2 -->
+          <rect class="dg-box" x="150" y="104" width="260" height="58" rx="10"/>
+          <text class="dg-t" x="280" y="127" text-anchor="middle">검수 보드</text>
+          <text class="dg-s" x="280" y="146" text-anchor="middle">선택지 A·B·C · 추천안 · 리소스 ID</text>
+          <line class="dg-line" x1="280" y1="162" x2="280" y2="196" marker-end="url(#ar)"/>
+          <text class="dg-l" x="290" y="184">사용자가 고름</text>
+          <!-- 3 -->
+          <rect class="dg-box" x="150" y="198" width="260" height="56" rx="10"/>
+          <text class="dg-t" x="280" y="221" text-anchor="middle">「검수 보드 반영」</text>
+          <text class="dg-s" x="280" y="240" text-anchor="middle">applied · history 기록, 되돌릴 수 있음</text>
+          <line class="dg-line" x1="280" y1="254" x2="280" y2="288" marker-end="url(#ar)"/>
+          <!-- 4 -->
+          <rect class="dg-box" x="150" y="290" width="260" height="58" rx="10"/>
+          <text class="dg-t" x="280" y="313" text-anchor="middle">조정 세션 · 트랙 나누기</text>
+          <text class="dg-s" x="280" y="332" text-anchor="middle">파일 영역 · 결정 번호 · 포트를 미리 나눔</text>
+          <line class="dg-line" x1="280" y1="348" x2="115" y2="386" marker-end="url(#ar)"/>
+          <line class="dg-line" x1="280" y1="348" x2="280" y2="386" marker-end="url(#ar)"/>
+          <line class="dg-line" x1="280" y1="348" x2="445" y2="386" marker-end="url(#ar)"/>
+          <!-- tracks -->
+          <rect class="dg-hot" x="40" y="388" width="150" height="80" rx="10"/>
+          <text class="dg-t" x="115" y="412" text-anchor="middle">트랙 세션 1</text>
+          <text class="dg-s" x="115" y="432" text-anchor="middle">자기 worktree · 브랜치</text>
+          <text class="dg-s" x="115" y="450" text-anchor="middle">구현 · 테스트 · 봇</text>
+          <rect class="dg-hot" x="205" y="388" width="150" height="80" rx="10"/>
+          <text class="dg-t" x="280" y="412" text-anchor="middle">트랙 세션 2</text>
+          <text class="dg-s" x="280" y="432" text-anchor="middle">자기 worktree · 브랜치</text>
+          <text class="dg-s" x="280" y="450" text-anchor="middle">구현 · 테스트 · 봇</text>
+          <rect class="dg-hot" x="370" y="388" width="150" height="80" rx="10"/>
+          <text class="dg-t" x="445" y="412" text-anchor="middle">트랙 세션 3…</text>
+          <text class="dg-s" x="445" y="432" text-anchor="middle">자기 worktree · 브랜치</text>
+          <text class="dg-s" x="445" y="450" text-anchor="middle">구현 · 테스트 · 봇</text>
+          <line class="dg-line" x1="115" y1="468" x2="270" y2="502" marker-end="url(#ar)"/>
+          <line class="dg-line" x1="280" y1="468" x2="280" y2="502" marker-end="url(#ar)"/>
+          <line class="dg-line" x1="445" y1="468" x2="290" y2="502" marker-end="url(#ar)"/>
+          <text class="dg-l" x="372" y="492">보고 + 노트</text>
+          <!-- 6 -->
+          <rect class="dg-box" x="150" y="504" width="260" height="58" rx="10"/>
+          <text class="dg-t" x="280" y="527" text-anchor="middle">조정 세션 · 합치기</text>
+          <text class="dg-s" x="280" y="546" text-anchor="middle">충돌 미리 보기 → --no-ff → 전체 테스트</text>
+          <line class="dg-line" x1="280" y1="562" x2="280" y2="596" marker-end="url(#ar)"/>
+          <text class="dg-l" x="290" y="584">사용자 승인 뒤</text>
+          <!-- 7 -->
+          <rect class="dg-box" x="150" y="598" width="260" height="56" rx="10"/>
+          <text class="dg-t" x="280" y="621" text-anchor="middle">웹 빌드 → 아티팩트 게시</text>
+          <text class="dg-s" x="280" y="640" text-anchor="middle">게임 · 편집기 · 홈, 바뀐 묶음만</text>
+          <!-- loop -->
+          <polyline class="dg-loop" points="150,626 22,626 22,42 146,42" marker-end="url(#ar2)" style="color:#b07a45"/>
+          <text class="dg-l" x="30" y="330" transform="rotate(-90 30 330)" text-anchor="middle">플레이 · 편집기 요청 → 「요청 확인」</text>
+        </svg>
+        </div>
+        <figcaption>개발 한 바퀴. 청록 칸이 동시에 도는 부분입니다. 11-12에는 트랙 8개가 같이 돌았고, 트랙은 문서를 직접 고치지 않고 자기 노트에 적어 조정 세션이 모아 반영합니다.</figcaption>
+      </figure>
+
+      <div class="stack">
+        <figure class="diagram">
+          <div class="scroll">
+          <svg viewBox="0 0 760 200" role="img" aria-label="리소스 파이프라인: 스펙 JSON을 Blender 헤드리스 빌더가 읽어 glb와 렌더를 만들고, base64 glb.json으로 감싼 뒤 게시할 때 양자화해 묶음으로 올린다. 편집기 요청은 다시 스펙 값으로 돌아온다." style="min-width:620px">
+            <defs>
+              <marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+              <marker id="br2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b07a45"/></marker>
+            </defs>
+            <rect class="dg-box" x="6" y="30" width="124" height="66" rx="10"/>
+            <text class="dg-t" x="68" y="57" text-anchor="middle">스펙 JSON</text>
+            <text class="dg-s" x="68" y="77" text-anchor="middle">색 · 크기 · 동작</text>
+            <line class="dg-line" x1="130" y1="63" x2="158" y2="63" marker-end="url(#br)"/>
+            <rect class="dg-hot" x="160" y="30" width="124" height="66" rx="10"/>
+            <text class="dg-t" x="222" y="57" text-anchor="middle">Blender 5.2</text>
+            <text class="dg-s" x="222" y="77" text-anchor="middle">헤드리스 빌더</text>
+            <line class="dg-line" x1="284" y1="63" x2="312" y2="63" marker-end="url(#br)"/>
+            <rect class="dg-box" x="314" y="30" width="124" height="66" rx="10"/>
+            <text class="dg-t" x="376" y="57" text-anchor="middle">.glb + 렌더</text>
+            <text class="dg-s" x="376" y="77" text-anchor="middle">검수용 그림</text>
+            <line class="dg-line" x1="438" y1="63" x2="466" y2="63" marker-end="url(#br)"/>
+            <rect class="dg-box" x="468" y="30" width="124" height="66" rx="10"/>
+            <text class="dg-t" x="530" y="57" text-anchor="middle">.glb.json</text>
+            <text class="dg-s" x="530" y="77" text-anchor="middle">base64로 감쌈</text>
+            <line class="dg-line" x1="592" y1="63" x2="620" y2="63" marker-end="url(#br)"/>
+            <rect class="dg-box" x="622" y="30" width="132" height="66" rx="10"/>
+            <text class="dg-t" x="688" y="57" text-anchor="middle">게시 묶음</text>
+            <text class="dg-s" x="688" y="77" text-anchor="middle">양자화 · 게임 · 편집기</text>
+            <polyline class="dg-loop" points="688,96 688,160 68,160 68,100" marker-end="url(#br2)" style="color:#b07a45"/>
+            <text class="dg-l" x="378" y="182" text-anchor="middle">리소스 편집기 요청 → 스펙 값 고쳐 다시 빌드 (교체 약속은 테스트가 검사)</text>
+          </svg>
+          </div>
+          <figcaption>리소스 파이프라인. 아티팩트는 .glb 파일을 올릴 수 없고 보안 정책이 data: 주소 읽기를 막아서, 모델을 base64 JSON으로 감싸 게임 안에서 풀어 씁니다. 게시할 때만 법선과 뼈 가중치를 줄여 모델 크기를 22.6 → 17.3MB로 낮췄습니다.</figcaption>
+        </figure>
+
+        <div class="method" style="margin-top:0">
+          <article class="card">
+            <h3>모듈 약속</h3>
+            <p style="font-size:.93rem">게임은 <code>data → sky → world → player → ui → audio → gameplay</code> 순서로 모듈을 불러오고, 모듈끼리는 이벤트와 서비스로만 말합니다. 약속은 <code>docs/CONTRACTS.md</code> 한 곳. 덕분에 트랙이 다른 트랙 없이도 데모로 확인됩니다.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="method">
+      <article class="card">
+        <h3>Claude Code 병렬 세션</h3>
+        <ul>
+          <li>조정 세션 하나가 트랙을 나누고 합칩니다. 트랙마다 브랜치와 <code>git worktree</code>를 따로 둡니다.</li>
+          <li>겹칠 만한 것은 시작 전에 나눕니다: 고칠 파일, 리소스 ID, 결정 번호 범위, 점검 포트.</li>
+          <li>합치기 전 충돌을 미리 보고, 목록 · 표 충돌은 줄 단위로 둘 다 살립니다. 개수를 박은 테스트는 두 쪽이 더한 만큼 맞춥니다.</li>
+          <li>합치기는 언제나 사용자 승인 뒤입니다.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>검수 보드 → 반영</h3>
+        <ul>
+          <li>보드마다 결정(D 번호)과 새 리소스 ID 표, 진행 계획을 한 화면에 둡니다.</li>
+          <li>사용자가 고른 것은 보드 저장소에 바로 저장되고, 고르지 않으면 추천안으로 확정합니다.</li>
+          <li>「검수 보드 반영」은 바뀐 결정만 반영하고 커밋을 기록해, 나중에 그 커밋으로 되돌릴 수 있습니다.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>셰이더 티어</h3>
+        <ul>
+          <li>모든 모델이 같은 툰 재질을 거치며 곡면 월드 · 외곽선 · 바람 · 물결을 받습니다.</li>
+          <li>조절 값은 공용 uniform이라 값을 바꿔도 셰이더를 다시 만들지 않습니다.</li>
+          <li>눈 쌓임 · 젖은 땅 · 낮은 안개 같은 날씨 효과는 그날 예보에 필요할 때만 셰이더에 넣고, 낮음 이하는 CPU로 대신합니다.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>자동 플레이 봇 · 점검 도구</h3>
+        <ul>
+          <li>머리 없는 Chrome에서 게임 루프를 멈추고 한 프레임씩 돌리며, 키 · 창 단추 · 가상 조이스틱으로만 플레이합니다. 시계만 앞당깁니다.</li>
+          <li>찾은 문제는 QA 번호로 보고서에 남깁니다. 막힘 · 저장 · 오류는 바로 고치고, 밸런스 · 보기는 보드로 올립니다.</li>
+          <li>행사 · 실내 · 시계 점검과 GPU 측정 도구가 따로 있습니다.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>아티팩트 게시 · 묶음</h3>
+        <ul>
+          <li>한 버전에 파일 511개 한계가 있어 에셋을 묶음 17개로 올립니다. 처음엔 섬 · 사람 묶음만, 나머지는 쓸 때 받습니다.</li>
+          <li>다시 게시할 때는 해시가 바뀐 묶음과 바뀐 모듈만 올리고, 같은 링크를 써서 플레이어 저장이 이어집니다.</li>
+          <li>로컬 개발 서버가 게시본과 같은 보안 정책을 걸어, 로컬에서 되면 게시본에서도 됩니다.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>요청 확인 · 반영 명령</h3>
+        <ul>
+          <li>편집기는 고친 것을 각자의 저장소에 남기고, 사용자는 채팅에 명령 한 줄을 보냅니다.</li>
+          <li>「리소스 요청 확인」 · 「스토리 반영」 · 「요소 반영」 · 「소리 반영」 · 「스타일 반영」은 모두 미리 보기 실행 → 테스트 → 커밋 → 다시 게시 → 반영 기록 순서입니다.</li>
+          <li>「전체 요청 확인」은 모든 편집기 · 보드 · 게임 문제 알림을 한 번에 모아 처리합니다.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="history">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">07</span><h2>개발 연대기</h2></div>
+    <figure class="diagram chart">
+      <div class="scroll">
+      <svg viewBox="0 0 760 240" role="img" aria-label="날짜별 커밋 수. 10월 29일이 173으로 가장 많고, 11월 11일 61, 11월 12일 50이다. 11월 2일·3일·9일은 커밋이 없다." style="min-width:600px">
+        <line class="grid" x1="44" y1="200" x2="744" y2="200"/>
+        <line class="grid" x1="44" y1="140" x2="744" y2="140"/>
+        <line class="grid" x1="44" y1="80" x2="744" y2="80"/>
+        <line class="grid" x1="44" y1="20" x2="744" y2="20"/>
+        <text class="yl" x="36" y="204" text-anchor="end">0</text>
+        <text class="yl" x="36" y="144" text-anchor="end">60</text>
+        <text class="yl" x="36" y="84" text-anchor="end">120</text>
+        <text class="yl" x="36" y="24" text-anchor="end">180</text>
+<path class="bar" d="M52.9 200V166Q52.9 162 56.9 162H74.9Q78.9 162 78.9 166V200Z"><title>10/28 · 커밋 38</title></path>
+<text class="xl" x="65.9" y="218" text-anchor="middle">10/28</text>
+<path class="bar" d="M96.6 200V31Q96.6 27 100.6 27H118.6Q122.6 27 122.6 31V200Z"><title>10/29 · 커밋 173</title></path>
+<text class="xl" x="109.6" y="218" text-anchor="middle">10/29</text>
+<path class="bar" d="M140.4 200V173Q140.4 169 144.4 169H162.4Q166.4 169 166.4 173V200Z"><title>10/30 · 커밋 31</title></path>
+<text class="xl" x="153.4" y="218" text-anchor="middle">10/30</text>
+<path class="bar" d="M184.1 200V174Q184.1 170 188.1 170H206.1Q210.1 170 210.1 174V200Z"><title>10/31 · 커밋 30</title></path>
+<text class="xl" x="197.1" y="218" text-anchor="middle">10/31</text>
+<path class="bar" d="M227.9 200V200Q227.9 198 229.9 198H251.9Q253.9 198 253.9 200V200Z"><title>11/01 · 커밋 2</title></path>
+<text class="xl" x="240.9" y="218" text-anchor="middle">11/01</text>
+<rect class="zero" x="271.6" y="199" width="26" height="1"><title>11/02 · 커밋 0</title></rect>
+<text class="xl" x="284.6" y="218" text-anchor="middle">11/02</text>
+<rect class="zero" x="315.4" y="199" width="26" height="1"><title>11/03 · 커밋 0</title></rect>
+<text class="xl" x="328.4" y="218" text-anchor="middle">11/03</text>
+<path class="bar" d="M359.1 200V172Q359.1 168 363.1 168H381.1Q385.1 168 385.1 172V200Z"><title>11/04 · 커밋 32</title></path>
+<text class="xl" x="372.1" y="218" text-anchor="middle">11/04</text>
+<path class="bar" d="M402.9 200V165Q402.9 161 406.9 161H424.9Q428.9 161 428.9 165V200Z"><title>11/05 · 커밋 39</title></path>
+<text class="xl" x="415.9" y="218" text-anchor="middle">11/05</text>
+<path class="bar" d="M446.6 200V200Q446.6 196 450.6 196H468.6Q472.6 196 472.6 200V200Z"><title>11/06 · 커밋 4</title></path>
+<text class="xl" x="459.6" y="218" text-anchor="middle">11/06</text>
+<path class="bar" d="M490.4 200V200Q490.4 197 493.4 197H513.4Q516.4 197 516.4 200V200Z"><title>11/07 · 커밋 3</title></path>
+<text class="xl" x="503.4" y="218" text-anchor="middle">11/07</text>
+<path class="bar" d="M534.1 200V197Q534.1 193 538.1 193H556.1Q560.1 193 560.1 197V200Z"><title>11/08 · 커밋 7</title></path>
+<text class="xl" x="547.1" y="218" text-anchor="middle">11/08</text>
+<rect class="zero" x="577.9" y="199" width="26" height="1"><title>11/09 · 커밋 0</title></rect>
+<text class="xl" x="590.9" y="218" text-anchor="middle">11/09</text>
+<path class="bar" d="M621.6 200V185Q621.6 181 625.6 181H643.6Q647.6 181 647.6 185V200Z"><title>11/10 · 커밋 19</title></path>
+<text class="xl" x="634.6" y="218" text-anchor="middle">11/10</text>
+<path class="bar" d="M665.4 200V143Q665.4 139 669.4 139H687.4Q691.4 139 691.4 143V200Z"><title>11/11 · 커밋 61</title></path>
+<text class="xl" x="678.4" y="218" text-anchor="middle">11/11</text>
+<path class="bar" d="M709.1 200V154Q709.1 150 713.1 150H731.1Q735.1 150 735.1 154V200Z"><title>11/12 · 커밋 50</title></path>
+<text class="xl" x="722.1" y="218" text-anchor="middle">11/12</text>
+        <text class="vl" x="109.6" y="21" text-anchor="middle">173</text>
+        <text class="vl" x="678.4" y="133" text-anchor="middle">61</text>
+        <text class="vl" x="722.1" y="144" text-anchor="middle">50</text>
+        <text class="ann" x="134" y="40">1·2차 트랙 합치기 · 웹 배포 · M3–M4</text>
+      </svg>
+      </div>
+      <figcaption>날짜별 커밋 수 (main에 닿는 커밋 489개, 작성 시각 한국 시간 기준). 막대에 마우스를 올리면 값이 보입니다.</figcaption>
+    </figure>
+
+    <ol class="timeline col">
+      <li><time>10-28</time><div>「레퍼런스작 같은 3D 게임을 웹으로」라는 한 줄에서 시작. 컨셉 보드, Blender 캐릭터 9 · 배경 32, 캐릭터 · 배경 편집기, 1차 트랙 다섯(섬 · 데이터 · UI · 소리 · 하늘)을 하루에 만들고 합침.</div></li>
+      <li><time>10-29</time><div>2차(채집 · 주민 · 집 · 셰이더) → 3차(휴대폰 · 웹 배포) → 4차 다듬기 → 5차 섬 생활 확장까지 하루에 네 번 합침. <span class="v">게임 링크 v2 → v6</span></div></li>
+      <li><time>10-30</time><div>축제와 단체 사진 엔딩, 편집기 완성(묶음 파일 · 편집기 홈 · 곡 · 지도 · 숫자 · 스타일). 검수 대기 145개 임시 확정. <span class="v">v10</span></div></li>
+      <li><time>10-31</time><div>출시 준비 트랙 합침: 자동 플레이 QA, 기기 점검, 접근성, 저장 옮기기, 문제 알리기. <span class="v">v12</span></div></li>
+      <li><time>11-04</time><div>그래픽 사양 4단계, 하늘 셰이더, 마우스 걷기, 시점 올려다보기, 상점 · 박물관 실내와 문 드나들기. <span class="v">v21</span></div></li>
+      <li><time>11-05</time><div>7차 보드 QA 결정 반영, 출시 점검표. 8차 보드부터 계절 행사 모델 16개와 행사 놀이 넷, 장면 넷까지 하루에. <span class="v">v22–v23</span></div></li>
+      <li><time>11-06 – 08</time><div>최적화와 행사 점검 도구, 섬 꾸미기. <span class="v">v24 · v25</span></div></li>
+      <li><time>11-10</time><div>새 주민 셋과 이사 오가기. 밤 · 새벽 보드, 무인도 투어 보드, 11차 보드. <span class="v">v26</span></div></li>
+      <li><time>11-11</time><div>밤 · 새벽, 무인도 투어, 시계 바늘, 편집기 셋 나누기, 옷 갈아입기, 남은 장면, 처음 받는 크기 절반으로, 실내 전수 점검, 시계 오늘 · 내일. GitHub 공개 저장소. <span class="v">v27 → v35</span></div></li>
+      <li><time>11-12</time><div>셰이더 보드 반영, 상점 견본 판, 13차 보드, 섬 일지. 트랙 8개 동시 진행 → 매일 할 거리 · 밤 미술상 · 보드 보관함 · 박물관 관과 별자리 · 집 증축 · 주민과 더 가깝게를 main에 합침. 테스트 525. <span class="v">v36 → v39</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">08</span><h2>앞으로 계획</h2></div>
+    <ol class="plan col">
+      <li>잠수(M16)와 실내 전수 점검 트랙을 main에 합치기<span class="who">두 세션 마무리 중 · 조정 세션</span></li>
+      <li>합친 main으로 전체 자동 플레이 · 실내 점검을 다시 돌린 뒤 게임 v40 게시, 편집기 셋과 편집기 홈 다시 게시<span class="who">M13–M16이 처음으로 게임 링크에 들어감</span></li>
+      <li>트랙 노트를 CLAUDE.md · README · 계약 문서에 모으고, <b>14차 검수 보드</b>로 M13–M16 다음 방향 정하기<span class="who">보관함에 14차로 기록</span></li>
+      <li>리소스 편집기에서 새 리소스 검수 (모델 56 · 장면 12)<span class="who">사용자</span></li>
+      <li>출시 손 점검 RC-05 · 06 · 07 · 08 · 12 → 공유 링크 공개 여부 결정<span class="who">사용자 · 그 뒤 실제 플레이어 피드백 받기</span></li>
+      <li>남은 큰 일과 차별화: 첫 장면 배 위 도착, 둘레 돌기 시점, 물가 걸어 들어가기, 이모티콘 대화와 밤 콘텐츠 넓히기<span class="who">14차 보드에서 순서 정함</span></li>
+      <li>선택: Unity 작은 시험판으로 이식 가능성 확인 (모델은 그대로 옮겨지고, 로직 약 3.2만 줄은 다시 써야 함)<span class="who">사용자가 Unity 에디터를 설치한 뒤 · <code>docs/notes/p49-unity-study.md</code></span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="links">
+  <div class="wrap">
+    <div class="sec-head"><span class="no">09</span><h2>링크</h2></div>
+    <div class="links">
+      <a href="https://claude.ai/artifact/73gDyHVhfveR7ESQ23JrbJ"><b>게임 「포근섬 이야기」</b><span>claude.ai 아티팩트 · v39 · 저장은 그 브라우저에</span></a>
+      <a href="https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv"><b>편집기 홈</b><span>모든 편집기 · 보드 · 전체 관리 표 · 검수 보드 보관함</span></a>
+      <a href="https://claude.ai/artifact/Lo1QpQ9svMsenNYUGUM72B"><b>13차 검수 보드</b><span>M13–M16 로드맵 · 결정 D140–D147</span></a>
+      <a href="https://claude.ai/artifact/1weSx9yyf2U4mLnwvopBNV"><b>리소스 편집기</b><span>모델 · 그림 전부, 다시 빌드 · 교체 요청</span></a>
+      <a href="https://claude.ai/artifact/NrmMmozFXQCdiw1oQMxCyF"><b>스토리 편집기</b><span>장면 · 주민 성격과 대사 · 편지</span></a>
+      <a href="https://claude.ai/artifact/DcidJEY1VRNNJdCxwge3Sj"><b>요소 편집기</b><span>상점 · 값 · 행사 · 섬 지도 · 방 배치</span></a>
+      <a href="https://github.com/rev3095/island-life-3d"><b>GitHub 저장소</b><span>공개 저장소 · 개발 일지 devlog.md</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap col">
+    포근섬 이야기 개발 보고서 · 2026-11-12 · 저장소 main <code>e6956d4</code> 기준. 근거 문서: <code>devlog.md</code> · <code>docs/PLAN.md</code> · <code>docs/notes/*</code> · <code>docs/qa/*</code>. 레퍼런스작의 이름 · 에셋 · 이미지는 쓰지 않았습니다.
+  </div>
+</footer>
+</body>
+</html>
