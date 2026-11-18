@@ -24,7 +24,7 @@ export function shiftIsland(local, ox) {
  * gen: gameplay/tour/islet.js generateIslet 결과 (칸·물체 자리는 그 섬 가운데 기준). ox: 월드 x 자리.
  * env = { kit, models, lazy, load } (world/index.js 의 것을 그대로)
  */
-export function buildIslet(ctx, gen, ox, { models, lazy, load }) {
+export function buildIslet(ctx, gen, ox, { models, lazy, load, island = null }) {
   // 따로 kit: 땅 재질의 풀·모래 섞기 텍스처(banks)가 재질마다 하나라 본섬과 나눠 쓰면 안 된다. 화면 밖 판정은 world.prepareFrame 이 둘 다 부른다
   const kit = createKit(ctx);
   gen.ox = ox;
@@ -34,7 +34,8 @@ export function buildIslet(ctx, gen, ox, { models, lazy, load }) {
   const terrain = buildTerrain(ctx, gen, api, kit, models);
   // 물체 변경은 저장하지 않는다: 이 섬만의 island 칸 (없앤 것·놓은 것·변형)
   const ictx = Object.create(ctx);
-  ictx.state = { ...ctx.state, island: { removed: [], added: [], variants: {}, fruit: {} } };
+  // M21-P3 구경 섬: island = 친구 섬 사진의 { removed, added } (좌표는 이미 ox 를 더한 것) — 이 가짜 칸에만 쓰고 저장하지 않는다
+  ictx.state = { ...ctx.state, island: { removed: [...(island?.removed ?? [])], added: [...(island?.added ?? [])], variants: { ...(island?.variants ?? {}) }, fruit: {} } };
   const objects = createObjects(ictx, api, kit, models, collision, { lazy, loadKind: load });
   objects.populate(gen.objects.map(o => ({ ...o, x: o.x + ox })));
   const half = Math.max(gen.w, gen.h) / 2 + 60;

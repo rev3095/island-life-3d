@@ -18,6 +18,8 @@ const WHY_TEXT = {
 };
 export const whyText = why => WHY_TEXT[why] ?? '지금은 섬을 올리지 못했어요.';
 
+let travel = null;   // M21-P3 travel.js (update)
+
 export default {
   name: 'visit',
   async init(ctx) {
@@ -125,6 +127,8 @@ export default {
       },
     };
     ctx.services.visit = api;
+    // M21-P3 구경 가기: 친구 섬 배 BD-20 · 섬 고르기 UI-39 · x 1300 구경 섬 · visit.trip() (visit/travel.js)
+    travel = await import('./travel.js').then(m => m.attachTravel(ctx, api)).catch(e => { console.warn('[visit] 구경 가기를 못 붙였다', e); return null; });
 
     // 하루 한 번 올리기
     ctx.events.on('data:newday', () => { if (R.needsUpload(V(), dayKey())) upload(); });
@@ -138,5 +142,5 @@ export default {
       if (store?.writable && R.needsUpload(v, dayKey())) upload();
     }, e => { console.warn('[visit] 저장소 열기 실패', e); ready = true; changed(); });
   },
-  update() {},
+  update(dt) { travel?.update?.(dt); },
 };

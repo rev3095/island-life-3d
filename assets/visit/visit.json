@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "about": "친구 섬 구경 가기 설정 (M21-P3, 17차 보드 wave17 D282-A · D285-A). 읽는 곳 src/gameplay/visit/travel.js · src/world/index.js(assets.env 를 나중에 받기) · tools/build-web.mjs(모델 → visit 묶음). 노트 docs/notes/m21-p3-visit.md. 자리 값은 칸 단위 — dock 은 어선 부두 뿌리(boat.site().root) 기준, islet 은 구경 섬 선착장(BD-05 dock 물체) 기준.",
+  "assets": { "env": ["visit-boat", "guestbook-stand", "stamp-board"] },
+  "ox": 1300,
+  "reach": 1.9,
+  "dock": { "boat": [2.2, -1.45], "stand": [1.6, -0.35] },
+  "islet": { "boat": [1.55, 3.3], "stand": [0.15, 3.4], "guestbook": [-1.4, -0.9] },
+  "villagers": { "max": 10 },
+  "greet": [
+    ["어서 와! {owner}네 섬에 놀러 왔구나.", "천천히 둘러보고 가~"],
+    ["어머, 처음 보는 얼굴이네!", "{island}은 바람이 참 좋아."],
+    ["안녕! 구경 왔어?", "{owner}가 알면 좋아할 거야."],
+    ["반가워! 여기는 {island}이야.", "다음에 또 놀러 와!"],
+    ["오늘 날씨 좋지?", "우리 섬 구경 잘 하고 가!"]
+  ]
+}
