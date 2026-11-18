@@ -556,3 +556,41 @@ stats() → { ms, passes }
 - **house**: 옷장 가구(`furn.wardrobe`, FU-12) 메뉴 첫 칸 「갈아입기」(outfit·ui.closet 이 있을 때). 상점 방 `places/shop.json` v4 = 옷 진열대 붙박이 FU-54 (`assets/furniture/fixtures/specs/clothes-rack.json`, gx 6 · gz 6, 2×1) + 진열 줄 `{ group: 'clothes', lx, lz, dx, y, hang, count: 2 }` (`stockPlan` 이 `hang` 을 넘긴다 — 윗옷은 가로대 높이에 걸고 모자·신발은 아래 단). `places.js` 가 도토리상점 진열 묶음에 `clothes: outfit.today()` 를 더한다.
 - **숫자** `rules.json` `shop.clothesPerDay` 2 (진열대 자리 둘이라 0–2, 0 = 안 팖, 같은 옷 다른 색은 같은 날 안 나옴 — `pickShopClothes`) · `shop.clothesGiftWardrobe` true (집·가방에 옷장이 없을 때 첫 옷과 옷장을 가방에). 요소 편집기 「상점」 시트 「옷 진열대 (11차)」.
 - **웹 묶음**: `tools/build-web.mjs` PACKS `clothes` (모델·썸네일, 처음에 받지 않음 — 입은 옷이 있거나 상점·옷장에서 그림을 볼 때), 목록 `assets/clothes/index.json` 은 섬 묶음(boot). FAMILIES `clothes`.
+
+## M21 친구 섬 구경 (17차 보드 wave17 D280–D287 모두 A)
+
+### P2 보여 주기 · 섬 코드 · 섬 사진 (`docs/notes/m21-p2-share.md`)
+
+- 서비스 `ctx.services.visit`:
+  - `available` (이 창에서 올릴 수 있나) · `kind` `'db'|'local'|null` · `uid` · `status()` → `{ ready, available, readable, share, wanted, code, lastPut, error, busy }`
+  - `setShare(on)` → `Promise<{ ok, code?, why? }>` · `upload()` (켜져 있을 때 지금 섬 다시 올리기) · `photo()` (올리지 않고 섬 사진만)
+  - `list()` → 올라온 섬 문서 배열 · `today({ list?, day?, n? })` → 오늘의 섬 문서 3개 · `find(글)` → 섬 문서 | null
+  - `rules` (= `visit/rules.js` 전부) · `whyText(why)` → 화면 글
+- 이벤트: `visit:share` `{ on, code }` · `visit:changed` (status 와 같은 모양).
+- 섬 문서 `islands/<uid>` = `{ code, user, v, snap, dayKey, at }`, `snap` = `snapshot()` 모양 `{ v, island:{name,seed,added,built,removed}, house:{stage}, player:{name,hair,shirt,outfit}, villagers:[{slug,…겉모양}], dayKey, at }`. 구경 섬(P3)은 `snap.v` 가 모르는 판이면 건너뛴다.
+- 구경은 읽기만: 구경 섬(P3)은 `snap` 으로 섬을 세울 뿐 남의 문서를 쓰지 않는다. 글은 P4 가 `visits/…` 에만.
+- 방명록·편지·선물 (M21-P4 가 쓸 모양 제안): `visits/<섬 코드>/<쓴 사람 id>/<글 id>` = `{ user, kind: 'guestbook'|'letter'|'gift', line: <고른 문장 id>, item?, at, hidden: false, reported?: true }`.
+  - **쓴 사람 id 필드 `user` 필수**, 경로의 쓴 사람 칸 = `user` = 쓴 사람. 남의 글 덮어쓰기·지우기 금지.
+  - 글은 고른 문장만 (자유 글 없음, `line` = 문장 표 id). 섬 주인은 자기 섬 글에 `hidden: true` 만 (내용은 그대로) — 순수 판단 `canWriteVisit` (테스트 있음). 「알리기」는 P4 가 게임 저장소 `reports` 에 `kind:'visit'` 으로 (이미 있는 문제 알리기 흐름).
+  - ⚠ 플랫폼 규칙으로는 `{self}` 가 경로 가운데 칸(코드 다음)에 올 수 있는지, 섬 주인만 `hidden` 을 바꾸게 하는 것은 **확인 안 됨** — 경로 규칙만으로는 「주인 숨기기」가 안 되므로, P4 는 숨기기를 주인 쪽 문서(`islands/<주인 uid>` 의 `hide: [글 경로…]`)로 하는 편이 안전하다. P4 가 정할 것.
+
+> P4 에서 바뀜: 방명록·편지·선물 모양은 위 제안(`visits/<코드>/<uid>/<글 id>`)이 아니라 아래 P4 의 `visits/<쓴 사람 uid>` 한 문서.
+
+### P3 구경 가기 (`docs/notes/m21-p3-visit.md`)
+
+- 서비스 `ctx.services.visit` 에 더함:
+  - **`trip()`** → `{ code, user (섬 주인 uid), island, owner, guestbook: { x, z } }` | null — 지금 구경 중인 섬. `guestbook` = 방명록 받침 PR-45 를 놓을 월드 자리 (도착 자리 서쪽 위).
+  - `visiting` · `travelBusy` · `pick()` (UI-39 열기) · `go(doc)` → `{ ok, why? }` · `back({ auto })` · `boat()` · `stand()` · `travelConfig`.
+- 이벤트: `visit:arrive` `{ code, user, island, owner, x, z, guestbook }` · `visit:leave` `{ code, user, auto }`.
+- 행동 키: `visit-greet` 99 · `visit-boat` 96 · **`visit-hands` 94 (구경 중 아래를 모두 막음)**. M21-P4 의 방명록 받침 Space 는 **95** (94 위, 96 아래)에 달면 된다. 받침 물체는 P4 가 `trip().guestbook` 자리에 `world.objects.add('guestbook-stand', …, { persist: false })` (구경 섬 물체 — 떠나면 섬과 같이 사라짐), 모델은 이미 `visit` 묶음·lazy.
+- 구경 중엔 `world.islet.active` 가 true (투어와 같은 틀) — 새로 칸·물체를 쓰는 모듈은 `tour.active` 대신 `world.islet.active` 를 볼 것.
+
+### P4 남기기 · 받기 (`docs/notes/m21-p4-guestbook.md`)
+
+- 저장 `visits/<쓴 사람 uid>` = `{ user, v, from: { name, island, code? }, notes: [{ id, to, kind: 'stamp'|'letter'|'gift', line, item?, day, at }], at }` (글 60개까지, 자유 글 칸 없음 — `rules.isNote`). 숨기기 = `islands/<주인 uid>.hide: [<쓴 사람 uid>/<글 id>…]`.
+- **P3 과 맞춘 것 (합친 뒤)**: `visit.trip()` → `{ code, user, island, owner, guestbook: { x, z } }` | null. 받침 PR-45 는 P4 가 `visit:arrive` 의 `guestbook` 자리에 놓고, Space 는 그 자리(또는 받침·우편함 물체) 1.9칸 안. 「방명록 보기」의 주인 숨김은 `visit.find(code)` 의 섬 문서 `hide`.
+- 구경 시작은 이벤트 이름에 기대지 않고 `trip()` 을 1초마다 본다 → `visit:arrive-seen { code, first, x, z }` (s70).
+- 서비스 `visit.guestbook`: `can(kind)` · `leave(kind, { line, item })` · `pull()` · `hide(key, on)` · `report(entry)` · `inbox()` · `stamps()` · `rewards()` · `leftToday()` · `lines()` · `describe(n)`. 창 `ui.friends.open(tab?)` · `ui.friends.pickLine({ title, lines })`.
+- 이벤트: `visit:stamp { code, stamp, first, newIsland, count, x, z }` · `visit:left { kind, code, line, item }` · `visit:letter { kind, first, from }` · `visit:inbox { count }` · `visit:arrive-seen`.
+- 우편함 `town.mail.friend({ from: { name, island }, lines: [글…], gift }) → 편지 | null`.
+- 저장 `state.visit` 에 더한 칸 (없으면 만든다): `left` · `stamps: [{ code, name, island, stamp, day }]` · `rewards: [item]` · `got: [noteKey]` · `inbox` · `hide: [noteKey]` · `trips` · `seen: { stamp, letter }`.

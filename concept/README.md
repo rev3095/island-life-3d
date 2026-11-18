@@ -140,6 +140,8 @@ https://claude.ai/artifact/8HRgTYch2hkp3fcVv4wZVv · 파일 `editors.html` (저�
 |---|---|---|
 | `reports/<id>` (`r<YYYYMMDD>-<HHMMSS>-<16진 4자리>`, 이름순 = 시간순) | 섬폰 「📮 문제 알리기」 | `{ status: 'new', kind: 'stuck' / 'error' / 'save' / 'look' / 'other', text, createdAt, game: {build, …}, errorTotal, reply: null, errors?, device?, place?, progress? }` — `docs/notes/p11-save.md` 「게임 저장소 `reports` 모양」 |
 | `checks/<자동 id>` | 게임 링크 끝 `#check` → 30초 → 「결과 저장」 | `{ v, kind: 'device-check', at, ms, build, where, by, device: {gpu, screen, touch, …}, quality: {start, end, changes, fixed}, frame, stops, plaza: {avg, p95, goal: 33, ok}, errors: {count, list}, time }` — `docs/notes/p11-check.md` 「저장 모양」 |
+| `islands/<uid>` (M21-P2) | 섬폰 설정 「내 섬 보여 주기」 | `{ code, user, v, snap, dayKey, at, hide? }` — 섬 사진. 모두 읽기·자기 문서만 쓰기 (`islands/{self}` interact). `hide` = 주인이 숨긴 방명록 글 — `docs/notes/m21-p2-share.md` |
+| `visits/<uid>` (M21-P4) | 친구 섬 방명록 도장·편지·선물 | `{ user, from, notes: [{ id, to: <섬 코드>, kind, line, item? }] }` — 고른 문장 id 만. 모두 읽기·자기 문서만 쓰기 (`visits/{self}` interact). 「알리기」는 `reports` 에 `kind: 'visit'` + `visit: { key, writer, to, … }` → "전체 요청 확인" 에서 그 글을 보고, 필요하면 Claude 가 admin 으로 그 사람 문서에서 글을 지운다 — `docs/notes/m21-p4-guestbook.md` |
 
 **문제 처리 (D47-A)** — `reports` 를 `query where status == 'new'` 로 읽어 하나씩 `status: 'working'` 으로 바꾸고:
 
