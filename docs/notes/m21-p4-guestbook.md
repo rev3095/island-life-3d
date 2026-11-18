@@ -50,7 +50,7 @@ P2 제안의 `visits` 두 줄이 이 모양에 그대로 맞는다 (`visits/{sel
   - `guestbook.js` 남기기·받기·숨기기·알리기·보상·행동 키, `attachGuestbook(ctx, visit)` (→ `visit.guestbook`, `ui.friends`).
   - `ui.js` 섬폰 「친구 섬」 창 UI-38 (탭 「📖 내 방명록」 받은 도장 · 「✉️ 받은 편지」 편지·선물, 줄마다 「숨기기/보이기」·「알리기」) + 「🏝️ 도장 모음」 UI-40 (도장 찍은 섬 칸 10개 · 오늘 남긴 섬 n/3 · 기념 가구 1·3·5·10) + 편지 문장 고르기 창.
 - 문장 표 `assets/visit/lines.json`: 도장 6 (`stamps` — 받침에서는 앞 넷) · 편지 문장 10 (`letters`, `gift` = 선물에 붙는 문장). **id 는 늘리기만** (받는 쪽이 모르는 id 는 버린다).
-- 남기기 (구경 중에만 — `visit.trip?.()` 가 섬 문서를 줄 때): 구경 섬의 `guestbook-stand`(PR-45) 또는 `mailbox` 물체 1.9칸 안에서 Space (행동 키 `visit-guestbook` 우선순위 **93** — 문 90 위, 말 걸기 100 아래) → 「도장 찍기 · 편지 남기기 · 선물 두기 · 방명록 보기」. 하루 세 섬, 섬마다 도장·편지·선물 하나씩 (`state.visit.left = { day, islands: { <코드>: [kind…] } }`). 선물은 가방에서 하나 (도구·색 변형·가품 빼고) — 저장소에 못 올리면 가방에 돌려준다.
+- 남기기 (구경 중에만 — `visit.trip?.()` 가 섬 문서를 줄 때): 구경 섬의 `guestbook-stand`(PR-45) 또는 `mailbox` 물체 1.9칸 안에서 Space (행동 키 `visit-guestbook` 우선순위 **95** — P3 `visit-hands` 94 위, `visit-boat` 96 아래. 받침은 P3 가 `visit:arrive` 로 알려 준 `guestbook` 자리에 `world.objects.add('guestbook-stand', …, { persist: false })` 로 놓는다) → 「도장 찍기 · 편지 남기기 · 선물 두기 · 방명록 보기」. 하루 세 섬, 섬마다 도장·편지·선물 하나씩 (`state.visit.left = { day, islands: { <코드>: [kind…] } }`). 선물은 가방에서 하나 (도구·색 변형·가품 빼고) — 저장소에 못 올리면 가방에 돌려준다.
 - 받기: 저장소가 준비될 때·`data:newday`·섬폰 「친구 섬」을 열 때 `pull()` → 새로 온 편지·선물은 우편함으로 (`town/mail.js` `friend()` — 편지 `from: 'friend'`, `friend: { name, island }`, 읽을 때 이름 「○○의 편지 · 섬 이름」, 선물은 기존 우편함 선물 받기 그대로(가방이 차면 쪽지로 남음)). 도장은 방명록 목록에만. 배달한 글 열쇠는 `state.visit.got` (400개까지). 받은 목록 사본 `state.visit.inbox` (80개).
 - 알리기: `reports/<id>` 에 `buildReport(…, withInfo:false)` 모양 + `kind: 'visit'` + `visit: { key, writer, to, kind, line, item, from }` (기존 `sendReport` — 로컬은 `game-reports`). 알리면 그 글을 숨긴다.
 - 보상: 도장 찍은 섬(처음 찍는 섬만) 1·3·5·10곳 → 기념 가구 FU-109–112 (`STAMP_REWARDS`, `src/data/visit-items.js`)를 「섬 우체국」 편지 선물로 (받은 것 `state.visit.rewards`). 섬 일지 목표 `friendstamp` 「친구 섬 방명록 도장」 1·3·5·10 (`on: 'stamp'`, journal.json v8, `journal/index.js` 가 `visit:stamp` 의 `newIsland` 만 셈).
@@ -60,7 +60,7 @@ P2 제안의 `visits` 두 줄이 이 모양에 그대로 맞는다 (`visits/{sel
 
 ## 약속 (CONTRACTS 「M21 친구 섬 구경」 절에 더할 것)
 
-- **P3 에 바라는 것**: `ctx.services.visit.trip()` → 지금 구경 중인 섬 문서 `{ code, user, snap, hide? }` | null (구경 섬이 `islands/<uid>` 문서를 그대로 주면 된다). 구경 섬에 `world.objects` 종류 `guestbook-stand` (PR-45) 를 주인 집 우편함 옆에 놓아 주면 받침 Space 가 걸린다 (없으면 그 섬의 `mailbox` 물체로 대신). 구경 섬에서 `world.objects.list` 가 그 섬 물체를 돌려줘야 한다.
+- **P3 과 맞춘 것 (합친 뒤)**: `visit.trip()` → `{ code, user, island, owner, guestbook: { x, z } }` | null. 받침 PR-45 는 P4 가 `visit:arrive` 의 `guestbook` 자리에 놓고, Space 는 그 자리(또는 받침·우편함 물체) 1.9칸 안. 「방명록 보기」의 주인 숨김은 `visit.find(code)` 의 섬 문서 `hide`.
 - 구경 시작은 이벤트 이름에 기대지 않고 `trip()` 을 1초마다 본다 → `visit:arrive-seen { code, first, x, z }` (s70).
 - 서비스 `visit.guestbook`: `can(kind)` · `leave(kind, { line, item })` · `pull()` · `hide(key, on)` · `report(entry)` · `inbox()` · `stamps()` · `rewards()` · `leftToday()` · `lines()` · `describe(n)`. 창 `ui.friends.open(tab?)` · `ui.friends.pickLine({ title, lines })`.
 - 이벤트: `visit:stamp { code, stamp, first, newIsland, count, x, z }` · `visit:left { kind, code, line, item }` · `visit:letter { kind, first, from }` · `visit:inbox { count }` · `visit:arrive-seen`.
@@ -76,8 +76,8 @@ P2 제안의 `visits` 두 줄이 이 모양에 그대로 맞는다 (`visits/{sel
 ## 문서 세션이 반영할 문장
 
 - CLAUDE.md 「큰 구조」 친구 섬 구경 줄(P2) 뒤에:
-  `- **친구 섬 남기기 (M21-P4, D283-A·D284-A·D286-A·D287-A)**: `src/gameplay/visit/` `guestbook.js`(남기기·받기·숨기기·알리기·보상) · `post.js`(저장소) · `ui.js`(섬폰 「🏝️ 친구 섬」 UI-38 방명록·받은 편지 + 도장 모음 UI-40). 구경 중 받침 PR-45(없으면 우편함) Space(93) → 방명록 도장 · 고른 문장 편지(문장 표 `assets/visit/lines.json`, id 만 저장 — 자유 입력 없음) · 선물 하나, 하루 세 섬(`state.visit.left`). 저장소 `visits/<쓴 사람 uid>` 한 문서 `{ user, from, notes:[{ id, to:<섬 코드>, kind, line, item? }] }` — 자기 문서만 쓰기(`visits/{self}`, 판단 `rules.canWriteVisit`), 주인은 모두 읽어 `to` 로 고르고, 숨기기는 자기 섬 문서 `islands/<uid>.hide`. 받은 편지·선물은 우편함(`town.mail.friend`), 알리기는 `reports` `kind:'visit'`. 도장 1·3·5·10섬 → 기념 가구 FU-109–112 · 일지 목표 `friendstamp`. 장면 s70–s72. 개발 서버 `/api/db/visits`. 노트 `docs/notes/m21-p4-guestbook.md`.`
-- CLAUDE.md 행동 키 우선순위 줄에 「· 친구 섬 방명록 93 (M21-P4 — 구경 중 받침·우편함 앞)」.
+  `- **친구 섬 남기기 (M21-P4, D283-A·D284-A·D286-A·D287-A)**: `src/gameplay/visit/` `guestbook.js`(남기기·받기·숨기기·알리기·보상) · `post.js`(저장소) · `ui.js`(섬폰 「🏝️ 친구 섬」 UI-38 방명록·받은 편지 + 도장 모음 UI-40). 구경 중 받침 PR-45 Space(95) → 방명록 도장 · 고른 문장 편지(문장 표 `assets/visit/lines.json`, id 만 저장 — 자유 입력 없음) · 선물 하나, 하루 세 섬(`state.visit.left`). 저장소 `visits/<쓴 사람 uid>` 한 문서 `{ user, from, notes:[{ id, to:<섬 코드>, kind, line, item? }] }` — 자기 문서만 쓰기(`visits/{self}`, 판단 `rules.canWriteVisit`), 주인은 모두 읽어 `to` 로 고르고, 숨기기는 자기 섬 문서 `islands/<uid>.hide`. 받은 편지·선물은 우편함(`town.mail.friend`), 알리기는 `reports` `kind:'visit'`. 도장 1·3·5·10섬 → 기념 가구 FU-109–112 · 일지 목표 `friendstamp`. 장면 s70–s72. 개발 서버 `/api/db/visits`. 노트 `docs/notes/m21-p4-guestbook.md`.`
+- CLAUDE.md 행동 키 우선순위 줄에 「· 친구 섬 방명록 95 (M21-P4 — 구경 중 받침 앞, `visit-hands` 94 위)」.
 - CLAUDE.md 「명령어」 dev-server 설명에 「· `/api/db/visits` (방명록·편지·선물)」.
 - `docs/CONTRACTS.md` 「M21 친구 섬 구경」 절에 위 「약속」.
 - `concept/README.md` 「게임 저장소」: `visits/<uid>` (방명록·편지·선물, 모두 읽기·자기 것만 쓰기) · `reports` 에 `kind:'visit'` (친구 섬 글 알리기 — "전체 요청 확인" 에서 그 글은 `visit.key` 로 찾아 보고, 필요하면 Claude 가 admin 으로 그 사람 문서에서 그 글을 지운다).

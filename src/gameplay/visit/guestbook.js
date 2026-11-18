@@ -53,7 +53,8 @@ export function createGuestbook(ctx, visit) {
 
   const trip = () => { try { return visit.trip?.() ?? null; } catch { return null; } };
   const me = () => ({ name: String(ctx.state.player?.name ?? '').slice(0, 20), island: String(ctx.state.island?.name ?? '').slice(0, 20), ...(R.isCode(V().code) ? { code: V().code } : {}) });
-  const tripName = t => ({ name: String(t?.snap?.player?.name ?? '').slice(0, 20), island: String(t?.snap?.island?.name ?? '').slice(0, 20) });
+  // P3 trip() = { code, user, island, owner, guestbook: { x, z } } (섬 문서 모양 snap 도 받아 준다)
+  const tripName = t => ({ name: String(t?.owner ?? t?.snap?.player?.name ?? '').slice(0, 20), island: String(t?.island ?? t?.snap?.island?.name ?? '').slice(0, 20) });
   let noteN = 0;
   const noteId = () => `n${Date.now().toString(36)}${(noteN++ % 36).toString(36)}`;
 
@@ -173,9 +174,12 @@ export function createGuestbook(ctx, visit) {
 
   // ---------- 구경 섬 받침 PR-45 Space (구경 중에만) ----------
   function standNear() {
-    if (!trip()) return null;
+    const t = trip();
+    if (!t) return null;
     const p = S().player?.position, objs = S().world?.objects;
-    if (!p || !objs?.list) return null;
+    if (!p) return null;
+    if (t.guestbook && Math.hypot(t.guestbook.x - p.x, t.guestbook.z - p.z) < REACH) return t.guestbook;   // P3 가 알려 준 받침 자리
+    if (!objs?.list) return null;
     for (const kind of ['guestbook-stand', 'mailbox']) {
       for (const o of objs.list(kind) ?? []) if (Math.hypot(o.x - p.x, o.z - p.z) < REACH) return o;
     }
@@ -225,7 +229,8 @@ export function createGuestbook(ctx, visit) {
       const st = await store();
       const docs = st ? await st.all().catch(() => []) : [];
       await linesReady;
-      const list = R.inbox(docs, t.code, { hide: t.hide ?? [], lineOk }).filter(x => x.kind === 'stamp' && !x.hidden).slice(0, 6);
+      const island = t.hide ? t : await Promise.resolve(visit.find?.(t.code)).catch(() => null);   // 주인이 숨긴 글은 그 섬 문서 hide
+      const list = R.inbox(docs, t.code, { hide: island?.hide ?? [], lineOk }).filter(x => x.kind === 'stamp' && !x.hidden).slice(0, 6);
       await say(list.length ? list.map(x => `${describe(x)} · ${x.day ?? ''}`) : ['(아직 도장이 없다. 첫 도장을 찍어 볼까?)']);
     }
   }
@@ -265,7 +270,8 @@ export async function attachGuestbook(ctx, visit) {
   visit.guestbook = gb;
   const S = () => ctx.services;
   S().gameplay?.interactions?.add?.({
-    name: 'visit-guestbook', intent: 'action', priority: 93, label: '방명록',
+    name: 'visit-guestbook', intent: 'action', priority: 95,   // P3 visit-hands 94 위 · visit-boat 96 아래
+    label: '방명록',
     test: () => (S().ui?.isBlocking?.() ? null : gb.standNear()),
     run: () => gb.atStand(),
   });
@@ -276,6 +282,16 @@ export async function attachGuestbook(ctx, visit) {
   let pulledReady = false;
   ctx.events.on('visit:changed', st => { if (st?.ready && !pulledReady && visit.uid) { pulledReady = true; gb.pull(); } });
   ctx.events.on('data:newday', () => gb.pull());
+  // P3 구경 섬에 내리면 방명록 받침 PR-45 를 그 섬 물체로 (저장 안 함 — 떠나면 섬과 같이 사라짐)
+  ctx.events.on('visit:arrive', ({ guestbook } = {}) => {
+    const world = S().world;
+    if (!guestbook || !world?.objects?.add || !world.island?.toTile) return;
+    const t = world.island.toTile(guestbook.x, guestbook.z);
+    try {
+      world.objects.add('guestbook-stand', Math.max(0, Math.min(world.island.w - 1, t.tx)), Math.max(0, Math.min(world.island.h - 1, t.tz)),
+        { persist: false, id: 'visit:guestbook', at: { x: guestbook.x, z: guestbook.z, y: 0 } });
+    } catch (e) { console.warn('[visit] 방명록 받침을 못 놓음', e); }
+  });
   if (typeof setInterval === 'function') setInterval(() => gb.watch(), 1000);
   return gb;
 }
