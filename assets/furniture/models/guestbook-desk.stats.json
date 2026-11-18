@@ -1,0 +1,62 @@
+{
+  "id": "FU-110",
+  "slug": "guestbook-desk",
+  "item": "furn.guestbook-desk",
+  "name": "방명록 책상",
+  "category": "furniture",
+  "kind": "guestbook-desk",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1742,
+  "parts": 3,
+  "materials": [
+    "brass",
+    "cover",
+    "handle",
+    "ink",
+    "pad",
+    "paper",
+    "quill",
+    "ribbon",
+    "stampA",
+    "stampB",
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "book",
+    "desk",
+    "props"
+  ],
+  "animations": {},
+  "size": [
+    0.82,
+    0.64,
+    0.94
+  ],
+  "bounds": [
+    [
+      -0.41,
+      -0.326,
+      0.0
+    ],
+    [
+      0.41,
+      0.31,
+      0.935
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 40852,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "guestbook-desk_front.png",
+    "guestbook-desk_main.png",
+    "guestbook-desk_thumb.png",
+    "guestbook-desk_top.png"
+  ]
+}

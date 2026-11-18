@@ -1,0 +1,76 @@
+{
+  "id": "FU-110",
+  "slug": "guestbook-desk",
+  "item": "furn.guestbook-desk",
+  "name": "방명록 책상",
+  "category": "furniture",
+  "kind": "guestbook-desk",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "작은 나무 책상 위에 펼친 방명록(도장 둘·글 줄), 깃펜 꽂이, 도장과 인주, 앞에 서랍 하나. 친구들이 다녀간 기록을 집 안에 둔다.",
+    "keywords": [
+      "작은 나무 책상",
+      "펼친 방명록",
+      "깃펜",
+      "도장·인주"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "17차 보드 wave17 D287-A · D280-A — M21 「친구 섬 구경」 (M21-P1 모델, 놓는 자리·놀이는 M21-P2)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "wood": "#C08A5A",
+    "woodDark": "#7A5236",
+    "woodLight": "#DDB07E",
+    "brass": "#D9B44A",
+    "cover": "#3F6F8E",
+    "paper": "#FFF8EC",
+    "ink": "#5E4632",
+    "stampA": "#E8604C",
+    "stampB": "#7DB36A",
+    "ribbon": "#F2C14E",
+    "quill": "#FFFFFF",
+    "pad": "#B8333E",
+    "handle": "#F2EBDD"
+  },
+  "paletteLabels": {
+    "wood": "책상",
+    "woodDark": "다리",
+    "woodLight": "서랍 앞",
+    "brass": "손잡이·펜 꽂이",
+    "cover": "방명록 표지",
+    "paper": "종이",
+    "ink": "글 줄",
+    "stampA": "도장 빨강",
+    "stampB": "도장 초록",
+    "ribbon": "책갈피 끈",
+    "quill": "깃펜",
+    "pad": "인주",
+    "handle": "도장 손잡이"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

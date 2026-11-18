@@ -1,0 +1,91 @@
+{
+  "id": "FU-109",
+  "slug": "friend-island-frame",
+  "item": "furn.friend-island-frame",
+  "name": "친구 섬 액자",
+  "category": "furniture",
+  "kind": "friend-island-frame",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "구경 간 친구 섬을 담은 벽 액자 — 하늘·바다 위 둥근 섬, 작은 집과 나무 둘, 선착장과 배, 왼쪽 위에 둥근 방문 도장. 나무 테, 벽에 건다.",
+    "keywords": [
+      "둥근 섬 그림",
+      "방문 도장",
+      "나무 테"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "17차 보드 wave17 D287-A · D280-A — M21 「친구 섬 구경」 (M21-P1 모델, 놓는 자리·놀이는 M21-P2)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.008,
+    "noOutline": [
+      "sky",
+      "sea",
+      "wave",
+      "land",
+      "sand",
+      "house",
+      "roof",
+      "tree",
+      "boat",
+      "sun",
+      "stamp",
+      "string"
+    ]
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    }
+  },
+  "palette": {
+    "frame": "#9C6B45",
+    "frameDark": "#6E4A31",
+    "sky": "#BFE3F2",
+    "sea": "#5E8FC2",
+    "wave": "#E4F3FA",
+    "land": "#7DB36A",
+    "sand": "#F2DFAE",
+    "house": "#FFF8EC",
+    "roof": "#E86F5A",
+    "tree": "#4E9C55",
+    "boat": "#F6F3EA",
+    "sun": "#FFD36E",
+    "stamp": "#E8604C",
+    "string": "#8C6440"
+  },
+  "paletteLabels": {
+    "frame": "나무 테",
+    "frameDark": "걸이 못·나무 줄기·선착장",
+    "sky": "하늘",
+    "sea": "바다",
+    "wave": "물결",
+    "land": "섬",
+    "sand": "모래",
+    "house": "집·배 객실",
+    "roof": "집 지붕",
+    "tree": "나무",
+    "boat": "배",
+    "sun": "해",
+    "stamp": "방문 도장",
+    "string": "걸이 끈"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "wall",
+  "animations": []
+}

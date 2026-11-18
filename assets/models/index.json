@@ -270,7 +270,7 @@
       "role": "서쪽 등대지기 · 바다표범 노인",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "CH-21",
@@ -280,7 +280,7 @@
       "role": "어선 뱃사공 · 해달",
       "category": "character",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     }
   ]
 }

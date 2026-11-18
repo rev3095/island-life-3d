@@ -1772,6 +1772,7 @@ import night_special_env; BUILDERS.update(night_special_env.builders(globals()))
 import contest_env; BUILDERS.update(contest_env.builders(globals()))   # M18-P3 광장 대회 무대 BD-17
 import lighthouse_env; BUILDERS.update(lighthouse_env.builders(globals()))   # M19-P4 옛 등대 BD-18 · 단계 소품 PR-41–44
 import fishboat_env; BUILDERS.update(fishboat_env.builders(globals()))   # east-fishboat 어선 선착장 BD-19 (부두 · 어선)
+import visit_env; BUILDERS.update(visit_env.builders(globals()))   # M21-P1 친구 섬 구경: 친구 섬 배 BD-20 · 방명록 받침 PR-45 · 방문 도장 판 PR-46
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

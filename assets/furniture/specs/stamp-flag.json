@@ -1,0 +1,74 @@
+{
+  "id": "FU-111",
+  "slug": "stamp-flag",
+  "item": "furn.stamp-flag",
+  "name": "도장 깃발",
+  "category": "furniture",
+  "kind": "stamp-flag",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "둥근 받침에 꽂은 나무 깃대와 삼각 깃발 두 장. 깃발에 구경 간 섬의 도장 셋이 찍혀 있고 깃대 끝에 작은 별.",
+    "keywords": [
+      "삼각 깃발 둘",
+      "찍힌 도장",
+      "깃대 끝 별"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "17차 보드 wave17 D287-A · D280-A — M21 「친구 섬 구경」 (M21-P1 모델, 놓는 자리·놀이는 M21-P2)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "height": {
+      "label": "높이",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "base": "#7A5236",
+    "baseTop": "#C08A5A",
+    "pole": "#DDB07E",
+    "star": "#FFD36E",
+    "flag": "#FFF1DC",
+    "flagB": "#9ED9C8",
+    "stampA": "#E8604C",
+    "stampB": "#4FA3C7",
+    "stampC": "#7DB36A"
+  },
+  "paletteLabels": {
+    "base": "받침",
+    "baseTop": "받침 윗단",
+    "pole": "깃대",
+    "star": "별",
+    "flag": "위 깃발",
+    "flagB": "아래 깃발",
+    "stampA": "도장 빨강",
+    "stampB": "도장 파랑",
+    "stampC": "도장 초록"
+  },
+  "footprint": [
+    1,
+    1
+  ],
+  "place": "floor",
+  "animations": []
+}

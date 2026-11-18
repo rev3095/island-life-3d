@@ -1,0 +1,116 @@
+{
+  "id": "BD-20",
+  "slug": "visit-boat",
+  "name": "친구 섬 배",
+  "category": "building",
+  "kind": "visit-boat",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "동쪽 선착장(어선 부두 BD-19 옆)에 매어 두는 작은 여객선. 가운데 지붕 덮인 객실에 긴 의자 둘·둥근 창, 위에 작은 굴뚝과 깃발, 옆구리에 구명 튜브. 타면 「내 섬을 보여 주기」를 켠 친구의 섬으로 구경 간다.",
+    "keywords": [
+      "작은 여객선",
+      "민트 객실 · 물결 차양 지붕",
+      "둥근 창",
+      "구명 튜브"
+    ],
+    "references": [
+      "어촌 섬을 오가는 작은 도선"
+    ],
+    "avoid": [
+      "큰 철선·유람선",
+      "모터보트",
+      "글자"
+    ],
+    "notes": "17차 보드 wave17 D287-A · D280-A — M21 「친구 섬 구경」 (M21-P1 모델, 놓는 자리·놀이는 M21-P2)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.014
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "length": {
+      "label": "길이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    },
+    "mastHeight": {
+      "label": "돛대 높이",
+      "value": 1,
+      "min": 0.7,
+      "max": 1.4,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "hull": "#FFF8EC",
+    "hullDark": "#5E4632",
+    "stripe": "#4FA3C7",
+    "stripeB": "#F2C14E",
+    "deck": "#C9A36E",
+    "trim": "#E8C64A",
+    "buoy": "#F6F3EA",
+    "cabin": "#9ED9C8",
+    "window": "#CFEFF8",
+    "post": "#F6F3EA",
+    "roof": "#E86F5A",
+    "roofB": "#FFF1DC",
+    "seat": "#B07D52",
+    "funnel": "#F6F3EA",
+    "flag": "#F29BB0",
+    "flagMark": "#FFFFFF",
+    "glow": "#FFD98A",
+    "rope": "#E8D5A8"
+  },
+  "paletteLabels": {
+    "hull": "배 몸",
+    "hullDark": "뱃전 난간·돛대",
+    "stripe": "파란 띠·튜브 무늬·굴뚝 띠",
+    "stripeB": "노란 가는 띠",
+    "deck": "갑판",
+    "trim": "이름판·사다리",
+    "buoy": "구명 튜브",
+    "cabin": "객실 벽",
+    "window": "둥근 창",
+    "post": "객실 기둥",
+    "roof": "지붕",
+    "roofB": "차양 물결",
+    "seat": "긴 의자",
+    "funnel": "굴뚝",
+    "flag": "깃발",
+    "flagMark": "깃발 무늬",
+    "glow": "돛대 등 (밤에 켜짐)",
+    "rope": "깃줄"
+  },
+  "footprint": [
+    3,
+    2
+  ],
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        2.5,
+        1.1
+      ]
+    }
+  }
+}
