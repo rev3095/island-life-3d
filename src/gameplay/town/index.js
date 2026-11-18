@@ -374,6 +374,8 @@ export default {
       befriend: (slug, n) => (villagers.some(v => v.slug === slug) ? addFriendship(villagerState(ctx.state, slug), n).up : null),
       talkTo: slug => { const V = villagers.find(v => v.slug === slug); return V && town.conversation(V, () => talk.converse(V)); },
       mail: { unread: () => mail.unread(), post: (from, kind, gift) => mail.post(from, kind, gift), deliver: d => mail.deliver(d), spot: mail.spot,
+        /** M21-P4 친구 섬 편지·선물 넣기 ({ from:{name,island}, lines, gift }) → 편지 | null */
+        friend: l => mail.friend(l),
         /** M15: 보낸 편지 목록 · 오늘 더 쓸 수 있나 */
         sent: () => mail.sent(), canWrite: () => mail.canWrite(),
         /** M17-P2: 편지 쓰기 창 (집 빚이 있을 때 우편함 = 빚 갚기 대화가 「편지 쓰기」 줄로 부른다) */

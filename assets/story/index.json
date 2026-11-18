@@ -75,6 +75,9 @@
     {"scene":"s66-lighthouse-keeper"},
     {"scene":"s67-lighthouse-keeper-night"},
     {"scene":"s68-ferryman-meet"},
-    {"scene":"s69-first-offshore"}
+    {"scene":"s69-first-offshore"},
+    {"scene":"s70-first-friend-island"},
+    {"scene":"s71-first-guestbook"},
+    {"scene":"s72-first-friend-letter"}
   ]
 }
