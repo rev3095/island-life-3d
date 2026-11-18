@@ -20,6 +20,7 @@ const PARTS = [
   ['rating', './rating/index.js'],
   ['contest', './contest/index.js'],     // M18-P3 계절 낚시·곤충 대회: 광장 무대 BD-17 · 대회 창 UI-34 · 트로피 FU-89–91 · s29 (assets/contest/, D194-A)       // M14 섬 별점 평가: 섬폰 ⭐ · 별 상 · s25 (assets/rating/, 결정 D152-A)
   ['lighthouse', './lighthouse/index.js'],   // M19-P4 등대 다시 켜기: 옛 등대 BD-18 · 단계 다섯 · 진행판 UI-37 · s54–s61 (assets/lighthouse/, D203-A · D206-A)
+  ['visit', './visit/index.js'],             // M21-P2 친구 섬 구경: 보여 주기 · 섬 코드 · 섬 사진 저장소 · 오늘의 섬 (D281-A · D284-A · D285-A) — town 뒤 (residents)
 ];
 
 /** 맞는 처리기가 없을 때 버튼 글자 */
