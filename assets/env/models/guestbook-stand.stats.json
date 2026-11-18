@@ -1,0 +1,42 @@
+{
+  "id": "PR-45",
+  "slug": "guestbook-stand",
+  "name": "방명록 받침",
+  "category": "prop",
+  "kind": "guestbook-stand",
+  "version": "0.1",
+  "triangles": 1386,
+  "parts": 4,
+  "materials": [
+    "cover",
+    "handle",
+    "ink",
+    "paper",
+    "ribbon",
+    "roof",
+    "stampA",
+    "stampB",
+    "stampC",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    0.73,
+    0.5,
+    1.37
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 31168,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "guestbook-stand_front.png",
+    "guestbook-stand_hero.jpg",
+    "guestbook-stand_main.png",
+    "guestbook-stand_thumb.png",
+    "guestbook-stand_top.png"
+  ]
+}

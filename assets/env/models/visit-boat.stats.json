@@ -1,0 +1,49 @@
+{
+  "id": "BD-20",
+  "slug": "visit-boat",
+  "name": "친구 섬 배",
+  "category": "building",
+  "kind": "visit-boat",
+  "version": "0.1",
+  "triangles": 5556,
+  "parts": 4,
+  "materials": [
+    "buoy",
+    "cabin",
+    "deck",
+    "flag",
+    "flagMark",
+    "funnel",
+    "glow",
+    "hull",
+    "hullDark",
+    "post",
+    "roof",
+    "roofB",
+    "rope",
+    "seat",
+    "stripe",
+    "stripeB",
+    "trim",
+    "window"
+  ],
+  "animations": {},
+  "size": [
+    2.72,
+    1.25,
+    1.61
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "glbBytes": 116928,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "visit-boat_front.png",
+    "visit-boat_hero.jpg",
+    "visit-boat_main.png",
+    "visit-boat_thumb.png",
+    "visit-boat_top.png"
+  ]
+}

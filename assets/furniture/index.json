@@ -408,6 +408,26 @@
       "status": "approved"
     },
     {
+      "id": "FU-109",
+      "slug": "friend-island-frame",
+      "item": "furn.friend-island-frame",
+      "name": "친구 섬 액자",
+      "place": "wall",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.82,
+        0.06,
+        1.94
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "FU-11",
       "slug": "sofa",
       "item": "furn.sofa",
@@ -431,6 +451,66 @@
       "animations": [],
       "version": "0.1",
       "status": "approved"
+    },
+    {
+      "id": "FU-110",
+      "slug": "guestbook-desk",
+      "item": "furn.guestbook-desk",
+      "name": "방명록 책상",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.82,
+        0.64,
+        0.94
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-111",
+      "slug": "stamp-flag",
+      "item": "furn.stamp-flag",
+      "name": "도장 깃발",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.71,
+        0.4,
+        1.37
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "FU-112",
+      "slug": "ship-model",
+      "item": "furn.ship-model",
+      "name": "작은 배 모형",
+      "place": "floor",
+      "footprint": [
+        1,
+        1
+      ],
+      "size": [
+        0.84,
+        0.48,
+        0.93
+      ],
+      "variants": [],
+      "animations": [],
+      "version": "0.1",
+      "status": "review"
     },
     {
       "id": "FU-12",

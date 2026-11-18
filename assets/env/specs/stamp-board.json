@@ -1,0 +1,89 @@
+{
+  "id": "PR-46",
+  "slug": "stamp-board",
+  "name": "방문 도장 판",
+  "category": "prop",
+  "kind": "stamp-board",
+  "version": "0.1",
+  "status": "review",
+  "prompt": {
+    "concept": "친구 섬 선착장·광장에 세우는 나무 판. 기둥 둘 사이 판에 도장 자리 3×4 (몇 칸은 색색 도장이 찍힘), 위에 리본 띠, 오른쪽 기둥에 끈으로 매단 큰 도장, 발치에 작은 화분 둘. 구경 온 섬마다 도장을 하나씩 모은다.",
+    "keywords": [
+      "나무 판",
+      "도장 자리 3×4",
+      "리본 띠",
+      "매단 도장"
+    ],
+    "references": [],
+    "avoid": [
+      "글자",
+      "기존 게임과 똑같은 디자인"
+    ],
+    "notes": "17차 보드 wave17 D287-A · D280-A — M21 「친구 섬 구경」 (M21-P1 모델, 놓는 자리·놀이는 M21-P2)"
+  },
+  "style": {
+    "shading": "toon",
+    "outline": true,
+    "outlineWidth": 0.01
+  },
+  "params": {
+    "scale": {
+      "label": "전체 크기",
+      "value": 1,
+      "min": 0.6,
+      "max": 1.4,
+      "step": 0.01,
+      "live": true
+    },
+    "width": {
+      "label": "폭",
+      "value": 1,
+      "min": 0.8,
+      "max": 1.3,
+      "step": 0.01
+    }
+  },
+  "palette": {
+    "wood": "#C08A5A",
+    "woodDark": "#7A5236",
+    "paper": "#FFF8EC",
+    "ribbon": "#E86F5A",
+    "slot": "#E9DCC4",
+    "stampA": "#E8604C",
+    "stampB": "#4FA3C7",
+    "stampC": "#7DB36A",
+    "stampD": "#F2C14E",
+    "rope": "#E8D5A8",
+    "handle": "#F2EBDD",
+    "pot": "#C46A4A",
+    "leaf": "#6FB35E"
+  },
+  "paletteLabels": {
+    "wood": "판",
+    "woodDark": "기둥",
+    "paper": "판 종이·도장 가운데",
+    "ribbon": "위 리본 띠",
+    "slot": "빈 도장 자리",
+    "stampA": "도장 빨강",
+    "stampB": "도장 파랑",
+    "stampC": "도장 초록",
+    "stampD": "도장 노랑",
+    "rope": "끈",
+    "handle": "도장 손잡이",
+    "pot": "화분",
+    "leaf": "화분 잎"
+  },
+  "animations": [],
+  "world": {
+    "collider": {
+      "box": [
+        1.2,
+        0.3
+      ]
+    },
+    "extent": [
+      0.63,
+      0.15
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "id": "FU-111",
+  "slug": "stamp-flag",
+  "item": "furn.stamp-flag",
+  "name": "도장 깃발",
+  "category": "furniture",
+  "kind": "stamp-flag",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1800,
+  "parts": 2,
+  "materials": [
+    "base",
+    "baseTop",
+    "flag",
+    "flagB",
+    "pole",
+    "stampA",
+    "stampB",
+    "stampC",
+    "star"
+  ],
+  "objects": [
+    "flag",
+    "pole"
+  ],
+  "animations": {},
+  "size": [
+    0.71,
+    0.4,
+    1.37
+  ],
+  "bounds": [
+    [
+      -0.2,
+      -0.2,
+      0.0
+    ],
+    [
+      0.511,
+      0.2,
+      1.37
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 36292,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "stamp-flag_front.png",
+    "stamp-flag_main.png",
+    "stamp-flag_thumb.png",
+    "stamp-flag_top.png"
+  ]
+}

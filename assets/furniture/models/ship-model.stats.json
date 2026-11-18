@@ -1,0 +1,61 @@
+{
+  "id": "FU-112",
+  "slug": "ship-model",
+  "item": "furn.ship-model",
+  "name": "작은 배 모형",
+  "category": "furniture",
+  "kind": "ship-model",
+  "version": "0.1",
+  "place": "floor",
+  "triangles": 1864,
+  "parts": 2,
+  "materials": [
+    "brass",
+    "cabin",
+    "deck",
+    "flag",
+    "funnel",
+    "hull",
+    "roof",
+    "string",
+    "stripe",
+    "window",
+    "wood",
+    "woodDark",
+    "woodLight"
+  ],
+  "objects": [
+    "ship",
+    "stand"
+  ],
+  "animations": {},
+  "size": [
+    0.84,
+    0.48,
+    0.93
+  ],
+  "bounds": [
+    [
+      -0.42,
+      -0.24,
+      0.0
+    ],
+    [
+      0.42,
+      0.24,
+      0.93
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 41580,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "ship-model_front.png",
+    "ship-model_main.png",
+    "ship-model_thumb.png",
+    "ship-model_top.png"
+  ]
+}

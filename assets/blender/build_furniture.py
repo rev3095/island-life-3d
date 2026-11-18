@@ -2111,6 +2111,7 @@ import night_special_furniture; BUILDERS.update(night_special_furniture.builders
 import contest_furniture; BUILDERS.update(contest_furniture.builders(globals()))   # M18-P3 대회 트로피 FU-89–91
 import seasonal_furniture; BUILDERS.update(seasonal_furniture.builders(globals()))   # M18-P4 계절 가구 FU-92–104 (D196-A)
 import story_furniture; BUILDERS.update(story_furniture.builders(globals()))   # M19-P2 사연 답례 가구 FU-105–108 (D201-A)
+import visit_furniture; BUILDERS.update(visit_furniture.builders(globals()))   # M21-P1 친구 섬 구경 기념 가구 FU-109–112 (D287-A)
 
 
 def build(palette, suffix='', offset=(0, 0, 0)):

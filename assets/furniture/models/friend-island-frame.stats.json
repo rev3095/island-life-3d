@@ -1,0 +1,61 @@
+{
+  "id": "FU-109",
+  "slug": "friend-island-frame",
+  "item": "furn.friend-island-frame",
+  "name": "친구 섬 액자",
+  "category": "furniture",
+  "kind": "friend-island-frame",
+  "version": "0.1",
+  "place": "wall",
+  "triangles": 1568,
+  "parts": 1,
+  "materials": [
+    "boat",
+    "frame",
+    "frameDark",
+    "house",
+    "land",
+    "roof",
+    "sand",
+    "sea",
+    "sky",
+    "stamp",
+    "string",
+    "sun",
+    "tree",
+    "wave"
+  ],
+  "objects": [
+    "frame"
+  ],
+  "animations": {},
+  "size": [
+    0.82,
+    0.06,
+    1.94
+  ],
+  "bounds": [
+    [
+      -0.41,
+      -0.07,
+      1.2
+    ],
+    [
+      0.41,
+      -0.008,
+      1.938
+    ]
+  ],
+  "footprint": [
+    1,
+    1
+  ],
+  "glbBytes": 40404,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "friend-island-frame_front.png",
+    "friend-island-frame_main.png",
+    "friend-island-frame_thumb.png",
+    "friend-island-frame_top.png"
+  ]
+}

@@ -529,6 +529,24 @@
       "status": "approved"
     },
     {
+      "id": "PR-45",
+      "slug": "guestbook-stand",
+      "name": "방명록 받침",
+      "category": "prop",
+      "kind": "guestbook-stand",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
+      "id": "PR-46",
+      "slug": "stamp-board",
+      "name": "방문 도장 판",
+      "category": "prop",
+      "kind": "stamp-board",
+      "version": "0.1",
+      "status": "review"
+    },
+    {
       "id": "BD-01",
       "slug": "house-player",
       "name": "플레이어 집",
@@ -715,7 +733,7 @@
       "category": "building",
       "kind": "fish-dock",
       "version": "0.1",
-      "status": "review"
+      "status": "approved"
     },
     {
       "id": "BD-19-2",
@@ -723,6 +741,15 @@
       "name": "어선",
       "category": "building",
       "kind": "fish-boat",
+      "version": "0.1",
+      "status": "approved"
+    },
+    {
+      "id": "BD-20",
+      "slug": "visit-boat",
+      "name": "친구 섬 배",
+      "category": "building",
+      "kind": "visit-boat",
       "version": "0.1",
       "status": "review"
     },

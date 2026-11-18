@@ -1,0 +1,44 @@
+{
+  "id": "PR-46",
+  "slug": "stamp-board",
+  "name": "방문 도장 판",
+  "category": "prop",
+  "kind": "stamp-board",
+  "version": "0.1",
+  "triangles": 2992,
+  "parts": 3,
+  "materials": [
+    "handle",
+    "leaf",
+    "paper",
+    "pot",
+    "ribbon",
+    "rope",
+    "slot",
+    "stampA",
+    "stampB",
+    "stampC",
+    "stampD",
+    "wood",
+    "woodDark"
+  ],
+  "animations": {},
+  "size": [
+    1.26,
+    0.3,
+    1.48
+  ],
+  "footprint": [
+    2,
+    1
+  ],
+  "glbBytes": 65104,
+  "blender": "5.2.3 LTS",
+  "renders": [
+    "stamp-board_front.png",
+    "stamp-board_hero.jpg",
+    "stamp-board_main.png",
+    "stamp-board_thumb.png",
+    "stamp-board_top.png"
+  ]
+}
