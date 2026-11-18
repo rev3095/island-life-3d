@@ -4,11 +4,14 @@
 //     POST /api/assets?name=<파일명>   → assets/references/<id>  (본문 = 파일 바이트)
 //     GET  /api/db/<collection>        → assets/review/<collection>.json 의 행 목록
 //     POST /api/db/<collection>        → 행 추가, PATCH /api/db/<collection>/<id> → 행 병합
+//     GET|PUT|DELETE /api/db/islands[/<uid>][?code=]  → M21-P2 섬 사진 (assets/review/islands.json, 쓴 사람 = x-island-user 머리글,
+//                                       게시본 저장소 규칙과 같은 판단 src/gameplay/visit/rules.js canWriteIsland)
 import { createServer } from "node:http";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { canWriteIsland, canDeleteIsland } from "./src/gameplay/visit/rules.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 // 포트: --port=4181 인자 > PORT 환경변수 > 4180 (작업 트리마다 다른 포트로 띄울 때)
@@ -62,6 +65,12 @@ async function api(req, res, path) {
     await writeFile(join(root, "assets/references", id), await body(req));
     return json(res, 200, { id, url: `assets/references/${id}` });
   }
+  const im = path.match(/^\/api\/db\/islands(?:\/([\w-]+))?$/);
+  if (im) {
+    const run = (queues.islands ?? Promise.resolve()).then(() => islandsApi(req, res, im[1] ?? null));
+    queues.islands = run.catch(() => {});
+    return run;
+  }
   const m = path.match(/^\/api\/db\/([\w-]+)(?:\/([\w-]+))?$/);
   if (m) {
     const [, col] = m;
@@ -76,6 +85,35 @@ async function api(req, res, path) {
 }
 
 const queues = {};
+// M21-P2 섬 사진 흉내: 행 = { id: <쓴 사람 id>, code, user, snap, … }. 남의 섬 덮어쓰기·지우기는 403
+async function islandsApi(req, res, id) {
+  const rows = await readRows("islands");
+  const uid = String(req.headers["x-island-user"] ?? "");
+  if (req.method === "GET") {
+    if (id) { const row = rows.find(r => r.id === id); return row ? json(res, 200, row) : json(res, 404, { code: "not_found" }); }
+    const code = new URL(req.url, "http://x").searchParams.get("code");
+    return json(res, 200, code ? rows.filter(r => r.code === code) : rows);
+  }
+  if (!id) return json(res, 404, { code: "not_found" });
+  const existing = rows.find(r => r.id === id) ?? null;
+  if (req.method === "PUT") {
+    const next = JSON.parse((await body(req)).toString("utf8") || "{}");
+    const codeOwner = rows.find(r => r.code === next.code && r.id !== id)?.user ?? null;
+    const v = canWriteIsland({ docId: id, uid, existing, next, codeOwner });
+    if (!v.ok) return json(res, 403, { code: "permission_denied", why: v.why });
+    const row = { ...next, id };
+    if (existing) rows[rows.indexOf(existing)] = row; else rows.push(row);
+    await writeRows("islands", rows);
+    return json(res, 200, { ok: true });
+  }
+  if (req.method === "DELETE") {
+    const v = canDeleteIsland({ docId: id, uid, existing });
+    if (!v.ok) return json(res, 403, { code: "permission_denied", why: v.why });
+    if (existing) { rows.splice(rows.indexOf(existing), 1); await writeRows("islands", rows); }
+    return json(res, 200, { ok: true });
+  }
+  return json(res, 405, { code: "method_not_allowed" });
+}
 async function writeOne(res, req, [, col, id], data) {
   const rows = await readRows(col);
   if (req.method === "POST" && !id) {

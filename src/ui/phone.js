@@ -293,7 +293,38 @@ export function createPhone(ctx, panels, { openBag, openMap, toast, setSetting }
       h('h3', { class: 'pk-set-head' }, '화면'), style && styleRow, style && h('h3', { class: 'pk-set-head' }, '그래픽 사양'), style && specRow, style && specNote, toggle('outline', '외곽선'), fullscreenRow(),
       !ctx.input?.touch && toggle('keyHint', '키 안내 보기'),   // 휴대폰엔 키 안내가 없다
       h('h3', { class: 'pk-set-head' }, '대화'), toggle('textLines', '주민 글 대사 보기', false),   // 5차 Z5: 끄면 이모티콘으로만 (검수 보드 z5 D14-A)
+      ...visitRows(),
     ].filter(Boolean));
+  }
+
+  // M21-P2 친구 섬 구경 (D281-A 기본 꺼짐 · D284-A 섬 코드): 켜기·끄기 + 내 섬 코드. 규칙·저장소는 gameplay/visit (ctx.services.visit)
+  function visitRows() {
+    const visit = ctx.services.visit;
+    if (!visit) return [];
+    const id = 'pk-set-visit';
+    const b = h('button', { type: 'button', role: 'switch', class: 'pk-switch', 'aria-labelledby': id }, h('span', { class: 'pk-switch-knob' }));
+    const note = h('p', { class: 'pk-muted pk-small', 'aria-live': 'polite' });
+    const draw = () => {
+      const st = visit.status();
+      b.setAttribute('aria-checked', String(!!st.share));
+      b.disabled = !st.available || st.busy;
+      note.textContent = !st.ready ? '섬 저장소를 찾는 중이에요…'
+        : !st.available ? '이 창에서는 섬을 보여 줄 수 없어요.'
+        : st.busy ? '섬 사진을 올리는 중이에요…'
+        : st.share ? `내 섬 코드 ${st.code ?? '------'} · 친구는 구경만 할 수 있어요. 하루 한 번 지금 섬 모습으로 바뀌어요.`
+        : '켜면 섬 코드가 생기고, 친구가 내 섬을 구경할 수 있어요 (가방·도토리는 안 보여요).';
+    };
+    b.addEventListener('click', async () => {
+      const on = b.getAttribute('aria-checked') !== 'true';
+      b.disabled = true;
+      const r = await visit.setShare(on);
+      draw();
+      if (!r?.ok) toast(visit.whyText?.(r?.why) ?? '지금은 바꿀 수 없어요.', '🏝️');
+      else toast(on ? `내 섬 보여 주기를 켰어요 · 코드 ${r.code ?? visit.status().code}` : '내 섬 보여 주기를 껐어요', '🏝️');
+    });
+    const off = ctx.events.on?.('visit:changed', () => { if (b.isConnected) draw(); else off?.(); });
+    draw();
+    return [h('h3', { class: 'pk-set-head' }, '친구 섬 구경'), h('div', { class: 'pk-set-row' }, h('span', { id }, '내 섬 보여 주기'), b), note];
   }
 
   // ---------- 보기 편하게 (7차 UI-10, D42-A 기본 묶음) ----------
