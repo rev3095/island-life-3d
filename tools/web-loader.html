@@ -293,6 +293,8 @@
     stepEl.textContent = '섬에 도착했어요!';
     countEl.hidden = true;
     actions.hidden = true;
+    // 데모 모드(?demo · #demo, src/core/demo.js): 시작 단추 없이 바로 섬으로 (소리는 화면을 처음 누를 때 켜진다)
+    if (window.__island?.demo) { choice = 'sound'; lift(); return; }
     startBox.hidden = false;
     drawSpec();
     soundBtn.focus({ preventScroll: true });

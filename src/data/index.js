@@ -2,6 +2,7 @@
 // ctx.services.data 에 올리고, 바뀌면 inventory:changed / wallet:changed / museum:changed / save:done 을 보낸다.
 // 다른 서비스(time 등)가 없어도 돈다. 약속은 docs/CONTRACTS.md 'data' 절.
 import * as items from './items.js';
+import { memoryStorage, applyDemoState } from '../core/demo.js';
 import * as spawns from './spawns.js';
 import * as economyRules from './economy.js';
 import { createInventory } from './inventory.js';
@@ -154,9 +155,11 @@ export default {
   name: 'data',
   init(ctx) {
     instance?.dispose();
-    instance = createDataService(ctx);
+    // 데모 모드: 저장을 메모리에만 (열 때마다 처음부터) + 튜토리얼을 마친 첫날로 (core/demo.js)
+    instance = createDataService(ctx, ctx.demo ? { storage: memoryStorage() } : {});
     ctx.services.data = instance.service;
     const loaded = instance.start();
+    if (ctx.demo) applyDemoState(ctx.state);
     if (ctx.debug) console.info(`[data] ${loaded ? '저장 불러옴' : '새 게임'} · 아이템 ${items.ITEMS.length}개`);
   },
   update(dt) {

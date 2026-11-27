@@ -33,6 +33,8 @@ const TAU = { overcast: 4, rain: 2.5, snow: 3, rainbow: 5, cover: 6 };   // 초
 const WET_IN = 25, WET_OUT = 60;                                         // 땅은 천천히 젖고 더 천천히 마른다
 const SCAN_EVERY = 3;                                                    // 밤 조명 재질 다시 훑기 (초)
 const SUN_DIST = 24;
+// 새 게임(저장 없음)·데모 모드(core/demo.js, ctx.demo)가 시작하는 시각 — 밤에 시작하면 칙칙하다. 데모는 이 시각·맑음에서 멈춘다
+const NEW_GAME_HOUR = 10, DEMO_HOUR = 10;
 // 하늘 값은 assets/style/presets.json 의 sky (스타일 편집기 「하늘」 → "스타일 반영"). 없는 값은 dome.js SKY_FX · 아래 기본값
 const { cloudShadow: SKY_CLOUD_SHADOW, ...SKY_FILE_FX } = SKY;
 Object.assign(SKY_FX, SKY_FILE_FX);
@@ -340,10 +342,14 @@ export function createSky(ctx) {
     async init() {
       ctx.services.time = service;
       const t0 = tstate();
+      // 저장 없는 새 게임: 시계 기록이 비어 있다 → 시작은 늘 낮 (NEW_GAME_HOUR). 데모는 낮에서 멈춘다 (core/demo.js)
+      const freshGame = !Number.isFinite(t0.game) && !t0.maxDay && !t0.offset;
       // 11차 시계: 날짜 흉내는 시험 칸이라 그 날짜에서 새로 센다. 진짜 섬은 가 본 날보다 앞이면 그날로 맞춘다
       if (ctx.preview) { t0.maxDay = null; t0.offset = 0; }
       tl.start({ fresh: !!ctx.preview });   // p41: 날짜 흉내는 그 날짜 지금 시각에서, 진짜 섬은 저장 시각에서 (닫아 둔 동안: rules time.whenClosed)
       if (!ctx.preview) catchUp();
+      if (ctx.demo) { service.setHour(DEMO_HOUR); tl.setPaused(true); service.setWeather('clear', { instant: true }); }   // 데모: 맑은 낮에서 멈춤
+      else if (freshGame && !ctx.preview) service.setHour(NEW_GAME_HOUR);
       if (!t0.maxDay) t0.maxDay = dayKeyOf(clockMs());
       events.on('data:loaded', () => { tstate(); if (!ctx.preview) catchUp(); memo.ms = NaN; });
       try { palettes = buildSeasonPalettes(await loadEnvSpecs(ctx.assets)); }

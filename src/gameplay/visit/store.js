@@ -61,12 +61,13 @@ async function artifactStore(claude) {
   };
 }
 
-/** 개발 서버 흉내 (dev-server.mjs /api/db/islands) */
+/** 개발 서버 흉내 (dev-server.mjs /api/db/islands) · 웹사이트 저장 서버 (server/worker.js, 같은 길) */
 async function devStore(fetchFn) {
   if (!fetchFn) return null;
-  const ok = await withTimeout(fetchFn('api/ping').then(r => r.ok, () => false), 3000);
-  if (!ok) return null;
-  const uid = devUid();
+  // 웹사이트(Cloudflare, server/worker.js)는 ping 이 쿠키로 정한 uid 를 돌려준다 → 그것을 쓴다. dev-server 는 uid 없음 → localStorage
+  const ping = await withTimeout(fetchFn('api/ping').then(r => (r.ok ? r.json().catch(() => ({})) : null), () => null), 3000);
+  if (!ping) return null;
+  const uid = typeof ping.uid === 'string' && ping.uid ? ping.uid : devUid();
   const headers = { 'content-type': 'application/json', 'x-island-user': uid };
   const call = async (method, path, body) => {
     const r = await fetchFn(`api/db/${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });

@@ -38,3 +38,6 @@ assets/models/editor-models-*.json
 assets/renders/editor-renders-*.json
 assets/renders/editor-thumbs.json
 assets/res/
+
+# Cloudflare wrangler 로컬 상태 (wrangler dev 의 로컬 D1 등)
+.wrangler/

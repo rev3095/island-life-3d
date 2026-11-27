@@ -11,6 +11,7 @@ import * as constants from './core/constants.js';
 import { createView } from './render/index.js';
 import { QUALITY, deviceQuality, urlQuality, ratioFor, createFrameGate, savedSpec } from './render/quality.js';
 import { previewOf } from './core/preview.js';
+import { isDemo } from './core/demo.js';   // 데모 모드 ?demo (저장 없이·튜토리얼 끝·낮 고정)
 import { installErrors } from './core/errors.js';   // M7-P4: 오류 모으기 (문제 알리기 창이 담는다)
 
 const errors = installErrors();
@@ -27,6 +28,7 @@ const MODULES = [
 ];
 
 const params = new URLSearchParams(location.search);
+const demo = isDemo(location);
 
 async function boot() {
   const canvas = document.getElementById('game');
@@ -36,7 +38,7 @@ async function boot() {
   // 계단 무늬 줄이기(MSAA)는 렌더러를 만들 때만 정해진다 → 낮음·매우 낮음은 끔 (내장 그래픽에서 화소 칠하기가 가장 비싸다).
   // powerPreference: 그래픽 카드가 둘인 노트북에서 빠른 쪽을 쓴다
   let saved = null;
-  try { saved = savedSpec(localStorage.getItem('island-life-save-v1')); } catch { /* 막힌 저장소 */ }
+  if (!demo) try { saved = savedSpec(localStorage.getItem('island-life-save-v1')); } catch { /* 막힌 저장소 */ }
   const quality = urlQuality(location) ?? saved ?? deviceQuality();   // 휴대폰(터치·좁은 화면)은 낮음부터 (M20 D265)
   materials.setShaderTier(QUALITY[quality].shaderFx);   // 툰 셰이더 등급은 재질을 만들기 전에 (낮음·매우 낮음 = 가벼운 등급)
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: QUALITY[quality].aa !== false, powerPreference: 'high-performance' });
@@ -72,6 +74,7 @@ async function boot() {
     focus: new THREE.Vector3(),         // 카메라가 따라가는 지점 (보통 플레이어). 곡면 월드 중심이기도 하다.
     debug: params.has('debug'),
     quality,                            // 'high' | 'mid' | 'low' | 'min' (render 가 바꾼다)
+    demo,                               // 데모 모드 (core/demo.js): data 가 메모리 저장소·튜토리얼 끝 상태로, sky 가 낮 고정
     preview: previewOf(location),       // 8차 D85-A 날짜 흉내 #date=YYYY-MM-DD → { date, saveKey } | null (core/preview.js)
   };
   window.__island = ctx;                // 개발용: 콘솔에서 상태 확인

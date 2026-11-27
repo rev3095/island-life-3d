@@ -1,0 +1,15 @@
+// 포근섬 이야기 웹사이트 (Cloudflare Workers): 정적 파일 = dist/site (node tools/build-web.mjs → node tools/build-site.mjs),
+// /api/* = server/worker.js (D1 저장소 island-life, 표 server/schema.sql).
+{
+  "name": "island-life-3d",
+  "main": "server/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "dist/site",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "island-life", "database_id": "76ea79c3-fad4-44f4-af80-c52f4def56fb" }
+  ]
+}
