@@ -38,8 +38,11 @@ if (missing.length) {
 
 // 틀: <body> 를 직접 열지 않아야 앞쪽 title·meta(viewport)·link·style·importmap 이 head 에 남는다 (첫 본문 요소에서 body 가 저절로 열린다)
 const page = readFileSync(`${SRC}/index.html`, 'utf8');
+// 아티팩트 뷰어가 페이지 앞에 붙이는 기본 스타일 (dev-server.mjs SKELETON 과 같은 글): body 여백 0 · 기본 글꼴 · [hidden] 숨기기 · 안전 영역.
+// 이것이 없으면 body 여백 8px·숨긴 창이 보이는 등 아티팩트와 달라진다. 페이지 자기 스타일이 뒤에 와서 덮는다.
+const BASE = '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>';
 const html = /^\s*<!doctype/i.test(page) ? page
-  : `<!doctype html><html lang="ko"><head><meta charset="utf-8">\n${page}\n</html>\n`;
+  : `<!doctype html><html lang="ko"><head><meta charset="utf-8">${BASE}\n${page}\n</html>\n`;
 writeFileSync(`${OUT}/index.html`, html);
 writeFileSync(`${OUT}/.nojekyll`, '');
 console.log(`→ ${OUT}/ (index.html 틀 감쌈, 묶음 밖 파일 ${copied}개 복사)`);
