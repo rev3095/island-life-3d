@@ -1,11 +1,11 @@
 // 데모(시연) 모드: 주소 ?demo (또는 #demo). 포트폴리오 페이지 등에 iframe 으로 실을 때 쓴다.
 // - 저장하지 않는다: 저장소를 메모리로 바꿔 열 때마다 처음부터 (기기·브라우저에 남지 않음, 기존 저장도 읽지 않음)
 // - 튜토리얼이 끝난 시점: 이름 정하기·밤톨 첫 안내·첫날 할 일 목록을 마친 것으로 (applyDemoState)
-// - 낮 고정: sky 가 DEMO_HOUR 시로 옮기고 시계를 멈춘다 · 시작 화면은 web-loader 가 바로 걷는다
+// - 아침 고정: sky 가 START_HOUR(7시)로 옮기고 시계를 멈춘다 · 시작 화면은 web-loader 가 바로 걷는다
 import { dayKeyOf } from '../sky/clock.js';
 import { TIPS } from '../gameplay/intro/tips.js';
 
-// 시각(낮 10시)은 sky/index.js NEW_GAME_HOUR · DEMO_HOUR (스타일 편집기가 sky 를 따로 읽어서 여기를 부르지 않는다)
+// 시각(오전 7시)은 sky/index.js START_HOUR (스타일 편집기가 sky 를 따로 읽어서 여기를 부르지 않는다)
 
 /** 주소가 데모 모드인가 */
 export function isDemo(loc = globalThis.location) {
